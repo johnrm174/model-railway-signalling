@@ -10,4 +10,6 @@ Although most of the code is specific to my particular layout, I have tried to w
 ('signals', 'points' 'switches' - and their 'common' functions) to promote re-use in other layouts. Currently most types of
 colour light signals (and position light signals) are supported. Semaphores are still on my TODO list
 
+To give it a go, just download the files and run 'my_layout'
+
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
