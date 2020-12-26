@@ -380,7 +380,7 @@ def create_layout_signals(canvas, sig_callback):
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
     
-    signals.create_colour_light_signal(canvas,9,1750,500,orientation=180, aspects= 2,
+    signals.create_colour_light_signal(canvas,9,1730,500,orientation=180, aspects= 2,
             sig_callback=sig_callback, sig_passed_button = True)
 
     signals.create_colour_light_signal (canvas,10,1400,500, orientation=180, aspects= 2,

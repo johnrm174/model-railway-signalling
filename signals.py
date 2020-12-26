@@ -350,15 +350,17 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
         poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black")
              
         # Draw the Buttons
+        but3win = canvas.create_window (x,y,window=button3)
         if position_light:
             point_coords = common.rotate_point (x,y,-35,-20,orientation) 
             but1win = canvas.create_window (point_coords,anchor=E,window=button1)
             but2win = canvas.create_window (point_coords,anchor=W,window=button2)
+            if fully_automatic:canvas.create_text (point_coords,anchor=E,font=myfont1,text=str(sig_id))
         else:
             point_coords = common.rotate_point (x,y,-20,-20,orientation) 
             but1win = canvas.create_window (point_coords,window=button1)
             but2win = canvas.create_window (point_coords,window=button2)
-        but3win = canvas.create_window (x,y,window=button3)
+            if fully_automatic:canvas.create_text (point_coords,font=myfont1,text=str(sig_id))
 
         # Draw the Aspects (running from bottom to top) - create all 4 and hide what we don't need
         line_coords = common.rotate_line (x,y,+40,-25,+30,-15,orientation) 
