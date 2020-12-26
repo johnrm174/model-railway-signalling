@@ -676,32 +676,12 @@ def refresh_signal_aspects():
 
     # DOWN Direction
 
-    # Signal 20 (signal ahead is 11)
-    signals.update_colour_light_signal (20,sig_ahead_id=11)
-    
     # Signal 12 (signal ahead is 21)
     signals.update_colour_light_signal (12,sig_ahead_id=21)
     
     # Signal 13 (signal ahead is 21)
     signals.update_colour_light_signal (13,sig_ahead_id=21)
-
-    # Signal 11 (signal ahead is eather 5,6,12 or 13)
-    if points.point_switched(9):
-        if points.point_switched(6):
-            signals.set_route_indication(11,signals.route_type.RH2)
-            signals.update_colour_light_signal (11,sig_ahead_id=5)
-        else:
-            signals.set_route_indication(11,signals.route_type.RH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=6)
-    else:
-        if points.point_switched(7):
-            signals.set_route_indication(11,signals.route_type.LH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=13)
-        else:
-            signals.set_route_indication(11,signals.route_type.MAIN)
-            signals.update_colour_light_signal (11,sig_ahead_id=12)
     
-
     # Signal 5 (signal ahead is eather 21 or none)
     if points.point_switched(2):
         signals.set_route_indication(5,signals.route_type.LH1)
@@ -726,5 +706,24 @@ def refresh_signal_aspects():
 
     # Signal 9 (signal ahead is 10)
     signals.update_colour_light_signal (9,sig_ahead_id=10)
+    
+    # Signal 11 (signal ahead is eather 5,6,12 or 13)
+    if points.point_switched(9):
+        if points.point_switched(6):
+            signals.set_route_indication(11,signals.route_type.RH2)
+            signals.update_colour_light_signal (11,sig_ahead_id=5)
+        else:
+            signals.set_route_indication(11,signals.route_type.RH1)
+            signals.update_colour_light_signal (11,sig_ahead_id=6)
+    else:
+        if points.point_switched(7):
+            signals.set_route_indication(11,signals.route_type.LH1)
+            signals.update_colour_light_signal (11,sig_ahead_id=13)
+        else:
+            signals.set_route_indication(11,signals.route_type.MAIN)
+            signals.update_colour_light_signal (11,sig_ahead_id=12)
+
+    # Signal 20 (signal ahead is 11)
+    signals.update_colour_light_signal (20,sig_ahead_id=11)
 
     return()

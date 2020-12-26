@@ -1,6 +1,7 @@
 import points 
 import signals 
 import switches
+import schematic
 import time
 import threading
 
@@ -50,7 +51,8 @@ power_switch_override = 10
 def thread_to_timeout_section (section_to_clear:int,time_delay:int,signal_to_trigger:int=0):
     time.sleep(time_delay)
     switches.clear_switch(section_to_clear)
-    override_signals_based_on_track_occupancy() # update the schematic
+    override_signals_based_on_track_occupancy()
+    schematic.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
     if signal_to_trigger > 0: 
         signals.trigger_timed_signal (signal_to_trigger,0,5)
     return ()
@@ -180,13 +182,6 @@ def update_track_occupancy(sig_passed:int):
         switches.set_switch(occupied_down_west)
         trigger_timed_exit_down_west()
         switches.clear_switch(occupied_down_platform)
-
-    # This is effectively the "exit" signal from our block section
-    # So we'll also trigger it as a timed (automatic)signal
-    elif sig_passed == 21:
-        if not signals.signal_clear(21): print ("SPAD - Signal 21")
-        switches.clear_switch(occupied_down_west)
-        signals.trigger_timed_signal(21,0,2)
         
     # Up Main Signals
         
@@ -210,16 +205,8 @@ def update_track_occupancy(sig_passed:int):
     elif sig_passed == 4:
         if not signals.signal_clear(4): print ("SPAD - Signal 4")
         switches.set_switch(occupied_up_east)
-        trigger_timed_exit_up_east()
-
         switches.clear_switch(occupied_up_platform)
-
-    # This is effectively the "exit" signal from our block section
-    # So we'll also trigger it as a timed (automatic)signal
-    elif sig_passed == 23:
-        if not signals.signal_clear(23): print ("SPAD - Signal 23")
-        switches.clear_switch(occupied_up_east)
-        signals.trigger_timed_signal(23,0,2)
+        trigger_timed_exit_up_east()
         
     # Remaining Signals - These lines are 2-way running
     # we have to establish the direction of travel form the signals
