@@ -1,5 +1,5 @@
 # model-railway-signalling
-A model railway signalling system written in Python for the rasberry Pi
+A model railway signalling system written in Python for the raspberry Pi
 
 This has been created to provide a representation of my layout, complete with points, signals and the switchable "power sections" 
 (yep - its all still analogue at the moment, no DCC here yet). I have also provided "track occupancy sections" and a means of 
