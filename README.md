@@ -10,6 +10,9 @@ Although most of the code is specific to my particular layout, I have tried to w
 ('signals', 'points' 'switches' - and their 'common' functions) to promote re-use in other layouts. Currently most types of
 colour light signals (and position light signals) are supported. Semaphores are still on my TODO list
 
+As far as the code is concerned, I've tried to keep it simple - and readable to those that aren't intimately familiar with
+some of the "advanced" aspects of the python language (e.g. I've avoided most of the object-oriented constructs where possible)
+
 To give it a go, just download the files and run 'my_layout'
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
