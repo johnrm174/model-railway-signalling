@@ -80,10 +80,11 @@ import common
 #
 # subsidary_signal_clear(sig_id) - returns the state of the subsidary signal (True/False)
 #
-# set_signal_override (sig_id) - Overrides the signal and sets it to "ON"
+# set_signal_override (sig_id*) - Overrides the signal and sets it to "ON"
 #                       - One or more Signal IDs can be specified in the call
 #
-# clear_signal_override (sig_id) - Clears the override and reverts the signal to the controlled state
+# clear_signal_override (sig_id*) - Clears the override and reverts the signal to the controlled state
+#                       - One or more Signal IDs can be specified in the call
 #
 # trigger_timed_signal - Sets signal to Red and then automatically cycles through the aspects back to green:
 #   Mandatory Parameters:
@@ -226,7 +227,7 @@ def toggle_subsidary (sig_id:int,ext_callback=sig_null):
     if not sig_exists(sig_id):
         print ("ERROR: toggle_subsidary - Signal ID "+str(sig_id)+" does not exist")
     else:
-        # get the signatkinter.fontl we are interested in
+        # get the signal we are interested in
         signal = signals[str(sig_id)]
         # Subsidary signals only supported for certan types of main signal
         if signal["sigtype"] == sig_type.colour_light:
@@ -271,7 +272,7 @@ def signal_passed_button (sig_id:int,ext_callback=sig_null):
     if not sig_exists(sig_id):
         print ("ERROR: signal_passed_button - Signal ID "+str(sig_id)+" does not exist")
     else:
-        # get the signal we are interested in
+        # Call the thread to pulse the signal passed button
         x = threading.Thread(target=thread_to_pulse_signal_passed_button, args=(sig_id,1))
         x.start()
         # Now make the external callback
