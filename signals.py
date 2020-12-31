@@ -455,7 +455,7 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
                       "sigtype": sig_type.colour_light,
                       "subtype": signal_sub_type,
                       "displayedaspect" : aspect_type.red,
-                      "overriddenaspect" : aspect_type.red,
+                      "overriddenaspect" : aspect_type.green,
                       "overridecallback" : sig_callback,   # Callback to use for automatically-triggered state changes
                       "sigclear" : False,             # Whether signal is On/Off - Common to All signal Types
                       "subclear" : False,             # Whether Subsidary is On/Off 
@@ -642,7 +642,7 @@ def update_feather_route_indication (sig_id:int):
             signal["canvas"].itemconfig (signal["rhf1"],fill="black")
             signal["canvas"].itemconfig (signal["rhf2"],fill="black")
             # Only display the route indication if the signal is clear and not overriden to red
-            if signal["sigclear"] and signal["overriddenaspect"] != aspect_type.red:
+            if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
                 if signal["routeset"] == route_type.LH1:
                     signal["canvas"].itemconfig (signal["lhf1"],fill="white")
                 elif signal["routeset"] == route_type.LH2:
