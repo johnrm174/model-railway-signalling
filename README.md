@@ -15,4 +15,7 @@ some of the "advanced" aspects of the python language (e.g. I've avoided most of
 
 To give it a go, just download the files and run 'my_layout'
 
+For a simple example of how to use the "signals" and "points" modules with the tkinter graphics package to create a basic 
+track schematic with interlocked signals/points see "simple_example.py
+
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
