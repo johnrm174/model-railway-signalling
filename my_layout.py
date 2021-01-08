@@ -53,14 +53,14 @@ def switch_button(switch_id,button_id):
     print ("***** CALLBACK - Section Switch "+str(switch_id)+", button "+str(button_id))
     # Could be a "track occupancy" switch change or a "track power section" switch change
     sections.override_signals_based_on_track_occupancy() # to reflect any manual track occupancy changes
-    schematic.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
+    sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
     schematic.update_track_schematic(canvas) # to reflect any track power section changes
     return()
 
 def point_callback_function(point_id,callback_type):
     print ("***** CALLBACK - Point " + str(point_id) + " : " + str(callback_type))
     sections.override_signals_based_on_track_occupancy() # to reflect any route changes
-    schematic.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
+    sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
     sections.update_track_power_section_switches() # sections auto switched on point & signal settings
     schematic.update_track_schematic(canvas) # To reflect any route changes 
     interlocking.process_interlocking_east()
@@ -72,7 +72,7 @@ def signal_callback_function(sig_id,callback_type):
     if callback_type == signals.sig_callback_type.sig_passed:
         sections.update_track_occupancy(sig_id) # update route occupancy sections as signal is passed
         sections.override_signals_based_on_track_occupancy() # to reflect any route occupancy changes
-    schematic.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
+    sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
     sections.update_track_power_section_switches() # sections auto switched on point & signal settings
     schematic.update_track_schematic(canvas) # to reflect any track power section changes 
     interlocking.process_interlocking_east()
@@ -107,7 +107,7 @@ sections.create_track_occupancy_switches(canvas,switch_button)
 
 # Set the initial interlocking conditions and signal aspects
 interlocking.set_initial_interlocking_conditions()
-schematic.refresh_signal_aspects()
+sections.refresh_signal_aspects()
 
 print ("Entering Main Loop")
 # Tag all the drawing objects to enable them to be resized when
