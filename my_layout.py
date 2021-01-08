@@ -9,8 +9,8 @@ import signals
 # change these to set the initial startup conditions
 #----------------------------------------------------------------------
 
-fullScreenState = False
-fpl_enabled = True    # Disable FPL for simpler operation
+fullScreenState = False # change to True to open as fullscreen on startup
+fpl_enabled = True      # change to false to Disable FPL for simpler operation
 
 #----------------------------------------------------------------------
 # a subclass of Canvas for dealing with resizing of windows
