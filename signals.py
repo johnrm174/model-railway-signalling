@@ -59,6 +59,8 @@ import common
 #       theatre_text:str  - The text to display in the theatre route indicator
 #
 # update_colour_light_signal - update the aspect based on the aspect of the signal ahead
+#                            - mainly intended for 3 and 4 aspect colour light signals but
+#                            - can also be used to set the aspect of 2 aspect distant signals
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
@@ -86,13 +88,16 @@ import common
 # clear_signal_override (sig_id*) - Clears the override and reverts the signal to the controlled state
 #                       - One or more Signal IDs can be specified in the call
 #
-# trigger_timed_signal - Sets signal to Red and then automatically cycles through the aspects back to green:
+# trigger_timed_signal - Sets signal to Red and then automatically cycles through the aspects back to green
+#                       - If a start delay >0 is specified then a 'sig_passed' callback event will be generated
+#                       - when the signal is first changed to RED - For each subsequent aspect change (all the
+#                       - way back to GREEN) 'sig_updated' callback event will be generated
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       start_delay:int - Delay (in seconds) before changing to Red (default=5)
 #       time_delay:int - Delay (in seconds) for cycling through the spects (default=5)
-#
+# 
 # -------------------------------------------------------------------------
 
 
@@ -510,21 +515,23 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int = 0):
                 # If signal is Overriden the set the signal to its overriden aspect
                 change_colour_light_signal_aspect (sig_id, signal["overriddenaspect"])
             elif (sig_ahead_id == 0 or signal["subtype"] == sig_sub_type.home
-                          or signal["subtype"] == sig_sub_type.distant
-                             or signal["subtype"] == sig_sub_type.red_ylw):
-                # Signal is clear - and its either its a 2 aspect signal or no signal
-                # ahead has been specified - We should therefore change to GREEN, unless 
-                # its a 2 aspect red/ylw signal where we change to the YELLOW
+                          or signal["subtype"] == sig_sub_type.red_ylw):
+                # Signal is clear and not overriden - Either no signal ahead has been specified
+                # or the signal type is either a 2 aspect home signal or a 2 aspect red/yellow signal
+                # In these cases we set it to its "clear" aspect - We  therefore change to GREEN,
+                # unless its a 2 aspect red/ylw signal where we change it to the YELLOW
                 if signal["subtype"] == sig_sub_type.red_ylw:
                     change_colour_light_signal_aspect (sig_id,aspect_type.yellow)
                 else:
                     change_colour_light_signal_aspect (sig_id,aspect_type.green)
             else:
-                # Its either a 3 or 4 aspect signal and a signal ahead has been specified
+                # Signal is clear and not overriden - and a valid signal ahead has been specified
+                # It must be either a 3 or 4 aspect signal or a 2 aspect distant signal
                 # We therefore need to take into account the aspect of the signal ahead
                 sig_ahead = signals[str(sig_ahead_id)]
                 if sig_ahead["displayedaspect"] == aspect_type.red:
-                    # Both 3/4 aspect signals should display a YELLOW aspect if signal ahead is RED
+                    # Both 3/4 aspect signals (and 2 aspect distant signals) should display
+                    # a YELLOW aspect if signal ahead is RED
                     change_colour_light_signal_aspect (sig_id,aspect_type.yellow) 
                 elif (signal["subtype"] == sig_sub_type.four_aspect and
                                 sig_ahead["displayedaspect"] == aspect_type.yellow):
@@ -1013,7 +1020,10 @@ def set_signal_override (*sig_ids:int):
             if signal["sigtype"] == sig_type.colour_light:
                 # Override the signal state and update the list of signals
                 signal["override"] = True
-                signal["overriddenaspect"] = aspect_type.red
+                if signal["subtype"] == sig_sub_type.distant:
+                    signal["overriddenaspect"] = aspect_type.yellow
+                else:
+                    signal["overriddenaspect"] = aspect_type.red
                 signals[str(sig_id)] = signal
                 # Update the signal to reflect the new state
                 # And change the button colours to indicate the override
@@ -1065,12 +1075,17 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=2):
     global signals # the dictionary of signals
 
     def thread_to_cycle_aspects (sig_id:int, ext_callback, start_delay, time_delay):
-        time.sleep (start_delay)
-        # Override Signal(to Red), "pulse" the signal passed button" and make the first callback
-        set_signal_override(sig_id)
-        x = threading.Thread(target=thread_to_pulse_signal_passed_button, args=(sig_id,1))
-        x.start()
-        ext_callback(sig_id,sig_callback_type.sig_updated)
+
+        time.sleep (start_delay) # Sleep until the initial "signal passed" event is due
+        set_signal_override(sig_id) # Override Signal(to Red),
+
+        # If a start delay was specified then "pulse" the signal passed button
+        # and make the first callback - in this case a "sig_passed" event
+        if start_delay > 0:
+            x = threading.Thread(target=thread_to_pulse_signal_passed_button, args=(sig_id,1))
+            x.start()
+            ext_callback(sig_id,sig_callback_type.sig_passed)
+
         time.sleep (time_delay) # Sleep until the next aspect change is due
 
         # Cycle through the aspects if its a 3 or 4 aspect signal

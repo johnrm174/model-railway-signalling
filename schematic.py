@@ -350,10 +350,10 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
 
 def create_layout_signals(canvas, sig_callback):
 
-    signals.create_colour_light_signal (canvas,1,100,500, aspects= 2,
+    signals.create_colour_light_signal (canvas,1,100,500, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True)
     
-    signals.create_colour_light_signal (canvas,2,475,500, aspects= 2,
+    signals.create_colour_light_signal (canvas,2,475,500, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True)
     
@@ -364,26 +364,26 @@ def create_layout_signals(canvas, sig_callback):
     signals.create_colour_light_signal (canvas,4,1050,550, aspects=4,
             sig_callback=sig_callback, sig_passed_button = True)
 
-    signals.create_colour_light_signal (canvas,5,750,400,orientation=180, aspects= 2,
+    signals.create_colour_light_signal (canvas,5,750,400,orientation=180, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,6,750,450, orientation=180, aspects= 2,
+    signals.create_colour_light_signal (canvas,6,750,450, orientation=180, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True, 
             lhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,7,1050,400, aspects= 2,
+    signals.create_colour_light_signal (canvas,7,1050,400, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,8,1050,450, aspects= 2,
+    signals.create_colour_light_signal (canvas,8,1050,450, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
     
-    signals.create_colour_light_signal(canvas,9,1730,500,orientation=180, aspects= 2,
+    signals.create_colour_light_signal(canvas,9,1730,500,orientation=180, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True)
 
-    signals.create_colour_light_signal (canvas,10,1400,500, orientation=180, aspects= 2,
+    signals.create_colour_light_signal (canvas,10,1400,500, orientation=180, aspects= 3,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
 
@@ -623,107 +623,4 @@ def update_track_schematic(canvas):
             
     return()
 
-#----------------------------------------------------------------------
-# Externally called function to Update multi aspect signals based on the signal
-# ahead) - Called when a signal has changed or if a point has changed
-# may need to be changed as the aspect of the signal ahead has changed.
-# Note - The order in which signals are updated is important. Change the most
-# forward signal first - and work back along the route that has been set
-#----------------------------------------------------------------------
 
-def refresh_signal_aspects():
-    
-    # UP Direction 
-
-    # Signal 7 (signal ahead is eather 23 or none)
-    if points.point_switched(8):
-        signals.set_route_indication(7,signals.route_type.RH1)
-        signals.update_colour_light_signal (7,sig_ahead_id=23)
-    else:
-        signals.set_route_indication(7,signals.route_type.MAIN)
-        
-    # Signal 8 (signal ahead is eather 21 or none)
-    if points.point_switched(8):
-        signals.set_route_indication(8,signals.route_type.RH1)
-        signals.update_colour_light_signal (8,sig_ahead_id=23)
-    else:
-        signals.set_route_indication(8,signals.route_type.MAIN)
-    
-    # Signal 4 (signal ahead is 21)
-    signals.update_colour_light_signal (4,sig_ahead_id=23)
-
-    # Signal 2 (signal ahead is eather 7 or 8)
-    if points.point_switched(4):
-        signals.set_route_indication(2,signals.route_type.LH1)
-        signals.update_colour_light_signal (2,sig_ahead_id=7)
-    else:
-        signals.set_route_indication(2,signals.route_type.MAIN)
-        signals.update_colour_light_signal (2,sig_ahead_id=8)
-
-    # Signal 3 (signal ahead is eather 4,7 or 8)
-    if not points.point_switched(2):
-        signals.set_route_indication(3,signals.route_type.MAIN)
-        signals.update_colour_light_signal (3,sig_ahead_id=4)
-    elif points.point_switched(4):
-        signals.set_route_indication(3,signals.route_type.LH2)
-        signals.update_colour_light_signal (3,sig_ahead_id=7)
-    else:
-        signals.set_route_indication(3,signals.route_type.LH1)
-        signals.update_colour_light_signal (3,sig_ahead_id=8)
-
-    # Signal 1 (signal ahead is 2)
-    signals.update_colour_light_signal (1,sig_ahead_id=2)
-
-    # DOWN Direction
-
-    # Signal 12 (signal ahead is 21)
-    signals.update_colour_light_signal (12,sig_ahead_id=21)
-    
-    # Signal 13 (signal ahead is 21)
-    signals.update_colour_light_signal (13,sig_ahead_id=21)
-    
-    # Signal 5 (signal ahead is eather 21 or none)
-    if points.point_switched(2):
-        signals.set_route_indication(5,signals.route_type.LH1)
-        signals.update_colour_light_signal (5,sig_ahead_id=21)
-    else:
-        signals.set_route_indication(5,signals.route_type.MAIN)
-        
-    # Signal 6 (signal ahead is eather 21 or none)
-    if points.point_switched(2):
-        signals.update_colour_light_signal (6,sig_ahead_id=21)
-        signals.set_route_indication(6,signals.route_type.LH1)
-    else:
-        signals.set_route_indication(6,signals.route_type.MAIN)
-        
-    # Signal 10 (signal ahead is eather 5 or 6)
-    if points.point_switched(6):
-        signals.update_colour_light_signal (10,sig_ahead_id=5)
-        signals.set_route_indication(10,signals.route_type.RH1)
-    else:
-        signals.set_route_indication(10,signals.route_type.MAIN)
-        signals.update_colour_light_signal (10,sig_ahead_id=6)
-
-    # Signal 9 (signal ahead is 10)
-    signals.update_colour_light_signal (9,sig_ahead_id=10)
-    
-    # Signal 11 (signal ahead is eather 5,6,12 or 13)
-    if points.point_switched(9):
-        if points.point_switched(6):
-            signals.set_route_indication(11,signals.route_type.RH2)
-            signals.update_colour_light_signal (11,sig_ahead_id=5)
-        else:
-            signals.set_route_indication(11,signals.route_type.RH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=6)
-    else:
-        if points.point_switched(7):
-            signals.set_route_indication(11,signals.route_type.LH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=13)
-        else:
-            signals.set_route_indication(11,signals.route_type.MAIN)
-            signals.update_colour_light_signal (11,sig_ahead_id=12)
-
-    # Signal 20 (signal ahead is 11)
-    signals.update_colour_light_signal (20,sig_ahead_id=11)
-
-    return()
