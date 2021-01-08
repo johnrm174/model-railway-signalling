@@ -26,17 +26,18 @@ import common
 #       x:int, y:int - Position of the point on the canvas (in pixels) 
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback - Function to call when a signal event happens - Default is null
+#       sig_callback:name - Function to call when a signal event happens - Default is null
 #       aspects:int - The number of aspects (2,3 or 4) - default is 3
 #       two_aspect:two_aspect_type - For 2 aspect signals, specify which type - Default Home (Red/Green)
-#       sig_passed_button - Creates a "signal Passed" button for automatic control - Default False
-#       position_light - If the signal is to have a subsidary position light signal - Default False
-#       lhfeather45:bool - LH route indication feather at 45 degrees - Default False
-#       lhfeather90:bool - LH route indication feather at 90 degrees - Default False
-#       rhfeather45:bool - RH route indication feather at 45 degrees - Default False
-#       rhfeather90:bool - RH route indication feather at 90 degrees - Default False
-#       theatre_route_indicator -  Theatre Type route indicator - Default False
-#       fully_automatic - Whether the signal will need manual controls - Default False
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       position_light:bool - Creates a subsidary position light signal - Default False
+#       lhfeather45:bool - Creates a LH route indication feather at 45 degrees - Default False
+#       lhfeather90:bool - Creates a LH route indication feather at 90 degrees - Default False
+#       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
+#       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
+#       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
+#               - Note that signals should never be created with both Feathers and a Theatre indicator
+#       fully_automatic:bool - Creates a signal without any manual controls - Default False
 #
 # create_ground_position_signal - created a grund position light signal
 #   Mandatory Parameters:
@@ -45,9 +46,8 @@ import common
 #       x:int, y:int - Position of the point on the canvas (in pixels) 
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       font_size:int- Font size for the button text - Default is 8
-#       sig_callback - The function to call when the main signal button is pressed
-#       sig_passed_button - Creates a "signal Passed" button for automatic control - Default False
+#       sig_callback:name - The function to call when the main signal button is pressed- Default is null
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
 #       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
 #       modern: bool - Specifies a modern type ground position signal (post 1996) - Default False
 #
@@ -55,8 +55,10 @@ import common
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       feathers:route_type - MAIN (no feathers displayed), LH1, LH2, RH1 or RH2
-#       theatre_text:str  - The text to display in the theatre route indicator
+#       feathers:route_type - MAIN (no feathers displayed), LH1, LH2, RH1 or RH2 - default 'MAIN'
+#       theatre_text:str  - The text to display in the theatre route indicator - default empty string
+#          - Note that both Feathers and theatre text can be specified in the call
+#          - What actually gets displayed will depend on what the signal was created with
 #
 # update_colour_light_signal - update the aspect based on the aspect of the signal ahead
 #                            - mainly intended for 3 and 4 aspect colour light signals but
@@ -78,9 +80,9 @@ import common
 # unlock_subsidary_signal(*sig_id) - to enable external point/signal interlocking functions
 #                       - One or more Signal IDs can be specified in the call
 #
-# signal_clear(sig_id) - returns the state of the signal (True/False)
+# signal_clear(sig_id) - returns the state of the signal (True/False - True if 'clear')
 #
-# subsidary_signal_clear(sig_id) - returns the state of the subsidary signal (True/False)
+# subsidary_signal_clear(sig_id) - returns the state of the subsidary signal (True/False- True if 'clear')
 #
 # set_signal_override (sig_id*) - Overrides the signal and sets it to "ON"
 #                       - One or more Signal IDs can be specified in the call
@@ -88,7 +90,7 @@ import common
 # clear_signal_override (sig_id*) - Clears the override and reverts the signal to the controlled state
 #                       - One or more Signal IDs can be specified in the call
 #
-# trigger_timed_signal - Sets signal to Red and then automatically cycles through the aspects back to green
+# trigger_timed_signal - Sets the signal to Red and then automatically cycles through the aspects back to green
 #                       - If a start delay >0 is specified then a 'sig_passed' callback event will be generated
 #                       - when the signal is first changed to RED - For each subsequent aspect change (all the
 #                       - way back to GREEN) 'sig_updated' callback event will be generated
@@ -120,13 +122,13 @@ class sig_callback_type(enum.Enum):
     sub_switched = 1   # The subsidary signal has been switched by the user
     sig_passed = 2     # The "signal passed" has been activated by the user
     sig_updated = 3    # The signal aspect has been changed/updated via an override
-    null_event = 4    # The signal aspect has been changed/updated via an override
+    null_event = 4     # The signal aspect has been changed/updated via an override
 
 # These are the 2 aspect signal types
 class two_aspect_type (enum.Enum):
     home = 0           # Red / Green
     distant = 1        # Yellow / Green
-    red_ylw = 2     # Red / Yellow
+    red_ylw = 2        # Red / Yellow
 
 # -------------------------------------------------------------------------
 # Classes used internally when creating/updating signals
@@ -143,7 +145,7 @@ class sig_type(enum.Enum):
 class sig_sub_type(enum.Enum):
     home = 1              # Colour light signals (2 aspect - Red/Grn) or semaphores
     distant = 2           # Colour light signals (2 aspect - Ylw/Grn) or semaphores
-    red_ylw = 3           # Colour light signals (2 aspect - Red/Ylw)
+    red_ylw = 3           # Colour light signals only (2 aspect - Red/Ylw)
     three_aspect = 4      # Colour light signals only
     four_aspect = 5       # Colour light signals only
     
@@ -339,7 +341,7 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
         line_coords = common.rotate_line (x,y,0,-20,+30,-20,orientation) 
         canvas.create_line (line_coords,width=3)
         
-        # Fraw the body of the position light (only draw if required)
+        # Draw the body of the position light - only if a position light has been specified
         if position_light:
             point_coords1 = common.rotate_point (x,y,+13,-12,orientation) 
             point_coords2 = common.rotate_point (x,y,+13,-28,orientation) 
@@ -350,12 +352,14 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
             canvas.create_polygon (points, outline="black")
         
         # Draw the position lights
+        # These get 'hidden' later if they are not required for the signal
         line_coords = common.rotate_line (x,y,+18,-27,+24,-21,orientation) 
         poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black")
         line_coords = common.rotate_line (x,y,+14,-14,+20,-20,orientation) 
         poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black")
              
-        # Draw the Buttons
+        # Create the 'windows' in which the buttons are displayed
+        # These get 'hidden' later if they are not required for the signal
         but3win = canvas.create_window (x,y,window=button3)
         if position_light:
             point_coords = common.rotate_point (x,y,-35,-20,orientation) 
@@ -368,7 +372,8 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
             but2win = canvas.create_window (point_coords,window=button2)
             if fully_automatic:canvas.create_text (point_coords,font=myfont1,text=str(sig_id))
 
-        # Draw the Aspects (running from bottom to top) - create all 4 and hide what we don't need
+        # Draw all foru aspects for the signal (running from bottom to top)
+        # Aspects we don't need (for this particular signal) get 'hidden' later
         line_coords = common.rotate_line (x,y,+40,-25,+30,-15,orientation) 
         red = canvas.create_oval (line_coords,fill="grey")
         line_coords = common.rotate_line (x,y,+50,-25,+40,-15,orientation) 
@@ -378,9 +383,9 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
         line_coords = common.rotate_line (x,y,+70,-25,+60,-15,orientation) 
         yel2 = canvas.create_oval (line_coords,fill="grey")
         
-        # now hide the aspects we don't need and define the x offset
-        # for the route indication feathers we are going to draw next
-        # also set the sub-type for the signal
+        # Now hide the aspects we don't need and define the 'offset' for the route indications based on
+        # the number of aspects - so that the feathers and theatre route indicator sit on top of the signal
+        # Also set the sub-type for the signal
         if aspects == 2:
             offset = -20
             canvas.itemconfigure(yel2,state='hidden')
@@ -406,6 +411,7 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
             offset = 0
    
         # now draw the feathers (x has been adjusted for the no of aspects)            
+        # These get 'hidden' later if they are not required for the signal
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-10,orientation) 
         rhfeather1 = canvas.create_line (line_coords,width=3,fill="black")
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-5,orientation) 
@@ -415,8 +421,8 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-35,orientation) 
         lhfeather2 = canvas.create_line (line_coords,width=3,fill="black")
         
-        # Create the theatre route indicator if one is specified for the signal
-        # We'll create the text object anyway (just enable it if required
+        # Draw the theatre route indicator box if one is specified for the signal
+        # The text object is created anyway - and 'hidden' later if not required
         point_coords = common.rotate_point (x,y,offset+80,-20,orientation)        
         if theatre_route_indicator:
             line_coords = common.rotate_line (x,y,offset+71,-12,offset+89,-28,orientation) 
@@ -427,10 +433,7 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
             theatre = canvas.create_text (point_coords,fill="white",text="",
                                     angle = orientation-90,state='hidden')
             
-        # Hide the buttons and feathers if we don't need need them for the signal
-        # If its a Ground signal, we've only created what we need anyway
-        # and other functions validate the request against the signal type
-        # so we shouldn't get into a state of trying to change the null objects
+        # Hide any drawing objects we don't need for this particular signal
         if not position_light: canvas.itemconfigure(but2win,state='hidden')
         if not position_light: canvas.itemconfigure(poslight1,state='hidden')
         if not position_light: canvas.itemconfigure(poslight2,state='hidden')
@@ -438,8 +441,8 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
         if not lhfeather90: canvas.itemconfigure(lhfeather2,state='hidden')
         if not rhfeather45: canvas.itemconfigure(rhfeather1,state='hidden')
         if not rhfeather90: canvas.itemconfigure(rhfeather2,state='hidden')
-        if fully_automatic: canvas.itemconfigure(but1win,state='hidden')
         if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
+        if fully_automatic: canvas.itemconfigure(but1win,state='hidden')
 
         # Compile a dictionary of everything we need to track for the signal
         new_signal = {"canvas" : canvas,              # canvas object
@@ -459,12 +462,12 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
                       "sigpassedbutton" : button3,    # drawing object
                       "sigtype": sig_type.colour_light,
                       "subtype": signal_sub_type,
-                      "displayedaspect" : aspect_type.red,
+                      "displayedaspect" : aspect_type.red,  # valid for all 2 aspects - as drawing objects are swapped
                       "overriddenaspect" : aspect_type.green,
                       "overridecallback" : sig_callback,   # Callback to use for automatically-triggered state changes
                       "sigclear" : False,             # Whether signal is On/Off - Common to All signal Types
-                      "subclear" : False,             # Whether Subsidary is On/Off 
-                      "override" : False,             # Whether signal is overriden - Common to All signal Types
+                      "subclear" : False,             # Whether Subsidary is On/Off - Common to All main signal Types
+                      "override" : False,             # Whether signal is overriden - Common to All main signal Types
                       "routeset" : route_type.MAIN,
                       "routetext" : "" }
     
@@ -480,19 +483,18 @@ def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
     return ()
 
 # -------------------------------------------------------------------------
-# Internal/Externally called function to Refreshes (re-draw) the signal aspect 
+# Internal/Externally called function to Refresh the displayed signal aspect 
 # Also takes into account the state of the signal ahead if one is specified
-# Implemented as a seperate function (outside of the toggle_signal callback)
-# So it can be externalised - called to refresh a signal if the one ahead has
-# been changed e.g. if the signal ahead has changed to ON and this
-# signal is OFF then we want to change it to YELLOW rather than GREEN
+# to ensure the correct aspect is displayed for 3/4 aspect types and 2 aspect 
+# distant signals - e.g. for a 3/4 aspect signal - if the signal ahead is ON
+# and this signal is OFF then we want to change it to YELLOW rather than GREEN
 # -------------------------------------------------------------------------
 
 def update_colour_light_signal (sig_id:int,sig_ahead_id:int = 0):
 
     global signals # the dictionary of signals
 
-    # Validate the signal(s) exist and they are not Ground Position Signals
+    # Validate the signal and the signal ahead (if one is specified) both exist
     if not sig_exists(sig_id):
         print ("ERROR: update_colour_light_signal - Signal "+str(sig_id)+" does not exist")
     elif sig_ahead_id != 0 and not sig_exists(sig_ahead_id): 
@@ -506,13 +508,17 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int = 0):
                     " is of unsupported type" + str(signal["sigtype"]))
         else:
             if not signal["sigclear"]:
-                # If signal is set to "ON" then change to RED unless it is a 2 aspect distant
+                # If signal is set to "ON" then change to RED
+                # unless it is a 2 aspect distant - in which case we want to set it to YELLOW
                 if signal["subtype"] == sig_sub_type.distant:
                     change_colour_light_signal_aspect (sig_id, aspect_type.yellow)
                 else:
                     change_colour_light_signal_aspect (sig_id, aspect_type.red)
             elif signal["override"]:
                 # If signal is Overriden the set the signal to its overriden aspect
+                # The overriden aspect would normally be RED - unless its been triggered
+                # as a 'timed' signal - in which case the associated thread will be cycling
+                # the 'override' through the aspects all the way back to GREEN
                 change_colour_light_signal_aspect (sig_id, signal["overriddenaspect"])
             elif (sig_ahead_id == 0 or signal["subtype"] == sig_sub_type.home
                           or signal["subtype"] == sig_sub_type.red_ylw):
@@ -525,13 +531,13 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int = 0):
                 else:
                     change_colour_light_signal_aspect (sig_id,aspect_type.green)
             else:
-                # Signal is clear and not overriden - and a valid signal ahead has been specified
-                # It must be either a 3 or 4 aspect signal or a 2 aspect distant signal
+                # Signal is clear, not overriden and is either a 3 or 4 aspect signal or
+                # a 2 aspect distant signal- and a valid signal ahead has been specified
                 # We therefore need to take into account the aspect of the signal ahead
                 sig_ahead = signals[str(sig_ahead_id)]
                 if sig_ahead["displayedaspect"] == aspect_type.red:
                     # Both 3/4 aspect signals (and 2 aspect distant signals) should display
-                    # a YELLOW aspect if signal ahead is RED
+                    # a YELLOW aspect if the signal ahead is RED
                     change_colour_light_signal_aspect (sig_id,aspect_type.yellow) 
                 elif (signal["subtype"] == sig_sub_type.four_aspect and
                                 sig_ahead["displayedaspect"] == aspect_type.yellow):
@@ -628,6 +634,7 @@ def change_colour_light_subsidary_aspect (sig_id:int):
 
 # -------------------------------------------------------------------------
 # Internal function to update the display of the feather route indication
+# The feathers will only be displayed if the signal was created with them
 # There should never be a need for external programmes to call into this
 # function - call into the set_route_indication function instead - but
 # we'll still validate the call just in case
@@ -664,7 +671,8 @@ def update_feather_route_indication (sig_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Internal function to update the display of the theatre route indication
+# Internal function to update the displayed value of the theatre route indication
+# The theatre indication will only be displayed if the signal was created with one
 # There should never be a need for external programmes to call into this
 # function - call into the set_route_indication function instead - but
 # we'll still validate the call just in case
@@ -679,8 +687,8 @@ def update_theatre_route_indication (sig_id:int):
         # get the signal that we are interested in
         signal = signals[str(sig_id)]
         if signal["sigtype"] == sig_type.colour_light:
-            # Only display the route indication if the signal is clear and not overriden
-            if signal["sigclear"] and signal["overriddenaspect"] != aspect_type.red:
+            # Only display the route indication if the signal is clear and not overriden to red
+            if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
                 signal["canvas"].itemconfig (signal["theatre"],text=signal["routetext"])
             else:
                 signal["canvas"].itemconfig (signal["theatre"],text="")     
@@ -691,8 +699,8 @@ def update_theatre_route_indication (sig_id:int):
 
 # -------------------------------------------------------------------------
 # Externally called function to set the route indication for the signal
-# Calls the appropriate internal functions to update the route indication
-# depending on the signal type
+# Calls the above internal functions to update the route feathers and the
+# theatre route indication as appropriate
 # -------------------------------------------------------------------------
 
 def set_route_indication (sig_id:int, feathers:route_type = route_type.MAIN, theatre_text:str =""):
@@ -728,8 +736,8 @@ def set_route_indication (sig_id:int, feathers:route_type = route_type.MAIN, the
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to create a Signal (drawing objects + state)
-# By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
+# Externally called function to create a Ground Position Signal (drawing objects
+# + state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
 # All attributes (that need to be tracked) are stored as a dictionary
 # This is then added to a dictionary of Signals for later reference
 # -------------------------------------------------------------------------
@@ -787,11 +795,11 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         line_coords = common.rotate_line (x,y,+1,-24,+8,-17,orientation) 
         poson = canvas.create_oval (line_coords,fill="grey",outline="black")
         
-        # Draw the Button for controlling the signal
+        # Create the 'window' in which the signal button is displayed
         point_coords = common.rotate_point (x,y,-25,-20,orientation) 
         canvas.create_window (point_coords,window=button1)
         
-        # Draw the Signal Passed Button - but hide it ifnot specified
+        # Create the 'window' for the Signal Passed Button - but hide it if not required
         but2win = canvas.create_window (x,y,window=button2)
         if not sig_passed_button: canvas.itemconfigure(but2win,state='hidden')
         
@@ -901,6 +909,7 @@ def subsidary_signal_clear (sig_id:int):
 # Externally called function to Lock the signal (preventing it being cleared)
 # If signal/point locking has been correctly implemented it should
 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
@@ -925,7 +934,8 @@ def lock_signal (*sig_ids:int):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Unlock the main signal 
+# Externally called function to Unlock the main signal
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
@@ -948,6 +958,7 @@ def unlock_signal (*sig_ids:int):
 # This is effectively a seperate signal from the main aspect
 # If signal/point locking has been correctly implemented it should
 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def lock_subsidary_signal (*sig_ids:int):
@@ -977,6 +988,7 @@ def lock_subsidary_signal (*sig_ids:int):
 
 # -------------------------------------------------------------------------
 # Externally called function to Unlock the subsidary signal
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def unlock_subsidary_signal (*sig_ids:int):
@@ -1001,8 +1013,10 @@ def unlock_subsidary_signal (*sig_ids:int):
 
 # -------------------------------------------------------------------------
 # Externally called function to Override a signal - setting it to RED
-# Signal will be set to red no matter what its current manual setting is
-# Used to support automation - Set signal to Danger once a train has passed
+# apart from 2 aspect distance signals - which are set to YELLOW
+# Signal will display the overriden aspect no matter what its current setting is
+# Used to support automation - e.g. set asignal to Danger once a train has passed
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
@@ -1036,7 +1050,8 @@ def set_signal_override (*sig_ids:int):
 
 # -------------------------------------------------------------------------
 # Externally called function to Clear a Signal Override 
-# Signal will revert to its current manual setting (on/off)
+# Signal will revert to its current manual setting (on/off) and displayed aspect
+# Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
@@ -1065,9 +1080,14 @@ def clear_signal_override (*sig_ids:int):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Override a signal - setting it to RED
-# Signal will be set to red no matter what its current manual setting is
-# Used to support automation - Set signal to Danger once a train has passed
+# Externally called function to 'override' a signal (changing it to RED) and then
+# cycle through all of the supported aspects all the way back to GREEN - when the
+# override will be cleared - intended for automation of 'exit' signals on a layout
+# The start_delay is the initial delay (in seconds) before the signal is changed to RED
+# the time_delay is the delay (in seconds) between each aspect change
+# A 'sig_passed' callback event will be generated when the signal is overriden if
+# and only if a start delay (> 0) is specified. For each subsequent aspect change
+# a'sig_updated' callback event will be generated
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=2):
