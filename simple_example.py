@@ -60,7 +60,6 @@ def main_callback_function(item_id,callback_type):
     signals.update_colour_light_signal(4, sig_ahead_id=5)
     
     if points.point_switched(1):
-        print ("here")
         signals.set_route_indication(2,feathers=signals.route_type.LH1)
         signals.update_colour_light_signal(2,sig_ahead_id=3)
     else:
