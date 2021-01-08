@@ -354,6 +354,7 @@ def create_layout_signals(canvas, sig_callback):
             sig_callback=sig_callback, sig_passed_button = True)
     
     signals.create_colour_light_signal (canvas,2,475,500, aspects= 3,
+            
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True)
     
