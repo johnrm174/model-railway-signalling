@@ -1,10 +1,3 @@
-from tkinter import *
-import tkinter.font
-import enum
-import time
-import threading
-import common
-
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing signal objects
 #
@@ -25,10 +18,11 @@ import common
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the point on the canvas (in pixels) 
 #   Optional Parameters:
+#       signal_subtype:sig_sub_type - Subtype of colour light signal to create - Default -four_aspect
+#                                     'three_aspect' and 'four_aspect' signal types are supported
+#                                     Also 2 aspect signal types of 'home', 'distant', 'red_ylw'
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default is null
-#       aspects:int - The number of aspects (2,3 or 4) - default is 3
-#       two_aspect:two_aspect_type - For 2 aspect signals, specify which type - Default Home (Red/Green)
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
 #       position_light:bool - Creates a subsidary position light signal - Default False
 #       lhfeather45:bool - Creates a LH route indication feather at 45 degrees - Default False
@@ -36,7 +30,6 @@ import common
 #       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
 #       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
 #       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-#               - Note that signals should never be created with both Feathers and a Theatre indicator
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
 #
 # create_ground_position_signal - created a grund position light signal
@@ -46,10 +39,10 @@ import common
 #       x:int, y:int - Position of the point on the canvas (in pixels) 
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback:name - The function to call when the main signal button is pressed- Default is null
+#       sig_callback:name - Function to call when a signal event happens - Default is null
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
 #       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
-#       modern: bool - Specifies a modern type ground position signal (post 1996) - Default False
+#       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
 #
 # set_route_indication - Set (and change) the route indication for the signal
 #   Mandatory Parameters:
@@ -60,9 +53,9 @@ import common
 #          - Note that both Feathers and theatre text can be specified in the call
 #          - What actually gets displayed will depend on what the signal was created with
 #
-# update_colour_light_signal - update the aspect based on the aspect of the signal ahead
-#                            - mainly intended for 3 and 4 aspect colour light signals but
-#                            - can also be used to set the aspect of 2 aspect distant signals
+# update_signal - update the aspect based on the aspect of the signal ahead
+#               - mainly intended for 3 and 4 aspect colour light signals but
+#               - can also be used to set the aspect of 2 aspect distant signals
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
@@ -90,7 +83,7 @@ import common
 # clear_signal_override (sig_id*) - Clears the override and reverts the signal to the controlled state
 #                       - One or more Signal IDs can be specified in the call
 #
-# trigger_timed_signal - Sets the signal to Red and then automatically cycles through the aspects back to green
+# trigger_timed_signal - Sets the signal to "ON"  and then automatically cycles through the aspects back to green
 #                       - If a start delay >0 is specified then a 'sig_passed' callback event will be generated
 #                       - when the signal is first changed to RED - For each subsequent aspect change (all the
 #                       - way back to GREEN) 'sig_updated' callback event will be generated
@@ -101,785 +94,92 @@ import common
 #       time_delay:int - Delay (in seconds) for cycling through the spects (default=5)
 # 
 # -------------------------------------------------------------------------
-
-
-# -------------------------------------------------------------------------
-# Classes used externally when creating/updating signals
-# -------------------------------------------------------------------------
-
-# Define the routes that a colour light signal with feather route indicators
-# can support (Theatre type route indicators can display any text character)
-class route_type(enum.Enum):
-    MAIN = 0
-    LH1 = 1
-    LH2 = 2
-    RH1 = 3
-    RH2 = 4
-
-# Define the different callbacks types for the signal
-class sig_callback_type(enum.Enum):
-    sig_switched = 0   # The signal has been switched by the user
-    sub_switched = 1   # The subsidary signal has been switched by the user
-    sig_passed = 2     # The "signal passed" has been activated by the user
-    sig_updated = 3    # The signal aspect has been changed/updated via an override
-    null_event = 4     # The signal aspect has been changed/updated via an override
-
-# These are the 2 aspect signal types
-class two_aspect_type (enum.Enum):
-    home = 0           # Red / Green
-    distant = 1        # Yellow / Green
-    red_ylw = 2        # Red / Yellow
-
-# -------------------------------------------------------------------------
-# Classes used internally when creating/updating signals
-# -------------------------------------------------------------------------
-
-# Define the signal types that can be created
-class sig_type(enum.Enum):
-    colour_light = 1
-    ground_position_light = 2
-    semaphore = 3                 # not yet implemented
-    ground_disc = 4               # not yet implemented
-
-# define the superset of signal sub types that can be created
-class sig_sub_type(enum.Enum):
-    home = 1              # Colour light signals (2 aspect - Red/Grn) or semaphores
-    distant = 2           # Colour light signals (2 aspect - Ylw/Grn) or semaphores
-    red_ylw = 3           # Colour light signals only (2 aspect - Red/Ylw)
-    three_aspect = 4      # Colour light signals only
-    four_aspect = 5       # Colour light signals only
-    
-# Define the aspects applicable to colour light signals
-class aspect_type(enum.Enum):  
-    red = 1
-    yellow = 2
-    green = 3
-    double_yellow = 4
-    
-# -------------------------------------------------------------------------
-# Signals are to be added to a global dictionary when created
-# -------------------------------------------------------------------------
-
-# Define an empty dictionary 
-signals:dict = {}
-
-# -------------------------------------------------------------------------
-# The default "External" callback for the Change button and shunt button
-# Used if these are not specified when the signal is created
-# i.e to cover the case of no position light or an auto signal
-# -------------------------------------------------------------------------
-
-def sig_null(sig_id, sig_callback = sig_callback_type.null_event):
-    return(sig_id, sig_callback)
-
-# -------------------------------------------------------------------------
-# Internal Function to check if a Signal exists in the list of Signals
-# Used in Most externally-called functions to validate the Sig_ID
-# -------------------------------------------------------------------------
-
-def sig_exists(sig_id):
-    return (str(sig_id) in signals.keys() )
-
-# -------------------------------------------------------------------------
-# Internal function to flip the state of a signal when the change button
-# is pressed - Will change signal to GREEEN/RED and initiate an external
-# callback if one is specified (external programme should then call
-# the refresh signal function with details of the signal ahead to
-# set the YELLOW aspect if the signal ahead is not clear
-# -------------------------------------------------------------------------
-
-def toggle_signal (sig_id:int,ext_callback=sig_null):
-
-    global signals # the dictionary of signals
-    # also imported from "common" - common.bgraised, common.bgsunken
-    
-    # Verify that the signal exists
-    if not sig_exists(sig_id):
-        print ("ERROR: toggle_signal - Signal ID "+str(sig_id)+" does not exist")
-    else:
-        # get the signal we are interested in
-        signal = signals[str(sig_id)]
-        # Common to all signal types
-        if signal["sigclear"]:
-            signal["sigclear"] = False
-            signal["sigbutton"].config(relief="raised",bg=common.bgraised)
-        else:
-            signal["sigclear"] = True
-            signal["sigbutton"].config(relief="sunken",bg=common.bgsunken)
-        # update the dictionary of signals
-        signals[str(sig_id)] = signal; 
-        # now call the type-specific functions to update the signals
-        if signal["sigtype"] == sig_type.colour_light:
-            update_colour_light_signal (sig_id) # update the aspect
-            update_feather_route_indication (sig_id) # update the route
-            update_theatre_route_indication (sig_id) # update the route
-        elif signal["sigtype"] == sig_type.ground_position_light:
-            update_ground_position_light_signal (sig_id) # update the aspect
-        # Now make the external callback
-        ext_callback(sig_id, sig_callback_type.sig_switched)
-
-    return ()
-
-# -------------------------------------------------------------------------
-# Internal function to flip the state of the position light when the 
-# SHUNT button is pressed - Will change signal to OFF/ON and initiate
-# an external callback if one is specified 
-# -------------------------------------------------------------------------
-
-def toggle_subsidary (sig_id:int,ext_callback=sig_null):
-
-    global signals # the dictionary of signals
-    
-    # Verify that the signal exists
-    if not sig_exists(sig_id):
-        print ("ERROR: toggle_subsidary - Signal ID "+str(sig_id)+" does not exist")
-    else:
-        # get the signal we are interested in
-        signal = signals[str(sig_id)]
-        # Subsidary signals only supported for certan types of main signal
-        if signal["sigtype"] == sig_type.colour_light:
-            if signal["subclear"]:
-                signal["subclear"] = False
-                signal["subbutton"].config(relief="raised",bg=common.bgraised)
-            else:
-                signal["subclear"] = True
-                signal["subbutton"].config(relief="sunken",bg=common.bgsunken)
-            # update the dictionary of signals
-            signals[str(sig_id)] = signal; 
-            # now call the type-specific functions to update the signals
-            if signal["sigtype"] == sig_type.colour_light:
-                change_colour_light_subsidary_aspect (sig_id) # now update the aspect
-            # Now make the external callback
-            ext_callback(sig_id, sig_callback_type.sub_switched)
-        else:
-            print ("ERROR: toggle_subsidary - Signal " + str(sig_id) +
-                       " is of unsupported type" + str(signal["sigtype"]))
-    return ()
-
-# -------------------------------------------------------------------------
-# Thread to "Pulse" the "signal passed" Button
-# -------------------------------------------------------------------------
-
-def thread_to_pulse_signal_passed_button (sig_id,time_delay):
-    signal = signals[str(sig_id)]
-    signal["sigpassedbutton"].config(bg="red")
-    time.sleep (time_delay)
-    signal["sigpassedbutton"].config(bg=common.bgraised)
-    return ()
-
-# -------------------------------------------------------------------------
-# Internal callback when the "signal passed" Button has been pressed
-# -------------------------------------------------------------------------
-def signal_passed_button (sig_id:int,ext_callback=sig_null):
-
-    global signals # the dictionary of signals
-    # also imported from "common" - common.bgraised, common.bgsunken
-    
-    # Verify that the signal exists
-    if not sig_exists(sig_id):
-        print ("ERROR: signal_passed_button - Signal ID "+str(sig_id)+" does not exist")
-    else:
-        # Call the thread to pulse the signal passed button
-        x = threading.Thread(target=thread_to_pulse_signal_passed_button, args=(sig_id,1))
-        x.start()
-        # Now make the external callback
-        ext_callback(sig_id, sig_callback_type.sig_passed)
-
-    return ()
-
-# -------------------------------------------------------------------------
-# Externally called function to create a Signal (drawing objects + state)
-# By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of Signals for later reference
-# -------------------------------------------------------------------------
-
-def create_colour_light_signal (canvas, sig_id:int, x:int, y:int,
-                    aspects:int = 3, two_aspect:two_aspect_type = two_aspect_type.home,
-                    sig_callback = sig_null, sig_passed_button:bool=False,
-                    orientation:int = 0, position_light:bool=False,
-                    lhfeather45:bool=False, lhfeather90:bool=False,
-                    rhfeather45:bool=False, rhfeather90:bool=False,
-                    theatre_route_indicator:bool=False,
-                    fully_automatic:bool=False):
-
-    global signals # the dictionary of signals
-    # also uses fontsize, xpadding, ypadding imported from "common"
-    
-    # Do some basic validation on the parameters we have been given
-    if sig_exists(sig_id):
-        print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+" already exists")
-        
-    elif sig_id < 1:
-        print ("ERROR: create_colour_light_signal - Signal ID must be greater than zero")
-        
-    elif orientation != 0 and orientation != 180:
-        print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+
-                       " - Invalid orientation angle - only 0 and 180 currently supported")
-        
-    elif aspects <2 or aspects > 4:
-        print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+
-                       " - Invalid number of aspects - only 2, 3 and 4 aspect types supported")
-    else: 
-        # set the font size for the buttons
-        myfont1 = tkinter.font.Font(size=common.fontsize)
-        myfont2 = tkinter.font.Font(size=1)
-
-        # Create the button objects and their callbacks
-        button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:toggle_signal(sig_id,sig_callback))
-        button2 = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:toggle_subsidary(sig_id,sig_callback))
-        button3 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
-                command=lambda:signal_passed_button(sig_id,sig_callback))
-        
-        # Draw the signal base line & signal post   
-        line_coords = common.rotate_line (x,y,0,0,0,-20,orientation) 
-        canvas.create_line (line_coords,width=2)
-        line_coords = common.rotate_line (x,y,0,-20,+30,-20,orientation) 
-        canvas.create_line (line_coords,width=3)
-        
-        # Draw the body of the position light - only if a position light has been specified
-        if position_light:
-            point_coords1 = common.rotate_point (x,y,+13,-12,orientation) 
-            point_coords2 = common.rotate_point (x,y,+13,-28,orientation) 
-            point_coords3 = common.rotate_point (x,y,+26,-28,orientation) 
-            point_coords4 = common.rotate_point (x,y,+26,-24,orientation) 
-            point_coords5 = common.rotate_point (x,y,+19,-12,orientation) 
-            points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
-            canvas.create_polygon (points, outline="black")
-        
-        # Draw the position lights
-        # These get 'hidden' later if they are not required for the signal
-        line_coords = common.rotate_line (x,y,+18,-27,+24,-21,orientation) 
-        poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black")
-        line_coords = common.rotate_line (x,y,+14,-14,+20,-20,orientation) 
-        poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black")
-             
-        # Create the 'windows' in which the buttons are displayed
-        # These get 'hidden' later if they are not required for the signal
-        but3win = canvas.create_window (x,y,window=button3)
-        if position_light:
-            point_coords = common.rotate_point (x,y,-35,-20,orientation) 
-            but1win = canvas.create_window (point_coords,anchor=E,window=button1)
-            but2win = canvas.create_window (point_coords,anchor=W,window=button2)
-            if fully_automatic:canvas.create_text (point_coords,anchor=E,font=myfont1,text=str(sig_id))
-        else:
-            point_coords = common.rotate_point (x,y,-20,-20,orientation) 
-            but1win = canvas.create_window (point_coords,window=button1)
-            but2win = canvas.create_window (point_coords,window=button2)
-            if fully_automatic:canvas.create_text (point_coords,font=myfont1,text=str(sig_id))
-
-        # Draw all foru aspects for the signal (running from bottom to top)
-        # Aspects we don't need (for this particular signal) get 'hidden' later
-        line_coords = common.rotate_line (x,y,+40,-25,+30,-15,orientation) 
-        red = canvas.create_oval (line_coords,fill="grey")
-        line_coords = common.rotate_line (x,y,+50,-25,+40,-15,orientation) 
-        yel = canvas.create_oval (line_coords,fill="grey")
-        line_coords = common.rotate_line (x,y,+60,-25,+50,-15,orientation) 
-        grn = canvas.create_oval (line_coords,fill="grey") 
-        line_coords = common.rotate_line (x,y,+70,-25,+60,-15,orientation) 
-        yel2 = canvas.create_oval (line_coords,fill="grey")
-        
-        # Now hide the aspects we don't need and define the 'offset' for the route indications based on
-        # the number of aspects - so that the feathers and theatre route indicator sit on top of the signal
-        # Also set the sub-type for the signal
-        if aspects == 2:
-            offset = -20
-            canvas.itemconfigure(yel2,state='hidden')
-            canvas.itemconfigure(grn,state='hidden')
-            if two_aspect == two_aspect_type.home:
-                signal_sub_type = sig_sub_type.home
-                grn = yel  # Reassign the green aspect to aspect#2
-
-            elif two_aspect == two_aspect_type.distant:
-                signal_sub_type = sig_sub_type.distant
-                grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
-                yel = red  # Reassign the Yellow aspect to aspect#1 (normally red in 3/4 aspect signals)
-            else:  # It must be a two_aspect_type.red_ylw
-                signal_sub_type = sig_sub_type.red_ylw
-                
-        elif aspects == 3:
-            signal_sub_type = sig_sub_type.three_aspect
-            canvas.itemconfigure(yel2,state='hidden')
-            offset = -10
-            
-        else: # its a 4 aspect signal
-            signal_sub_type = sig_sub_type.four_aspect
-            offset = 0
    
-        # now draw the feathers (x has been adjusted for the no of aspects)            
-        # These get 'hidden' later if they are not required for the signal
-        line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-10,orientation) 
-        rhfeather1 = canvas.create_line (line_coords,width=3,fill="black")
-        line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-5,orientation) 
-        rhfeather2 = canvas.create_line (line_coords,width=3,fill="black")
-        line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-30,orientation) 
-        lhfeather1 = canvas.create_line (line_coords,width=3,fill="black")
-        line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-35,orientation) 
-        lhfeather2 = canvas.create_line (line_coords,width=3,fill="black")
-        
-        # Draw the theatre route indicator box if one is specified for the signal
-        # The text object is created anyway - and 'hidden' later if not required
-        point_coords = common.rotate_point (x,y,offset+80,-20,orientation)        
-        if theatre_route_indicator:
-            line_coords = common.rotate_line (x,y,offset+71,-12,offset+89,-28,orientation) 
-            canvas.create_rectangle (line_coords,fill="black")
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                    angle = orientation-90,state='normal')
-        else:
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                    angle = orientation-90,state='hidden')
-            
-        # Hide any drawing objects we don't need for this particular signal
-        if not position_light: canvas.itemconfigure(but2win,state='hidden')
-        if not position_light: canvas.itemconfigure(poslight1,state='hidden')
-        if not position_light: canvas.itemconfigure(poslight2,state='hidden')
-        if not lhfeather45: canvas.itemconfigure(lhfeather1,state='hidden')
-        if not lhfeather90: canvas.itemconfigure(lhfeather2,state='hidden')
-        if not rhfeather45: canvas.itemconfigure(rhfeather1,state='hidden')
-        if not rhfeather90: canvas.itemconfigure(rhfeather2,state='hidden')
-        if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
-        if fully_automatic: canvas.itemconfigure(but1win,state='hidden')
+# Specify the external Modules we need to import
 
-        # Compile a dictionary of everything we need to track for the signal
-        new_signal = {"canvas" : canvas,              # canvas object
-                      "grn" : grn,                    # drawing object
-                      "yel" : yel,                    # drawing object
-                      "red" : red,                    # drawing object
-                      "yel2" : yel2,                  # drawing object
-                      "pos1" : poslight1,             # drawing object
-                      "pos2" : poslight2,             # drawing object
-                      "lhf1": lhfeather1,             # drawing object
-                      "lhf2": lhfeather2,             # drawing object
-                      "rhf1": rhfeather1,             # drawing object
-                      "rhf2": rhfeather2,             # drawing object
-                      "theatre": theatre,             # drawing object                
-                      "sigbutton" : button1,          # drawing object
-                      "subbutton" : button2,          # drawing object
-                      "sigpassedbutton" : button3,    # drawing object
-                      "sigtype": sig_type.colour_light,
-                      "subtype": signal_sub_type,
-                      "displayedaspect" : aspect_type.red,  # valid for all 2 aspects - as drawing objects are swapped
-                      "overriddenaspect" : aspect_type.green,
-                      "overridecallback" : sig_callback,   # Callback to use for automatically-triggered state changes
-                      "sigclear" : False,             # Whether signal is On/Off - Common to All signal Types
-                      "subclear" : False,             # Whether Subsidary is On/Off - Common to All main signal Types
-                      "override" : False,             # Whether signal is overriden - Common to All main signal Types
-                      "routeset" : route_type.MAIN,
-                      "routetext" : "" }
-    
-        # Add the new signal to the dictionary of signals
-        signals[str(sig_id)] = new_signal
-        
-        # Clear the signal if it is an automatic signal
-        if fully_automatic: toggle_signal(sig_id)
-        
-        # Set the initial aspect
-        update_colour_light_signal(sig_id)
-       
-    return ()
+from tkinter import *
+import signals_common
+import signals_colour_lights
 
 # -------------------------------------------------------------------------
-# Internal/Externally called function to Refresh the displayed signal aspect 
-# Also takes into account the state of the signal ahead if one is specified
-# to ensure the correct aspect is displayed for 3/4 aspect types and 2 aspect 
-# distant signals - e.g. for a 3/4 aspect signal - if the signal ahead is ON
-# and this signal is OFF then we want to change it to YELLOW rather than GREEN
+# Externally called Functions and classes to create the specific signal types
+# These are imported into the current context so they "exist" within the
+# context of the main "Signals" Module so external programmes only need
+# to import the 'signals' modules to make use of these classes/functions
+# e.g. An external module would use 'Signals.create_colour_light_signal (...)'
 # -------------------------------------------------------------------------
 
-def update_colour_light_signal (sig_id:int,sig_ahead_id:int = 0):
+from signals_common import sig_type
+from signals_common import route_type
+from signals_common import sig_callback_type
 
-    global signals # the dictionary of signals
+from signals_colour_lights import create_colour_light_signal
+from signals_ground_position import create_ground_position_signal
+from signals_colour_lights import signal_sub_type
 
-    # Validate the signal and the signal ahead (if one is specified) both exist
-    if not sig_exists(sig_id):
-        print ("ERROR: update_colour_light_signal - Signal "+str(sig_id)+" does not exist")
-    elif sig_ahead_id != 0 and not sig_exists(sig_ahead_id): 
-        print ("ERROR: update_colour_light_signal - Signal Ahead "+str(sig_id)+" does not exist")
+# -------------------------------------------------------------------------
+# Externally called Function to update a signal according the state of the
+# Signal ahead - Intended mainly for Coulour Light Signal types so we can
+# ensure the "CLEAR" aspect reflects the aspect of ths signal ahead
+# Calls the signal type-specific functions depending on the signal type
+# -------------------------------------------------------------------------
+
+def update_signal (sig_id:int, sig_ahead_id:int = 0):
+
+    # Validate the signal exists and it is not a Ground Position Signal
+    if not signals_common.sig_exists(sig_id):
+        print ("ERROR: update_signal_aspect - Signal "+str(sig_id)+" does not exist")
+        
+    elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
+        print ("ERROR: update_signal_aspect - Signal Ahead "+str(sig_ahead_id)+" does not exist")
+        
     else:
         # get the signals that we are interested in
-        signal = signals[str(sig_id)]
-        # check the signal is of the correct type for this type-specific function 
-        if signal["sigtype"] != sig_type.colour_light:
-            print ("ERROR: update_colour_light_signal - Signal "+str(sig_id)+
-                    " is of unsupported type" + str(signal["sigtype"]))
-        else:
-            if not signal["sigclear"]:
-                # If signal is set to "ON" then change to RED
-                # unless it is a 2 aspect distant - in which case we want to set it to YELLOW
-                if signal["subtype"] == sig_sub_type.distant:
-                    change_colour_light_signal_aspect (sig_id, aspect_type.yellow)
-                else:
-                    change_colour_light_signal_aspect (sig_id, aspect_type.red)
-            elif signal["override"]:
-                # If signal is Overriden the set the signal to its overriden aspect
-                # The overriden aspect would normally be RED - unless its been triggered
-                # as a 'timed' signal - in which case the associated thread will be cycling
-                # the 'override' through the aspects all the way back to GREEN
-                change_colour_light_signal_aspect (sig_id, signal["overriddenaspect"])
-            elif (sig_ahead_id == 0 or signal["subtype"] == sig_sub_type.home
-                          or signal["subtype"] == sig_sub_type.red_ylw):
-                # Signal is clear and not overriden - Either no signal ahead has been specified
-                # or the signal type is either a 2 aspect home signal or a 2 aspect red/yellow signal
-                # In these cases we set it to its "clear" aspect - We  therefore change to GREEN,
-                # unless its a 2 aspect red/ylw signal where we change it to the YELLOW
-                if signal["subtype"] == sig_sub_type.red_ylw:
-                    change_colour_light_signal_aspect (sig_id,aspect_type.yellow)
-                else:
-                    change_colour_light_signal_aspect (sig_id,aspect_type.green)
-            else:
-                # Signal is clear, not overriden and is either a 3 or 4 aspect signal or
-                # a 2 aspect distant signal- and a valid signal ahead has been specified
-                # We therefore need to take into account the aspect of the signal ahead
-                sig_ahead = signals[str(sig_ahead_id)]
-                if sig_ahead["displayedaspect"] == aspect_type.red:
-                    # Both 3/4 aspect signals (and 2 aspect distant signals) should display
-                    # a YELLOW aspect if the signal ahead is RED
-                    change_colour_light_signal_aspect (sig_id,aspect_type.yellow) 
-                elif (signal["subtype"] == sig_sub_type.four_aspect and
-                                sig_ahead["displayedaspect"] == aspect_type.yellow):
-                    # 4 aspect signals will display a DOUBLE YELLOW aspect if signal ahead is YELLOW
-                    change_colour_light_signal_aspect (sig_id,aspect_type.double_yellow)
-                else:
-                    # We can change the signal to display the GREEN aspect
-                    change_colour_light_signal_aspect (sig_id,aspect_type.green)             
-    return ()
-
-#-------------------------------------------------------------------
-# Internal function to deal with the update of the drawing objects
-# for the colour light signal type when we update the aspect.
-# There should never be a need for external programmes to call into
-# this function but we'll still validate the call just in case
-#------------------------------------------------------------------
-    
-def change_colour_light_signal_aspect (sig_id:int,new_aspect:aspect_type):
-
-    global signals # the dictionary of signals
-    
-    if not sig_exists(sig_id):
-        print ("ERROR: change_colour_light_signal_aspect - Signal "+str(sig_id)+" does not exist")
-    else:
-        # get the signal we are interested in
-        signal = signals[str(sig_id)]
+        signal = signals_common.signals[str(sig_id)]
+        
+        # now call the signal type-specific functions to update the signal
         if signal["sigtype"] == sig_type.colour_light:
-            if new_aspect == aspect_type.red:
-                # Change the signal to display the RED aspect
-                signal["canvas"].itemconfig (signal["red"],fill="red")
-                signal["canvas"].itemconfig (signal["yel"],fill="grey")
-                signal["canvas"].itemconfig (signal["grn"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-                signal["displayedaspect"]= aspect_type.red
-            elif new_aspect == aspect_type.yellow:
-                # Change the signal to display the Yellow aspect
-                signal["canvas"].itemconfig (signal["red"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel"],fill="yellow")
-                signal["canvas"].itemconfig (signal["grn"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-                signal["displayedaspect"]= aspect_type.yellow
-            elif new_aspect == aspect_type.double_yellow:
-                # Change the signal to display the Double Yellow aspect
-                signal["canvas"].itemconfig (signal["red"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel"],fill="yellow")
-                signal["canvas"].itemconfig (signal["grn"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
-                signal["displayedaspect"]= aspect_type.double_yellow
-            else:
-                # Change the signal to display the Green aspect
-                signal["canvas"].itemconfig (signal["red"],fill="grey")
-                signal["canvas"].itemconfig (signal["yel"],fill="grey")
-                signal["canvas"].itemconfig (signal["grn"],fill="green")
-                signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-                signal["displayedaspect"]= aspect_type.green
-            # save the updates back to the dictionary of signals
-            signals[str(sig_id)] = signal
-        else:
-            print ("ERROR: change_colour_light_signal_aspect - Signal "+str(sig_id)+
-                        " is of unsupported type" + str(signal["sigtype"]))
-    return ()
-
-#-------------------------------------------------------------------
-# Internal function to deal with the update of the drawing objects
-# for the colour light subsidary signal. There should never be a
-# need for external programmes to call into this function but
-# we'll still validate the call just in case
-#------------------------------------------------------------------
-    
-def change_colour_light_subsidary_aspect (sig_id:int):
-
-    global signals # the dictionary of signals
-    
-    # Verify that the signal exists
-    if not sig_exists(sig_id):
-        print ("ERROR: change_colour_light_subsidary_aspect - Signal ID "+str(sig_id)+" does not exist")
-    else:
-        # get the signal we are interested in
-        signal = signals[str(sig_id)]
-        # Subsidary signals only supported for certan types of main signal
-        if signal["sigtype"] == sig_type.colour_light:
-            # common to all signal types
-            if signal["subclear"]:
-                signal["canvas"].itemconfig (signal["pos1"],fill="white")
-                signal["canvas"].itemconfig (signal["pos2"],fill="white")
-            else:
-                signal["canvas"].itemconfig (signal["pos1"],fill="grey")
-                signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-
-        else:
-            print ("ERROR: change_colour_light_subsidary_aspect - Signal " + str(sig_id) +
-                       " is of unsupported type" + str(signal["sigtype"]))
-    return ()
-
-# -------------------------------------------------------------------------
-# Internal function to update the display of the feather route indication
-# The feathers will only be displayed if the signal was created with them
-# There should never be a need for external programmes to call into this
-# function - call into the set_route_indication function instead - but
-# we'll still validate the call just in case
-# -------------------------------------------------------------------------
-
-def update_feather_route_indication (sig_id:int):
-
-    global signals # the dictionary of signals
-
-    if not sig_exists(sig_id):
-        print ("ERROR: update_feather_route_indication - Signal "+str(sig_id)+" does not exist")
-    else:
-        # get the signal that we are interested in
-        signal = signals[str(sig_id)]
-        if signal["sigtype"] == sig_type.colour_light:
-            # Clear down all the indications and then set only the one we want
-            signal["canvas"].itemconfig (signal["lhf1"],fill="black")
-            signal["canvas"].itemconfig (signal["lhf2"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf1"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf2"],fill="black")
-            # Only display the route indication if the signal is clear and not overriden to red
-            if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
-                if signal["routeset"] == route_type.LH1:
-                    signal["canvas"].itemconfig (signal["lhf1"],fill="white")
-                elif signal["routeset"] == route_type.LH2:
-                    signal["canvas"].itemconfig (signal["lhf2"],fill="white")
-                elif signal["routeset"] == route_type.RH1:
-                    signal["canvas"].itemconfig (signal["rhf1"],fill="white")
-                elif signal["routeset"] == route_type.RH2:
-                    signal["canvas"].itemconfig (signal["rhf2"],fill="white")       
-        else:
-            print ("ERROR: update_feather_route_indication - Signal "+str(sig_id)+
-                        " is of unsupported type" + str(signal["sigtype"]))  
-    return ()
-
-# -------------------------------------------------------------------------
-# Internal function to update the displayed value of the theatre route indication
-# The theatre indication will only be displayed if the signal was created with one
-# There should never be a need for external programmes to call into this
-# function - call into the set_route_indication function instead - but
-# we'll still validate the call just in case
-# -------------------------------------------------------------------------
-
-def update_theatre_route_indication (sig_id:int):
-
-    global signals # the dictionary of signals
-    if not sig_exists(sig_id):
-        print ("ERROR: update_theatre_route_indication - Signal "+str(sig_id)+" does not exist")
-    else:
-        # get the signal that we are interested in
-        signal = signals[str(sig_id)]
-        if signal["sigtype"] == sig_type.colour_light:
-            # Only display the route indication if the signal is clear and not overriden to red
-            if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
-                signal["canvas"].itemconfig (signal["theatre"],text=signal["routetext"])
-            else:
-                signal["canvas"].itemconfig (signal["theatre"],text="")     
-        else:
-            print ("ERROR: update_feather_route_indication - Signal "+str(sig_id)+
-                        " is of unsupported type" + str(signal["sigtype"]))
-    return ()
+            signals_colour_lights.update_colour_light_signal_aspect (sig_id,sig_ahead_id )
+        
+    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to set the route indication for the signal
-# Calls the above internal functions to update the route feathers and the
-# theatre route indication as appropriate
+# Calls the signal type-specific functions depending on the signal type
 # -------------------------------------------------------------------------
 
-def set_route_indication (sig_id:int, feathers:route_type = route_type.MAIN, theatre_text:str =""):
-
-    global signals # the dictionary of signals
+def set_route_indication (sig_id:int, route:route_type = route_type.MAIN, theatre_text:str =""):
 
     # Validate the signal exists and it is not a Ground Position Signal
-    if not sig_exists(sig_id):
+    if not signals_common.sig_exists(sig_id):
         print ("ERROR: set_route_indication - Signal "+str(sig_id)+" does not exist")
         
     else:
         # get the signals that we are interested in
-        signal = signals[str(sig_id)]
+        signal = signals_common.signals[str(sig_id)]
         
+        # now call the signal type-specific functions to update the signal
         if signal["sigtype"] == sig_type.colour_light:
-            
-            # Set the New route information)
-            signal["routeset"] = feathers
-            signal["routetext"] = theatre_text
-            
-            # update the dictionary of signals
-            signals[str(sig_id)] = signal
-            
-            # Refresh the route indications that are supported for this signal type
-            # Only the indication types enabled at signal creation time will be displayed
-            update_feather_route_indication (sig_id)
-            update_theatre_route_indication (sig_id)
-            
-        else:
-            print ("ERROR: set_route_indication - Signal "+str(sig_id)+
-                    " is of unsupported type" + str(signal["sigtype"]))
-
+            signals_colour_lights.update_colour_light_route_indication (sig_id,route,theatre_text)
+                        
     return()
-
-# -------------------------------------------------------------------------
-# Externally called function to create a Ground Position Signal (drawing objects
-# + state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of Signals for later reference
-# -------------------------------------------------------------------------
-
-def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
-                          sig_callback = sig_null, orientation:int = 0,
-                          sig_passed_button: bool = False, 
-                          shunt_ahead: bool = False, modern: bool = False):
-
-    global signals # the dictionary of signals
-    # also imported from "common" - fontsize, xpadding, ypadding
-
-    # Do some basic validation on the parameters we have been given
-    if sig_exists(sig_id):
-        print ("ERROR: create_ground_position_signal - Signal ID "+str(sig_id)+" already exists")
-        
-    elif sig_id < 1:
-        print ("ERROR: create_ground_position_signal - Signal ID must be greater than zero")
-        
-    elif orientation != 0 and orientation != 180:
-        print ("ERROR: create_ground_position_signal - Signal ID "+str(sig_id)+
-                       " - Invalid orientation angle - only 0 and 180 currently supported")
-        
-    else: # we're good to go on and create the signal
-
-        # set the font size for the buttons
-        myfont1 = tkinter.font.Font(size=common.fontsize)
-        myfont2 = tkinter.font.Font(size=1)
-            
-        # Create the button objects and their callbacks
-        button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:toggle_signal(sig_id,sig_callback))
-        button2 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
-                command=lambda:signal_passed_button(sig_id,sig_callback))
-        
-        # Draw the signal base
-        line_coords = common.rotate_line (x,y,0,0,0,-25,orientation) 
-        canvas.create_line (line_coords,width=2)
-        
-        # Draw the main body of signal
-        point_coords1 = common.rotate_point (x,y,0,-5,orientation) 
-        point_coords2 = common.rotate_point (x,y,0,-25,orientation) 
-        point_coords3 = common.rotate_point (x,y,+20,-25,orientation) 
-        point_coords4 = common.rotate_point (x,y,+20,-20,orientation) 
-        point_coords5 = common.rotate_point (x,y,+5,-5,orientation) 
-        points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
-        canvas.create_polygon (points, outline="black")
-        
-        # Draw the position lights - we'll set the initial aspect later
-        line_coords = common.rotate_line (x,y,+1,-14,+8,-7,orientation) 
-        posroot = canvas.create_oval (line_coords,fill="grey",outline="black")
-        line_coords = common.rotate_line (x,y,+9,-24,+16,-17,orientation) 
-        posoff = canvas.create_oval (line_coords,fill="grey",outline="black")
-        line_coords = common.rotate_line (x,y,+1,-24,+8,-17,orientation) 
-        poson = canvas.create_oval (line_coords,fill="grey",outline="black")
-        
-        # Create the 'window' in which the signal button is displayed
-        point_coords = common.rotate_point (x,y,-25,-20,orientation) 
-        canvas.create_window (point_coords,window=button1)
-        
-        # Create the 'window' for the Signal Passed Button - but hide it if not required
-        but2win = canvas.create_window (x,y,window=button2)
-        if not sig_passed_button: canvas.itemconfigure(but2win,state='hidden')
-        
-        # Compile a dictionary of everything we need to track for the signal
-        new_signal = {"canvas" : canvas,              # canvas object
-                      "posroot" : posroot,            # drawing object
-                      "poson" : poson,                # drawing object
-                      "posoff": posoff,               # drawing object
-                      "sigbutton" : button1,          # drawing object
-                      "sigpassedbutton" : button2,    # drawing object
-                      "shuntahead" : shunt_ahead,
-                      "modern" : modern,
-                      "sigtype": sig_type.ground_position_light,
-                      "sigclear" : False}
-        
-        # Add the new signal to the dictionary of signals
-        signals[str(sig_id)] = new_signal
-        
-        # Set the aspect to display (as is dependent on whether the signal is a shunt
-        # ahead or normal position light and whether its modern or pre-1996
-        update_ground_position_light_signal (sig_id)
-       
-    return ()
-
-# -------------------------------------------------------------------------
-# Internal function to Refresh the aspect of a ground position signal
-# There should never be a need for external programmes to call into this
-# function but we'll still validate the call just in case it 
-# -------------------------------------------------------------------------
-
-def update_ground_position_light_signal (sig_id:int):
-
-    global signals # the dictionary of signals
-    
-    # Validate the signal(s) exist and they are not Ground Position Signals
-    if not sig_exists(sig_id):
-        print ("ERROR: update_ground_position_light_signal - Signal "+str(sig_id)+" does not exist")
-    else:
-        # get the signals that we are interested in
-        signal = signals[str(sig_id)]
-        if signal["sigtype"] == sig_type.ground_position_light:
-            if signal["sigclear"]:
-                # indication is the same whether itt a shunt ahead or a normal
-                # position light and whether its modern or pre-1996
-                signal["canvas"].itemconfig (signal["posoff"],fill="white")
-                signal["canvas"].itemconfig (signal["posroot"],fill="white")
-                signal["canvas"].itemconfig (signal["poson"],fill="grey") 
-            elif signal["shuntahead"]:
-                # Aspect to display is yellow
-                signal["canvas"].itemconfig (signal["poson"],fill="yellow")
-                signal["canvas"].itemconfig (signal["posoff"],fill="grey")
-                # The "root" pos light is also yellow for modern signals (pre-1996 its white)
-                if signal["modern"]: signal["canvas"].itemconfig (signal["posroot"],fill="yellow")
-                else: signal["canvas"].itemconfig (signal["posroot"],fill="white")                        
-            else:   # signal is a normal ground position light signal
-                # Aspect to display is Red
-                signal["canvas"].itemconfig (signal["poson"],fill="red")
-                signal["canvas"].itemconfig (signal["posoff"],fill="grey")
-                # The "root" pos light is also red for modern signals (pre-1996 its white)
-                if signal["modern"]: signal["canvas"].itemconfig (signal["posroot"],fill="red")
-                else: signal["canvas"].itemconfig (signal["posroot"],fill="white")
-        else:
-            print ("ERROR: update_ground_position_light_signal - Signal "+str(sig_id)+" is of the wrong type")
-    return ()
-
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the signal
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int):
-    global signals # the dictionary of signals
+        
     # Validate the signal exists and it is not a Ground Position Signal
-    if not sig_exists(sig_id):
+    if not signals_common.sig_exists(sig_id):
         print ("ERROR: signal_clear - Signal "+str(sig_id)+" does not exist")
         sig_clear = False
+        
     else:
         # get the signal that we are interested in
-        signal = signals[str(sig_id)]
+        signal = signals_common.signals[str(sig_id)]
         sig_clear = signal["sigclear"]
+        
     return (sig_clear)
 
 # -------------------------------------------------------------------------
@@ -888,49 +188,46 @@ def signal_clear (sig_id:int):
 # -------------------------------------------------------------------------
 
 def subsidary_signal_clear (sig_id:int):
-    global signals # the dictionary of signals
+        
     # Validate the signal exists
-    if not sig_exists(sig_id):
+    if not signals_common.sig_exists(sig_id):
         print ("ERROR: subsidary_signal_clear - Signal "+str(sig_id)+" does not exist")
         sig_clear = False
+        
     else:
         # get the signals that we are interested in
-        signal = signals[str(sig_id)]
+        signal = signals_common.signals[str(sig_id)]
+        
         # Check the signal type supports subsidary signals
         if signal["sigtype"] == sig_type.colour_light:
             sig_clear = signal["subclear"]
         else:
-            print ("ERROR: subsidary_signal_clear - Signal " + str(sig_id) +
-                       " is of unsupported type" + str(signal["sigtype"]))
             sig_clear = False
+            
     return (sig_clear)
 
 # -------------------------------------------------------------------------
 # Externally called function to Lock the signal (preventing it being cleared)
-# If signal/point locking has been correctly implemented it should
-# only be possible to lock a signal that is "ON" (i.e. at DANGER)
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
-    
-    global signals # the dictionary of signals
-    
+        
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
+        if not signals_common.sig_exists(sig_id):
             print ("ERROR: lock_signal - Signal "+str(sig_id)+" does not exist")  
         else:   
             # get the signal that we are interested in
-            signal = signals[str(sig_id)]
+            signal = signals_common.signals[str(sig_id)]
             
-            # Set the signal to danger if we need to before locking
-            if signal["sigclear"]:
-                print ("WARNING: lock_signal - Signal "+ str(sig_id) +" is CLEAR")
-                print ("WARNING: lock_signal - Setting to ON before locking")
-                toggle_signal (sig_id)    
+            # If signal/point locking has been correctly implemented it should
+            # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+            if signal["sigclear"]: print ("WARNING: lock_signal - Signal "+ str(sig_id) +" is CLEAR")
+            
             # Disable the Signal button to lock it
             signal["sigbutton"].config(state="disabled")
+            
     return()
 
 # -------------------------------------------------------------------------
@@ -939,81 +236,76 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
-    
-    global signals # the dictionary of signals
-    
+        
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
+        if not signals_common.sig_exists(sig_id):
             print ("ERROR: unlock_signal - Signal "+str(sig_id)+" does not exist")
+            
         else:   
             # get the signal that we are interested in
-            signal = signals[str(sig_id)]
+            signal = signals_common.signals[str(sig_id)]
+            
             # Enable the Signal button to unlock it
             signal["sigbutton"].config(state="normal")
+            
     return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Lock the subsidary signal
 # This is effectively a seperate signal from the main aspect
-# If signal/point locking has been correctly implemented it should
-# only be possible to lock a signal that is "ON" (i.e. at DANGER)
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def lock_subsidary_signal (*sig_ids:int):
-    
-    global signals # the dictionary of signals
-    
+        
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
+        if not signals_common.sig_exists(sig_id):
             print ("ERROR: lock_subsidary - Signal "+str(sig_id)+" does not exist")
+            
         else:
             # get the signal that we are interested in
-            signal = signals[str(sig_id)]      
+            signal = signals_common.signals[str(sig_id)]
+            
+            # If signal/point locking has been correctly implemented it should
+            # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+            if signal["subclear"]: print ("WARNING: lock_subsidary_signal - Subsidary signal "+ str(sig_id) +" is CLEAR")
+            
             # Check the signal type supports subsidary signals
-            if signal["sigtype"] == sig_type.colour_light:        
-                # Set the signal to danger if we need to before locking
-                if signal["subclear"]:
-                    print ("WARNING: lock_subsidary - Subsidary signal "+ str(sig_id) +" is CLEAR")
-                    print ("WARNING: lock_subsidary - Setting to ON before locking")
-                    toggle_subsidary (sig_id)            
-                # Disable the Subsidary Signal button to lock it
+            # If so we disable the Button to lock the subsidary signal
+            if signal["sigtype"] == sig_type.colour_light:
                 signal["subbutton"].config(state="disabled")        
-            else:
-                print ("ERROR: lock_subsidary - Signal " + str(sig_id) +
-                           " is of unsupported type" + str(signal["sigtype"]))
+                
     return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Unlock the subsidary signal
+# This is effectively a seperate signal from the main aspect
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def unlock_subsidary_signal (*sig_ids:int):
-    
-    global signals # the dictionary of signals
-    
+        
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
-            print ("ERROR: unlock_subsidary - Signal "+str(sig_id)+" does not exist")  
+        if not signals_common.sig_exists(sig_id):
+            print ("ERROR: unlock_subsidary - Signal "+str(sig_id)+" does not exist")
+            
         else:
             # get the signal that we are interested in
-            signal = signals[str(sig_id)] 
+            signal = signals_common.signals[str(sig_id)]
+            
             # Check the signal type supports subsidary signals
+            # If so we re-enable the Button to unlock the subsidary signal
             if signal["sigtype"] == sig_type.colour_light:    
-                # Enable the Subsidary Signal button to unlock it
                 signal["subbutton"].config(state="normal") 
-            else:
-                print ("ERROR: unlock_subsidary - Signal " + str(sig_id) +
-                           " is of unsupported type" + str(signal["sigtype"]))
+                
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Override a signal - setting it to RED
-# apart from 2 aspect distance signals - which are set to YELLOW
+# Externally called function to Override a signal - effectively setting it
+# to RED (apart from 2 aspect distance signals - which are set to YELLOW)
 # Signal will display the overriden aspect no matter what its current setting is
 # Used to support automation - e.g. set asignal to Danger once a train has passed
 # Multiple signal IDs can be specified in the call
@@ -1021,131 +313,89 @@ def unlock_subsidary_signal (*sig_ids:int):
 
 def set_signal_override (*sig_ids:int):
     
-    global signals # the dictionary of signals
-
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
+        if not signals_common.sig_exists(sig_id):
             print ("ERROR: set_signal_override - Signal "+str(sig_id)+" does not exist")
+            
         else:
             # get the signal that we are interested in
-            signal = signals[str(sig_id)]
+            signal = signals_common.signals[str(sig_id)]
+            
             # Check the signal type supports this feature
             if signal["sigtype"] == sig_type.colour_light:
-                # Override the signal state and update the list of signals
-                signal["override"] = True
-                if signal["subtype"] == sig_sub_type.distant:
-                    signal["overriddenaspect"] = aspect_type.yellow
-                else:
-                    signal["overriddenaspect"] = aspect_type.red
-                signals[str(sig_id)] = signal
-                # Update the signal to reflect the new state
-                # And change the button colours to indicate the override
-                update_colour_light_signal (sig_id)
+                
+                # Override the signal and change the button colour
                 signal["sigbutton"].config(fg="red")
-            else:
-                print ("ERROR: set_signal_override - Signal " + str(sig_id) +
-                           " is of unsupported type" + str(signal["sigtype"]))
+                signal["override"] = True
+                
+                # Update the dictionary of signals
+                signals_common.signals[str(sig_id)] = signal
+                
+                # Update the signal to reflect its overriden state
+                signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+                
     return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Clear a Signal Override 
-# Signal will revert to its current manual setting (on/off) and displayed aspect
+# Signal will revert to its current manual setting (on/off) and aspect
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
-    
-    global signals # the dictionary of signals
-        
+            
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not sig_exists(sig_id):
-            print ("ERROR: clear_signal_override - Signal "+str(sig_id)+" does not exist")      
+        if not signals_common.sig_exists(sig_id):
+            print ("ERROR: clear_signal_override - Signal "+str(sig_id)+" does not exist")
+            
         else:
             # get the signal that we are interested in
-            signal = signals[str(sig_id)]      
+            signal = signals_common.signals[str(sig_id)]
+            
             # Check the signal type supports this feature
-            if signal["sigtype"] == sig_type.colour_light:        
-                # Clear the Override and update the list of signals
+            if signal["sigtype"] == sig_type.colour_light:
+                
+                # Clear the override and change the button colour
                 signal["override"] = False
-                signal["overriddenaspect"] = aspect_type.green
-                signals[str(sig_id)] = signal         
-                # Now update the signal to reflect the new state
-                update_colour_light_signal (sig_id)
                 signal["sigbutton"].config(fg="black")
-            else:
-                print ("ERROR: clear_signal_override - Signal " + str(sig_id) +
-                           " is of unsupported type" + str(signal["sigtype"]))
+                
+                # Update the dictionary of signals
+                signals_common.signals[str(sig_id)] = signal
+                
+                # Update the signal to reflect its "non-overriden" state
+                signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to 'override' a signal (changing it to RED) and then
-# cycle through all of the supported aspects all the way back to GREEN - when the
-# override will be cleared - intended for automation of 'exit' signals on a layout
-# The start_delay is the initial delay (in seconds) before the signal is changed to RED
-# the time_delay is the delay (in seconds) between each aspect change
+# Externally called Function to 'override' a signal (changing it to 'ON') after
+# a specified time delay and then clearing the override the signal after another
+# specified time delay. In the case of colour light signals, this will cause the
+# signal to cycle through the supported aspects all the way back to GREEN. When
+# the Override is cleared, the signal will revert to its previously displayed aspect
+# This is to support the automation of 'exit' signals on a layout
 # A 'sig_passed' callback event will be generated when the signal is overriden if
 # and only if a start delay (> 0) is specified. For each subsequent aspect change
 # a'sig_updated' callback event will be generated
 # -------------------------------------------------------------------------
 
-def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=2):
-    
-    global signals # the dictionary of signals
-
-    def thread_to_cycle_aspects (sig_id:int, ext_callback, start_delay, time_delay):
-
-        time.sleep (start_delay) # Sleep until the initial "signal passed" event is due
-        set_signal_override(sig_id) # Override Signal(to Red),
-
-        # If a start delay was specified then "pulse" the signal passed button
-        # and make the first callback - in this case a "sig_passed" event
-        if start_delay > 0:
-            x = threading.Thread(target=thread_to_pulse_signal_passed_button, args=(sig_id,1))
-            x.start()
-            ext_callback(sig_id,sig_callback_type.sig_passed)
-
-        time.sleep (time_delay) # Sleep until the next aspect change is due
-
-        # Cycle through the aspects if its a 3 or 4 aspect signal
-        signal = signals[str(sig_id)]
-        if signal["subtype"] == sig_sub_type.three_aspect or signal["subtype"] == sig_sub_type.four_aspect:
-            signal["overriddenaspect"] = aspect_type.yellow
-            signals[str(sig_id)] = signal
-            update_colour_light_signal (sig_id)
-            ext_callback(sig_id, sig_callback_type.sig_updated) # Make an intermediate external callback
-            time.sleep (time_delay) # Sleep until the next aspect change is due
-
-        signal = signals[str(sig_id)]
-        if signal["subtype"] == sig_sub_type.four_aspect:
-            signal["overriddenaspect"] = aspect_type.double_yellow
-            signals[str(sig_id)] = signal
-            update_colour_light_signal (sig_id)
-            ext_callback(sig_id,sig_callback_type.sig_updated) # Make an intermediate external callback
-            time.sleep (time_delay) # Sleep until the next aspect change is due
-                                
-        # We've finished - so clear the override on the signal (also updates the aspect)
-        clear_signal_override (sig_id) 
-        ext_callback(sig_id,sig_callback_type.sig_updated) # Now make the final external callback
-        
-        return ()
+def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
 
     # Validate the signal exists
-    if not sig_exists(sig_id):
+    if not signals_common.sig_exists(sig_id):
         print ("ERROR: trigger_timed_signal - Signal "+str(sig_id)+" does not exist")
+        
     else:
         # get the signal that we are interested in
-        signal = signals[str(sig_id)]
-        # Check the signal type supports this feature
+        signal = signals_common.signals[str(sig_id)]
+        
+        # Call the signal type-specific functions to trigger the signal
         if signal["sigtype"] == sig_type.colour_light:
-            x = threading.Thread (target=thread_to_cycle_aspects,
-                    args= (sig_id, signal["overridecallback"],start_delay,time_delay))
-            x.start()
-        else:
-            print ("ERROR: trigger_timed_signal - Signal " + str(sig_id) +
-                       " is of unsupported type" + str(signal["sigtype"]))
+            signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
+            
     return()
 
 
-###############################################################################
+##########################################################################################

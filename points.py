@@ -1,7 +1,7 @@
 from tkinter import *
 import tkinter.font
 import enum
-import common
+import signals_common
 
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing point objects
@@ -222,33 +222,33 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     else: # we're good to go on and create the point
         
         # set the font size for the buttons
-        myfont = tkinter.font.Font(size=common.fontsize)
+        myfont = tkinter.font.Font(size=signals_common.fontsize)
 
         # Create the button objects and their callbacks
         button1 = Button (canvas,text=str(point_id), state="normal", 
                     relief="raised", font = myfont,bg= "grey85",
-                    padx=common.xpadding, pady=common.ypadding,
+                    padx=signals_common.xpadding, pady=signals_common.ypadding,
                     command = lambda:toggle_point(point_id,point_callback))
         button2 = Button (canvas,text="L",state="normal", relief="sunken",
-                    padx=common.xpadding, pady=common.ypadding, font = myfont, bg = "white",
+                    padx=signals_common.xpadding, pady=signals_common.ypadding, font = myfont, bg = "white",
                     command = lambda:toggle_fpl(point_id,point_callback))
 
         #Create some drawing objects (depending on point type)
         if pointtype==point_type.RH:
             
-            line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
+            line_coords = signals_common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
 
-            line_coords = common.rotate_line (x,y,-25,0,-15,+10,orientation)
+            line_coords = signals_common.rotate_line (x,y,-25,0,-15,+10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
 
-            line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
+            line_coords = signals_common.rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
 
-            line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
+            line_coords = signals_common.rotate_line (x,y,-15,+10,0,+25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
 
-            point_coords = common.rotate_point (x,y,0,-20,orientation)
+            point_coords = signals_common.rotate_point (x,y,0,-20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
                 but2win = canvas.create_window (point_coords,anchor=E,window=button2)
@@ -259,19 +259,19 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             
         else:  # Point type must be LH
             
-            line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
+            line_coords = signals_common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
 
-            line_coords = common.rotate_line (x,y,-25,0,-15,-10,orientation)
+            line_coords = signals_common.rotate_line (x,y,-25,0,-15,-10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
 
-            line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
+            line_coords = signals_common.rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
 
-            line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
+            line_coords = signals_common.rotate_line (x,y,-15,-10,0,-25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
             
-            point_coords = common.rotate_point (x,y,0,+20,orientation)
+            point_coords = signals_common.rotate_point (x,y,0,+20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
                 but2win = canvas.create_window (point_coords,anchor=E,window=button2)
