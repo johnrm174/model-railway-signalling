@@ -245,9 +245,9 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             offset = -20
             canvas.itemconfigure(yel2,state='hidden')
             canvas.itemconfigure(grn,state='hidden')
-            if signal_sub_type == signal_sub_type.home:
+            if signal_subtype == signal_sub_type.home:
                 grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
-            elif signal_sub_type == signal_sub_type.distant:
+            elif signal_subtype == signal_sub_type.distant:
                 grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
                 yel = red  # Reassign the Yellow aspect to aspect#1 (normally red in 3/4 aspect signals)
 
@@ -299,13 +299,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if fully_automatic:
             canvas.itemconfigure(but1win,state='hidden')
             signal_clear = True
-            if signal_subtype == signal_sub_type.distant:
+            if signal_subtype == signal_sub_type.red_ylw:
                 initial_aspect = aspect_type.yellow
             else:
                 initial_aspect = aspect_type.green
         else:
             signal_clear= False
-            if signal_subtype == signal_sub_type.red_ylw:
+            if signal_subtype == signal_sub_type.distant:
                 initial_aspect = aspect_type.yellow
             else:
                 initial_aspect = aspect_type.red
@@ -456,10 +456,11 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     
     # We now need to refresh the signal drawing objects to reflect the state
     # Also refresh the theatre route and feather route indications
+    
     refresh_signal_aspects (signal)
     refresh_feather_route_indication (signal)
     refresh_theatre_route_indication (signal)
-    
+        
     # save the updates back to the dictionary of signals
     signals[str(sig_id)] = signal
             
