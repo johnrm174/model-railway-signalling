@@ -100,6 +100,7 @@
 from tkinter import *
 import signals_common
 import signals_colour_lights
+import signals_ground_position
 
 # -------------------------------------------------------------------------
 # Externally called Functions and classes to create the specific signal types
@@ -327,6 +328,8 @@ def set_signal_override (*sig_ids:int):
             # now call the signal type-specific functions to update the signal
             if signal["sigtype"] == sig_type.colour_light:
                 signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+            elif signal["sigtype"] == sig_type.ground_pos_light:
+                signals_ground_position.update_ground_position_light_signal (sig_id)
                 
     return()
 
@@ -353,12 +356,12 @@ def clear_signal_override (*sig_ids:int):
                 
             # Update the dictionary of signals
             signals_common.signals[str(sig_id)] = signal
-
-            # Check the signal type supports this feature
-            if signal["sigtype"] == sig_type.colour_light:
                 
             # now call the signal type-specific functions to update the signal
+            if signal["sigtype"] == sig_type.colour_light:
                 signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+            elif signal["sigtype"] == sig_type.ground_pos_light:
+                signals_ground_position.update_ground_position_light_signal (sig_id)
 
     return()
 

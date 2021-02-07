@@ -181,7 +181,8 @@ def update_ground_position_light_signal (sig_id:int):
     # get the signals that we are interested in
     signal = signals[str(sig_id)]
     
-    if signal["sigclear"]:
+    # Only set the signal to its clear aspect if not overriden
+    if signal["sigclear"] and not signal ["override"]:
         # indication is the same whether its a shunt ahead or a normal
         # position light and whether its modern or pre-1996
         signal["canvas"].itemconfig (signal["posoff"],fill="white")
