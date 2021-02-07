@@ -350,52 +350,64 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
 
 def create_layout_signals(canvas, sig_callback):
 
-    signals.create_colour_light_signal (canvas,1,100,500, aspects= 3,
+    signals.create_colour_light_signal (canvas,1,100,500,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True)
     
-    signals.create_colour_light_signal (canvas,2,475,500, aspects= 3,
-            
+    signals.create_colour_light_signal (canvas,2,475,500,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True)
     
-    signals.create_colour_light_signal (canvas,3,400,550, aspects=4,
+    signals.create_colour_light_signal (canvas,3,400,550,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45 = True, lhfeather90 = True )
 
-    signals.create_colour_light_signal (canvas,4,1050,550, aspects=4,
+    signals.create_colour_light_signal (canvas,4,1050,550,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True)
 
-    signals.create_colour_light_signal (canvas,5,750,400,orientation=180, aspects= 3,
+    signals.create_colour_light_signal (canvas,5,750,400,orientation=180,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,6,750,450, orientation=180, aspects= 3,
+    signals.create_colour_light_signal (canvas,6,750,450, orientation=180,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True, 
             lhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,7,1050,400, aspects= 3,
+    signals.create_colour_light_signal (canvas,7,1050,400,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal (canvas,8,1050,450, aspects= 3,
+    signals.create_colour_light_signal (canvas,8,1050,450,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
     
-    signals.create_colour_light_signal(canvas,9,1730,500,orientation=180, aspects= 3,
+    signals.create_colour_light_signal(canvas,9,1730,500,orientation=180,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True)
 
-    signals.create_colour_light_signal (canvas,10,1400,500, orientation=180, aspects= 3,
+    signals.create_colour_light_signal (canvas,10,1400,500, orientation=180,
+            signal_subtype = signals.signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True)
 
-    signals.create_colour_light_signal(canvas,11,1500,600, orientation=180, aspects=4,
+    signals.create_colour_light_signal(canvas,11,1500,600, orientation=180,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45=True, rhfeather45=True, rhfeather90=True)
     
-    signals.create_colour_light_signal (canvas,12,750,600, orientation=180, aspects=4,
+    signals.create_colour_light_signal (canvas,12,750,600, orientation=180,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True)
 
-    signals.create_colour_light_signal (canvas,13,750,650, orientation=180, aspects=4,
+    signals.create_colour_light_signal (canvas,13,750,650, orientation=180,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True)
 
     signals.create_ground_position_signal(canvas,14,550,250, shunt_ahead=True,
@@ -407,16 +419,20 @@ def create_layout_signals(canvas, sig_callback):
     signals.create_ground_position_signal(canvas,16,1300,400,orientation=180,
             shunt_ahead=True, sig_callback=sig_callback,)
 
-    signals.create_colour_light_signal (canvas,20,1850,600, orientation=180, aspects=4,
+    signals.create_colour_light_signal (canvas,20,1850,600, orientation=180,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback,sig_passed_button=True,fully_automatic=True)
     
-    signals.create_colour_light_signal (canvas,21,100,600, orientation=180, aspects=4,
+    signals.create_colour_light_signal (canvas,21,100,600, orientation=180,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback,fully_automatic=True)
     
-    signals.create_colour_light_signal (canvas,22,50,550, aspects=4,
+    signals.create_colour_light_signal (canvas,22,50,550,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback,sig_passed_button=True,fully_automatic=True)
     
-    signals.create_colour_light_signal (canvas,23,1800,550, aspects=4,
+    signals.create_colour_light_signal (canvas,23,1800,550,
+            signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback,fully_automatic=True)
                             
     return()

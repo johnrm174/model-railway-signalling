@@ -56,17 +56,17 @@ def main_callback_function(item_id,callback_type):
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     
-    signals.update_colour_light_signal(3, sig_ahead_id=5)
-    signals.update_colour_light_signal(4, sig_ahead_id=5)
+    signals.update_signal(3, sig_ahead_id=5)
+    signals.update_signal(4, sig_ahead_id=5)
     
     if points.point_switched(1):
-        signals.set_route_indication(2,feathers=signals.route_type.LH1)
-        signals.update_colour_light_signal(2,sig_ahead_id=3)
+        signals.set_route_indication(2,route=signals.route_type.LH1)
+        signals.update_signal(2,sig_ahead_id=3)
     else:
-        signals.set_route_indication(2,feathers=signals.route_type.MAIN)
-        signals.update_colour_light_signal(2,sig_ahead_id=4)
+        signals.set_route_indication(2,route=signals.route_type.MAIN)
+        signals.update_signal(2,sig_ahead_id=4)
 
-    signals.update_colour_light_signal(1, sig_ahead_id=2)
+    signals.update_signal(1, sig_ahead_id=2)
     
     # This is the end of the callback - return to the main loop and wait for the next event
     
@@ -113,11 +113,11 @@ canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from 
 # The "callback" is the name of the function (above) that will be called when something has changed
 # Signal 2 is the signal just before the point - so it needs a route indication
 print ("Creating Signals")
-signals.create_colour_light_signal (canvas,1,50,200,sig_callback=main_callback_function,aspects=aspects)
-signals.create_colour_light_signal (canvas,2,300,200,sig_callback=main_callback_function,aspects=aspects,lhfeather45=True )
-signals.create_colour_light_signal (canvas,3,600,150,sig_callback=main_callback_function,aspects=aspects)
-signals.create_colour_light_signal (canvas,4,600,200,sig_callback=main_callback_function,aspects=aspects)
-signals.create_colour_light_signal (canvas,5,900,200,sig_callback=main_callback_function,aspects=aspects)
+signals.create_colour_light_signal (canvas,1,50,200,sig_callback=main_callback_function)
+signals.create_colour_light_signal (canvas,2,300,200,sig_callback=main_callback_function,lhfeather45=True )
+signals.create_colour_light_signal (canvas,3,600,150,sig_callback=main_callback_function)
+signals.create_colour_light_signal (canvas,4,600,200,sig_callback=main_callback_function)
+signals.create_colour_light_signal (canvas,5,900,200,sig_callback=main_callback_function)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Interlocking")

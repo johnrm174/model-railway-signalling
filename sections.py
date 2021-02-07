@@ -486,97 +486,97 @@ def refresh_signal_aspects():
 
     # Signal 7 (signal ahead is eather 23 or none)
     if points.point_switched(8):
-        signals.set_route_indication(7,signals.route_type.RH1)
-        signals.update_colour_light_signal (7,sig_ahead_id=23)
+        signals.set_route_indication(7,signals.route_type.RH1,theatre_text="M")
+        signals.update_signal (7,sig_ahead_id=23)
     else:
-        signals.set_route_indication(7,signals.route_type.MAIN)
+        signals.set_route_indication(7,signals.route_type.MAIN,theatre_text="B")
         
     # Signal 8 (signal ahead is eather 21 or none)
     if points.point_switched(8):
-        signals.set_route_indication(8,signals.route_type.RH1)
-        signals.update_colour_light_signal (8,sig_ahead_id=23)
+        signals.set_route_indication(8,signals.route_type.RH1,theatre_text="M")
+        signals.update_signal (8,sig_ahead_id=23)
     else:
-        signals.set_route_indication(8,signals.route_type.MAIN)
+        signals.set_route_indication(8,signals.route_type.MAIN,theatre_text="B")
     
     # Signal 4 (signal ahead is 21)
-    signals.update_colour_light_signal (4,sig_ahead_id=23)
+    signals.update_signal (4,sig_ahead_id=23)
 
     # Signal 2 (signal ahead is eather 7 or 8)
     if points.point_switched(4):
-        signals.set_route_indication(2,signals.route_type.LH1)
-        signals.update_colour_light_signal (2,sig_ahead_id=7)
+        signals.set_route_indication(2,signals.route_type.LH1,theatre_text="G")
+        signals.update_signal (2,sig_ahead_id=7)
     else:
-        signals.set_route_indication(2,signals.route_type.MAIN)
-        signals.update_colour_light_signal (2,sig_ahead_id=8)
+        signals.set_route_indication(2,signals.route_type.MAIN,theatre_text="3")
+        signals.update_signal (2,sig_ahead_id=8)
 
     # Signal 3 (signal ahead is either 4,7 or 8)
     if not points.point_switched(2):
-        signals.set_route_indication(3,signals.route_type.MAIN)
-        signals.update_colour_light_signal (3,sig_ahead_id=4)
+        signals.set_route_indication(3,signals.route_type.MAIN,theatre_text="2")
+        signals.update_signal (3,sig_ahead_id=4)
     elif points.point_switched(4):
-        signals.set_route_indication(3,signals.route_type.LH2)
-        signals.update_colour_light_signal (3,sig_ahead_id=7)
+        signals.set_route_indication(3,signals.route_type.LH2,theatre_text="G")
+        signals.update_signal (3,sig_ahead_id=7)
     else:
-        signals.set_route_indication(3,signals.route_type.LH1)
-        signals.update_colour_light_signal (3,sig_ahead_id=8)
+        signals.set_route_indication(3,signals.route_type.LH1,theatre_text="3")
+        signals.update_signal (3,sig_ahead_id=8)
 
     # Signal 1 (signal ahead is 2)
-    signals.update_colour_light_signal (1,sig_ahead_id=2)
+    signals.update_signal (1,sig_ahead_id=2)
     
     # Signal 22 (signal ahead is 3)
-    signals.update_colour_light_signal (22,sig_ahead_id=3)
+    signals.update_signal (22,sig_ahead_id=3)
 
 
     # DOWN Direction ###########################################
 
     # Signal 12 (signal ahead is 21)
-    signals.update_colour_light_signal (12,sig_ahead_id=21)
+    signals.update_signal (12,sig_ahead_id=21)
     
     # Signal 13 (signal ahead is 21)
-    signals.update_colour_light_signal (13,sig_ahead_id=21)
+    signals.update_signal (13,sig_ahead_id=21)
     
     # Signal 5 (signal ahead is eather 21 or none)
     if points.point_switched(2):
-        signals.set_route_indication(5,signals.route_type.LH1)
-        signals.update_colour_light_signal (5,sig_ahead_id=21)
+        signals.set_route_indication(5,signals.route_type.LH1,theatre_text="M")
+        signals.update_signal (5,sig_ahead_id=21)
     else:
-        signals.set_route_indication(5,signals.route_type.MAIN)
+        signals.set_route_indication(5,signals.route_type.MAIN,theatre_text="B")
         
     # Signal 6 (signal ahead is eather 21 or none)
     if points.point_switched(2):
-        signals.update_colour_light_signal (6,sig_ahead_id=21)
-        signals.set_route_indication(6,signals.route_type.LH1)
+        signals.update_signal (6,sig_ahead_id=21)
+        signals.set_route_indication(6,signals.route_type.LH1,theatre_text="M")
     else:
-        signals.set_route_indication(6,signals.route_type.MAIN)
+        signals.set_route_indication(6,signals.route_type.MAIN,theatre_text="B")
         
     # Signal 10 (signal ahead is eather 5 or 6)
     if points.point_switched(6):
-        signals.update_colour_light_signal (10,sig_ahead_id=5)
-        signals.set_route_indication(10,signals.route_type.RH1)
+        signals.update_signal (10,sig_ahead_id=5)
+        signals.set_route_indication(10,signals.route_type.RH1,theatre_text="G")
     else:
-        signals.set_route_indication(10,signals.route_type.MAIN)
-        signals.update_colour_light_signal (10,sig_ahead_id=6)
+        signals.set_route_indication(10,signals.route_type.MAIN,theatre_text="3")
+        signals.update_signal (10,sig_ahead_id=6)
 
     # Signal 9 (signal ahead is 10)
-    signals.update_colour_light_signal (9,sig_ahead_id=10)
+    signals.update_signal (9,sig_ahead_id=10)
     
     # Signal 11 (signal ahead is eather 5,6,12 or 13)
     if points.point_switched(9):
         if points.point_switched(6):
-            signals.set_route_indication(11,signals.route_type.RH2)
-            signals.update_colour_light_signal (11,sig_ahead_id=5)
+            signals.set_route_indication(11,signals.route_type.RH2,theatre_text="G")
+            signals.update_signal (11,sig_ahead_id=5)
         else:
-            signals.set_route_indication(11,signals.route_type.RH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=6)
+            signals.set_route_indication(11,signals.route_type.RH1,theatre_text="3")
+            signals.update_signal (11,sig_ahead_id=6)
     else:
         if points.point_switched(7):
-            signals.set_route_indication(11,signals.route_type.LH1)
-            signals.update_colour_light_signal (11,sig_ahead_id=13)
+            signals.set_route_indication(11,signals.route_type.LH1,theatre_text="1")
+            signals.update_signal (11,sig_ahead_id=13)
         else:
-            signals.set_route_indication(11,signals.route_type.MAIN)
-            signals.update_colour_light_signal (11,sig_ahead_id=12)
+            signals.set_route_indication(11,signals.route_type.MAIN,theatre_text="M")
+            signals.update_signal (11,sig_ahead_id=12)
 
     # Signal 20 (signal ahead is 11)
-    signals.update_colour_light_signal (20,sig_ahead_id=11)
+    signals.update_signal (20,sig_ahead_id=11)
 
     return()
