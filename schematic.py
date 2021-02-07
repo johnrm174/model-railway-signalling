@@ -401,11 +401,6 @@ def create_layout_signals(canvas, sig_callback):
             signal_subtype = signals.signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45=True, rhfeather45=True, rhfeather90=True)
-
-#    signals.create_colour_light_signal(canvas,11,1500,600, orientation=180,
-#            signal_subtype = signals.signal_sub_type.four_aspect,
-#            sig_callback=sig_callback, sig_passed_button = True,
-#            theatre_route_indicator=True)
     
     signals.create_colour_light_signal (canvas,12,750,600, orientation=180,
             signal_subtype = signals.signal_sub_type.four_aspect,
