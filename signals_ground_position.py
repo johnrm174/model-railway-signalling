@@ -112,6 +112,8 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                 bg=bgraised, command=lambda:toggle_ground_position_light_signal(sig_id,sig_callback))
         button2 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
                 command=lambda:signal_passed_event(sig_id,sig_callback))
+        # Create a dummy button for the "Subsisdary Button" (not used for this signal type)
+        null_button = Button(canvas)
         
         # Draw the signal base
         line_coords = rotate_line (x,y,0,0,0,-25,orientation) 
@@ -148,7 +150,11 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         new_signal = {"canvas" : canvas,                      # MANDATORY - canvas object
                       "sigtype": sig_type.ground_pos_light,   # MANDATORY - The type of the signal
                       "sigclear" : False,                     # MANDATORY - The Internal state of the signal
-                      "sigbutton" : button1,                  # MANDATORY - Button drawing object
+                      "sigbutton" : button1,                  # MANDATORY - Button drawing object (main signal button)
+                      "automatic" : False,                    # MANDATORY - If signal is fully automatic (not used for this sig type)
+                      "subclear" : False,                     # MANDATORY - Subsidary Signal State (not used for this sig type)
+                      "override" : False,                     # MANDATORY - Override" State (not used for this sig type)
+                      "subbutton" : null_button,              # MANDATORY - Subsidary signal Button (not used for this sig type)
                       "passedbutton" : button2,               # SHARED - Button drawing object
                       "posroot" : posroot,                    # Type-specific - drawing object
                       "poson" : poson,                        # Type-specific - drawing object

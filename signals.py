@@ -128,10 +128,13 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 
     # Validate the signal exists and it is not a Ground Position Signal
     if not signals_common.sig_exists(sig_id):
-        print ("ERROR: update_signal_aspect - Signal "+str(sig_id)+" does not exist")
-        
+        print ("ERROR: update_signal - Signal "+str(sig_id)+" does not exist")
+    
     elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
-        print ("ERROR: update_signal_aspect - Signal Ahead "+str(sig_ahead_id)+" does not exist")
+        print ("ERROR: update_signal - Signal Ahead "+str(sig_ahead_id)+" does not exist")
+        
+    elif sig_id == sig_ahead_id: 
+        print ("ERROR: update_signal - Signal Ahead "+str(sig_ahead_id)+" is the same ID")
         
     else:
         # get the signals that we are interested in
@@ -197,12 +200,7 @@ def subsidary_signal_clear (sig_id:int):
     else:
         # get the signals that we are interested in
         signal = signals_common.signals[str(sig_id)]
-        
-        # Check the signal type supports subsidary signals
-        if signal["sigtype"] == sig_type.colour_light:
-            sig_clear = signal["subclear"]
-        else:
-            sig_clear = False
+        sig_clear = signal["subclear"]
             
     return (sig_clear)
 
@@ -246,8 +244,9 @@ def unlock_signal (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             
-            # Enable the Signal button to unlock it
-            signal["sigbutton"].config(state="normal")
+            # Enable the Signal button to unlock it (if its not a fully automatic signal)
+            if not signal["automatic"]:
+                signal["sigbutton"].config(state="normal")
             
     return()
 
@@ -272,10 +271,8 @@ def lock_subsidary_signal (*sig_ids:int):
             # only be possible to lock a signal that is "ON" (i.e. at DANGER)
             if signal["subclear"]: print ("WARNING: lock_subsidary_signal - Subsidary signal "+ str(sig_id) +" is CLEAR")
             
-            # Check the signal type supports subsidary signals
-            # If so we disable the Button to lock the subsidary signal
-            if signal["sigtype"] == sig_type.colour_light:
-                signal["subbutton"].config(state="disabled")        
+            # Disable the Button to lock the subsidary signal
+            signal["subbutton"].config(state="disabled")        
                 
     return()
 
@@ -296,10 +293,8 @@ def unlock_subsidary_signal (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             
-            # Check the signal type supports subsidary signals
-            # If so we re-enable the Button to unlock the subsidary signal
-            if signal["sigtype"] == sig_type.colour_light:    
-                signal["subbutton"].config(state="normal") 
+            # Re-enable the Button to unlock the subsidary signal
+            signal["subbutton"].config(state="normal") 
                 
     return()
 
@@ -322,17 +317,15 @@ def set_signal_override (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             
-            # Check the signal type supports this feature
+            # Set the override state and change the button text to indicate override
+            signal["override"] = True
+            signal["sigbutton"].config(fg="red", disabledforeground="red")
+
+            # Update the dictionary of signals
+            signals_common.signals[str(sig_id)] = signal
+            
+            # now call the signal type-specific functions to update the signal
             if signal["sigtype"] == sig_type.colour_light:
-                
-                # Override the signal and change the button colour
-                signal["sigbutton"].config(fg="red")
-                signal["override"] = True
-                
-                # Update the dictionary of signals
-                signals_common.signals[str(sig_id)] = signal
-                
-                # Update the signal to reflect its overriden state
                 signals_colour_lights.update_colour_light_signal_aspect (sig_id)
                 
     return()
@@ -354,17 +347,17 @@ def clear_signal_override (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             
+            # Clear the override and change the button colour
+            signal["override"] = False
+            signal["sigbutton"].config(fg="black",disabledforeground="grey50")
+                
+            # Update the dictionary of signals
+            signals_common.signals[str(sig_id)] = signal
+
             # Check the signal type supports this feature
             if signal["sigtype"] == sig_type.colour_light:
                 
-                # Clear the override and change the button colour
-                signal["override"] = False
-                signal["sigbutton"].config(fg="black")
-                
-                # Update the dictionary of signals
-                signals_common.signals[str(sig_id)] = signal
-                
-                # Update the signal to reflect its "non-overriden" state
+            # now call the signal type-specific functions to update the signal
                 signals_colour_lights.update_colour_light_signal_aspect (sig_id)
 
     return()

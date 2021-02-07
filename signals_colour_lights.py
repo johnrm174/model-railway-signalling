@@ -169,6 +169,10 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif (lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90) and theatre_route_indicator:
         print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+
                        " - Signal can only have Feathers OR a Theatre Route Indicator")
+    elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
+          signal_subtype in (signal_sub_type.distant,signal_sub_type.red_ylw)):
+        print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+
+                       " - 2 Aspect Distant or Red/Yellow signals should not have Route Indicators")
         
     else:
         
@@ -213,17 +217,15 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Create the 'windows' in which the buttons are displayed
         # These get 'hidden' later if they are not required for the signal
         # We adjust the  positions if the signal supports a position light button
-        but3win = canvas.create_window (x,y,window=button3)
         if position_light:
             point_coords = rotate_point (x,y,-35,-20,orientation) 
             but1win = canvas.create_window (point_coords,anchor=E,window=button1)
             but2win = canvas.create_window (point_coords,anchor=W,window=button2)
-            if fully_automatic:canvas.create_text (point_coords,anchor=E,font=myfont1,text=str(sig_id))
         else:
             point_coords = rotate_point (x,y,-20,-20,orientation) 
             but1win = canvas.create_window (point_coords,window=button1)
             but2win = canvas.create_window (point_coords,window=button2)
-            if fully_automatic:canvas.create_text (point_coords,font=myfont1,text=str(sig_id))
+        but3win = canvas.create_window (x,y,window=button3)
 
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
@@ -294,10 +296,11 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
         
         # Set the initial state of the signal depending on whether its fully automatic or not
-        # Also if its fully automatic we want to disable the signal button by hiding it
-        # We also set the initial aspect of the signal - which will vary by signal type
+        # Fully automatic signals are set to OFF and display their "clear" aspect
+        # Manual signals are set to ON and display their "danger/caution aspect)
+        # We also disable the signal button for fully automatic signals
         if fully_automatic:
-            canvas.itemconfigure(but1win,state='hidden')
+            button1.config(state="disabled",relief="sunken", bd=0)
             signal_clear = True
             if signal_subtype == signal_sub_type.red_ylw:
                 initial_aspect = aspect_type.yellow
@@ -309,6 +312,14 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                 initial_aspect = aspect_type.yellow
             else:
                 initial_aspect = aspect_type.red
+                
+        # Set the "Override" Aspect - this is the default aspect that will be displayed
+        # by the signal when it is overridden - This will be RED apart from 2 aspect
+        # Distant signals where it will be YELLOW
+        if signal_subtype == signal_sub_type.distant:
+            override_aspect = aspect_type.yellow
+        else:
+            override_aspect = aspect_type.red
 
         # Compile a dictionary of everything we need to track for the signal
         # Note that setting a "displayedaspect" of RED is valid for all 2 aspects
@@ -319,16 +330,17 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         new_signal = {"canvas" : canvas,                      # MANDATORY - canvas object
                       "sigtype" : sig_type.colour_light,      # MANDATORY - The type of the signal 
                       "sigclear" : signal_clear,              # MANDATORY - The Internal state of the signal
-                      "sigbutton" : button1,                  # MANDATORY - Button Drawing object
-                      "subclear" : False,                     # SHARED - Initial Subsidary state
-                      "override" : False,                     # SHARED - Initial "Override" State
+                      "sigbutton" : button1,                  # MANDATORY - Button Drawing object (main Signal)
+                      "automatic" : fully_automatic,          # MANDATORY - Whether the signal has manual control
+                      "subclear" : False,                     # MANDATORY - Internal state of Subsidary Signal
+                      "override" : False,                     # MANDATORY - Internal "Override" State
+                      "subbutton" : button2,                  # MANDATORY - Button drawing object (subsidary signal)
                       "routeset" : route_type.MAIN,           # SHARED - Initial Route setting to display (none)
                       "theatretext" : "",                     # SHARED - Initial Route setting to display (none)
-                      "subbutton" : button2,                  # SHARED - Button drawing object
                       "passedbutton" : button3,               # SHARED - Button drawing object
                       "theatre" : theatre,                    # SHARED - Text drawing object
                       "displayedaspect" : initial_aspect,     # Type-specific - Signal aspect to display
-                      "overriddenaspect" : aspect_type.red,   # Type-specific - The 'Overridden' aspect
+                      "overriddenaspect" : override_aspect,   # Type-specific - The 'Overridden' aspect
                       "externalcallback" : sig_callback,      # Type-specific - Callback for timed signal events
                       "subtype" : signal_subtype ,            # Type-specific - subtype of the signal
                       "grn" : grn,                            # Type-specific - drawing object
@@ -598,11 +610,14 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         # Sleep until the initial "signal passed" event is due
         time.sleep (start_delay)
         
-        # Override the signal - and set tthe initial overriden aspect to RED
-        # Overriden Aspect should already be Red - But set just in case
+        # Override the signal - and set the initial overriden aspect
+        # This will have been previously defined at signal creation time
+        # (RED apart from 2-aspect Distant Signals - which are YELLOW)
+        # We set it back to this initial aspect after cycling through
+        # the aspects at the end of this thread
         signal=signals[str(sig_id)]
         signal["override"] = True
-        signal["overriddenaspect"] = aspect_type.red
+        signal["sigbutton"].config(fg="red",disabledforeground="red")
         signals[str(sig_id)] = signal
 
         # If a start delay (>0) has been specified then we assume the intention
@@ -634,11 +649,16 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             time.sleep (time_delay) 
                                 
         # We've finished - so clear the override on the signal
-        # We ALWAYS set the Overriden aspect back to RED - as this is the aspect
-        # That should always be displayed if the signal is overriden externally
+        # We ALWAYS set the Overriden aspect back to its initial condition as
+        # this is the aspect that will be used when the signal is next overriden
         signal=signals[str(sig_id)]
         signal["override"] = False
-        signal["overriddenaspect"] = aspect_type.red
+        signal["sigbutton"].config(fg="black",disabledforeground="grey50")
+        if signal["subtype"] == signal_sub_type.distant:
+            signal["overriddenaspect"] = aspect_type.yellow
+        else:
+            signal["overriddenaspect"] = aspect_type.red
+
         signals[str(sig_id)] = signal
 
         # Now make the final external callback
