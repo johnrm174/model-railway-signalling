@@ -23,6 +23,11 @@ import enum
 import time
 import threading
 
+# Import the module that allows us to map signals to DCC Signal addresses
+# so they can be controlled via the Pi-SPROG-3 DCC command station
+
+import signals_dcc_control
+
 # Specify the common signals functions, classes and parameters to import
 # These are imported into the current context so directly "available"
 
@@ -359,7 +364,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     
         # We now need to refresh the signal drawing objects to reflect the initial state
         # Effectively ON unless its fully automatic - in which case it will be OFF (clear)
-        refresh_signal_aspects (new_signal)
+        update_colour_light_signal_aspect (sig_id)
     
     return ()
 
@@ -385,10 +390,13 @@ def update_colour_light_subsidary_signal (sig_id:int):
         if signal["subclear"]:
             signal["canvas"].itemconfig (signal["pos1"],fill="white")
             signal["canvas"].itemconfig (signal["pos2"],fill="white")
+            signals_dcc_control.set_dcc_colour_light_signal_subsidary_OFF(sig_id)   # OFF is "Clear"
+            
         else:
             signal["canvas"].itemconfig (signal["pos1"],fill="grey")
             signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-            
+            signals_dcc_control.set_dcc_colour_light_signal_subsidary_ON(sig_id)
+
         # We have just updated the drawing objects - not our reference to them
         # Therefore no updates to save back to the dictionary of signals
 
@@ -469,9 +477,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # We now need to refresh the signal drawing objects to reflect the state
     # Also refresh the theatre route and feather route indications
     
-    refresh_signal_aspects (signal)
-    refresh_feather_route_indication (signal)
-    refresh_theatre_route_indication (signal)
+    refresh_signal_aspects (sig_id)
+    refresh_feather_route_indication (sig_id)
+    refresh_theatre_route_indication (sig_id)
         
     # save the updates back to the dictionary of signals
     signals[str(sig_id)] = signal
@@ -501,8 +509,8 @@ def update_colour_light_route_indication (sig_id,
         signal["theatretext"] = theatre_text
                 
         # Refresh the route indications
-        refresh_feather_route_indication (signal)
-        refresh_theatre_route_indication (signal)
+        refresh_feather_route_indication (sig_id)
+        refresh_theatre_route_indication (sig_id)
         
         # save the updates back to the dictionary of signals
         signals[str(sig_id)] = signal
@@ -514,7 +522,10 @@ def update_colour_light_route_indication (sig_id,
 # updating the signal drawing objects associated with each aspect
 # -------------------------------------------------------------------------
 
-def refresh_signal_aspects (signal):
+def refresh_signal_aspects (sig_id):
+
+    # get the signals that we are interested in
+    signal = signals[str(sig_id)]
 
     if signal["displayedaspect"] == aspect_type.red:
         # Change the signal to display the RED aspect
@@ -523,6 +534,8 @@ def refresh_signal_aspects (signal):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
+        signals_dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
+        
     elif signal["displayedaspect"] == aspect_type.yellow:
         # Change the signal to display the Yellow aspect
         signal["canvas"].itemconfig (signal["red"],fill="grey")
@@ -530,18 +543,26 @@ def refresh_signal_aspects (signal):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
+        signals_dcc_control.set_dcc_colour_light_signal_to_yellow(sig_id)
+
+        
     elif signal["displayedaspect"] == aspect_type.double_yellow:
         # Change the signal to display the Double Yellow aspect
         signal["canvas"].itemconfig (signal["red"],fill="grey")
         signal["canvas"].itemconfig (signal["yel"],fill="yellow")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
+        
+        signals_dcc_control.set_dcc_colour_light_signal_to_double_yellow(sig_id)
+
     else:
         # Change the signal to display the Green aspect
         signal["canvas"].itemconfig (signal["red"],fill="grey")
         signal["canvas"].itemconfig (signal["yel"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="green")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
+
+        signals_dcc_control.set_dcc_colour_light_signal_to_green(sig_id)
 
     return ()
 
@@ -551,8 +572,11 @@ def refresh_signal_aspects (signal):
 # (if not then the objects are hidden' and the function will have no effect)
 # -------------------------------------------------------------------------
 
-def refresh_feather_route_indication (signal):
-        
+def refresh_feather_route_indication (sig_id):
+
+    # get the signals that we are interested in
+    signal = signals[str(sig_id)]
+
     # Clear down all the indications and then set only the one we want
     signal["canvas"].itemconfig (signal["lhf45"],fill="black")
     signal["canvas"].itemconfig (signal["lhf90"],fill="black")
@@ -561,15 +585,29 @@ def refresh_feather_route_indication (signal):
     
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
+        
         if signal["routeset"] == route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
+            signals_dcc_control.set_dcc_colour_light_signal_route_LH1(sig_id)
+            
         elif signal["routeset"] == route_type.LH2:
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
+            signals_dcc_control.set_dcc_colour_light_signal_route_LH2(sig_id)
+
         elif signal["routeset"] == route_type.RH1:
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
+            signals_dcc_control.set_dcc_colour_light_signal_route_RH1(sig_id)
+
         elif signal["routeset"] == route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
+            signals_dcc_control.set_dcc_colour_light_signal_route_RH2(sig_id)
             
+        else:
+            signals_dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
+            
+    else:
+        signals_dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
+
     return ()
 
 # -------------------------------------------------------------------------
@@ -578,7 +616,10 @@ def refresh_feather_route_indication (signal):
 # (if not then the text object is 'hidden' and the function will have no effect)
 # -------------------------------------------------------------------------
 
-def refresh_theatre_route_indication (signal):
+def refresh_theatre_route_indication (sig_id):
+
+    # get the signals that we are interested in
+    signal = signals[str(sig_id)]
 
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):

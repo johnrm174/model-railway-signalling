@@ -1,6 +1,8 @@
 from tkinter import *
 import signals
 import points
+import signals_dcc_control
+import pi_sprog_interface
 
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use the "points"
@@ -14,8 +16,8 @@ import points
 # Here are some global variables for you to change and see the effect
 #----------------------------------------------------------------------
 
-aspects = 3  # Effectively sets the signal type - try 2, 3 or 4 aspects
-
+use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3 
+sprog_debug_level = 1       # 0 = No debug, 1 = status messages only, 2 = all CBUS messages
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -108,6 +110,17 @@ points.create_point(canvas,2,points.point_type.RH, 700,200,"black",
 
 # Draw the continuation of the Main Line 
 canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from point to start of loop
+
+# If we are going to use DCC control, then we need to initialise the Pi-SPROG-3
+# and define the DCC mappings for the signals we are then going to create
+# Mappings should be created first so that when the signal is created then
+# the appropriate DCC bus commands will be sent to set the aspects correctly
+# for theaspects that are being displayed by the signal on the schematic
+
+if use_dcc_control:
+    pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
+    signals_dcc_control.map_dcc_colour_light_signal (sig_id = 2, red = 5, grn = 6, yel1 = 7, yel2 = 8, LH1=4)
+
 
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed
