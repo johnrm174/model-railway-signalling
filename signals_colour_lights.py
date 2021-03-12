@@ -26,7 +26,7 @@ import threading
 # Import the module that allows us to map signals to DCC Signal addresses
 # so they can be controlled via the Pi-SPROG-3 DCC command station
 
-import signals_dcc_control
+import dcc_control
 
 # Specify the common signals functions, classes and parameters to import
 # These are imported into the current context so directly "available"
@@ -390,12 +390,12 @@ def update_colour_light_subsidary_signal (sig_id:int):
         if signal["subclear"]:
             signal["canvas"].itemconfig (signal["pos1"],fill="white")
             signal["canvas"].itemconfig (signal["pos2"],fill="white")
-            signals_dcc_control.set_dcc_colour_light_signal_subsidary_OFF(sig_id)   # OFF is "Clear"
+            dcc_control.set_dcc_colour_light_signal_subsidary_OFF(sig_id)   # OFF is "Clear"
             
         else:
             signal["canvas"].itemconfig (signal["pos1"],fill="grey")
             signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-            signals_dcc_control.set_dcc_colour_light_signal_subsidary_ON(sig_id)
+            dcc_control.set_dcc_colour_light_signal_subsidary_ON(sig_id)
 
         # We have just updated the drawing objects - not our reference to them
         # Therefore no updates to save back to the dictionary of signals
@@ -534,7 +534,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
-        signals_dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
+        dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
         
     elif signal["displayedaspect"] == aspect_type.yellow:
         # Change the signal to display the Yellow aspect
@@ -543,7 +543,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
-        signals_dcc_control.set_dcc_colour_light_signal_to_yellow(sig_id)
+        dcc_control.set_dcc_colour_light_signal_to_yellow(sig_id)
 
         
     elif signal["displayedaspect"] == aspect_type.double_yellow:
@@ -553,7 +553,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
         
-        signals_dcc_control.set_dcc_colour_light_signal_to_double_yellow(sig_id)
+        dcc_control.set_dcc_colour_light_signal_to_double_yellow(sig_id)
 
     else:
         # Change the signal to display the Green aspect
@@ -562,7 +562,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="green")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
 
-        signals_dcc_control.set_dcc_colour_light_signal_to_green(sig_id)
+        dcc_control.set_dcc_colour_light_signal_to_green(sig_id)
 
     return ()
 
@@ -588,25 +588,25 @@ def refresh_feather_route_indication (sig_id):
         
         if signal["routeset"] == route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-            signals_dcc_control.set_dcc_colour_light_signal_route_LH1(sig_id)
+            dcc_control.set_dcc_colour_light_signal_route_LH1(sig_id)
             
         elif signal["routeset"] == route_type.LH2:
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
-            signals_dcc_control.set_dcc_colour_light_signal_route_LH2(sig_id)
+            dcc_control.set_dcc_colour_light_signal_route_LH2(sig_id)
 
         elif signal["routeset"] == route_type.RH1:
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
-            signals_dcc_control.set_dcc_colour_light_signal_route_RH1(sig_id)
+            dcc_control.set_dcc_colour_light_signal_route_RH1(sig_id)
 
         elif signal["routeset"] == route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-            signals_dcc_control.set_dcc_colour_light_signal_route_RH2(sig_id)
+            dcc_control.set_dcc_colour_light_signal_route_RH2(sig_id)
             
         else:
-            signals_dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
+            dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
             
     else:
-        signals_dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
+        dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
 
     return ()
 

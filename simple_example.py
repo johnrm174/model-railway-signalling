@@ -1,7 +1,7 @@
 from tkinter import *
 import signals
 import points
-import signals_dcc_control
+import dcc_control
 import pi_sprog_interface
 
 #----------------------------------------------------------------------
@@ -119,7 +119,12 @@ canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from 
 
 if use_dcc_control:
     pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
-    signals_dcc_control.map_dcc_colour_light_signal (sig_id = 2, red = 5, grn = 6, yel1 = 7, yel2 = 8, LH1=4)
+    
+    dcc_control.map_dcc_colour_light_signal (sig_id = 2,
+                            danger = [[5,True],[6,False],[7,False],[8,False]],
+                            proceed = [[5,False],[6,True],[7,False],[8,False]],
+                            caution = [[5,False],[6,False],[7,True],[8,False]],
+                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]])
 
 
 # Create the Signals on the Schematic track plan
