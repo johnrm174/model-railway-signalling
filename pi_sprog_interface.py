@@ -53,12 +53,9 @@ import threading
 import serial
 import time
 
-# Create a new class of the Serial Port (port is immediately opened on object creation)
-# We're not receiving anything else on this port so its OK to set up the port without
-# a timeout - as we are only interested in "complete" messages (terminated by ';')
+# Create a new class of the Serial Port (port is configured/opened later)
 
-serial_port = serial.Serial (port="/dev/serial0", baudrate=115200, bytesize=8, timeout=None,
-                      parity = serial.PARITY_NONE,stopbits=serial.STOPBITS_ONE)
+serial_port = serial.Serial ()
 
 # Global Variables (constants used by the fuctions in the module)
 
@@ -274,6 +271,19 @@ def initialise_pi_sprog (debug:int = 0):
 
     # Assign the global debug level (used across all other functions)
     debug_level = debug
+    
+    if debug_level > 0: print ("initialise_pi_sprog - Opening Serial Port")
+
+    # We're not receiving anything else on this port so its OK to set up the port without
+    # a timeout - as we are only interested in "complete" messages (terminated by ';')
+
+    serial_port.baudrate = 115200
+    serial_port.port = "/dev/serial0"
+    serial_port.bytesize = 8
+    serial_port.timeout = None
+    serial_port.parity = serial.PARITY_NONE
+    serial_port.stopbits = serial.STOPBITS_ONE
+    serial_port.open()
     
     # Start the thread to read buffered responses from the PI-SPROG
     thread = threading.Thread (target=thread_to_read_received_data)
