@@ -124,7 +124,8 @@ if use_dcc_control:
                             danger = [[5,True],[6,False],[7,False],[8,False]],
                             proceed = [[5,False],[6,True],[7,False],[8,False]],
                             caution = [[5,False],[6,False],[7,True],[8,False]],
-                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]])
+                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
+                            LH1 = 4)
 
 
 # Create the Signals on the Schematic track plan

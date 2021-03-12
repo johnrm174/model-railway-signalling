@@ -21,45 +21,57 @@
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to create a DCC mapping for
 #      Optional Parameters:
-#         red:int  - the address for the "red" indication (default = 0 = No Mapping)
-#         grn:int  - the address for the "green" indication (default = 0 = No Mapping)
-#         yel1:int - the address for the "yellow" indication (default = 0 = No Mapping)
-#         yel2:int - the address for the "2nd yellow" indication (default = 0 = No Mapping)                    
-#         call:int - the address for the "position light" indication (default = 0 = No Mapping)
-#         LH1:int  - the address for the "LH 45 feather" indication (default = 0 = No Mapping)
-#         LH2:int  - the address for the "LH 90 feather" indication (default = 0 = No Mapping)
-#         RH1:int  - the address for the "RH 45 feather" indication (default = 0 = No Mapping)
-#         RH2:int  - the address for the "RH 90 feather" indication) (default = 0 = No Mapping)
+#         proceed[[add:int,state:bool],] - Truth table of DCC addresses/states (default = no mapping)
+#         danger [[add:int,state:bool],] - Truth table of DCC addresses/states (default = No mapping)
+#         caution[[add:int,state:bool],] - Truth table of DCC addresses/states (default = No mapping)
+#         proceed[[add:int,state:bool],] - Truth table of DCC addresses/states (Default = No mapping)
+#         call:int - the address for the "position light" indication (default = No Mapping)
+#         LH1:int  - the address for the "LH 45 feather" indication  (default = No Mapping)
+#         LH2:int  - the address for the "LH 90 feather" indication  (default = No Mapping)
+#         RH1:int  - the address for the "RH 45 feather" indication  (default = No Mapping)
+#         RH2:int  - the address for the "RH 90 feather" indication  (default = No Mapping)
 #
-# Once Mapped, the following functions are called to send the appropriate DCC commands
-# to change the dissplayed aspect to the required aspect
+# Once Mapped, the following functions are called to send the mapped DCC commands
+# to change the state of the signal out on the layout t
 # 
-#    set_dcc_colour_light_signal_to_red (sig_id)
-#    set_dcc_colour_light_signal_to_green(sig_id)
-#    set_dcc_colour_light_signal_to_yellow(sig_id)
-#    set_dcc_colour_light_signal_to_double_yellow(sig_id)
-#    set_dcc_colour_light_signal_subsidary_OFF (sig_id)
-#    set_dcc_colour_light_signal_subsidary_ON (sig_id)
-#    set_dcc_colour_light_signal_route_LH1 (sig_id)
-#    set_dcc_colour_light_signal_route_LH2 (sig_id)
-#    set_dcc_colour_light_signal_route_RH1 (sig_id)
-#    set_dcc_colour_light_signal_route_RH2 (sig_id)
-#    set_dcc_colour_light_signal_route_MAIN (sig_id)
+#   update_dcc_signal - Update the main aspect of a signal by sending the mapped DCC commands
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to command
+#         state:signal_state_type - The state to command it into (proceed, caution, prelim_caution, danger)
+#
+#   update_dcc_subsidary_signal - Update the subsidary aspect of a signal by sending the mapped DCC commands
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to command
+#         state:bool - The state to command it into (True = Proceed, False = Danger)
+#
+#   update_dcc_signal_route - Update the feather routes of a signal by sending the mapped DCC commands
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to command
+#         route:signals_common.route_type - The route to set (see signals_common for more details of this type)
+#
 #----------------------------------------------------------------------
 
+import signals_common
 import pi_sprog_interface
+import enum
 
 # The mapping types that are currently supported
-class dcc_mapping_type:
+class dcc_mapping_type(enum.Enum):
     truth_table = 1
     
-# Define empty dictionary for the mappings and dcc addresses
+# The Possible states for a main signal
+class signal_state_type(enum.Enum):
+    danger = 1
+    proceed = 2
+    caution = 3
+    prelim_caution = 4
+    
+# Define empty dictionaries for the mappings and dcc addresses
 dcc_mappings:dict = {}
 dcc_addresses:dict = {}
 
 # Internal function to test if a mapping exists for a signal
 def sig_mapped(sig_id):
-    global dcc_mappings
     return (str(sig_id) in dcc_mappings.keys() )
 
 #-----------------------------------------------------------------------------------------
@@ -80,9 +92,7 @@ def sig_mapped(sig_id):
 def map_dcc_colour_light_signal (sig_id:int, 
                                  danger =[[0,False],], proceed = [[0,False],],
                                  caution = [[0,False],], prelim_caution = [[0,False],],
-                                 call:int=0, LH1:int=0, LH2:int=0,RH1:int=0, RH2:int=0):
-    global dcc_addresses
-    global dcc_mappings
+                                 call:int=0, LH1:int=0, LH2:int=0, RH1:int=0, RH2:int=0):
     
     # Do some basic validation on the parameters we have been given
     if sig_mapped(sig_id):
@@ -92,328 +102,122 @@ def map_dcc_colour_light_signal (sig_id:int,
         print ("ERROR: map_dcc_colour_light_signal - Signal ID must be greater than zero")
         
     else:
-        # Add to the global list of DCC addresses so we can track their states. This
-        # ensures we will only send the bare minimum of DCC bus commands to make changes
+        # Add all addresses to the global list of DCC addresses so we can track their states.
+        # This enables us to then send the bare minimum of DCC bus commands to make changes
         
         for entry in danger:
-            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): False})
+            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): None})
         for entry in proceed:
-            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): False})
+            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): None})
         for entry in caution:
-            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): False})
+            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): None})
         for entry in prelim_caution:
-            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): False})
+            if entry[0] > 0 : dcc_addresses.update({str(entry[0]): None})
             
-        if call > 0: dcc_addresses.update({str(call): False})
-        if LH1 > 0: dcc_addresses.update({str(call): False})
-        if LH2 > 0: dcc_addresses.update({str(call): False})
-        if RH1 > 0: dcc_addresses.update({str(call): False})
-        if RH2 > 0: dcc_addresses.update({str(call): False})
+        if call> 0: dcc_addresses.update({str(call): None})
+        if LH1 > 0: dcc_addresses.update({str(LH1): None})
+        if LH2 > 0: dcc_addresses.update({str(LH2): None})
+        if RH1 > 0: dcc_addresses.update({str(RH1): None})
+        if RH2 > 0: dcc_addresses.update({str(RH2): None})
         
-        # Create the Mapping
+        # Create the DCC Mapping entry for the signal
+        # We use the truth tables we have been given for the main signal aspect
+        # We create our own truth table for the feather route indicators
         new_dcc_mapping = {
             "mapping_type" : dcc_mapping_type.truth_table,
-            "red"  : danger,
-            "grn"  : proceed, 
-            "yel"  : caution,
-            "dyel" : prelim_caution,
-            "call" : call,
-            "LH1"  : LH1,  
-            "LH2"  : LH2,  
-            "RH1"  : RH1,  
-            "RH2"  : RH2 }
+            str(signal_state_type.danger) : danger,
+            str(signal_state_type.proceed) : proceed, 
+            str(signal_state_type.caution) : caution,
+            str(signal_state_type.prelim_caution) : prelim_caution,
+            str(signals_common.route_type.LH1) : [[LH1,True],[LH2,False],[RH1,False],[RH2,False]],
+            str(signals_common.route_type.LH2) : [[LH1,False],[LH2,True],[RH1,False],[RH2,False]],
+            str(signals_common.route_type.RH1) : [[LH1,False],[LH2,False],[RH1,True],[RH2,False]],
+            str(signals_common.route_type.RH2) : [[LH1,False],[LH2,False],[RH1,False],[RH2,True]],
+            str(signals_common.route_type.MAIN) :[[LH1,False],[LH2,False],[RH1,False],[RH2,False]],
+            "call" : call }
         
         dcc_mappings[str(sig_id)] = new_dcc_mapping
-        
-
+    
     return ()
 
-map_dcc_colour_light_signal(100,
-                            danger = [[1,True],[2,False],[3,False],[4,False]],
-                            proceed = [[1,False],[2,True],[3,False],[4,False]],
-                            caution = [[1,False],[2,False],[3,True],[4,False]],
-                            prelim_caution = [[1,False],[2,False],[3,True],[4,True]])
-map_dcc_colour_light_signal(101)
 #-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set a displayed aspect of RED
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
+# Function to send the appropriate DCC commands to set the state of a DCC Signal
+# We track the state of each indication and we only send the DCC commands needed
+# to change the DCC addresses that need changing (if they don't we leave as they are)
 #------------------------------------------------------------------------------------------
 
-def set_dcc_colour_light_signal_to_red(sig_id):
-
-    global dcc_addresses
-    global dcc_mappings
+def update_dcc_signal(sig_id: int, state: signal_state_type):
 
     if sig_mapped(sig_id):
         
+        # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_mappings[str(sig_id)]
         
-        for entry in dcc_mapping["red"]:
-            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                dcc_addresses[str(entry[0])] = entry[1]
-  
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
+        # This is where we would branch to handle different DCC Mapping Types
+        # Currently only the "Truth Table" type mapping is supported
+        if dcc_mapping["mapping_type"] == dcc_mapping_type.truth_table:
+                        
+            # Send the DCC commands to change the state if required
+            for entry in dcc_mapping[str(state)]:
+                if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
+                    pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+                    dcc_addresses[str(entry[0])] = entry[1]
+                        
+        # Save back the changes we have made to the signal
+        dcc_mappings[str(sig_id)] = dcc_mapping
+                    
     return()
 
 #-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set a displayed aspect of GREEN
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
+# Function to send the appropriate DCC commands to change the subsidary signal aspect
+# We track the state of each indication and we only send the DCC commands needed
+# to change the DCC addresses that need changing (if they don't we leave as they are)
 #------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_to_green(sig_id):
+            
+def update_dcc_subsidary_signal (sig_id:int,state:bool):
     
     if sig_mapped(sig_id):
         
+        # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        for entry in dcc_mapping["grn"]:
-            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                dcc_addresses[str(entry[0])] = entry[1]
-  
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set a displayed aspect of YELLOW
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_to_yellow(sig_id):
-
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        for entry in dcc_mapping["yel"]:
-            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                dcc_addresses[str(entry[0])] = entry[1]
-  
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set a displayed aspect of DOUBLE YELLOW
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_to_double_yellow(sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        for entry in dcc_mapping["dyel"]:
-            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                dcc_addresses[str(entry[0])] = entry[1]
-  
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-
-    return()
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the subsidary signal aspect
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-            
-def set_dcc_colour_light_signal_subsidary_OFF (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
         address = dcc_mapping["call"]
-        if address > 0 and dcc_addresses[str(address)] is False:
-            pi_sprog_interface.send_accessory_short_event (address,True)
-            dcc_addresses[str(address)] = True
-            
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
+        
+        # Send the DCC commands to change the state if required
+        if address > 0:
+            if state is True and dcc_addresses[str(address)] is False:
+                pi_sprog_interface.send_accessory_short_event (address,True)
+                dcc_addresses[str(address)] = True
+            elif state is False and dcc_addresses[str(address)] is True:
+                pi_sprog_interface.send_accessory_short_event (address,False)
+                dcc_addresses[str(address)] = False
 
-def set_dcc_colour_light_signal_subsidary_ON (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        address = dcc_mapping["call"]
-        if address > 0 and dcc_addresses[str(address)] is True:
-            pi_sprog_interface.send_accessory_short_event (address,False)
-            dcc_addresses[str(address)] = False
-            
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
-
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the feather route indicator to LH1
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-            
-def set_dcc_colour_light_signal_route_LH1 (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        if dcc_mapping["LH1"]["address"] > 0 and not dcc_mapping["LH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH1"]["address"], True)
-            dcc_mapping["LH1"]["state"] = True
-            
-        if dcc_mapping["LH2"]["address"] > 0 and dcc_mapping["LH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH2"]["address"], False)
-            dcc_mapping["LH2"]["state"] = False
-            
-        if dcc_mapping["RH1"]["address"] > 0 and dcc_mapping["RH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH1"]["address"], False)
-            dcc_mapping["RH1"]["state"] = False
-            
-        if dcc_mapping["RH2"]["address"] > 0 and dcc_mapping["RH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH2"]["address"], False)
-            dcc_mapping["RH2"]["state"] = False
-        
+        # Save back the changes we have made to the signal
         dcc_mappings[str(sig_id)] = dcc_mapping         
             
     return()
 
 #-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the feather route indicator to LH2
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
+# Function to send the appropriate DCC commands to change the route indication
+# We track the state of each indication and we only send the DCC commands needed
+# to change the DCC addresses that need changing (if they don't we leave as they are)
 #------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_route_LH2 (sig_id):
+            
+def update_dcc_signal_route (sig_id, route:signals_common.route_type):
     
     if sig_mapped(sig_id):
         
+        # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        if dcc_mapping["LH1"]["address"] > 0 and dcc_mapping["LH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH1"]["address"], False)
-            dcc_mapping["LH1"]["state"] = False
-            
-        if dcc_mapping["LH2"]["address"] > 0 and not dcc_mapping["LH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH2"]["address"], True)
-            dcc_mapping["LH2"]["state"] = True
-            
-        if dcc_mapping["RH1"]["address"] > 0 and dcc_mapping["RH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH1"]["address"], False)
-            dcc_mapping["RH1"]["state"] = False
-            
-        if dcc_mapping["RH2"]["address"] > 0 and dcc_mapping["RH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH2"]["address"], False)
-            dcc_mapping["RH2"]["state"] = False
-        
+                        
+        # Send the DCC commands to change the state if required
+        print (route)
+        for entry in dcc_mapping[str(route)]:
+            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
+                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+                dcc_addresses[str(entry[0])] = entry[1]
+
+        # Save back the changes we have made to the signal
         dcc_mappings[str(sig_id)] = dcc_mapping         
-            
+
     return()
 
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the feather route indicator to RH1
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_route_RH1 (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        if dcc_mapping["LH1"]["address"] > 0 and dcc_mapping["LH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH1"]["address"], False)
-            dcc_mapping["LH1"]["state"] = False
-            
-        if dcc_mapping["LH2"]["address"] > 0 and dcc_mapping["LH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH2"]["address"], False)
-            dcc_mapping["LH2"]["state"] = False
-            
-        if dcc_mapping["RH1"]["address"] > 0 and not dcc_mapping["RH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH1"]["address"], True)
-            dcc_mapping["RH1"]["state"] = True
-            
-        if dcc_mapping["RH2"]["address"] > 0 and dcc_mapping["RH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH2"]["address"], False)
-            dcc_mapping["RH2"]["state"] = False
-        
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the feather route indicator to RH1
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_route_RH2 (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
-        if dcc_mapping["LH1"]["address"] > 0 and dcc_mapping["LH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH1"]["address"], False)
-            dcc_mapping["LH1"]["state"] = False
-            
-        if dcc_mapping["LH2"]["address"] > 0 and dcc_mapping["LH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH2"]["address"], False)
-            dcc_mapping["LH2"]["state"] = False
-            
-        if dcc_mapping["RH1"]["address"] > 0 and not dcc_mapping["RH1"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH1"]["address"], True)
-            dcc_mapping["RH1"]["state"] = True
-            
-        if dcc_mapping["RH2"]["address"] > 0 and dcc_mapping["RH2"]["state"] :
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH2"]["address"], False)
-            dcc_mapping["RH2"]["state"] = False
-        
-        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()
-
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the feather route indicator to RH1
-# We track the state of each indication so we can then  only send the DCC commands needed
-# to change the indications we need when switching between displayed aspects
-#------------------------------------------------------------------------------------------
-
-def set_dcc_colour_light_signal_route_MAIN (sig_id):
-    
-    if sig_mapped(sig_id):
-        
-        dcc_mapping = dcc_mappings[str(sig_id)]
-        
- #       if dcc_mapping["LH1"] > 0 and dcc_mapping["LH1"]["state"] :
-#            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH1"]["address"], False)
-#            dcc_mapping["LH1"] = False
-            
-#        if dcc_mapping["LH2"]["address"] > 0 and dcc_mapping["LH2"]["state"] :
-#            pi_sprog_interface.send_accessory_short_event (dcc_mapping["LH2"]["address"], False)
-#            dcc_mapping["LH2"]["state"] = False
-            
-#        if dcc_mapping["RH1"]["address"] > 0 and dcc_mapping["RH1"]["state"] :
-#            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH1"]["address"], False)
-#            dcc_mapping["RH1"]["state"] = False
-            
- #       if dcc_mapping["RH2"]["address"] > 0 and dcc_mapping["RH2"]["state"] :
-#            pi_sprog_interface.send_accessory_short_event (dcc_mapping["RH2"]["address"], False)
- #           dcc_mapping["RH2"]["state"] = False
-        
-#        dcc_mappings[str(sig_id)] = dcc_mapping         
-            
-    return()

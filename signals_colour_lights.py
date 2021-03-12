@@ -534,7 +534,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
-        dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
         
     elif signal["displayedaspect"] == aspect_type.yellow:
         # Change the signal to display the Yellow aspect
@@ -543,7 +543,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
         
-        dcc_control.set_dcc_colour_light_signal_to_yellow(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.caution)
 
         
     elif signal["displayedaspect"] == aspect_type.double_yellow:
@@ -553,7 +553,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
         
-        dcc_control.set_dcc_colour_light_signal_to_double_yellow(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.prelim_caution)
 
     else:
         # Change the signal to display the Green aspect
@@ -562,7 +562,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["grn"],fill="green")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
 
-        dcc_control.set_dcc_colour_light_signal_to_green(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
 
     return ()
 
@@ -585,28 +585,23 @@ def refresh_feather_route_indication (sig_id):
     
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
-        
+
         if signal["routeset"] == route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-            dcc_control.set_dcc_colour_light_signal_route_LH1(sig_id)
             
         elif signal["routeset"] == route_type.LH2:
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
-            dcc_control.set_dcc_colour_light_signal_route_LH2(sig_id)
 
         elif signal["routeset"] == route_type.RH1:
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
-            dcc_control.set_dcc_colour_light_signal_route_RH1(sig_id)
 
         elif signal["routeset"] == route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-            dcc_control.set_dcc_colour_light_signal_route_RH2(sig_id)
-            
-        else:
-            dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
-            
+                
+        dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
+  
     else:
-        dcc_control.set_dcc_colour_light_signal_route_MAIN(sig_id)
+        dcc_control.update_dcc_signal_route(sig_id, route_type.MAIN)
 
     return ()
 

@@ -190,7 +190,7 @@ def update_ground_position_light_signal (sig_id:int):
         signal["canvas"].itemconfig (signal["posoff"],fill="white")
         signal["canvas"].itemconfig (signal["posroot"],fill="white")
         signal["canvas"].itemconfig (signal["poson"],fill="grey")
-        dcc_control.set_dcc_colour_light_signal_to_green(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
 
     elif signal["shuntahead"]:
         # Aspect to display is yellow
@@ -201,7 +201,7 @@ def update_ground_position_light_signal (sig_id:int):
             signal["canvas"].itemconfig (signal["posroot"],fill="yellow")
         else:
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
-        dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
 
     else:
         # signal is a normal ground position light signal - Aspect to display is Red
@@ -212,7 +212,7 @@ def update_ground_position_light_signal (sig_id:int):
             signal["canvas"].itemconfig (signal["posroot"],fill="red")
         else:
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
-        dcc_control.set_dcc_colour_light_signal_to_red(sig_id)
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
 
     # We have just updated the drawing objects - not our reference to them
     # Therefore no updates to save back to the dictionary of signals
