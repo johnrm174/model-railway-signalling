@@ -30,6 +30,11 @@
 #       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
 #       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
 #       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
+#       refresh_immediately:bool - When set to False the signal aspects will NOT be updated
+#                          when the signal is switched by the user - they will only be updated
+#                          when (and if) the "update_signal" function is subsequently called.
+#                          This is useful for 3 and 4 aspect signals where the displayed Aspect will
+#                          depend on the signal ahead Default - Default True 
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
 #
 # create_ground_position_signal - created a grund position light signal

@@ -74,7 +74,6 @@ def main_callback_function(item_id,callback_type):
     
     return()
 
-
 #------------------------------------------------------------------------------------
 # This is where the code begins
 #------------------------------------------------------------------------------------
@@ -85,6 +84,24 @@ window = Tk()
 window.title("Simple Interlocking Example")
 canvas = Canvas(window,height=400,width=1000)
 canvas.pack()
+
+# If we are going to use DCC control, then we need to initialise the Pi-SPROG-3
+# and define the DCC mappings for the signals we are then going to create
+# Mappings should be created first so that when the signal is created then
+# the appropriate DCC bus commands will be sent to set the aspects correctly
+# for theaspects that are being displayed by the signal on the schematic
+
+if use_dcc_control:
+    pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
+    
+    dcc_control.map_dcc_colour_light_signal (sig_id = 2,
+                            danger = [[5,True],[6,False],[7,False],[8,False]],
+                            proceed = [[5,False],[6,True],[7,False],[8,False]],
+                            caution = [[5,False],[6,False],[7,True],[8,False]],
+                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
+                            LH1 = 4)
+    dcc_control.map_dcc_point (1, 100)
+    dcc_control.map_dcc_point (2, 101)
 
 # Draw the Schematic track plan (creating points as required)
 print ("Drawing Schematic and creating points")
@@ -111,32 +128,26 @@ points.create_point(canvas,2,points.point_type.RH, 700,200,"black",
 # Draw the continuation of the Main Line 
 canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from point to start of loop
 
-# If we are going to use DCC control, then we need to initialise the Pi-SPROG-3
-# and define the DCC mappings for the signals we are then going to create
-# Mappings should be created first so that when the signal is created then
-# the appropriate DCC bus commands will be sent to set the aspects correctly
-# for theaspects that are being displayed by the signal on the schematic
-
-if use_dcc_control:
-    pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
-    
-    dcc_control.map_dcc_colour_light_signal (sig_id = 2,
-                            danger = [[5,True],[6,False],[7,False],[8,False]],
-                            proceed = [[5,False],[6,True],[7,False],[8,False]],
-                            caution = [[5,False],[6,False],[7,True],[8,False]],
-                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
-                            LH1 = 4)
-
-
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed
 # Signal 2 is the signal just before the point - so it needs a route indication
 print ("Creating Signals")
-signals.create_colour_light_signal (canvas,1,50,200,sig_callback=main_callback_function)
-signals.create_colour_light_signal (canvas,2,300,200,sig_callback=main_callback_function,lhfeather45=True )
-signals.create_colour_light_signal (canvas,3,600,150,sig_callback=main_callback_function)
-signals.create_colour_light_signal (canvas,4,600,200,sig_callback=main_callback_function)
-signals.create_colour_light_signal (canvas,5,900,200,sig_callback=main_callback_function)
+signals.create_colour_light_signal (canvas,1,50,200,
+                                    sig_callback=main_callback_function,
+                                    refresh_immediately = False)
+signals.create_colour_light_signal (canvas,2,300,200,
+                                    sig_callback=main_callback_function,
+                                    refresh_immediately = False,
+                                    lhfeather45=True )
+signals.create_colour_light_signal (canvas,3,600,150,
+                                    sig_callback=main_callback_function,
+                                    refresh_immediately = False)
+signals.create_colour_light_signal (canvas,4,600,200,
+                                    sig_callback=main_callback_function,
+                                    refresh_immediately = False)
+signals.create_colour_light_signal (canvas,5,900,200,
+                                    sig_callback=main_callback_function,
+                                    refresh_immediately = True)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Interlocking")

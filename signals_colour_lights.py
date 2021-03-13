@@ -46,7 +46,6 @@ from signals_common import toggle_subsidary
 from signals_common import sig_callback_type
 from signals_common import pulse_signal_passed_button
 
-
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
 # -------------------------------------------------------------------------
@@ -87,8 +86,10 @@ def null_callback (sig_id, ext_callback):
 def toggle_colour_light_signal (sig_id:int, ext_callback = null_callback):
     # Call the common function to toggle the signal state and button object
     toggle_signal(sig_id)
-    # Call the internal function to update and refresh the signal
-    update_colour_light_signal_aspect(sig_id)
+    # Call the internal function to update and refresh the signal - unless this signal
+    # is configured to be refreshed later (based on the aspect of the signal ahead)
+    if signals[str(sig_id)]["refresh"]: 
+        update_colour_light_signal_aspect(sig_id)
     # Make the external callback
     ext_callback (sig_id, sig_callback_type.sig_switched)
     return ()
@@ -160,8 +161,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 rhfeather45:bool=False,
                                 rhfeather90:bool=False,
                                 theatre_route_indicator:bool=False,
+                                refresh_immediately = True,
                                 fully_automatic:bool=False):
-
     
     # Do some basic validation on the parameters we have been given
     if sig_exists(sig_id):
@@ -178,9 +179,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
           signal_subtype in (signal_sub_type.distant,signal_sub_type.red_ylw)):
         print ("ERROR: create_colour_light_signal - Signal ID "+str(sig_id)+
                        " - 2 Aspect Distant or Red/Yellow signals should not have Route Indicators")
-        
     else:
-        
         # set the font size for the buttons
         # We only want a small button for "Signal Passed" - hence a small font size
         myfont1 = tkinter.font.Font(size=fontsize)
@@ -348,6 +347,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "overriddenaspect" : override_aspect,   # Type-specific - The 'Overridden' aspect
                       "externalcallback" : sig_callback,      # Type-specific - Callback for timed signal events
                       "subtype" : signal_subtype ,            # Type-specific - subtype of the signal
+                      "refresh" : refresh_immediately,        # Type-specific - controls when aspects are updated
                       "grn" : grn,                            # Type-specific - drawing object
                       "yel" : yel,                            # Type-specific - drawing object
                       "red" : red,                            # Type-specific - drawing object
@@ -390,18 +390,17 @@ def update_colour_light_subsidary_signal (sig_id:int):
         if signal["subclear"]:
             signal["canvas"].itemconfig (signal["pos1"],fill="white")
             signal["canvas"].itemconfig (signal["pos2"],fill="white")
-            dcc_control.set_dcc_colour_light_signal_subsidary_OFF(sig_id)   # OFF is "Clear"
+            dcc_control.update_dcc_subsidary_signal(sig_id,True)  
             
         else:
             signal["canvas"].itemconfig (signal["pos1"],fill="grey")
             signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-            dcc_control.set_dcc_colour_light_signal_subsidary_ON(sig_id)
+            dcc_control.update_dcc_subsidary_signal(sig_id,False)
 
         # We have just updated the drawing objects - not our reference to them
         # Therefore no updates to save back to the dictionary of signals
 
     return ()
-
 
 # -------------------------------------------------------------------------
 # Function to Refresh the displayed signal aspect according the signal state
@@ -445,7 +444,6 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # as the remaining 3 and 4 aspect signals types)
     elif sig_ahead_id == 0:
         signal["displayedaspect"] = aspect_type.green
-
     
     else:
         # Signal is clear, not overriden, a valid signal ahead has been specified
@@ -533,7 +531,6 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
         
     elif signal["displayedaspect"] == aspect_type.yellow:
@@ -542,9 +539,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="yellow")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.caution)
-
         
     elif signal["displayedaspect"] == aspect_type.double_yellow:
         # Change the signal to display the Double Yellow aspect
@@ -552,7 +547,6 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="yellow")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
-        
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.prelim_caution)
 
     else:
@@ -561,7 +555,6 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="green")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
 
     return ()
@@ -576,27 +569,33 @@ def refresh_feather_route_indication (sig_id):
 
     # get the signals that we are interested in
     signal = signals[str(sig_id)]
-
-    # Clear down all the indications and then set only the one we want
-    signal["canvas"].itemconfig (signal["lhf45"],fill="black")
-    signal["canvas"].itemconfig (signal["lhf90"],fill="black")
-    signal["canvas"].itemconfig (signal["rhf45"],fill="black")
-    signal["canvas"].itemconfig (signal["rhf90"],fill="black")
     
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
 
         if signal["routeset"] == route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-            
+            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
+
         elif signal["routeset"] == route_type.LH2:
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
+            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
 
         elif signal["routeset"] == route_type.RH1:
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
+            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
+            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
 
         elif signal["routeset"] == route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
+            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
+            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
+            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
                 
         dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
   
