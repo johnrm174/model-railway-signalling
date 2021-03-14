@@ -570,36 +570,27 @@ def refresh_feather_route_indication (sig_id):
     # get the signals that we are interested in
     signal = signals[str(sig_id)]
     
+    # initially set all the indications to OFF - we'll then set what we need
+    signal["canvas"].itemconfig (signal["lhf45"],fill="black")
+    signal["canvas"].itemconfig (signal["lhf90"],fill="black")
+    signal["canvas"].itemconfig (signal["rhf45"],fill="black")
+    signal["canvas"].itemconfig (signal["rhf90"],fill="black")
+    
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.red):
 
         if signal["routeset"] == route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-
         elif signal["routeset"] == route_type.LH2:
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
-            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-
         elif signal["routeset"] == route_type.RH1:
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
-            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
-            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-
         elif signal["routeset"] == route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-            signal["canvas"].itemconfig (signal["lhf45"],fill="black")
-            signal["canvas"].itemconfig (signal["lhf90"],fill="black")
-            signal["canvas"].itemconfig (signal["rhf45"],fill="black")
-                
         dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
   
     else:
+        # If the signal is set to Red then we need to inhibit the indications
         dcc_control.update_dcc_signal_route(sig_id, route_type.MAIN)
 
     return ()
