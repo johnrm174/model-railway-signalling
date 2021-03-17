@@ -91,7 +91,7 @@ def update_signals():
 #----------------------------------------------------------------------
 
 def signal_button(sig_id, sig_callback):
-    print ("***** CALLBACK - Main Signal Button " + str(sig_id) + " - " + str(sig_callback))
+    print ("***** CALLBACK - Signal " + str(sig_id) + " - " + str(sig_callback))
     
     # Deal with the timed signals
     if sig_callback == sig_callback_type.sig_passed:
@@ -242,17 +242,21 @@ print ("Creating Signals")
 # Top row of signals 
 create_colour_light_signal (canvas,1,200,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
+                            refresh_immediately = False,
                             theatre_route_indicator=True)
 create_colour_light_signal (canvas,2,400,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
+                            refresh_immediately = False,
                             lhfeather45=True,lhfeather90=True)
 create_colour_light_signal (canvas,3,600,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
+                            refresh_immediately = False,
                             fully_automatic=True,
                             sig_passed_button=True)
 create_colour_light_signal (canvas,4,800,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
+                            refresh_immediately = False,
                             rhfeather45=True,rhfeather90=True)
 create_colour_light_signal (canvas,5,1000,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
@@ -269,21 +273,25 @@ create_colour_light_signal (canvas,6,200,150, sig_callback=signal_button,
 create_colour_light_signal (canvas,7,400,150, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             lhfeather45=True,lhfeather90=True,
+                            refresh_immediately = False,
                             orientation=180)
 create_colour_light_signal (canvas,8,600,150, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
+                            refresh_immediately = False,
                             fully_automatic=True,
                             sig_passed_button=True,
                             orientation=180)
 create_colour_light_signal (canvas,9,800,150, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
+                            refresh_immediately = False,
                             orientation=180)
 create_colour_light_signal (canvas,10,1000,150, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.three_aspect,
                             rhfeather45=True,rhfeather90=True,
                             lhfeather45=True,lhfeather90=True,
+                            refresh_immediately = False,
                             sig_passed_button=True,
                             fully_automatic=True,
                             orientation=180)
@@ -292,20 +300,24 @@ canvas.create_text (200,240,text="Signal 11 is a 2 Aspect Home - Signal Ahead\nh
 create_colour_light_signal (canvas,11,200,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.home,
                             theatre_route_indicator=True,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,12,400,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             lhfeather45=True,lhfeather90=True,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,13,600,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
+                            refresh_immediately = False,
                             fully_automatic=True,
                             sig_passed_button=True,
                             position_light = True)
 create_colour_light_signal (canvas,14,800,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,15,1000,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.home,
@@ -324,11 +336,13 @@ create_colour_light_signal (canvas,16,200,350, sig_callback=signal_button,
 create_colour_light_signal (canvas,17,400,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             lhfeather45=True,lhfeather90=True,
+                            refresh_immediately = False,
                             orientation=180,
                             position_light = True)
 create_colour_light_signal (canvas,18,600,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
+                            refresh_immediately = False,
                             fully_automatic=True,
                             sig_passed_button=True,
                             orientation=180,
@@ -336,10 +350,12 @@ create_colour_light_signal (canvas,18,600,350, sig_callback=signal_button,
 create_colour_light_signal (canvas,19,800,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
+                            refresh_immediately = False,
                             orientation=180,
                             position_light = True)
 create_colour_light_signal (canvas,20,1000,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.distant,
+                            refresh_immediately = False,
                             sig_passed_button=True,
                             fully_automatic=True,
                             orientation=180,
@@ -349,20 +365,24 @@ create_colour_light_signal (canvas,20,1000,350, sig_callback=signal_button,
 canvas.create_text (200,525,text="Signal 21 is a 2 Aspect RED/YLW - Signal Ahead\nwill have no effect on the aspect displayed")
 create_colour_light_signal (canvas,21,200,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.red_ylw,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,22,400,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             lhfeather45=True,lhfeather90=True,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,23,600,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
+                            refresh_immediately = False,
                             fully_automatic=True,
                             sig_passed_button=True,
                             position_light = True)
 create_colour_light_signal (canvas,24,800,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
+                            refresh_immediately = False,
                             position_light = True)
 create_colour_light_signal (canvas,25,1000,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.red_ylw,

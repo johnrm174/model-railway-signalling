@@ -632,7 +632,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
     # --------------------------------------------------------------
     
     def thread_to_cycle_aspects (sig_id, start_delay, time_delay):
-
+        
         # Sleep until the initial "signal passed" event is due
         time.sleep (start_delay)
         
@@ -655,7 +655,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             signal_updated_event(sig_id,signal["externalcallback"]) 
         # Sleep until the next aspect change is due
         time.sleep (time_delay) 
-
+        
         # Cycle through the aspects if its a 3 or 4 aspect signal
         signal=signals[str(sig_id)]
         if signal["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
