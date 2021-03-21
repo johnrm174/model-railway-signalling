@@ -93,13 +93,16 @@ canvas.pack()
 
 if use_dcc_control:
     pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
-    
+    # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
+    # and set to "8 individual output" Mode (CV38=8). In this example we are using
+    # outputs E, F, G, H to drive our sifnal with D driving the feather indication
     dcc_control.map_dcc_colour_light_signal (sig_id = 2,
                             danger = [[5,True],[6,False],[7,False],[8,False]],
                             proceed = [[5,False],[6,True],[7,False],[8,False]],
                             caution = [[5,False],[6,False],[7,True],[8,False]],
                             prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
-                            LH1 = 4)
+                            LH1 = [[4,True]], MAIN = [[4, False]])
+    # Points are simply mapped to single addresses
     dcc_control.map_dcc_point (1, 100)
     dcc_control.map_dcc_point (2, 101)
 
