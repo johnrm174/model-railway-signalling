@@ -30,6 +30,11 @@
 #       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
 #       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
 #       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
+#       refresh_immediately:bool - When set to False the signal aspects will NOT be updated
+#                          when the signal is switched by the user - they will only be updated
+#                          when (and if) the "update_signal" function is subsequently called.
+#                          This is useful for 3 and 4 aspect signals where the displayed Aspect will
+#                          depend on the signal ahead Default - Default True 
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
 #
 # create_ground_position_signal - created a grund position light signal
@@ -327,7 +332,9 @@ def set_signal_override (*sig_ids:int):
             
             # now call the signal type-specific functions to update the signal
             if signal["sigtype"] == sig_type.colour_light:
-                signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+                # We generate a signal updated event for colour light signals rather than updating them
+                # as the aspect will not automatically be updated if "refresh_immediately" is set to false
+                signals_colour_lights.signal_updated_event (sig_id, ext_callback = signal["externalcallback"])
             elif signal["sigtype"] == sig_type.ground_pos_light:
                 signals_ground_position.update_ground_position_light_signal (sig_id)
                 
@@ -359,7 +366,11 @@ def clear_signal_override (*sig_ids:int):
                 
             # now call the signal type-specific functions to update the signal
             if signal["sigtype"] == sig_type.colour_light:
-                signals_colour_lights.update_colour_light_signal_aspect (sig_id)
+                # We generate a signal updated event for colour light signals rather than updating them
+                # as the aspect will not automatically be updated if "refresh_immediately" is set to false
+                # Also, for 3/4 aspect signals, when clearing an override, the aspect to display will
+                # depend on the signal ahead so we need to let the calling programme something has changed
+                signals_colour_lights.signal_updated_event (sig_id, ext_callback = signal["externalcallback"])
             elif signal["sigtype"] == sig_type.ground_pos_light:
                 signals_ground_position.update_ground_position_light_signal (sig_id)
 

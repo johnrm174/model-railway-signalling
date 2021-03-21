@@ -1,7 +1,14 @@
 from tkinter import *
 import tkinter.font
 import enum
-import signals_common
+
+import dcc_control
+
+from signals_common import rotate_point         
+from signals_common import rotate_line
+from signals_common import xpadding
+from signals_common import ypadding
+from signals_common import fontsize
 
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing point objects
@@ -160,12 +167,14 @@ def toggle_point (point_id:int,ext_callback=point_null):
             point["changebutton"].config(relief="sunken",bg="white")
             point["switched"] = True
             point["canvas"].itemconfig(point["blade2"],state="normal") #switched
-            point["canvas"].itemconfig(point["blade1"],state="hidden") #normal 
+            point["canvas"].itemconfig(point["blade1"],state="hidden") #normal
+            dcc_control.update_dcc_point(point_id,True)
         else:
             point["changebutton"].config(relief="raised",bg="grey85") 
             point["switched"] = False
             point["canvas"].itemconfig(point["blade2"],state="hidden") #switched 
             point["canvas"].itemconfig(point["blade1"],state="normal") #normal
+            dcc_control.update_dcc_point(point_id,False)
 
         # update the dictionary of points with the new state  
         points[str(point_id)] = point;
@@ -222,33 +231,33 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     else: # we're good to go on and create the point
         
         # set the font size for the buttons
-        myfont = tkinter.font.Font(size=signals_common.fontsize)
+        myfont = tkinter.font.Font(size=fontsize)
 
         # Create the button objects and their callbacks
         button1 = Button (canvas,text=str(point_id), state="normal", 
                     relief="raised", font = myfont,bg= "grey85",
-                    padx=signals_common.xpadding, pady=signals_common.ypadding,
+                    padx=xpadding, pady=ypadding,
                     command = lambda:toggle_point(point_id,point_callback))
         button2 = Button (canvas,text="L",state="normal", relief="sunken",
-                    padx=signals_common.xpadding, pady=signals_common.ypadding, font = myfont, bg = "white",
+                    padx=xpadding, pady=ypadding, font = myfont, bg = "white",
                     command = lambda:toggle_fpl(point_id,point_callback))
 
         #Create some drawing objects (depending on point type)
         if pointtype==point_type.RH:
             
-            line_coords = signals_common.rotate_line (x,y,-25,0,-10,0,orientation) 
+            line_coords = rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
 
-            line_coords = signals_common.rotate_line (x,y,-25,0,-15,+10,orientation)
+            line_coords = rotate_line (x,y,-25,0,-15,+10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
 
-            line_coords = signals_common.rotate_line (x,y,-10,0,+25,0,orientation)
+            line_coords = rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
 
-            line_coords = signals_common.rotate_line (x,y,-15,+10,0,+25,orientation)
+            line_coords = rotate_line (x,y,-15,+10,0,+25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
 
-            point_coords = signals_common.rotate_point (x,y,0,-20,orientation)
+            point_coords = rotate_point (x,y,0,-20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
                 but2win = canvas.create_window (point_coords,anchor=E,window=button2)
@@ -259,19 +268,19 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             
         else:  # Point type must be LH
             
-            line_coords = signals_common.rotate_line (x,y,-25,0,-10,0,orientation) 
+            line_coords = rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
 
-            line_coords = signals_common.rotate_line (x,y,-25,0,-15,-10,orientation)
+            line_coords = rotate_line (x,y,-25,0,-15,-10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
 
-            line_coords = signals_common.rotate_line (x,y,-10,0,+25,0,orientation)
+            line_coords = rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
 
-            line_coords = signals_common.rotate_line (x,y,-15,-10,0,-25,orientation)
+            line_coords = rotate_line (x,y,-15,-10,0,-25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
             
-            point_coords = signals_common.rotate_point (x,y,0,+20,orientation)
+            point_coords = rotate_point (x,y,0,+20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
                 but2win = canvas.create_window (point_coords,anchor=E,window=button2)
@@ -317,6 +326,9 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # [blade straight, blade switched, route straight, route switched]
         point_objects=[blade1,blade2,route1,route2]
         
+        # Set the initial state of the point (via DCC)
+        dcc_control.update_dcc_point(point_id,False)
+
     return(point_objects)
 
 # -------------------------------------------------------------------------

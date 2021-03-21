@@ -19,6 +19,8 @@
 from tkinter import *
 import tkinter.font
 
+import dcc_control
+
 # Specify the common signals functions, classes and parameters to import
 # These are imported into the current context so directly "available"
 
@@ -188,7 +190,8 @@ def update_ground_position_light_signal (sig_id:int):
         signal["canvas"].itemconfig (signal["posoff"],fill="white")
         signal["canvas"].itemconfig (signal["posroot"],fill="white")
         signal["canvas"].itemconfig (signal["poson"],fill="grey")
-        
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
+
     elif signal["shuntahead"]:
         # Aspect to display is yellow
         signal["canvas"].itemconfig (signal["poson"],fill="yellow")
@@ -198,7 +201,8 @@ def update_ground_position_light_signal (sig_id:int):
             signal["canvas"].itemconfig (signal["posroot"],fill="yellow")
         else:
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
-        
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
+
     else:
         # signal is a normal ground position light signal - Aspect to display is Red
         signal["canvas"].itemconfig (signal["poson"],fill="red")
@@ -208,6 +212,7 @@ def update_ground_position_light_signal (sig_id:int):
             signal["canvas"].itemconfig (signal["posroot"],fill="red")
         else:
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
+        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
 
     # We have just updated the drawing objects - not our reference to them
     # Therefore no updates to save back to the dictionary of signals
