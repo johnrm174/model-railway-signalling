@@ -10,9 +10,7 @@
 #--------------------------------------------------------------------------------
 
 from tkinter import *
-from signals import *
-import pi_sprog_interface
-import dcc_control
+from model_railway_signals import *
 
 #----------------------------------------------------------------------
 # global variables 
@@ -42,15 +40,10 @@ def set_two_aspect():
     global address
     global row_under_test
     # Set Mode 0 = 4 x 2 aspect 
-    pi_sprog_interface.service_mode_write_cv (38,0)
+    service_mode_write_cv (38,0)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, True)  # Signal 1
-    pi_sprog_interface.send_accessory_short_event (address+1, True)  # Signal 2
-    pi_sprog_interface.send_accessory_short_event (address+2, True)  # Signal 3
-    pi_sprog_interface.send_accessory_short_event (address+3, True)  # Signal 4
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 1
     lock_signal(5,6,8,9,11,12,14,16)
@@ -66,17 +59,10 @@ def set_three_aspect():
     global row_under_test
     global address
     # Set Mode 9 = 2 x 3 aspect with feather
-    pi_sprog_interface.service_mode_write_cv (38,9)
+    service_mode_write_cv (38,9)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, False)  # Signal 1 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+1, False)  # Signal 1 - address 2
-    pi_sprog_interface.send_accessory_short_event (address+2, False)  # Signal 1 - feather
-    pi_sprog_interface.send_accessory_short_event (address+3, False)  # Signal 2 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+4, False)  # Signal 2 - address 2
-    pi_sprog_interface.send_accessory_short_event (address+5, False)  # Signal 2 - feather
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 2
     lock_signal(1,2,3,4,8,9,11,12,14,16)
@@ -92,15 +78,10 @@ def set_four_aspect():
     global address
     global row_under_test
     # Set Mode 1 = 2 x 3 aspect with feather
-    pi_sprog_interface.service_mode_write_cv (38,1)
+    service_mode_write_cv (38,1)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, False)  # Signal 1 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+1, False)  # Signal 1 - address 2
-    pi_sprog_interface.send_accessory_short_event (address+2, False)  # Signal 2 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+3, False)  # Signal 2 - address 2
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 3
     lock_signal(1,2,3,4,5,6,11,12,14,16)
@@ -115,19 +96,10 @@ def set_individual_outputs():
     global address
     global row_under_test
     # Set Mode 8 = 8 individual outputs
-    pi_sprog_interface.service_mode_write_cv (38,8)
+    service_mode_write_cv (38,8)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, True)  # output 1
-    pi_sprog_interface.send_accessory_short_event (address+1, False)  # output 2
-    pi_sprog_interface.send_accessory_short_event (address+2, False)  # output 3
-    pi_sprog_interface.send_accessory_short_event (address+3, False)  # output 4
-    pi_sprog_interface.send_accessory_short_event (address+4, True)  # output 5
-    pi_sprog_interface.send_accessory_short_event (address+5, False)  # output 6
-    pi_sprog_interface.send_accessory_short_event (address+6, False)  # output 7
-    pi_sprog_interface.send_accessory_short_event (address+7, False)  # output 8
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 4
     lock_signal(1,2,3,4,5,6,8,9,14,16)
@@ -143,16 +115,10 @@ def set_four_aspect_single():
     global address
     global row_under_test
     # Set Mode 1 = 2 x 3 aspect with feather
-    pi_sprog_interface.service_mode_write_cv (38,19)
+    service_mode_write_cv (38,19)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, False)  # Signal 1 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+1, False)  # Signal 1 - address 2
-    pi_sprog_interface.send_accessory_short_event (address+2, False)  # Signal 2 - Feather 1
-    pi_sprog_interface.send_accessory_short_event (address+3, False)  # Signal 3 - Feather 2
-    pi_sprog_interface.send_accessory_short_event (address+4, False)  # Signal 4 - Position Light
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 5
     lock_signal(1,2,3,4,5,6,8,9,11,12,16)
@@ -168,15 +134,10 @@ def set_four_aspect_feathers():
     global address
     global row_under_test
     # Set Mode 1 = 2 x 3 aspect with feather
-    pi_sprog_interface.service_mode_write_cv (38,3)
+    service_mode_write_cv (38,3)
     # Cycle the power to enable the changes
-    pi_sprog_interface.request_track_off()
-    pi_sprog_interface.request_track_on()
-    # set all addresses to a known state
-    pi_sprog_interface.send_accessory_short_event (address+0, False)  # Signal 1 - address 1
-    pi_sprog_interface.send_accessory_short_event (address+1, False)  # Signal 1 - address 2
-    pi_sprog_interface.send_accessory_short_event (address+2, False)  # Signal 2 - Feather 1
-    pi_sprog_interface.send_accessory_short_event (address+3, False)  # Signal 3 - Feather 2
+    request_dcc_power_off()
+    request_dcc_power_on()
     # Only enable the signals for this test mode
     row_under_test = 6
     lock_signal(1,2,3,4,5,6,8,9,11,12,14)
@@ -242,24 +203,24 @@ def toggle_feather():
 #----------------------------------------------------------------------
 
 # Initialise the Pi sprog (and switch on the track power)
-pi_sprog_interface.initialise_pi_sprog (sprog_debug_level)
+initialise_pi_sprog (sprog_debug_level)
 
 # Reset the Decoder to its defaults
-pi_sprog_interface.service_mode_write_cv (8,8)
+service_mode_write_cv (8,8)
 
 # Set output address mode
-pi_sprog_interface.service_mode_write_cv (29,192) # Output address mode
-#pi_sprog_interface.service_mode_write_cv (29,128) # Decoder Address Mode
+service_mode_write_cv (29,192) # Output address mode
+#service_mode_write_cv (29,128) # Decoder Address Mode
 
 # Set the base address - the Signalist SC1 needs an offset of 4
 upper_address = ((address+4) & 0xff00) >> 8
 lower_address = ((address+4) & 0x00ff)
-pi_sprog_interface.service_mode_write_cv (1,lower_address)
-pi_sprog_interface.service_mode_write_cv (9,upper_address)
+service_mode_write_cv (1,lower_address)
+service_mode_write_cv (9,upper_address)
 
 # Cycle the power to enable the changes
-pi_sprog_interface.request_track_off()
-pi_sprog_interface.request_track_on()
+request_dcc_power_off()
+request_dcc_power_on()
 
 #------------------------------------------------------------------------------------
 # This is the Start of the Main Test Programme
@@ -318,71 +279,71 @@ canvas.create_line (50,300,950,300, width=2)
 print ("Mapping Signals")
 
 # These are the simplest (2 aspect on/off)
-dcc_control.map_dcc_colour_light_signal (1, danger=[[address,True]], proceed=[[address,False]])
-dcc_control.map_dcc_colour_light_signal (2, danger=[[address+1,True]], proceed=[[address+1,False]])
-dcc_control.map_dcc_colour_light_signal (3, danger=[[address+2,True]], proceed=[[address+2,False]])
-dcc_control.map_dcc_colour_light_signal (4, caution=[[address+3,True]], proceed=[[address+3,False]])
+map_dcc_signal (1, danger=[[address,True]], proceed=[[address,False]])
+map_dcc_signal (2, danger=[[address+1,True]], proceed=[[address+1,False]])
+map_dcc_signal (3, danger=[[address+2,True]], proceed=[[address+2,False]])
+map_dcc_signal (4, caution=[[address+3,True]], proceed=[[address+3,False]])
 
 # 3 aspect signals with Feather - Note that this differs from the Signalist SC1 Manual
-dcc_control.map_dcc_colour_light_signal (5, danger=[[address,False],[address+1,False]],
-                                         proceed=[[address+1,False],[address,True]],
-                                         caution=[[address+1,True],[address,False]],
-                                         LH1 = [[address+2,True]],
-                                         LH2 = [[address+2,False]],
-                                         RH1 = [[address+2,False]],
-                                         RH2 = [[address+2,False]],
-                                         MAIN = [[address+2,False]] )
-dcc_control.map_dcc_colour_light_signal (6, danger=[[address+3,False],[address+4,False]],
-                                         proceed=[[address+4,False],[address+3,True]],
-                                         caution=[[address+4,True],[address+3,False]],
-                                         LH1 = [[address+5,False]],
-                                         LH2 = [[address+5,False]],
-                                         RH1 = [[address+5,True]],
-                                         RH2 = [[address+5,False]],
-                                         MAIN = [[address+5,False]] )
+map_dcc_signal (5, danger=[[address,False],[address+1,False]],
+                 proceed=[[address+1,False],[address,True]],
+                 caution=[[address+1,True],[address,False]],
+                 LH1 = [[address+2,True]],
+                 LH2 = [[address+2,False]],
+                 RH1 = [[address+2,False]],
+                 RH2 = [[address+2,False]],
+                 MAIN = [[address+2,False]] )
+map_dcc_signal (6, danger=[[address+3,False],[address+4,False]],
+                 proceed=[[address+4,False],[address+3,True]],
+                 caution=[[address+4,True],[address+3,False]],
+                 LH1 = [[address+5,False]],
+                 LH2 = [[address+5,False]],
+                 RH1 = [[address+5,True]],
+                 RH2 = [[address+5,False]],
+                 MAIN = [[address+5,False]] )
 
 # 4 aspect signals - Note that this differes from the truth table in the Signalist SC1 Manual
-dcc_control.map_dcc_colour_light_signal (8, danger=[[address,False],[address+1,False]],
-                                         proceed=[[address,True],[address+1,False]],
-                                         caution=[[address+1,True],[address,False]],
-                                         prelim_caution=[[address+1,True],[address,True]])
-dcc_control.map_dcc_colour_light_signal (9, danger=[[address+2,False],[address+3,False]],
-                                         proceed=[[address+2,True],[address+3,False]],
-                                         caution=[[address+3,True],[address+2,False]],
-                                         prelim_caution=[[address+3,True],[address+2,True]])
+map_dcc_signal (8, danger=[[address,False],[address+1,False]],
+                 proceed=[[address,True],[address+1,False]],
+                 caution=[[address+1,True],[address,False]],
+                 prelim_caution=[[address+1,True],[address,True]])
+map_dcc_signal (9, danger=[[address+2,False],[address+3,False]],
+                 proceed=[[address+2,True],[address+3,False]],
+                 caution=[[address+3,True],[address+2,False]],
+                 prelim_caution=[[address+3,True],[address+2,True]])
 
 # 4 aspect signals - With individual output address mapping
-dcc_control.map_dcc_colour_light_signal (11, danger=[[address+1,False],[address+2,False],[address+3,False],[address,True]],
-                                         proceed=[[address,False],[address+2,False],[address+3,False],[address+1,True]],
-                                         caution=[[address,False],[address+1,False],[address+3,False],[address+2,True]],
-                                         prelim_caution=[[address,False],[address+1,False],[address+2,True],[address+3,True]])
-dcc_control.map_dcc_colour_light_signal (12, danger=[[address+5,False],[address+6,False],[address+7,False],[address+4,True]],
-                                         proceed=[[address+4,False],[address+6,False],[address+7,False],[address+5,True]],
-                                         caution=[[address+4,False],[address+5,False],[address+7,False],[address+6,True]],
-                                         prelim_caution=[[address+4,False],[address+5,False],[address+6,True],[address+7,True]])
+map_dcc_signal (11, danger=[[address+1,False],[address+2,False],[address+3,False],[address,True]],
+                 proceed=[[address,False],[address+2,False],[address+3,False],[address+1,True]],
+                 caution=[[address,False],[address+1,False],[address+3,False],[address+2,True]],
+                 prelim_caution=[[address,False],[address+1,False],[address+2,True],[address+3,True]])
+map_dcc_signal (12, danger=[[address+5,False],[address+6,False],[address+7,False],[address+4,True]],
+                 proceed=[[address+4,False],[address+6,False],[address+7,False],[address+5,True]],
+                 caution=[[address+4,False],[address+5,False],[address+7,False],[address+6,True]],
+                 prelim_caution=[[address+4,False],[address+5,False],[address+6,True],[address+7,True]])
 
 # 4 aspect signal - With Position light and single feather
-dcc_control.map_dcc_colour_light_signal (14, danger=[[address,False],[address+1,False]],
-                                         proceed=[[address,True],[address+1,False]],
-                                         caution=[[address+1,True],[address,False]],
-                                         prelim_caution=[[address+1,True],[address,True]],
-                                         LH1 = [[address+3,False]],
-                                         LH2 = [[address+3,False]],
-                                         RH1 = [[address+3,True]],
-                                         RH2 = [[address+3,False]],
-                                         MAIN = [[address+3,False]],
-                                         call = address+4)
+map_dcc_signal (14, danger=[[address,False],[address+1,False]],
+                 proceed=[[address,True],[address+1,False]],
+                 caution=[[address+1,True],[address,False]],
+                 prelim_caution=[[address+1,True],[address,True]],
+                 LH1 = [[address+3,False]],
+                 LH2 = [[address+3,False]],
+                 RH1 = [[address+3,True]],
+                 RH2 = [[address+3,False]],
+                 MAIN = [[address+3,False]],
+                 call = address+4)
 
 # 4 aspect signal - With Multiple feathers
-dcc_control.map_dcc_colour_light_signal (16, danger=[[address,False],[address+1,False]],
-                                         proceed=[[address,True],[address+1,False]],
-                                         caution=[[address+1,True],[address,False]],
-                                         prelim_caution=[[address+1,True],[address,True]],
-                                         LH1 = [[address+2,False],[address+3,True]],
-                                         LH2 = [[address+2,False],[address+3,False]],
-                                         RH1 = [[address+3,False],[address+2,True]],
-                                         RH2 = [[address+2,True],[address+3,True]],
-                                         MAIN = [[address+2,False],[address+3,False]] )
+map_dcc_signal (16, danger=[[address,False],[address+1,False]],
+                 proceed=[[address,True],[address+1,False]],
+                 caution=[[address+1,True],[address,False]],
+                 prelim_caution=[[address+1,True],[address,True]],
+                 LH1 = [[address+2,False],[address+3,True]],
+                 LH2 = [[address+2,False],[address+3,False]],
+                 RH1 = [[address+3,False],[address+2,True]],
+                 RH2 = [[address+2,True],[address+3,True]],
+                 MAIN = [[address+2,False],[address+3,False]] )
 
 print ("Creating Signals")
 

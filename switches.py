@@ -1,6 +1,5 @@
 from tkinter import *
 import tkinter.font
-import signals_common
 
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing switch objects (buttons)
@@ -146,15 +145,15 @@ def create_switch (canvas, switch_id:int, x:int, y:int, switch_callback = switch
     else: # we're good to go on and create the switch
         
         # set the font size for the buttons
-        myfont = tkinter.font.Font(size=signals_common.fontsize)
+        myfont = tkinter.font.Font(size=8)
 
         # Create the button objects and their callbacks
         button1 = Button (canvas,text=label1,state="normal",
-                    padx=signals_common.xpadding,pady=signals_common.ypadding,
+                    padx=3,pady=3,
                     relief="raised", font=myfont, bg=bg_inactive, fg=fg_inactive,
                     activebackground=bg_inactive, activeforeground=fg_inactive,
                     command = lambda:toggle_switch(switch_id,1,switch_callback))
-        button2 = Button (canvas,text=label2,state="normal",padx=signals_common.xpadding,pady=signals_common.ypadding,
+        button2 = Button (canvas,text=label2,state="normal",padx=3,pady=3,
                     relief="raised", font=myfont, bg=bg_inactive, fg=fg_inactive,
                     activebackground=bg_inactive, activeforeground=fg_inactive,
                     command = lambda:toggle_switch(switch_id,2,switch_callback))

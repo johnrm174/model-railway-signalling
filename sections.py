@@ -1,5 +1,4 @@
-import points 
-import signals 
+import model_railway_signals
 import switches
 
 #----------------------------------------------------------------------
@@ -117,34 +116,34 @@ def update_track_occupancy(sig_passed:int):
     
     # This is effectively the "entry" Signal to area of control
     if sig_passed == 20:
-        if not signals.signal_clear(20): print ("SPAD - Signal 20")
+        if not model_railway_signals.signal_clear(20): print ("SPAD - Signal 20")
         switches.set_switch (occupied_down_east)
         
     elif sig_passed == 11:
-        if not signals.signal_clear(11): print ("SPAD - Signal 11")
+        if not model_railway_signals.signal_clear(11): print ("SPAD - Signal 11")
         switches.clear_switch(occupied_down_east)
-        if not points.point_switched(9) and not points.point_switched(7):
+        if not model_railway_signals.point_switched(9) and not model_railway_signals.point_switched(7):
              # Movement into the Down loop
             switches.set_switch(occupied_down_loop)
-        elif not points.point_switched(9) and points.point_switched(7):
+        elif not model_railway_signals.point_switched(9) and model_railway_signals.point_switched(7):
              # Movement into the down platform
             switches.set_switch(occupied_down_platform)
-        elif points.point_switched(9) and not points.point_switched(6):
+        elif model_railway_signals.point_switched(9) and not model_railway_signals.point_switched(6):
              # Movement into the branch platform
             switches.set_switch(occupied_branch_platform)
         else :  # Movement into the goods loop
             switches.set_switch(occupied_goods_loop)
            
     elif sig_passed == 12:
-        if not signals.signal_clear(12): print ("SPAD - Signal 12")
+        if not model_railway_signals.signal_clear(12): print ("SPAD - Signal 12")
         switches.set_switch(occupied_down_west)
-        signals.trigger_timed_signal(21,5,5)
+        model_railway_signals.trigger_timed_signal(21,5,5)
         switches.clear_switch(occupied_down_loop)
 
     elif sig_passed == 13:
-        if not signals.signal_clear(13): print ("SPAD - Signal 13")
+        if not model_railway_signals.signal_clear(13): print ("SPAD - Signal 13")
         switches.set_switch(occupied_down_west)
-        signals.trigger_timed_signal(21,5,5)
+        model_railway_signals.trigger_timed_signal(21,5,5)
         switches.clear_switch(occupied_down_platform)
 
     elif sig_passed == 21:
@@ -156,26 +155,26 @@ def update_track_occupancy(sig_passed:int):
         
     # This is effectively the "entry" Signal to our area of control
     elif sig_passed == 22: 
-        if not signals.signal_clear(22): print ("SPAD - Signal 22")
+        if not model_railway_signals.signal_clear(22): print ("SPAD - Signal 22")
         switches.set_switch(occupied_up_west)
 
     elif sig_passed == 3:
-        if not signals.signal_clear(3): print ("SPAD - Signal 3")
+        if not model_railway_signals.signal_clear(3): print ("SPAD - Signal 3")
         switches.clear_switch(occupied_up_west)
-        if not points.point_switched(2):
+        if not model_railway_signals.point_switched(2):
             # movement into up platform
             switches.set_switch(occupied_up_platform)
-        elif points.point_switched(2) and not points.point_switched(4):
+        elif model_railway_signals.point_switched(2) and not model_railway_signals.point_switched(4):
             # movement into branch platform
             switches.set_switch(occupied_branch_platform)
         else :  # movement into the goods loop
             switches.set_switch(occupied_goods_loop)
             
     elif sig_passed == 4:
-        if not signals.signal_clear(4): print ("SPAD - Signal 4")
+        if not model_railway_signals.signal_clear(4): print ("SPAD - Signal 4")
         switches.set_switch(occupied_up_east)
         switches.clear_switch(occupied_up_platform)
-        signals.trigger_timed_signal(23,5,5)
+        model_railway_signals.trigger_timed_signal(23,5,5)
         
     elif sig_passed == 23:
         # This is effectively the "exit" Signal from our area of control
@@ -188,7 +187,7 @@ def update_track_occupancy(sig_passed:int):
 
     # This is effectively the "entry" Signal to our area of control from the branch
     elif sig_passed == 1:
-        if signals.signal_clear(1):
+        if model_railway_signals.signal_clear(1):
             # assume west-to-east -train entering our area of control
             switches.set_switch(occupied_branch_west)
         else:
@@ -196,9 +195,9 @@ def update_track_occupancy(sig_passed:int):
             switches.clear_switch(occupied_branch_west)
 
     elif sig_passed == 2:
-        if signals.signal_clear(2) or signals.subsidary_signal_clear(2): # assume west-to-east
+        if model_railway_signals.signal_clear(2) or model_railway_signals.subsidary_signal_clear(2): # assume west-to-east
             switches.clear_switch(occupied_branch_west)
-            if not points.point_switched(4):
+            if not model_railway_signals.point_switched(4):
                 # movement into branch platform
                 switches.set_switch(occupied_branch_platform)
             else :  # movement into the goods loop
@@ -207,61 +206,61 @@ def update_track_occupancy(sig_passed:int):
             switches.set_switch(occupied_branch_west)
 
     elif sig_passed == 5:
-        if signals.signal_clear(5) or signals.subsidary_signal_clear(5): # assume east-to-west
+        if model_railway_signals.signal_clear(5) or model_railway_signals.subsidary_signal_clear(5): # assume east-to-west
             switches.clear_switch(occupied_goods_loop)
-            if not points.point_switched(5):
-                if points.point_switched(4) and not points.point_switched(2):
+            if not model_railway_signals.point_switched(5):
+                if model_railway_signals.point_switched(4) and not model_railway_signals.point_switched(2):
                     # movement onto branch
                     switches.set_switch(occupied_branch_west)
-                elif points.point_switched(4) and points.point_switched(2):
+                elif model_railway_signals.point_switched(4) and model_railway_signals.point_switched(2):
                     # movement onto down main
                     switches.set_switch(occupied_down_west)
-                    signals.trigger_timed_signal(21,5,5)
+                    model_railway_signals.trigger_timed_signal(21,5,5)
         else:
             switches.set_switch(occupied_goods_loop)
 
     elif sig_passed == 6:
-        if signals.signal_clear(6) or signals.subsidary_signal_clear(6): # assume east-to-west
+        if model_railway_signals.signal_clear(6) or model_railway_signals.subsidary_signal_clear(6): # assume east-to-west
             switches.clear_switch(occupied_branch_platform)
-            if not points.point_switched(2):
+            if not model_railway_signals.point_switched(2):
                 # movement onto branch
                 switches.set_switch(occupied_branch_west)
             else: # movement onto down main
                 switches.set_switch(occupied_down_west)
-                signals.trigger_timed_signal(21,5,5)
+                model_railway_signals.trigger_timed_signal(21,5,5)
 
         else:
             switches.set_switch(occupied_branch_platform)
             
     elif sig_passed == 7:
-        if signals.signal_clear(7) or signals.subsidary_signal_clear(7): # assume west-to-east
+        if model_railway_signals.signal_clear(7) or model_railway_signals.subsidary_signal_clear(7): # assume west-to-east
             switches.clear_switch(occupied_goods_loop)
-            if points.point_switched(6) and not points.point_switched(8):
+            if model_railway_signals.point_switched(6) and not model_railway_signals.point_switched(8):
                 # movement onto branch
                 switches.set_switch(occupied_branch_east)
-            elif points.point_switched(6) and points.point_switched(8):
+            elif model_railway_signals.point_switched(6) and model_railway_signals.point_switched(8):
                 # movement onto down main
                 switches.set_switch(occupied_up_east)
-                signals.trigger_timed_signal(23,5,5)
+                model_railway_signals.trigger_timed_signal(23,5,5)
 
         else:
             switches.set_switch(occupied_goods_loop)
                 
     elif sig_passed == 8:
-        if signals.signal_clear(8) or signals.subsidary_signal_clear(8): # assume west-to-east
+        if model_railway_signals.signal_clear(8) or model_railway_signals.subsidary_signal_clear(8): # assume west-to-east
             switches.clear_switch(occupied_branch_platform)
-            if not points.point_switched(8):
+            if not model_railway_signals.point_switched(8):
                 # movement onto branch
                 switches.set_switch(occupied_branch_east)
             else: # movement onto up main
                 switches.set_switch(occupied_up_east)
-                signals.trigger_timed_signal(23,5,5)
+                model_railway_signals.trigger_timed_signal(23,5,5)
         else:
             switches.set_switch(occupied_branch_platform)
             
     # This is effectively the "entry" Signal to our block section from the branch
     elif sig_passed == 9:
-        if signals.signal_clear(9):
+        if model_railway_signals.signal_clear(9):
             # assume east-to-west - entering our area of control
             switches.set_switch(occupied_branch_east)
         else:
@@ -269,9 +268,9 @@ def update_track_occupancy(sig_passed:int):
             switches.clear_switch(occupied_branch_east)
 
     elif sig_passed == 10:
-        if signals.signal_clear(10) or signals.subsidary_signal_clear(10): # assume east-to-west
+        if model_railway_signals.signal_clear(10) or model_railway_signals.subsidary_signal_clear(10): # assume east-to-west
             switches.clear_switch(occupied_branch_east)
-            if not points.point_switched(6):
+            if not model_railway_signals.point_switched(6):
                 # movement into branch platform
                 switches.set_switch(occupied_branch_platform)
             else :  # movement into the goods loop
@@ -295,80 +294,80 @@ def override_signals_based_on_track_occupancy():
     global occupied_up_east, occupied_up_west, occupied_up_platform,occupied_goods_loop
     global occupied_branch_east, occupied_branch_west, occupied_branch_platform    
 
-    signals.clear_signal_override(1,2,3,4,5,6,7,8,9,10,11,12,13,20,22)
+    model_railway_signals.clear_signal_override(1,2,3,4,5,6,7,8,9,10,11,12,13,20,22)
 
     # Down Line Sections
     
     if switches.switch_active(occupied_down_east):
-        signals.set_signal_override(20)
+        model_railway_signals.set_signal_override(20)
     
-    if switches.switch_active(occupied_down_platform) and points.point_switched(7) and not points.point_switched(9):
-        signals.set_signal_override(11)
+    if switches.switch_active(occupied_down_platform) and model_railway_signals.point_switched(7) and not model_railway_signals.point_switched(9):
+        model_railway_signals.set_signal_override(11)
         
-    if switches.switch_active(occupied_down_loop) and not points.point_switched(7) and not points.point_switched(9):
-        signals.set_signal_override(11)
+    if switches.switch_active(occupied_down_loop) and not model_railway_signals.point_switched(7) and not model_railway_signals.point_switched(9):
+        model_railway_signals.set_signal_override(11)
         
     if switches.switch_active(occupied_down_west):
-        if points.point_switched(1) and points.point_switched(2) and not points.point_switched(4):
-            signals.set_signal_override(6) # departure from branch platform
-        elif points.point_switched(1) and points.point_switched(2) and points.point_switched(4):
-            signals.set_signal_override(5) # departure from goods loop
-        elif points.point_switched(3):
-            signals.set_signal_override(13) # departure from Down Platform
+        if model_railway_signals.point_switched(1) and model_railway_signals.point_switched(2) and not model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(6) # departure from branch platform
+        elif model_railway_signals.point_switched(1) and model_railway_signals.point_switched(2) and model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(5) # departure from goods loop
+        elif model_railway_signals.point_switched(3):
+            model_railway_signals.set_signal_override(13) # departure from Down Platform
         else:
-            signals.set_signal_override(12) # departure from Down Loop
+            model_railway_signals.set_signal_override(12) # departure from Down Loop
     
     # Up Line Sections
 
     if switches.switch_active(occupied_up_west):
-        signals.set_signal_override(22)
+        model_railway_signals.set_signal_override(22)
 
-    if switches.switch_active(occupied_up_platform) and not points.point_switched(2):
-        signals.set_signal_override(3)
+    if switches.switch_active(occupied_up_platform) and not model_railway_signals.point_switched(2):
+        model_railway_signals.set_signal_override(3)
         
     if switches.switch_active(occupied_up_east):
-        if not points.point_switched(8):
-            signals.set_signal_override(4) # departure from Up Platform
-        elif not points.point_switched(6):
-            signals.set_signal_override(8) # departure from Up Platform
+        if not model_railway_signals.point_switched(8):
+            model_railway_signals.set_signal_override(4) # departure from Up Platform
+        elif not model_railway_signals.point_switched(6):
+            model_railway_signals.set_signal_override(8) # departure from Up Platform
         else:
-            signals.set_signal_override(7) # departure from Goods Loop
+            model_railway_signals.set_signal_override(7) # departure from Goods Loop
 
     # Station and Branch Sections
     
     if switches.switch_active(occupied_branch_west):
-        signals.set_signal_override(1) # entrance into section
-        if not points.point_switched(2) and not points.point_switched(4):
-            signals.set_signal_override(6) # departure from Branch Platform
-        elif not points.point_switched(2) and points.point_switched(4):
-            signals.set_signal_override(5) # departure from Goods Loop
+        model_railway_signals.set_signal_override(1) # entrance into section
+        if not model_railway_signals.point_switched(2) and not model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(6) # departure from Branch Platform
+        elif not model_railway_signals.point_switched(2) and model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(5) # departure from Goods Loop
 
     if switches.switch_active(occupied_branch_east):
-        signals.set_signal_override(9) # entrance into section
-        if not points.point_switched(8) and not points.point_switched(6):
-            signals.set_signal_override(8) # departure from Branch Platform
-        elif not points.point_switched(8) and points.point_switched(6):
-            signals.set_signal_override(7) # departure from Goods Loop
+        model_railway_signals.set_signal_override(9) # entrance into section
+        if not model_railway_signals.point_switched(8) and not model_railway_signals.point_switched(6):
+            model_railway_signals.set_signal_override(8) # departure from Branch Platform
+        elif not model_railway_signals.point_switched(8) and model_railway_signals.point_switched(6):
+            model_railway_signals.set_signal_override(7) # departure from Goods Loop
 
     if switches.switch_active(occupied_branch_platform):
-        if not points.point_switched(2) and not points.point_switched(4):
-            signals.set_signal_override(2) # Arrival from Branch West
-        elif points.point_switched(2) and not points.point_switched(4):
-            signals.set_signal_override(3) # Arrival from Up West
-        if not points.point_switched(6) and not points.point_switched(8):
-            signals.set_signal_override(10) # Arrival from Branch East
-        elif not points.point_switched(6) and points.point_switched(8) and points.point_switched(9):
-            signals.set_signal_override(11) # Arrival from Down East
+        if not model_railway_signals.point_switched(2) and not model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(2) # Arrival from Branch West
+        elif model_railway_signals.point_switched(2) and not model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(3) # Arrival from Up West
+        if not model_railway_signals.point_switched(6) and not model_railway_signals.point_switched(8):
+            model_railway_signals.set_signal_override(10) # Arrival from Branch East
+        elif not model_railway_signals.point_switched(6) and model_railway_signals.point_switched(8) and model_railway_signals.point_switched(9):
+            model_railway_signals.set_signal_override(11) # Arrival from Down East
             
     if switches.switch_active(occupied_goods_loop):
-        if not points.point_switched(2) and points.point_switched(4):
-            signals.set_signal_override(2) # Arrival from Branch West
-        elif points.point_switched(2) and points.point_switched(4):
-            signals.set_signal_override(3) # Arrival from Up West
-        if points.point_switched(6) and not points.point_switched(8):
-            signals.set_signal_override(10) # Arrival from Branch East
-        elif points.point_switched(6) and points.point_switched(8) and points.point_switched(9):
-            signals.set_signal_override(11) # Arrival from Down East
+        if not model_railway_signals.point_switched(2) and model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(2) # Arrival from Branch West
+        elif model_railway_signals.point_switched(2) and model_railway_signals.point_switched(4):
+            model_railway_signals.set_signal_override(3) # Arrival from Up West
+        if model_railway_signals.point_switched(6) and not model_railway_signals.point_switched(8):
+            model_railway_signals.set_signal_override(10) # Arrival from Branch East
+        elif model_railway_signals.point_switched(6) and model_railway_signals.point_switched(8) and model_railway_signals.point_switched(9):
+            model_railway_signals.set_signal_override(11) # Arrival from Down East
 
     return()
 
@@ -386,86 +385,86 @@ def update_track_power_section_switches():
     if not switches.switch_active (power_switch_override):
 
         # Auto switch the Down loop power section
-        if signals.signal_clear(12):
+        if model_railway_signals.signal_clear(12):
             switches.set_switch (power_down_loop)
-        elif signals.signal_clear(11) and not points.point_switched(9) and not points.point_switched(7):
+        elif model_railway_signals.signal_clear(11) and not model_railway_signals.point_switched(9) and not model_railway_signals.point_switched(7):
             switches.set_switch (power_down_loop)
         else:
             switches.clear_switch (power_down_loop)
             
         # Auto switch the Down Platform power section
-        if signals.signal_clear(13):
+        if model_railway_signals.signal_clear(13):
             switches.set_switch (power_down_platform)
-        elif signals.signal_clear(11) and not points.point_switched(9) and points.point_switched(7):
+        elif model_railway_signals.signal_clear(11) and not model_railway_signals.point_switched(9) and model_railway_signals.point_switched(7):
             switches.set_switch (power_down_platform)
         else:
             switches.clear_switch (power_down_platform)
             
         # Auto switch the Up Platform power section
-        if signals.signal_clear(4):
+        if model_railway_signals.signal_clear(4):
             switches.set_switch (power_up_platform)
-        elif signals.signal_clear(3) and not points.point_switched(2):
+        elif model_railway_signals.signal_clear(3) and not model_railway_signals.point_switched(2):
             switches.set_switch (power_up_platform)
         else:
             switches.clear_switch (power_up_platform)
 
         # Auto switch the LH Branch Headshunt power section
-        if signals.signal_clear(1) or signals.signal_clear(2):
+        if model_railway_signals.signal_clear(1) or model_railway_signals.signal_clear(2):
             switches.set_switch(power_branch_west,1)
-        elif (signals.signal_clear(5) or signals.signal_clear (6)) and not points.point_switched(2):
+        elif (model_railway_signals.signal_clear(5) or model_railway_signals.signal_clear (6)) and not model_railway_signals.point_switched(2):
             switches.set_switch(power_branch_west,1)
-        elif signals.subsidary_signal_clear(2) or signals.subsidary_signal_clear(6):
+        elif model_railway_signals.subsidary_signal_clear(2) or model_railway_signals.subsidary_signal_clear(6):
             switches.set_switch(power_branch_west,2)
-        elif signals.subsidary_signal_clear(5) and points.point_switched(4) and not points.point_switched(5):
+        elif model_railway_signals.subsidary_signal_clear(5) and model_railway_signals.point_switched(4) and not model_railway_signals.point_switched(5):
             switches.set_switch(power_branch_west,2)
         else:
             switches.clear_switch(power_branch_west,1)
             switches.clear_switch(power_branch_west,2)
             
         # Auto switch the RH Branch Headshunt power section
-        if signals.signal_clear(9) or signals.signal_clear(10):
+        if model_railway_signals.signal_clear(9) or model_railway_signals.signal_clear(10):
             switches.set_switch(power_branch_east,1)
-        elif (signals.signal_clear(7) or signals.signal_clear (8)) and not points.point_switched(8):
+        elif (model_railway_signals.signal_clear(7) or model_railway_signals.signal_clear (8)) and not model_railway_signals.point_switched(8):
             switches.set_switch(power_branch_east,1)
-        elif signals.subsidary_signal_clear(10) or signals.subsidary_signal_clear(8):
+        elif model_railway_signals.subsidary_signal_clear(10) or model_railway_signals.subsidary_signal_clear(8):
             switches.set_switch(power_branch_east,2)
-        elif signals.subsidary_signal_clear(7) and points.point_switched(6):
+        elif model_railway_signals.subsidary_signal_clear(7) and model_railway_signals.point_switched(6):
             switches.set_switch(power_branch_east,2)
         else:
             switches.clear_switch(power_branch_east,1)
             switches.clear_switch(power_branch_east,2)
             
         # Auto switch the Goods Loop power section - LH side first
-        if signals.signal_clear(15) or signals.signal_clear(14) or signals.signal_clear(5) or signals.subsidary_signal_clear(5):
+        if model_railway_signals.signal_clear(15) or model_railway_signals.signal_clear(14) or model_railway_signals.signal_clear(5) or model_railway_signals.subsidary_signal_clear(5):
             switches.set_switch(power_goods_loop,1)
-        elif (signals.signal_clear(2) or signals.subsidary_signal_clear(2)) and points.point_switched(4):
+        elif (model_railway_signals.signal_clear(2) or model_railway_signals.subsidary_signal_clear(2)) and model_railway_signals.point_switched(4):
             switches.set_switch(power_goods_loop,1)
-        elif signals.signal_clear(3) and points.point_switched(2) and points.point_switched(4): 
+        elif model_railway_signals.signal_clear(3) and model_railway_signals.point_switched(2) and model_railway_signals.point_switched(4): 
             switches.set_switch(power_goods_loop,1)
         # Deal with RH side 
-        elif signals.signal_clear(16) or signals.signal_clear(7) or signals.subsidary_signal_clear(7):
+        elif model_railway_signals.signal_clear(16) or model_railway_signals.signal_clear(7) or model_railway_signals.subsidary_signal_clear(7):
             switches.set_switch(power_goods_loop,2)
-        elif (signals.signal_clear(10) or signals.subsidary_signal_clear(10)) and points.point_switched(6):
+        elif (model_railway_signals.signal_clear(10) or model_railway_signals.subsidary_signal_clear(10)) and model_railway_signals.point_switched(6):
             switches.set_switch(power_goods_loop,2)
-        elif signals.signal_clear(11) and points.point_switched(9) and points.point_switched(6):
+        elif model_railway_signals.signal_clear(11) and model_railway_signals.point_switched(9) and model_railway_signals.point_switched(6):
             switches.set_switch(power_goods_loop,2)
         else:
             switches.clear_switch(power_goods_loop,1)
             switches.clear_switch(power_goods_loop,2)
             
         # Auto switch the Platform 3 power section - LH side first
-        if signals.signal_clear(6) or signals.subsidary_signal_clear(6):
+        if model_railway_signals.signal_clear(6) or model_railway_signals.subsidary_signal_clear(6):
             switches.set_switch(power_branch_platform,1)
-        elif (signals.signal_clear(2) or signals.subsidary_signal_clear(2)) and not points.point_switched(4):
+        elif (model_railway_signals.signal_clear(2) or model_railway_signals.subsidary_signal_clear(2)) and not model_railway_signals.point_switched(4):
             switches.set_switch(power_branch_platform,1)
-        elif signals.signal_clear(3) and points.point_switched(3) and not points.point_switched(4): 
+        elif model_railway_signals.signal_clear(3) and model_railway_signals.point_switched(3) and not model_railway_signals.point_switched(4): 
             switches.set_switch(power_branch_platform,1)
         # Deal with RH side 
-        elif signals.signal_clear(8) or signals.subsidary_signal_clear(8):
+        elif model_railway_signals.signal_clear(8) or model_railway_signals.subsidary_signal_clear(8):
             switches.set_switch(power_branch_platform,2)
-        elif (signals.signal_clear(10) or signals.subsidary_signal_clear(10)) and not points.point_switched(6):
+        elif (model_railway_signals.signal_clear(10) or model_railway_signals.subsidary_signal_clear(10)) and not model_railway_signals.point_switched(6):
             switches.set_switch(power_branch_platform,2)
-        elif signals.signal_clear(11) and points.point_switched(9) and not points.point_switched(6):
+        elif model_railway_signals.signal_clear(11) and model_railway_signals.point_switched(9) and not model_railway_signals.point_switched(6):
             switches.set_switch(power_branch_platform,1)
         else:
             switches.clear_switch(power_branch_platform,1)
@@ -485,98 +484,102 @@ def refresh_signal_aspects():
     # UP Direction ###########################################
 
     # Signal 7 (signal ahead is eather 23 or none)
-    if points.point_switched(8):
-        signals.set_route_indication(7,signals.route_type.RH1,theatre_text="M")
-        signals.update_signal (7,sig_ahead_id=23)
+    if model_railway_signals.point_switched(8):
+        model_railway_signals.set_route_indication(7,model_railway_signals.route_type.RH1,theatre_text="M")
+        model_railway_signals.update_signal(7,sig_ahead_id=23)
     else:
-        signals.set_route_indication(7,signals.route_type.MAIN,theatre_text="B")
-        
+        model_railway_signals.set_route_indication(7,model_railway_signals.route_type.MAIN,theatre_text="B")
+        model_railway_signals.update_signal(7)
+
     # Signal 8 (signal ahead is eather 21 or none)
-    if points.point_switched(8):
-        signals.set_route_indication(8,signals.route_type.RH1,theatre_text="M")
-        signals.update_signal (8,sig_ahead_id=23)
+    if model_railway_signals.point_switched(8):
+        model_railway_signals.set_route_indication(8,model_railway_signals.route_type.RH1,theatre_text="M")
+        model_railway_signals.update_signal(8,sig_ahead_id=23)
     else:
-        signals.set_route_indication(8,signals.route_type.MAIN,theatre_text="B")
-    
+        model_railway_signals.set_route_indication(8,model_railway_signals.route_type.MAIN,theatre_text="B")
+        model_railway_signals.update_signal(8)
+
     # Signal 4 (signal ahead is 21)
-    signals.update_signal (4,sig_ahead_id=23)
+    model_railway_signals.update_signal (4,sig_ahead_id=23)
 
     # Signal 2 (signal ahead is eather 7 or 8)
-    if points.point_switched(4):
-        signals.set_route_indication(2,signals.route_type.LH1,theatre_text="G")
-        signals.update_signal (2,sig_ahead_id=7)
+    if model_railway_signals.point_switched(4):
+        model_railway_signals.set_route_indication(2,model_railway_signals.route_type.LH1,theatre_text="G")
+        model_railway_signals.update_signal(2,sig_ahead_id=7)
     else:
-        signals.set_route_indication(2,signals.route_type.MAIN,theatre_text="3")
-        signals.update_signal (2,sig_ahead_id=8)
+        model_railway_signals.set_route_indication(2,model_railway_signals.route_type.MAIN,theatre_text="3")
+        model_railway_signals.update_signal(2,sig_ahead_id=8)
 
     # Signal 3 (signal ahead is either 4,7 or 8)
-    if not points.point_switched(2):
-        signals.set_route_indication(3,signals.route_type.MAIN,theatre_text="2")
-        signals.update_signal (3,sig_ahead_id=4)
-    elif points.point_switched(4):
-        signals.set_route_indication(3,signals.route_type.LH2,theatre_text="G")
-        signals.update_signal (3,sig_ahead_id=7)
+    if not model_railway_signals.point_switched(2):
+        model_railway_signals.set_route_indication(3,model_railway_signals.route_type.MAIN,theatre_text="2")
+        model_railway_signals.update_signal(3,sig_ahead_id=4)
+    elif model_railway_signals.point_switched(4):
+        model_railway_signals.set_route_indication(3,model_railway_signals.route_type.LH2,theatre_text="G")
+        model_railway_signals.update_signal(3,sig_ahead_id=7)
     else:
-        signals.set_route_indication(3,signals.route_type.LH1,theatre_text="3")
-        signals.update_signal (3,sig_ahead_id=8)
+        model_railway_signals.set_route_indication(3,model_railway_signals.route_type.LH1,theatre_text="3")
+        model_railway_signals.update_signal(3,sig_ahead_id=8)
 
     # Signal 1 (signal ahead is 2)
-    signals.update_signal (1,sig_ahead_id=2)
+    model_railway_signals.update_signal(1,sig_ahead_id=2)
     
     # Signal 22 (signal ahead is 3)
-    signals.update_signal (22,sig_ahead_id=3)
+    model_railway_signals.update_signal(22,sig_ahead_id=3)
 
 
     # DOWN Direction ###########################################
 
     # Signal 12 (signal ahead is 21)
-    signals.update_signal (12,sig_ahead_id=21)
+    model_railway_signals.update_signal(12,sig_ahead_id=21)
     
     # Signal 13 (signal ahead is 21)
-    signals.update_signal (13,sig_ahead_id=21)
+    model_railway_signals.update_signal(13,sig_ahead_id=21)
     
     # Signal 5 (signal ahead is eather 21 or none)
-    if points.point_switched(2):
-        signals.set_route_indication(5,signals.route_type.LH1,theatre_text="M")
-        signals.update_signal (5,sig_ahead_id=21)
+    if model_railway_signals.point_switched(2):
+        model_railway_signals.set_route_indication(5,model_railway_signals.route_type.LH1,theatre_text="M")
+        model_railway_signals.update_signal(5,sig_ahead_id=21)
     else:
-        signals.set_route_indication(5,signals.route_type.MAIN,theatre_text="B")
-        
+        model_railway_signals.set_route_indication(5,model_railway_signals.route_type.MAIN,theatre_text="B")
+        model_railway_signals.update_signal(5)
+
     # Signal 6 (signal ahead is eather 21 or none)
-    if points.point_switched(2):
-        signals.update_signal (6,sig_ahead_id=21)
-        signals.set_route_indication(6,signals.route_type.LH1,theatre_text="M")
+    if model_railway_signals.point_switched(2):
+        model_railway_signals.update_signal (6,sig_ahead_id=21)
+        model_railway_signals.set_route_indication(6,model_railway_signals.route_type.LH1,theatre_text="M")
     else:
-        signals.set_route_indication(6,signals.route_type.MAIN,theatre_text="B")
-        
+        model_railway_signals.set_route_indication(6,model_railway_signals.route_type.MAIN,theatre_text="B")
+        model_railway_signals.update_signal (6)
+
     # Signal 10 (signal ahead is eather 5 or 6)
-    if points.point_switched(6):
-        signals.update_signal (10,sig_ahead_id=5)
-        signals.set_route_indication(10,signals.route_type.RH1,theatre_text="G")
+    if model_railway_signals.point_switched(6):
+        model_railway_signals.update_signal (10,sig_ahead_id=5)
+        model_railway_signals.set_route_indication(10,model_railway_signals.route_type.RH1,theatre_text="G")
     else:
-        signals.set_route_indication(10,signals.route_type.MAIN,theatre_text="3")
-        signals.update_signal (10,sig_ahead_id=6)
+        model_railway_signals.set_route_indication(10,model_railway_signals.route_type.MAIN,theatre_text="3")
+        model_railway_signals.update_signal (10,sig_ahead_id=6)
 
     # Signal 9 (signal ahead is 10)
-    signals.update_signal (9,sig_ahead_id=10)
+    model_railway_signals.update_signal (9,sig_ahead_id=10)
     
     # Signal 11 (signal ahead is eather 5,6,12 or 13)
-    if points.point_switched(9):
-        if points.point_switched(6):
-            signals.set_route_indication(11,signals.route_type.RH2,theatre_text="G")
-            signals.update_signal (11,sig_ahead_id=5)
+    if model_railway_signals.point_switched(9):
+        if model_railway_signals.point_switched(6):
+            model_railway_signals.set_route_indication(11,model_railway_signals.route_type.RH2,theatre_text="G")
+            model_railway_signals.update_signal (11,sig_ahead_id=5)
         else:
-            signals.set_route_indication(11,signals.route_type.RH1,theatre_text="3")
-            signals.update_signal (11,sig_ahead_id=6)
+            model_railway_signals.set_route_indication(11,model_railway_signals.route_type.RH1,theatre_text="3")
+            model_railway_signals.update_signal (11,sig_ahead_id=6)
     else:
-        if points.point_switched(7):
-            signals.set_route_indication(11,signals.route_type.LH1,theatre_text="1")
-            signals.update_signal (11,sig_ahead_id=13)
+        if model_railway_signals.point_switched(7):
+            model_railway_signals.set_route_indication(11,model_railway_signals.route_type.LH1,theatre_text="1")
+            model_railway_signals.update_signal (11,sig_ahead_id=13)
         else:
-            signals.set_route_indication(11,signals.route_type.MAIN,theatre_text="M")
-            signals.update_signal (11,sig_ahead_id=12)
+            model_railway_signals.set_route_indication(11,model_railway_signals.route_type.MAIN,theatre_text="M")
+            model_railway_signals.update_signal (11,sig_ahead_id=12)
 
     # Signal 20 (signal ahead is 11)
-    signals.update_signal (20,sig_ahead_id=11)
+    model_railway_signals.update_signal (20,sig_ahead_id=11)
 
     return()

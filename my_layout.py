@@ -2,7 +2,7 @@ from tkinter import *
 import interlocking
 import schematic
 import sections
-import signals 
+import model_railway_signals 
 
 #----------------------------------------------------------------------
 # Global Variables
@@ -69,7 +69,7 @@ def point_callback_function(point_id,callback_type):
 
 def signal_callback_function(sig_id,callback_type):
     print ("***** CALLBACK - Signal " + str(sig_id) + " : " + str(callback_type))
-    if callback_type == signals.sig_callback_type.sig_passed:
+    if callback_type == model_railway_signals.sig_callback_type.sig_passed:
         sections.update_track_occupancy(sig_id) # update route occupancy sections as signal is passed
         sections.override_signals_based_on_track_occupancy() # to reflect any route occupancy changes
     sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
