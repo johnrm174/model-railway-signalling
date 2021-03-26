@@ -7,7 +7,7 @@
 #----------------------------------------------------------------------
 
 from tkinter import *
-from signals import *
+from model_railway_signals import *
 import threading
 import time
 
