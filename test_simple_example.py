@@ -136,17 +136,17 @@ canvas.pack()
 # for theaspects that are being displayed by the signal on the schematic
 
 if use_dcc_control:
-    initialise_pi_sprog (sprog_debug_level)
-    request_dcc_power_on ()
+    initialise_pi_sprog(sprog_debug_level)
+    request_dcc_power_on()
     # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
-    # outputs E, F, G, H to drive our sifnal with D driving the feather indication
+    # outputs A,B,C,D to drive our signal with E driving the feather indication
     map_dcc_signal (sig_id = 2,
-                    danger = [[5,True],[6,False],[7,False],[8,False]],
-                    proceed = [[5,False],[6,True],[7,False],[8,False]],
-                    caution = [[5,False],[6,False],[7,True],[8,False]],
-                    prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
-                    LH1 = [[4,True]], MAIN = [[4, False]])
+                    danger = [[1,True],[2,False],[3,False],[4,False]],
+                    proceed = [[1,False],[2,True],[3,False],[4,False]],
+                    caution = [[1,False],[2,False],[3,True],[4,False]],
+                    prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
+                    LH1 = [[5,True]], MAIN = [[5, False]])
     # Points are simply mapped to single addresses
     map_dcc_point (1, 100)
     map_dcc_point (2, 101)
@@ -181,23 +181,28 @@ create_section(canvas,4,800,200,section_callback=main_callback_function)
 # Signal 2 is the signal just before the point - so it needs a route indication
 print ("Creating Signals")
 create_colour_light_signal (canvas,1,50,200,
+                            signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,2,275,200,
+                            signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False,
                             lhfeather45=True )
 create_colour_light_signal (canvas,3,600,150,
+                            signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,4,600,200,
+                            signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,5,900,200,
+                            signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             fully_automatic=True,
                             sig_passed_button=True)

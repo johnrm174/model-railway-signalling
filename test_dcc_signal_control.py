@@ -29,7 +29,7 @@ row_under_test = 1        # This is to control what signals we actually test in 
 # Also note that the base address configuration written to the CVs of the Signalist
 # decoder needs an offset: address_to_set_via_CVs = first_decoder_address + 4.
 # This offest is applied later in the code when we write the CVs for the decoder
-signalist_decoder_number = 100              
+signalist_decoder_number = 1              
 address = signalist_decoder_number*8 - 7  
 
 #----------------------------------------------------------------------
@@ -204,6 +204,7 @@ def toggle_feather():
 
 # Initialise the Pi sprog (and switch on the track power)
 initialise_pi_sprog (sprog_debug_level)
+request_dcc_power_on()
 
 # Reset the Decoder to its defaults
 service_mode_write_cv (8,8)

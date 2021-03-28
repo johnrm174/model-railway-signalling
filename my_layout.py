@@ -61,7 +61,6 @@ def sections_callback_function(section_id,callback_type):
     # Will be a "track occupancy" switch change 
     sections.override_signals_based_on_track_occupancy() # to reflect any manual track occupancy changes
     sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
-    schematic.update_track_schematic(canvas) # to reflect any track power section changes
     return()
 
 def point_callback_function(point_id,callback_type):
