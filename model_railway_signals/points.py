@@ -72,9 +72,9 @@ class point_type(enum.Enum):
     
 # Define the different callbacks types for the point
 class point_callback_type(enum.Enum):
-    point_switched = 0   # The point has been switched by the user
-    fpl_switched = 1   # The facing point lock has been switched by the user
-    null_event = 2
+    null_event = 10
+    point_switched = 11   # The point has been switched by the user
+    fpl_switched = 12   # The facing point lock has been switched by the user
 
 # -------------------------------------------------------------------------
 # Points are to be added to a global dictionary when created

@@ -25,6 +25,12 @@ from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import trigger_timed_signal
 
+from .track_sections import section_callback_type
+from .track_sections import create_section
+from .track_sections import section_occupied
+from .track_sections import set_section_occupied
+from .track_sections import clear_section_occupied
+
 from .pi_sprog_interface import initialise_pi_sprog
 from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import request_dcc_power_on
@@ -63,6 +69,13 @@ __all__ = [
         'set_signal_override',
         'clear_signal_override',
         'trigger_timed_signal',
+        # Public track_section types
+        'section_callback_type',
+        # Public track_section functions
+        'create_section',
+        'section_occupied',
+        'set_section_occupied',
+        'clear_section_occupied',
         # Public DCC control functions
         'initialise_pi_sprog',
         'service_mode_write_cv',

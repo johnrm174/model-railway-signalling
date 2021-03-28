@@ -24,36 +24,85 @@ sprog_debug_level = 1       # 0 = No debug, 1 = status messages only, 2 = all CB
 def main_callback_function(item_id,callback_type):
     print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
 
+    #--------------------------------------------------------------
+    # Deal with changes to the Track Occupancy
+    #--------------------------------------------------------------
+    
+    if callback_type == sig_callback_type.sig_passed:
+        if item_id == 1:
+            set_section_occupied(1)
+        elif item_id == 2:
+            clear_section_occupied(1)
+            if point_switched(1):
+                set_section_occupied(2)
+            else:
+                set_section_occupied(3)
+        elif item_id == 3:
+            clear_section_occupied(2)
+            set_section_occupied(4)
+        elif item_id == 4:
+            clear_section_occupied(3)
+            set_section_occupied(4)
+        elif item_id == 5:
+            trigger_timed_signal (5,0,3)
+            clear_section_occupied(4)
+            
+    #--------------------------------------------------------------
+    # Override signals based on track occupancy - we could use
+    # the signal passed events to do this but we also need to
+    # allow for manual setting/resetting the track occupancy sections
+    #--------------------------------------------------------------
+    
+    if section_occupied(1):
+        set_signal_override(1)
+    else:
+        clear_signal_override(1)
+    if ((section_occupied(2) and point_switched(1)) or
+            (section_occupied(3) and not point_switched(1))):
+        set_signal_override(2)
+    else:
+        clear_signal_override(2)
+    if section_occupied(4):
+        set_signal_override(3)
+        set_signal_override(4)
+    else:
+        clear_signal_override(3)
+        clear_signal_override(4)
+        
+    #-------------------------------------------------------------- 
     # Process the signal/point interlocking
+    #--------------------------------------------------------------
     
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
     if not fpl_active(1):
         lock_signal(2)
     else:
         unlock_signal(2)
-
-    # Either signal 3 or 4 are locked (at danger) depending on the setting of point 2
-    if point_switched(2):
+    # Signal 3 is locked (at danger) if point 2 is set against it 
+    if not point_switched(2):
+        lock_signal(3)
+    else:
         unlock_signal(3)
+    # Signal 4 is locked (at danger) if point 2 is set against it 
+    if point_switched(2):
         lock_signal(4)
     else:
         unlock_signal(4)
-        lock_signal(3)
-
-    # Point 1 is interlocked if signal 2 is set to clear
+    # Point 1 is locked if signal 2 is set to clear
     if signal_clear(2):
         lock_point(1)
     else:
         unlock_point(1)
-
-    # Point 2 is interlocked if either signals 3 or 4 are set to clear
+    # Point 2 is locked if either signals 3 or 4 are set to clear
     if signal_clear(3) or signal_clear(4):
         lock_point(2)
     else:
         unlock_point(2)
-
+        
+    #--------------------------------------------------------------
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
+    #--------------------------------------------------------------
     
     update_signal(3, sig_ahead_id=5)
     update_signal(4, sig_ahead_id=5)
@@ -66,13 +115,7 @@ def main_callback_function(item_id,callback_type):
         update_signal(2,sig_ahead_id=4)
 
     update_signal(1, sig_ahead_id=2)
-    
-    # If signal 5 has been passed, we'll trigger it as a timed signal
-    if callback_type == sig_callback_type.sig_passed:
-        trigger_timed_signal (5,0,3)
-    
-    # This is the end of the callback - return to the main loop and wait for the next event
-    
+        
     return()
 
 #------------------------------------------------------------------------------------
@@ -108,29 +151,30 @@ if use_dcc_control:
     map_dcc_point (1, 100)
     map_dcc_point (2, 101)
 
-# Draw the Schematic track plan (creating points as required)
 print ("Drawing Schematic and creating points")
-
 # Draw the the Main line (up to the first point)
-canvas.create_line(0,200,375,200,fill="black",width=3) 
-
+canvas.create_line(0,200,350,200,fill="black",width=3) 
 # Create (and draw) the first point - a left hand point with a Facing Point Lock
 # The "callback" is the name of the function (above) that will be called when something has changed
-create_point(canvas,1,point_type.LH, 400,200,"black",point_callback=main_callback_function,fpl=True) 
-
+create_point(canvas,1,point_type.LH, 375,200,"black",point_callback=main_callback_function,fpl=True) 
 # Draw the Main Line and Loop Line
-canvas.create_line(400,175,425,150,fill="black",width=3) # 45 degree line from point to start of loop
-canvas.create_line(425,150,675,150,fill="black",width=3) # Loop line
-canvas.create_line(425,200,675,200,fill="black",width=3) # Main Line
+canvas.create_line(375,175,400,150,fill="black",width=3) # 45 degree line from point to start of loop
+canvas.create_line(400,150,675,150,fill="black",width=3) # Loop line
+canvas.create_line(400,200,675,200,fill="black",width=3) # Main Line
 canvas.create_line(675,150,700,175,fill="black",width=3) # 45 degree line from end of loop to second point
-
 # Create (and draw) the second point - a right hand point rotated by 180 degrees
 # No facing point lock needed for this point as direction of travel is left to right
 create_point(canvas,2,point_type.RH, 700,200,"black",
                     point_callback=main_callback_function,orientation=180) 
-
 # Draw the continuation of the Main Line 
 canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from point to start of loop
+
+# Create the track occupancy sections
+print ("Creating the track Occupancy Sections")
+create_section(canvas,1,175,200,section_callback=main_callback_function)
+create_section(canvas,2,500,150,section_callback=main_callback_function)
+create_section(canvas,3,500,200,section_callback=main_callback_function)
+create_section(canvas,4,800,200,section_callback=main_callback_function)
 
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed
@@ -138,16 +182,20 @@ canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from 
 print ("Creating Signals")
 create_colour_light_signal (canvas,1,50,200,
                             sig_callback=main_callback_function,
+                            sig_passed_button = True,
                             refresh_immediately = False)
-create_colour_light_signal (canvas,2,300,200,
+create_colour_light_signal (canvas,2,275,200,
                             sig_callback=main_callback_function,
+                            sig_passed_button = True,
                             refresh_immediately = False,
                             lhfeather45=True )
 create_colour_light_signal (canvas,3,600,150,
                             sig_callback=main_callback_function,
+                            sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,4,600,200,
                             sig_callback=main_callback_function,
+                            sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,5,900,200,
                             sig_callback=main_callback_function,

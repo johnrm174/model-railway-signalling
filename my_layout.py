@@ -2,6 +2,7 @@ from tkinter import *
 import interlocking
 import schematic
 import sections
+import power_switches
 import model_railway_signals 
 
 #----------------------------------------------------------------------
@@ -50,8 +51,14 @@ def quitFullScreen(event):
 #----------------------------------------------------------------------
 
 def switch_button(switch_id,button_id):
-    print ("***** CALLBACK - Section Switch "+str(switch_id)+", button "+str(button_id))
-    # Could be a "track occupancy" switch change or a "track power section" switch change
+    print ("***** CALLBACK - Power Section Switch "+str(switch_id)+", button "+str(button_id))
+    # A "track power section" switch change
+    schematic.update_track_schematic(canvas) # to reflect any track power section changes
+    return()
+
+def sections_callback_function(section_id,callback_type):
+    print ("***** CALLBACK - Track Occupancy Section "+str(section_id)+" : "+str(callback_type))
+    # Will be a "track occupancy" switch change 
     sections.override_signals_based_on_track_occupancy() # to reflect any manual track occupancy changes
     sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
     schematic.update_track_schematic(canvas) # to reflect any track power section changes
@@ -61,7 +68,7 @@ def point_callback_function(point_id,callback_type):
     print ("***** CALLBACK - Point " + str(point_id) + " : " + str(callback_type))
     sections.override_signals_based_on_track_occupancy() # to reflect any route changes
     sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
-    sections.update_track_power_section_switches() # sections auto switched on point & signal settings
+    power_switches.update_track_power_section_switches() # sections auto switched on point & signal settings
     schematic.update_track_schematic(canvas) # To reflect any route changes 
     interlocking.process_interlocking_east()
     interlocking.process_interlocking_west()
@@ -73,7 +80,7 @@ def signal_callback_function(sig_id,callback_type):
         sections.update_track_occupancy(sig_id) # update route occupancy sections as signal is passed
         sections.override_signals_based_on_track_occupancy() # to reflect any route occupancy changes
     sections.refresh_signal_aspects() # Ensure any aspect changes are reflected back along the route
-    sections.update_track_power_section_switches() # sections auto switched on point & signal settings
+    power_switches.update_track_power_section_switches() # sections auto switched on point & signal settings
     schematic.update_track_schematic(canvas) # to reflect any track power section changes 
     interlocking.process_interlocking_east()
     interlocking.process_interlocking_west()
@@ -102,8 +109,8 @@ schematic.create_track_schematic(canvas,point_callback_function,fpl_enabled=fpl_
 schematic.create_layout_signals(canvas,signal_callback_function)
 
 # Create the section Switches and track occupancy switches for the layout
-sections.create_section_switches(canvas, switch_button)
-sections.create_track_occupancy_switches(canvas,switch_button)
+power_switches.create_section_switches(canvas,switch_button)
+sections.create_track_occupancy_switches(canvas,sections_callback_function)
 
 # Set the initial interlocking conditions and signal aspects
 interlocking.set_initial_interlocking_conditions()
