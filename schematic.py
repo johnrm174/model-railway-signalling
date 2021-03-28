@@ -1,5 +1,5 @@
-import model_railway_signals
-import switches
+from model_railway_signals import *
+import power_switches
 
 # The default colours for the schematic
 off_colour = "grey75" # sections that are switched off
@@ -75,7 +75,6 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     # Global drawing objects for the MPD Schematic
     global mpd, point20, point21, point22, point23, mpd1, mpd2, mpd3, mpd4, mpd5, mpd6
 
-
     #------------------------------------------------------------------------------------
     # Draw the Goods Yard
     #------------------------------------------------------------------------------------
@@ -83,15 +82,15 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     # Goods yard LH headshunt
     lines1 = [canvas.create_line(450,240,450,260,fill=off_colour,width=3)] # End stop
     lines2 = [canvas.create_line(450,250,575,250,fill=off_colour,width=3)]  # up to point 5
-    lines3 = model_railway_signals.create_point (canvas,5,model_railway_signals.point_type.RH,600,250,off_colour,also_switch=105,
+    lines3 = create_point (canvas,5,point_type.RH,600,250,off_colour,also_switch=105,
                 point_callback=point_callback)
     lines4 = [canvas.create_line(625,250,875,250,fill=off_colour,width=3)]  # from point 5 to point 18
     lines5 = [canvas.create_line(600,275,700,375,fill=off_colour,width=3)]  # from point 5 to point 105
-    lines6 = model_railway_signals.create_point (canvas,18,model_railway_signals.point_type.LH,900,250,off_colour,
+    lines6 = create_point (canvas,18,point_type.LH,900,250,off_colour,
                 point_callback=point_callback)
 
     # Goods yard RH headshunt
-    lines7 = model_railway_signals.create_point (canvas,110,model_railway_signals.point_type.RH,1225,400,off_colour,auto=True,
+    lines7 = create_point (canvas,110,point_type.RH,1225,400,off_colour,auto=True,
                 orientation=180, point_callback=point_callback)
     lines8 = [canvas.create_line(1250,400,1500,400,fill=off_colour,width=3)] # point 101 Headshunt
     lines9 = [canvas.create_line(1500,390,1500,410,fill=off_colour,width=3)] # End stop
@@ -103,29 +102,29 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
                canvas.create_line(1068,43,1082,57,fill=off_colour,width=3)] # End stop
 
     lines1 = [canvas.create_line(925,250,975,250,fill=off_colour,width=3)] # point 18 to point 14
-    lines2 = model_railway_signals.create_point (canvas,14,model_railway_signals.point_type.LH,1000,250,off_colour,
+    lines2 = create_point (canvas,14,point_type.LH,1000,250,off_colour,
                 point_callback=point_callback)
     point14 = lines1 + lines2
     
     lines1 = [canvas.create_line(1025,250,1100,250,fill=off_colour,width=3)] # point 14 to point 13
-    lines2 = model_railway_signals.create_point (canvas,13,model_railway_signals.point_type.RH,1125,250,off_colour,
+    lines2 = create_point (canvas,13,point_type.RH,1125,250,off_colour,
                 point_callback=point_callback)
     point13 = lines1 + lines2
 
     # Top ladder of sidings
     
     lines1 = [canvas.create_line(1000,225,1025,200,fill=off_colour,width=3)] # point 14 to point 15
-    lines2 = model_railway_signals.create_point (canvas,15,model_railway_signals.point_type.LH,1050,200,off_colour,
+    lines2 = create_point (canvas,15,point_type.LH,1050,200,off_colour,
                 point_callback=point_callback)
     point15 = lines1 + lines2
     
     lines1 = [canvas.create_line(1050,175,1075,150,fill=off_colour,width=3)] # point 15 to point 16
-    lines2 = model_railway_signals.create_point (canvas,16,model_railway_signals.point_type.LH,1100,150,off_colour,
+    lines2 = create_point (canvas,16,point_type.LH,1100,150,off_colour,
                 point_callback=point_callback)
     point16 = lines1 + lines2
 
     lines1 = [canvas.create_line(1100,125,1125,100,fill=off_colour,width=3)] # point 16 to point 17
-    lines2 =model_railway_signals.create_point (canvas,17,model_railway_signals.point_type.LH,1150,100,off_colour,
+    lines2 =create_point (canvas,17,point_type.LH,1150,100,off_colour,
                 point_callback=point_callback)
     point17 = lines1 + lines2
 
@@ -149,12 +148,12 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
                 canvas.create_line(1500,240,1500,260,fill=off_colour,width=3)] # End stop
 
     lines1 = [canvas.create_line(1125,275,1150,300,fill=off_colour,width=3)] # point 13 to point 12
-    lines2 = model_railway_signals.create_point (canvas,12,model_railway_signals.point_type.RH,1175,300,off_colour,
+    lines2 = create_point (canvas,12,point_type.RH,1175,300,off_colour,
                 point_callback=point_callback)
     point12 = lines1 + lines2
     
     lines1 = [canvas.create_line(1175,325,1200,350,fill=off_colour,width=3)] # point 12 to point 11
-    lines2 = model_railway_signals.create_point (canvas,10,model_railway_signals.point_type.RH,1225,350,off_colour, also_switch=110,
+    lines2 = create_point (canvas,10,point_type.RH,1225,350,off_colour, also_switch=110,
                 point_callback=point_callback)
     point10 = lines1 + lines2
 
@@ -169,7 +168,7 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     #------------------------------------------------------------------------------------
 
     lines1 = [canvas.create_line(500,400,625,400,fill=off_colour,width=3)]  # point 19 to point 4
-    lines2 = model_railway_signals.create_point(canvas,19,model_railway_signals.point_type.RH,475,400,off_colour,
+    lines2 = create_point(canvas,19,point_type.RH,475,400,off_colour,
                         orientation=180, point_callback=point_callback)
     mpd = lines1 + lines2  # The Main MPD Section 
     
@@ -177,11 +176,11 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
               canvas.create_line(318,232,332,218,fill=off_colour,width=3)] # End stop
     
     lines1 = [canvas.create_line(425,400,450,400,fill=off_colour,width=3)]  # point 20 to point 19
-    lines2 = model_railway_signals.create_point(canvas,20,model_railway_signals.point_type.RH,400,400,off_colour,
+    lines2 = create_point(canvas,20,point_type.RH,400,400,off_colour,
                         orientation=180, point_callback=point_callback)
     point20 = lines1 + lines2
     
-    lines1 = model_railway_signals.create_point(canvas,21,model_railway_signals.point_type.RH,275,400,off_colour,
+    lines1 = create_point(canvas,21,point_type.RH,275,400,off_colour,
                         orientation=180, point_callback=point_callback)
     lines2 = [canvas.create_line(300,400,375,400,fill=off_colour,width=3)] # point 21 to point 20
     point21 = lines1 + lines2
@@ -193,7 +192,7 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
             canvas.create_line(100,350,250,350,fill=off_colour,width=3), # point 21 siding 2
             canvas.create_line(100,340,100,360,fill=off_colour,width=3)] # End stop
 
-    lines1 = model_railway_signals.create_point(canvas,22,model_railway_signals.point_type.RH,300,300,off_colour,
+    lines1 = create_point(canvas,22,point_type.RH,300,300,off_colour,
                         orientation=180, point_callback=point_callback)
     lines2 = [canvas.create_line(400,375,325,300,fill=off_colour,width=3)] 
     point22 = lines1 + lines2
@@ -203,7 +202,7 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     canvas.create_oval (200,175,250,225, width=3, outline=off_colour)
 
 
-    lines1 = model_railway_signals.create_point(canvas,23,model_railway_signals.point_type.RH,225,300,off_colour,
+    lines1 = create_point(canvas,23,point_type.RH,225,300,off_colour,
                         orientation=180, point_callback=point_callback)
     lines2 = [canvas.create_line(250,300,275,300,fill=off_colour,width=3)] 
     point23 = lines1 + lines2
@@ -220,19 +219,19 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     #------------------------------------------------------------------------------------
     
     # LH auto section #3 (on goods loop)
-    lines1 = model_railway_signals.create_point(canvas,4,model_railway_signals.point_type.LH,650,400,off_colour,fpl=fpl_enabled, also_switch=104,
+    lines1 = create_point(canvas,4,point_type.LH,650,400,off_colour,fpl=fpl_enabled, also_switch=104,
                         orientation=180, point_callback=point_callback)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     lh_auto_sec3 = lines1
     
     # Goods loop (switchable between rh and lh auto sections)
-    lines1 = model_railway_signals.create_point (canvas,105,model_railway_signals.point_type.RH,700,400,off_colour, auto=True, orientation=180)
+    lines1 = create_point (canvas,105,point_type.RH,700,400,off_colour, auto=True, orientation=180)
     lines2 = [canvas.create_line(725,400,1150,400,fill=off_colour,width=3)]  # point 105 to point 6
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     goods_loop = lines1 + lines2
 
     # RH auto section #3 (on goods loop)
-    lines1 = model_railway_signals.create_point (canvas,6,model_railway_signals.point_type.RH,1175,400,off_colour,fpl=fpl_enabled,also_switch=106,
+    lines1 = create_point (canvas,6,point_type.RH,1175,400,off_colour,fpl=fpl_enabled,also_switch=106,
                 point_callback=point_callback)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     rh_auto_sec3 = lines1
@@ -249,9 +248,9 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     lh_headshunt = lines1
     
     # draw lh auto section #2(on branch-line)
-    lines1 = model_railway_signals.create_point (canvas,102,model_railway_signals.point_type.LH,550,500,off_colour,auto=True,orientation=180)
+    lines1 = create_point (canvas,102,point_type.LH,550,500,off_colour,auto=True,orientation=180)
     lines2 = [canvas.create_line(575,500,625,450,fill=off_colour,width=3)] # Point 102 to Point 104
-    lines3 = model_railway_signals.create_point (canvas,104,model_railway_signals.point_type.LH,650,450,off_colour,auto=True)
+    lines3 = create_point (canvas,104,point_type.LH,650,450,off_colour,auto=True)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     lh_auto_sec2 = lines1 + lines2 + lines3
 
@@ -260,9 +259,9 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     platform3 = lines1
     
     # draw rh auto section #2(on branch-line)
-    lines1 = model_railway_signals.create_point (canvas,106,model_railway_signals.point_type.RH,1175,450,off_colour,auto=True,orientation=180)
+    lines1 = create_point (canvas,106,point_type.RH,1175,450,off_colour,auto=True,orientation=180)
     lines2 = [canvas.create_line(1200,450,1250,500,fill=off_colour,width=3)] # Point 102 to Point 104
-    lines3 = model_railway_signals.create_point (canvas,108,model_railway_signals.point_type.RH,1275,500,off_colour,auto=True)
+    lines3 = create_point (canvas,108,point_type.RH,1275,500,off_colour,auto=True)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     rh_auto_sec2 = lines1 + lines2 + lines3
 
@@ -282,9 +281,9 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     canvas.create_line(575,550,650,550,fill=up_colour,width=3) # point 2 to start of platform
 
     # draw lh auto section #1(on down-line)
-    lines1 = model_railway_signals.create_point (canvas,101,model_railway_signals.point_type.LH,450,550,up_colour,auto=True,orientation=180)
+    lines1 = create_point (canvas,101,point_type.LH,450,550,up_colour,auto=True,orientation=180)
     lines2 = [canvas.create_line(475,550,525,550,fill=up_colour,width=3)] # point 101 to point 2
-    lines3 = model_railway_signals.create_point (canvas,2,model_railway_signals.point_type.LH,550,550,up_colour,fpl=fpl_enabled,also_switch=102,
+    lines3 = create_point (canvas,2,point_type.LH,550,550,up_colour,fpl=fpl_enabled,also_switch=102,
                 point_callback=point_callback)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     lh_auto_sec1 = lines1 + lines2 + lines3
@@ -294,10 +293,10 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
     platform2 = lines1
     
     # draw rh auto section #1(on down-line)
-    lines1 = model_railway_signals.create_point (canvas,8,model_railway_signals.point_type.RH,1275,550,up_colour,fpl=fpl_enabled,also_switch=108,
+    lines1 = create_point (canvas,8,point_type.RH,1275,550,up_colour,fpl=fpl_enabled,also_switch=108,
                 orientation=180,point_callback=point_callback)
     lines2 = [canvas.create_line(1300,550,1350,550,fill=up_colour,width=3)] # point 8 to point 109
-    lines3 = model_railway_signals.create_point (canvas,109,model_railway_signals.point_type.RH,1375,550,up_colour,auto=True)
+    lines3 = create_point (canvas,109,point_type.RH,1375,550,up_colour,auto=True)
     # Point return comprises: [straight blade, switched blade, straight route ,switched route]
     rh_auto_sec1 = lines1 + lines2 + lines3
 
@@ -311,15 +310,15 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
 
     # lh Down line route (objects that are never going to change colour)
     canvas.create_line(0,600,425,600,fill=down_colour,width=3)  # end of canvas to point 1
-    model_railway_signals.create_point(canvas,1,model_railway_signals.point_type.LH,450,600,down_colour,fpl=fpl_enabled,also_switch=101,
+    create_point(canvas,1,point_type.LH,450,600,down_colour,fpl=fpl_enabled,also_switch=101,
             point_callback=point_callback)
 
     canvas.create_line(475,600,600,600,fill=down_colour,width=3) # point 1 to point 103
-    model_railway_signals.create_point(canvas,103,model_railway_signals.point_type.RH,625,600,down_colour,auto=True)
+    create_point(canvas,103,point_type.RH,625,600,down_colour,auto=True)
     canvas.create_line(575,640,575,660,fill=down_colour,width=3) # End stop
     canvas.create_line(575,650,600,650,fill=down_colour,width=3) # End stop to point 3
 
-    model_railway_signals.create_point(canvas,3,model_railway_signals.point_type.RH,625,650,down_colour,fpl=fpl_enabled,also_switch=103,
+    create_point(canvas,3,point_type.RH,625,650,down_colour,fpl=fpl_enabled,also_switch=103,
                 orientation=180, point_callback=point_callback)
 
     # Down through loop (switchable on/off)
@@ -332,10 +331,10 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
 
     # rh Down line route (objects that are never going to change colour)
     canvas.create_line(1150,650,1175,625,fill=down_colour,width=3) # end of loop to point 7
-    model_railway_signals.create_point(canvas,7,model_railway_signals.point_type.LH,1175,600,down_colour,fpl=fpl_enabled,orientation=180,
+    create_point(canvas,7,point_type.LH,1175,600,down_colour,fpl=fpl_enabled,orientation=180,
                 point_callback=point_callback)
     canvas.create_line(1200,600,1350,600,fill=down_colour,width=3) # point 7 to point 9
-    model_railway_signals.create_point(canvas,9,model_railway_signals.point_type.RH,1375,600,down_colour,fpl=fpl_enabled, also_switch=109,
+    create_point(canvas,9,point_type.RH,1375,600,down_colour,fpl=fpl_enabled, also_switch=109,
                 orientation=180,point_callback=point_callback)
     canvas.create_line(1400,600,1900,600,fill=down_colour,width=3) # point 9 to end of canvas
 
@@ -348,104 +347,104 @@ def create_track_schematic (canvas, point_callback, fpl_enabled:bool=True):
 
 def create_layout_signals(canvas, sig_callback):
 
-    model_railway_signals.create_colour_light_signal (canvas,1,100,500,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,1,100,500,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal (canvas,2,475,500,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,2,475,500,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal (canvas,3,400,550,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,3,400,550,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45 = True, lhfeather90 = True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,4,1050,550,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,4,1050,550,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,5,750,400,orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,5,750,400,orientation=180,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45= True, position_light=True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,6,750,450, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,6,750,450, orientation=180,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True, 
             lhfeather45= True, position_light=True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,7,1050,400,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,7,1050,400,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,8,1050,450,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,8,1050,450,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal(canvas,9,1730,500,orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal(canvas,9,1730,500,orientation=180,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,10,1400,500, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.three_aspect,
+    create_colour_light_signal (canvas,10,1400,500, orientation=180,
+            signal_subtype = signal_sub_type.three_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             rhfeather45= True, position_light=True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal(canvas,11,1500,600, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal(canvas,11,1500,600, orientation=180,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             lhfeather45=True, rhfeather45=True, rhfeather90=True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal (canvas,12,750,600, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,12,750,600, orientation=180,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             refresh_immediately = False)
 
-    model_railway_signals.create_colour_light_signal (canvas,13,750,650, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,13,750,650, orientation=180,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback, sig_passed_button = True,
             refresh_immediately = False)
 
-    model_railway_signals.create_ground_position_signal(canvas,14,550,250, shunt_ahead=True,
+    create_ground_position_signal(canvas,14,550,250, shunt_ahead=True,
             sig_callback=sig_callback)
 
-    model_railway_signals.create_ground_position_signal(canvas,15,575,400,
+    create_ground_position_signal(canvas,15,575,400,
             sig_callback=sig_callback)
 
-    model_railway_signals.create_ground_position_signal(canvas,16,1300,400,orientation=180,
+    create_ground_position_signal(canvas,16,1300,400,orientation=180,
             shunt_ahead=True, sig_callback=sig_callback,)
 
-    model_railway_signals.create_colour_light_signal (canvas,20,1850,600, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,20,1850,600, orientation=180,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback,sig_passed_button=True,fully_automatic=True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal (canvas,21,100,600, orientation=180,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,21,100,600, orientation=180,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback,fully_automatic=True)
     
-    model_railway_signals.create_colour_light_signal (canvas,22,50,550,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,22,50,550,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback,sig_passed_button=True,fully_automatic=True,
             refresh_immediately = False)
     
-    model_railway_signals.create_colour_light_signal (canvas,23,1800,550,
-            signal_subtype = model_railway_signals.signal_sub_type.four_aspect,
+    create_colour_light_signal (canvas,23,1800,550,
+            signal_subtype = signal_sub_type.four_aspect,
             sig_callback=sig_callback,fully_automatic=True)
                             
     return()
@@ -479,24 +478,24 @@ def update_track_schematic(canvas):
     #-----------------------------------------------------------------------------------------------
     
     # lh Headshunt
-    if switches.switch_active(6,1): lh_headshunt_colour = branch_colour 
-    elif switches.switch_active(6,2): lh_headshunt_colour = local_colour
+    if power_switches.switch_active(6,1): lh_headshunt_colour = branch_colour 
+    elif power_switches.switch_active(6,2): lh_headshunt_colour = local_colour
     else: lh_headshunt_colour = off_colour
     for i in lh_headshunt: canvas.itemconfig (i, fill=lh_headshunt_colour)
     
     # rh Headshunt
-    if switches.switch_active(7,1): rh_headshunt_colour = branch_colour 
-    elif switches.switch_active(7,2): rh_headshunt_colour = local_colour
+    if power_switches.switch_active(7,1): rh_headshunt_colour = branch_colour 
+    elif power_switches.switch_active(7,2): rh_headshunt_colour = local_colour
     else: rh_headshunt_colour = off_colour
     for i in rh_headshunt: canvas.itemconfig (i, fill=rh_headshunt_colour)
     
     # goods yard and headshunt
-    if switches.switch_active(8,1): goods_yard_colour = local_colour 
+    if power_switches.switch_active(8,1): goods_yard_colour = local_colour 
     else: goods_yard_colour = off_colour
     for i in goods_yard: canvas.itemconfig (i, fill=goods_yard_colour)
 
     # Motive Power Depot
-    if switches.switch_active(9,1): mpd_colour = local_colour 
+    if power_switches.switch_active(9,1): mpd_colour = local_colour 
     else: mpd_colour = off_colour
     for i in mpd: canvas.itemconfig (i, fill=mpd_colour)
 
@@ -505,27 +504,27 @@ def update_track_schematic(canvas):
     # (i.e. some auto sections will inherit from other auto sections)
     #-----------------------------------------------------------------------------------------------
 
-    if model_railway_signals.point_switched(1): lh_auto_sec1_colour = down_colour
+    if point_switched(1): lh_auto_sec1_colour = down_colour
     else: lh_auto_sec1_colour = up_colour
     for i in lh_auto_sec1: canvas.itemconfig (i, fill=lh_auto_sec1_colour)
 
-    if model_railway_signals.point_switched(2): lh_auto_sec2_colour = lh_auto_sec1_colour
+    if point_switched(2): lh_auto_sec2_colour = lh_auto_sec1_colour
     else: lh_auto_sec2_colour = lh_headshunt_colour
     for i in lh_auto_sec2:canvas.itemconfig(i, fill=lh_auto_sec2_colour)
     
-    if model_railway_signals.point_switched(4): lh_auto_sec3_colour = lh_auto_sec2_colour
+    if point_switched(4): lh_auto_sec3_colour = lh_auto_sec2_colour
     else: lh_auto_sec3_colour = mpd_colour
     # We colour this in later with the goods loop
     
-    if model_railway_signals.point_switched(9): rh_auto_sec1_colour = down_colour
+    if point_switched(9): rh_auto_sec1_colour = down_colour
     else: rh_auto_sec1_colour = up_colour
     for i in rh_auto_sec1: canvas.itemconfig (i,fill=rh_auto_sec1_colour)
 
-    if model_railway_signals.point_switched(8): rh_auto_sec2_colour = rh_auto_sec1_colour
+    if point_switched(8): rh_auto_sec2_colour = rh_auto_sec1_colour
     else: rh_auto_sec2_colour = rh_headshunt_colour
     for i in rh_auto_sec2: canvas.itemconfig (i, fill=rh_auto_sec2_colour)
     
-    if model_railway_signals.point_switched(6): rh_auto_sec3_colour = rh_auto_sec2_colour
+    if point_switched(6): rh_auto_sec3_colour = rh_auto_sec2_colour
     else: rh_auto_sec3_colour = goods_yard_colour
     # We colour this in later with the goods loop
     
@@ -533,14 +532,14 @@ def update_track_schematic(canvas):
     # Switch the remaining platform and loop sections (that may depend on the auto sections)
     #-----------------------------------------------------------------------------------------------
 
-    if switches.switch_active(1,1) and model_railway_signals.point_switched(5):
+    if power_switches.switch_active(1,1) and point_switched(5):
         goods_loop_colour = goods_yard_colour
         lh_auto_sec3_colour = off_colour
         rh_auto_sec3_colour = goods_loop_colour
-    elif switches.switch_active(1,1) and not model_railway_signals.point_switched(5):
+    elif power_switches.switch_active(1,1) and not point_switched(5):
         goods_loop_colour = lh_auto_sec3_colour
         rh_auto_sec3_colour = goods_loop_colour
-    elif switches.switch_active(1,2):
+    elif power_switches.switch_active(1,2):
         goods_loop_colour = rh_auto_sec3_colour
         lh_auto_sec3_colour = goods_loop_colour
     else:
@@ -552,24 +551,24 @@ def update_track_schematic(canvas):
     for i in rh_auto_sec3: canvas.itemconfig (i, fill=rh_auto_sec3_colour)
     for i in lh_auto_sec3: canvas.itemconfig (i, fill=lh_auto_sec3_colour)
 
-    if switches.switch_active(2,1):
+    if power_switches.switch_active(2,1):
         for i in platform3: canvas.itemconfig(i,fill = lh_auto_sec2_colour)
-    elif switches.switch_active(2,2):
+    elif power_switches.switch_active(2,2):
         for i in platform3: canvas.itemconfig(i,fill = rh_auto_sec2_colour)
     else:
         for i in platform3: canvas.itemconfig(i,fill = off_colour)
 
-    if switches.switch_active(3,1):
+    if power_switches.switch_active(3,1):
         for i in platform2: canvas.itemconfig (i, fill = up_colour)
     else:
         for i in platform2: canvas.itemconfig (i, fill = off_colour)
 
-    if switches.switch_active(4,1):
+    if power_switches.switch_active(4,1):
         for i in through_loop: canvas.itemconfig (i, fill = down_colour)
     else:
         for i in through_loop: canvas.itemconfig (i, fill = off_colour)
 
-    if switches.switch_active(5,1):
+    if power_switches.switch_active(5,1):
         for i in platform1: canvas.itemconfig (i, fill = down_colour)
     else:
         for i in platform1: canvas.itemconfig (i, fill = off_colour)
@@ -584,18 +583,18 @@ def update_track_schematic(canvas):
             siding1 + siding2 + siding3 + siding4 + siding5 + siding6 + siding7 + siding8)
     for i in all_sidings: canvas.itemconfig (i, fill = off_colour)
 
-    if model_railway_signals.point_switched(18):
+    if point_switched(18):
         for i in siding1: canvas.itemconfig (i, fill = goods_yard_colour)  
     else :
         for i in point14: canvas.itemconfig (i, fill = goods_yard_colour)
-        if model_railway_signals.point_switched(14):
+        if point_switched(14):
             for i in point15: canvas.itemconfig (i, fill = goods_yard_colour)
-            if model_railway_signals.point_switched(15):
+            if point_switched(15):
                 for i in point16: canvas.itemconfig (i, fill = goods_yard_colour)
-                if model_railway_signals.point_switched(16):
+                if point_switched(16):
                     for i in point17: canvas.itemconfig (i, fill = goods_yard_colour)
                     
-                    if model_railway_signals.point_switched(17):
+                    if point_switched(17):
                         for i in siding2: canvas.itemconfig (i, fill = goods_yard_colour)
                     else:
                         for i in siding3: canvas.itemconfig (i, fill = goods_yard_colour)
@@ -605,11 +604,11 @@ def update_track_schematic(canvas):
                 for i in siding5: canvas.itemconfig (i, fill = goods_yard_colour)
         else: #point14 not switched
             for i in point13: canvas.itemconfig (i, fill = goods_yard_colour)
-            if model_railway_signals.point_switched(13):
+            if point_switched(13):
                 for i in point12: canvas.itemconfig (i, fill = goods_yard_colour)
-                if model_railway_signals.point_switched(12):
+                if point_switched(12):
                     for i in point10: canvas.itemconfig (i, fill = goods_yard_colour)
-                    if not model_railway_signals.point_switched(10):
+                    if not point_switched(10):
                         for i in siding8: canvas.itemconfig (i, fill = goods_yard_colour)
                 else: #point12  not switched
                     for i in siding7: canvas.itemconfig (i, fill = goods_yard_colour)
@@ -625,27 +624,27 @@ def update_track_schematic(canvas):
     all_sidings = point20 + point21 + point22 + point23 + mpd1 + mpd2 + mpd3 +mpd4 + mpd5 + mpd6
     for i in all_sidings: canvas.itemconfig (i, fill = off_colour)
 
-    if model_railway_signals.point_switched(19):
+    if point_switched(19):
         for i in mpd1: canvas.itemconfig (i, fill = mpd_colour)  
     else:
         for i in point20: canvas.itemconfig (i, fill = mpd_colour)
         
-        if model_railway_signals.point_switched(20):
+        if point_switched(20):
             for i in point22: canvas.itemconfig (i, fill = mpd_colour)
             
-            if model_railway_signals.point_switched(22):
+            if point_switched(22):
                 for i in mpd2: canvas.itemconfig (i, fill = mpd_colour)
                 
             else: # point 22 not switched
                 for i in point23: canvas.itemconfig (i, fill = mpd_colour)
-                if model_railway_signals.point_switched(23):
+                if point_switched(23):
                     for i in mpd3: canvas.itemconfig (i, fill = mpd_colour)
                 else: # point 23 not switched
                     for i in mpd4: canvas.itemconfig (i, fill = mpd_colour)
                     
         else: # point 20 not switched
             for i in point21: canvas.itemconfig (i, fill = mpd_colour)
-            if model_railway_signals.point_switched(21):
+            if point_switched(21):
                 for i in mpd5: canvas.itemconfig (i, fill = mpd_colour)
             else: # point 21 not switched
                 for i in mpd6: canvas.itemconfig (i, fill = mpd_colour)
