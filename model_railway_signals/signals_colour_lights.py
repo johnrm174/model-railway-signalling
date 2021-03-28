@@ -208,11 +208,11 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # We adjust the  positions if the signal supports a position light button
         if position_light:
             point_coords = common.rotate_point (x,y,-35,-20,orientation) 
-            but1win = canvas.create_window (point_coords,anchor=E,window=button1)
+            canvas.create_window (point_coords,anchor=E,window=button1)
             but2win = canvas.create_window (point_coords,anchor=W,window=button2)
         else:
             point_coords = common.rotate_point (x,y,-20,-20,orientation) 
-            but1win = canvas.create_window (point_coords,window=button1)
+            canvas.create_window (point_coords,window=button1)
             but2win = canvas.create_window (point_coords,window=button2)
         but3win = canvas.create_window (x,y,window=button3)
 
