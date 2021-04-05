@@ -28,7 +28,15 @@ def main_callback_function(item_id,callback_type):
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
     
-    if callback_type == sig_callback_type.sig_passed:
+    # If its an external track sensor event then pulse the associated "signal passed"
+    # button - Here we use a straightforward 1-1 mapping as we gave our sensors the
+    # same IDs as their associated signals when we created them
+    if callback_type == track_sensor_callback_type.sensor_triggered:
+        pulse_signal_passed_button(item_id)
+        
+    # Now deal with the track occupancy
+    if (callback_type == sig_callback_type.sig_passed
+           or callback_type == track_sensor_callback_type.sensor_triggered):
         if item_id == 1:
             set_section_occupied(1)
         elif item_id == 2:
@@ -206,6 +214,12 @@ create_colour_light_signal (canvas,5,900,200,
                             sig_callback=main_callback_function,
                             fully_automatic=True,
                             sig_passed_button=True)
+
+
+# Map an external track sensor for signal 2 - For simplicity, we'll give it the same ID as the signal
+create_track_sensor (2, gpio_channel = 4,
+                    sensor_callback = main_callback_function,
+                    sensor_timeout = 3.0)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Interlocking")

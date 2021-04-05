@@ -42,7 +42,7 @@ import enum
 # Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
     null_event = 20
-    section_switched = 21   # The section has been manually sectioned by the user
+    section_switched = 21   # The section has been manually switched by the user
     
 # -------------------------------------------------------------------------
 # sections are to be added to a global dictionary when created
@@ -53,7 +53,7 @@ sections: dict = {}
 
 # -------------------------------------------------------------------------
 # The default "External" callback for the section buttons
-# Used if this is  not specified when the section is created
+# Used if this is not specified when the section is created
 # -------------------------------------------------------------------------
 
 def section_null(section_id, section_callback = section_callback_type.null_event):

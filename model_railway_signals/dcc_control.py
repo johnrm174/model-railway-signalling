@@ -101,7 +101,7 @@ dcc_addresses:dict = {}
 def sig_mapped(sig_id):
     return (str(sig_id) in dcc_signal_mappings.keys() )
 
-# Internal function to test if a mapping exists for a signal
+# Internal function to test if a mapping exists for a point
 def point_mapped(point_id):
     return (str(point_id) in dcc_point_mappings.keys() )
 
