@@ -3,24 +3,26 @@
 # to the required DCC Accessory Addresses and then for sending the appropriate 
 # commands to change the points/signals in accordance with these mappings.
 #
-# For signals only "Truth Table" mapping is currently supported. This allows
-# each aspect (e.g. RED, GREEN, YELLOW, DOUBLE YELLOW)to be mapped by a "Truth
-# Table" containing one or more DCC Addresses and states.
+# For signals "Truth Table" and "Event Driven" types are currently supported.
+# The "Truth Table" mapping  enables each aspect (e.g. RED, GREEN, YELLOW, DOUBLE YELLOW)
+# to be mapped to a "Truth Table" containing one or more DCC Addresses/states.
+# The "Event Driven" mapping uses a single dcc command (address/state) to change
+# the signal to the required aspect - as used by the TrainTech DCC signals
 #
-# This provides maximum flexibility for commanding DCC Signals as signals lights
-# can therefore either be controlled individually (i.e. Each LED of the signal is
-# controlled via its own individual address controls each) or via the "Truth Table"
-# LED on the signal) or via an "output matrix" of addresses/states - which seems
-# to be supported by many of the DCC signal decoders currently on the market.
-# This also provides for easy commanding of signals with additional "indications" to
-# be controlled - such as feather route indicators or position light subsidaries.
-#
+# The "Truth Table" mapping provides maximum flexibility for commanding DCC Signals as
+# each "light" can either be controlled individually (i.e. Each LED of the signal is
+# controlled via its own individual address) or via a "Truth Table" (where the displayed
+# aspect will depend on the binary "code" written to 2 or more DCC addresses)
 # This has been successfully tested with the Harman Signallist SC1 DCC Decoder
 # set into the "8 individual controlled outputs" Mode (CV38=8)
 #
+# In both cases, any additional route indications or calling on aspects can be mapped
+# to their individual addresses.
+#
 # Not all signals/points that exist on the layout need to have a DCC Mapping configured
-# This provides flexibility for including signals on the schematic which are "off scene"
-# on the layout. If no mapping is present, then no DCC commands will be sent
+# for the software to operate - If no DCC mapping has been defined, then no DCC commands
+# will be sent. This provides flexibility for including signals on the schematic which are
+# "off scene" or for progressively "working up" the signalling scheme for a layour.
 #
 # The following functions are designed to be called by external modules:
 #
@@ -28,10 +30,11 @@
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to create a DCC mapping for
 #      Optional Parameters:
-#         proceed[[add:int,state:bool],] - Truth table of DCC addresses/states (default = no mapping)
-#         danger [[add:int,state:bool],] - Truth table of DCC addresses/states (default = No mapping)
-#         caution[[add:int,state:bool],] - Truth table of DCC addresses/states (default = No mapping)
-#         proceed[[add:int,state:bool],] - Truth table of DCC addresses/states (default = No mapping)
+#         signal_type: dcc_signal_type - the type of the DCC Signal (default = truth_table)
+#         proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
+#         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
+#         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
+#         prelim_caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
 #         call:int - the DCC address for the "position light" indication (default = No Mapping)
 #         LH1:int  - the DCC address for the "LH 45 feather" indication  (default = No Mapping)
 #         LH2:int  - the DCC address for the "LH 90 feather" indication  (default = No Mapping)
@@ -82,8 +85,9 @@ from . import pi_sprog_interface
 import enum
 
 # The mapping types that are currently supported
-class dcc_mapping_type(enum.Enum):
+class dcc_signal_type(enum.Enum):
     truth_table = 1
+    event_driven = 2
     
 # The Possible states for a main signal
 class signal_state_type(enum.Enum):
@@ -108,23 +112,29 @@ def point_mapped(point_id):
 #-----------------------------------------------------------------------------------------
 # Function to "map" a particular signal object to a series of DCC addresses/commands
 #
-# Modes currently supported:
-#   "Truth Table" mapping - This allows each aspect (e.g. RED, GREEN, YELLOW, DOUBLE YELLOW)
-#    to be mapped by a "Truth Tables" of DCC Addressses/states. The Feather Route indications are
-#    are also defined as a truth table of DCC addresses.
-#
-#    For example - a 4 aspect signal, where each LED is mapped to a single DCC Address
-#    (Red=5, Green=6, Yel1 =7, Yel2 =8) would be configured as follows:
+#    Truth Table example - a 4 aspect signal, where each LED is mapped to a single DCC
+#    Address (Red=5, Green=6, Yel1 =7, Yel2 =8) would be configured as follows:
 #
 #        map_dcc_colour_light_signal (sig_id = 10,
+#                            signal_type = dcc_signal_type.truth_table,
 #                            danger = [[5,True],[6,False],[7,False],[8,False]],
 #                            proceed = [[5,False],[6,True],[7,False],[8,False]],
 #                            caution = [[5,False],[6,False],[7,True],[8,False]],
 #                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]]  )
 #
+#    Event Driven example - a 4 aspect signal, where 2 addresses are used (the base address
+#    to select the Red or Green aspect and the base+1 address to set the Yellow or Double Yellow
+#    Aspect. A single DCC command is then used to change the signal to the required state
+#
+#        map_dcc_signal (sig_id = 2,
+#                        signal_type = dcc_signal_type.event_driven,
+#                        danger = [[1,False]],
+#                        proceed = [[1,True]],
+#                        caution = [[2,True]],
+#                        prelim_caution = [[2,False]])
 #-----------------------------------------------------------------------------------------
 
-def map_dcc_signal (sig_id:int, 
+def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.truth_table,
                     danger = [[0,False],], proceed = [[0,False],],
                     caution = [[0,False],], prelim_caution = [[0,False],],
                     LH1 = [[0,False],], LH2 = [[0,False],],
@@ -164,7 +174,7 @@ def map_dcc_signal (sig_id:int,
         # been given for the main signal aspect and the feather route indicators.
         # The "Calling On" position light indication is mapped to a single address
         new_dcc_mapping = {
-            "mapping_type" : dcc_mapping_type.truth_table,
+            "mapping_type" : signal_type,
             str(signal_state_type.danger) : danger,
             str(signal_state_type.proceed) : proceed, 
             str(signal_state_type.caution) : caution,
@@ -240,12 +250,18 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
         
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        # This is where we would branch to handle different DCC Mapping Types
-        # Currently only the "Truth Table" type mapping is supported
-        if dcc_mapping["mapping_type"] == dcc_mapping_type.truth_table:
-            # Send the DCC commands to change the state if required
+        # Branch to Deal with each supported signal type
+        if dcc_mapping["mapping_type"] == dcc_signal_type.truth_table:
+            # Send the DCC commands to change the state if required - If a particular
+            # address is already set to the required state we don't send the command
             for entry in dcc_mapping[str(state)]:
                 if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
+                    pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+                    dcc_addresses[str(entry[0])] = entry[1]     
+        elif dcc_mapping["mapping_type"] == dcc_signal_type.event_driven:
+            # Send the single DCC commands to change the state - Always send the command
+            for entry in dcc_mapping[str(state)]:
+                if entry[0] > 0:
                     pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
                     dcc_addresses[str(entry[0])] = entry[1]     
         # Save back the changes we have made to the signal

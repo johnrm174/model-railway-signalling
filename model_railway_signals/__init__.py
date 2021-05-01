@@ -41,6 +41,7 @@ from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
 
+from .dcc_control import dcc_signal_type
 from .dcc_control import map_dcc_signal
 from .dcc_control import map_dcc_point
 
@@ -87,6 +88,8 @@ __all__ = [
       # public track_sensor functions
         'create_track_sensor',
         'track_sensor_active',
+      # Public DCC control types
+        'dcc_signal_type',
       # Public DCC control functions
         'initialise_pi_sprog',
         'service_mode_write_cv',
