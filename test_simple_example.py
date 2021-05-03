@@ -1,6 +1,10 @@
 from tkinter import *
 from model_railway_signals import *
 
+import logging
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use the "points"
 # and "signals" modules, with the tkinter graphics library to create a
@@ -14,7 +18,6 @@ from model_railway_signals import *
 #----------------------------------------------------------------------
 
 use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3 
-sprog_debug_level = 1       # 0 = No debug, 1 = status messages only, 2 = all CBUS messages
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -22,12 +25,12 @@ sprog_debug_level = 1       # 0 = No debug, 1 = status messages only, 2 = all CB
 #----------------------------------------------------------------------
 
 def main_callback_function(item_id,callback_type):
-    print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
+#    print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
 
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
-    
+
     # If its an external track sensor event then pulse the associated "signal passed"
     # button - Here we use a straightforward 1-1 mapping as we gave our sensors the
     # same IDs as their associated signals when we created them
@@ -76,7 +79,24 @@ def main_callback_function(item_id,callback_type):
     else:
         clear_signal_override(3)
         clear_signal_override(4)
-        
+
+    #--------------------------------------------------------------
+    # Refresh the signal aspects based on the route settings
+    # The order is important - Need to work back along the route
+    #--------------------------------------------------------------
+    
+    update_signal(3, sig_ahead_id=5)
+    update_signal(4, sig_ahead_id=5)
+    
+    if point_switched(1):
+        set_route_indication(2,route=route_type.LH1)
+        update_signal(2,sig_ahead_id=3)
+    else:
+        set_route_indication(2,route=route_type.MAIN)
+        update_signal(2,sig_ahead_id=4)
+
+    update_signal(1, sig_ahead_id=2)
+    
     #-------------------------------------------------------------- 
     # Process the signal/point interlocking
     #--------------------------------------------------------------
@@ -107,22 +127,7 @@ def main_callback_function(item_id,callback_type):
     else:
         unlock_point(2)
         
-    #--------------------------------------------------------------
-    # Refresh the signal aspects based on the route settings
-    # The order is important - Need to work back along the route
-    #--------------------------------------------------------------
-    
-    update_signal(3, sig_ahead_id=5)
-    update_signal(4, sig_ahead_id=5)
-    
-    if point_switched(1):
-        set_route_indication(2,route=route_type.LH1)
-        update_signal(2,sig_ahead_id=3)
-    else:
-        set_route_indication(2,route=route_type.MAIN)
-        update_signal(2,sig_ahead_id=4)
 
-    update_signal(1, sig_ahead_id=2)
         
     return()
 
@@ -144,7 +149,8 @@ canvas.pack()
 # for theaspects that are being displayed by the signal on the schematic
 
 if use_dcc_control:
-    initialise_pi_sprog(sprog_debug_level)
+    print ("Initialising Pi Sprog and creating DCC Mappings")
+    initialise_pi_sprog()
     request_dcc_power_on()
     # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using

@@ -12,6 +12,7 @@ from . import common
 import enum
 import time
 import threading
+import logging
 
 # -------------------------------------------------------------------------
 # Global Classes to be used externally when creating/updating signals or 
@@ -69,13 +70,20 @@ def sig_exists(sig_id):
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
+    
+    global logging
+    
     # get the signal we are interested in
     signal = signals[str(sig_id)]
     # Update the state of the signal button - Common to ALL signal types
     if signal["sigclear"]:
+        logging.info ("*****************************Event ******************************")
+        logging.info ("Signal "+str(sig_id)+": Toggling main signal to ON")
         signal["sigclear"] = False
         signal["sigbutton"].config(relief="raised",bg=common.bgraised)
     else:
+        logging.info ("*****************************Event ******************************")
+        logging.info ("Signal "+str(sig_id)+": Toggling main signal to OFF")
         signal["sigclear"] = True
         signal["sigbutton"].config(relief="sunken",bg=common.bgsunken)
     # update the dictionary of signals
@@ -89,13 +97,20 @@ def toggle_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
+    
+    global logging
+    
     # get the signal we are interested in
     signal = signals[str(sig_id)]
     # Update the state of the subsidary button - Common to ALL signal types
     if signal["subclear"]:
+        logging.info ("*****************************Event ******************************")
+        logging.info ("Signal "+str(sig_id)+": Toggling subsidary signal to ON")
         signal["subclear"] = False
         signal["subbutton"].config(relief="raised",bg=common.bgraised)
     else:
+        logging.info ("*****************************Event ******************************")
+        logging.info ("Signal "+str(sig_id)+": Toggling subsidary signal to OFF")
         signal["subclear"] = True
         signal["subbutton"].config(relief="sunken",bg=common.bgsunken)
     # update the dictionary of signals
@@ -122,6 +137,9 @@ def thread_to_pulse_sig_passed_button (sig_id, duration):
 # -------------------------------------------------------------------------
 
 def pulse_signal_passed_button (sig_id:int):
+    
+    global logging
+    
     # Call the thread to pulse the signal passed button
     x = threading.Thread(target=thread_to_pulse_sig_passed_button,args=(sig_id, 1.0))
     x.start()

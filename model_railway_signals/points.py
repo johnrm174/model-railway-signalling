@@ -24,8 +24,9 @@
 #          button will be displayed - Default is False (no FPL)
 #       also_switch:int - the Id of another point that is to be automatically switched
 #          with this point (i.e. the other point would be an "auto" point) - Default is none
-#       auto:bool - If the point is to be switched with another point. In this case
-#          then the FPL and switching buttons will not be displayed)- Default is False,
+#       auto:bool - If the point is to be fully automatic (e.g switched by another point or if
+#          the intention is to switch the point from external code as required). In this case
+#          case the FPL and switching buttons will not be displayed - Default is False.
 #
 # lock_point(*point_id) - to enable external point/signal interlocking functions
 #                       - One or more Point_IDs can be specified in the call
@@ -33,11 +34,11 @@
 # unlock_point (*point_id) - to enable external point/signal interlocking functions
 #                       - One or more Point_IDs can be specified in the call
 #
-# switch_point(*point_id) - to enable external point switching functions
-#                       - One or more Point_IDs can be specified in the call
+# toggle_point(point_id) - to enable automated route setting from the external programme
+#                        - use in conjunction with 'point_switched' to find the state first
 #
-# clear_point (*point_id) - to enable external point switching functions
-#                       - One or more Point_IDs can be specified in the call
+# toggle_fpl(point_id) - to enable automated route setting from the external programme
+#                      - use in conjunction with 'fpl_active' to find the state first
 #
 # point_switched (point_id) - returns the state of the point (True/False)
 #     provides knowledge of the routes that have been set up to support
@@ -61,6 +62,7 @@ from . import common
 from tkinter import *
 import tkinter.font
 import enum
+import logging
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling the create_point function
@@ -74,7 +76,7 @@ class point_type(enum.Enum):
 class point_callback_type(enum.Enum):
     null_event = 10
     point_switched = 11   # The point has been switched by the user
-    fpl_switched = 12   # The facing point lock has been switched by the user
+    fpl_switched = 12     # The facing point lock has been switched by the user
 
 # -------------------------------------------------------------------------
 # Points are to be added to a global dictionary when created
@@ -82,6 +84,14 @@ class point_callback_type(enum.Enum):
 
 # Define an empty dictionary 
 points: dict = {}
+
+# -------------------------------------------------------------------------
+# Internal Function to check if a Point exists in the list of Points
+# Used in Most externally-called functions to validate the Point_ID
+# -------------------------------------------------------------------------
+
+def point_exists(point_id):
+    return (str(point_id) in points.keys() )
 
 # -------------------------------------------------------------------------
 # Callbacks for processing button pushes
@@ -97,45 +107,37 @@ def point_null(point_id, point_callback = point_callback_type.null_event):
     return(point_id,point_callback)
 
 # -------------------------------------------------------------------------
-# Internal Function to check if a Point exists in the list of Points
-# Used in Most externally-called functions to validate the Point_ID
-# -------------------------------------------------------------------------
-
-def point_exists(point_id):
-    return (str(point_id) in points.keys() )
-
-# -------------------------------------------------------------------------
 # Internal function to flip the state of the Points Facing Point Lock
 # when the FPL button is pressed - Will SET/UNSET the FPL and initiate
-# an external callback if one is specified.
+# an external callback if one is specified. Can also be called by external
+# code to enable automated route setting functions
 # -------------------------------------------------------------------------
 
 def toggle_fpl (point_id:int,ext_callback=point_null ):
 
     global points # the dictionary of points
-
-    # Validate the point exists 
-    if not point_exists(point_id):
-        print ("ERROR: toggle_fpl - Point "+str(point_id)+" does not exist")
+    global logging
     
+    # Validate the point ID as this can be called by external code
+    if not point_exists(point_id):
+        logging.error ("Point "+str(point_id)+": Point to toggle FPL does not exist")
     else:   
-        # get the point we are interested in
+    # get the point we are interested in
         point = points[str(point_id)]
-
-        if not point["hasfpl"]:
-            print ("ERROR: toggle_fpl - Point "+str(point_id)+" does not have FPL")
-        elif not point["fpllock"]:
+        if not point["fpllock"]:
+            logging.info ("*****************************Event ******************************")
+            logging.info ("Point "+str(point_id)+": Activating Facing Point Lock")
             point["changebutton"].config(state="disabled") 
             point["lockbutton"].config(relief="sunken",bg="white") 
             point["fpllock"]=True 
         else:
+            logging.info ("*****************************Event ******************************")
+            logging.info ("Point "+str(point_id)+": Clearing Facing Point Lock")
             point["changebutton"].config(state="normal")  
             point["lockbutton"].config(relief="raised",bg="grey85")
             point["fpllock"]=False
-            
         # update the dictionary of points with the new state  
         points[str(point_id)] = point; 
-
         # Now make the external callback
         ext_callback(point_id,point_callback_type.fpl_switched)
         
@@ -144,49 +146,46 @@ def toggle_fpl (point_id:int,ext_callback=point_null ):
 # -------------------------------------------------------------------------
 # Internal function to flip the state of a point when the change button
 # is pressed - Will flip the point setting and initiate an external
-# callback if one is specified
-# Will also iterate through the list of other points to switch if any
-# were specified when the point was created (i.e .auto points)
+# callback if one is specified. Can also be called by external
+# code to enable automated route setting functions
+# Will also recursivelly call itself to change the "also_switch"
+# point to switch if one was specified when the point was created
 # -------------------------------------------------------------------------
 
 def toggle_point (point_id:int,ext_callback=point_null):
     
     global points # the dictionary of points
-
-    # Validate the point exists 
+    global logging
+    
+    # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
-        print ("ERROR: toggle_point - Point "+str(point_id)+" does not exist")
-
+        logging.error ("Point "+str(point_id)+": Point to toggle does not exist")
     else:   
         # get the point we are interested in
         point = points[str(point_id)]
-
         if not point["switched"]:
+            logging.info ("*****************************Event ******************************")
+            logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
             point["changebutton"].config(relief="sunken",bg="white")
             point["switched"] = True
             point["canvas"].itemconfig(point["blade2"],state="normal") #switched
             point["canvas"].itemconfig(point["blade1"],state="hidden") #normal
             dcc_control.update_dcc_point(point_id,True)
         else:
+            logging.info ("*****************************Event ******************************")
+            logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
             point["changebutton"].config(relief="raised",bg="grey85") 
             point["switched"] = False
             point["canvas"].itemconfig(point["blade2"],state="hidden") #switched 
             point["canvas"].itemconfig(point["blade1"],state="normal") #normal
             dcc_control.update_dcc_point(point_id,False)
-
         # update the dictionary of points with the new state  
         points[str(point_id)] = point;
         
         # Now change any other points we need (i.e. points switched with this one)
-        if point["alsoswitch"] == point_id:
-            print ("ERROR: toggle_point - Additional Point to switch "
-                    +str(point["alsoswitch"])+" is the same as current point")
-        elif point["alsoswitch"] != 0:
-            if not point_exists(point["alsoswitch"]):
-                print ("ERROR: toggle_point - Additional Point to switch "
-                    +str(point["alsoswitch"])+" does not exists")
-            else :
-                toggle_point (point["alsoswitch"])
+        if point["alsoswitch"] != 0:
+            logging.info ("Point "+str(point_id)+": Also switching point "+str(point["alsoswitch"]))
+            toggle_point (point["alsoswitch"])
 
         # Now make the external callback
         ext_callback(point_id, point_callback_type.point_switched)
@@ -209,28 +208,31 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                   reverse:bool=False,auto:bool=False,fpl:bool=False):
     
     global points # the dictionary of points
+    global logging
     # also uses common.fontsize, common.xpadding, common.ypadding imported from "common"
     
+    logging.info ("Point "+str(point_id)+": Creating Point (initial state is NORMAL)")
     # Do some basic validation on the parameters we have been given
     if point_exists(point_id):
-        print ("ERROR: create_point - Point ID "+str(point_id)+" already exists")
+        logging.error ("Point "+str(point_id)+": Point already exists")
         point_objects = [0,0,0,0]
     elif point_id < 1:
-        print ("ERROR: create_point - Point ID "+str(point_id)+" is invalid")
+        logging.error ("Point "+str(point_id)+": Point ID must be greater than zero")
         point_objects = [0,0,0,0]
     elif also_switch < 0:
-        print ("ERROR: create_point - Point ID "+str(point_id)+" - Point ID to also switch is invalid")
+        logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' must be greater than zero")
+        point_objects = [0,0,0,0]
+    elif also_switch == point_id:
+        logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' is the same as the point to create")
         point_objects = [0,0,0,0]
     elif orientation != 0 and orientation != 180:
-        print ("ERROR: create_point - Point ID "+str(point_id)+
-                       " - Invalid orientation angle - only 0 and 180 currently supported")
+        logging.error ("Point "+str(point_id)+": Invalid orientation angle - only 0 and 180 currently supported")
         point_objects = [0,0,0,0]
 
     else: # we're good to go on and create the point
-        
+
         # set the font size for the buttons
         myfont = tkinter.font.Font(size=common.fontsize)
-
         # Create the button objects and their callbacks
         button1 = Button (canvas,text=str(point_id), state="normal", 
                     relief="raised", font = myfont,bg= "grey85",
@@ -242,19 +244,17 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 
         #Create some drawing objects (depending on point type)
         if pointtype==point_type.RH:
-            
+            # Draw the lines representing the point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
-
             line_coords = common.rotate_line (x,y,-25,0,-15,+10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
-
             line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
-
             line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
-
+            # Create the buttons to activate/deactivate the FPL and switch the point
+            # if the point we are creating doesn't have FPL then we hide that button later
             point_coords = common.rotate_point (x,y,0,-20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
@@ -262,22 +262,18 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             else:
                 but1win = canvas.create_window (point_coords,window=button1) 
                 but2win = canvas.create_window (point_coords,window=button2)
-
-            
         else:  # Point type must be LH
-            
+            # Draw the lines representing the point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
-
             line_coords = common.rotate_line (x,y,-25,0,-15,-10,orientation)
             blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
-
             line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
             route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
-
             line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
             route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
-            
+            # Draw the buttons to activate/deactivate the FPL and switch the point
+            # if the point we are creating doesn't have FPL then we hide that button later
             point_coords = common.rotate_point (x,y,0,+20,orientation)
             if fpl:
                 but1win = canvas.create_window (point_coords,anchor=W,window=button1) 
@@ -293,14 +289,14 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             blade1=blade2
             blade2=temp
 
-        #We now hide the line for the switched route (display it later when we need it)
+        # Hide the line for the switched route (display it later when we need it)
         canvas.itemconfig(blade2, state="hidden")
         
         # Hide the  buttons if we don't need them for this particular point
         if auto or not fpl: canvas.itemconfigure(but2win,state='hidden')
         if auto: canvas.itemconfigure(but1win,state='hidden')
 
-        # Disable the FPL button (default state = point locked)
+        # Disable the change button if the point has FPL(default state = FPL active)
         if fpl: button1.config(state="disabled")
 
         # Compile a dictionary of everything we need to track
@@ -312,7 +308,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                       "changebutton" : button1,        # drawing object
                       "lockbutton" : button2,          # drawing object
                       "alsoswitch" : also_switch,
-                      "switched" : False,     
+                      "locked" : False,
+                      "switched" : False,    # We toggle the point later to set the initial state  
                       "fpllock" : fpl,          
                       "hasfpl" : fpl}
 
@@ -324,60 +321,66 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # [blade straight, blade switched, route straight, route switched]
         point_objects=[blade1,blade2,route1,route2]
         
-        # Set the initial state of the point (via DCC)
+        # Set the initial state of the point
         dcc_control.update_dcc_point(point_id,False)
 
     return(point_objects)
 
 # -------------------------------------------------------------------------
-# Externally called function to Lock points (preventing it being switched)
-# If signal/point locking has been correctly implemented it should only
+# Externally called function to Lock one or more points. If the external
+# signal/point locking code has been correctly implemented it should only
 # be possible to lock a point that has the Facing point Lock activated
 # -------------------------------------------------------------------------
 
 def lock_point (*point_ids:int):
     global points # the dictionary of points
+    global logging
     for point_id in point_ids:
         # Validate the point exists 
         if not point_exists(point_id):
-            print ("ERROR: lock_point - Point "+str(point_id)+" does not exist")
+            logging.error ("Point "+str(point_id)+": Point to lock does not exist")
         else:   
             # get the point that we are interested in
             point = points[str(point_id)]
-            # if the point has FPL then we should just need to inhibit the lock button
-            if point["hasfpl"]:
-                # Just in case it isn't locally locked, we'll lock it anyway
-                if not point["fpllock"]:
-                    print ("WARNING: lock_point - FPL not activated for point "+
-                       str(point_id))
-                    print ("WARNING: lock_point - Activating FPL before locking")
-                    toggle_fpl (point_id)
-                # Now inhibit the FPL button to stop it being manually unlocked
-                point["lockbutton"].config(state="disabled") 
-            else:
-                # We just need to inhibit the Change button
-                point["changebutton"].config(state="disabled")
+            if not point["locked"]:
+                logging.info ("Point "+str(point_id)+": Locking point")
+                # if the point has FPL then we should just need to inhibit the lock button
+                if point["hasfpl"]:
+                    # Just in case it isn't locally locked, we'll lock it anyway
+                    if not point["fpllock"]:
+                        logging.warning ("Point "+str(point_id)+": FPL not activated - Activating FPL before locking")
+                        toggle_fpl (point_id)
+                    # Now inhibit the FPL button to stop it being manually unlocked
+                    point["lockbutton"].config(state="disabled") 
+                else:
+                    # We just need to inhibit the Change button
+                    point["changebutton"].config(state="disabled")
+                point["locked"] = True
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Unlock points
+# Externally called function to Unlock one or more points
 # -------------------------------------------------------------------------
 
 def unlock_point (*point_ids:int):
     global points # the dictionary of points
+    global logging
     for point_id in point_ids:
         # Validate the point exists
         if not point_exists(point_id):
-            print ("ERROR: unlock_point - Point "+str(point_id)+" does not exist")
+            logging.error ("Point "+str(point_id)+": Point to unlock does not exist")
         else:   
             # get the point that we are interested in
             point = points[str(point_id)]
-            # If the point has FPL We just need to re-enable the FPL button
-            # Otherwise we re-enable the change button
-            if point["hasfpl"]:
-                point["lockbutton"].config(state="normal") 
-            else:
-                point["changebutton"].config(state="normal") 
+            if point["locked"]:
+                logging.info ("Point "+str(point_id)+": Unlocking point")
+                # If the point has FPL We just need to re-enable the FPL button
+                # Otherwise we re-enable the change button
+                if point["hasfpl"]:
+                    point["lockbutton"].config(state="normal") 
+                else:
+                    point["changebutton"].config(state="normal") 
+                point["locked"] = False
     return ()
 
 # -------------------------------------------------------------------------
@@ -386,9 +389,10 @@ def unlock_point (*point_ids:int):
 
 def point_switched (point_id:int):
     global points # the dictionary of points
+    global logging
     # Validate the point exists
     if not point_exists(point_id):
-        print ("ERROR: point_switched - Point "+str(point_id)+" does not exist")
+        logging.error ("Point "+str(point_id)+": Point does not exist")
         switched = False
     else:   
         # get the point that we are interested in
@@ -398,53 +402,24 @@ def point_switched (point_id:int):
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the FPL
-# if the point does not have a FPL the return will be TRUE
+# if the point does not have a FPL the return will always be TRUE
 # -------------------------------------------------------------------------
 
 def fpl_active(point_id:int):
     global points # the dictionary of points
+    global logging
     # Validate the point exists
     if not point_exists(point_id):
-        print ("ERROR: fpl_active - Point "+str(point_id)+" does not exist")
+        logging.error ("Point "+str(point_id)+": Point does not exist")
         locked = False
     else:   
         # get the point that we are interested in
         point = points[str(point_id)]
-        if point["hasfpl"]: locked = point["fpllock"]
-        else: locked = True 
+        if point["hasfpl"]:
+            locked = point["fpllock"]
+        else:
+            locked = True 
     return (locked)
-
-# -------------------------------------------------------------------------
-# Externally called functions to Switch and Unswitch a point
-# Can be used for external automated route setting functions
-# Any Facing Point Locking is ignored bu these functions
-# -------------------------------------------------------------------------
-
-def switch_point (*point_ids:int):
-    for point_id in point_ids:
-        # Validate the point exists
-        if not point_exists(point_id):
-            print ("ERROR: switch_point - Point "+str(point_id)+" does not exist")
-        elif not point_switched(point_id):
-            if fpl_active (point_id):
-                print ("WARNING: switch_point - Point "+str(point_id)+" - FPL active")
-                print ("WARNING: switch_point - Clearing FPL before Switching")
-                toggle_fpl (point_id)
-            toggle_point(point_id)
-    return()
-
-def clear_point (*point_ids:int):
-    for point_id in point_ids:
-        # Validate the point exists
-        if not point_exists(point_id):
-            print ("ERROR: unswitch_point - Point "+str(point_id)+" does not exist")
-        elif point_switched(point_id):
-            if fpl_active (point_id):
-                print ("WARNING: clear_point - Point "+str(point_id)+" - FPL active")
-                print ("WARNING: clear_point - Clearing FPL before Switching")
-                toggle_fpl (point_id)
-            toggle_point(point_id)
-    return()
 
 
 ###############################################################################

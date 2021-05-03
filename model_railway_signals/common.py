@@ -7,11 +7,9 @@
 import math
 
 # -------------------------------------------------------------------------
-# Global variables for how the signals/points/switches buttons appear
+# Global variables for how the signals/points/sections buttons appear
 # on the screen. This is to allow the appearance to be optimised for
 # particular window sizes/screen resolutions.
-# These are also used by the Points and Switches Modules as these use
-# the same tkinter "Button" objects
 # -------------------------------------------------------------------------
 
 fontsize = 8  # Used by the Signals, Points and switches modules

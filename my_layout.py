@@ -5,6 +5,10 @@ import sections
 import power_switches
 import model_railway_signals 
 
+import logging
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
+
 #----------------------------------------------------------------------
 # Global Variables
 # change these to set the initial startup conditions

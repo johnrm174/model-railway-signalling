@@ -21,10 +21,15 @@
 import enum
 import time
 import threading
-import RPi.GPIO as GPIO
+import logging
+import sys
 
-# We want to refer to the ports by port number and not physical pin number
-GPIO.setmode(GPIO.BCM)
+# A quick and dirty way of getting the code to run on Windows for development
+# As the Windows version of python doesn't include the RPi specific GPIO package
+if sys.platform == 'linux':
+    import RPi.GPIO as GPIO
+    # We want to refer to the ports by port number and not physical pin number
+    GPIO.setmode(GPIO.BCM)
 
 # -------------------------------------------------------------------------
 # Define the different callbacks types for the sensor
@@ -63,8 +68,10 @@ def channel_mapped(channel):
 # -------------------------------------------------------------------------
 
 def track_sensor_triggered (gpio_channel):
-    # the dictionary of mapped channels
-    global channels 
+    
+    global channels # the dictionary of mapped channels
+    global logging
+    
     # Thread to "lock" the sensor for the specified timeout period
     def thread_to_timeout_sensor (channel, sleep_delay):
         channels[str(channel)]["timeout_start"] = time.time()
@@ -76,7 +83,7 @@ def track_sensor_triggered (gpio_channel):
 
     # This is where the main code begins
     if not channel_mapped (gpio_channel):
-        print ("ERROR: sensor_triggered - Channel "+str(gpio_channel)+" not mapped")
+        logging.error ("Sensor "+str(gpio_channel)+": Triggered sensor not mapped")
     else:
         if channels[str(gpio_channel)]["timeout_active"]:
             # If we are still in the timeout period then we want to extend it
@@ -86,6 +93,7 @@ def track_sensor_triggered (gpio_channel):
             x = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
             x.start()
             # Get the channel configuration details and make the callback
+            logging.info ("Sensor "+str(gpio_channel)+": has been triggered")
             sensor_id = channels[str(gpio_channel)]["sensor_id"]
             ext_callback = channels[str(gpio_channel)]["callback"]
             ext_callback(sensor_id,track_sensor_callback_type.sensor_triggered)
@@ -102,31 +110,40 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
                          sensor_timeout = 3.0):
     
     global channels # the dictionary of sensors
+    global logging
     # also uses fontsize, xpadding, ypadding imported from "common"
 
-    # Verify that a sensor with the same ID does not already exist
-    sensor_mapped = False
-    for channel in channels.keys():
-        if channels[str(channel)]["sensor_id"] == sensor_id:
-            print ("ERROR: create_sensor - Sensor "+str(sensor_id)+" - already exists - mapped to Channel "+str(channel))
-            sensor_mapped = True
+    # Validate the parameters we have been given
+    logging.info ("Sensor "+str(sensor_id)+": Creating Track Sensor object")
     if sensor_id < 1:
-        print ("ERROR: create_sensor - Sensor 0 - Sensor ID must be greater than zero")
+        logging.error ("Sensor "+str(sensor_id)+": Sensor ID must be greater than zero")
     elif channel_mapped(gpio_channel):
-        print ("ERROR: create_sensor - Sensor "+str(sensor_id)+" - already mapped to another Channel")
+        logging.error ("Sensor "+str(sensor_id)+": Channel "+str(gpio_channel)+" is already mapped to another Sensor")
     elif gpio_channel < 4 or gpio_channel > 26 or gpio_channel == 14 or gpio_channel == 15:
         # We don't use GPIO 14 or 15 as these are used for UART comms with the PI-SPROG-3
         # We don't use GPIO 0, 1, 2, 3 as these are the I2C (which we might want to use later)
-        print ("ERROR: create_sensor - Sensor "+str(sensor_id)+" - Invalid GPIO Channel "+str(gpio_channel))
-    elif not sensor_mapped:
-        # we're good to go on and create the sensor
-        GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
-        # Add the to the dictionaries of sensors and channels
-        channels[str(gpio_channel)] = {"sensor_id"      : sensor_id,
-                                       "callback"       : sensor_callback,
-                                       "timeout_value"  : sensor_timeout,
-                                       "timeout_active" : False}
+        logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Channel "+str(gpio_channel)
+                        + " - Channels (Channel number must be between 4 and 26 - also 14 & 15 are reserved)")
+    else:
+        sensor_mapped = False
+        for channel in channels.keys():
+            if channels[str(channel)]["sensor_id"] == sensor_id:
+                logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to Channel "+str(channel))
+                sensor_mapped = True
+        if not sensor_mapped:
+            # A quick and dirty way of getting the code to run on Windows for development
+            # As the Windows version of python doesn't include the RPi specific GPIO package
+            if sys.platform == 'linux':
+                GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
+            else:
+                logging.warning ("Sensor "+str(sensor_id)+": Unsupported platform - GPIO inputs will be non-functional")
+
+            # Add the to the dictionaries of sensors and channels
+            channels[str(gpio_channel)] = {"sensor_id"      : sensor_id,
+                                           "callback"       : sensor_callback,
+                                           "timeout_value"  : sensor_timeout,
+                                           "timeout_active" : False}
     return()
 
 # -------------------------------------------------------------------------
@@ -135,10 +152,17 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
 
 def track_sensor_active (sensor_id:int):
 
-    for channel in channels.keys():
-        if channels[str(channel)]["sensor_id"] == sensor_id:
-            return not bool(GPIO.input(int(channel)))
-        print ("ERROR: sensor_active - Sensor "+str(sensor_id)+" does not exist")
+    global logging
+    
+    # A quick and dirty way of getting the code to run on Windows for development
+    # As the Windows version of python doesn't include the RPi specific GPIO package
+    if sys.platform == 'linux':
+        for channel in channels.keys():
+            if channels[str(channel)]["sensor_id"] == sensor_id:
+                return not bool(GPIO.input(int(channel)))
+            logging.error ("Sensor "+str(sensor_id)+": does not exist")
+            return (False)
+    else:
         return (False)
 
 ############################################################################
