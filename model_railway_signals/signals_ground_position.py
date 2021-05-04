@@ -35,6 +35,22 @@ def null_callback (sig_id, ext_callback):
     return (sig_id, ext_callback)
 
 # -------------------------------------------------------------------------
+# Callbacks for processing button pushes
+# -------------------------------------------------------------------------
+
+def signal_button_event (sig_id,external_callback):
+    global logging
+    logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
+    toggle_ground_position_light_signal(sig_id,external_callback)
+    return ()
+
+def sig_passed_button_event (sig_id,external_callback):
+    global logging
+    logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    raise_signal_passed_event(sig_id,external_callback)
+    return ()
+
+# -------------------------------------------------------------------------
 # Callback function to flip the state of a signal when the signal
 # button is clicked - Will change state of the signal and initiate an
 # external callback if one was specified when the signal was first created
@@ -58,12 +74,8 @@ def toggle_ground_position_light_signal (sig_id:int,ext_callback=null_callback):
 # If not specified then we use the "null callback" to do nothing
 # -------------------------------------------------------------------------
 
-def signal_passed_event (sig_id:int, ext_callback = null_callback):
+def raise_signal_passed_event (sig_id:int, ext_callback = null_callback):
     
-    global logging
-    
-    logging.info ("*****************************Event ******************************")
-    logging.info ("Signal "+str(sig_id)+": Signal passed event initiated")
     # Call the common function to pulse the button object
     signals_common.pulse_signal_passed_button (sig_id)
     # Call the internal function to update and refresh the signal
@@ -105,9 +117,9 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         # Create the button objects and their callbacks
         button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
                 state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:toggle_ground_position_light_signal(sig_id,sig_callback))
+                bg=common.bgraised, command=lambda:signal_button_event(sig_id,sig_callback))
         button2 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
-                command=lambda:signal_passed_event(sig_id,sig_callback))
+                command=lambda:sig_passed_button_event(sig_id,sig_callback))
         # Create a dummy button for the "Subsisdary Button" (not used for this signal type)
         null_button = Button(canvas)
         

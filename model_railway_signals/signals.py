@@ -66,6 +66,12 @@
 #   Optional Parameters:
 #       sig_ahead_id:int - The ID for the signal "ahead" of the one we want to set
 #
+# toggle_signal(sig_id) - to enable automated route setting from the external programme
+#                        - use in conjunction with 'signal_clear' to find the state first
+#
+# toggle_subsidary(sig_id) - to enable automated route setting from the external programme
+#                      - use in conjunction with 'subsidary_signal_clear' to find the state first
+#
 # lock_signal(*sig_id) - to enable external point/signal interlocking functions
 #                       - One or more Signal IDs can be specified in the call
 #
@@ -394,10 +400,12 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
         logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
         # get the signal that we are interested in
         signal = signals_common.signals[str(sig_id)]
-        if signal["override"]: logging.warning ("Signal "+str(sig_id)+": Timed signal is already overriden")
-        # Call the signal type-specific functions to trigger the signal
-        if signal["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
+        if signal["override"]:
+            logging.warning ("Signal "+str(sig_id)+": Timed signal is already overriden - not Triggering signal")
+        else:
+            # Call the signal type-specific functions to trigger the signal
+            if signal["sigtype"] == signals_common.sig_type.colour_light:
+                signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
     return()
 
 # -------------------------------------------------------------------------

@@ -69,6 +69,16 @@ def section_exists(section_id):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------
+# Callback for processing Button presses (manual toggling of Track Sections
+# -------------------------------------------------------------------------
+
+def section_button_event (section_id:int,external_callback):
+    global logging
+    logging.info ("Track Section "+str(section_id)+": Track Section Manual Update *****************************")
+    toggle_section(section_id,external_callback)
+    return ()
+
+# -------------------------------------------------------------------------
 # Internal function to flip the state of the section. This Will SET/UNSET
 # the section and initiate an external callback if one is specified
 # -------------------------------------------------------------------------
@@ -126,7 +136,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     padx=common.xpadding, pady=common.ypadding,
                     relief="raised", font=myfont,
                     bg="grey", fg="grey", activebackground="grey", activeforeground="grey",
-                    command = lambda:toggle_section(section_id,section_callback))
+                    command = lambda:section_button_event(section_id,section_callback))
 
         # Create some drawing objects (depending on section type)
         canvas.create_window (x,y,window=button1) 

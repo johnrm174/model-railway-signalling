@@ -77,13 +77,11 @@ def toggle_signal (sig_id:int):
     signal = signals[str(sig_id)]
     # Update the state of the signal button - Common to ALL signal types
     if signal["sigclear"]:
-        logging.info ("*****************************Event ******************************")
-        logging.info ("Signal "+str(sig_id)+": Toggling main signal to ON")
+        logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
         signal["sigclear"] = False
         signal["sigbutton"].config(relief="raised",bg=common.bgraised)
     else:
-        logging.info ("*****************************Event ******************************")
-        logging.info ("Signal "+str(sig_id)+": Toggling main signal to OFF")
+        logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
         signal["sigclear"] = True
         signal["sigbutton"].config(relief="sunken",bg=common.bgsunken)
     # update the dictionary of signals
@@ -104,30 +102,15 @@ def toggle_subsidary (sig_id:int):
     signal = signals[str(sig_id)]
     # Update the state of the subsidary button - Common to ALL signal types
     if signal["subclear"]:
-        logging.info ("*****************************Event ******************************")
-        logging.info ("Signal "+str(sig_id)+": Toggling subsidary signal to ON")
+        logging.info ("Signal "+str(sig_id)+": Toggling subsidary to ON")
         signal["subclear"] = False
         signal["subbutton"].config(relief="raised",bg=common.bgraised)
     else:
-        logging.info ("*****************************Event ******************************")
-        logging.info ("Signal "+str(sig_id)+": Toggling subsidary signal to OFF")
+        logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
         signal["subclear"] = True
         signal["subbutton"].config(relief="sunken",bg=common.bgsunken)
     # update the dictionary of signals
     signals[str(sig_id)] = signal;
-    return ()
-
-# -------------------------------------------------------------------------
-# Thread to "Pulse" the "signal passed" Button - used to provide a clear
-# visual indication when "signal passed" events have been triggered
-# -------------------------------------------------------------------------
-
-def thread_to_pulse_sig_passed_button (sig_id, duration):
-    # get the signal we are interested in
-    signal = signals[str(sig_id)]
-    signal["passedbutton"].config(bg="red")
-    time.sleep (duration)
-    signal["passedbutton"].config(bg=common.bgraised)
     return ()
 
 # -------------------------------------------------------------------------
@@ -137,9 +120,25 @@ def thread_to_pulse_sig_passed_button (sig_id, duration):
 # -------------------------------------------------------------------------
 
 def pulse_signal_passed_button (sig_id:int):
+
+    #-------------------------------------------------------------------------
+    # Thread to "Pulse" the "signal passed" Button - used to provide a clear
+    # visual indication when "signal passed" events have been triggered
+    # -------------------------------------------------------------------------
+
+    def thread_to_pulse_sig_passed_button (sig_id, duration):
+        # get the signal we are interested in
+        signal = signals[str(sig_id)]
+        signal["passedbutton"].config(bg="red")
+        time.sleep (duration)
+        signal["passedbutton"].config(bg=common.bgraised)
+        return ()
+    
+    # The main function code begins here
     
     global logging
     
+    logging.info ("Signal "+str(sig_id)+": Pulsing signal passed button")
     # Call the thread to pulse the signal passed button
     x = threading.Thread(target=thread_to_pulse_sig_passed_button,args=(sig_id, 1.0))
     x.start()

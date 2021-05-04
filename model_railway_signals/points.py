@@ -31,7 +31,7 @@
 # lock_point(*point_id) - to enable external point/signal interlocking functions
 #                       - One or more Point_IDs can be specified in the call
 #
-# unlock_point (*point_id) - to enable external point/signal interlocking functions
+# unlock_point(*point_id) - to enable external point/signal interlocking functions
 #                       - One or more Point_IDs can be specified in the call
 #
 # toggle_point(point_id) - to enable automated route setting from the external programme
@@ -94,17 +94,29 @@ def point_exists(point_id):
     return (str(point_id) in points.keys() )
 
 # -------------------------------------------------------------------------
-# Callbacks for processing button pushes
-# -------------------------------------------------------------------------
-
-# -------------------------------------------------------------------------
 # The default callback for the Change button and Lock button
 # used if these are not specified when the point is created
 # i.e to cover the case of no FPL or an auto point
 # -------------------------------------------------------------------------
 
-def point_null(point_id, point_callback = point_callback_type.null_event):
-    return(point_id,point_callback)
+def null_callback(point_id,external_callback):
+    return(point_id,external_callback)
+
+# -------------------------------------------------------------------------
+# Callbacks for processing button pushes
+# -------------------------------------------------------------------------
+
+def fpl_button_event (point_id,external_callback):
+    global logging
+    logging.info("Point "+str(point_id)+": FPL Button Event *******************************************")
+    toggle_fpl(point_id,external_callback)
+    return ()
+
+def change_button_event (point_id,external_callback):
+    global logging
+    logging.info("Point "+str(point_id)+": Change Button Event ****************************************")
+    toggle_point(point_id,external_callback)
+    return ()
 
 # -------------------------------------------------------------------------
 # Internal function to flip the state of the Points Facing Point Lock
@@ -113,7 +125,7 @@ def point_null(point_id, point_callback = point_callback_type.null_event):
 # code to enable automated route setting functions
 # -------------------------------------------------------------------------
 
-def toggle_fpl (point_id:int,ext_callback=point_null ):
+def toggle_fpl (point_id:int,external_callback=null_callback):
 
     global points # the dictionary of points
     global logging
@@ -125,13 +137,11 @@ def toggle_fpl (point_id:int,ext_callback=point_null ):
     # get the point we are interested in
         point = points[str(point_id)]
         if not point["fpllock"]:
-            logging.info ("*****************************Event ******************************")
             logging.info ("Point "+str(point_id)+": Activating Facing Point Lock")
             point["changebutton"].config(state="disabled") 
             point["lockbutton"].config(relief="sunken",bg="white") 
             point["fpllock"]=True 
         else:
-            logging.info ("*****************************Event ******************************")
             logging.info ("Point "+str(point_id)+": Clearing Facing Point Lock")
             point["changebutton"].config(state="normal")  
             point["lockbutton"].config(relief="raised",bg="grey85")
@@ -139,7 +149,7 @@ def toggle_fpl (point_id:int,ext_callback=point_null ):
         # update the dictionary of points with the new state  
         points[str(point_id)] = point; 
         # Now make the external callback
-        ext_callback(point_id,point_callback_type.fpl_switched)
+        external_callback(point_id,point_callback_type.fpl_switched)
         
     return()
 
@@ -152,7 +162,7 @@ def toggle_fpl (point_id:int,ext_callback=point_null ):
 # point to switch if one was specified when the point was created
 # -------------------------------------------------------------------------
 
-def toggle_point (point_id:int,ext_callback=point_null):
+def toggle_point (point_id:int,external_callback=null_callback):
     
     global points # the dictionary of points
     global logging
@@ -164,7 +174,6 @@ def toggle_point (point_id:int,ext_callback=point_null):
         # get the point we are interested in
         point = points[str(point_id)]
         if not point["switched"]:
-            logging.info ("*****************************Event ******************************")
             logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
             point["changebutton"].config(relief="sunken",bg="white")
             point["switched"] = True
@@ -172,7 +181,6 @@ def toggle_point (point_id:int,ext_callback=point_null):
             point["canvas"].itemconfig(point["blade1"],state="hidden") #normal
             dcc_control.update_dcc_point(point_id,True)
         else:
-            logging.info ("*****************************Event ******************************")
             logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
             point["changebutton"].config(relief="raised",bg="grey85") 
             point["switched"] = False
@@ -188,7 +196,7 @@ def toggle_point (point_id:int,ext_callback=point_null):
             toggle_point (point["alsoswitch"])
 
         # Now make the external callback
-        ext_callback(point_id, point_callback_type.point_switched)
+        external_callback(point_id, point_callback_type.point_switched)
 
     return()
 
@@ -204,7 +212,7 @@ def toggle_point (point_id:int,ext_callback=point_null):
 
 def create_point (canvas, point_id:int, pointtype:point_type,
                   x:int, y:int, colour:str, orientation:int = 0,
-                  point_callback = point_null, also_switch:int = 0,
+                  point_callback = null_callback, also_switch:int = 0,
                   reverse:bool=False,auto:bool=False,fpl:bool=False):
     
     global points # the dictionary of points
@@ -237,10 +245,10 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         button1 = Button (canvas,text=str(point_id), state="normal", 
                     relief="raised", font = myfont,bg= "grey85",
                     padx=common.xpadding, pady=common.ypadding,
-                    command = lambda:toggle_point(point_id,point_callback))
+                    command = lambda:change_button_event(point_id,point_callback))
         button2 = Button (canvas,text="L",state="normal", relief="sunken",
                     padx=common.xpadding, pady=common.ypadding, font = myfont, bg = "white",
-                    command = lambda:toggle_fpl(point_id,point_callback))
+                    command = lambda:fpl_button_event(point_id,point_callback))
 
         #Create some drawing objects (depending on point type)
         if pointtype==point_type.RH:

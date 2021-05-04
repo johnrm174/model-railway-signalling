@@ -93,8 +93,8 @@ def track_sensor_triggered (gpio_channel):
             x = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
             x.start()
             # Get the channel configuration details and make the callback
-            logging.info ("Sensor "+str(gpio_channel)+": has been triggered")
             sensor_id = channels[str(gpio_channel)]["sensor_id"]
+            logging.info("Sensor "+str(sensor_id)+": Triggered Event ********************************************")
             ext_callback = channels[str(gpio_channel)]["callback"]
             ext_callback(sensor_id,track_sensor_callback_type.sensor_triggered)
     return()
