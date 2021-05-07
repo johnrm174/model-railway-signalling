@@ -12,6 +12,10 @@
 from tkinter import *
 from model_railway_signals import *
 
+import logging
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+
 #----------------------------------------------------------------------
 # global variables 
 #----------------------------------------------------------------------

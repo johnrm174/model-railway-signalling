@@ -25,6 +25,7 @@ from . import common
 
 from tkinter import *
 import tkinter.font
+import logging
 
 # -------------------------------------------------------------------------
 # Define a null callback function for internal use
@@ -32,6 +33,22 @@ import tkinter.font
 
 def null_callback (sig_id, ext_callback):
     return (sig_id, ext_callback)
+
+# -------------------------------------------------------------------------
+# Callbacks for processing button pushes
+# -------------------------------------------------------------------------
+
+def signal_button_event (sig_id,external_callback):
+    global logging
+    logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
+    toggle_ground_position_light_signal(sig_id,external_callback)
+    return ()
+
+def sig_passed_button_event (sig_id,external_callback):
+    global logging
+    logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    raise_signal_passed_event(sig_id,external_callback)
+    return ()
 
 # -------------------------------------------------------------------------
 # Callback function to flip the state of a signal when the signal
@@ -57,7 +74,8 @@ def toggle_ground_position_light_signal (sig_id:int,ext_callback=null_callback):
 # If not specified then we use the "null callback" to do nothing
 # -------------------------------------------------------------------------
 
-def signal_passed_event (sig_id:int, ext_callback = null_callback):
+def raise_signal_passed_event (sig_id:int, ext_callback = null_callback):
+    
     # Call the common function to pulse the button object
     signals_common.pulse_signal_passed_button (sig_id)
     # Call the internal function to update and refresh the signal
@@ -80,17 +98,16 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                     shunt_ahead: bool = False,
                                     modern_type: bool = False):
 
+    global logging
+
+    logging.info ("Signal "+str(sig_id)+": Creating Ground Position Signal")
     # Do some basic validation on the parameters we have been given
     if signals_common.sig_exists(sig_id):
-        print ("ERROR: create_ground_position_signal - Signal ID "+str(sig_id)+" already exists")
-        
+        logging.error ("Signal "+str(sig_id)+": Signal already exists")        
     elif sig_id < 1:
-        print ("ERROR: create_ground_position_signal - Signal ID must be greater than zero")
-        
+        logging.error ("Signal "+str(sig_id)+": Signal ID must be greater than zero")        
     elif orientation != 0 and orientation != 180:
-        print ("ERROR: create_ground_position_signal - Signal ID "+str(sig_id)+
-                       " - Invalid orientation angle - only 0 and 180 currently supported")
-        
+        logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")                  
     else:
         
         # set the font size for the buttons
@@ -100,9 +117,9 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         # Create the button objects and their callbacks
         button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
                 state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:toggle_ground_position_light_signal(sig_id,sig_callback))
+                bg=common.bgraised, command=lambda:signal_button_event(sig_id,sig_callback))
         button2 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
-                command=lambda:signal_passed_event(sig_id,sig_callback))
+                command=lambda:sig_passed_button_event(sig_id,sig_callback))
         # Create a dummy button for the "Subsisdary Button" (not used for this signal type)
         null_button = Button(canvas)
         
@@ -141,10 +158,12 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         new_signal = {"canvas" : canvas,                      # MANDATORY - canvas object
                       "sigtype": signals_common.sig_type.ground_pos_light,   # MANDATORY - The type of the signal
                       "sigclear" : False,                     # MANDATORY - The Internal state of the signal
-                      "sigbutton" : button1,                  # MANDATORY - Button drawing object (main signal button)
                       "automatic" : False,                    # MANDATORY - If signal is fully automatic (not used for this sig type)
                       "subclear" : False,                     # MANDATORY - Subsidary Signal State (not used for this sig type)
                       "override" : False,                     # MANDATORY - Override" State (not used for this sig type)
+                      "siglocked" : False,                    # MANDATORY - Current state of interlocking 
+                      "sublocked" : False,                    # MANDATORY - Current state of interlocking (not used for this sig type)
+                      "sigbutton" : button1,                  # MANDATORY - Button drawing object (main signal button)
                       "subbutton" : null_button,              # MANDATORY - Subsidary signal Button (not used for this sig type)
                       "passedbutton" : button2,               # SHARED - Button drawing object
                       "posroot" : posroot,                    # Type-specific - drawing object
@@ -164,16 +183,21 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 
 # -------------------------------------------------------------------------
 # Internal function to Refresh the aspects of a ground position signal
-# Function assumes the Sig_ID has been validated by the calling programme
+# Function assumes the Sig_ID has been validated by the calling module
+# Note that we expect this function to only ever get called on a state 
+# change therefore we don't track the displayed aspect of the signal
 # -------------------------------------------------------------------------
 
 def update_ground_position_light_signal (sig_id:int):
-    
+
+    global logging
+
     # get the signals that we are interested in
     signal = signals_common.signals[str(sig_id)]
     
     # Only set the signal to its clear aspect if not overriden
     if signal["sigclear"] and not signal ["override"]:
+        logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/WHITE")
         # indication is the same whether its a shunt ahead or a normal
         # position light and whether its modern or pre-1996
         signal["canvas"].itemconfig (signal["posoff"],fill="white")
@@ -182,13 +206,14 @@ def update_ground_position_light_signal (sig_id:int):
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
 
     elif signal["shuntahead"]:
-        # Aspect to display is yellow
-        signal["canvas"].itemconfig (signal["poson"],fill="yellow")
+        signal["canvas"].itemconfig (signal["poson"],fill="gold")
         signal["canvas"].itemconfig (signal["posoff"],fill="grey")
         # The "root" pos light is also yellow for modern signals (pre-1996 its white)
         if signal["moderntype"]:
-            signal["canvas"].itemconfig (signal["posroot"],fill="yellow")
+            logging.info ("Signal "+str(sig_id)+": Changing aspect to YELLOW/YELLOW")
+            signal["canvas"].itemconfig (signal["posroot"],fill="gold")
         else:
+            logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/YELLOW")
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
 
@@ -198,8 +223,10 @@ def update_ground_position_light_signal (sig_id:int):
         signal["canvas"].itemconfig (signal["posoff"],fill="grey")
         # The "root" pos light is also red for modern signals (pre-1996 its white)
         if signal["moderntype"]:
+            logging.info ("Signal "+str(sig_id)+": Changing aspect to RED/RED")
             signal["canvas"].itemconfig (signal["posroot"],fill="red")
         else:
+            logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/RED")
             signal["canvas"].itemconfig (signal["posroot"],fill="white")
         dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
 

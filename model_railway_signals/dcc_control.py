@@ -35,11 +35,11 @@
 #         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
 #         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
 #         prelim_caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-#         call:int - the DCC address for the "position light" indication (default = No Mapping)
-#         LH1:int  - the DCC address for the "LH 45 feather" indication  (default = No Mapping)
-#         LH2:int  - the DCC address for the "LH 90 feather" indication  (default = No Mapping)
-#         RH1:int  - the DCC address for the "RH 45 feather" indication  (default = No Mapping)
-#         RH2:int  - the DCC address for the "RH 90 feather" indication  (default = No Mapping)
+#         LH1[[add:int,state:bool],] - List of DCC addresses/states for "LH45" (default = No Mapping)
+#         LH2[[add:int,state:bool],] - List of DCC addresses/states for "LH90" (default = No Mapping)
+#         RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
+#         RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
+#         call:int - Single DCC address for the "position light" indication (default = No Mapping)
 #
 #   map_dcc_point
 #      Mandatory Parameters:
@@ -83,6 +83,7 @@ from . import signals_common
 from . import pi_sprog_interface
 
 import enum
+import logging
 
 # The mapping types that are currently supported
 class dcc_signal_type(enum.Enum):
@@ -99,7 +100,6 @@ class signal_state_type(enum.Enum):
 # Define empty dictionaries for the mappings and dcc addresses
 dcc_signal_mappings:dict = {}
 dcc_point_mappings:dict = {}
-dcc_addresses:dict = {}
 
 # Internal function to test if a mapping exists for a signal
 def sig_mapped(sig_id):
@@ -141,52 +141,47 @@ def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.tr
                     RH1 = [[0,False],], RH2 = [[0,False],],
                     MAIN = [[0,False],], call:int=0):
     
-    # Do some basic validation on the parameters we have been given
-    if sig_mapped(sig_id):
-        print ("ERROR: map_dcc_colour_light_signal - Signal ID "+str(sig_id)+" already mapped")
-    elif sig_id < 1:
-        print ("ERROR: map_dcc_colour_light_signal - Signal ID must be greater than zero")    
-    else:
-        # Add all addresses to the global list of DCC addresses so we can track their states.
-        # This enables us to then send the bare minimum of DCC bus commands to make changes
-        # We set these to 'None' initially - as the state of the DCC signal is unset/unknown
-        for entry in danger:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in proceed:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in caution:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in prelim_caution:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in LH1:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in LH2:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in RH1:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in RH2:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        for entry in MAIN:
-            if entry[0] > 0 : dcc_addresses[str(entry[0])] = None
-        if call> 0: dcc_addresses[str(call)] = None
-        
-        # Create the DCC Mapping entry for the signal. We use the truth tables we have
-        # been given for the main signal aspect and the feather route indicators.
-        # The "Calling On" position light indication is mapped to a single address
-        new_dcc_mapping = {
-            "mapping_type" : signal_type,
-            str(signal_state_type.danger) : danger,
-            str(signal_state_type.proceed) : proceed, 
-            str(signal_state_type.caution) : caution,
-            str(signal_state_type.prelim_caution) : prelim_caution,
-            str(signals_common.route_type.LH1) : LH1,
-            str(signals_common.route_type.LH2) : LH2,
-            str(signals_common.route_type.RH1) : RH1,
-            str(signals_common.route_type.RH2) : RH2,
-            str(signals_common.route_type.MAIN) : MAIN,
-            "call" : call }
-        dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
+    global logging
     
+    # Do some basic validation on the parameters we have been given
+    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping")
+    if sig_mapped(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
+    elif sig_id < 1:
+        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
+    else:
+        # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
+        # within the valid DCC accessory address range od 1 and 2047
+        addresses = danger + proceed + caution + prelim_caution +LH1 + LH2 + RH1 + RH2 + MAIN
+        addresses_valid = True
+        for entry in addresses:
+            if entry[0] < 0 or entry[0] > 2047:
+                logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry[0])+" - must be between 1 and 2047")
+                addresses_valid = False
+            elif entry[1] not in (True,False):
+                logging.error ("Signal "+str(sig_id)+": Invalid DCC State "+str(entry[1])+" - must be between True or False")
+                addresses_valid = False
+        if (call < 0 or call > 2047):
+            logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
+            addresses_valid = False
+        if addresses_valid:
+            # Create the DCC Mapping entry for the signal. We use the truth tables we have
+            # been given for the main signal aspect and the feather route indicators.
+            # The "Calling On" position light indication is mapped to a single address
+            new_dcc_mapping = {
+                "mapping_type" : signal_type,
+                str(signal_state_type.danger) : danger,
+                str(signal_state_type.proceed) : proceed, 
+                str(signal_state_type.caution) : caution,
+                str(signal_state_type.prelim_caution) : prelim_caution,
+                str(signals_common.route_type.LH1) : LH1,
+                str(signals_common.route_type.LH2) : LH2,
+                str(signals_common.route_type.RH1) : RH1,
+                str(signals_common.route_type.RH2) : RH2,
+                str(signals_common.route_type.MAIN) : MAIN,
+                "call" : call }
+            dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
+        
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -197,15 +192,17 @@ def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.tr
 
 def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
     
+    global logging
+    
+    logging.info ("Point "+str(point_id)+": Creating DCC Address mapping")
     # Do some basic validation on the parameters we have been given
     if point_mapped(point_id):
-        print ("ERROR: map_dcc_point - Point ID "+str(point_id)+" already mapped")
+        logging.error ("Point "+str(point_id)+": Point already has a DCC Address mapping")
     elif point_id < 1:
-        print ("ERROR: map_dcc_point - Point ID must be greater than zero")
+        logging.error ("Point "+str(point_id)+": Point ID for DCC Mapping must be greater than zero")
+    elif (address < 1 or address > 2047):
+        logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
     else:
-        # Add the address to the global list of DCC addresses so we can track the state.
-        # We set this to 'None' initially - as the state of the DCC point is unset/unknown
-        if address> 0: dcc_addresses[str(address)] = None
         # Create the DCC Mapping entry for the point
         new_dcc_mapping = {
             "address"  : address,
@@ -219,23 +216,17 @@ def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
 #------------------------------------------------------------------------------------------
 
 def update_dcc_point(point_id:int, state:bool):
-
+    
+    global logging
+    
     if point_mapped(point_id):
-        
+        logging.info ("Point "+str(point_id)+": Retrieving DCC mappings for point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
-        address = dcc_mapping["address"]
         if dcc_mapping["reversed"]: state = not state
-        if address > 0:
-            if state is True and dcc_addresses[str(address)] is not True:
-                pi_sprog_interface.send_accessory_short_event (address,True)
-                dcc_addresses[str(address)] = True
-            elif state is False and dcc_addresses[str(address)] is not False:
-                pi_sprog_interface.send_accessory_short_event (address,False)
-                dcc_addresses[str(address)] = False
-        # Save back the changes we have made to the point
-        dcc_point_mappings[str(point_id)] = dcc_mapping         
-        
+        if dcc_mapping["address"] > 0:
+            # Send the DCC commands to change the state
+            pi_sprog_interface.send_accessory_short_event (dcc_mapping["address"],state)        
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -245,28 +236,19 @@ def update_dcc_point(point_id:int, state:bool):
 #------------------------------------------------------------------------------------------
 
 def update_dcc_signal(sig_id: int, state: signal_state_type):
-
+    
+    global logging
+    
     if sig_mapped(sig_id):
-        
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
-        if dcc_mapping["mapping_type"] == dcc_signal_type.truth_table:
-            # Send the DCC commands to change the state if required - If a particular
-            # address is already set to the required state we don't send the command
-            for entry in dcc_mapping[str(state)]:
-                if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
-                    pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                    dcc_addresses[str(entry[0])] = entry[1]     
-        elif dcc_mapping["mapping_type"] == dcc_signal_type.event_driven:
-            # Send the single DCC commands to change the state - Always send the command
+        if dcc_mapping["mapping_type"] in (dcc_signal_type.truth_table,dcc_signal_type.event_driven):
+            # Send the DCC commands to change the state
             for entry in dcc_mapping[str(state)]:
                 if entry[0] > 0:
                     pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                    dcc_addresses[str(entry[0])] = entry[1]     
-        # Save back the changes we have made to the signal
-        dcc_signal_mappings[str(sig_id)] = dcc_mapping
-                    
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -276,26 +258,16 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
 #------------------------------------------------------------------------------------------
             
 def update_dcc_subsidary_signal (sig_id:int,state:bool):
+        
+    global logging
     
     if sig_mapped(sig_id):
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        address = dcc_mapping["call"]
-        # Send the DCC commands to change the state if required
-        # Note that we test on "if not True" and "if not False" so that we
-        # will ALWAYS send a DCC Command to put the signal into the required
-        # state the first time we set the aspect (before then, the state of
-        # the DCC signal out on the layout is unknown - with a state of "None"
-        if address > 0:
-            if state is True and dcc_addresses[str(address)] is not True:
-                pi_sprog_interface.send_accessory_short_event (address,True)
-                dcc_addresses[str(address)] = True
-            elif state is False and dcc_addresses[str(address)] is not False:
-                pi_sprog_interface.send_accessory_short_event (address,False)
-                dcc_addresses[str(address)] = False
-        # Save back the changes we have made to the signal
-        dcc_signal_mappings[str(sig_id)] = dcc_mapping         
-            
+        # Send the DCC commands to change the state 
+        if dcc_mapping["call"] > 0:
+            pi_sprog_interface.send_accessory_short_event (dcc_mapping["call"],state)        
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -306,16 +278,16 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
             
 def update_dcc_signal_route (sig_id, route:signals_common.route_type):
     
+    global logging
+    
     if sig_mapped(sig_id):
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
         # Send the DCC commands to change the state if required
         for entry in dcc_mapping[str(route)]:
-            if entry[0] > 0 and dcc_addresses[str(entry[0])] is not entry[1]:
+            if entry[0] > 0:
                 pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
-                dcc_addresses[str(entry[0])] = entry[1]
-        # Save back the changes we have made to the signal
-        dcc_signal_mappings[str(sig_id)] = dcc_mapping         
-
     return()
 
+#######################################################################################

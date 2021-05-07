@@ -34,6 +34,7 @@ from . import common
 from tkinter import *
 import tkinter.font
 import enum
+import logging
 
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling the create_point function
@@ -68,30 +69,41 @@ def section_exists(section_id):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------
+# Callback for processing Button presses (manual toggling of Track Sections
+# -------------------------------------------------------------------------
+
+def section_button_event (section_id:int,external_callback):
+    global logging
+    logging.info ("Section "+str(section_id)+": Track Section Manual Update *****************************")
+    toggle_section(section_id,external_callback)
+    return ()
+
+# -------------------------------------------------------------------------
 # Internal function to flip the state of the section. This Will SET/UNSET
 # the section and initiate an external callback if one is specified
 # -------------------------------------------------------------------------
 
 def toggle_section (section_id:int, ext_callback=section_null):
+    
     global sections # the dictionary of sections
-    # Validate the section exists 
-    if not section_exists(section_id):
-        print ("ERROR: toggle_section - Section "+str(section_id)+" does not exist")
-    else:
-        # get the section that we are interested in
-        section = sections[str(section_id)]
-        if section["occupied"] == True:  # section is on
-            section["occupied"] = False
-            section["button1"].config(relief="raised", bg="grey", fg="grey",
-                            activebackground="grey", activeforeground="grey")
-        else:  # section is off
-            section["occupied"] = True
-            section["button1"].config(relief="sunken", bg="black",fg="white",
-                            activebackground="black", activeforeground="white")
-        # update the dictionary of sections with the new state  
-        sections[str(section_id)] = section;
-        # Now make the external callback
-        ext_callback(section_id,section_callback_type.section_switched)
+    global logging
+    
+    # get the section that we are interested in
+    section = sections[str(section_id)]
+    if section["occupied"] == True:  # section is on
+        logging.info ("Section "+str(section_id)+": Changing to CLEAR")
+        section["occupied"] = False
+        section["button1"].config(relief="raised", bg="grey", fg="grey",
+                        activebackground="grey", activeforeground="grey")
+    else:  # section is off
+        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED")
+        section["occupied"] = True
+        section["button1"].config(relief="sunken", bg="black",fg="white",
+                        activebackground="black", activeforeground="white")
+    # update the dictionary of sections with the new state  
+    sections[str(section_id)] = section;
+    # Now make the external callback
+    ext_callback(section_id,section_callback_type.section_switched)
     return()
 
 # -------------------------------------------------------------------------
@@ -105,13 +117,15 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     label:str = "Train On Line"):
     
     global sections # the dictionary of sections
+    global logging
     # also uses fontsize, xpadding, ypadding imported from "common"
 
+    logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
     # Verify that a section with the same ID does not already exist
     if section_exists(section_id):
-        print ("ERROR: create_section - section ID "+str(section_id)+" already exists")
+        logging.error ("Section "+str(section_id)+": Section already exists")
     elif section_id < 1:
-        print ("ERROR: create_section - section ID must be greater than zero")
+        logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
     else: # we're good to go on and create the section
         
         # set the font size for the buttons
@@ -122,7 +136,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     padx=common.xpadding, pady=common.ypadding,
                     relief="raised", font=myfont,
                     bg="grey", fg="grey", activebackground="grey", activeforeground="grey",
-                    command = lambda:toggle_section(section_id,section_callback))
+                    command = lambda:section_button_event(section_id,section_callback))
 
         # Create some drawing objects (depending on section type)
         canvas.create_window (x,y,window=button1) 
@@ -142,10 +156,13 @@ def create_section (canvas, section_id:int, x:int, y:int,
 # -------------------------------------------------------------------------
 
 def section_occupied (section_id:int):
+    
     global sections # the dictionary of sections
+    global logging
+    
     # Validate the section exists
     if not section_exists(section_id):
-        print ("ERROR: section_occupied - section "+str(section_id)+" does not exist")
+        logging.error ("Section "+str(section_id)+": Section does not exist")
         occupied = False
     else:   
         # get the section that we are interested in
@@ -158,9 +175,12 @@ def section_occupied (section_id:int):
 # -------------------------------------------------------------------------
 
 def set_section_occupied (section_id:int):
+    
+    global logging
+    
     # Validate the section exists
     if not section_exists(section_id):
-        print ("ERROR: set_section_occupied - section "+str(section_id)+" does not exist")
+        logging.error ("Section "+str(section_id)+": Section to set to Occupied does not exist")
     elif not section_occupied(section_id):
         toggle_section(section_id)
     return()
@@ -168,7 +188,7 @@ def set_section_occupied (section_id:int):
 def clear_section_occupied (section_id:int):
     # Validate the section exists
     if not section_exists(section_id):
-        print ("ERROR: clear_section_occupied - section "+str(section_id)+" does not exist")
+        logging.error ("Section "+str(section_id)+": Section to set to Clear does not exist")
     if section_occupied(section_id,):
         toggle_section(section_id)
     return()

@@ -10,6 +10,9 @@ from tkinter import *
 from model_railway_signals import *
 import threading
 import time
+import logging
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
 
 # Global variables to thrack the state of the test functions
 
@@ -91,7 +94,7 @@ def update_signals():
 #----------------------------------------------------------------------
 
 def signal_button(sig_id, sig_callback):
-    print ("***** CALLBACK - Signal " + str(sig_id) + " - " + str(sig_callback))
+#    print ("***** CALLBACK - Signal " + str(sig_id) + " - " + str(sig_callback))
     
     # Deal with the timed signals
     if sig_callback == sig_callback_type.sig_passed:

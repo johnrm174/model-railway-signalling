@@ -5,8 +5,8 @@ from .points import lock_point
 from .points import unlock_point
 from .points import point_switched
 from .points import fpl_active
-from .points import switch_point
-from .points import clear_point
+from .points import toggle_point
+from .points import toggle_fpl
 
 from .signals_common import route_type
 from .signals_common import sig_callback_type
@@ -18,8 +18,10 @@ from .signals import set_route_indication
 from .signals import update_signal
 from .signals import lock_signal
 from .signals import unlock_signal
+from .signals import toggle_signal
 from .signals import lock_subsidary_signal
 from .signals import unlock_subsidary_signal
+from .signals import toggle_subsidary_signal
 from .signals import signal_clear
 from .signals import subsidary_signal_clear
 from .signals import set_signal_override
@@ -55,8 +57,8 @@ __all__ = [
         'unlock_point',
         'point_switched',
         'fpl_active',
-        'switch_point',
-        'clear_point',
+        'toggle_point',
+        'toggle_fpl',
       # Public signal types
         'route_type',
         'signal_sub_type',
@@ -68,8 +70,10 @@ __all__ = [
         'update_signal',
         'lock_signal',
         'unlock_signal',
+        'toggle_signal',
         'lock_subsidary_signal',
         'unlock_subsidary_signal',
+        'toggle_subsidary_signal',
         'signal_clear',
         'subsidary_signal_clear',
         'set_signal_override',
