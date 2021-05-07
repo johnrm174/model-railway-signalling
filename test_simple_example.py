@@ -150,7 +150,7 @@ canvas.pack()
 
 if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
-    initialise_pi_sprog()
+    initialise_pi_sprog(debug=True)
     request_dcc_power_on()
     # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using

@@ -137,12 +137,12 @@ def toggle_fpl (point_id:int,external_callback=null_callback):
     # get the point we are interested in
         point = points[str(point_id)]
         if not point["fpllock"]:
-            logging.info ("Point "+str(point_id)+": Activating Facing Point Lock")
+            logging.info ("Point "+str(point_id)+": Activating FPL")
             point["changebutton"].config(state="disabled") 
             point["lockbutton"].config(relief="sunken",bg="white") 
             point["fpllock"]=True 
         else:
-            logging.info ("Point "+str(point_id)+": Clearing Facing Point Lock")
+            logging.info ("Point "+str(point_id)+": Clearing FPL")
             point["changebutton"].config(state="normal")  
             point["lockbutton"].config(relief="raised",bg="grey85")
             point["fpllock"]=False
@@ -192,7 +192,6 @@ def toggle_point (point_id:int,external_callback=null_callback):
         
         # Now change any other points we need (i.e. points switched with this one)
         if point["alsoswitch"] != 0:
-            logging.info ("Point "+str(point_id)+": Also switching point "+str(point["alsoswitch"]))
             toggle_point (point["alsoswitch"])
 
         # Now make the external callback
@@ -219,7 +218,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     global logging
     # also uses common.fontsize, common.xpadding, common.ypadding imported from "common"
     
-    logging.info ("Point "+str(point_id)+": Creating Point (initial state is NORMAL)")
+    logging.info ("Point "+str(point_id)+": Creating Point")
     # Do some basic validation on the parameters we have been given
     if point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Point already exists")

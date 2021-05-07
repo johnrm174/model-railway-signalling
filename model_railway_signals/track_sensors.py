@@ -114,7 +114,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
     # also uses fontsize, xpadding, ypadding imported from "common"
 
     # Validate the parameters we have been given
-    logging.info ("Sensor "+str(sensor_id)+": Creating Track Sensor object")
+    logging.info ("Sensor "+str(sensor_id)+": Creating track sensor mapping")
     if sensor_id < 1:
         logging.error ("Sensor "+str(sensor_id)+": Sensor ID must be greater than zero")
     elif channel_mapped(gpio_channel):

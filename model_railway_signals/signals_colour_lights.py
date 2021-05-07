@@ -393,7 +393,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
     # get the signals that we are interested in
     signal = signals_common.signals[str(sig_id)]
     if signal["subclear"]:
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary signal aspect to OFF")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
         signal["canvas"].itemconfig (signal["pos1"],fill="white")
         signal["canvas"].itemconfig (signal["pos2"],fill="white")
         dcc_control.update_dcc_subsidary_signal(sig_id,True)  
@@ -401,7 +401,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
     else:
         signal["canvas"].itemconfig (signal["pos1"],fill="grey")
         signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary signal aspect to ON")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to NOT DISPLAYED")
         dcc_control.update_dcc_subsidary_signal(sig_id,False)
     # We have just updated the drawing objects - not our reference to them
     # Therefore no updates to save back to the dictionary of signals
@@ -428,7 +428,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     if not signal["sigclear"]:
         if signal["subtype"] == signal_sub_type.distant:
             new_aspect = aspect_type.YELLOW
-            log_message = " (signal is ON and 2 aspect distant)"
+            log_message = " (signal is ON and 2-aspect distant)"
         else:
             new_aspect = aspect_type.RED
             log_message = " (signal is ON)"
@@ -445,11 +445,11 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # we can ignore the signal ahead and set it to its "clear" aspect
     elif signal["subtype"] == signal_sub_type.home:
         new_aspect = aspect_type.GREEN
-        log_message = " (signal is OFF and 2 aspect home)"
+        log_message = " (signal is OFF and 2-aspect home)"
 
     elif signal["subtype"] == signal_sub_type.red_ylw:
         new_aspect = aspect_type.YELLOW
-        log_message = " (signal is OFF and 2 aspect R/Y)"
+        log_message = " (signal is OFF and 2-aspect R/Y)"
 
     # If no signal ahead has been specified then we can also set the signal
     # to its "clear" aspect (this includes 2 aspect distant signals as well
@@ -476,8 +476,8 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
                 new_aspect = aspect_type.DOUBLE_YELLOW
             else:
                 new_aspect = aspect_type.GREEN
-            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
-                        " is displaying " + str (signal_ahead["displayedaspect"])+")")
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
+                                  + str(signal_ahead["displayedaspect"]).rpartition('.')[-1]+")")
                 
         # Finally we'll fallback to using "sigclear" which should be supported across all
         # signal types - so this should allow mixing and matching of signals
@@ -493,7 +493,8 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # Only refresh the signal drawing objects if the aspect has changed    
     current_aspect = signal["displayedaspect"]
     if new_aspect != current_aspect:
-        logging.info ("Signal "+str(sig_id)+": Changing main signal aspect to " + str(new_aspect)+ log_message)
+        logging.info ("Signal "+str(sig_id)+": Changing aspect to "
+                      + str(new_aspect).rpartition('.')[-1] + log_message)
         signal["displayedaspect"] = new_aspect
         refresh_signal_aspects (sig_id)
         # We only refresh the feather and theatre route indications on signal aspect
@@ -530,12 +531,12 @@ def update_colour_light_route_indication (sig_id,
     # is not set to RED (In this case all route indications will be inhibited - so we'll leave
     # the refresh of the route indications until the signal is next changed)
     if signal["routeset"] != route_to_set:
-        logging.info ("Signal "+str(sig_id)+": Setting selected route to "+str(route_to_set))
+        logging.info ("Signal "+str(sig_id)+": Setting route to "+str(route_to_set).rpartition('.')[-1])
         signal["routeset"] = route_to_set
         if signal["displayedaspect"] != aspect_type.RED:
             refresh_feather_route_indication (sig_id)
     if signal["theatretext"] != theatre_text:
-        logging.info ("Signal "+str(sig_id)+": Setting selected theatre text to \'"+str(theatre_text)+"\'")
+        logging.info ("Signal "+str(sig_id)+": Setting theatre text to \'"+str(theatre_text)+"\'")
         signal["theatretext"] = theatre_text
         if signal["displayedaspect"] != aspect_type.RED:
             refresh_theatre_route_indication (sig_id)
@@ -609,24 +610,21 @@ def refresh_feather_route_indication (sig_id):
     
     # Only display the route indication if the signal is clear and not overriden to red
     if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-
+        logging.info ("Signal "+str(sig_id)+": Changing route indication to"
+                      + str(signal["routeset"]).rpartition('.')[-1])
         if signal["routeset"] == signals_common.route_type.LH1:
-            logging.info ("Signal "+str(sig_id)+": Changing feather route indication to LH1")
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
         elif signal["routeset"] == signals_common.route_type.LH2:
-            logging.info ("Signal "+str(sig_id)+": Changing feather route indication to LH2")
             signal["canvas"].itemconfig (signal["lhf90"],fill="white")
         elif signal["routeset"] == signals_common.route_type.RH1:
-            logging.info ("Signal "+str(sig_id)+": Changing feather route indication to RH1")
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
         elif signal["routeset"] == signals_common.route_type.RH2:
-            logging.info ("Signal "+str(sig_id)+": Changing feather route indication to RH2")
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
         dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
   
     else:
         # If the signal is set to Red then we need to inhibit the indications
-        logging.info ("Signal "+str(sig_id)+": Inhibiting feather route indications (signal is RED)")
+        logging.info ("Signal "+str(sig_id)+": Inhibiting route indication (signal is displaying RED)")
         dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.MAIN)
 
     return ()

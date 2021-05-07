@@ -144,6 +144,7 @@ def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.tr
     global logging
     
     # Do some basic validation on the parameters we have been given
+    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping")
     if sig_mapped(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
     elif sig_id < 1:
@@ -164,7 +165,6 @@ def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.tr
             logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
             addresses_valid = False
         if addresses_valid:
-            logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping")
             # Create the DCC Mapping entry for the signal. We use the truth tables we have
             # been given for the main signal aspect and the feather route indicators.
             # The "Calling On" position light indication is mapped to a single address
@@ -194,6 +194,7 @@ def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
     
     global logging
     
+    logging.info ("Point "+str(point_id)+": Creating DCC Address mapping")
     # Do some basic validation on the parameters we have been given
     if point_mapped(point_id):
         logging.error ("Point "+str(point_id)+": Point already has a DCC Address mapping")
@@ -202,7 +203,6 @@ def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
     elif (address < 1 or address > 2047):
         logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
     else:
-        logging.info ("Point "+str(point_id)+": Creating DCC Address mapping")
         # Create the DCC Mapping entry for the point
         new_dcc_mapping = {
             "address"  : address,
@@ -220,7 +220,7 @@ def update_dcc_point(point_id:int, state:bool):
     global logging
     
     if point_mapped(point_id):
-        logging.info ("Point "+str(point_id)+": Sending DCC Bus commands to change point")
+        logging.info ("Point "+str(point_id)+": Retrieving DCC mappings for point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
@@ -240,7 +240,7 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change Signal to "+str(state))
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
@@ -262,7 +262,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change Subsidary to "+str(state))
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
@@ -281,7 +281,7 @@ def update_dcc_signal_route (sig_id, route:signals_common.route_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change route to "+str(route))
+        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
         # Send the DCC commands to change the state if required

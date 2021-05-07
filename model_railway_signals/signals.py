@@ -220,7 +220,7 @@ def lock_signal (*sig_ids:int):
             signal = signals_common.signals[str(sig_id)]
             # Only lock it if its not already locked
             if not signal["siglocked"]:
-                logging.info ("Signal "+str(sig_id)+": Locking main signal")
+                logging.info ("Signal "+str(sig_id)+": Locking signal")
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
                 if signal["sigclear"]: logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF")            
@@ -247,7 +247,7 @@ def unlock_signal (*sig_ids:int):
             signal = signals_common.signals[str(sig_id)]
             # Only unlock it if its not already locked
             if signal["siglocked"]:
-                logging.info ("Signal "+str(sig_id)+": Unlocking main signal")
+                logging.info ("Signal "+str(sig_id)+": Unlocking signal")
                 # Enable the Signal button to unlock it (if its not a fully automatic signal)
                 if not signal["automatic"]: signal["sigbutton"].config(state="normal")
                 signal["siglocked"] = False
@@ -272,7 +272,7 @@ def lock_subsidary_signal (*sig_ids:int):
             signal = signals_common.signals[str(sig_id)]
             # Only lock it if its not already locked
             if not signal["sublocked"]:
-                logging.info ("Signal "+str(sig_id)+": Locking subsidary signal")
+                logging.info ("Signal "+str(sig_id)+": Locking subsidary")
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
                 if signal["subclear"]: logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF")            
@@ -300,7 +300,7 @@ def unlock_subsidary_signal (*sig_ids:int):
             signal = signals_common.signals[str(sig_id)]
             # Only unlock it if its not already locked
             if signal["sublocked"]:
-                logging.info ("Signal "+str(sig_id)+": Unlocking subsidary signal")
+                logging.info ("Signal "+str(sig_id)+": Unlocking subsidary")
                 # Re-enable the Button to unlock the subsidary signal
                 signal["subbutton"].config(state="normal")
                 signal["sublocked"] = False
@@ -326,7 +326,7 @@ def set_signal_override (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             if not signal["override"]:
-                logging.info ("Signal "+str(sig_id)+": Setting signal override")
+                logging.info ("Signal "+str(sig_id)+": Setting override")
                 # Set the override state and change the button text to indicate override
                 signal["override"] = True
                 signal["sigbutton"].config(fg="red", disabledforeground="red")
@@ -361,7 +361,7 @@ def clear_signal_override (*sig_ids:int):
             # get the signal that we are interested in
             signal = signals_common.signals[str(sig_id)]
             if signal["override"]:
-                logging.info ("Signal "+str(sig_id)+": Clearing signal override")
+                logging.info ("Signal "+str(sig_id)+": Clearing override")
                 # Clear the override and change the button colour
                 signal["override"] = False
                 signal["sigbutton"].config(fg="black",disabledforeground="grey50")
