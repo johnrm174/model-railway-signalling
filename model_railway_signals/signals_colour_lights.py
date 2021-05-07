@@ -52,7 +52,7 @@ class signal_sub_type(enum.Enum):
 
 # Define the aspects applicable to colour light signals
 class aspect_type(enum.Enum):  
-    unknown = 0
+    UNKNOWN = 0
     RED = 1
     YELLOW = 2
     GREEN = 3
@@ -352,7 +352,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "theatretext" : "",                          # SHARED - Initial Route setting to display (none)
                       "passedbutton" : button3,                    # SHARED - Button drawing object
                       "theatre" : theatre,                         # SHARED - Text drawing object
-                      "displayedaspect" : aspect_type.unknown,     # Type-specific - Signal aspect to display
+                      "displayedaspect" : aspect_type.UNKNOWN,     # Type-specific - Signal aspect to display
                       "overriddenaspect" : override_aspect,        # Type-specific - The 'Overridden' aspect
                       "externalcallback" : sig_callback,           # Type-specific - Callback for timed signal events
                       "subtype" : signal_subtype ,                 # Type-specific - subtype of the signal
@@ -371,9 +371,10 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Add the new signal to the dictionary of signals
         signals_common.signals[str(sig_id)] = new_signal
     
-        # We now need to refresh the signal drawing objects to reflect the initial state
-        # We don't set any route indications as signals are created with no routes displayed
+        # We now need to update the signal aspect to reflect the initial dtate 
+        # Also the feather route indications (to ensure we clear down the signal)
         update_colour_light_signal_aspect (sig_id)
+        refresh_feather_route_indication (sig_id)
     
     return ()
 
@@ -502,7 +503,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         # has transitioned either from RED or to RED.(This is OK as only signal types
         # with RED aspects can be created with feather or theatre route indications)
         # We also only update Feather Route Indications if a divergent route (other
-        # than MAIN) has been set (i.e. when we need to sisplay/inhibit a feather)
+        # than MAIN) has been set (i.e. when we need to display/inhibit a feather)
         if new_aspect == aspect_type.RED or current_aspect == aspect_type.RED:
             refresh_theatre_route_indication (sig_id)
             if signal["routeset"] != signals_common.route_type.MAIN:
