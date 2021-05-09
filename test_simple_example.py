@@ -25,7 +25,7 @@ use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3
 #----------------------------------------------------------------------
 
 def main_callback_function(item_id,callback_type):
-#    print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
+    print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
 
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
@@ -84,12 +84,13 @@ def main_callback_function(item_id,callback_type):
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     #--------------------------------------------------------------
-    
+    print ("here")
     update_signal(3, sig_ahead_id=5)
     update_signal(4, sig_ahead_id=5)
     
     if point_switched(1):
         set_route_indication(2,route=route_type.LH1)
+        set_approach_control (3, release_on_yellow=True)
         update_signal(2,sig_ahead_id=3)
     else:
         set_route_indication(2,route=route_type.MAIN)
@@ -150,7 +151,7 @@ canvas.pack()
 
 if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
-    initialise_pi_sprog(debug=True)
+    initialise_pi_sprog(debug=False)
     request_dcc_power_on()
     # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
@@ -213,6 +214,7 @@ create_colour_light_signal (canvas,2,275,200,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            approach_release_button = True,
                             refresh_immediately = False,
                             lhfeather45=True )
 create_colour_light_signal (canvas,3,600,150,
