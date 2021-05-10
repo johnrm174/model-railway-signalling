@@ -173,7 +173,7 @@ def raise_signal_passed_event (sig_id:int, external_callback):
 
 def raise_approach_release_event (sig_id:int, external_callback):
     # Call the common function to pulse the button object
-    signals_common.release_signal (sig_id)
+    signals_common.pulse_signal_release_button (sig_id)
     # reset the state of the signal
     signals_common.signals[str(sig_id)]["releaseonyel"] = False
     signals_common.signals[str(sig_id)]["releaseonred"] = False
@@ -260,8 +260,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
            signal_subtype in (signal_sub_type.distant,signal_sub_type.red_ylw)):
         logging.error ("Signal "+str(sig_id)+": 2 Aspect Y/G or R/Y signals should not have Route Indicators")
-    elif not (lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and approach_release_button:
-        logging.error ("Signal "+str(sig_id)+": Only junction signals can have approach release control")
     else:
         # set the font size for the buttons
         # We only want a small button for "Signal Passed" - hence a small font size
@@ -469,6 +467,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
     global logging
     
     # get the signals that we are interested in
+    # We just need to update the drawing objects - not our reference to them
     signal = signals_common.signals[str(sig_id)]
     if signal["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
@@ -481,8 +480,6 @@ def update_colour_light_subsidary_signal (sig_id:int):
         signal["canvas"].itemconfig (signal["pos2"],fill="grey")
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to NOT DISPLAYED")
         dcc_control.update_dcc_subsidary_signal(sig_id,False)
-    # We have just updated the drawing objects - not our reference to them
-    # Therefore no updates to save back to the dictionary of signals
     return ()
 
 # -------------------------------------------------------------------------
@@ -600,7 +597,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to "
                       + str(new_aspect).rpartition('.')[-1] + log_message)
-        signal["displayedaspect"] = new_aspect
+        # update the signal aspect
+        signals_common.signals[str(sig_ahead_id)]["displayedaspect"] = new_aspect
+        # refresh the signal aspect
         refresh_signal_aspects (sig_id)
         # We only refresh the feather and theatre route indications on signal aspect
         # changes if we need to enable/disable the route display (i.e. if the signal
@@ -612,9 +611,6 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             refresh_theatre_route_indication (sig_id)
             if signal["routeset"] != signals_common.route_type.MAIN:
                  refresh_feather_route_indication (sig_id)
-
-    # save the updates back to the dictionary of signals
-    signals_common.signals[str(sig_id)] = signal
             
     return ()
 

@@ -106,27 +106,6 @@ def toggle_subsidary (sig_id:int):
         signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
 
-# -------------------------------------------------------------------------
-# Generic function to flip the internal state of a subsidary signal
-# (associated with a main signal) and the state of the Signal button
-# Called on a Subsidary Signal "Button Press" event
-# -------------------------------------------------------------------------
-
-def toggle_subsidary (sig_id:int):
-    
-    global logging
-    
-    # Update the state of the subsidary button - Common to ALL signal types
-    if signals[str(sig_id)]["subclear"]:
-        logging.info ("Signal "+str(sig_id)+": Toggling subsidary to ON")
-        signals[str(sig_id)]["subclear"] = False
-        signals[str(sig_id)]["subbutton"].config(relief="raised",bg=common.bgraised)
-    else:
-        logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
-        signals[str(sig_id)]["subclear"] = True
-        signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
-    return ()
-
 #-------------------------------------------------------------------------
 # Thread to "Pulse" a TKINTER" Button - used to provide a clear
 # visual indication when "signal passed" events have been triggered
@@ -166,7 +145,7 @@ def pulse_signal_passed_button (sig_id:int):
 # "approach release" Button Events and external "approach release" events
 # -------------------------------------------------------------------------
 
-def release_signal (sig_id:int):
+def pulse_signal_release_button (sig_id:int):
     
     global logging
     
