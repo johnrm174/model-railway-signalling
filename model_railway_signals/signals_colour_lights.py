@@ -609,8 +609,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         # than MAIN) has been set (i.e. when we need to display/inhibit a feather)
         if new_aspect == aspect_type.RED or current_aspect == aspect_type.RED:
             refresh_theatre_route_indication (sig_id)
-            if signal["routeset"] != signals_common.route_type.MAIN:
-                 refresh_feather_route_indication (sig_id)
+            refresh_feather_route_indication (sig_id)
             
     return ()
 
