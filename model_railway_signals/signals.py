@@ -316,7 +316,6 @@ def set_signal_override (*sig_ids:int):
                 # Set the override state and change the button text to indicate override
                 signals_common.signals[str(sig_id)]["override"] = True
                 signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red", disabledforeground="red")
-
                 # now call the signal type-specific functions to update the signal
                 if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                     # We only refresh the aspect if the signal is configured to refresh when switched
@@ -443,29 +442,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            # do some basic validation
-            if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]=signals_colour_lights.signal_sub_type.home:
-                logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
-            elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]=signals_colour_lights.signal_sub_type.distant:
-                logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect dustant signal")
-            else:  
-                if release_on_yellow:
-                    if not signals_common.signals[str(sig_id)]["releaseonyel"]:
-                        logging.info ("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
-                    signals_common.signals[str(sig_id)]["releaseonyel"] = True
-                    signals_common.signals[str(sig_id)]["releaseonred"] = False
-
-                else:
-                    if not signals_common.signals[str(sig_id)]["releaseonred"]:
-                        logging.info ("Signal "+str(sig_id)+": Setting approach control (release on red)")
-                    signals_common.signals[str(sig_id)]["releaseonred"] = True
-                    signals_common.signals[str(sig_id)]["releaseonyel"] = False
-
-                # We only refresh the aspect if the signal is configured to refresh when switched
-                # Otherwise, it will be the responsibility of the calling programme to make another
-                # call to update the signal aspect accordingly (based on the signal ahead)
-                if signals_common.signals[str(sig_id)]["refresh"]:
-                    signals_colour_lights.update_colour_light_signal_aspect(sig_id)
+            signals_colour_lights.set_approach_control(sig_id,release_on_yellow)
     return()
 
 # -------------------------------------------------------------------------

@@ -96,6 +96,8 @@ class signal_state_type(enum.Enum):
     proceed = 2
     caution = 3
     prelim_caution = 4
+    flash_caution = 5
+    flash_prelim_caution = 6
     
 # Define empty dictionaries for the mappings and dcc addresses
 dcc_signal_mappings:dict = {}
@@ -134,12 +136,20 @@ def point_mapped(point_id):
 #                        prelim_caution = [[2,False]])
 #-----------------------------------------------------------------------------------------
 
-def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.truth_table,
-                    danger = [[0,False],], proceed = [[0,False],],
-                    caution = [[0,False],], prelim_caution = [[0,False],],
-                    LH1 = [[0,False],], LH2 = [[0,False],],
-                    RH1 = [[0,False],], RH2 = [[0,False],],
-                    MAIN = [[0,False],], call:int=0):
+def map_dcc_signal (sig_id:int,
+                    signal_type:dcc_signal_type = dcc_signal_type.truth_table,
+                    danger = [[0,False],],
+                    proceed = [[0,False],],
+                    caution = [[0,False],],
+                    prelim_caution = [[0,False],],
+                    flash_caution = [[0,False],],
+                    flash_prelim_caution = [[0,False],],
+                    LH1 = [[0,False],],
+                    LH2 = [[0,False],],
+                    RH1 = [[0,False],],
+                    RH2 = [[0,False],],
+                    MAIN = [[0,False],],
+                    call:int=0):
     
     global logging
     
@@ -174,6 +184,8 @@ def map_dcc_signal (sig_id:int, signal_type:dcc_signal_type = dcc_signal_type.tr
                 str(signal_state_type.proceed) : proceed, 
                 str(signal_state_type.caution) : caution,
                 str(signal_state_type.prelim_caution) : prelim_caution,
+                str(signal_state_type.flash_caution) : flash_caution,
+                str(signal_state_type.flash_prelim_caution) : flash_prelim_caution,
                 str(signals_common.route_type.LH1) : LH1,
                 str(signals_common.route_type.LH2) : LH2,
                 str(signals_common.route_type.RH1) : RH1,
@@ -220,7 +232,7 @@ def update_dcc_point(point_id:int, state:bool):
     global logging
     
     if point_mapped(point_id):
-        logging.info ("Point "+str(point_id)+": Retrieving DCC mappings for point")
+        logging.debug ("Point "+str(point_id)+": Retrieving DCC mappings for point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
@@ -240,7 +252,7 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
+        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
@@ -262,7 +274,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
+        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
@@ -281,7 +293,7 @@ def update_dcc_signal_route (sig_id, route:signals_common.route_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
+        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
         # Send the DCC commands to change the state if required

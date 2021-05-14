@@ -3,21 +3,14 @@ from model_railway_signals import *
 
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
 #----------------------------------------------------------------------
-# This programme provides a simple example of how to use the "points"
-# and "signals" modules, with the tkinter graphics library to create a
-# track schematic with a couple of points, add signals and then apply
-# a basic "interlocking" scheme. For a more complicated example (with
-# "track circuits", automatic signals and route displays see "my_layout"
+# This programme provides a simple example of how to use "approach control"
 # ---------------------------------------------------------------------
 
-#----------------------------------------------------------------------
-# Here are some global variables for you to change and see the effect
-#----------------------------------------------------------------------
-
-use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3 
+use_dcc_control = True               # will drive DCC signals via the Pi-SPROG-3
+approach_control_Yellow = True       # False = Approach Control on Red
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -25,37 +18,31 @@ use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3
 #----------------------------------------------------------------------
 
 def main_callback_function(item_id,callback_type):
-#    print ("***** CALLBACK - Item " + str(item_id) + " : " + str(callback_type))
 
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
-
-    # If its an external track sensor event then pulse the associated "signal passed"
-    # button - Here we use a straightforward 1-1 mapping as we gave our sensors the
-    # same IDs as their associated signals when we created them
-    if callback_type == track_sensor_callback_type.sensor_triggered:
-        pulse_signal_passed_button(item_id)
         
-    # Now deal with the track occupancy
-    if (callback_type == sig_callback_type.sig_passed
-           or callback_type == track_sensor_callback_type.sensor_triggered):
+    if callback_type == sig_callback_type.sig_passed:
         if item_id == 1:
             set_section_occupied(1)
         elif item_id == 2:
             clear_section_occupied(1)
-            if point_switched(1):
-                set_section_occupied(2)
-            else:
-                set_section_occupied(3)
+            set_section_occupied(2)
         elif item_id == 3:
             clear_section_occupied(2)
-            set_section_occupied(4)
+            set_section_occupied(3)
         elif item_id == 4:
             clear_section_occupied(3)
-            set_section_occupied(4)
+            if point_switched(1):
+                set_section_occupied(5)
+            else:
+                set_section_occupied(4)
         elif item_id == 5:
             trigger_timed_signal (5,0,3)
+            clear_section_occupied(5)
+        elif item_id == 6:
+            trigger_timed_signal (6,0,3)
             clear_section_occupied(4)
             
     #--------------------------------------------------------------
@@ -64,37 +51,30 @@ def main_callback_function(item_id,callback_type):
     # allow for manual setting/resetting the track occupancy sections
     #--------------------------------------------------------------
     
-    if section_occupied(1):
-        set_signal_override(1)
-    else:
-        clear_signal_override(1)
-    if ((section_occupied(2) and point_switched(1)) or
-            (section_occupied(3) and not point_switched(1))):
-        set_signal_override(2)
-    else:
-        clear_signal_override(2)
-    if section_occupied(4):
-        set_signal_override(3)
+    for I in (1,2,3):
+        if section_occupied(I):
+            set_signal_override(I)
+        else:
+            clear_signal_override(I)
+    if section_occupied(4) or section_occupied(5):
         set_signal_override(4)
     else:
-        clear_signal_override(3)
         clear_signal_override(4)
 
     #--------------------------------------------------------------
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     #--------------------------------------------------------------
-    update_signal(3, sig_ahead_id=5)
-    update_signal(4, sig_ahead_id=5)
     
     if point_switched(1):
-        set_route_indication(2,route=route_type.LH1)
-        update_signal(2,sig_ahead_id=3)
+        set_route_indication(4,route=route_type.LH1)
+        update_signal(4,sig_ahead_id=5)
     else:
-        set_route_indication(2,route=route_type.MAIN)
-        update_signal(2,sig_ahead_id=4)
-
-    update_signal(1, sig_ahead_id=2)
+        set_route_indication(4,route=route_type.MAIN)
+        update_signal(4,sig_ahead_id=6)
+    update_signal(3,sig_ahead_id=4)
+    update_signal(2,sig_ahead_id=3)
+    update_signal(1,sig_ahead_id=2)
     
     #-------------------------------------------------------------- 
     # Process the signal/point interlocking
@@ -102,29 +82,28 @@ def main_callback_function(item_id,callback_type):
     
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
     if not fpl_active(1):
-        lock_signal(2)
-    else:
-        unlock_signal(2)
-    # Signal 3 is locked (at danger) if point 2 is set against it 
-    if not point_switched(2):
-        lock_signal(3)
-    else:
-        unlock_signal(3)
-    # Signal 4 is locked (at danger) if point 2 is set against it 
-    if point_switched(2):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if signal 2 is set to clear
-    if signal_clear(2):
+    
+    if signal_clear(4):
         lock_point(1)
     else:
         unlock_point(1)
-    # Point 2 is locked if either signals 3 or 4 are set to clear
-    if signal_clear(3) or signal_clear(4):
-        lock_point(2)
-    else:
-        unlock_point(2)
+    
+    #-------------------------------------------------------------- 
+    # Here is the approach control code - we only want to set approach
+    # control when the route is initially set up - and then re-set the
+    # approach control when the signal is passed. this is so we don't
+    # inadvertantly re-set the approach control on other events received
+    # between the time the train releases the approach control and the
+    # train actually reaches the signal
+    #--------------------------------------------------------------
+
+    if ((callback_type == point_callback_type.point_switched and item_id==1 and point_switched(1)) or
+        (callback_type == sig_callback_type.sig_passed and item_id==4)):
+        set_approach_control (4,release_on_yellow=approach_control_Yellow)
+
         
     return()
 
@@ -135,8 +114,8 @@ def main_callback_function(item_id,callback_type):
 # Create the Window and canvas
 print ("Creating Window and Canvas")
 window = Tk()
-window.title("Simple Interlocking Example")
-canvas = Canvas(window,height=400,width=1000)
+window.title("An example of using Approach Control")
+canvas = Canvas(window,height=400,width=1100)
 canvas.pack()
 
 # If we are going to use DCC control, then we need to initialise the Pi-SPROG-3
@@ -149,53 +128,53 @@ if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
     initialise_pi_sprog (command_debug=False)
     request_dcc_power_on()
-    # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
+    # Signal 4 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
     # outputs A,B,C,D to drive our signal with E driving the feather indication
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
     # Address + 7), but we are only using the firs t 5 in this example
-    map_dcc_signal (sig_id = 2, signal_type = dcc_signal_type.truth_table,
+    map_dcc_signal (sig_id = 4, signal_type = dcc_signal_type.truth_table,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
                     LH1 = [[5,True]], MAIN = [[5, False]])
-    # This assumes a TrainTech DCC 4 Aspect Signal configured with a base address of 9
-    # In this example we are using base address & Base Address+1 to drive the signal
-    # Its an event driven signal - so a single command to change to a new aspect
-    map_dcc_signal (sig_id = 5, signal_type = dcc_signal_type.event_driven,
+    # Signals 2 and 3 assumes a TrainTech DCC 4 Aspect Signal with a base address of 9
+    # In these example we are using base address, Base Address+1 and Base_Address+2
+    # Its an event driven signal - so we only need a single command to change the aspect
+    map_dcc_signal (sig_id = 3, signal_type = dcc_signal_type.event_driven,
                     danger = [[9,False]],
                     proceed = [[9,True]],
                     caution = [[10,True]],
-                    prelim_caution = [[10,False]])
-    # Points are simply mapped to single addresses
-    map_dcc_point (1, 100)
-    map_dcc_point (2, 101)
+                    prelim_caution = [[10,False]],
+                    flash_caution = [[11,True]],
+                    flash_prelim_caution = [[11,False]])
+    map_dcc_signal (sig_id = 2, signal_type = dcc_signal_type.event_driven,
+                    danger = [[12,False]],
+                    proceed = [[12,True]],
+                    caution = [[13,True]],
+                    prelim_caution = [[13,False]],
+                    flash_caution = [[14,True]],
+                    flash_prelim_caution = [[14,False]])
 
 print ("Drawing Schematic and creating points")
 # Draw the the Main line (up to the first point)
-canvas.create_line(0,200,350,200,fill="black",width=3) 
+canvas.create_line(0,200,800,200,fill="black",width=3) 
 # Create (and draw) the first point - a left hand point with a Facing Point Lock
 # The "callback" is the name of the function (above) that will be called when something has changed
-create_point(canvas,1,point_type.LH, 375,200,"black",point_callback=main_callback_function,fpl=True) 
+create_point(canvas,1,point_type.LH, 825,200,"black",point_callback=main_callback_function,fpl=True) 
 # Draw the Main Line and Loop Line
-canvas.create_line(375,175,400,150,fill="black",width=3) # 45 degree line from point to start of loop
-canvas.create_line(400,150,675,150,fill="black",width=3) # Loop line
-canvas.create_line(400,200,675,200,fill="black",width=3) # Main Line
-canvas.create_line(675,150,700,175,fill="black",width=3) # 45 degree line from end of loop to second point
-# Create (and draw) the second point - a right hand point rotated by 180 degrees
-# No facing point lock needed for this point as direction of travel is left to right
-create_point(canvas,2,point_type.RH, 700,200,"black",
-                    point_callback=main_callback_function,orientation=180) 
-# Draw the continuation of the Main Line 
-canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from point to start of loop
+canvas.create_line(825,175,850,150,fill="black",width=3) # 45 degree line from point to start of loop
+canvas.create_line(850,150,1100,150,fill="black",width=3) # Loop line
+canvas.create_line(850,200,1100,200,fill="black",width=3) # Main Line
 
 # Create the track occupancy sections
 print ("Creating the track Occupancy Sections")
 create_section(canvas,1,175,200,section_callback=main_callback_function)
-create_section(canvas,2,500,150,section_callback=main_callback_function)
-create_section(canvas,3,500,200,section_callback=main_callback_function)
-create_section(canvas,4,800,200,section_callback=main_callback_function)
+create_section(canvas,2,400,200,section_callback=main_callback_function)
+create_section(canvas,3,625,200,section_callback=main_callback_function)
+create_section(canvas,4,925,200,section_callback=main_callback_function)
+create_section(canvas,5,925,150,section_callback=main_callback_function)
 
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed
@@ -210,33 +189,29 @@ create_colour_light_signal (canvas,2,275,200,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            refresh_immediately = False)
+create_colour_light_signal (canvas,3,500,200,
+                            signal_subtype = signal_sub_type.four_aspect,
+                            sig_callback=main_callback_function,
+                            sig_passed_button = True,
+                            refresh_immediately = False)
+create_colour_light_signal (canvas,4,725,200,
+                            signal_subtype = signal_sub_type.four_aspect,
+                            sig_callback=main_callback_function,
+                            sig_passed_button = True,
                             refresh_immediately = False,
-                            lhfeather45=True )
-create_colour_light_signal (canvas,3,600,150,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False)
-create_colour_light_signal (canvas,4,600,200,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False)
-create_colour_light_signal (canvas,5,900,200,
+                            approach_release_button = True,
+                            lhfeather45 = True)
+create_colour_light_signal (canvas,5,1000,150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             fully_automatic=True,
                             sig_passed_button=True)
-
-
-# Map an external track sensor for signal 2 - For simplicity, we'll give it the same ID as the signal
-create_track_sensor (2, gpio_channel = 4,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-
-# Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
-print ("Setting Initial Interlocking")
-lock_signal(3)
+create_colour_light_signal (canvas,6,1000,200,
+                            signal_subtype = signal_sub_type.four_aspect,
+                            sig_callback=main_callback_function,
+                            fully_automatic=True,
+                            sig_passed_button=True)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
