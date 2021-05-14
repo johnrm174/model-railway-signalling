@@ -8,12 +8,12 @@
 #           - with or without amanual control buttons
 #
 # Common features supported by Colour Light signals
-#           - Create Signals (as above)
 #           - set_route_indication (Route Type and theatre text)
 #           - update_signal (based on a specified signal Ahead)
 #           - lock_subsidary_signal / unlock_subsidary_signal
 #           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override 
+#           - set_signal_override / clear_signal_override
+#           - set_approach_control / clear_approch_control
 #           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 

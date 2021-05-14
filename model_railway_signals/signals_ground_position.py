@@ -12,6 +12,7 @@
 #
 # Common features supported by Ground Position Colour Light signals
 #           - lock_signal / unlock_signal
+#           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
 # change the way we import depending on whether we are running locally or not
