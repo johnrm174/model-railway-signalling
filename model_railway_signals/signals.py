@@ -129,7 +129,7 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
     
     global logging
     
-    # Validate the signal exists and it is not a Ground Position Signal
+    # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal does not exist")
     elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
@@ -137,10 +137,8 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
     elif sig_id == sig_ahead_id: 
         logging.error ("Signal "+str(sig_id)+": Signal ahead "+str(sig_ahead_id)+" is the same ID")
     else:
-        # get the signals that we are interested in
-        signal = signals_common.signals[str(sig_id)]
-        # now call the signal type-specific functions to update the signal
-        if signal["sigtype"] == signals_common.sig_type.colour_light:
+        # Call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_signal_aspect (sig_id,sig_ahead_id )
     return()
 
@@ -153,15 +151,12 @@ def set_route_indication (sig_id:int, route:signals_common.route_type = signals_
     
     global logging
     
-    # Validate the signal exists and it is not a Ground Position Signal
+    # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal does not exist")
     else:
-        # get the signals that we are interested in
-        signal = signals_common.signals[str(sig_id)]
-        
-        # now call the signal type-specific functions to update the signal
-        if signal["sigtype"] == signals_common.sig_type.colour_light:
+        # Call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_route_indication (sig_id,route,theatre_text)           
     return()
 
@@ -173,14 +168,13 @@ def signal_clear (sig_id:int):
     
     global logging
     
-    # Validate the signal exists and it is not a Ground Position Signal
+    # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal does not exist")
         sig_clear = False
     else:
-        # get the signal that we are interested in
-        signal = signals_common.signals[str(sig_id)]
-        sig_clear = signal["sigclear"]
+        # get the signal state to return
+        sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
     return (sig_clear)
 
 # -------------------------------------------------------------------------
@@ -197,9 +191,8 @@ def subsidary_signal_clear (sig_id:int):
         logging.error ("Signal "+str(sig_id)+": Signal does not exist")
         sig_clear = False
     else:
-        # get the signals that we are interested in
-        signal = signals_common.signals[str(sig_id)]
-        sig_clear = signal["subclear"]
+        # get the subsidary state to return
+        sig_clear = signals_common.signals[str(sig_id)]["subclear"]
     return (sig_clear)
 
 # -------------------------------------------------------------------------
@@ -216,17 +209,16 @@ def lock_signal (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Signal does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
             # Only lock it if its not already locked
-            if not signal["siglocked"]:
+            if not signals_common.signals[str(sig_id)]["siglocked"]:
                 logging.info ("Signal "+str(sig_id)+": Locking signal")
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
-                if signal["sigclear"]: logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF")            
+                if signals_common.signals[str(sig_id)]["sigclear"]:
+                    logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF")            
                 # Disable the Signal button to lock it
-                signal["sigbutton"].config(state="disabled")
-                signal["siglocked"] = True
+                signals_common.signals[str(sig_id)]["sigbutton"].config(state="disabled")
+                signals_common.signals[str(sig_id)]["siglocked"] = True
     return()
 
 # -------------------------------------------------------------------------
@@ -243,14 +235,13 @@ def unlock_signal (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Signal to unlock does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
             # Only unlock it if its not already locked
-            if signal["siglocked"]:
+            if signals_common.signals[str(sig_id)]["siglocked"]:
                 logging.info ("Signal "+str(sig_id)+": Unlocking signal")
                 # Enable the Signal button to unlock it (if its not a fully automatic signal)
-                if not signal["automatic"]: signal["sigbutton"].config(state="normal")
-                signal["siglocked"] = False
+                if not signals_common.signals[str(sig_id)]["automatic"]:
+                    signals_common.signals[str(sig_id)]["sigbutton"].config(state="normal")
+                signals_common.signals[str(sig_id)]["siglocked"] = False
     return()
 
 # -------------------------------------------------------------------------
@@ -268,17 +259,16 @@ def lock_subsidary_signal (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Subsidary signal to lock does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
             # Only lock it if its not already locked
-            if not signal["sublocked"]:
+            if not signals_common.signals[str(sig_id)]["sublocked"]:
                 logging.info ("Signal "+str(sig_id)+": Locking subsidary")
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
-                if signal["subclear"]: logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF")            
+                if signals_common.signals[str(sig_id)]["subclear"]:
+                    logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF")            
                 # Disable the Button to lock the subsidary signal
-                signal["subbutton"].config(state="disabled")        
-                signal["sublocked"] = True
+                signals_common.signals[str(sig_id)]["subbutton"].config(state="disabled")        
+                signals_common.signals[str(sig_id)]["sublocked"] = True
     return()
 
 # -------------------------------------------------------------------------
@@ -296,14 +286,12 @@ def unlock_subsidary_signal (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Subsidary signal to unlock does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
             # Only unlock it if its not already locked
-            if signal["sublocked"]:
+            if signals_common.signals[str(sig_id)]["sublocked"]:
                 logging.info ("Signal "+str(sig_id)+": Unlocking subsidary")
                 # Re-enable the Button to unlock the subsidary signal
-                signal["subbutton"].config(state="normal")
-                signal["sublocked"] = False
+                signals_common.signals[str(sig_id)]["subbutton"].config(state="normal")
+                signals_common.signals[str(sig_id)]["sublocked"] = False
     return()
 
 # -------------------------------------------------------------------------
@@ -323,23 +311,19 @@ def set_signal_override (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Signal to Override does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
-            if not signal["override"]:
+            if not signals_common.signals[str(sig_id)]["override"]:
                 logging.info ("Signal "+str(sig_id)+": Setting override")
                 # Set the override state and change the button text to indicate override
-                signal["override"] = True
-                signal["sigbutton"].config(fg="red", disabledforeground="red")
-                # Update the dictionary of signals
-                signals_common.signals[str(sig_id)] = signal
-
+                signals_common.signals[str(sig_id)]["override"] = True
+                signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red", disabledforeground="red")
                 # now call the signal type-specific functions to update the signal
-                if signal["sigtype"] == signals_common.sig_type.colour_light:
-                    # Refresh the aspect - even if the signal is configured to not refresh when switched
-                    # On the basis that if we override a signal - we're effectively setting it to DANGER
-                    # and the aspect of the signal ahead will make no difference to the displayed aspect
-                    signals_colour_lights.update_colour_light_signal_aspect(sig_id)
-                elif signal["sigtype"] == signals_common.sig_type.ground_pos_light:
+                if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+                    # We only refresh the aspect if the signal is configured to refresh when switched
+                    # Otherwise, it will be the responsibility of the calling programme to make another
+                    # call to update the signal aspect accordingly (based on the signal ahead)
+                    if signals_common.signals[str(sig_id)]["refresh"]:
+                        signals_colour_lights.update_colour_light_signal_aspect(sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
         return()
 
@@ -358,22 +342,19 @@ def clear_signal_override (*sig_ids:int):
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Signal to Clear Override does not exist")
         else:
-            # get the signal that we are interested in
-            signal = signals_common.signals[str(sig_id)]
-            if signal["override"]:
+            if signals_common.signals[str(sig_id)]["override"]:
                 logging.info ("Signal "+str(sig_id)+": Clearing override")
                 # Clear the override and change the button colour
-                signal["override"] = False
-                signal["sigbutton"].config(fg="black",disabledforeground="grey50")
-                # Update the dictionary of signals
-                signals_common.signals[str(sig_id)] = signal
+                signals_common.signals[str(sig_id)]["override"] = False
+                signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
                 # now call the signal type-specific functions to update the signal
-                if signal["sigtype"] == signals_common.sig_type.colour_light:
+                if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                     # We only refresh the aspect if the signal is configured to refresh when switched
                     # Otherwise, it will be the responsibility of the calling programme to make another
                     # call to update the signal aspect accordingly (based on the signal ahead)
-                    if signal["refresh"]: signals_colour_lights.update_colour_light_signal_aspect(sig_id)
-                elif signal["sigtype"] == signals_common.sig_type.ground_pos_light:
+                    if signals_common.signals[str(sig_id)]["refresh"]:
+                        signals_colour_lights.update_colour_light_signal_aspect(sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
     return()
 
@@ -398,13 +379,11 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
         logging.error ("Signal "+str(sig_id)+": Signal to Trigger does not exist")
     else:
         logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
-        # get the signal that we are interested in
-        signal = signals_common.signals[str(sig_id)]
-        if signal["override"]:
+        if signals_common.signals[str(sig_id)]["override"]:
             logging.warning ("Signal "+str(sig_id)+": Timed signal is already overriden - not Triggering signal")
         else:
             # Call the signal type-specific functions to trigger the signal
-            if signal["sigtype"] == signals_common.sig_type.colour_light:
+            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                 signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
     return()
 
@@ -418,15 +397,14 @@ def toggle_signal (sig_id:int):
     
     global logging
     
+    # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal to toggle does not exist")
     else:
-        # get the signal that we are interested in
-        signal = signals_common.signals[str(sig_id)]
         # now call the signal type-specific functions to update the signal
-        if signal["sigtype"] == signals_common.sig_type.colour_light:
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_colour_light_signal(sig_id)
-        elif signal["sigtype"] == signals_common.sig_type.ground_pos_light:
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
     return()
 
@@ -440,15 +418,49 @@ def toggle_subsidary_signal (sig_id:int):
     
     global logging
     
+    # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Subsidary signal to toggle does not exist")
     else:
-        # get the signal that we are interested in
-        signal = signals_common.signals[str(sig_id)]
         # now call the signal type-specific functions to update the signal
-        if signal["sigtype"] == signals_common.sig_type.colour_light:
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_subsidary_signal(sig_id)
     return()
 
+# -------------------------------------------------------------------------
+# Externally called function to set the "approach conrol" for the signal
+# Calls the signal type-specific functions depending on the signal type
+# -------------------------------------------------------------------------
+
+def set_approach_control (sig_id:int, release_on_yellow:bool = False):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal to set approach control does not exist")
+    else:
+        # now call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            signals_colour_lights.set_approach_control(sig_id,release_on_yellow)
+    return()
+
+# -------------------------------------------------------------------------
+# Externally called function to clear the "approach control" for the signal
+# Calls the signal type-specific functions depending on the signal type
+# -------------------------------------------------------------------------
+
+def clear_approach_control (sig_id:int):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal to clear approach control does not exist")
+    else:
+        # now call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            signals_colour_lights.raise_approach_release_event (sig_id)
+    return()
 
 ##########################################################################################

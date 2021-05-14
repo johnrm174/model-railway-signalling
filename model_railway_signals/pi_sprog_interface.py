@@ -71,6 +71,7 @@ serial_port = serial.Serial ()
 can_bus_id = 1                # The arbitary CANBUS ID we will use for the Pi
 pi_cbus_node = 1              # The arbitary CBUS Node ID we will use for the Pi
 transmit_delay = 0.02         # The delay between sending CBUS Messages (in seconds)
+debug = False                 # Enhanced Debug logging - set when Pi Sprog is initialised
 
 # Global Variables (configured/changed by the functions in the module)
 track_power_on = False        # if the track power is OFF we wont try sending any commands
@@ -92,6 +93,7 @@ def thread_to_send_buffered_data ():
     global output_buffer
     global transmit_delay
     global logging
+    global debug
     
     while True:
         # Perform a short sleep so the thread doesn't max out the CPU
@@ -102,7 +104,7 @@ def thread_to_send_buffered_data ():
             command_string = output_buffer[0]
             output_buffer.pop(0)
             # Print the Transmitted message (if the appropriate debug level is set)
-            logging.debug ("Pi-SPROG - Transmit CBUS Message: " + command_string)
+            if debug:logging.debug ("Pi-SPROG - Transmit CBUS Message: " + command_string)
             # Write the CBUS Message to the serial port
             serial_port.write(bytes(command_string,"Ascii"))
             # Sleep before sending the next CBUS message
@@ -121,6 +123,7 @@ def thread_to_read_received_data ():
     global track_power_on
     global service_mode_status
     global logging
+    global debug
     
     while True:
         # Perform a short sleep so the thread doesn't max out the CPU
@@ -128,7 +131,7 @@ def thread_to_read_received_data ():
         # Read from the port until we get the GridConnect Protocol message termination character
         byte_string = serial_port.read_until(b";")
         # Print the Received message (if the appropriate debug level is set
-        logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
+        if debug:logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
         # Extract the OpCode - so we can decide what to do
         op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
         
@@ -245,15 +248,19 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
 
 #------------------------------------------------------------------------------
 # Externally Called Function to establish basic comms with the PI-SPROG
-# All this does (with debug_level = 0) is to open the port. With Debug
-# Level set >0 it also requests the status of the Command station
+# All this does (with command_debug = False) is to open the port. With 
+# command_debug = True it also requests the status of the Command station
+# and will enable an "enhanced" level of debug logging - namely logging
+# of all the CBUS commands sent to the Pi SPROG
 #------------------------------------------------------------------------------
 
-def initialise_pi_sprog (debug:bool = False):
+def initialise_pi_sprog (command_debug:bool = False):
 
     global logging
+    global debug
     logging.info ("Pi-SPROG: Opening Comms Port")
     
+    debug = command_debug
     # We're not receiving anything else on this port so its OK to set up the port without
     # a timeout - as we are only interested in "complete" messages (terminated by ';')
     serial_port.baudrate = 115200
@@ -342,10 +349,10 @@ def send_accessory_short_event (address:int, active:bool):
         byte4 = (address & 0x00ff)
         #  Send a ASON or ASOF Command (Accessoy Short On or Accessory Short Off)
         if active:
-            logging.info ("Pi-SPROG: Sending DCC command ASON (Accessory Short ON) to DCC address: "+ str(address))
+            logging.debug ("Pi-SPROG: Sending DCC command ASON (Accessory Short ON) to DCC address: "+ str(address))
             send_cbus_command (2, 3, 152, byte1, byte2, byte3, byte4)
         else:
-            logging.info ("Pi-SPROG: Sending DCC command ASOF (Accessory Short OFF) to DCC address: "+ str(address))
+            logging.debug ("Pi-SPROG: Sending DCC command ASOF (Accessory Short OFF) to DCC address: "+ str(address))
             send_cbus_command (2, 3, 153, byte1, byte2, byte3, byte4)
     return ()
 
@@ -447,7 +454,7 @@ def send_DCC_accessory_decoder_packet (address:int, active:bool, output_channel:
         byte3 = (byte1 ^ byte2)
         
         #  Send a RDCC3 Command (Request 3-Byte DCC Packet) via the CBUS
-        logging.info ("PI >> SPROG - RDCC3 (Send 3 Byte DCC Packet) : Address:"
+        logging.debug ("PI >> SPROG - RDCC3 (Send 3 Byte DCC Packet) : Address:"
                         + str(address) + "  Channel:" + str(output_channel) +"  State:" + str(active))
         send_cbus_command (2, 2, 128, repeat, byte1, byte2, byte3)
 
@@ -505,7 +512,7 @@ def send_extended_DCC_accessory_decoder_packet (address:int, aspect:int, repeat:
         byte4 = (byte1 ^ byte2 ^ byte3);
         
         #  Send a RDCC4 Command (Request 4-Byte DCC Packet) via the CBUS
-        logging.info ("PI >> SPROG - RDCC4 (Send 4 Byte DCC Packet) : Address:"
+        logging.debug ("PI >> SPROG - RDCC4 (Send 4 Byte DCC Packet) : Address:"
                         + str(address) + "  Aspect:" + str(aspect))
         send_cbus_command (2, 2, 160, repeat, byte1, byte2, byte3, byte4)
 

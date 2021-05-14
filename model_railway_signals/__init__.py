@@ -26,6 +26,8 @@ from .signals import signal_clear
 from .signals import subsidary_signal_clear
 from .signals import set_signal_override
 from .signals import clear_signal_override
+from .signals import set_approach_control
+from .signals import clear_approach_control
 from .signals import trigger_timed_signal
 
 from .track_sections import section_callback_type
@@ -78,6 +80,8 @@ __all__ = [
         'subsidary_signal_clear',
         'set_signal_override',
         'clear_signal_override',
+        'set_approach_control',
+        'clear_approach_control',
         'trigger_timed_signal',
         'pulse_signal_passed_button',
       # Public track_section types

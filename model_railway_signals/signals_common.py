@@ -40,6 +40,7 @@ class sig_callback_type(enum.Enum):
     sub_switched = 2   # The subsidary signal has been switched by the user
     sig_passed = 3     # The "signal passed" has been activated by the user
     sig_updated = 4    # The signal aspect has been changed/updated via an override
+    sig_released = 5  # The signal has been "released" on the approach of a train
 
 # Define the main signal types that can be created
 
@@ -73,19 +74,15 @@ def toggle_signal (sig_id:int):
     
     global logging
     
-    # get the signal we are interested in
-    signal = signals[str(sig_id)]
     # Update the state of the signal button - Common to ALL signal types
-    if signal["sigclear"]:
+    if signals[str(sig_id)]["sigclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
-        signal["sigclear"] = False
-        signal["sigbutton"].config(relief="raised",bg=common.bgraised)
+        signals[str(sig_id)]["sigclear"] = False
+        signals[str(sig_id)]["sigbutton"].config(relief="raised",bg=common.bgraised)
     else:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
-        signal["sigclear"] = True
-        signal["sigbutton"].config(relief="sunken",bg=common.bgsunken)
-    # update the dictionary of signals
-    signals[str(sig_id)] = signal;
+        signals[str(sig_id)]["sigclear"] = True
+        signals[str(sig_id)]["sigbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
 
 # -------------------------------------------------------------------------
@@ -98,49 +95,64 @@ def toggle_subsidary (sig_id:int):
     
     global logging
     
-    # get the signal we are interested in
-    signal = signals[str(sig_id)]
     # Update the state of the subsidary button - Common to ALL signal types
-    if signal["subclear"]:
+    if signals[str(sig_id)]["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling subsidary to ON")
-        signal["subclear"] = False
-        signal["subbutton"].config(relief="raised",bg=common.bgraised)
+        signals[str(sig_id)]["subclear"] = False
+        signals[str(sig_id)]["subbutton"].config(relief="raised",bg=common.bgraised)
     else:
         logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
-        signal["subclear"] = True
-        signal["subbutton"].config(relief="sunken",bg=common.bgsunken)
-    # update the dictionary of signals
-    signals[str(sig_id)] = signal;
+        signals[str(sig_id)]["subclear"] = True
+        signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
 
+#-------------------------------------------------------------------------
+# Thread to "Pulse" a TKINTER" Button - used to provide a clear
+# visual indication when "signal passed" events have been triggered
 # -------------------------------------------------------------------------
-# Generic function to trigger a "signal passed" visual indication by
-# pulsing the signal passed button (if the signal was created with one)
-# Normally called on "Signal Passed" Button Events and external events
+
+def thread_to_pulse_button (button, duration):
+    button.config(bg="red")
+    time.sleep (duration)
+    button.config(bg=common.bgraised)
+    return ()
+    
+# -------------------------------------------------------------------------
+# Generic function to generate a "signal passed" visual indication by pulsing
+# the signal passed button (if the signal was created with one). Called on
+# "Signal Passed" Button Events and external "signal passed" events. As we
+# expect this function to be called from external code we validate the call
 # -------------------------------------------------------------------------
 
 def pulse_signal_passed_button (sig_id:int):
-
-    #-------------------------------------------------------------------------
-    # Thread to "Pulse" the "signal passed" Button - used to provide a clear
-    # visual indication when "signal passed" events have been triggered
-    # -------------------------------------------------------------------------
-
-    def thread_to_pulse_sig_passed_button (sig_id, duration):
-        # get the signal we are interested in
-        signal = signals[str(sig_id)]
-        signal["passedbutton"].config(bg="red")
-        time.sleep (duration)
-        signal["passedbutton"].config(bg=common.bgraised)
-        return ()
-    
-    # The main function code begins here
     
     global logging
     
     logging.info ("Signal "+str(sig_id)+": Pulsing signal passed button")
-    # Call the thread to pulse the signal passed button
-    x = threading.Thread(target=thread_to_pulse_sig_passed_button,args=(sig_id, 1.0))
+    # Validate the signal exists 
+    if not sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+    else:
+        button = signals[str(sig_id)]["passedbutton"]
+        # Call the thread to pulse the button
+        x = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
+        x.start()
+    return ()
+
+# -------------------------------------------------------------------------
+# Generic function to generate a "approach release" visual indication by pulsing
+# the approach release button (if the signal was created with one). Called on
+# "approach release" Button Events and external "approach release" events
+# -------------------------------------------------------------------------
+
+def pulse_signal_release_button (sig_id:int):
+    
+    global logging
+    
+    logging.info ("Signal "+str(sig_id)+": Pulsing approach release button")
+    button = signals[str(sig_id)]["releasebutton"]
+    # Call the thread to pulse the button
+    x = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
     x.start()
     return ()
 
