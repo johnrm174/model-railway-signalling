@@ -2,8 +2,6 @@ from tkinter import *
 from model_railway_signals import *
 
 import logging
-#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use the "points"
@@ -17,7 +15,10 @@ logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 # Here are some global variables for you to change and see the effect
 #----------------------------------------------------------------------
 
-use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3 
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO) 
+use_dcc_control = True    # will drive DCC signals via the Pi-SPROG-3
+debug_dcc = False         # Provides additional logging of the DCC CBUS command strings
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -147,7 +148,7 @@ canvas.pack()
 
 if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
-    initialise_pi_sprog (command_debug=False)
+    initialise_pi_sprog (dcc_debug_mode=debug_dcc)
     request_dcc_power_on()
     # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
@@ -235,8 +236,9 @@ create_track_sensor (2, gpio_channel = 4,
                     sensor_timeout = 3.0)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
-print ("Setting Initial Interlocking")
+print ("Setting Initial Route and Interlocking")
 lock_signal(3)
+set_route_indication (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")

@@ -11,7 +11,11 @@
 #
 # The following functions are designed to be called by external modules:
 #
-#   initialise_pi_sprog (Open the comms port to the Pi Sprog and requests status if Debug = True)
+#   initialise_pi_sprog (Open the comms port to the Pi Sprog)
+#      Optional Parameters:
+#         dcc_debug_mode:bool - Enable an additional level of logging for the actual CBUS
+#                               commands being sent to the Pi-SPROG. Will also Request
+#                               and report the command station status from the Pi-Sprog)
 #
 #   send_accessory_short_event (sends a short accessory event - either on or off)
 #             (events are only sent if we think the track power is currently switched on)
@@ -63,6 +67,7 @@ import threading
 import serial
 import time
 import logging
+import queue
 
 # Create a new class of the Serial Port (port is configured/opened later)
 serial_port = serial.Serial ()
@@ -79,7 +84,7 @@ service_mode_status = 0       # The response code from programming a CV
 
 # This is the output buffer for messages to be sent to the SPROG
 # We use a buffer so we can throttle the transmit rate without blocking
-output_buffer = []            
+output_buffer = queue.Queue()
 
 #------------------------------------------------------------------------------
 # Internal thread to write queued CBUS messages to the Serial Port with a
@@ -96,19 +101,13 @@ def thread_to_send_buffered_data ():
     global debug
     
     while True:
-        # Perform a short sleep so the thread doesn't max out the CPU
-        time.sleep (0.001)
-        # Check if there are any messages in the output buffer that need to be sent
-        if len(output_buffer) > 0:
-            # Read the first CBUS Message from the list and then remove from the list
-            command_string = output_buffer[0]
-            output_buffer.pop(0)
-            # Print the Transmitted message (if the appropriate debug level is set)
-            if debug:logging.debug ("Pi-SPROG - Transmit CBUS Message: " + command_string)
-            # Write the CBUS Message to the serial port
-            serial_port.write(bytes(command_string,"Ascii"))
-            # Sleep before sending the next CBUS message
-            time.sleep(transmit_delay)
+        command_string = output_buffer.get()
+        #Print the Transmitted message (if the appropriate debug level is set)
+        if debug:logging.debug ("Pi-SPROG - Transmit CBUS Message: " + command_string)
+        # Write the CBUS Message to the serial port
+        serial_port.write(bytes(command_string,"Ascii"))
+        # Sleep before sending the next CBUS message
+        time.sleep(transmit_delay)
     return()
     
 #------------------------------------------------------------------------------
@@ -126,8 +125,6 @@ def thread_to_read_received_data ():
     global debug
     
     while True:
-        # Perform a short sleep so the thread doesn't max out the CPU
-        time.sleep (0.001)
         # Read from the port until we get the GridConnect Protocol message termination character
         byte_string = serial_port.read_until(b";")
         # Print the Received message (if the appropriate debug level is set
@@ -243,7 +240,7 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
         # Finally - add the command string termination character
         command_string = command_string + ";"
         # Add the command to the output buffer (to be picked up by the Tx thread)
-        output_buffer.append(command_string)
+        output_buffer.put(command_string)
     return()
 
 #------------------------------------------------------------------------------
@@ -254,13 +251,13 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
 # of all the CBUS commands sent to the Pi SPROG
 #------------------------------------------------------------------------------
 
-def initialise_pi_sprog (command_debug:bool = False):
+def initialise_pi_sprog (dcc_debug_mode:bool = False):
 
     global logging
     global debug
     logging.info ("Pi-SPROG: Opening Comms Port")
     
-    debug = command_debug
+    debug = dcc_debug_mode
     # We're not receiving anything else on this port so its OK to set up the port without
     # a timeout - as we are only interested in "complete" messages (terminated by ';')
     serial_port.baudrate = 115200

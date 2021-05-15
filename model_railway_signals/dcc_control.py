@@ -232,7 +232,7 @@ def update_dcc_point(point_id:int, state:bool):
     global logging
     
     if point_mapped(point_id):
-        logging.debug ("Point "+str(point_id)+": Retrieving DCC mappings for point")
+        logging.info ("Point "+str(point_id)+": Sending DCC Bus commands to switch point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
@@ -252,7 +252,7 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
@@ -274,7 +274,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
@@ -293,7 +293,7 @@ def update_dcc_signal_route (sig_id, route:signals_common.route_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
+        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change route display")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
         # Send the DCC commands to change the state if required

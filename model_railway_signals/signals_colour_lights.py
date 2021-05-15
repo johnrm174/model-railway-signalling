@@ -234,6 +234,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
            signal_subtype == signal_sub_type.distant):
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Route Indicators")
+    elif approach_release_button and signal_subtype == signal_sub_type.distant:
+        logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
     else:
         # set the font size for the buttons
         # We only want a small button for "Signal Passed" - hence a small font size
@@ -397,7 +399,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "subbutton" : button2,                       # MANDATORY - Button drawing object (subsidary signal)
                       "releaseonred" : False,                      # SHARED - State of the "Approach Release for the signal
                       "releaseonyel" : False,                      # SHARED - State of the "Approach Release for the signal
-                      "routeset" : signals_common.route_type.MAIN, # SHARED - Initial Route setting to display (none)
+                      "routeset" : signals_common.route_type.NONE, # SHARED - Initial Route setting to display (none)
                       "theatretext" : "",                          # SHARED - Initial Route setting to display (none)
                       "passedbutton" : button3,                    # SHARED - Button drawing object
                       "releasebutton" : button4,                   # SHARED - Button drawing object
@@ -734,23 +736,25 @@ def refresh_feather_route_indication (sig_id):
     signal["canvas"].itemconfig (signal["lhf90"],fill="black")
     signal["canvas"].itemconfig (signal["rhf45"],fill="black")
     signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-    # Only display the route indication if the signal is clear and not overriden to red
-    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-        logging.info ("Signal "+str(sig_id)+": Setting route indication to "
-                      + str(signal["routeset"]).rpartition('.')[-1])
-        if signal["routeset"] == signals_common.route_type.LH1:
-            signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-        elif signal["routeset"] == signals_common.route_type.LH2:
-            signal["canvas"].itemconfig (signal["lhf90"],fill="white")
-        elif signal["routeset"] == signals_common.route_type.RH1:
-            signal["canvas"].itemconfig (signal["rhf45"],fill="white")
-        elif signal["routeset"] == signals_common.route_type.RH2:
-            signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-        dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
-    else:
-        # If the signal is set to Red then we need to inhibit the indications
-        logging.info ("Signal "+str(sig_id)+": Inhibiting route indication (signal is displaying RED)")
-        dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.MAIN)
+    # Only bother updating the signal if the routes are bring used
+    if signal["routeset"] != signals_common.route_type.NONE:
+        # Only display the route indication if the signal is clear and not overriden to red
+        if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
+            logging.info ("Signal "+str(sig_id)+": Setting feather light route indication for "
+                          + str(signal["routeset"]).rpartition('.')[-1])
+            if signal["routeset"] == signals_common.route_type.LH1:
+                signal["canvas"].itemconfig (signal["lhf45"],fill="white")
+            elif signal["routeset"] == signals_common.route_type.LH2:
+                signal["canvas"].itemconfig (signal["lhf90"],fill="white")
+            elif signal["routeset"] == signals_common.route_type.RH1:
+                signal["canvas"].itemconfig (signal["rhf45"],fill="white")
+            elif signal["routeset"] == signals_common.route_type.RH2:
+                signal["canvas"].itemconfig (signal["rhf90"],fill="white")
+            dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
+        else:
+            # If the signal is set to Red then we need to inhibit the indications
+            logging.info ("Signal "+str(sig_id)+": Inhibiting all feathers indication (signal is displaying RED)")
+            dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.MAIN)
 
     return ()
 
@@ -865,10 +869,12 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     global logging
     
     # do some basic validation specific to this function for colour light signals
-    if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
+    if signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control for a 2 aspect distant signal")
+    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
-    elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
+    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release ony yellow red) for a 2 aspect red/yellow signal")
     else:
         # give an indication that the approach control has been set for the signal
         signals_common.signals[str(sig_id)]["sigbutton"].config(underline=0)

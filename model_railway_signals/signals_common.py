@@ -25,6 +25,7 @@ import logging
 # by subsidary "arms" either side of the main signal arm
 
 class route_type(enum.Enum):
+    NONE = 0
     MAIN = 1
     LH1 = 2          # immediate left
     LH2 = 3          # far left

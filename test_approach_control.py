@@ -3,7 +3,7 @@ from model_railway_signals import *
 
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use "approach control"
@@ -126,7 +126,7 @@ canvas.pack()
 
 if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
-    initialise_pi_sprog (command_debug=False)
+    initialise_pi_sprog (dcc_debug_mode=False)
     request_dcc_power_on()
     # Signal 4 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
@@ -212,6 +212,9 @@ create_colour_light_signal (canvas,6,1000,200,
                             sig_callback=main_callback_function,
                             fully_automatic=True,
                             sig_passed_button=True)
+
+print ("Setting Initial Route and Interlocking")
+set_route_indication (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
