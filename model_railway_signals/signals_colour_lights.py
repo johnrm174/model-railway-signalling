@@ -455,7 +455,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
     else:
         signal["canvas"].itemconfig (signal["pos1"],fill="grey")
         signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to NOT DISPLAYED")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK/DARK")
         dcc_control.update_dcc_subsidary_signal(sig_id,False)
     return ()
 
