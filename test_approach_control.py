@@ -67,10 +67,10 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
     
     if point_switched(1):
-        set_route_indication(4,route=route_type.LH1)
+        set_route(4,route=route_type.LH1)
         update_signal(4,sig_ahead_id=5)
     else:
-        set_route_indication(4,route=route_type.MAIN)
+        set_route(4,route=route_type.MAIN)
         update_signal(4,sig_ahead_id=6)
     update_signal(3,sig_ahead_id=4)
     update_signal(2,sig_ahead_id=3)
@@ -214,7 +214,7 @@ create_colour_light_signal (canvas,6,1000,200,
                             sig_passed_button=True)
 
 print ("Setting Initial Route and Interlocking")
-set_route_indication (2,route_type.MAIN)
+set_route (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")

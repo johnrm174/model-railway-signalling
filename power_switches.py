@@ -269,9 +269,9 @@ def update_track_power_section_switches():
             set_switch(power_branch_west,1)
         elif (signal_clear(5) or signal_clear (6)) and not point_switched(2):
             set_switch(power_branch_west,1)
-        elif subsidary_signal_clear(2) or subsidary_signal_clear(6):
+        elif subsidary_clear(2) or subsidary_clear(6):
             set_switch(power_branch_west,2)
-        elif subsidary_signal_clear(5) and point_switched(4) and not point_switched(5):
+        elif subsidary_clear(5) and point_switched(4) and not point_switched(5):
             set_switch(power_branch_west,2)
         else:
             clear_switch (power_branch_west,1)
@@ -282,25 +282,25 @@ def update_track_power_section_switches():
             set_switch(power_branch_east,1)
         elif (signal_clear(7) or signal_clear (8)) and not point_switched(8):
             set_switch(power_branch_east,1)
-        elif subsidary_signal_clear(10) or subsidary_signal_clear(8):
+        elif subsidary_clear(10) or subsidary_clear(8):
             set_switch(power_branch_east,2)
-        elif subsidary_signal_clear(7) and point_switched(6):
+        elif subsidary_clear(7) and point_switched(6):
             set_switch(power_branch_east,2)
         else:
             clear_switch(power_branch_east,1)
             clear_switch(power_branch_east,2)
             
         # Auto switch the Goods Loop power section - LH side first
-        if signal_clear(15) or signal_clear(14) or signal_clear(5) or subsidary_signal_clear(5):
+        if signal_clear(15) or signal_clear(14) or signal_clear(5) or subsidary_clear(5):
             set_switch(power_goods_loop,1)
-        elif (signal_clear(2) or subsidary_signal_clear(2)) and point_switched(4):
+        elif (signal_clear(2) or subsidary_clear(2)) and point_switched(4):
             set_switch(power_goods_loop,1)
         elif signal_clear(3) and point_switched(2) and point_switched(4): 
             set_switch(power_goods_loop,1)
         # Deal with RH side 
-        elif signal_clear(16) or signal_clear(7) or subsidary_signal_clear(7):
+        elif signal_clear(16) or signal_clear(7) or subsidary_clear(7):
             set_switch(power_goods_loop,2)
-        elif (signal_clear(10) or subsidary_signal_clear(10)) and point_switched(6):
+        elif (signal_clear(10) or subsidary_clear(10)) and point_switched(6):
             set_switch(power_goods_loop,2)
         elif signal_clear(11) and point_switched(9) and point_switched(6):
             set_switch(power_goods_loop,2)
@@ -309,16 +309,16 @@ def update_track_power_section_switches():
             clear_switch(power_goods_loop,2)
             
         # Auto switch the Platform 3 power section - LH side first
-        if signal_clear(6) or subsidary_signal_clear(6):
+        if signal_clear(6) or subsidary_clear(6):
             set_switch(power_branch_platform,1)
-        elif (signal_clear(2) or subsidary_signal_clear(2)) and not point_switched(4):
+        elif (signal_clear(2) or subsidary_clear(2)) and not point_switched(4):
             set_switch(power_branch_platform,1)
         elif signal_clear(3) and point_switched(3) and not point_switched(4): 
             set_switch(power_branch_platform,1)
         # Deal with RH side 
-        elif signal_clear(8) or subsidary_signal_clear(8):
+        elif signal_clear(8) or subsidary_clear(8):
             set_switch(power_branch_platform,2)
-        elif (signal_clear(10) or subsidary_signal_clear(10)) and not point_switched(6):
+        elif (signal_clear(10) or subsidary_clear(10)) and not point_switched(6):
             set_switch(power_branch_platform,2)
         elif signal_clear(11) and point_switched(9) and not point_switched(6):
             set_switch(power_branch_platform,1)

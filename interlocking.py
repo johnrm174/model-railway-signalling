@@ -29,8 +29,8 @@ def process_interlocking_west():
     # Main Signal - Branch Line towards Signal 2
     # ----------------------------------------------------------------------
 
-    if ( (not point_switched(2) and (signal_clear(5) or signal_clear(6) or subsidary_signal_clear(6))) or
-         (not point_switched(2) and point_switched(4) and not point_switched(5) and subsidary_signal_clear(5)) ):
+    if ( (not point_switched(2) and (signal_clear(5) or signal_clear(6) or subsidary_clear(6))) or
+         (not point_switched(2) and point_switched(4) and not point_switched(5) and subsidary_clear(5)) ):
         # A conflicting outbound movement has been cleared
         lock_signal(1)
     else:
@@ -43,17 +43,17 @@ def process_interlocking_west():
 
     if ( (point_switched(2) or not fpl_active(2) or not fpl_active(4)) or
          (point_switched(4) and point_switched(5)) or
-         (signal_clear(5) or signal_clear(6) or subsidary_signal_clear(6)) or
-         (point_switched(4) and not point_switched(5) and subsidary_signal_clear(5)) ):
+         (signal_clear(5) or signal_clear(6) or subsidary_clear(6)) or
+         (point_switched(4) and not point_switched(5) and subsidary_clear(5)) ):
         # Route is not set/locked or a conflicting outbound movement has been cleared
         lock_signal(2)
-        lock_subsidary_signal(2)
+        lock_subsidary(2)
     else:
         # finally interlock the main/subsidary signals
-        if subsidary_signal_clear(2): lock_signal(2)
+        if subsidary_clear(2): lock_signal(2)
         else: unlock_signal(2)
-        if signal_clear(2): lock_subsidary_signal(2)
-        else: unlock_subsidary_signal(2)
+        if signal_clear(2): lock_subsidary(2)
+        else: unlock_subsidary(2)
 
     # ----------------------------------------------------------------------
     # Signal 3 (West box)
@@ -77,41 +77,41 @@ def process_interlocking_west():
     if point_switched(5):
         # Shunting move into Goods yard only
         lock_signal(5)
-        if signal_clear(14): lock_subsidary_signal(5)
-        else: unlock_subsidary_signal(5)
+        if signal_clear(14): lock_subsidary(5)
+        else: unlock_subsidary(5)
     elif not fpl_active(4):
         # No Route - Point 4 not locked
         lock_signal(5)
-        lock_subsidary_signal(5)
+        lock_subsidary(5)
     elif not point_switched(4) and fpl_active(4):
         # Shunting move into MPD only
         lock_signal(5)
-        if signal_clear(15): lock_subsidary_signal(5)
-        else: unlock_subsidary_signal(5)
+        if signal_clear(15): lock_subsidary(5)
+        else: unlock_subsidary(5)
     elif not fpl_active(2):
         # No Route - Point 2 not locked
         lock_signal(5)
-        lock_subsidary_signal(5)
+        lock_subsidary(5)
     elif not point_switched(2):
-        if signal_clear(1) or signal_clear(2) or subsidary_signal_clear(2):
+        if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
             # Route is set to Branch but a conflicting inbound movement has been cleared
             lock_signal(5)
-            lock_subsidary_signal(5)
+            lock_subsidary(5)
         else:
             # Route is set and locked to Branch - shunting allowed
             # interlock the main/subsidary signals
-            if subsidary_signal_clear(5): lock_signal(5)
+            if subsidary_clear(5): lock_signal(5)
             else: unlock_signal(5)
-            if signal_clear(5): lock_subsidary_signal(5)
-            else: unlock_subsidary_signal(5)
+            if signal_clear(5): lock_subsidary(5)
+            else: unlock_subsidary(5)
     elif not point_switched(1) or not fpl_active(1):
         # Outbound Route is not fully set (no route onto Down Main)
         lock_signal(5)
-        lock_subsidary_signal(5)
+        lock_subsidary(5)
     else:
         # Route is set and locked to Down Main - shunting not allowed
         unlock_signal(5)
-        lock_subsidary_signal(5)
+        lock_subsidary(5)
 
     # ----------------------------------------------------------------------
     # Signal 6 (West box)
@@ -122,27 +122,27 @@ def process_interlocking_west():
     if point_switched(4) or not fpl_active(4) or not fpl_active(2):
         # Initial departure route from platform 3 (to branch or main) not set and locked
         lock_signal(6)
-        lock_subsidary_signal(6)
+        lock_subsidary(6)
     elif not point_switched(2):
-        if signal_clear(1) or signal_clear(2) or subsidary_signal_clear(2):
+        if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
             # Route is set to Branch but a conflicting inbound movement has been cleared
             lock_signal(6)
-            lock_subsidary_signal(6)
+            lock_subsidary(6)
         else:
             # Route is set and locked to Branch - shunting allowed
             # interlock the main/subsidary signals
-            if subsidary_signal_clear(6): lock_signal(6)
+            if subsidary_clear(6): lock_signal(6)
             else: unlock_signal(6)
-            if signal_clear(6): lock_subsidary_signal(6)
-            else: unlock_subsidary_signal(6)
+            if signal_clear(6): lock_subsidary(6)
+            else: unlock_subsidary(6)
     elif not point_switched(1) or not fpl_active(1):
         # Outbound Route is not fully set (no route onto Down Main)
         lock_signal(6)
-        lock_subsidary_signal(6)
+        lock_subsidary(6)
     else:
         # Route is set and locked to Down Main - shunting not allowed
         unlock_signal(6)
-        lock_subsidary_signal(6)
+        lock_subsidary(6)
         
     # ----------------------------------------------------------------------
     # Signal 12 (West box)
@@ -171,7 +171,7 @@ def process_interlocking_west():
     # Subsidary Signal - Route to Goods Loop only
     # ----------------------------------------------------------------------
     
-    if not point_switched(5) or subsidary_signal_clear(5):
+    if not point_switched(5) or subsidary_clear(5):
         # Exit route not set or a conflicting shunting movement is cleared
         lock_signal(14)
     else:
@@ -182,7 +182,7 @@ def process_interlocking_west():
     # Subsidary Signal - Route to Goods Loop only
     # ----------------------------------------------------------------------
 
-    if point_switched(5) or point_switched(4) or not fpl_active(4) or subsidary_signal_clear(5):
+    if point_switched(5) or point_switched(4) or not fpl_active(4) or subsidary_clear(5):
         # Exit route not set and locked or a conflicting shunting movement is cleared
         lock_signal(15)
     else:
@@ -206,8 +206,8 @@ def process_interlocking_west():
     # ----------------------------------------------------------------------
 
     if ( (signal_clear(5) or signal_clear(6) or signal_clear(3) or signal_clear(2)) or
-         (subsidary_signal_clear(5) and point_switched(4) and not point_switched(5)) or
-         (subsidary_signal_clear(2) or subsidary_signal_clear(6)) ):
+         (subsidary_clear(5) and point_switched(4) and not point_switched(5)) or
+         (subsidary_clear(2) or subsidary_clear(6)) ):
         lock_point(2)
     else:
         unlock_point(2)
@@ -226,9 +226,9 @@ def process_interlocking_west():
     # Point 4 (West box)
     # ----------------------------------------------------------------------
 
-    if ( (signal_clear(5) or subsidary_signal_clear(5)) or
-         (signal_clear(6) or subsidary_signal_clear(6)) or
-         (signal_clear(2) or subsidary_signal_clear(2)) or
+    if ( (signal_clear(5) or subsidary_clear(5)) or
+         (signal_clear(6) or subsidary_clear(6)) or
+         (signal_clear(2) or subsidary_clear(2)) or
          (point_switched(2) and signal_clear(3)) or signal_clear(15) ):
         lock_point(4)
     else:
@@ -238,8 +238,8 @@ def process_interlocking_west():
     # Point 5 (West box) - No Facing Point Locks
     # ----------------------------------------------------------------------
 
-    if ( (signal_clear(5) or subsidary_signal_clear(5) or signal_clear(14) or signal_clear(15)) or 
-         (point_switched(4) and not point_switched(2) and (signal_clear(2) or subsidary_signal_clear(2))) or
+    if ( (signal_clear(5) or subsidary_clear(5) or signal_clear(14) or signal_clear(15)) or 
+         (point_switched(4) and not point_switched(2) and (signal_clear(2) or subsidary_clear(2))) or
          (point_switched(4) and point_switched(2) and signal_clear(3)) ):
         lock_point(5)
     else:

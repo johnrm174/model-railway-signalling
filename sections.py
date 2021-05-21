@@ -149,7 +149,7 @@ def update_track_occupancy(sig_passed:int):
             clear_section_occupied(occupied_branch_west)
 
     elif sig_passed == 2:
-        if signal_clear(2) or subsidary_signal_clear(2): # assume west-to-east
+        if signal_clear(2) or subsidary_clear(2): # assume west-to-east
             clear_section_occupied(occupied_branch_west)
             if not point_switched(4):
                 # movement into branch platform
@@ -160,7 +160,7 @@ def update_track_occupancy(sig_passed:int):
             set_section_occupied(occupied_branch_west)
 
     elif sig_passed == 5:
-        if signal_clear(5) or subsidary_signal_clear(5): # assume east-to-west
+        if signal_clear(5) or subsidary_clear(5): # assume east-to-west
             clear_section_occupied(occupied_goods_loop)
             if not point_switched(5):
                 if point_switched(4) and not point_switched(2):
@@ -174,7 +174,7 @@ def update_track_occupancy(sig_passed:int):
             set_section_occupied(occupied_goods_loop)
 
     elif sig_passed == 6:
-        if signal_clear(6) or subsidary_signal_clear(6): # assume east-to-west
+        if signal_clear(6) or subsidary_clear(6): # assume east-to-west
             clear_section_occupied(occupied_branch_platform)
             if not point_switched(2):
                 # movement onto branch
@@ -187,7 +187,7 @@ def update_track_occupancy(sig_passed:int):
             set_section_occupied(occupied_branch_platform)
             
     elif sig_passed == 7:
-        if signal_clear(7) or subsidary_signal_clear(7): # assume west-to-east
+        if signal_clear(7) or subsidary_clear(7): # assume west-to-east
             clear_section_occupied(occupied_goods_loop)
             if point_switched(6) and not point_switched(8):
                 # movement onto branch
@@ -201,7 +201,7 @@ def update_track_occupancy(sig_passed:int):
             set_section_occupied(occupied_goods_loop)
                 
     elif sig_passed == 8:
-        if signal_clear(8) or subsidary_signal_clear(8): # assume west-to-east
+        if signal_clear(8) or subsidary_clear(8): # assume west-to-east
             clear_section_occupied(occupied_branch_platform)
             if not point_switched(8):
                 # movement onto branch
@@ -222,7 +222,7 @@ def update_track_occupancy(sig_passed:int):
             clear_section_occupied(occupied_branch_east)
 
     elif sig_passed == 10:
-        if signal_clear(10) or subsidary_signal_clear(10): # assume east-to-west
+        if signal_clear(10) or subsidary_clear(10): # assume east-to-west
             clear_section_occupied(occupied_branch_east)
             if not point_switched(6):
                 # movement into branch platform
@@ -338,18 +338,18 @@ def refresh_signal_aspects():
 
     # Signal 7 (signal ahead is eather 23 or none)
     if point_switched(8):
-        set_route_indication(7,route_type.RH1,theatre_text="M")
+        set_route(7,route_type.RH1,theatre_text="M")
         update_signal(7,sig_ahead_id=23)
     else:
-        set_route_indication(7,route_type.MAIN,theatre_text="B")
+        set_route(7,route_type.MAIN,theatre_text="B")
         update_signal(7)
 
     # Signal 8 (signal ahead is eather 21 or none)
     if point_switched(8):
-        set_route_indication(8,route_type.RH1,theatre_text="M")
+        set_route(8,route_type.RH1,theatre_text="M")
         update_signal(8,sig_ahead_id=23)
     else:
-        set_route_indication(8,route_type.MAIN,theatre_text="B")
+        set_route(8,route_type.MAIN,theatre_text="B")
         update_signal(8)
 
     # Signal 4 (signal ahead is 21)
@@ -357,21 +357,21 @@ def refresh_signal_aspects():
 
     # Signal 2 (signal ahead is eather 7 or 8)
     if point_switched(4):
-        set_route_indication(2,route_type.LH1,theatre_text="G")
+        set_route(2,route_type.LH1,theatre_text="G")
         update_signal(2,sig_ahead_id=7)
     else:
-        set_route_indication(2,route_type.MAIN,theatre_text="3")
+        set_route(2,route_type.MAIN,theatre_text="3")
         update_signal(2,sig_ahead_id=8)
 
     # Signal 3 (signal ahead is either 4,7 or 8)
     if not point_switched(2):
-        set_route_indication(3,route_type.MAIN,theatre_text="2")
+        set_route(3,route_type.MAIN,theatre_text="2")
         update_signal(3,sig_ahead_id=4)
     elif point_switched(4):
-        set_route_indication(3,route_type.LH2,theatre_text="G")
+        set_route(3,route_type.LH2,theatre_text="G")
         update_signal(3,sig_ahead_id=7)
     else:
-        set_route_indication(3,route_type.LH1,theatre_text="3")
+        set_route(3,route_type.LH1,theatre_text="3")
         update_signal(3,sig_ahead_id=8)
 
     # Signal 1 (signal ahead is 2)
@@ -391,26 +391,26 @@ def refresh_signal_aspects():
     
     # Signal 5 (signal ahead is eather 21 or none)
     if point_switched(2):
-        set_route_indication(5,route_type.LH1,theatre_text="M")
+        set_route(5,route_type.LH1,theatre_text="M")
         update_signal(5,sig_ahead_id=21)
     else:
-        set_route_indication(5,route_type.MAIN,theatre_text="B")
+        set_route(5,route_type.MAIN,theatre_text="B")
         update_signal(5)
 
     # Signal 6 (signal ahead is eather 21 or none)
     if point_switched(2):
         update_signal (6,sig_ahead_id=21)
-        set_route_indication(6,route_type.LH1,theatre_text="M")
+        set_route(6,route_type.LH1,theatre_text="M")
     else:
-        set_route_indication(6,route_type.MAIN,theatre_text="B")
+        set_route(6,route_type.MAIN,theatre_text="B")
         update_signal (6)
 
     # Signal 10 (signal ahead is eather 5 or 6)
     if point_switched(6):
         update_signal (10,sig_ahead_id=5)
-        set_route_indication(10,route_type.RH1,theatre_text="G")
+        set_route(10,route_type.RH1,theatre_text="G")
     else:
-        set_route_indication(10,route_type.MAIN,theatre_text="3")
+        set_route(10,route_type.MAIN,theatre_text="3")
         update_signal (10,sig_ahead_id=6)
 
     # Signal 9 (signal ahead is 10)
@@ -419,17 +419,17 @@ def refresh_signal_aspects():
     # Signal 11 (signal ahead is eather 5,6,12 or 13)
     if point_switched(9):
         if point_switched(6):
-            set_route_indication(11,route_type.RH2,theatre_text="G")
+            set_route(11,route_type.RH2,theatre_text="G")
             update_signal (11,sig_ahead_id=5)
         else:
-            set_route_indication(11,route_type.RH1,theatre_text="3")
+            set_route(11,route_type.RH1,theatre_text="3")
             update_signal (11,sig_ahead_id=6)
     else:
         if point_switched(7):
-            set_route_indication(11,route_type.LH1,theatre_text="1")
+            set_route(11,route_type.LH1,theatre_text="1")
             update_signal (11,sig_ahead_id=13)
         else:
-            set_route_indication(11,route_type.MAIN,theatre_text="M")
+            set_route(11,route_type.MAIN,theatre_text="M")
             update_signal (11,sig_ahead_id=12)
 
     # Signal 20 (signal ahead is 11)

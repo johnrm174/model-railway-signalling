@@ -169,7 +169,7 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # Calls the signal type-specific functions depending on the signal type
 # -------------------------------------------------------------------------
 
-def set_route_indication (sig_id:int, route:signals_common.route_type = signals_common.route_type.NONE, theatre_text:str ="NONE"):
+def set_route (sig_id:int, route:signals_common.route_type = signals_common.route_type.NONE, theatre_text:str ="NONE"):
     
     global logging
     
@@ -204,7 +204,7 @@ def signal_clear (sig_id:int):
 # signal - if the signal does not have one then the return will be FALSE
 # -------------------------------------------------------------------------
 
-def subsidary_signal_clear (sig_id:int):
+def subsidary_clear (sig_id:int):
     
     global logging
     
@@ -272,7 +272,7 @@ def unlock_signal (*sig_ids:int):
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
-def lock_subsidary_signal (*sig_ids:int):
+def lock_subsidary (*sig_ids:int):
     
     global logging
     
@@ -299,7 +299,7 @@ def lock_subsidary_signal (*sig_ids:int):
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
-def unlock_subsidary_signal (*sig_ids:int):
+def unlock_subsidary (*sig_ids:int):
     
     global logging
     
@@ -436,7 +436,7 @@ def toggle_signal (sig_id:int):
 # in conjunction with 'subsidary_signal_clear' to find the state first
 # -------------------------------------------------------------------------
 
-def toggle_subsidary_signal (sig_id:int):
+def toggle_subsidary (sig_id:int):
     
     global logging
     

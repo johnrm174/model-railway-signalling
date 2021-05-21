@@ -29,19 +29,19 @@ def thread_to_cycle_routes (time_delay, null):
     while True:
         time.sleep (time_delay)
         for I in range(1,36):
-            set_route_indication (I,route_type.LH2,"1")
+            set_route (I,route_type.LH2,"1")
         time.sleep (time_delay)
         for I in range(1,36):
-            set_route_indication (I,route_type.LH1,"2")
+            set_route (I,route_type.LH1,"2")
         time.sleep (time_delay)
         for I in range(1,36):
-            set_route_indication (I,route_type.RH1,"3")
+            set_route (I,route_type.RH1,"3")
         time.sleep (time_delay)
         for I in range(1,36):
-            set_route_indication (I,route_type.RH2,"4")
+            set_route (I,route_type.RH2,"4")
         time.sleep (time_delay)
         for I in range(1,36):
-            set_route_indication (I,route_type.MAIN,"M")
+            set_route (I,route_type.MAIN,"M")
     return()
 
 #----------------------------------------------------------------------
@@ -133,11 +133,11 @@ def lock_unlock_signals(button):
 def lock_unlock_subsidary(button):
     global subsidaries_locked
     if subsidaries_locked:
-        for I in range(1,36): unlock_subsidary_signal(I)
+        for I in range(1,36): unlock_subsidary(I)
         button.config(relief="raised")
         subsidaries_locked = False
     else:
-        for I in range(1,36): lock_subsidary_signal(I)
+        for I in range(1,36): lock_subsidary(I)
         button.config(relief="sunken")
         subsidaries_locked = True
     return()
@@ -180,7 +180,7 @@ def print_subsidary_state(button):
     print ("")
     print ("Current State of all subsidaries is as follows:")
     for I in range(1,36):
-        if subsidary_signal_clear(I):
+        if subsidary_clear(I):
             print ("Subsidary Signal " + str(I) + " is OFF")
         else:
             print ("Subsidary Signal " + str(I) + " is ON")

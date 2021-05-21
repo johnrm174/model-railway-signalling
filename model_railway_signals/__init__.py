@@ -14,16 +14,16 @@ from .signals_common import pulse_signal_passed_button
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_ground_position import create_ground_position_signal
-from .signals import set_route_indication
+from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
 from .signals import unlock_signal
 from .signals import toggle_signal
-from .signals import lock_subsidary_signal
-from .signals import unlock_subsidary_signal
-from .signals import toggle_subsidary_signal
+from .signals import lock_subsidary
+from .signals import unlock_subsidary
+from .signals import toggle_subsidary
 from .signals import signal_clear
-from .signals import subsidary_signal_clear
+from .signals import subsidary_clear
 from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import set_approach_control
@@ -68,16 +68,16 @@ __all__ = [
       # Public signal functions
         'create_colour_light_signal',
         'create_ground_position_signal',
-        'set_route_indication',
+        'set_route',
         'update_signal',
         'lock_signal',
         'unlock_signal',
         'toggle_signal',
-        'lock_subsidary_signal',
-        'unlock_subsidary_signal',
-        'toggle_subsidary_signal',
+        'lock_subsidary',
+        'unlock_subsidary',
+        'toggle_subsidary',
         'signal_clear',
-        'subsidary_signal_clear',
+        'subsidary_clear',
         'set_signal_override',
         'clear_signal_override',
         'set_approach_control',

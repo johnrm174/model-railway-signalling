@@ -89,10 +89,10 @@ def main_callback_function(item_id,callback_type):
     update_signal(4, sig_ahead_id=5)
     
     if point_switched(1):
-        set_route_indication(2,route=route_type.LH1)
+        set_route(2,route=route_type.LH1)
         update_signal(2,sig_ahead_id=3)
     else:
-        set_route_indication(2,route=route_type.MAIN)
+        set_route(2,route=route_type.MAIN)
         update_signal(2,sig_ahead_id=4)
 
     update_signal(1, sig_ahead_id=2)
@@ -239,7 +239,7 @@ create_track_sensor (2, gpio_channel = 4,
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Route and Interlocking")
 lock_signal(3)
-set_route_indication (2,route_type.MAIN)
+set_route (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")

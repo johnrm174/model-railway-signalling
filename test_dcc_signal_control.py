@@ -51,7 +51,7 @@ def set_two_aspect():
     # Only enable the signals for this test mode
     row_under_test = 1
     lock_signal(5,6,8,9,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(1,2,3,4)
     return()
 
@@ -70,7 +70,7 @@ def set_three_aspect():
     # Only enable the signals for this test mode
     row_under_test = 2
     lock_signal(1,2,3,4,8,9,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(5,6)
     return()
 
@@ -89,7 +89,7 @@ def set_four_aspect():
     # Only enable the signals for this test mode
     row_under_test = 3
     lock_signal(1,2,3,4,5,6,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(8,9)
     return()
 #----------------------------------------------------------------------
@@ -107,7 +107,7 @@ def set_individual_outputs():
     # Only enable the signals for this test mode
     row_under_test = 4
     lock_signal(1,2,3,4,5,6,8,9,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(11,12)
     return()
 
@@ -126,7 +126,7 @@ def set_four_aspect_single():
     # Only enable the signals for this test mode
     row_under_test = 5
     lock_signal(1,2,3,4,5,6,8,9,11,12,16)
-    unlock_subsidary_signal(14)
+    unlock_subsidary(14)
     unlock_signal(14)
     return()
 
@@ -145,7 +145,7 @@ def set_four_aspect_feathers():
     # Only enable the signals for this test mode
     row_under_test = 6
     lock_signal(1,2,3,4,5,6,8,9,11,12,14)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(16)
     return()
 
@@ -191,15 +191,15 @@ def toggle_feather():
     else:
         route = route_type.MAIN
     if row_under_test==2:
-        set_route_indication (5,route)
-        set_route_indication (6,route)
-        set_route_indication (7,route)
+        set_route (5,route)
+        set_route (6,route)
+        set_route (7,route)
     elif row_under_test==5:
-        set_route_indication (14,route)
-        set_route_indication (15,route)
+        set_route (14,route)
+        set_route (15,route)
     elif row_under_test==6:
-        set_route_indication (16,route)
-        set_route_indication (17,route)
+        set_route (16,route)
+        set_route (17,route)
     return()
 
 #----------------------------------------------------------------------
@@ -435,7 +435,7 @@ create_colour_light_signal (canvas,17,350,300, sig_callback=signal_button,
 print ("Inhibit everything until the test mode is selected")
 
 lock_signal(1,2,3,4,5,6,8,9,11,12,14,16)
-lock_subsidary_signal(14)
+lock_subsidary(14)
 
 print ("Entering main event loop")
 
