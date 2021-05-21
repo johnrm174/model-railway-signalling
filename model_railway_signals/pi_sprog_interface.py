@@ -251,7 +251,9 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
 # of all the CBUS commands sent to the Pi SPROG
 #------------------------------------------------------------------------------
 
-def initialise_pi_sprog (dcc_debug_mode:bool = False):
+def initialise_pi_sprog (port_name:str="/dev/serial0",
+                         baud_rate:int = 115200,
+                         dcc_debug_mode:bool = False):
 
     global logging
     global debug
@@ -260,8 +262,8 @@ def initialise_pi_sprog (dcc_debug_mode:bool = False):
     debug = dcc_debug_mode
     # We're not receiving anything else on this port so its OK to set up the port without
     # a timeout - as we are only interested in "complete" messages (terminated by ';')
-    serial_port.baudrate = 115200
-    serial_port.port = "/dev/serial0"
+    serial_port.baudrate = baud_rate
+    serial_port.port = port_name
     serial_port.bytesize = 8
     serial_port.timeout = None
     serial_port.parity = serial.PARITY_NONE
