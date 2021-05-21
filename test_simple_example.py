@@ -231,6 +231,7 @@ create_colour_light_signal (canvas,5,900,200,
 
 
 # Map an external track sensor for signal 2 - For simplicity, we'll give it the same ID as the signal
+print ("Creating external Track Sensor Mappings")
 create_track_sensor (2, gpio_channel = 4,
                     sensor_callback = main_callback_function,
                     sensor_timeout = 3.0)
