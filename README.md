@@ -27,6 +27,12 @@ To give it a go, just clone the repository and and run one of the following:
                            schematic with interlocked signals/points. Also includes a simple DCC Mapping example 
                            (1 signal and 2 points ) and an external track sensor to provide a "signal passed" event.
 
+'test_approach_control.py' - an example of using automated "approach control" for junction signals. This is where a signal
+                            displays a more restrictive aspect (either red or yellow) when a lower-speed divergent route is
+                            set, forcing the approaching train to slow down and be prepared to stop. As the train approaches, 
+                            the signal is "released", allowing the train to proceed past the signal and onto the divergent route
+                            Examples of "Approach on Red" and "Approach on Yellow" are provided.
+
 'test_dcc_signal_control.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. Enables the various
                               modes to be selected (includes programming of the required CVs) and then tested. I used this
                               decoder as it seemed to provide the most flexibility for some of my more complex signal types.
