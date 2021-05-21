@@ -31,7 +31,8 @@ To give it a go, just clone the repository and and run one of the following:
                             displays a more restrictive aspect (either red or yellow) when a lower-speed divergent route is
                             set, forcing the approaching train to slow down and be prepared to stop. As the train approaches, 
                             the signal is "released", allowing the train to proceed past the signal and onto the divergent route
-                            Examples of "Approach on Red" and "Approach on Yellow" are provided.
+                            Examples of "Approach on Red" and "Approach on Yellow" are provided. For "Approach on yellow", the
+                            signals behind will show the correct single and double flashing yellow aspects.
 
 'test_dcc_signal_control.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. Enables the various
                               modes to be selected (includes programming of the required CVs) and then tested. I used this
