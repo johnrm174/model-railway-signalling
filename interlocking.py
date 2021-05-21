@@ -63,7 +63,8 @@ def process_interlocking_west():
     if ( (point_switched(1) or not fpl_active(1) or not fpl_active(2)) or
          (point_switched(2) and not fpl_active(4)) or
          (point_switched(2) and point_switched(4) and point_switched(5)) ):
-        # Route into goods loop is not fully set/locked 
+        # Route into goods loop is not fully set/locked
+        # We don't have to worry about departing routes as they should all be locked
         lock_signal(3)
     else:
         unlock_signal(3)
@@ -193,8 +194,8 @@ def process_interlocking_west():
     # Routes from Goods Loop, Platform 3, Down Loop and Platform 1
     # ----------------------------------------------------------------------
 
-    if ( (point_switched(1) and point_switched(2)) and (signal_clear(5) or signal_clear(6)) or
-         (signal_clear(3) or signal_clear(12) or signal_clear(13)) ):
+    if ( (signal_clear(3) or signal_clear(12) or signal_clear(13) ) or 
+         (point_switched(1) and point_switched(2)) and (signal_clear(5) or signal_clear(6)) ):
         # Departure route onto DOWN MAIN set/cleared - or arrival route from UP MAIN set/cleared
         lock_point(1)
     else:
@@ -229,7 +230,8 @@ def process_interlocking_west():
     if ( (signal_clear(5) or subsidary_clear(5)) or
          (signal_clear(6) or subsidary_clear(6)) or
          (signal_clear(2) or subsidary_clear(2)) or
-         (point_switched(2) and signal_clear(3)) or signal_clear(15) ):
+         (point_switched(2) and signal_clear(3)) or
+          signal_clear(15) ):
         lock_point(4)
     else:
         unlock_point(4)
