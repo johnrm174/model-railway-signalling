@@ -169,7 +169,7 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # Calls the signal type-specific functions depending on the signal type
 # -------------------------------------------------------------------------
 
-def set_route_indication (sig_id:int, route:signals_common.route_type = signals_common.route_type.MAIN, theatre_text:str =""):
+def set_route_indication (sig_id:int, route:signals_common.route_type = signals_common.route_type.NONE, theatre_text:str ="NONE"):
     
     global logging
     

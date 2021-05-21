@@ -400,7 +400,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "releaseonred" : False,                      # SHARED - State of the "Approach Release for the signal
                       "releaseonyel" : False,                      # SHARED - State of the "Approach Release for the signal
                       "routeset" : signals_common.route_type.NONE, # SHARED - Initial Route setting to display (none)
-                      "theatretext" : "",                          # SHARED - Initial Route setting to display (none)
+                      "theatretext" : "NONE",                      # SHARED - Initial Route setting to display (none)
                       "passedbutton" : button3,                    # SHARED - Button drawing object
                       "releasebutton" : button4,                   # SHARED - Button drawing object
                       "theatre" : theatre,                         # SHARED - Text drawing object
@@ -695,8 +695,8 @@ def refresh_signal_aspects (sig_id):
 # -------------------------------------------------------------------------
 
 def update_colour_light_route_indication (sig_id,
-            route_to_set:signals_common.route_type = signals_common.route_type.MAIN,
-                                          theatre_text:str =""):
+            route_to_set:signals_common.route_type = signals_common.route_type.NONE,
+                                          theatre_text:str ="NONE"):
     global logging
     
     # get the signals that we are interested in
@@ -771,14 +771,15 @@ def refresh_theatre_route_indication (sig_id):
     # get the signal that we are interested in
     signal = signals_common.signals[str(sig_id)]
     # Only display the route indication if the signal is clear and not overriden to red
-    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-        if signal["theatretext"]:
-            logging.info ("Signal "+str(sig_id)+": Setting theatre indication to \'"+signal["theatretext"]+"\'")
-        signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
-    else:
-        if signal["theatretext"]:
-            logging.info ("Signal "+str(sig_id)+": Inhibiting theatre indication (signal is displaying RED)")
+    if signal["theatretext"] == "NONE":
         signal["canvas"].itemconfig (signal["theatre"],text="")     
+    else:
+        if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
+            logging.info ("Signal "+str(sig_id)+": Setting theatre indication to \'"+signal["theatretext"]+"\'")
+            signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
+        else:
+            logging.info ("Signal "+str(sig_id)+": Inhibiting theatre indication (signal is displaying RED)")
+            signal["canvas"].itemconfig (signal["theatre"],text="")     
     return ()
 
 # -------------------------------------------------------------------------
