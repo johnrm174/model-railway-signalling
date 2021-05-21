@@ -16,7 +16,7 @@ import logging
 #----------------------------------------------------------------------
 
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO) 
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG) 
 use_dcc_control = True    # will drive DCC signals via the Pi-SPROG-3
 debug_dcc = False         # Provides additional logging of the DCC CBUS command strings
 
@@ -154,17 +154,17 @@ if use_dcc_control:
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
     # outputs A,B,C,D to drive our signal with E driving the feather indication
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
-    # Address + 7), but we are only using the firs t 5 in this example
-    map_dcc_signal (sig_id = 2, signal_type = dcc_signal_type.truth_table,
+    # Address + 7), but we are only using the first 5 in this example
+    map_dcc_signal (sig_id = 2,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                    LH1 = [[5,True]], MAIN = [[5, False]])
+                    LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]] )
     # This assumes a TrainTech DCC 4 Aspect Signal configured with a base address of 9
     # In this example we are using base address & Base Address+1 to drive the signal
     # Its an event driven signal - so a single command to change to a new aspect
-    map_dcc_signal (sig_id = 5, signal_type = dcc_signal_type.event_driven,
+    map_dcc_signal (sig_id = 5,
                     danger = [[9,False]],
                     proceed = [[9,True]],
                     caution = [[10,True]],

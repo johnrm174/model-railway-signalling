@@ -3,7 +3,7 @@ from model_railway_signals import *
 
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use "approach control"
@@ -67,10 +67,12 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
     
     if point_switched(1):
-        set_route(4,route=route_type.LH1)
+#        set_route(4,route=route_type.LH1)
+        set_route(4,theatre_text="1")
         update_signal(4,sig_ahead_id=5)
     else:
-        set_route(4,route=route_type.MAIN)
+#        set_route(4,route=route_type.MAIN)
+        set_route(4,theatre_text="")
         update_signal(4,sig_ahead_id=6)
     update_signal(3,sig_ahead_id=4)
     update_signal(2,sig_ahead_id=3)
@@ -132,24 +134,27 @@ if use_dcc_control:
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
     # outputs A,B,C,D to drive our signal with E driving the feather indication
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
-    # Address + 7), but we are only using the firs t 5 in this example
-    map_dcc_signal (sig_id = 4, signal_type = dcc_signal_type.truth_table,
+    # Address + 7), but we are only using the first 5 in this example
+    map_dcc_signal (sig_id = 4,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                    LH1 = [[5,True]], MAIN = [[5, False]])
+                    LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]])
+#                    THEATRE = [ ["#", [[5,True],[6,False]]],
+#                                ["1",[[5,False],[6,True]]],
+#                                ["",[[5,True],[6,False]]] ])
     # Signals 2 and 3 assumes a TrainTech DCC 4 Aspect Signal with a base address of 9
     # In these example we are using base address, Base Address+1 and Base_Address+2
     # Its an event driven signal - so we only need a single command to change the aspect
-    map_dcc_signal (sig_id = 3, signal_type = dcc_signal_type.event_driven,
+    map_dcc_signal (sig_id = 3,
                     danger = [[9,False]],
                     proceed = [[9,True]],
                     caution = [[10,True]],
                     prelim_caution = [[10,False]],
                     flash_caution = [[11,True]],
                     flash_prelim_caution = [[11,False]])
-    map_dcc_signal (sig_id = 2, signal_type = dcc_signal_type.event_driven,
+    map_dcc_signal (sig_id = 2,
                     danger = [[12,False]],
                     proceed = [[12,True]],
                     caution = [[13,True]],
@@ -201,7 +206,8 @@ create_colour_light_signal (canvas,4,725,200,
                             sig_passed_button = True,
                             refresh_immediately = False,
                             approach_release_button = True,
-                            lhfeather45 = True)
+#                            lhfeather45 = True)
+                            theatre_route_indicator = True)
 create_colour_light_signal (canvas,5,1000,150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,

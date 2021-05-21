@@ -14,13 +14,13 @@ from model_railway_signals import *
 
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
 #----------------------------------------------------------------------
 # global variables 
 #----------------------------------------------------------------------
 
-sprog_debug_level = 1     # 0 = No debug, 1 = status messages only, 2 = all CBUS messages
+sprog_debug = TRUE        # Request command station status and log all all CBUS messages
 route = route_type.MAIN   # Initial route Indication (which then gets toggled during tests)
 row_under_test = 1        # This is to control what signals we actually test in each mode
 
@@ -207,7 +207,7 @@ def toggle_feather():
 #----------------------------------------------------------------------
 
 # Initialise the Pi sprog (and switch on the track power)
-initialise_pi_sprog (sprog_debug_level)
+initialise_pi_sprog (dcc_debug_mode = sprog_debug)
 request_dcc_power_on()
 
 # Reset the Decoder to its defaults
@@ -297,7 +297,8 @@ map_dcc_signal (5, danger=[[address,False],[address+1,False]],
                  LH2 = [[address+2,False]],
                  RH1 = [[address+2,False]],
                  RH2 = [[address+2,False]],
-                 MAIN = [[address+2,False]] )
+                 MAIN = [[address+2,False]],
+                 NONE = [[address+2,False]] )
 map_dcc_signal (6, danger=[[address+3,False],[address+4,False]],
                  proceed=[[address+4,False],[address+3,True]],
                  caution=[[address+4,True],[address+3,False]],
@@ -305,7 +306,8 @@ map_dcc_signal (6, danger=[[address+3,False],[address+4,False]],
                  LH2 = [[address+5,False]],
                  RH1 = [[address+5,True]],
                  RH2 = [[address+5,False]],
-                 MAIN = [[address+5,False]] )
+                 MAIN = [[address+5,False]],
+                 NONE = [[address+5,False]] )
 
 # 4 aspect signals - Note that this differes from the truth table in the Signalist SC1 Manual
 map_dcc_signal (8, danger=[[address,False],[address+1,False]],
@@ -337,6 +339,7 @@ map_dcc_signal (14, danger=[[address,False],[address+1,False]],
                  RH1 = [[address+3,True]],
                  RH2 = [[address+3,False]],
                  MAIN = [[address+3,False]],
+                 NONE = [[address+3,False]],
                  call = address+4)
 
 # 4 aspect signal - With Multiple feathers
@@ -348,7 +351,8 @@ map_dcc_signal (16, danger=[[address,False],[address+1,False]],
                  LH2 = [[address+2,False],[address+3,False]],
                  RH1 = [[address+3,False],[address+2,True]],
                  RH2 = [[address+2,True],[address+3,True]],
-                 MAIN = [[address+2,False],[address+3,False]] )
+                 MAIN = [[address+2,False],[address+3,False]],
+                 NONE = [[address+2,False],[address+3,False]] )
 
 print ("Creating Signals")
 

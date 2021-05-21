@@ -587,10 +587,12 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         # with RED aspects can be created with feather or theatre route indications)
         # We also only update Feather Route Indications if a divergent route (other
         # than MAIN) has been set (i.e. when we need to display/inhibit a feather)
+        # A route of NONE signifies the route indication isn't used (so we don't update)
         if new_aspect == aspect_type.RED or current_aspect == aspect_type.RED:
-            refresh_theatre_route_indication (sig_id)
-            refresh_feather_route_indication (sig_id)
-            
+            if signal["routeset"] != signals_common.route_type.NONE:
+                refresh_feather_route_indication (sig_id)
+            if signal["theatretext"] != "NONE":
+                refresh_theatre_route_indication (sig_id)            
     return ()
 
 # -------------------------------------------------------------------------
@@ -704,12 +706,14 @@ def update_colour_light_route_indication (sig_id,
     # Only refresh the signal drawing objects if the route has changed and the displayed aspect
     # is not set to RED (In this case all route indications will be inhibited - so we'll leave
     # the refresh of the route indications until the signal is next changed)
-    if signal["routeset"] != route_to_set:
+    # A route of NONE signifies the route indication isn't used (so we don't update)
+    if signal["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
         logging.info ("Signal "+str(sig_id)+": Setting route to "+str(route_to_set).rpartition('.')[-1])
         signal["routeset"] = route_to_set
         if signal["displayedaspect"] != aspect_type.RED:
             refresh_feather_route_indication (sig_id)
-    if signal["theatretext"] != theatre_text:
+            
+    if signal["theatretext"] != theatre_text and theatre_text != "NONE":
         logging.info ("Signal "+str(sig_id)+": Setting theatre route text to \'"+str(theatre_text)+"\'")
         signal["theatretext"] = theatre_text
         if signal["displayedaspect"] != aspect_type.RED:
@@ -736,25 +740,23 @@ def refresh_feather_route_indication (sig_id):
     signal["canvas"].itemconfig (signal["lhf90"],fill="black")
     signal["canvas"].itemconfig (signal["rhf45"],fill="black")
     signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-    # Only bother updating the signal if the routes are bring used
-    if signal["routeset"] != signals_common.route_type.NONE:
-        # Only display the route indication if the signal is clear and not overriden to red
-        if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-            logging.info ("Signal "+str(sig_id)+": Setting feather light route indication for "
-                          + str(signal["routeset"]).rpartition('.')[-1])
-            if signal["routeset"] == signals_common.route_type.LH1:
-                signal["canvas"].itemconfig (signal["lhf45"],fill="white")
-            elif signal["routeset"] == signals_common.route_type.LH2:
-                signal["canvas"].itemconfig (signal["lhf90"],fill="white")
-            elif signal["routeset"] == signals_common.route_type.RH1:
-                signal["canvas"].itemconfig (signal["rhf45"],fill="white")
-            elif signal["routeset"] == signals_common.route_type.RH2:
-                signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-            dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
-        else:
-            # If the signal is set to Red then we need to inhibit the indications
-            logging.info ("Signal "+str(sig_id)+": Inhibiting all feathers indication (signal is displaying RED)")
-            dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.MAIN)
+    # Only display the route indication if the signal is clear and not overriden to red
+    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
+        logging.info ("Signal "+str(sig_id)+": Setting feather light route indication for "
+                      + str(signal["routeset"]).rpartition('.')[-1])
+        if signal["routeset"] == signals_common.route_type.LH1:
+            signal["canvas"].itemconfig (signal["lhf45"],fill="white")
+        elif signal["routeset"] == signals_common.route_type.LH2:
+            signal["canvas"].itemconfig (signal["lhf90"],fill="white")
+        elif signal["routeset"] == signals_common.route_type.RH1:
+            signal["canvas"].itemconfig (signal["rhf45"],fill="white")
+        elif signal["routeset"] == signals_common.route_type.RH2:
+            signal["canvas"].itemconfig (signal["rhf90"],fill="white")
+        dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
+    else:
+        # If the signal is set to Red then we need to inhibit the indications
+        logging.info ("Signal "+str(sig_id)+": Inhibiting all feathers indication (signal is displaying RED)")
+        dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.NONE)
 
     return ()
 
@@ -771,15 +773,14 @@ def refresh_theatre_route_indication (sig_id):
     # get the signal that we are interested in
     signal = signals_common.signals[str(sig_id)]
     # Only display the route indication if the signal is clear and not overriden to red
-    if signal["theatretext"] == "NONE":
-        signal["canvas"].itemconfig (signal["theatre"],text="")     
+    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
+        logging.info ("Signal "+str(sig_id)+": Setting theatre indication to \'"+signal["theatretext"]+"\'")
+        signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
+        dcc_control.update_dcc_signal_theatre( sig_id,signal["theatretext"])  
     else:
-        if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-            logging.info ("Signal "+str(sig_id)+": Setting theatre indication to \'"+signal["theatretext"]+"\'")
-            signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
-        else:
-            logging.info ("Signal "+str(sig_id)+": Inhibiting theatre indication (signal is displaying RED)")
-            signal["canvas"].itemconfig (signal["theatre"],text="")     
+        logging.info ("Signal "+str(sig_id)+": Inhibiting theatre indication (signal is displaying RED)")
+        signal["canvas"].itemconfig (signal["theatre"],text="")
+        dcc_control.update_dcc_signal_theatre( sig_id,"#")   # Hash is special character (no indication)
     return ()
 
 # -------------------------------------------------------------------------
