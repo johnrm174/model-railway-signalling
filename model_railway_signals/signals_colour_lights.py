@@ -3,7 +3,7 @@
 #
 # Currently supported sub types: 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
 #           - with or without a position light subsidary signal
-#           - with or without feather route indicators (maximum of 4)
+#           - with or without feather route indicators (maximum of 5)
 #           - with or without a theatre type route indicator
 #           - with or without amanual control buttons
 #
@@ -211,6 +211,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 sig_passed_button:bool=False,
                                 approach_release_button:bool=False,
                                 position_light:bool=False,
+                                mainfeather:bool=False,
                                 lhfeather45:bool=False,
                                 lhfeather90:bool=False,
                                 rhfeather45:bool=False,
@@ -228,7 +229,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Signal ID must be greater than zero")
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")          
-    elif (lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90) and theatre_route_indicator:
+    elif (lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or mainfeather) and theatre_route_indicator:
         logging.error ("Signal "+str(sig_id)+": Signal can only have Feathers OR a Theatre Route Indicator")
     elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
            signal_subtype == signal_sub_type.distant):
@@ -329,6 +330,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 
         # now draw the feathers (x has been adjusted for the no of aspects)            
         # These get 'hidden' later if they are not required for the signal
+        line_coords = common.rotate_line (x,y,offset+71,-20,offset+85,-20,orientation) 
+        main = canvas.create_line (line_coords,width=3,fill="black")
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-10,orientation) 
         rhf45 = canvas.create_line (line_coords,width=3,fill="black")
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-5,orientation) 
@@ -355,6 +358,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             canvas.itemconfigure(but2win,state='hidden')
             canvas.itemconfigure(poslight1,state='hidden')
             canvas.itemconfigure(poslight2,state='hidden')
+        if not mainfeather: canvas.itemconfigure(main,state='hidden')
         if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')
         if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
         if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
@@ -414,6 +418,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "yel2" : yel2,                               # Type-specific - drawing object
                       "pos1" : poslight1,                          # Type-specific - drawing object
                       "pos2" : poslight2,                          # Type-specific - drawing object
+                      "mainf": main,                               # Type-specific - drawing object
                       "lhf45": lhf45,                              # Type-specific - drawing object
                       "lhf90": lhf90,                              # Type-specific - drawing object
                       "rhf45": rhf45,                              # Type-specific - drawing object
@@ -781,6 +786,7 @@ def refresh_feather_route_indication (sig_id):
     signal["canvas"].itemconfig (signal["lhf90"],fill="black")
     signal["canvas"].itemconfig (signal["rhf45"],fill="black")
     signal["canvas"].itemconfig (signal["rhf90"],fill="black")
+    signal["canvas"].itemconfig (signal["mainf"],fill="black")
     # Only display the route indication if the signal is not at RED
     if signal["displayedaspect"] != aspect_type.RED:
         if signal["routeset"] == signals_common.route_type.LH1:
@@ -791,6 +797,8 @@ def refresh_feather_route_indication (sig_id):
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
         elif signal["routeset"] == signals_common.route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
+        elif signal["routeset"] == signals_common.route_type.MAIN:
+            signal["canvas"].itemconfig (signal["mainf"],fill="white")
             
     return()
 

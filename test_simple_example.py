@@ -152,15 +152,15 @@ if use_dcc_control:
     request_dcc_power_on()
     # Signal 2 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
-    # outputs A,B,C,D to drive our signal with E driving the feather indication
+    # outputs A,B,C,D to drive our signal with E & F driving the feather indications
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
-    # Address + 7), but we are only using the first 5 in this example
+    # Address + 7), but we are only using the first 6 in this example
     map_dcc_signal (sig_id = 2,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                    LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]] )
+                    LH1 = [[5,True],[6,False]], MAIN = [[6,True],[5,False]], NONE = [[5,False],[6,False]] )
 
     # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
     # and can take up to 4 consecutive addresses (if you include the flashing aspects)
@@ -220,7 +220,8 @@ create_colour_light_signal (canvas,2,275,200,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False,
-                            lhfeather45=True )
+                            lhfeather45=True,
+                            mainfeather=True)
 create_colour_light_signal (canvas,3,600,150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,

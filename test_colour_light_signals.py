@@ -35,13 +35,13 @@ def thread_to_cycle_routes (time_delay, null):
             set_route (I,route_type.LH1,"2")
         time.sleep (time_delay)
         for I in range(1,36):
+            set_route (I,route_type.MAIN,"M")
+        time.sleep (time_delay)
+        for I in range(1,36):
             set_route (I,route_type.RH1,"3")
         time.sleep (time_delay)
         for I in range(1,36):
             set_route (I,route_type.RH2,"4")
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.MAIN,"M")
     return()
 
 #----------------------------------------------------------------------
@@ -265,6 +265,7 @@ create_colour_light_signal (canvas,5,1000,100, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
                             lhfeather45=True,lhfeather90=True,
+                            mainfeather=True,
                             sig_passed_button=True,
                             fully_automatic=True)
 
@@ -326,6 +327,7 @@ create_colour_light_signal (canvas,15,1000,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.home,
                             rhfeather45=True,rhfeather90=True,
                             lhfeather45=True,lhfeather90=True,
+                            mainfeather=True,
                             sig_passed_button=True,
                             fully_automatic=True,
                             position_light = True)

@@ -4,7 +4,7 @@
 # Currently supported types:
 #    1) Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
 #           - with or without a position light subsidary signal
-#           - with or without route indication feathers (maximum of 4)
+#           - with or without route indication feathers (maximum of 5)
 #           - with or without a theatre type route indicator
 #    2) Ground Position Light Signals
 #           - groud position light or shunt ahead position light
@@ -30,6 +30,7 @@
 #       lhfeather90:bool - Creates a LH route indication feather at 90 degrees - Default False
 #       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
 #       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
+#       mainfeather:bool - Creates a MAIN route indication feather - Default False
 #       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
 #       refresh_immediately:bool - When set to False the signal aspects will NOT be updated
 #                          when the signal is switched by the user - they will only be updated
