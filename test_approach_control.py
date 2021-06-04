@@ -199,6 +199,7 @@ if use_dcc_control:
     # These are event driven signals - so we only need a single command to change the aspect
     
     # Signal 2 (addresses 9,10,11,12) gives an example of how to configure it yourself
+    # note that if it had a route indication you should also set 'auto_route_inhibit = True'
     map_dcc_signal (sig_id = 2,
                     danger = [[9,False]],
                     proceed = [[9,True]],

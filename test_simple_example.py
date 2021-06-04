@@ -171,6 +171,7 @@ if use_dcc_control:
     # Signal 4 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
     map_traintech_signal (sig_id = 4, base_address = 13)
     # Signal 5 shows you how its configured in terms of the mappings "under the hood"
+    # note that if it had a route indication you should also set 'auto_route_inhibit = True'
     map_dcc_signal (sig_id = 5,
                     danger = [[17,False]],
                     proceed = [[17,True]],
