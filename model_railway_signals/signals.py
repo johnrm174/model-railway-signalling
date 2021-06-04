@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------
-# This module is used for creating and managing signal objects
+# This module (and its dependent packages)is used for creating and managing signal objects
 #
 # Currently supported types:
 #    1) Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
@@ -24,6 +24,7 @@
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default is null
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       approach_release_button:bool - Creates an "Approach Release" button for automatic control - Default False
 #       position_light:bool - Creates a subsidary position light signal - Default False
 #       lhfeather45:bool - Creates a LH route indication feather at 45 degrees - Default False
 #       lhfeather90:bool - Creates a LH route indication feather at 90 degrees - Default False
@@ -102,7 +103,28 @@
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       start_delay:int - Delay (in seconds) before changing to Red (default=5)
-#       time_delay:int - Delay (in seconds) for cycling through the spects (default=5)
+#       time_delay:int - Delay (in seconds) for cycling through the aspects (default=5)
+#
+# set_approach_control - Puts the signal into "Approach Release" Mode where the signal will display a particular
+#                        aspect/state (either Red or Yellow) to approaching trains. As the Train approaches the
+#                        signal, the signal would be "released" to display the normal aspect. normally used for
+#                        diverging routes which have a lower speed restriction to the main line. When a signal
+#                        is set in "approach control" mode then the signals behind will display the appropriate
+#                        aspects when subsequently updated (based on the signal ahead). for "Release on Red"
+#                        these would be the normal aspects you would expect. For "Release on Yellow", and
+#                        assuming 4 aspect signals, the signal behind will display a flashing single yellow
+#                        aspect and the signal behind that will display a flashing double yellow aspect  
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
+#   Optional Parameters:
+#       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect (default=False)
+#
+# clear_approach_control - This"releases" the signal to display the normal aspect. Ans should be called when
+#                            a train is approaching the signal (so the signal clears in front of the driver)
+#                            Note that signals can also be released when the "release control button" is activated
+#                            (which is displayed just in front of the signal if specified at signal creation time)
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
 # 
 # -------------------------------------------------------------------------
    
@@ -147,7 +169,7 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # Calls the signal type-specific functions depending on the signal type
 # -------------------------------------------------------------------------
 
-def set_route_indication (sig_id:int, route:signals_common.route_type = signals_common.route_type.MAIN, theatre_text:str =""):
+def set_route (sig_id:int, route:signals_common.route_type = signals_common.route_type.NONE, theatre_text:str ="NONE"):
     
     global logging
     
@@ -182,7 +204,7 @@ def signal_clear (sig_id:int):
 # signal - if the signal does not have one then the return will be FALSE
 # -------------------------------------------------------------------------
 
-def subsidary_signal_clear (sig_id:int):
+def subsidary_clear (sig_id:int):
     
     global logging
     
@@ -250,7 +272,7 @@ def unlock_signal (*sig_ids:int):
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
-def lock_subsidary_signal (*sig_ids:int):
+def lock_subsidary (*sig_ids:int):
     
     global logging
     
@@ -277,7 +299,7 @@ def lock_subsidary_signal (*sig_ids:int):
 # Multiple signal IDs can be specified in the call
 # -------------------------------------------------------------------------
 
-def unlock_subsidary_signal (*sig_ids:int):
+def unlock_subsidary (*sig_ids:int):
     
     global logging
     
@@ -414,7 +436,7 @@ def toggle_signal (sig_id:int):
 # in conjunction with 'subsidary_signal_clear' to find the state first
 # -------------------------------------------------------------------------
 
-def toggle_subsidary_signal (sig_id:int):
+def toggle_subsidary (sig_id:int):
     
     global logging
     

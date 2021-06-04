@@ -8,12 +8,12 @@
 #           - with or without amanual control buttons
 #
 # Common features supported by Colour Light signals
-#           - Create Signals (as above)
 #           - set_route_indication (Route Type and theatre text)
 #           - update_signal (based on a specified signal Ahead)
 #           - lock_subsidary_signal / unlock_subsidary_signal
 #           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override 
+#           - set_signal_override / clear_signal_override
+#           - set_approach_control / clear_approch_control
 #           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
@@ -57,8 +57,8 @@ class aspect_type(enum.Enum):
     YELLOW = 2
     GREEN = 3
     DOUBLE_YELLOW = 4
-    FLASHING_YELLOW =5
-    FLASHING_DOUBLE_YELLOW=6
+    FLASHING_YELLOW = 5
+    FLASHING_DOUBLE_YELLOW = 6
 
 # -------------------------------------------------------------------------
 # Define a null callback function for internal use
@@ -86,12 +86,14 @@ def subsidary_button_event (sig_id,external_callback):
 def sig_passed_button_event (sig_id,external_callback):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    signals_common.pulse_signal_passed_button (sig_id)
     raise_signal_passed_event(sig_id,external_callback)
     return ()
 
 def approach_release_button_event (sig_id,external_callback):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
+    signals_common.pulse_signal_release_button (sig_id)
     raise_approach_release_event(sig_id,external_callback)
     return ()
 
@@ -103,7 +105,7 @@ def approach_release_button_event (sig_id,external_callback):
 # If not specified then we use the "null_callback" to do nothing
 # -------------------------------------------------------------------------
 
-def raise_signal_updated_event (sig_id:int, external_callback):
+def raise_signal_updated_event (sig_id:int, external_callback=null_callback):
     
     global logging
     
@@ -125,9 +127,7 @@ def raise_signal_updated_event (sig_id:int, external_callback):
 # then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def raise_signal_passed_event (sig_id:int, external_callback):
-    # Call the common function to pulse the button object
-    signals_common.pulse_signal_passed_button (sig_id)
+def raise_signal_passed_event (sig_id:int, external_callback=null_callback):
     # Call the internal function to update and refresh the signal - unless this signal
     # is configured to be refreshed later (based on the aspect of the signal ahead)
     if signals_common.signals[str(sig_id)]["refresh"]: 
@@ -144,10 +144,9 @@ def raise_signal_passed_event (sig_id:int, external_callback):
 # then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def raise_approach_release_event (sig_id:int, external_callback):
-    # Call the common function to pulse the button object
-    signals_common.pulse_signal_release_button (sig_id)
+def raise_approach_release_event (sig_id:int, external_callback=null_callback):
     # reset the state of the signal
+    logging.info ("Signal "+str(sig_id)+": Clearing approach control")
     signals_common.signals[str(sig_id)]["releaseonyel"] = False
     signals_common.signals[str(sig_id)]["releaseonred"] = False
     signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
@@ -234,6 +233,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
            signal_subtype == signal_sub_type.distant):
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Route Indicators")
+    elif approach_release_button and signal_subtype == signal_sub_type.distant:
+        logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
     else:
         # set the font size for the buttons
         # We only want a small button for "Signal Passed" - hence a small font size
@@ -397,8 +398,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                       "subbutton" : button2,                       # MANDATORY - Button drawing object (subsidary signal)
                       "releaseonred" : False,                      # SHARED - State of the "Approach Release for the signal
                       "releaseonyel" : False,                      # SHARED - State of the "Approach Release for the signal
-                      "routeset" : signals_common.route_type.MAIN, # SHARED - Initial Route setting to display (none)
-                      "theatretext" : "",                          # SHARED - Initial Route setting to display (none)
+                      "routeset" : signals_common.route_type.NONE, # SHARED - Initial Route setting to display (none)
+                      "theatretext" : "NONE",                      # SHARED - Initial Route setting to display (none)
                       "passedbutton" : button3,                    # SHARED - Button drawing object
                       "releasebutton" : button4,                   # SHARED - Button drawing object
                       "theatre" : theatre,                         # SHARED - Text drawing object
@@ -453,7 +454,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
     else:
         signal["canvas"].itemconfig (signal["pos1"],fill="grey")
         signal["canvas"].itemconfig (signal["pos2"],fill="grey")
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to NOT DISPLAYED")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK/DARK")
         dcc_control.update_dcc_subsidary_signal(sig_id,False)
     return ()
 
@@ -566,28 +567,50 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             new_aspect = aspect_type.GREEN
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is OFF)")
 
-    # Only refresh the signal drawing objects if the aspect has changed
     current_aspect = signal["displayedaspect"]
-
+    # Only refresh the signal if the aspect has been changed
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to "
                       + str(new_aspect).rpartition('.')[-1] + log_message)
-        # Update the signal aspect - use threadlocks to ensure we coordinate the
+        # Update the signal aspect - use a threadlock to ensure we coordinate the
         # update with the flash_aspects_thread in a deterministic manner 
         aspect_thread_lock.acquire()
         signals_common.signals[str(sig_id)]["displayedaspect"] = new_aspect
         aspect_thread_lock.release()
-        # refresh the signal aspect
         refresh_signal_aspects (sig_id)
-        # We only refresh the feather and theatre route indications on signal aspect
-        # changes if we need to enable/disable the route display (i.e. if the signal
-        # has transitioned either from RED or to RED.(This is OK as only signal types
-        # with RED aspects can be created with feather or theatre route indications)
-        # We also only update Feather Route Indications if a divergent route (other
-        # than MAIN) has been set (i.e. when we need to display/inhibit a feather)
-        if new_aspect == aspect_type.RED or current_aspect == aspect_type.RED:
-            refresh_theatre_route_indication (sig_id)
-            refresh_feather_route_indication (sig_id)
+
+        # Only update the respective route indication if the route is actively set
+        # A route of 'NONE' signifies that the particular route indication isn't used
+        if signal["routeset"] != signals_common.route_type.NONE:
+            # We only refresh the feather and theatre route indications on signal aspect
+            # changes if we need to enable/disable the route display (i.e. if the signal
+            # has transitioned either from RED or to RED.(This is OK as only signal types
+            # with RED aspects can be created with feather or theatre route indications)
+            if current_aspect == aspect_type.RED:
+                logging.info ("Signal "+str(sig_id)+": Enabling feather light route indication for "
+                      + str(signal["routeset"]).rpartition('.')[-1])
+                refresh_feather_route_indication (sig_id)
+                dcc_control.update_dcc_signal_route(sig_id,signal["routeset"],signal_change=True,sig_at_danger=False)
+            elif new_aspect == aspect_type.RED:
+                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route indications (signal is at RED)")
+                refresh_feather_route_indication (sig_id)
+                dcc_control.update_dcc_signal_route(sig_id,signal["routeset"],signal_change=True,sig_at_danger=True)
+
+        # Only update the respective route indication if the route is actively set
+        # A route of 'NONE' signifies that the particular route indication isn't used
+        if signal["theatretext"] != "NONE":
+            # We only refresh the feather and theatre route indications on signal aspect
+            # changes if we need to enable/disable the route display (i.e. if the signal
+            # has transitioned either from RED or to RED.(This is OK as only signal types
+            # with RED aspects can be created with feather or theatre route indications)
+            if current_aspect == aspect_type.RED:
+                logging.info ("Signal "+str(sig_id)+": Enabling theatre route indication for \'"+signal["theatretext"]+"\'")
+                refresh_theatre_route_indication (sig_id)            
+                dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=False)
+            elif new_aspect == aspect_type.RED:
+                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indications (signal is at RED)")
+                refresh_theatre_route_indication (sig_id)
+                dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=True)
             
     return ()
 
@@ -693,25 +716,45 @@ def refresh_signal_aspects (sig_id):
 # -------------------------------------------------------------------------
 
 def update_colour_light_route_indication (sig_id,
-            route_to_set:signals_common.route_type = signals_common.route_type.MAIN,
-                                          theatre_text:str =""):
+            route_to_set:signals_common.route_type = signals_common.route_type.NONE,
+                                          theatre_text:str ="NONE"):
     global logging
     
     # get the signals that we are interested in
     signal = signals_common.signals[str(sig_id)]
-    # Only refresh the signal drawing objects if the route has changed and the displayed aspect
-    # is not set to RED (In this case all route indications will be inhibited - so we'll leave
-    # the refresh of the route indications until the signal is next changed)
-    if signal["routeset"] != route_to_set:
+    
+    # Only update the respective route indication if the route has been changed and has actively
+    # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
+    if signal["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
         logging.info ("Signal "+str(sig_id)+": Setting route to "+str(route_to_set).rpartition('.')[-1])
         signal["routeset"] = route_to_set
+        # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
+        # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
+            logging.info ("Signal "+str(sig_id)+": Setting feather light route indication for "
+                      + str(signal["routeset"]).rpartition('.')[-1])
             refresh_feather_route_indication (sig_id)
-    if signal["theatretext"] != theatre_text:
-        logging.info ("Signal "+str(sig_id)+": Setting theatre route text to \'"+str(theatre_text)+"\'")
+        # We always call the function to update the DCC route indication on a change in route
+        # to cater for DCC signal types that automatically enable/disable the route indication 
+        # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
+        dcc_control.update_dcc_signal_route (sig_id, signal["routeset"], signal_change = False,
+                          sig_at_danger = (signal["displayedaspect"] == aspect_type.RED))
+            
+    # Only update the respective route indication if the route has been changed and has actively
+    # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
+    if signal["theatretext"] != theatre_text and theatre_text != "NONE":
+        logging.info ("Signal "+str(sig_id)+": Setting theatre route indication text to \'"+str(theatre_text)+"\'")
         signal["theatretext"] = theatre_text
+        # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
+        # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
             refresh_theatre_route_indication (sig_id)
+        # We always call the function to update the DCC route indication on a change in route
+        # to cater for DCC signal types that automatically enable/disable the route indication 
+        # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
+        dcc_control.update_dcc_signal_theatre (sig_id, signal["theatretext"], signal_change = False,
+                                 sig_at_danger = (signal["displayedaspect"] == aspect_type.RED))
+
     # save the updates back to the dictionary of signals
     signals_common.signals[str(sig_id)] = signal
     
@@ -734,10 +777,8 @@ def refresh_feather_route_indication (sig_id):
     signal["canvas"].itemconfig (signal["lhf90"],fill="black")
     signal["canvas"].itemconfig (signal["rhf45"],fill="black")
     signal["canvas"].itemconfig (signal["rhf90"],fill="black")
-    # Only display the route indication if the signal is clear and not overriden to red
-    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-        logging.info ("Signal "+str(sig_id)+": Setting route indication to "
-                      + str(signal["routeset"]).rpartition('.')[-1])
+    # Only display the route indication if the signal is not at RED
+    if signal["displayedaspect"] != aspect_type.RED:
         if signal["routeset"] == signals_common.route_type.LH1:
             signal["canvas"].itemconfig (signal["lhf45"],fill="white")
         elif signal["routeset"] == signals_common.route_type.LH2:
@@ -746,13 +787,8 @@ def refresh_feather_route_indication (sig_id):
             signal["canvas"].itemconfig (signal["rhf45"],fill="white")
         elif signal["routeset"] == signals_common.route_type.RH2:
             signal["canvas"].itemconfig (signal["rhf90"],fill="white")
-        dcc_control.update_dcc_signal_route(sig_id, signal["routeset"])
-    else:
-        # If the signal is set to Red then we need to inhibit the indications
-        logging.info ("Signal "+str(sig_id)+": Inhibiting route indication (signal is displaying RED)")
-        dcc_control.update_dcc_signal_route(sig_id, signals_common.route_type.MAIN)
-
-    return ()
+            
+    return()
 
 # -------------------------------------------------------------------------
 # Internal Function to update the displayed value of the theatre route indication.
@@ -766,15 +802,11 @@ def refresh_theatre_route_indication (sig_id):
 
     # get the signal that we are interested in
     signal = signals_common.signals[str(sig_id)]
-    # Only display the route indication if the signal is clear and not overriden to red
-    if signal["sigclear"] and (not signal["override"] or signal["overriddenaspect"] != aspect_type.RED):
-        if signal["theatretext"]:
-            logging.info ("Signal "+str(sig_id)+": Setting theatre indication to \'"+signal["theatretext"]+"\'")
+    # Only display the route indication if the signal is not at RED
+    if signal["displayedaspect"] != aspect_type.RED:
         signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
     else:
-        if signal["theatretext"]:
-            logging.info ("Signal "+str(sig_id)+": Inhibiting theatre indication (signal is displaying RED)")
-        signal["canvas"].itemconfig (signal["theatre"],text="")     
+        signal["canvas"].itemconfig (signal["theatre"],text="")
     return ()
 
 # -------------------------------------------------------------------------
@@ -865,10 +897,12 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     global logging
     
     # do some basic validation specific to this function for colour light signals
-    if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
+    if signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control for a 2 aspect distant signal")
+    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
-    elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
+    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release ony yellow red) for a 2 aspect red/yellow signal")
     else:
         # give an indication that the approach control has been set for the signal
         signals_common.signals[str(sig_id)]["sigbutton"].config(underline=0)

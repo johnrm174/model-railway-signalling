@@ -2,8 +2,6 @@ from tkinter import *
 from model_railway_signals import *
 
 import logging
-#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 
 #----------------------------------------------------------------------
 # This programme provides a simple example of how to use the "points"
@@ -17,7 +15,10 @@ logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 # Here are some global variables for you to change and see the effect
 #----------------------------------------------------------------------
 
-use_dcc_control = True      # will drive DCC signals via the Pi-SPROG-3 
+#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG) 
+use_dcc_control = True    # will drive DCC signals via the Pi-SPROG-3
+debug_dcc = False         # Provides additional logging of the DCC CBUS command strings
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -88,10 +89,10 @@ def main_callback_function(item_id,callback_type):
     update_signal(4, sig_ahead_id=5)
     
     if point_switched(1):
-        set_route_indication(2,route=route_type.LH1)
+        set_route(2,route=route_type.LH1)
         update_signal(2,sig_ahead_id=3)
     else:
-        set_route_indication(2,route=route_type.MAIN)
+        set_route(2,route=route_type.MAIN)
         update_signal(2,sig_ahead_id=4)
 
     update_signal(1, sig_ahead_id=2)
@@ -147,27 +148,35 @@ canvas.pack()
 
 if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
-    initialise_pi_sprog (command_debug=False)
+    initialise_pi_sprog (dcc_debug_mode=debug_dcc)
     request_dcc_power_on()
-    # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
+    # Signal 2 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
     # outputs A,B,C,D to drive our signal with E driving the feather indication
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
-    # Address + 7), but we are only using the firs t 5 in this example
-    map_dcc_signal (sig_id = 2, signal_type = dcc_signal_type.truth_table,
+    # Address + 7), but we are only using the first 5 in this example
+    map_dcc_signal (sig_id = 2,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                    LH1 = [[5,True]], MAIN = [[5, False]])
-    # This assumes a TrainTech DCC 4 Aspect Signal configured with a base address of 9
-    # In this example we are using base address & Base Address+1 to drive the signal
-    # Its an event driven signal - so a single command to change to a new aspect
-    map_dcc_signal (sig_id = 5, signal_type = dcc_signal_type.event_driven,
-                    danger = [[9,False]],
-                    proceed = [[9,True]],
-                    caution = [[10,True]],
-                    prelim_caution = [[10,False]])
+                    LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]] )
+
+    # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
+    # and can take up to 4 consecutive addresses (if you include the flashing aspects)
+    # Signal 1 (addresses 22,23,24,25) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 1, base_address = 22)
+    # Signal 3 (addresses 9,10,11,12) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 3, base_address = 9)
+    # Signal 4 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 4, base_address = 13)
+    # Signal 5 shows you how its configured in terms of the mappings "under the hood"
+    # note that if it had a route indication you should also set 'auto_route_inhibit = True'
+    map_dcc_signal (sig_id = 5,
+                    danger = [[17,False]],
+                    proceed = [[17,True]],
+                    caution = [[18,True]],
+                    prelim_caution = [[18,False]])
     # Points are simply mapped to single addresses
     map_dcc_point (1, 100)
     map_dcc_point (2, 101)
@@ -230,13 +239,15 @@ create_colour_light_signal (canvas,5,900,200,
 
 
 # Map an external track sensor for signal 2 - For simplicity, we'll give it the same ID as the signal
+print ("Creating external Track Sensor Mappings")
 create_track_sensor (2, gpio_channel = 4,
                     sensor_callback = main_callback_function,
                     sensor_timeout = 3.0)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
-print ("Setting Initial Interlocking")
+print ("Setting Initial Route and Interlocking")
 lock_signal(3)
+set_route (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")

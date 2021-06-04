@@ -3,7 +3,7 @@
 # to the required DCC Accessory Addresses and then for sending the appropriate 
 # commands to change the points/signals in accordance with these mappings.
 #
-# For signals "Truth Table" and "Event Driven" types are currently supported.
+# For signals "Truth Table" & "Event Driven" types are currently supported.
 # The "Truth Table" mapping  enables each aspect (e.g. RED, GREEN, YELLOW, DOUBLE YELLOW)
 # to be mapped to a "Truth Table" containing one or more DCC Addresses/states.
 # The "Event Driven" mapping uses a single dcc command (address/state) to change
@@ -30,7 +30,7 @@
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to create a DCC mapping for
 #      Optional Parameters:
-#         signal_type: dcc_signal_type - the type of the DCC Signal (default = truth_table)
+#         auto_route_inhibit:bool - Whether the signal inhibits route indications at DANGER (default=False)
 #         proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
 #         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
 #         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
@@ -39,7 +39,25 @@
 #         LH2[[add:int,state:bool],] - List of DCC addresses/states for "LH90" (default = No Mapping)
 #         RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
 #         RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
-#         call:int - Single DCC address for the "position light" indication (default = No Mapping)
+#         MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
+#         NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit all indications (default = No Mapping)
+#                 Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
+#                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
+#         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
+#                 Each entry comprises the "character" and the associated list of DCC addresses/states
+#                 "#" is a special character - which means inhibit all indications (when signal is at danger)
+#                 Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
+#                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
+#         subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
+#
+#   map_traintech_signal - Generate the mappings for a TrainTech signal
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to create a DCC mapping for
+#         base_address:int - The base address of the signal (the signal will take 4 consecutive addresses)
+#      Optional Parameters:
+#         route_address:int - The address for the route indicator (Feather or Theatre) - Default = 0 (no indicator)
+#         theatre_route:str - The character to be associated with the Theartre display - Default = "NONE" (no Text)
+#         feather_route:signals_common.route_type - The route to be associated with the feather - Default = NONE (no route)
 #
 #   map_dcc_point
 #      Mandatory Parameters:
@@ -71,6 +89,21 @@
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to command
 #         route:signals_common.route_type - The route to set (see signals_common for more details of this type)
+#         signal_at_danger:bool - Depending on the signal type
+#
+#   update_dcc_signal_route - Update the feather route indication of a signal by sending the mapped DCC commands
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to command
+#         route:signals_common.route_type - The route to set (see signals_common for more details of this type)
+#         signal_change:bool - Indicates whether we are dealing with a to/from DANGER change or a change in route
+#         sig_at_danger:bool - the current state of the signal (we need this info to process different DCC signal types)
+#
+#   update_dcc_signal_theatre - Update the theatre route indication of a signal by sending the mapped DCC commands
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to command
+#         character_to_display:str - The character representing the route that is set
+#         signal_change:bool - Indicates whether we are dealing with a to/from DANGER change or a change in route
+#         sig_at_danger:bool - the current state of the signal (we need this info to process different DCC signal types)
 #
 #----------------------------------------------------------------------
 
@@ -87,8 +120,7 @@ import logging
 
 # The mapping types that are currently supported
 class dcc_signal_type(enum.Enum):
-    truth_table = 1
-    event_driven = 2
+    address_mapped = 1
     
 # The Possible states for a main signal
 class signal_state_type(enum.Enum):
@@ -115,21 +147,28 @@ def point_mapped(point_id):
 # Function to "map" a particular signal object to a series of DCC addresses/commands
 #
 #    Truth Table example - a 4 aspect signal, where each LED is mapped to a single DCC
-#    Address (Red=5, Green=6, Yel1 =7, Yel2 =8) would be configured as follows:
+#    Address (Red=5, Green=6, Yel1 =7, Yel2 =8) would be configured as below.
+#    This example also includes an example configuration for a theatre route indication
+#    which we will use to display "1" or "2" for divergent routes and an empty string
+#    (therefore blank) for the main route. Note that we also need to include a mapping
+#    for the "special" character "#" which represents the mappings to apply when the
+#    theatre indicator is inhibited (when the signal is set to RED)
 #
 #        map_dcc_colour_light_signal (sig_id = 10,
-#                            signal_type = dcc_signal_type.truth_table,
 #                            danger = [[5,True],[6,False],[7,False],[8,False]],
 #                            proceed = [[5,False],[6,True],[7,False],[8,False]],
 #                            caution = [[5,False],[6,False],[7,True],[8,False]],
-#                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]]  )
+#                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
+#                            THEATRE = [ ["#", [[9,False],[10,False]]],
+#                                        ["",[[9,False],[10,False]]],
+#                                        ["1",[[9,False],[10,True]]],
+#                                        ["2",[[9,True],[10,False]]] ]   )
 #
 #    Event Driven example - a 4 aspect signal, where 2 addresses are used (the base address
 #    to select the Red or Green aspect and the base+1 address to set the Yellow or Double Yellow
 #    Aspect. A single DCC command is then used to change the signal to the required state
 #
 #        map_dcc_signal (sig_id = 2,
-#                        signal_type = dcc_signal_type.event_driven,
 #                        danger = [[1,False]],
 #                        proceed = [[1,True]],
 #                        caution = [[2,True]],
@@ -137,7 +176,7 @@ def point_mapped(point_id):
 #-----------------------------------------------------------------------------------------
 
 def map_dcc_signal (sig_id:int,
-                    signal_type:dcc_signal_type = dcc_signal_type.truth_table,
+                    auto_route_inhibit:bool = False,
                     danger = [[0,False],],
                     proceed = [[0,False],],
                     caution = [[0,False],],
@@ -149,7 +188,9 @@ def map_dcc_signal (sig_id:int,
                     RH1 = [[0,False],],
                     RH2 = [[0,False],],
                     MAIN = [[0,False],],
-                    call:int=0):
+                    NONE = [[0,False],],
+                    THEATRE = [["#", [[0,False],]],],
+                    subsidary:int=0):
     
     global logging
     
@@ -162,7 +203,9 @@ def map_dcc_signal (sig_id:int,
     else:
         # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
         # within the valid DCC accessory address range od 1 and 2047
-        addresses = danger + proceed + caution + prelim_caution +LH1 + LH2 + RH1 + RH2 + MAIN
+        addresses = danger + proceed + caution + prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE
+        for theatre_state in THEATRE:
+            addresses = addresses + theatre_state[1]
         addresses_valid = True
         for entry in addresses:
             if entry[0] < 0 or entry[0] > 2047:
@@ -171,15 +214,16 @@ def map_dcc_signal (sig_id:int,
             elif entry[1] not in (True,False):
                 logging.error ("Signal "+str(sig_id)+": Invalid DCC State "+str(entry[1])+" - must be between True or False")
                 addresses_valid = False
-        if (call < 0 or call > 2047):
-            logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
+        if (subsidary < 0 or subsidary > 2047):
+            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for subsidary"+str(address)+" - must be between 1 and 2047")
             addresses_valid = False
         if addresses_valid:
             # Create the DCC Mapping entry for the signal. We use the truth tables we have
             # been given for the main signal aspect and the feather route indicators.
             # The "Calling On" position light indication is mapped to a single address
             new_dcc_mapping = {
-                "mapping_type" : signal_type,
+                "mapping_type" : dcc_signal_type.address_mapped,
+                "auto_route_inhibit" : auto_route_inhibit,
                 str(signal_state_type.danger) : danger,
                 str(signal_state_type.proceed) : proceed, 
                 str(signal_state_type.caution) : caution,
@@ -191,10 +235,62 @@ def map_dcc_signal (sig_id:int,
                 str(signals_common.route_type.RH1) : RH1,
                 str(signals_common.route_type.RH2) : RH2,
                 str(signals_common.route_type.MAIN) : MAIN,
-                "call" : call }
+                str(signals_common.route_type.NONE) : NONE,
+                "THEATRE" : THEATRE,
+                "subsidary" : subsidary }
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
         
     return ()
+
+#-----------------------------------------------------------------------------------------
+# Function to "map" a TrainTech" Event-driven signal to the appropriate DCC addresses/commands
+# This function provided to simplify the calling code - i.e. this does all the hard work for you
+#-----------------------------------------------------------------------------------------
+
+
+def map_traintech_signal (sig_id:int,
+                          base_address:int,
+                          route_address:int = 0,
+                          theatre_route = "NONE",
+                          feather_route = signals_common.route_type.NONE):
+
+    # Do some basic validation on the parameters we have been given
+    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Train Tech Signal")
+    if sig_mapped(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
+    elif sig_id < 1:
+        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
+    elif base_address < 0 or base_address > 2047:
+            theatre_address.error ("Signal "+str(sig_id)+": Invalid DCC Address for signal"+str(address)+" - must be between 1 and 2047")
+    elif route_address < 0 or route_address > 2047:
+            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(address)+" - must be between 1 and 2047")
+    else:
+        # Create the DCC Mapping entry for the signal.
+        new_dcc_mapping = {
+                "mapping_type" : dcc_signal_type.address_mapped,
+                "auto_route_inhibit" : True,
+                str(signal_state_type.danger) : [[base_address,False]],
+                str(signal_state_type.proceed) : [[base_address,True]], 
+                str(signal_state_type.caution) : [[base_address+1,True]],
+                str(signal_state_type.prelim_caution) : [[base_address+1,False]],
+                str(signal_state_type.flash_caution) : [[base_address+3,True]],
+                str(signal_state_type.flash_prelim_caution) : [[base_address+3,False]],
+                str(signals_common.route_type.LH1) : [[route_address,False]],
+                str(signals_common.route_type.LH2) : [[route_address,False]],
+                str(signals_common.route_type.RH1) : [[route_address,False]],
+                str(signals_common.route_type.RH2) : [[route_address,False]],
+                str(signals_common.route_type.MAIN) : [[route_address,False]],
+                str(signals_common.route_type.NONE) : [[route_address,False]],
+                "THEATRE" : [ [str(theatre_route), [[route_address,True],]],
+                              ["#", [[route_address,False],]],
+                              ["", [[route_address,False],]] ],
+                "subsidary" : 0 }
+        # finally configure the feather route that is being configured
+        new_dcc_mapping[str(feather_route)] = [[route_address,True]]
+        dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
+    return ()
+
+
 
 #-----------------------------------------------------------------------------------------
 # Externally called unction to "map" a particular point object to a DCC address/command
@@ -232,7 +328,7 @@ def update_dcc_point(point_id:int, state:bool):
     global logging
     
     if point_mapped(point_id):
-        logging.debug ("Point "+str(point_id)+": Retrieving DCC mappings for point")
+        logging.info ("Point "+str(point_id)+": Sending DCC Bus commands to switch point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
@@ -243,8 +339,6 @@ def update_dcc_point(point_id:int, state:bool):
 
 #-----------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to set the state of a DCC Signal
-# We track the state of each indication and we only send the DCC commands needed
-# to change the DCC addresses that need changing (if they don't we leave as they are)
 #------------------------------------------------------------------------------------------
 
 def update_dcc_signal(sig_id: int, state: signal_state_type):
@@ -252,11 +346,11 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for main signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
-        if dcc_mapping["mapping_type"] in (dcc_signal_type.truth_table,dcc_signal_type.event_driven):
+        if dcc_mapping["mapping_type"] == dcc_signal_type.address_mapped:
             # Send the DCC commands to change the state
             for entry in dcc_mapping[str(state)]:
                 if entry[0] > 0:
@@ -265,8 +359,6 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
 
 #-----------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to change the subsidary signal aspect
-# We track the state of each indication and we only send the DCC commands needed
-# to change the DCC addresses that need changing (if they don't we leave as they are)
 #------------------------------------------------------------------------------------------
             
 def update_dcc_subsidary_signal (sig_id:int,state:bool):
@@ -274,32 +366,84 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for subsidary signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
-        if dcc_mapping["call"] > 0:
+        if dcc_mapping["subsidary"] > 0:
             pi_sprog_interface.send_accessory_short_event (dcc_mapping["call"],state)        
     return()
 
 #-----------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to change the route indication
-# We track the state of each indication and we only send the DCC commands needed
-# to change the DCC addresses that need changing (if they don't we leave as they are)
+# Whether we need to send out DCC commands to actually change the route indication will
+# depend on the DCC signal type and WHY we are changing the route indication - Some DCC
+# signals automatically disable/enable the route indications when the signal is switched
+# to/from DANGER - In this case we only need to command it when the ROUTE has been changed.
+# For signals that don't do this, we need to send out commands every time we need to change
+# the route display - i.e. on all Signal Changes (to/from DANGER) to enable/disable the
+# display, and for all ROUTE changes when the signal is not at DANGER
 #------------------------------------------------------------------------------------------
             
-def update_dcc_signal_route (sig_id, route:signals_common.route_type):
-    
+def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
+                              signal_change:bool,sig_at_danger:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.debug ("Signal "+str(sig_id)+": Retrieving DCC mappings for route display")
+        # Retrieve the DCC mappings for our signal
+        dcc_mapping = dcc_signal_mappings[str(sig_id)]
+        # Only send commands to enable/disable route if we need to
+        # All signals - Any route change when the signal is not at DANGER
+        # Auto inhibit signals - additionally route changes when signal is at DANGER
+        # Non auto inhibit signals - additionally all signal changes to/from DANGER
+        if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
+             (not dcc_mapping["auto_route_inhibit"] and signal_change) or
+             (not sig_at_danger and not signal_change) ):
+            logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change route display")
+#            # If the signal is at DANGER - we need to inhibit the display irrespective of the route
+#            # and therefore use the mappings defined for Route "NONE" (for inhibit indication)
+#            if sig_at_danger: route = signals_common.route_type.NONE
+            # Send the DCC commands to change the state if required
+            for entry in dcc_mapping[str(route)]:
+                if entry[0] > 0:
+                    pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+    return()
+
+#-----------------------------------------------------------------------------------------
+# Function to send the appropriate DCC commands to change the Theatre indication
+# Whether we need to send out DCC commands to actually change the route indication will
+# depend on the DCC signal type and WHY we are changing the route indication - Some DCC
+# signals automatically disable/enable the route indications when the signal is switched
+# to/from DANGER - In this case we only need to command it when the ROUTE has been changed.
+# For signals that don't do this, we need to send out commands every time we need to change
+# the route display - i.e. on all Signal Changes (to/from DANGER) to enable/disable the
+# display, and for all ROUTE changes when the signal is not at DANGER
+#------------------------------------------------------------------------------------------
+            
+def update_dcc_signal_theatre (sig_id:int, character_to_display, 
+                               signal_change:bool,sig_at_danger:bool):
+    global logging
+    
+    if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
-        # Send the DCC commands to change the state if required
-        for entry in dcc_mapping[str(route)]:
-            if entry[0] > 0:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+        # Only send commands to enable/disable route if we need to
+        # All signals - Any route change when the signal is not at DANGER
+        # Auto inhibit signals - additionally route changes when signal is at DANGER
+        # Non auto inhibit signals - additionally all signal changes to/from DANGER
+        if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
+             (not dcc_mapping["auto_route_inhibit"] and signal_change) or
+             (not sig_at_danger and not signal_change) ):
+            logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change Theatre display")
+#            # If the signal is at DANGER - we need to inhibit the display irrespective of the route
+#            # and therefore use the mappings defined the special character '#' (for inhibit indication)
+#            if sig_at_danger: character_to_display = "#"  
+            # Send the DCC commands to change the state if required
+            for entry in dcc_mapping["THEATRE"]:
+                if entry[0] == character_to_display:
+                    for command in entry[1]:
+                        if command[0] > 0:
+                             pi_sprog_interface.send_accessory_short_event (command[0],command[1])
     return()
 
 #######################################################################################

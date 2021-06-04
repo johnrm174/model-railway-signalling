@@ -11,19 +11,20 @@ from .points import toggle_fpl
 from .signals_common import route_type
 from .signals_common import sig_callback_type
 from .signals_common import pulse_signal_passed_button
+from .signals_common import pulse_signal_release_button
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_ground_position import create_ground_position_signal
-from .signals import set_route_indication
+from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
 from .signals import unlock_signal
 from .signals import toggle_signal
-from .signals import lock_subsidary_signal
-from .signals import unlock_subsidary_signal
-from .signals import toggle_subsidary_signal
+from .signals import lock_subsidary
+from .signals import unlock_subsidary
+from .signals import toggle_subsidary
 from .signals import signal_clear
-from .signals import subsidary_signal_clear
+from .signals import subsidary_clear
 from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import set_approach_control
@@ -47,6 +48,7 @@ from .pi_sprog_interface import request_dcc_power_off
 
 from .dcc_control import dcc_signal_type
 from .dcc_control import map_dcc_signal
+from .dcc_control import map_traintech_signal
 from .dcc_control import map_dcc_point
 
 __all__ = [
@@ -68,22 +70,23 @@ __all__ = [
       # Public signal functions
         'create_colour_light_signal',
         'create_ground_position_signal',
-        'set_route_indication',
+        'set_route',
         'update_signal',
         'lock_signal',
         'unlock_signal',
         'toggle_signal',
-        'lock_subsidary_signal',
-        'unlock_subsidary_signal',
-        'toggle_subsidary_signal',
+        'lock_subsidary',
+        'unlock_subsidary',
+        'toggle_subsidary',
         'signal_clear',
-        'subsidary_signal_clear',
+        'subsidary_clear',
         'set_signal_override',
         'clear_signal_override',
         'set_approach_control',
         'clear_approach_control',
         'trigger_timed_signal',
         'pulse_signal_passed_button',
+        'pulse_signal_release_button',
       # Public track_section types
         'section_callback_type',
       # Public track_section functions
@@ -104,6 +107,7 @@ __all__ = [
         'request_dcc_power_on',
         'request_dcc_power_off',
         'map_dcc_signal',
+        'map_traintech_signal',
         'map_dcc_point'
            ]
 

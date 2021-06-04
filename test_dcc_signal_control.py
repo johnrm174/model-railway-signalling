@@ -14,13 +14,13 @@ from model_railway_signals import *
 
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
 #----------------------------------------------------------------------
 # global variables 
 #----------------------------------------------------------------------
 
-sprog_debug_level = 1     # 0 = No debug, 1 = status messages only, 2 = all CBUS messages
+sprog_debug = TRUE        # Request command station status and log all all CBUS messages
 route = route_type.MAIN   # Initial route Indication (which then gets toggled during tests)
 row_under_test = 1        # This is to control what signals we actually test in each mode
 
@@ -51,7 +51,7 @@ def set_two_aspect():
     # Only enable the signals for this test mode
     row_under_test = 1
     lock_signal(5,6,8,9,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(1,2,3,4)
     return()
 
@@ -70,7 +70,7 @@ def set_three_aspect():
     # Only enable the signals for this test mode
     row_under_test = 2
     lock_signal(1,2,3,4,8,9,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(5,6)
     return()
 
@@ -89,7 +89,7 @@ def set_four_aspect():
     # Only enable the signals for this test mode
     row_under_test = 3
     lock_signal(1,2,3,4,5,6,11,12,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(8,9)
     return()
 #----------------------------------------------------------------------
@@ -107,7 +107,7 @@ def set_individual_outputs():
     # Only enable the signals for this test mode
     row_under_test = 4
     lock_signal(1,2,3,4,5,6,8,9,14,16)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(11,12)
     return()
 
@@ -126,7 +126,7 @@ def set_four_aspect_single():
     # Only enable the signals for this test mode
     row_under_test = 5
     lock_signal(1,2,3,4,5,6,8,9,11,12,16)
-    unlock_subsidary_signal(14)
+    unlock_subsidary(14)
     unlock_signal(14)
     return()
 
@@ -145,7 +145,7 @@ def set_four_aspect_feathers():
     # Only enable the signals for this test mode
     row_under_test = 6
     lock_signal(1,2,3,4,5,6,8,9,11,12,14)
-    lock_subsidary_signal(14)
+    lock_subsidary(14)
     unlock_signal(16)
     return()
 
@@ -191,15 +191,15 @@ def toggle_feather():
     else:
         route = route_type.MAIN
     if row_under_test==2:
-        set_route_indication (5,route)
-        set_route_indication (6,route)
-        set_route_indication (7,route)
+        set_route (5,route)
+        set_route (6,route)
+        set_route (7,route)
     elif row_under_test==5:
-        set_route_indication (14,route)
-        set_route_indication (15,route)
+        set_route (14,route)
+        set_route (15,route)
     elif row_under_test==6:
-        set_route_indication (16,route)
-        set_route_indication (17,route)
+        set_route (16,route)
+        set_route (17,route)
     return()
 
 #----------------------------------------------------------------------
@@ -207,7 +207,7 @@ def toggle_feather():
 #----------------------------------------------------------------------
 
 # Initialise the Pi sprog (and switch on the track power)
-initialise_pi_sprog (sprog_debug_level)
+initialise_pi_sprog (dcc_debug_mode = sprog_debug)
 request_dcc_power_on()
 
 # Reset the Decoder to its defaults
@@ -297,7 +297,8 @@ map_dcc_signal (5, danger=[[address,False],[address+1,False]],
                  LH2 = [[address+2,False]],
                  RH1 = [[address+2,False]],
                  RH2 = [[address+2,False]],
-                 MAIN = [[address+2,False]] )
+                 MAIN = [[address+2,False]],
+                 NONE = [[address+2,False]] )
 map_dcc_signal (6, danger=[[address+3,False],[address+4,False]],
                  proceed=[[address+4,False],[address+3,True]],
                  caution=[[address+4,True],[address+3,False]],
@@ -305,7 +306,8 @@ map_dcc_signal (6, danger=[[address+3,False],[address+4,False]],
                  LH2 = [[address+5,False]],
                  RH1 = [[address+5,True]],
                  RH2 = [[address+5,False]],
-                 MAIN = [[address+5,False]] )
+                 MAIN = [[address+5,False]],
+                 NONE = [[address+5,False]] )
 
 # 4 aspect signals - Note that this differes from the truth table in the Signalist SC1 Manual
 map_dcc_signal (8, danger=[[address,False],[address+1,False]],
@@ -337,6 +339,7 @@ map_dcc_signal (14, danger=[[address,False],[address+1,False]],
                  RH1 = [[address+3,True]],
                  RH2 = [[address+3,False]],
                  MAIN = [[address+3,False]],
+                 NONE = [[address+3,False]],
                  call = address+4)
 
 # 4 aspect signal - With Multiple feathers
@@ -348,7 +351,8 @@ map_dcc_signal (16, danger=[[address,False],[address+1,False]],
                  LH2 = [[address+2,False],[address+3,False]],
                  RH1 = [[address+3,False],[address+2,True]],
                  RH2 = [[address+2,True],[address+3,True]],
-                 MAIN = [[address+2,False],[address+3,False]] )
+                 MAIN = [[address+2,False],[address+3,False]],
+                 NONE = [[address+2,False],[address+3,False]] )
 
 print ("Creating Signals")
 
@@ -435,7 +439,7 @@ create_colour_light_signal (canvas,17,350,300, sig_callback=signal_button,
 print ("Inhibit everything until the test mode is selected")
 
 lock_signal(1,2,3,4,5,6,8,9,11,12,14,16)
-lock_subsidary_signal(14)
+lock_subsidary(14)
 
 print ("Entering main event loop")
 

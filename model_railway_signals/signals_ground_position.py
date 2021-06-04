@@ -12,6 +12,7 @@
 #
 # Common features supported by Ground Position Colour Light signals
 #           - lock_signal / unlock_signal
+#           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
 # change the way we import depending on whether we are running locally or not
@@ -47,6 +48,7 @@ def signal_button_event (sig_id,external_callback):
 def sig_passed_button_event (sig_id,external_callback):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    signals_common.pulse_signal_passed_button (sig_id)
     raise_signal_passed_event(sig_id,external_callback)
     return ()
 
@@ -76,8 +78,6 @@ def toggle_ground_position_light_signal (sig_id:int,ext_callback=null_callback):
 
 def raise_signal_passed_event (sig_id:int, ext_callback = null_callback):
     
-    # Call the common function to pulse the button object
-    signals_common.pulse_signal_passed_button (sig_id)
     # Call the internal function to update and refresh the signal
     update_ground_position_light_signal (sig_id)
     # Make the external callback

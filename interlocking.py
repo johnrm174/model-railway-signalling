@@ -12,7 +12,8 @@ from model_railway_signals import *
 # External function to set the initial locking conditions at startup
 #----------------------------------------------------------------------
 def set_initial_interlocking_conditions():
-    lock_signal (5,7,13,14)
+#    lock_signal (5,7,13,14)
+    lock_signal (5,13,14)
     return()
 
 #----------------------------------------------------------------------
@@ -23,97 +24,95 @@ def set_initial_interlocking_conditions():
 
 def process_interlocking_west():
 
-    # Clear down all the current locking first - and start afresh
-    unlock_point(1,2,3,4,5)
-    unlock_signal(1,2,3,5,6,12,13,14,15)
-    unlock_subsidary_signal(2,5,6)
-
     # ----------------------------------------------------------------------
     # Signal 1 (West box)
-    # Main Signal - Routes into Platform 3 or Goods loop
+    # Main Signal - Branch Line towards Signal 2
     # ----------------------------------------------------------------------
 
-    if signal_clear(1) and not point_switched(2):
-        if point_switched(4):
-            lock_signal(5)
-            if not point_switched(5):
-                lock_subsidary_signal(5)
-        else:
-            lock_signal(6)
-            lock_subsidary_signal(6)
+    if ( (not point_switched(2) and (signal_clear(5) or signal_clear(6) or subsidary_clear(6))) or
+         (not point_switched(2) and point_switched(4) and not point_switched(5) and subsidary_clear(5)) ):
+        # A conflicting outbound movement has been cleared
+        lock_signal(1)
+    else:
+        unlock_signal(1)
 
     # ----------------------------------------------------------------------
     # Signal 2 (West box)
-    # Main Signal & Subsidary Signal - Routes into Platform 3 or Goods loop
+    # Main & Subsidary Signals - Branch Line into Platform 3 or Goods loop
     # ----------------------------------------------------------------------
 
-    if signal_clear(2):
-        lock_point (2,4)
-        lock_subsidary_signal (2)
-        if point_switched(4):
-            lock_point(5)
-            lock_signal(5)
-            lock_subsidary_signal(5)
-        else:
-            lock_signal(6)
-            lock_subsidary_signal(6)
-            
-    if subsidary_signal_clear(2):
-        lock_point(2,4)
-        lock_signal (2)
-        if point_switched(4):
-            lock_point(5)
-            lock_signal(5)
-            lock_subsidary_signal(5)
-        else:
-            lock_signal (6)
-            lock_subsidary_signal(6)
+    if ( (point_switched(2) or not fpl_active(2) or not fpl_active(4)) or
+         (point_switched(4) and point_switched(5)) or
+         (signal_clear(5) or signal_clear(6) or subsidary_clear(6)) or
+         (point_switched(4) and not point_switched(5) and subsidary_clear(5)) ):
+        # Route is not set/locked or a conflicting outbound movement has been cleared
+        lock_signal(2)
+        lock_subsidary(2)
+    else:
+        # finally interlock the main/subsidary signals
+        if subsidary_clear(2): lock_signal(2)
+        else: unlock_signal(2)
+        if signal_clear(2): lock_subsidary(2)
+        else: unlock_subsidary(2)
 
     # ----------------------------------------------------------------------
     # Signal 3 (West box)
-    # Main Signal - Routes into Platform 1, Platform 3 or Goods loop
+    # Main Signal - Up Main into Platform 1, Platform 3 or Goods loop
     # ----------------------------------------------------------------------
 
-    if signal_clear(3):
-        lock_point(1,2)
-        if point_switched(2):
-            lock_point(4)
-            if point_switched(4):
-                lock_point(5)
-                lock_signal(5)
-                lock_subsidary_signal(5)
-            else:
-                lock_signal(6)
-                lock_subsidary_signal(6)
-
+    if ( (point_switched(1) or not fpl_active(1) or not fpl_active(2)) or
+         (point_switched(2) and not fpl_active(4)) or
+         (point_switched(2) and point_switched(4) and point_switched(5)) ):
+        # Route into goods loop is not fully set/locked
+        # We don't have to worry about departing routes as they should all be locked
+        lock_signal(3)
+    else:
+        unlock_signal(3)
+        
     # ----------------------------------------------------------------------
     # Signal 5 (West box)
     # Main Signal - Routes onto Branch or Down Maiin
-    # Subsidary Signal - Route onto Branch only
+    # Subsidary Signal - Route onto Branch or MPD or Goods Yard
     # ----------------------------------------------------------------------
 
-    if signal_clear(5):
-        lock_point(2,4,5)
-        lock_subsidary_signal(5)
-        if not point_switched(2):
-            lock_signal(1,2)
-            lock_subsidary_signal(2)
-        else:
-            lock_point(1)
-            
-    if subsidary_signal_clear(5):
+    if point_switched(5):
+        # Shunting move into Goods yard only
         lock_signal(5)
-        lock_point(5)
-        if point_switched(5):
-            lock_signal(14)
+        if signal_clear(14): lock_subsidary(5)
+        else: unlock_subsidary(5)
+    elif not fpl_active(4):
+        # No Route - Point 4 not locked
+        lock_signal(5)
+        lock_subsidary(5)
+    elif not point_switched(4) and fpl_active(4):
+        # Shunting move into MPD only
+        lock_signal(5)
+        if signal_clear(15): lock_subsidary(5)
+        else: unlock_subsidary(5)
+    elif not fpl_active(2):
+        # No Route - Point 2 not locked
+        lock_signal(5)
+        lock_subsidary(5)
+    elif not point_switched(2):
+        if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
+            # Route is set to Branch but a conflicting inbound movement has been cleared
+            lock_signal(5)
+            lock_subsidary(5)
         else:
-            lock_point(4)
-            if not point_switched(4):
-                lock_signal(15)
-            else:
-                lock_point(2)
-                lock_signal(1,2)
-                lock_subsidary_signal(2)
+            # Route is set and locked to Branch - shunting allowed
+            # interlock the main/subsidary signals
+            if subsidary_clear(5): lock_signal(5)
+            else: unlock_signal(5)
+            if signal_clear(5): lock_subsidary(5)
+            else: unlock_subsidary(5)
+    elif not point_switched(1) or not fpl_active(1):
+        # Outbound Route is not fully set (no route onto Down Main)
+        lock_signal(5)
+        lock_subsidary(5)
+    else:
+        # Route is set and locked to Down Main - shunting not allowed
+        unlock_signal(5)
+        lock_subsidary(5)
 
     # ----------------------------------------------------------------------
     # Signal 6 (West box)
@@ -121,128 +120,132 @@ def process_interlocking_west():
     # Subsidary Signal - Route onto Branch only
     # ----------------------------------------------------------------------
 
-    if signal_clear(6):
-        lock_point(2,4)
-        lock_subsidary_signal (6)
-        if not point_switched(2):
-            lock_signal(1,2)
-            lock_subsidary_signal(2)
+    if point_switched(4) or not fpl_active(4) or not fpl_active(2):
+        # Initial departure route from platform 3 (to branch or main) not set and locked
+        lock_signal(6)
+        lock_subsidary(6)
+    elif not point_switched(2):
+        if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
+            # Route is set to Branch but a conflicting inbound movement has been cleared
+            lock_signal(6)
+            lock_subsidary(6)
         else:
-            lock_point(1,2,4)
-            
-    if subsidary_signal_clear(6):
-        lock_point(2,4)
-        lock_signal(1,2,6)
-        lock_subsidary_signal(2)
-
+            # Route is set and locked to Branch - shunting allowed
+            # interlock the main/subsidary signals
+            if subsidary_clear(6): lock_signal(6)
+            else: unlock_signal(6)
+            if signal_clear(6): lock_subsidary(6)
+            else: unlock_subsidary(6)
+    elif not point_switched(1) or not fpl_active(1):
+        # Outbound Route is not fully set (no route onto Down Main)
+        lock_signal(6)
+        lock_subsidary(6)
+    else:
+        # Route is set and locked to Down Main - shunting not allowed
+        unlock_signal(6)
+        lock_subsidary(6)
+        
     # ----------------------------------------------------------------------
     # Signal 12 (West box)
     # Main Signal - Route onto Down Main only
     # ----------------------------------------------------------------------
 
-    if signal_clear(12):
-        lock_point(1,3)
-        
+    if point_switched(3) or not fpl_active(3) or point_switched(1) or not fpl_active(1):
+        # Initial departure route not set and locked
+        lock_signal(12)
+    else:
+        unlock_signal(12)
+
     # ----------------------------------------------------------------------
     # Signal 13 (West box)
     # Main Signal - Route onto Down Main only
     # ----------------------------------------------------------------------
 
-    if signal_clear(13):
-        lock_point(1,3)
+    if not point_switched(3) or not fpl_active(3) or point_switched(1) or not fpl_active(1):
+        # Initial departure route not set and locked
+        lock_signal(13)
+    else:
+        unlock_signal(13)
 
     # ----------------------------------------------------------------------
     # Signal 14 (West box) - Exit from Goods Yard
     # Subsidary Signal - Route to Goods Loop only
     # ----------------------------------------------------------------------
-
-    if signal_clear(14):
-        lock_point(5)
-        lock_subsidary_signal(5)
     
+    if not point_switched(5) or subsidary_clear(5):
+        # Exit route not set or a conflicting shunting movement is cleared
+        lock_signal(14)
+    else:
+        unlock_signal(14)
+
     # ----------------------------------------------------------------------
     # Signal 15 (West box) - Exit from MPD
     # Subsidary Signal - Route to Goods Loop only
     # ----------------------------------------------------------------------
 
-    if signal_clear(15):
-        lock_point(4,5)
-        lock_subsidary_signal(5)
+    if point_switched(5) or point_switched(4) or not fpl_active(4) or subsidary_clear(5):
+        # Exit route not set and locked or a conflicting shunting movement is cleared
+        lock_signal(15)
+    else:
+        unlock_signal(15)
 
     # ----------------------------------------------------------------------
     # Point 1 (West box)
     # Routes from Goods Loop, Platform 3, Down Loop and Platform 1
     # ----------------------------------------------------------------------
 
-    if not fpl_active(1):
-        lock_signal (3,12,13)
-        if point_switched(2):
-            lock_signal(5,6)
+    if ( (signal_clear(3) or signal_clear(12) or signal_clear(13) ) or 
+         (point_switched(1) and point_switched(2)) and (signal_clear(5) or signal_clear(6)) ):
+        # Departure route onto DOWN MAIN set/cleared - or arrival route from UP MAIN set/cleared
+        lock_point(1)
+    else:
+        unlock_point(1)
 
-    elif point_switched(1):
-        lock_signal(3,12,13)
-        
-    elif point_switched(2) and not point_switched(1):
-        lock_signal(5,6)
-     
     # ----------------------------------------------------------------------
     # Point 2 (West box)
     # Routes from Goods Loop, Platform 3, Down Loop and Platform 1
     # ----------------------------------------------------------------------
 
-    if not fpl_active(2):
-        lock_signal(2,3,5,6)
-        lock_subsidary_signal(2,6)
-        if point_switched(4) and not point_switched(5):
-            lock_subsidary_signal(5)
-
-    elif point_switched(2):
-        lock_signal(2)
-        lock_subsidary_signal(2)
-        if not point_switched(4):
-            lock_subsidary_signal(6)
-        elif point_switched(4) and not point_switched(5):
-            lock_subsidary_signal(5)
+    if ( (signal_clear(5) or signal_clear(6) or signal_clear(3) or signal_clear(2)) or
+         (subsidary_clear(5) and point_switched(4) and not point_switched(5)) or
+         (subsidary_clear(2) or subsidary_clear(6)) ):
+        lock_point(2)
+    else:
+        unlock_point(2)
 
     # ----------------------------------------------------------------------
     # Point 3 (West box)
     # Routes from Down Loop and Platform 1
     # ----------------------------------------------------------------------
 
-    if not fpl_active(3):
-        lock_signal(12,13)
-    elif point_switched(3):
-        lock_signal(12)
+    if signal_clear(12) or signal_clear(13):
+        lock_point(3)
     else:
-        lock_signal(13)
-
+        unlock_point(3)
+        
     # ----------------------------------------------------------------------
     # Point 4 (West box)
     # ----------------------------------------------------------------------
 
-    if not fpl_active(4):
-        lock_signal(2,5,15)
-        lock_subsidary_signal(2)
-        if not point_switched(5):
-            lock_subsidary_signal(5)
-        if point_switched(2):
-            lock_signal(3)
-    elif point_switched(4):
-        lock_signal(6,15)
-        lock_subsidary_signal(6)
+    if ( (signal_clear(5) or subsidary_clear(5)) or
+         (signal_clear(6) or subsidary_clear(6)) or
+         (signal_clear(2) or subsidary_clear(2)) or
+         (point_switched(2) and signal_clear(3)) or
+          signal_clear(15) ):
+        lock_point(4)
     else:
-        lock_signal(5)
+        unlock_point(4)
 
     # ----------------------------------------------------------------------
     # Point 5 (West box) - No Facing Point Locks
     # ----------------------------------------------------------------------
 
-    if point_switched(5):
-        lock_signal(5,15)
+    if ( (signal_clear(5) or subsidary_clear(5) or signal_clear(14) or signal_clear(15)) or 
+         (point_switched(4) and not point_switched(2) and (signal_clear(2) or subsidary_clear(2))) or
+         (point_switched(4) and point_switched(2) and signal_clear(3)) ):
+        lock_point(5)
     else:
-        lock_signal(14)
-
-    return()
+        unlock_point(5)
 
 #----------------------------------------------------------------------
 # Station East Interlocking
@@ -250,18 +253,11 @@ def process_interlocking_west():
 
 def process_interlocking_east():
     
-    # Clear down all the current locking first - and start afresh
-    unlock_point(6,7,8,9,10)
-    unlock_signal(4,7,8,9,10,11,16)
-    unlock_subsidary_signal(7,8,10)
 
     # ----------------------------------------------------------------------
     # Signal 4 (East box)
     # Main Signal - Route onto Up Maiin
     # ----------------------------------------------------------------------
-
-    if signal_clear(4):
-        lock_point(8,9)
 
     # ----------------------------------------------------------------------
     # Signal 7 (East box)
@@ -269,25 +265,6 @@ def process_interlocking_east():
     # Subsidary Signal - Route onto Branch only
     # ----------------------------------------------------------------------
 
-    if signal_clear(7):
-        lock_point(6,8)
-        lock_subsidary_signal(7)
-        if not point_switched(8):
-            lock_signal(9,10)
-            lock_subsidary_signal(10)
-        else:
-            lock_point(9)
-            
-    if subsidary_signal_clear(7):
-        lock_point(6)
-        lock_signal(7)
-        if not point_switched(6): 
-            lock_point(10)
-            lock_signal(16)
-        else: 
-            lock_point(8)
-            lock_signal(9,10)
-            lock_subsidary_signal(10)
         
     # ----------------------------------------------------------------------
     # Signal 8 (East box)
@@ -295,151 +272,50 @@ def process_interlocking_east():
     # Subsidary Signal - Route onto Branch only
     # ----------------------------------------------------------------------
 
-    if signal_clear(8):
-        lock_point(6,8)
-        lock_subsidary_signal (8)
-        if not point_switched(8):
-            lock_signal(9,10)
-            lock_subsidary_signal(10)
-        else:
-            lock_point(9)
-            
-    if subsidary_signal_clear(8):
-        lock_point(6,8)
-        lock_signal(8,9,10)
-        lock_subsidary_signal(10)
     
     # ----------------------------------------------------------------------
     # Signal 9 (East box)
     # Main Signal - Routes into Platform 3 or Goods loop
     # ----------------------------------------------------------------------
 
-    if signal_clear(9) and not point_switched(8):
-        if point_switched(6):
-            lock_signal(7)
-            lock_subsidary_signal(7)
-        else:
-            lock_signal(8)
-            lock_subsidary_signal(8)
 
     # ----------------------------------------------------------------------
     # Signal 10 (East box)
     # Main Signal & Subsidary Signal - Routes into Platform 3 or Goods loop
     # ----------------------------------------------------------------------
 
-    if signal_clear(10):
-        lock_point(8,6)
-        lock_subsidary_signal(10)
-        if point_switched(6):
-            lock_signal(7)
-            lock_subsidary_signal(7)
-        else:
-            lock_signal (8)
-            lock_subsidary_signal (8)
-            
-    if subsidary_signal_clear(10):
-        lock_point(8,6)
-        lock_signal(10)
-        if point_switched(6):
-            lock_signal(7)
-            lock_subsidary_signal (7)
-        else:
-            lock_signal (8)
-            lock_subsidary_signal(8)
-
     # ----------------------------------------------------------------------
     # Signal 11 (East box)
     # Main Signal - Routes into Plat 1, Down Loop, Plat 3 or Goods loop
     # ----------------------------------------------------------------------
 
-    if signal_clear(11):
-        lock_point(9)
-        if not point_switched(9):
-            lock_point(7)
-        else:
-            lock_point(6,8)
-            if point_switched(6):
-                lock_signal(7)
-                lock_subsidary_signal(7)
-            else:
-                lock_signal (8)
-                lock_subsidary_signal(8)
-
+ 
     # ----------------------------------------------------------------------
     # Signal 16 (East box) - Exit from Goods Yard
     # ----------------------------------------------------------------------
-
-    if signal_clear(16):
-        lock_point(6,10)
-        lock_subsidary_signal(7)
 
     # ----------------------------------------------------------------------
     # Point 6 (East box)
     # ----------------------------------------------------------------------
         
-    if not fpl_active(6):
-        lock_signal(7,8,10)
-        lock_subsidary_signal(7,8,10)
-        if point_switched(8) and point_switched(9):
-            lock_signal(11)
-    elif point_switched(6):
-        lock_signal(8,16)
-        lock_subsidary_signal(8)
-    else:
-        lock_signal(7)
-        
     # ----------------------------------------------------------------------
     # Point 7 (East box)
     # ----------------------------------------------------------------------
 
-    if not fpl_active(7) and not point_switched(9):
-        lock_signal(11)
-
     # ----------------------------------------------------------------------
     # Point 8 (East box)
     # ----------------------------------------------------------------------
-            
-    if not fpl_active(8):
-        lock_signal(4,7,8,10)
-        lock_subsidary_signal(10,8)
-        if point_switched(6):
-            lock_subsidary_signal(7)
-        if point_switched(9):
-            lock_signal(11)
 
-    elif point_switched(8):
-        lock_signal(4,10)
-        lock_subsidary_signal(10)
-        if not point_switched(6):
-            lock_subsidary_signal(8)
-        else:
-            lock_subsidary_signal(7)
-            
-    elif point_switched(9):
-        lock_signal(11)
             
     # ----------------------------------------------------------------------
     # Point 9 (East box)
     # ----------------------------------------------------------------------
 
-    if not fpl_active(9):
-        lock_signal(4,11)
-        if point_switched(8):
-            lock_signal(7,8)
-
-    elif point_switched(9):
-        lock_signal(4)
-        if point_switched(8):
-            lock_signal(7,8)
 
     # ----------------------------------------------------------------------
     # Point 10 (East box) - To Goods yard
     # ----------------------------------------------------------------------
 
-    if point_switched(10):
-        lock_signal(16)
-        if not point_switched(6):
-            lock_subsidary_signal(7)
 
     return()
 

@@ -22,14 +22,18 @@ import enum
 import time
 import threading
 import logging
-import sys
 
-# A quick and dirty way of getting the code to run on Windows for development
-# As the Windows version of python doesn't include the RPi specific GPIO package
-if sys.platform == 'linux':
-    import RPi.GPIO as GPIO
-    # We want to refer to the ports by port number and not physical pin number
-    GPIO.setmode(GPIO.BCM)
+# We can only use GPIO interface if we're running on a Raspberry Pi
+# Other Platforms don't include the RPi specific GPIO package
+def is_raspberrypi():
+    global GPIO
+    try:
+        import RPi.GPIO as GPIO
+        GPIO.setmode(GPIO.BCM)     # We want to refer to the ports by port number and not physical pin number
+        return (True)
+    except Exception: pass
+    return (False)
+raspberry_pi = is_raspberrypi()
 
 # -------------------------------------------------------------------------
 # Define the different callbacks types for the sensor
@@ -111,6 +115,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
     
     global channels # the dictionary of sensors
     global logging
+    global raspberry_pi
     # also uses fontsize, xpadding, ypadding imported from "common"
 
     # Validate the parameters we have been given
@@ -133,11 +138,11 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         if not sensor_mapped:
             # A quick and dirty way of getting the code to run on Windows for development
             # As the Windows version of python doesn't include the RPi specific GPIO package
-            if sys.platform == 'linux':
+            if raspberry_pi:
                 GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
                 GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
             else:
-                logging.warning ("Sensor "+str(sensor_id)+": Unsupported platform - GPIO inputs will be non-functional")
+                logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
 
             # Add the to the dictionaries of sensors and channels
             channels[str(gpio_channel)] = {"sensor_id"      : sensor_id,
@@ -153,10 +158,11 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
 def track_sensor_active (sensor_id:int):
 
     global logging
+    global raspberry_pi
     
     # A quick and dirty way of getting the code to run on Windows for development
     # As the Windows version of python doesn't include the RPi specific GPIO package
-    if sys.platform == 'linux':
+    if raspberry_pi:
         for channel in channels.keys():
             if channels[str(channel)]["sensor_id"] == sensor_id:
                 return not bool(GPIO.input(int(channel)))
