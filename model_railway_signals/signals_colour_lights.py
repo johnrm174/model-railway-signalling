@@ -146,6 +146,7 @@ def raise_signal_passed_event (sig_id:int, external_callback=null_callback):
 
 def raise_approach_release_event (sig_id:int, external_callback=null_callback):
     # reset the state of the signal
+    logging.info ("Signal "+str(sig_id)+": Clearing approach control")
     signals_common.signals[str(sig_id)]["releaseonyel"] = False
     signals_common.signals[str(sig_id)]["releaseonred"] = False
     signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)

@@ -287,7 +287,6 @@ def map_traintech_signal (sig_id:int,
                 "subsidary" : 0 }
         # finally configure the feather route that is being configured
         new_dcc_mapping[str(feather_route)] = [[route_address,True]]
-        print (new_dcc_mapping)
         dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
     return ()
 
