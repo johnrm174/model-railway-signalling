@@ -150,7 +150,7 @@ if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
     initialise_pi_sprog (dcc_debug_mode=debug_dcc)
     request_dcc_power_on()
-    # This assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
+    # Signal 2 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using
     # outputs A,B,C,D to drive our signal with E driving the feather indication
     # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
@@ -161,14 +161,21 @@ if use_dcc_control:
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
                     LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]] )
-    # This assumes a TrainTech DCC 4 Aspect Signal configured with a base address of 9
-    # In this example we are using base address & Base Address+1 to drive the signal
-    # Its an event driven signal - so a single command to change to a new aspect
+
+    # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
+    # and can take up to 4 consecutive addresses (if you include the flashing aspects)
+    # Signal 1 (addresses 22,23,24,25) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 1, base_address = 22)
+    # Signal 3 (addresses 9,10,11,12) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 3, base_address = 9)
+    # Signal 4 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 4, base_address = 13)
+    # Signal 5 shows you how its configured in terms of the mappings "under the hood"
     map_dcc_signal (sig_id = 5,
-                    danger = [[9,False]],
-                    proceed = [[9,True]],
-                    caution = [[10,True]],
-                    prelim_caution = [[10,False]])
+                    danger = [[17,False]],
+                    proceed = [[17,True]],
+                    caution = [[18,True]],
+                    prelim_caution = [[18,False]])
     # Points are simply mapped to single addresses
     map_dcc_point (1, 100)
     map_dcc_point (2, 101)

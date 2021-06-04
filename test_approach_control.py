@@ -76,11 +76,11 @@ def main_callback_function(item_id,callback_type):
             set_signal_override(I)
         else:
             clear_signal_override(I)
-    if section_occupied(4) or section_occupied(5):
-        set_signal_override(4)
+    if (point_switched(1) and section_occupied(5)) or (not point_switched(1) and section_occupied(4)):
+          set_signal_override(4)
     else:
         clear_signal_override(4)
-    if section_occupied(14) or section_occupied(15):
+    if (point_switched(11) and section_occupied(15)) or (not point_switched(11) and section_occupied(14)):
         set_signal_override(14)
     else:
         clear_signal_override(14)
@@ -104,7 +104,7 @@ def main_callback_function(item_id,callback_type):
         set_route(14,theatre_text="1")
         update_signal(14,sig_ahead_id=15)
     else:
-        set_route(14,theatre_text="")
+        set_route(14,theatre_text="2")
         update_signal(14,sig_ahead_id=16)
     update_signal(13,sig_ahead_id=14)
     update_signal(12,sig_ahead_id=13)
@@ -137,16 +137,21 @@ def main_callback_function(item_id,callback_type):
     # approach control when the signal is passed. this is so we don't
     # inadvertantly re-set the approach control on other events received
     # between the time the train releases the approach control and the
-    # train actually reaches the signal
+    # train actually reaches the signal. We'll also clear the approach
+    # control if the route is switched back to main
     #--------------------------------------------------------------
 
     if ((callback_type == point_callback_type.point_switched and item_id==1 and point_switched(1)) or
         (callback_type == sig_callback_type.sig_passed and item_id==4)):
         set_approach_control (4,release_on_yellow=True)
+    if callback_type == point_callback_type.point_switched and item_id==1 and not point_switched(1):
+        clear_approach_control (4)
 
     if ((callback_type == point_callback_type.point_switched and item_id==11 and point_switched(11)) or
         (callback_type == sig_callback_type.sig_passed and item_id==14)):
         set_approach_control (14,release_on_yellow=False)
+    if callback_type == point_callback_type.point_switched and item_id==11 and not point_switched(11):
+        clear_approach_control (14)
 
         
     return()
@@ -172,43 +177,44 @@ if use_dcc_control:
     print ("Initialising Pi Sprog and creating DCC Mappings")
     initialise_pi_sprog (dcc_debug_mode=False)
     request_dcc_power_on()
-    # Signal 4/14 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
+    
+    # Signal 14 assumes a Signalist SC1 decoder configured with a base address of 1 (CV1=5)
     # and set to "8 individual output" Mode (CV38=8). In this example we are using outputs
-    # A,B,C,D to drive our signal with output E driving the feather indication of signal 4
-    # and the theatre route indication (either "1" or off) of Signal 14
-    # The Signallist SC1 uses 8 consecutive addresses in total (Base Address to Base
-    # Address + 7), but we are only using the first 5 in this example
-    map_dcc_signal (sig_id = 4,
+    # A,B,C,D to drive our signal with output E driving the theatre route indication, configured
+    # to toggle between "1" or "2" or OFF (where OFF is used for the signal at DANGER)
+    # The Signallist SC1 uses 8 consecutive addresses in total (Base to Base+7), but we
+    # are only using the first 6 outputs (and hence the first 6 addresses) in this example
+    map_dcc_signal (sig_id = 14,
                     danger = [[1,True],[2,False],[3,False],[4,False]],
                     proceed = [[1,False],[2,True],[3,False],[4,False]],
                     caution = [[1,False],[2,False],[3,True],[4,False]],
                     prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                    LH1 = [[5,True]], MAIN = [[5, False]], NONE = [[5, False]])
-    map_dcc_signal (sig_id = 14,
-                    danger = [[17,True],[18,False],[19,False],[20,False]],
-                    proceed = [[17,False],[18,True],[19,False],[20,False]],
-                    caution = [[17,False],[18,False],[19,True],[20,False]],
-                    prelim_caution = [[17,False],[18,False],[19,True],[20,True]],
-                    THEATRE = [ ["#", [[21,False]]],
-                                ["1",[[21,False]]],
-                                ["",[[21,False]]]  ] )
-    # Signals 2 and 3 assumes a TrainTech DCC 4 Aspect Signal with a base address of 9
-    # In these example we are using base address, Base Address+1 and Base_Address+2
-    # Its an event driven signal - so we only need a single command to change the aspect
-    map_dcc_signal (sig_id = 3,
+                    THEATRE = [ ["#",[[5,False],[6,False]]],
+                                ["1",[[6,False],[5,True]]],
+                                ["2",[[5,False],[6,True]]]  ] )
+
+    # Signals 2, 3 and 4 assume a TrainTech DCC 4 Aspect Signals (with flashing aspects)
+    # Each signal effectively uses 4 addresses - Base, Base+1, Base+2 & Base+3 (plus another
+    # address anywhere in the DCC address space for the Feather/Theatre route indicator
+    # These are event driven signals - so we only need a single command to change the aspect
+    
+    # Signal 2 (addresses 9,10,11,12) gives an example of how to configure it yourself
+    map_dcc_signal (sig_id = 2,
                     danger = [[9,False]],
                     proceed = [[9,True]],
                     caution = [[10,True]],
                     prelim_caution = [[10,False]],
-                    flash_caution = [[11,True]],
-                    flash_prelim_caution = [[11,False]])
-    map_dcc_signal (sig_id = 2,
-                    danger = [[12,False]],
-                    proceed = [[12,True]],
-                    caution = [[13,True]],
-                    prelim_caution = [[13,False]],
-                    flash_caution = [[14,True]],
-                    flash_prelim_caution = [[14,False]])
+                    flash_caution = [[12,True]],
+                    flash_prelim_caution = [[12,False]])
+    # Signal 3 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
+    map_traintech_signal (sig_id = 3, base_address = 13)
+    # Signal 4 (addresses 17,18,19,20)- a traintech 4 aspect with a feather (address 21)
+    # Note that you could also just programme the Route Indication to use the same address as point 1
+    # and not bother mapping the route indication at all - this would be fine as the traintech signals
+    # automatically inhibit the route indication when the signal is set to RED
+    map_traintech_signal (sig_id = 4, base_address = 17, route_address = 21, feather_route= route_type.LH1)
+    # Signal 5 (addresses 22,23,24,25)- a traintech 4 aspect
+    map_traintech_signal (sig_id = 5, base_address = 22)
 
 print ("Drawing Schematic and creating points")
 
@@ -319,8 +325,8 @@ create_colour_light_signal (canvas,16,1000,400,
                             sig_passed_button=True)
 
 print ("Setting Initial Route and Interlocking")
-set_route (2,route=route_type.MAIN)
-set_route (12,theatre_text="")
+set_route (4,route=route_type.MAIN)
+set_route (14,theatre_text="2")
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
