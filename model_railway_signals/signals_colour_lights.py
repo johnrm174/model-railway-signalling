@@ -594,7 +594,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             elif new_aspect == aspect_type.RED:
                 logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route indications (signal is at RED)")
                 refresh_feather_route_indication (sig_id)
-                dcc_control.update_dcc_signal_route(sig_id,signal["routeset"],signal_change=True,sig_at_danger=True)
+                # This is where we send the route type of "NONE" which should be mapped 
+                # to the DCC commands we need to send to inhibit the theatre route display
+                dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE,signal_change=True,sig_at_danger=True)
 
         # Only update the respective route indication if the route is actively set
         # A route of 'NONE' signifies that the particular route indication isn't used
@@ -610,7 +612,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             elif new_aspect == aspect_type.RED:
                 logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indications (signal is at RED)")
                 refresh_theatre_route_indication (sig_id)
-                dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=True)
+                # This is where we send the special character "#"- which should be mapped 
+                # to the DCC commands we need to send to inhibit the theatre route display
+                dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
             
     return ()
 

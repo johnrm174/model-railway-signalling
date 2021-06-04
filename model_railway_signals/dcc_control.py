@@ -400,9 +400,6 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
             logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change route display")
-#            # If the signal is at DANGER - we need to inhibit the display irrespective of the route
-#            # and therefore use the mappings defined for Route "NONE" (for inhibit indication)
-#            if sig_at_danger: route = signals_common.route_type.NONE
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping[str(route)]:
                 if entry[0] > 0:
@@ -435,9 +432,6 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
             logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change Theatre display")
-#            # If the signal is at DANGER - we need to inhibit the display irrespective of the route
-#            # and therefore use the mappings defined the special character '#' (for inhibit indication)
-#            if sig_at_danger: character_to_display = "#"  
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
