@@ -117,9 +117,9 @@
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect to Red (default=False)
+#       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect (default=False)
 #
-# release_approach_control - This"releases" the signal to display the normal aspect. Ans should be called when
+# clear_approach_control - This"releases" the signal to display the normal aspect. Ans should be called when
 #                            a train is approaching the signal (so the signal clears in front of the driver)
 #                            Note that signals can also be released when the "release control button" is activated
 #                            (which is displayed just in front of the signal if specified at signal creation time)
