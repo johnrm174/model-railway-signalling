@@ -19,7 +19,32 @@ layout schematic to ensure your code is doing what its supposed to do). Full log
 your own schemes - just set the log level to info to see what the package is doing 'under the hood'. And when you do enable
 the DCC control aspects, a log level of DEBUG will show you the commands being sent out to the Pi-SPROG-3
 
-Several examples of using the Package are included in the repository:
+Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
+
+## Installation
+To install use:
+<pre>
+$ pip install model-railway-signals
+</pre>
+or alternatively:
+<pre>
+$ python3 -m pip install model-railway-signals 
+</pre>
+You may need to ensure you have the latest version of pip installed:
+<pre>
+$ pip install --upgrade pip
+</pre>
+or alternatively:
+<pre>
+$ python3 -m pip install --upgrade pip
+</pre>
+
+## Using the package
+
+To use the "public" functions for developing your own layout signalling system:
+<code> from model_railway_signals import * </code>
+
+Some examples are included in the repository: https://github.com/johnrm174/model-railway-signalling:
 
 <pre>
 'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a
@@ -43,7 +68,6 @@ Several examples of using the Package are included in the repository:
 </pre>
 Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
 
-Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
 ## Point Functions
 <pre>
