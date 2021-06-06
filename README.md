@@ -21,33 +21,32 @@ the DCC control aspects, a log level of DEBUG will show you the commands being s
 
 Several examples of using the Package are included in the repository:
 
-'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a basic track 
-                           schematic with interlocked signals/points. Also includes a simple DCC Mapping example 
-                           (1 signal and 2 points ) and an external track sensor to provide a "signal passed" event.
+<pre>
+'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a
+           basic track schematic with interlocked signals/points. Also includes a simple DCC Mapping example
+           (1 signal and 2 points) and an external track sensor to provide a "signal passed" event.
 
-'test_approach_control.py' - an example of using automated "approach control" for junction signals. This is where a signal
-                            displays a more restrictive aspect (either red or yellow) when a lower-speed divergent route is
-                            set, forcing the approaching train to slow down and be prepared to stop. As the train approaches, 
-                            the signal is "released", allowing the train to proceed past the signal and onto the divergent route
-                            Examples of "Approach on Red" and "Approach on Yellow" are provided. For "Approach on yellow", the
-                            signals behind will show the correct single and double flashing yellow aspects.
+'test_approach_control.py' - an example of using automated "approach control" for junction signals. This 
+           is where a signal displays a more restrictive aspect (either red or yellow) when a lower-speed 
+           divergent route is set, forcing the approaching train to slow down and be prepared to stop. As 
+           the train approaches, the signal is "released", allowing the train to proceed past the signal 
+           and onto the divergent route. Examples of "Approach on Red" and "Approach on Yellow" are provided. 
+           For "Approach on yellow", the signals behind will show the correct flashing yellow aspects.
 
-'test_harman-signalist_sc1.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. Enables the various
-                              modes to be selected (includes programming of the required CVs) and then tested. I used this
-                              decoder as it seemed to provide the most flexibility for some of my more complex signal types.
-                              Note that some of the modes will be similar/identical to other manufacturer's DCC signals
+'test_harman-signalist_sc1.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. 
+           Enables the various modes to be selected (includes programming of CVs) and then tested. I used 
+           this decoder as it provided the most flexibility for some of my more complex signal types.
+           Note that some of the modes will be similar/identical to other manufacturer's DCC signals.
 
-'test_colour_light_signals.py'- developed primarily for testing, but it does provide an example of every signal type and all
-                                the control features currently supported
-
+'test_colour_light_signals.py'- developed primarily for testing, but it does provide an example of every 
+           signal type and all the control features currently supported.
+</pre>
 Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
-
-
-# Point Functions
-
+## Point Functions
+<pre>
 point_type (use when creating points)
   point_type.RH
   point_type.LH
@@ -56,8 +55,9 @@ point_callback_type (tells the calling program what has triggered the callback):
   point_callback_type.point_switched (point has been switched)
   point_callback_type.fpl_switched (facing point lock has been switched)
 
-create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that make up the point (so calling
-      programs can later update them if required (e.g. change the colour of the lines to represent the route that has been set up)
+create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
+               make up the point (so calling programs can later update them if required (e.g. change 
+               the colour of the lines to represent the route that has been set up)
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       point_id:int - The ID for the point - also displayed on the point button
@@ -70,8 +70,8 @@ create_point - Creates a point object and returns a list of the tkinter drawing 
                         Note that the callback function returns (item_id, callback type)
       reverse:bool - If the switching logic is to be reversed - Default is False
       fpl:bool - If the point is to have a Facing point lock (FPL) - Default is False (no FPL)
-      also_switch:int - the Id of another point that is to be automatically switched with this point - Default is none
-      auto:bool - If the point is to be fully automatic (e.g switched by another point - Default is False.
+      also_switch:int - the Id of another point to automatically switch with this point - Default none
+      auto:bool - If the point is to be fully automatic (e.g switched by another point - Default False.
 
 lock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
 
@@ -86,15 +86,16 @@ point_switched (point_id) - returns the state of the point (True/False) - to sup
 fpl_active (point_id) - returns the state of the FPL (True/False) - to support point/signal interlocking
                       - Will always return True if the point does not have a Facing point Lock - to enable full 
                       - interlocking logic to be written for layouts but then inhibited for simplified control 
+</pre>
 
-# Signal Functions
-
+## Signal Functions
+<pre>
 Currently supported types:
-   1) Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
+   Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
           - with or without a position light subsidary signal
           - with or without route indication feathers (maximum of 5)
           - with or without a theatre type route indicator
-   2) Ground Position Light Signals
+   Ground Position Light Signals
           - groud position light or shunt ahead position light
           - either early or modern (post 1996) types
 
@@ -116,7 +117,7 @@ route_type (use for specifying the route - thise equate to the route feathers):
 sig_callback_type (tells the calling program what has triggered the callback):
     sig_callback_type.sig_switched (signal has been switched)
     sig_callback_type.sub_switched (subsidary signal has been switched)
-    sig_callback_type.sig_passed ("signal passed" button has been activated - or triggered by a Timed signal)
+    sig_callback_type.sig_passed ("signal passed" button activated - or triggered by a Timed signal)
     sig_callback_type.sig_updated (signal aspect has been updated as part of a timed sequence)
     sig_callback_type.sig_released (signal "approach release" button has been activated)
 
@@ -131,7 +132,7 @@ create_colour_light_signal - Creates a colour light signal
       sig_callback:name - Function to call when a signal event happens - Default is no callback
                         Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-      approach_release_button:bool - Creates an "Approach Release" button for approach control - Default False
+      approach_release_button:bool - Creates an "Approach Release" button - Default False
       position_light:bool - Creates a subsidary position light signal - Default False
       lhfeather45:bool - Creates a LH route indication feather at 45 degrees - Default False
       lhfeather90:bool - Creates a LH route indication feather at 90 degrees - Default False
@@ -139,9 +140,10 @@ create_colour_light_signal - Creates a colour light signal
       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
       mainfeather:bool - Creates a MAIN route indication feather - Default False
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-      refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated when the
-                signal is changed and the external programme will need to call the seperate 'update_signal' function
-                use for 3/4 aspect signals - where the displayed aspect will depend on the signal ahead - Default True 
+      refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
+                when the signal is changed and the external programme will need to call the seperate 
+                'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
+                depend on the signal ahead - Default True 
       fully_automatic:bool - Creates a signal without any manual controls - Default False
 
 create_ground_position_signal - create a ground position light signal
@@ -183,17 +185,17 @@ lock_subsidary(*sig_id) - use for point/signal interlocking (multiple Signal_IDs
 
 unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
 
-signal_clear(sig_id) - returns the state of the signal (True = 'clear') - to support point/signal interlocking
+signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
 
-subsidary_clear(sig_id) - returns the state of the subsidary (True = 'clear') - to support point/signal interlocking
+subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
 
-set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signal IDs can be specified)
+set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
 
-clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signal IDs can be specified)
+clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
 
-pulse_signal_passed_button (sig_id) - Pulses the signal passed button - use when event is triggered by a track sensor
+pulse_signal_passed_button (sig_id) - Pulses the signal passed button - use to indicate track sensor events
 
-pulse_signal_release_button (sig_id) - Pulses the approach release button - use when event is triggered by a track sensor
+pulse_signal_release_button (sig_id) - Pulses the approach release button - use to indicate track sensor events
 
 trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
                       - If a start delay >0 is specified then a 'sig_passed' callback event is generated
@@ -224,10 +226,10 @@ clear_approach_control - This "releases" the signal to display the normal aspect
                            (which is displayed just in front of the signal if specified at signal creation time)
   Mandatory Parameters:
       sig_id:int - The ID for the signal
+</pre>
 
-
-# Track Occupancy Functions
-
+## Track Occupancy Functions
+<pre>
 section_callback_type (tells the calling program what has triggered the callback):
     section_callback_type.section_switched - The section has been toggled (occupied/clear) by the user
 
@@ -246,24 +248,26 @@ section_occupied (section_id)- Returns the current state of the section (True=Oc
 set_section_occupied (section_id) - Sets the specified section to "occupied"
 
 clear_section_occupied (section_id)- Sets the specified section to "clear"
+</pre>
 
-# Track Sensor Functions
-
+## Track Sensor Functions
+<pre>
 sensor_callback_type (tells the calling program what has triggered the callback):
-    track_sensor_callback_type.sensor_triggered - The section has been toggled (occupied/clear) by the user
+    track_sensor_callback_type.sensor_triggered - The section has been toggled by the user
 
 create_sensor - Creates a sensor object
   Mandatory Parameters:
       sensor_id:int - The ID to be used for the sensor 
       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
   Optional Parameters:
-      sensor_timeout - The time period during which further triggers are ignored (default is 3 seconds)
+      sensor_timeout - The time period during which further triggers are ignored (default = 3 seconds)
       sensor_callback - The function to call when the sensor triggers (default is no callback)
                         Note that the callback function returns (item_id, callback type)
 
 sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
+</pre>
 
-# DCC Address Mapping functions
+## DCC Address Mapping Functions
 
 These functions provide the means to map the signals and points on the layout to the series of DCC 
 commands needed to control them.
@@ -283,12 +287,12 @@ mapped to a single DCC address.
 Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no DCC mapping 
 has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
 schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
-
+<pre>
   map_dcc_signal - Map a signal to one or more DCC Addresses
      Mandatory Parameters:
         sig_id:int - The ID for the signal to create a DCC mapping for
      Optional Parameters:
-        auto_route_inhibit:bool - Whether the signal itself inhibits any route indications at DANGER (default=False)
+        auto_route_inhibit:bool - If the signal inhibits route indications at DANGER (default=False)
         proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
@@ -298,7 +302,7 @@ schematic which are "off scene" or for progressively "working up" the signalling
         RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
         RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
         MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
-        NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit all indications (default = No Mapping)
+        NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit routes (default = No Mapping)
                 Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
@@ -323,14 +327,15 @@ schematic which are "off scene" or for progressively "working up" the signalling
         address:int - the single DCC address for the point
      Optional Parameters:
         state_reversed:bool - Set to True to reverse the DCC logic (default = false)
+</pre>
 
-# Pi-Sprog Interface
+## Pi-Sprog Interface Functions
 
 This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi UART. It does not provide
 a fully-functional interface for All DCC command and control functions - just the minimum set needed to support the driving
 of signals and points via a selection of common DCC Accessory decoders.Basic CV Programming is also supported - primarily 
 as an aid to testing, but for full decoder programming the recommendation is to use JRMI DecoderPro.
-
+<pre>
   initialise_pi_sprog (Open the comms port to the Pi Sprog)
      Optional Parameters:
         port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
@@ -352,6 +357,7 @@ as an aid to testing, but for full decoder programming the recommendation is to 
   request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
          returns True if we have received acknowledgement that Track Power has been turned off
          returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
+</pre>
 
 
 
