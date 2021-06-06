@@ -1,36 +1,28 @@
 #----------------------------------------------------------------------
-# This module provides basic functions for "mapping" signal and points objects
-# to the required DCC Accessory Addresses and then for sending the appropriate 
-# commands to change the points/signals in accordance with these mappings.
-#
-# For signals "Truth Table" & "Event Driven" types are currently supported.
-# The "Truth Table" mapping  enables each aspect (e.g. RED, GREEN, YELLOW, DOUBLE YELLOW)
-# to be mapped to a "Truth Table" containing one or more DCC Addresses/states.
-# The "Event Driven" mapping uses a single dcc command (address/state) to change
-# the signal to the required aspect - as used by the TrainTech DCC signals
-#
-# The "Truth Table" mapping provides maximum flexibility for commanding DCC Signals as
-# each "light" can either be controlled individually (i.e. Each LED of the signal is
-# controlled via its own individual address) or via a "Truth Table" (where the displayed
-# aspect will depend on the binary "code" written to 2 or more DCC addresses)
-# This has been successfully tested with the Harman Signallist SC1 DCC Decoder
-# set into the "8 individual controlled outputs" Mode (CV38=8)
-#
-# In both cases, any additional route indications or calling on aspects can be mapped
-# to their individual addresses.
-#
-# Not all signals/points that exist on the layout need to have a DCC Mapping configured
-# for the software to operate - If no DCC mapping has been defined, then no DCC commands
-# will be sent. This provides flexibility for including signals on the schematic which are
-# "off scene" or for progressively "working up" the signalling scheme for a layour.
-#
-# The following functions are designed to be called by external modules:
+# These functions provide the means to map the signals and points on the layout to the series of DCC 
+# commands needed to control them.
+# 
+# For the main signal aspects, either "Truth Table" or "Event Driven" mappings can be defined
+# The "Event Driven" mapping uses a single dcc command (address/state) to change the signal to 
+# the required aspect - as used by the TrainTech DCC signals. The "Truth Table" mapping provides
+# maximum flexibility for commanding DCC Signals as each "led" can either be controlled individually 
+# (i.e. Each LED of the signal is controlled via its own individual address) or via a "Truth Table" 
+# (where the displayed aspect will depend on the binary "code" written to 2 or more DCC addresses)
+# This has been successfully tested with the Harman Signallist SC1 DCC Decoder in various modes
+# 
+# "Truth Table" or "Event Driven" mappings can alos be defined for the Route indications supported by
+# the signal (feathers or theatre). If the signal has a subsidary associated with it, this is always
+# mapped to a single DCC address.
+# 
+# Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no DCC mapping 
+# has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
+# schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
 #
 #   map_dcc_signal - Map a signal to one or more DCC Addresses
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to create a DCC mapping for
 #      Optional Parameters:
-#         auto_route_inhibit:bool - Whether the signal inhibits route indications at DANGER (default=False)
+#         auto_route_inhibit:bool - If the signal inhibits route indications at DANGER (default=False)
 #         proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
 #         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
 #         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
@@ -40,16 +32,16 @@
 #         RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
 #         RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
 #         MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
-#         NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit all indications (default = No Mapping)
+#         NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit routes (default = No Mapping)
 #                 Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
 #                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
 #         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
 #                 Each entry comprises the "character" and the associated list of DCC addresses/states
 #                 "#" is a special character - which means inhibit all indications (when signal is at danger)
 #                 Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
-#                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
+#                 unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
 #         subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
-#
+# 
 #   map_traintech_signal - Generate the mappings for a TrainTech signal
 #      Mandatory Parameters:
 #         sig_id:int - The ID for the signal to create a DCC mapping for
@@ -57,53 +49,14 @@
 #      Optional Parameters:
 #         route_address:int - The address for the route indicator (Feather or Theatre) - Default = 0 (no indicator)
 #         theatre_route:str - The character to be associated with the Theartre display - Default = "NONE" (no Text)
-#         feather_route:signals_common.route_type - The route to be associated with the feather - Default = NONE (no route)
-#
+#         feather_route:route_type - The route to be associated with the feather - Default = NONE (no route)
+# 
 #   map_dcc_point
 #      Mandatory Parameters:
 #         point_id:int - The ID for the point to create a DCC mapping for
 #         address:int - the single DCC address for the point
 #      Optional Parameters:
 #         state_reversed:bool - Set to True to reverse the DCC logic (default = false)
-
-# Once Mapped, the following functions are called to send the mapped DCC commands
-# to change the state of the signals or points out on the layout. If no mapping has
-# previously been defined then no DCC commands will be sent out to the layout
-#
-#   update_dcc_point - Change the specified point by sending the mapped DCC command
-#      Mandatory Parameters:
-#         point_id:int - The ID for the point to command
-#         state:signal_state_type - The state to command it into (True or False)
-# 
-#   update_dcc_signal - Update the main aspect of a signal by sending the mapped DCC commands
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to command
-#         state:signal_state_type - The state to command it into (proceed, caution, prelim_caution, danger)
-#
-#   update_dcc_subsidary_signal - Update the subsidary aspect of a signal by sending the mapped DCC commands
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to command
-#         state:bool - The state to command it into (True = Proceed, False = Danger)
-#
-#   update_dcc_signal_route - Update the feather routes of a signal by sending the mapped DCC commands
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to command
-#         route:signals_common.route_type - The route to set (see signals_common for more details of this type)
-#         signal_at_danger:bool - Depending on the signal type
-#
-#   update_dcc_signal_route - Update the feather route indication of a signal by sending the mapped DCC commands
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to command
-#         route:signals_common.route_type - The route to set (see signals_common for more details of this type)
-#         signal_change:bool - Indicates whether we are dealing with a to/from DANGER change or a change in route
-#         sig_at_danger:bool - the current state of the signal (we need this info to process different DCC signal types)
-#
-#   update_dcc_signal_theatre - Update the theatre route indication of a signal by sending the mapped DCC commands
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to command
-#         character_to_display:str - The character representing the route that is set
-#         signal_change:bool - Indicates whether we are dealing with a to/from DANGER change or a change in route
-#         sig_at_danger:bool - the current state of the signal (we need this info to process different DCC signal types)
 #
 #----------------------------------------------------------------------
 

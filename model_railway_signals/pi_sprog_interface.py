@@ -1,39 +1,27 @@
 #----------------------------------------------------------------------------------------
-# This module provides a basic CBUS interface for sending and receiving commands
-# for the control of points and signals on the layout. It has been specifically
-# designed to drive the Pi-SPROG-3 via the UART serial interface on the Raspberry PI.
-#
-# It is not meant to provide a fully-functional interface for All DCC command
-# and control functions - just the minimum set needed to support the driving
-# of signals and points via a selection of common DCC Accessory decoders.
-# Basic CV Programming is also supported - primarily as an aid to testing
-# For full decoder programming the recommendation is to use JRMI DecoderPro.
-#
-# The following functions are designed to be called by external modules:
+# This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi UART. It does not provide
+# a fully-functional interface for All DCC command and control functions - just the minimum set needed to support the driving
+# of signals and points via a selection of common DCC Accessory decoders.Basic CV Programming is also supported - primarily 
+# as an aid to testing, but for full decoder programming the recommendation is to use JRMI DecoderPro.
 #
 #   initialise_pi_sprog (Open the comms port to the Pi Sprog)
 #      Optional Parameters:
-#         dcc_debug_mode:bool - Enable an additional level of logging for the actual CBUS
-#                               commands being sent to the Pi-SPROG. Will also Request
-#                               and report the command station status from the Pi-Sprog)
-#
-#   send_accessory_short_event (sends a short accessory event - either on or off)
-#             (events are only sent if we think the track power is currently switched on)
-#      Mandatory Parameters:
-#         address:int - The Device number of the accessory to be switched (the DCC Address)
-#         status:bool - State to switch it to (True=ON, False = OFF)
-#
+#         port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
+#         baud_rate:int - The baud rate to use for the serial port - Default = 115200,
+#         dcc_debug_mode:bool - Sets an additional level of logging for the CBUS commands being sent to the Pi-SPROG. 
+#                             - Will also Request and report the command station status (from the Pi-SPROG-3)
+# 
 #   service_mode_write_cv (programmes a CV in direct bit mode and waits for response)
 #              (events are only sent if we think the track power is currently switched on)
 #              (if acknowledgement isn't received within 5 seconds then the request times out)
 #      Mandatory Parameters:
 #         cv:int - The CV (Configuration Variable) to be programmed
 #         value:int - The value to programme
-#
+# 
 #   request_dcc_power_on (sends a request to switch on the track power and waits for acknowledgement)
 #          returns True if we have received acknowledgement that Track Power has been turned on
 #          returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
-#
+# 
 #   request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
 #          returns True if we have received acknowledgement that Track Power has been turned off
 #          returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)

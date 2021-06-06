@@ -3,12 +3,17 @@
 # Only basic left hand and right hand points are currently supported but
 # you should be able to mimic most formations with these basic types
 #
-# The following functions are designed to be called by external modules
-#
-# create_point - Creates a point object and returns a list of the
-#       drawing objects (lines) that make up the point (so calling
-#       code can later update them if required (e.g. change the colour
-#       of the lines to represent the route that has been set up)
+# point_type (use when creating points)
+#   point_type.RH
+#   point_type.LH
+# 
+# point_callback_type (tells the calling program what has triggered the callback):
+#   point_callback_type.point_switched (point has been switched)
+#   point_callback_type.fpl_switched (facing point lock has been switched)
+# 
+# create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
+#                make up the point (so calling programs can later update them if required (e.g. change 
+#                the colour of the lines to represent the route that has been set up)
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       point_id:int - The ID for the point - also displayed on the point button
@@ -17,38 +22,26 @@
 #       colour:str - Any tkinter colour can be specified as a string
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       point_callback - The function to call when a point button is pressed - default null
-#       reverse:bool - If the switching logic is to be reversed (i.e. "normal" will be
-#          the divergent route and "switched" will be the straight route - Default is False
-#       fpl:bool - If the point is to have a Facing point lock. If not then no FPL
-#          button will be displayed - Default is False (no FPL)
-#       also_switch:int - the Id of another point that is to be automatically switched
-#          with this point (i.e. the other point would be an "auto" point) - Default is none
-#       auto:bool - If the point is to be fully automatic (e.g switched by another point or if
-#          the intention is to switch the point from external code as required). In this case
-#          case the FPL and switching buttons will not be displayed - Default is False.
-#
-# lock_point(*point_id) - to enable external point/signal interlocking functions
-#                       - One or more Point_IDs can be specified in the call
-#
-# unlock_point(*point_id) - to enable external point/signal interlocking functions
-#                       - One or more Point_IDs can be specified in the call
-#
-# toggle_point(point_id) - to enable automated route setting from the external programme
-#                        - use in conjunction with 'point_switched' to find the state first
-#
-# toggle_fpl(point_id) - to enable automated route setting from the external programme
-#                      - use in conjunction with 'fpl_active' to find the state first
-#
-# point_switched (point_id) - returns the state of the point (True/False)
-#     provides knowledge of the routes that have been set up to support
-#     external point/signal interlocking and route display functions
-#
-# fpl_active (point_id) - returns the state of the FPL (True/False)
-#     to support external point/signal interlocking functions
-#     Will always return True if the point does not have a Facing point Lock
-#     This enables full interlocking logic to be written for layouts but
-#     then the FPL feature inhibited for simplified control 
+#       point_callback - The function to call when a point button is pressed - default is no callback
+#                         Note that the callback function returns (item_id, callback type)
+#       reverse:bool - If the switching logic is to be reversed - Default is False
+#       fpl:bool - If the point is to have a Facing point lock (FPL) - Default is False (no FPL)
+#       also_switch:int - the Id of another point to automatically switch with this point - Default none
+#       auto:bool - If the point is to be fully automatic (e.g switched by another point - Default False.
+# 
+# lock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+# 
+# unlock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+# 
+# toggle_point(point_id) - use for route setting (can use 'point_switched' to find the state first)
+# 
+# toggle_fpl(point_id) - use for route setting (can use 'fpl_active' to find the state first)
+# 
+# point_switched (point_id) - returns the state of the point (True/False) - to support point/signal interlocking
+# 
+# fpl_active (point_id) - returns the state of the FPL (True/False) - to support point/signal interlocking
+#                       - Will always return True if the point does not have a Facing point Lock - to enable full 
+#                       - interlocking logic to be written for layouts but then inhibited for simplified control 
 #
 # -------------------------------------------------------------------------
 

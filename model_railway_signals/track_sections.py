@@ -1,28 +1,24 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing Track Occupancy objects (sections)
 #
-# The following functions are designed to be called by external modules
-#
-# create_section - Creates a section object
+# section_callback_type (tells the calling program what has triggered the callback):
+#     section_callback_type.section_switched - The section has been toggled (occupied/clear) by the user
+# 
+# create_section - Creates a Track Occupancy section object
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the section is to be displayed
 #       section_id:int - The ID to be used for the section 
-#       x:int, y:int - Position of the point on the canvas (in pixels)
+#       x:int, y:int - Position of the section on the canvas (in pixels)
 #   Optional Parameters:
 #       section_callback - The function to call if the section is manually toggled - default: null
+#                         Note that the callback function returns (item_id, callback type)
 #       label - The label to display on the section when occupied - default: "Train On Line"
-#
-# section_occupied - Returns the current state of the section (True/False)
-#   Mandatory Parameters:
-#       section_id:int - The ID of the section
-#
-# set_section_occupied - Sets the specified section to "occupied"
-#   Mandatory Parameters:
-#       section_id:int - The ID of the section
-#
-# clear_section_occupied - Sets the specified section to "clear"
-#   Mandatory Parameters:
-#       section_id:int - The ID of the section
+# 
+# section_occupied (section_id)- Returns the current state of the section (True=Occupied, False=Clear)
+# 
+# set_section_occupied (section_id) - Sets the specified section to "occupied"
+# 
+# clear_section_occupied (section_id)- Sets the specified section to "clear"
 #
 # --------------------------------------------------------------------------------
 

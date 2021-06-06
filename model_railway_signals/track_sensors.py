@@ -1,20 +1,19 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating Track Sensor objects (Sensors) mapped to GPIO Pins
 #
-# The following functions are designed to be called by external modules
-#
+# sensor_callback_type (tells the calling program what has triggered the callback):
+#     track_sensor_callback_type.sensor_triggered - The section has been toggled by the user
+# 
 # create_sensor - Creates a sensor object
 #   Mandatory Parameters:
 #       sensor_id:int - The ID to be used for the sensor 
-#       gpio_channel:int - The GPIO input to use for the sensor
-#               (note this is the GPIO port number not the physical pin number):
+#       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
 #   Optional Parameters:
-#       sensor_timeout - The time period during which further triggers are ignored
-#       sensor_callback - The function to call when the sensor triggers
-#
-# sensor_active - Returns the current state of the sensor (True/False)
-#   Mandatory Parameters:
-#      sensor_id:int - The ID of the sensor
+#       sensor_timeout - The time period during which further triggers are ignored (default = 3 seconds)
+#       sensor_callback - The function to call when the sensor triggers (default is no callback)
+#                         Note that the callback function returns (item_id, callback type)
+# 
+# sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
 #
 # --------------------------------------------------------------------------------
 
