@@ -324,7 +324,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
         if dcc_mapping["subsidary"] > 0:
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["call"],state)        
+            pi_sprog_interface.send_accessory_short_event (dcc_mapping["subsidary"],state)        
     return()
 
 #-----------------------------------------------------------------------------------------
