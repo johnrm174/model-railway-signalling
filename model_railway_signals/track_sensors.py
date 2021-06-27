@@ -165,8 +165,8 @@ def track_sensor_active (sensor_id:int):
         for channel in channels.keys():
             if channels[str(channel)]["sensor_id"] == sensor_id:
                 return not bool(GPIO.input(int(channel)))
-            logging.error ("Sensor "+str(sensor_id)+": does not exist")
-            return (False)
+        logging.error ("Sensor "+str(sensor_id)+": does not exist")
+        return (False)
     else:
         return (False)
 
