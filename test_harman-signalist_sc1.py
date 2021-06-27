@@ -340,7 +340,7 @@ map_dcc_signal (14, danger=[[address,False],[address+1,False]],
                  RH2 = [[address+3,False]],
                  MAIN = [[address+3,False]],
                  NONE = [[address+3,False]],
-                 call = address+4)
+                 subsidary = address+4)
 
 # 4 aspect signal - With Multiple feathers
 map_dcc_signal (16, danger=[[address,False],[address+1,False]],
