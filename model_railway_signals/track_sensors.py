@@ -9,7 +9,8 @@
 #       sensor_id:int - The ID to be used for the sensor 
 #       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
 #   Optional Parameters:
-#       sensor_timeout - The time period during which further triggers are ignored (default = 3 seconds)
+#       sensor_timeout:float - The time period during which further triggers are ignored (default = 3.0 seconds)
+#       trigger_period:float - The duration that the sensor needs to remain active before raising a trigger (default = 0.001 seconds)
 #       sensor_callback - The function to call when the sensor triggers (default is no callback)
 #                         Note that the callback function returns (item_id, callback type)
 # 
@@ -92,14 +93,17 @@ def track_sensor_triggered (gpio_channel):
             # If we are still in the timeout period then we want to extend it
             channels[str(gpio_channel)]["timeout_start"] = time.time()
         else:
-            # Start a new timeout thread and make the external callback
-            x = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
-            x.start()
-            # Get the channel configuration details and make the callback
+            # Wait for the trigger delay period and then check the sensor is still active
+            # We do this to alow any spurious "spikes" on the inputs to be filtered out
+            time.sleep (channels[str(gpio_channel)]["trigger_period"])
             sensor_id = channels[str(gpio_channel)]["sensor_id"]
-            logging.info("Sensor "+str(sensor_id)+": Triggered Event ********************************************")
-            ext_callback = channels[str(gpio_channel)]["callback"]
-            ext_callback(sensor_id,track_sensor_callback_type.sensor_triggered)
+            if track_sensor_active(sensor_id):
+                # Start a new timeout thread and make the external callback
+                x = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
+                x.start()
+                logging.info("Sensor "+str(sensor_id)+": Triggered Event ********************************************")
+                ext_callback = channels[str(gpio_channel)]["callback"]
+                ext_callback(sensor_id,track_sensor_callback_type.sensor_triggered)
     return()
 
 # -------------------------------------------------------------------------
@@ -110,7 +114,8 @@ def track_sensor_triggered (gpio_channel):
 
 def create_track_sensor (sensor_id:int, gpio_channel:int,
                          sensor_callback = sensor_null,
-                         sensor_timeout = 3.0):
+                         sensor_timeout:float = 3.0,
+                         trigger_period:float = 0.001):
     
     global channels # the dictionary of sensors
     global logging
@@ -146,6 +151,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
             # Add the to the dictionaries of sensors and channels
             channels[str(gpio_channel)] = {"sensor_id"      : sensor_id,
                                            "callback"       : sensor_callback,
+                                           "trigger_period" : trigger_period,
                                            "timeout_value"  : sensor_timeout,
                                            "timeout_active" : False}
     return()

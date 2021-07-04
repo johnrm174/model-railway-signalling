@@ -25,8 +25,6 @@ def report_sensor_status_thread():
                 clear_section_occupied(I+1)
         time.sleep (0.01)
 
-report_sensor_status = threading.Thread(target = report_sensor_status_thread)
-report_sensor_status.start()
 
 #------------------------------------------------------------------------------------
 # This is where the code begins
@@ -66,6 +64,10 @@ create_track_sensor (13,gpio_channel=18,sensor_timeout=1.0)
 create_track_sensor (14,gpio_channel=19,sensor_timeout=1.0)
 create_track_sensor (15,gpio_channel=20,sensor_timeout=1.0)
 create_track_sensor (16,gpio_channel=21,sensor_timeout=1.0)
+
+# Start the thread to report the status of all the sensors:
+report_sensor_status = threading.Thread(target = report_sensor_status_thread)
+report_sensor_status.start()
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
