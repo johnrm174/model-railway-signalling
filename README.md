@@ -284,7 +284,8 @@ create_sensor - Creates a sensor object
       sensor_id:int - The ID to be used for the sensor 
       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
   Optional Parameters:
-      sensor_timeout - The time period during which further triggers are ignored (default = 3 seconds)
+      sensor_timeout:float - The time period during which further triggers are ignored (default = 3 seconds)
+      trigger_period:float - The duration that the sensor needs to remain active before raising a trigger (default = 0.001 seconds)
       sensor_callback - The function to call when the sensor triggers (default is no callback)
                         Note that the callback function returns (item_id, callback type)
 
