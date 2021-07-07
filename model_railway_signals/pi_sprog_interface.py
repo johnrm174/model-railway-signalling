@@ -64,10 +64,11 @@ serial_port = serial.Serial ()
 can_bus_id = 1                # The arbitary CANBUS ID we will use for the Pi
 pi_cbus_node = 1              # The arbitary CBUS Node ID we will use for the Pi
 transmit_delay = 0.02         # The delay between sending CBUS Messages (in seconds)
-debug = False                 # Enhanced Debug logging - set when Pi Sprog is initialised
 
 # Global Variables (configured/changed by the functions in the module)
-track_power_on = False        # if the track power is OFF we wont try sending any commands
+debug = False                 # Enhanced Debug logging - set when Pi Sprog is initialised
+serial_port_opened = False    # If serial port has not been opened, we won't try sending any commands
+track_power_on = False        # if the track power is OFF we wont try sending DCC Bus commands
 service_mode_status = 0       # The response code from programming a CV
 
 # This is the output buffer for messages to be sent to the SPROG
@@ -245,7 +246,9 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
 
     global logging
     global debug
-    logging.info ("Pi-SPROG: Opening Comms Port")
+    global serial_port_opened
+    
+    logging.info ("Pi-SPROG: Opening Serial Port")
     
     debug = dcc_debug_mode
     # We're not receiving anything else on this port so its OK to set up the port without
@@ -256,22 +259,29 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
     serial_port.timeout = None
     serial_port.parity = serial.PARITY_NONE
     serial_port.stopbits = serial.STOPBITS_ONE
-    serial_port.open()
     
-    # Start the threads to send/receive buffered responses from the PI-SPROG
-    thread = threading.Thread (target=thread_to_read_received_data)
-    thread.start()
-    thread = threading.Thread (target=thread_to_send_buffered_data)
-    thread.start()
-
-    if debug:
-        logging.info ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
-        send_cbus_command (mj_pri=2, min_pri=2, op_code=12)
-        time.sleep (1.0)
-        logging.info ("Pi-SPROG: Sending QNN command (Query Node Number)")
-        send_cbus_command (mj_pri=2, min_pri=3, op_code=13)
-        time.sleep (1.0)
-
+    try:
+        serial_port.open()
+        # if the above works (doesn't raise an exception) then we know the serial port has been opened
+        serial_port_opened = True
+        # Start the threads to send/receive buffered responses from the PI-SPROG
+        thread = threading.Thread (target=thread_to_read_received_data)
+        thread.start()
+        thread = threading.Thread (target=thread_to_send_buffered_data)
+        thread.start()
+        # If enhanced debugging is selected, we'll query the status of the command station
+        if debug:
+            logging.info ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
+            send_cbus_command (mj_pri=2, min_pri=2, op_code=12)
+            time.sleep (1.0)
+            logging.info ("Pi-SPROG: Sending QNN command (Query Node Number)")
+            send_cbus_command (mj_pri=2, min_pri=3, op_code=13)
+            time.sleep (1.0)
+        return()
+    except Exception: pass
+    # If the attempt to open the serial port fails then we catch the exception
+    logging.error ("Pi-SPROG: Error opening Serial Port: '"+ str(port_name) + "' - No Pi-SPROG commands will be sent")
+        
     return ()
 
 #------------------------------------------------------------------------------
@@ -282,17 +292,20 @@ def request_dcc_power_on():
 
     global track_power_on
     global logging
+    global serial_port_opened
     
-    # Send the command to switch on the Track Supply (to the DCC Bus)
-    logging.info ("Pi-SPROG: Sending RTON command (Request Track Power On)")
-    send_cbus_command (mj_pri=2, min_pri=2, op_code=9)
-    # Now wait until we get confirmation thet the Track power is on
-    # If the SPROG hasn't responded in 5 seconds its not going to respond at all
-    timeout_start = time.time()
-    while time.time() < timeout_start + 5:
-        if track_power_on: break
-    if not track_power_on: logging.error("Pi-SPROG: Request to turn on Track Power failed")
-    time.sleep (0.5)
+    # Only bother sending commands to the Pi Sprog if the serial port has been opened
+    if serial_port_opened:
+        # Send the command to switch on the Track Supply (to the DCC Bus)
+        logging.info ("Pi-SPROG: Sending RTON command (Request Track Power On)")
+        send_cbus_command (mj_pri=2, min_pri=2, op_code=9)
+        # Now wait until we get confirmation thet the Track power is on
+        # If the SPROG hasn't responded in 5 seconds its not going to respond at all
+        timeout_start = time.time()
+        while time.time() < timeout_start + 5:
+            if track_power_on: break
+        if not track_power_on: logging.error("Pi-SPROG: Request to turn on Track Power failed")
+        time.sleep (0.5)
     return(track_power_on)
 
 #------------------------------------------------------------------------------
@@ -303,17 +316,20 @@ def request_dcc_power_off():
 
     global track_power_on
     global logging
-    
-    # Send the command to switch on the Track Supply (to the DCC Bus)
-    logging.info ("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
-    send_cbus_command (mj_pri=2, min_pri=2, op_code=8)
-    # Now wait until we get confirmation thet the Track power is on
-    # If the SPROG hasn't responded in 5 seconds its not going to respond at all
-    timeout_start = time.time()
-    while time.time() < timeout_start + 5:
-        if not track_power_on:break
-    if track_power_on: logging.error("Pi-SPROG: Request to turn off Track Power failed")
-    time.sleep (0.5)
+    global serial_port_opened
+
+    # Only bother sending commands to the Pi Sprog if the serial port has been opened
+    if serial_port_opened:
+        # Send the command to switch on the Track Supply (to the DCC Bus)
+        logging.info ("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
+        send_cbus_command (mj_pri=2, min_pri=2, op_code=8)
+        # Now wait until we get confirmation thet the Track power is on
+        # If the SPROG hasn't responded in 5 seconds its not going to respond at all
+        timeout_start = time.time()
+        while time.time() < timeout_start + 5:
+            if not track_power_on:break
+        if track_power_on: logging.error("Pi-SPROG: Request to turn off Track Power failed")
+        time.sleep (0.5)
     return(not track_power_on)
 
 #------------------------------------------------------------------------------
