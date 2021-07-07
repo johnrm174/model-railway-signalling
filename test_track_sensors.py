@@ -1,14 +1,14 @@
+#----------------------------------------------------------------------
+# This programme provides a simple test programme for the track sensors
+# using the Raspberry Pi GPIO inputs
+# ---------------------------------------------------------------------
+
 from tkinter import *
 from model_railway_signals import *
 
 import logging
 import time
 import threading
-
-#----------------------------------------------------------------------
-# This programme provides a simple test programme for the track sensors
-# using the Raspberry Pi GPIO inputs
-# ---------------------------------------------------------------------
 
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 

@@ -13,7 +13,6 @@ from tkinter import *
 from model_railway_signals import *
 
 import logging
-#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
 #----------------------------------------------------------------------
@@ -92,6 +91,7 @@ def set_four_aspect():
     lock_subsidary(14)
     unlock_signal(8,9)
     return()
+
 #----------------------------------------------------------------------
 # This is the callback function to set CV38 = 8 
 #----------------------------------------------------------------------
