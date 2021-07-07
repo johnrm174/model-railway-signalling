@@ -281,7 +281,7 @@ def update_dcc_point(point_id:int, state:bool):
     global logging
     
     if point_mapped(point_id):
-        logging.info ("Point "+str(point_id)+": Sending DCC Bus commands to switch point")
+        logging.info ("Point "+str(point_id)+": Generating DCC Bus commands to switch point")
         # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
@@ -299,7 +299,7 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change main signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Branch to Deal with each supported signal type
@@ -319,7 +319,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change subsidary signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change subsidary signal aspect")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
@@ -352,7 +352,7 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
         if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
-            logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change route display")
+            logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping[str(route)]:
                 if entry[0] > 0:
@@ -384,7 +384,7 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
         if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
-            logging.info ("Signal "+str(sig_id)+": Sending DCC Bus commands to change Theatre display")
+            logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change Theatre display")
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
