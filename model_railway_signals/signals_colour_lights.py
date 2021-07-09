@@ -914,7 +914,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release ony yellow red) for a 2 aspect red/yellow signal")
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
     else:
         # give an indication that the approach control has been set for the signal
         signals_common.signals[str(sig_id)]["sigbutton"].config(underline=0)
