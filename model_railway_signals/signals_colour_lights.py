@@ -427,14 +427,17 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Add the new signal to the dictionary of signals
         signals_common.signals[str(sig_id)] = new_signal
     
-        # We now need to update the signal/subsidary aspects to reflect the initial state
-        # This will also send the DCC commands to put the DCC signal into a known state
+        # Update the signal aspects to reflect the initial state. This will
+        # also send the DCC commands to put the DCC signal into the initial state
         update_colour_light_signal_aspect (sig_id)
-        update_colour_light_subsidary_signal (sig_id)
-        # We also need to ensure we send the appropriate DCC commands to set the
-        # route indications into a known state (always off)
-        dcc_control.update_dcc_signal_theatre (sig_id,"#")
-        dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE)
+        # If there is a subsidary then update to reflect the initial state. This will
+        # also send the DCC commands to put the DCC signal into the initial state
+        if position_light:update_colour_light_subsidary_signal (sig_id)
+        # If there are route indicators we also need to ensure we send the appropriate
+        # DCC commands to set the these into a known state (always off)
+        if theatre_route_indicator: dcc_control.update_dcc_signal_theatre (sig_id,"#")
+        if mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90:
+            dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE)
 
     return ()
 
