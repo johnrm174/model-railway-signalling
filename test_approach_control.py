@@ -90,7 +90,7 @@ def main_callback_function(item_id,callback_type):
         else:
             clear_signal_override(I)
     if (point_switched(1) and section_occupied(5)) or (not point_switched(1) and section_occupied(4)):
-          set_signal_override(4)
+        set_signal_override(4)
     else:
         clear_signal_override(4)
     if (point_switched(11) and section_occupied(15)) or (not point_switched(11) and section_occupied(14)):
