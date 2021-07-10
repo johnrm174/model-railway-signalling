@@ -214,10 +214,16 @@ def map_traintech_signal (sig_id:int,
     elif sig_id < 1:
         logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
     elif base_address < 0 or base_address > 2047:
-            theatre_address.error ("Signal "+str(sig_id)+": Invalid DCC Address for signal"+str(address)+" - must be between 1 and 2047")
+        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for signal"+str(address)+" - must be between 1 and 2047")
     elif route_address < 0 or route_address > 2047:
-            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(address)+" - must be between 1 and 2047")
+        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(address)+" - must be between 1 and 2047")
+    elif theatre_route != "NONE" and feather_route != signals_common.route_type.NONE:
+        logging.error ("Signal "+str(sig_id)+": Signal can only support Feather or Theatre - not both")
     else:
+        # We only need to map the address for the feather OR the theatre (can't have both)
+        theatre_address = route_address
+        if feather_route == signals_common.route_type.NONE: route_address = 0
+        else: theatre_address = 0
         # Create the DCC Mapping entry for the signal.
         new_dcc_mapping = {
                 "mapping_type" : dcc_signal_type.address_mapped,
@@ -234,9 +240,9 @@ def map_traintech_signal (sig_id:int,
                 str(signals_common.route_type.RH2) : [[route_address,False]],
                 str(signals_common.route_type.MAIN) : [[route_address,False]],
                 str(signals_common.route_type.NONE) : [[route_address,False]],
-                "THEATRE" : [ [str(theatre_route), [[route_address,True],]],
-                              ["#", [[route_address,False],]],
-                              ["", [[route_address,False],]] ],
+                "THEATRE" : [ [str(theatre_route), [[theatre_address,True],]],
+                              ["#", [[theatre_address,False],]],
+                              ["", [[theatre_address,False],]] ],
                 "subsidary" : 0 }
         # finally configure the feather route that is being configured
         new_dcc_mapping[str(feather_route)] = [[route_address,True]]
@@ -339,7 +345,7 @@ def update_dcc_subsidary_signal (sig_id:int,state:bool):
 #------------------------------------------------------------------------------------------
             
 def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
-                              signal_change:bool,sig_at_danger:bool):
+                              signal_change:bool=False,sig_at_danger:bool=False):
     global logging
     
     if sig_mapped(sig_id):
@@ -371,7 +377,7 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
 #------------------------------------------------------------------------------------------
             
 def update_dcc_signal_theatre (sig_id:int, character_to_display, 
-                               signal_change:bool,sig_at_danger:bool):
+                               signal_change:bool=False,sig_at_danger:bool=False):
     global logging
     
     if sig_mapped(sig_id):
