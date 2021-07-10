@@ -148,6 +148,7 @@
 from . import signals_common
 from . import signals_colour_lights
 from . import signals_ground_position
+from . import signals_semaphores
 
 from tkinter import *
 import logging
@@ -192,6 +193,8 @@ def set_route (sig_id:int, route:signals_common.route_type = signals_common.rout
         # Call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_route_indication (sig_id,route,theatre_text)           
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.update_semaphore_route_indication (sig_id,route,theatre_text)
     return()
 
 # -------------------------------------------------------------------------
@@ -359,6 +362,8 @@ def set_signal_override (*sig_ids:int):
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                    signals_semaphores.update_semaphore_signal (sig_id)
         return()
 
 # -------------------------------------------------------------------------
@@ -390,6 +395,8 @@ def clear_signal_override (*sig_ids:int):
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                    signals_semaphores.update_semaphore_signal (sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -419,6 +426,8 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
             # Call the signal type-specific functions to trigger the signal
             if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                 signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_semaphores.trigger_timed_semaphore_signal (sig_id,start_delay,time_delay)
     return()
 
 # -------------------------------------------------------------------------
@@ -440,6 +449,8 @@ def toggle_signal (sig_id:int):
             signals_colour_lights.toggle_colour_light_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_colour_lights.toggle_semaphore_signal(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -459,6 +470,9 @@ def toggle_subsidary (sig_id:int):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_subsidary_signal(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_colour_lights.toggle_semaphore_subsidary(sig_id)
+
     return()
 
 # -------------------------------------------------------------------------
@@ -477,6 +491,8 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.set_approach_control(sig_id,release_on_yellow)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.set_approach_control(sig_id,release_on_yellow)
     return()
 
 # -------------------------------------------------------------------------
@@ -495,6 +511,8 @@ def clear_approach_control (sig_id:int):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.raise_approach_release_event (sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.raise_approach_release_event (sig_id)
     return()
 
 ##########################################################################################
