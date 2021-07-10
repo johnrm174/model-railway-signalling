@@ -14,6 +14,7 @@ from .signals_common import pulse_signal_passed_button
 from .signals_common import pulse_signal_release_button
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
+from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
 from .signals import set_route
 from .signals import update_signal
@@ -69,6 +70,7 @@ __all__ = [
         'sig_callback_type',
       # Public signal functions
         'create_colour_light_signal',
+        'create_semaphore_signal',
         'create_ground_position_signal',
         'set_route',
         'update_signal',
