@@ -132,8 +132,8 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if signal 2 is set to clear
-    if signal_clear(2):
+    # Point 1 is locked if signal 2 (or its subsidary) is set to clear
+    if signal_clear(2) or subsidary_clear(2):
         lock_point(1)
     else:
         unlock_point(1)
@@ -152,7 +152,7 @@ def main_callback_function(item_id,callback_type):
 # Create the Window and canvas
 print ("Creating Window and Canvas")
 window = Tk()
-window.title("Simple Interlocking Example")
+window.title("Simple Interlocking Example - with Semaphores")
 canvas = Canvas(window,height=400,width=1000)
 canvas.pack()
 
@@ -168,7 +168,7 @@ request_dcc_power_on()
 
 # Simple mapping of the main signal to a single DCC address
 map_semaphore_signal (sig_id = 1, main_signal = 1 )
-map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 10 )
+map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 10 , left_subsidary = 11)
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
 map_semaphore_signal (sig_id = 4, main_signal = 4 )
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
