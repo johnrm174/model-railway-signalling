@@ -593,25 +593,6 @@ def update_semaphore_route_indication (sig_id,
         # Refresh the signal drawing objects (which will also send the DCC commands to change the arms accordingly
         update_semaphore_signal(sig_id)
         update_semaphore_subsidary(sig_id)
-        # Inhibit the main signal button if there is no theatre and the route does not have a main signal arm
-        # Otherwise enable it - as long as the subsidary isn't already externally interlocked
-        # We rely on the external interlocking code to ensure that signal is ON before any route change
-        if ( ((signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and signal["lhroute1"] is None)
-                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and signal["rhroute1"] is None))
-                and not signal["hastheatre"]): 
-            signals_common.signals[str(sig_id)]["sigbutton"].config(state="disabled")        
-        elif not signals_common.signals[str(sig_id)]["siglocked"]:
-            signals_common.signals[str(sig_id)]["sigbutton"].config(state="normal")
-        # Inhibit the subsidary signal button if there is no theatre and the route does not have a subsidary arm
-        # Otherwise enable it - as long as the subsidary isn't already externally interlocked
-        # We rely on the external interlocking code to ensure that signal is ON before any route change
-        if ( ((signal["routeset"] in (signals_common.route_type.NONE,signals_common.route_type.MAIN) and signal["subsidarymain"] is None)
-                or (signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and signal["subsidarylh1"] is None)
-                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and signal["subsidaryrh1"] is None))
-                and not signal["hastheatre"]): 
-            signals_common.signals[str(sig_id)]["subbutton"].config(state="disabled")        
-        elif not signals_common.signals[str(sig_id)]["sublocked"]:
-            signals_common.signals[str(sig_id)]["subbutton"].config(state="normal")
 
     # Only update the Theatre route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
@@ -672,7 +653,7 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         # then this will result in a update of the signal (either immediately or by the external
         # programme acting on the callback if the signal is not set to refresh immediately)
         signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg=arm_colour,disabledforeground=arm_colour)
+        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
         # If a start delay (>0) has been specified then we assume the intention
         # is to trigger a "signal Passed" event after the initial delay
         # Otherwise we'll trigger a "signal updated" event
