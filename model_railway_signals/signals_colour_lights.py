@@ -461,13 +461,12 @@ def update_colour_light_subsidary_signal (sig_id:int):
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
         signal["canvas"].itemconfig (signal["pos1"],fill="white")
         signal["canvas"].itemconfig (signal["pos2"],fill="white")
-        dcc_control.update_dcc_subsidary_signal(sig_id,True)  
-        
+        dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")  
     else:
         signal["canvas"].itemconfig (signal["pos1"],fill="grey")
         signal["canvas"].itemconfig (signal["pos2"],fill="grey")
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK/DARK")
-        dcc_control.update_dcc_subsidary_signal(sig_id,False)
+        dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
     return ()
 
 # -------------------------------------------------------------------------
@@ -682,7 +681,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.danger)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.danger)
         
     elif signal["displayedaspect"] == aspect_type.YELLOW:
         # Change the signal to display the Yellow aspect
@@ -690,7 +689,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="yellow")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.caution)
         
     elif signal["displayedaspect"] == aspect_type.DOUBLE_YELLOW:
         # Change the signal to display the Double Yellow aspect
@@ -698,7 +697,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="yellow")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="yellow")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.prelim_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.prelim_caution)
         
     elif signal["displayedaspect"] == aspect_type.FLASHING_YELLOW:
         # The flash_signal_aspects thread will take care of the flashing aspect
@@ -706,13 +705,13 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["red"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.flash_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.flash_caution)
         
     elif signal["displayedaspect"] == aspect_type.FLASHING_DOUBLE_YELLOW:
         # Change the signal to display the Double Yellow aspect
         signal["canvas"].itemconfig (signal["red"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="grey")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.flash_prelim_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.flash_prelim_caution)
 
     elif signal["displayedaspect"] == aspect_type.GREEN:
         # Change the signal to display the Green aspect
@@ -720,7 +719,7 @@ def refresh_signal_aspects (sig_id):
         signal["canvas"].itemconfig (signal["yel"],fill="grey")
         signal["canvas"].itemconfig (signal["grn"],fill="green")
         signal["canvas"].itemconfig (signal["yel2"],fill="grey")
-        dcc_control.update_dcc_signal(sig_id, dcc_control.signal_state_type.proceed)
+        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.proceed)
 
     return ()
 
