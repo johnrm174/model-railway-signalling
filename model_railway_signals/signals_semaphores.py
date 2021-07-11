@@ -25,11 +25,10 @@
 #import dcc_control
 from . import common
 from . import signals_common
-#from . import dcc_control
+from . import dcc_control
 
 from tkinter import *
 import tkinter.font
-import enum
 import time
 import threading
 import logging
@@ -200,6 +199,14 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     elif distant and approach_release_button:
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
     else:
+        
+        # We rely on a value of None later in the code so sat any "False values" to None
+        if subsidarymain == False: subsidarymain = None
+        if subsidarylh1 == False: subsidarylh1 = None
+        if subsidaryrh1 == False: subsidaryrh1 = None
+        if lhroute1 == False: lhroute1 = None
+        if rhroute1 == False: rhroute1 = None
+
         # set the font size for the buttons
         # We only want a small button for "Signal Passed" - hence a small font size
         myfont1 = tkinter.font.Font(size=common.fontsize)
@@ -221,7 +228,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # Create the 'windows' in which the buttons are displayed
         # We adjust the  positions if the signal supports a position light button
-        if subsidarymain or subsidarylh1 or subsidaryrh1:
+        if subsidarymain is not None or subsidarylh1 is not None or subsidaryrh1 is not None:
             point_coords = common.rotate_point (x,y,-35,-20,orientation) 
             canvas.create_window (point_coords,anchor=E,window=button1)
             but2win = canvas.create_window (point_coords,anchor=W,window=button2)
@@ -238,11 +245,11 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         canvas.create_line(common.rotate_line(x,y,0,0,0,-22,orientation),width=2,fill="white")
         canvas.create_line(common.rotate_line(x,y,0,-22,+70,-22,orientation),width=3,fill="white")
         # Draw the rest of the gantry to support other arms as required
-        if lhroute1 or subsidarylh1:
+        if lhroute1 is not None or subsidarylh1 is not None:
             canvas.create_line(common.rotate_line(x,y,40,-22,40,-37,orientation),width=2,fill="white")
             canvas.create_line(common.rotate_line(x,y,40,-37,50,-37,orientation),width=2,fill="white")
             if lhroute1: canvas.create_line(common.rotate_line(x,y,50,-37,70,-37,orientation),width=2,fill="white")
-        if rhroute1 or subsidaryrh1:
+        if rhroute1 is not None or subsidaryrh1 is not None:
             canvas.create_line(common.rotate_line(x,y,40,-22,40,-7,orientation),width=2,fill="white")
             canvas.create_line(common.rotate_line(x,y,40,-7,50,-7,orientation),width=2,fill="white")
             if rhroute1: canvas.create_line(common.rotate_line(x,y,50,-7,70,-7,orientation),width=2,fill="white")
@@ -252,65 +259,65 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         else: arm_colour = "red"
         # Draw the signal arm for the main route
         mainsigon = canvas.create_line(common.rotate_line(x,y,+70,-19,+70,-32,orientation),fill=arm_colour,width=4)
-        mainsigoff = canvas.create_line(common.rotate_line(x,y,+70,-19,+77,-32,orientation),fill=arm_colour,width=4)
+        mainsigoff = canvas.create_line(common.rotate_line(x,y,+70,-19,+77,-32,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arm for the main route
         mainsubon = canvas.create_line(common.rotate_line(x,y,+50,-19,+50,-28,orientation),fill=arm_colour,width=3)
-        mainsuboff = canvas.create_line(common.rotate_line(x,y,+50,-19,+55,-28,orientation),fill=arm_colour,width=3)
+        mainsuboff = canvas.create_line(common.rotate_line(x,y,+50,-19,+55,-28,orientation),fill=arm_colour,width=3,state='hidden')
         # Draw the signal arm for the RH route
         rhsigon = canvas.create_line(common.rotate_line(x,y,+65,-5,+65,-17,orientation),fill=arm_colour,width=4)
-        rhsigoff = canvas.create_line(common.rotate_line(x,y,+65,-5,+72,-17,orientation),fill=arm_colour,width=4)
+        rhsigoff = canvas.create_line(common.rotate_line(x,y,+65,-5,+72,-17,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arm for the RH route
         rhsubon = canvas.create_line(common.rotate_line(x,y,+50,-5,+50,-13,orientation),fill=arm_colour,width=3)
-        rhsuboff = canvas.create_line(common.rotate_line(x,y,+50,-5,+55,-13,orientation),fill=arm_colour,width=3)
+        rhsuboff = canvas.create_line(common.rotate_line(x,y,+50,-5,+55,-13,orientation),fill=arm_colour,width=3,state='hidden')
         # Draw the signal arm for the LH route
         lhsigon = canvas.create_line(common.rotate_line(x,y,+65,-34,+65,-47,orientation),fill=arm_colour,width=4)
-        lhsigoff = canvas.create_line(common.rotate_line(x,y,+65,-34,+72,-47,orientation),fill=arm_colour,width=4)
+        lhsigoff = canvas.create_line(common.rotate_line(x,y,+65,-34,+72,-47,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arm for the LH route
         lhsubon = canvas.create_line(common.rotate_line(x,y,+50,-34,+50,-43,orientation),fill=arm_colour,width=3)
-        lhsuboff = canvas.create_line(common.rotate_line(x,y,+50,-34,+55,-43,orientation),fill=arm_colour,width=3)
+        lhsuboff = canvas.create_line(common.rotate_line(x,y,+50,-34,+55,-43,orientation),fill=arm_colour,width=3,state='hidden')
 
         # Hide any drawing objects we don't need for this particular signal
         if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
         if not approach_release_button: canvas.itemconfigure(but4win,state='hidden')
-        if not subsidarymain:
-            print ("here")
-            canvas.itemconfigure(mainsubon,state='hidden')
-            canvas.itemconfigure(mainsuboff,state='hidden')
-        if not subsidarylh1:
-            canvas.itemconfigure(lhsubon,state='hidden')
-            canvas.itemconfigure(lhsuboff,state='hidden')
-        if not subsidaryrh1:
-            canvas.itemconfigure(rhsubon,state='hidden')
-            canvas.itemconfigure(rhsuboff,state='hidden')
-        if not lhroute1:         
-            canvas.itemconfigure(lhsigon,state='hidden')
-            canvas.itemconfigure(lhsigoff,state='hidden')
-        if not rhroute1:
-            canvas.itemconfigure(rhsigon,state='hidden')
-            canvas.itemconfigure(rhsigoff,state='hidden')
-                 
-        # Set the initial state of the signal depending on whether its fully automatic or not
-        # Fully automatic signals are set to OFF to display their "clear" aspect
-        # Manual signals are set to ON and display their "danger/caution aspect)
-        # We also disable the signal button for fully automatic signals
-        if fully_automatic:
-            button1.config(state="disabled",relief="sunken", bd=0)
-            signal_clear = True
-        else:
-            signal_clear = False
-            
+        if subsidarymain is None: canvas.itemconfigure(mainsubon,state='hidden')
+        if subsidarylh1 is None: canvas.itemconfigure(lhsubon,state='hidden')
+        if subsidaryrh1 is None: canvas.itemconfigure(rhsubon,state='hidden')
+        if lhroute1 is None: canvas.itemconfigure(lhsigon,state='hidden')
+        if rhroute1 is None: canvas.itemconfigure(rhsigon,state='hidden')
+                             
         # Draw the theatre route indicator box if one is specified for the signal
         # The text object is created anyway - and 'hidden' later if not required
         point_coords = common.rotate_point (x,y,+29,-22,orientation)
         if theatre_route_indicator:
             line_coords = common.rotate_line (x,y,+20,-14,+40,-30,orientation) 
             canvas.create_rectangle (line_coords,fill="black")
-            theatre = canvas.create_text (point_coords,fill="white",text="0",
+            theatre = canvas.create_text (point_coords,fill="white",text="",
                                      angle = orientation-90,state='normal')
         else:
             theatre = canvas.create_text (point_coords,fill="white",text="",
                                      angle = orientation-90,state='hidden')
-             
+            
+        # Set the initial state of the signal Arms if they have been created
+        if fully_automatic: mainroute = True
+        else: mainroute = False
+        if subsidarymain is not None: subsidarymain = False
+        if subsidarylh1 is not None: subsidarylh1 = False
+        if subsidaryrh1 is not None: subsidaryrh1 = False
+        if lhroute1 is not None: lhroute1 = False
+        if rhroute1 is not None: rhroute1 = False
+    
+        # If its a fully automatic signal then set the initial state to Clear and inhibit the button
+        # Also set the current state of the main route to the opposite of what we need for the signal
+        # this will ensure that the signal gets "changed" when we update it and the appropriate DCC
+        # commands sent out to put the signal into the correct initial (known) state
+        if fully_automatic:
+            signal_clear = True
+            mainroute = False
+            button1.config(state="disabled",relief="sunken", bd=0)
+        else:
+            signal_clear = False
+            mainroute = True
+
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
@@ -329,13 +336,14 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                       "theatretext" : "NONE",                      # SHARED - Initial Route setting to display (none)
                       "passedbutton" : button3,                    # SHARED - Button drawing object
                       "releasebutton" : button4,                   # SHARED - Button drawing object
-                      "theatre" : theatre,                         # SHARED - Text drawing object
+                      "theatre"       : theatre,                   # SHARED - Text drawing object
                       "externalcallback" : sig_callback,           # Type-specific - Callback for timed signal events
                       "distant"       : distant,                   # Type-specific - subtype of the signal (home/distant)
                       "hastheatre"    : theatre_route_indicator,   # Type-specific - details of the signal configuration
                       "subsidarymain" : subsidarymain,             # Type-specific - details of the signal configuration
                       "subsidarylh1"  : subsidarylh1,              # Type-specific - details of the signal configuration
                       "subsidaryrh1"  : subsidaryrh1,              # Type-specific - details of the signal configuration
+                      "mainroute"     : mainroute,                 # Type-specific - details of the signal configuration
                       "lhroute1"      : lhroute1,                  # Type-specific - details of the signal configuration
                       "rhroute1"      : rhroute1,                  # Type-specific - details of the signal configuration
                       "mainsigon"  : mainsigon,                    # Type-specific - drawing object
@@ -349,15 +357,26 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                       "lhsubon"    : lhsubon,                      # Type-specific - drawing object
                       "lhsuboff"   : lhsuboff,                     # Type-specific - drawing object
                       "rhsubon"    : rhsubon,                      # Type-specific - drawing object
-                      "rhsuboff"   : rhsuboff,                     # Type-specific - drawing object
-                      }                             # Type-specific - drawing object
+                      "rhsuboff"   : rhsuboff }                    # Type-specific - drawing object
         
         # Add the new signal to the dictionary of signals
         signals_common.signals[str(sig_id)] = new_signal
-        # We now need to update the signal aspects to reflect the initial dtate 
+        
+        # Update the signal to display the initial aspects
         update_semaphore_signal (sig_id)
-        if subsidarymain or subsidarylh1 or subsidaryrh1: update_semaphore_subsidary(sig_id)
-    
+        update_semaphore_subsidary(sig_id)
+        
+        # Send the DCC commands to put everything but the main signal arm into the initial "known" state
+        if new_signal["lhroute1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
+        if new_signal["rhroute1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
+        if new_signal["subsidarymain"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
+        if new_signal["subsidarylh1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
+        if new_signal["subsidaryrh1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
+        
+        # If there is a theatre route indicator we also need to ensure we send the appropriate
+        # DCC commands to set this into a known state (always off initially)
+        if theatre_route_indicator: dcc_control.update_dcc_signal_theatre (sig_id,"#")
+
     return ()
 
 #-------------------------------------------------------------------
@@ -371,80 +390,81 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     
 def update_semaphore_subsidary (sig_id:int):
     
-    global logging
+    def update_main_subsidary(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["subsidarymain"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to PROCEED")
+            signal["canvas"].itemconfigure(signal["mainsuboff"],state='normal')
+            signal["canvas"].itemconfigure(signal["mainsubon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")
+            signals_common.signals[str(sig_id)]["subsidarymain"]=True
+        elif not set_to_clear and signal["subsidarymain"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to DANGER")
+            signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
+            signals_common.signals[str(sig_id)]["subsidarymain"]=False
+        return()
     
+    def update_lh_subsidary(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["subsidarylh1"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to PROCEED")
+            signal["canvas"].itemconfigure(signal["lhsuboff"],state='normal')
+            signal["canvas"].itemconfigure(signal["lhsubon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="left_subsidary")
+            signals_common.signals[str(sig_id)]["subsidarylh1"]=True
+        elif not set_to_clear and signal["subsidarylh1"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to DANGER")
+            signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
+            signals_common.signals[str(sig_id)]["subsidarylh1"]=False
+        return()
+    
+    def update_rh_subsidary(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["subsidaryrh1"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to PROCEED")
+            signal["canvas"].itemconfigure(signal["rhsuboff"],state='normal')
+            signal["canvas"].itemconfigure(signal["rhsubon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="right_subsidary")
+            signals_common.signals[str(sig_id)]["subsidaryrh1"]=True
+        elif not set_to_clear and signal["subsidaryrh1"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to DANGER")
+            signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
+            signals_common.signals[str(sig_id)]["subsidaryrh1"]=False
+        return()
+    
+    #---------------------------------------
+    # This is where the function code begins
+    #---------------------------------------
+    global logging
     # get the signal that we are interested in
     signal = signals_common.signals[str(sig_id)]
     if signal["subclear"]:
         # Subsidary is Clear - we need to correctly set the subsidary arms that were created
         if signal["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to PROCEED")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='normal')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='hidden')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
+            if signal["subsidarymain"] is not None: update_main_subsidary(sig_id,True)
+            if signal["subsidarylh1"] is not None: update_lh_subsidary(sig_id,False)
+            if signal["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,False)
         elif signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to PROCEED")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='normal')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='hidden')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
+            if signal["subsidarymain"] is not None: update_main_subsidary(sig_id,False)
+            if signal["subsidarylh1"] is not None: update_lh_subsidary(sig_id,True)
+            if signal["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,False)
         elif signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to PROCEED")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='normal')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='hidden')
+            if signal["subsidarymain"] is not None: update_main_subsidary(sig_id,False)
+            if signal["subsidarylh1"] is not None: update_lh_subsidary(sig_id,False)
+            if signal["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,True)
     else: 
-        # Subsidary is at Danger - we need to correctly set the subsidary arms that were created
-        if signal["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to DANGER")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
-        elif signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to DANGER")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
-        elif signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2):
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to DANGER")
-            if signal["subsidarymain"]:
-                signal["canvas"].itemconfigure(signal["mainsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["mainsubon"],state='normal')
-            if signal["subsidarylh1"]:
-                signal["canvas"].itemconfigure(signal["lhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsubon"],state='normal')
-            if signal["subsidaryrh1"]:
-                signal["canvas"].itemconfigure(signal["rhsuboff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsubon"],state='normal')
+        if signal["subsidarymain"] is not None: update_main_subsidary(sig_id,False)
+        if signal["subsidarylh1"] is not None: update_lh_subsidary(sig_id,False)
+        if signal["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,False)
  
     return ()
 
@@ -459,95 +479,96 @@ def update_semaphore_subsidary (sig_id:int):
 
 def update_semaphore_signal (sig_id:int):
 
-    global logging
+    def update_main_signal(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["mainroute"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for MAIN route to PROCEED")
+            signal["canvas"].itemconfigure(signal["mainsigoff"],state='normal')
+            signal["canvas"].itemconfigure(signal["mainsigon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
+            signals_common.signals[str(sig_id)]["mainroute"]=True
+        elif not set_to_clear and signal["mainroute"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for MAIN route to DANGER")
+            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
+            signals_common.signals[str(sig_id)]["mainroute"]=False
+        return()
     
-    # get the signal that we are interested in
-    signal = signals_common.signals[str(sig_id)]
-
+    def update_lh_signal(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["lhroute1"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for LH route to PROCEED")
+            signal["canvas"].itemconfigure(signal["lhsigoff"],state='normal')
+            signal["canvas"].itemconfigure(signal["lhsigon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="left_signal")
+            signals_common.signals[str(sig_id)]["lhroute1"]=True
+        elif not set_to_clear and signal["lhroute1"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for LH route to DANGER")
+            signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
+            signals_common.signals[str(sig_id)]["lhroute1"]=False
+        return()
+    
+    def update_rh_signal(sig_id,set_to_clear):
+        global logging
+        signal = signals_common.signals[str(sig_id)]
+        if set_to_clear and signal["rhroute1"]==False:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for RH route to PROCEED")
+            signal["canvas"].itemconfigure(signal["rhsigoff"],state='normal')
+            signal["canvas"].itemconfigure(signal["rhsigon"],state='hidden')
+            dcc_control.update_dcc_signal_element(sig_id,True,element="right_signal")
+            signals_common.signals[str(sig_id)]["rhroute1"]=True
+        elif not set_to_clear and signal["rhroute1"]==True:
+            logging.info ("Signal "+str(sig_id)+": Changing signal arm for RH route to DANGER")
+            signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
+            signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
+            dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
+            signals_common.signals[str(sig_id)]["rhroute1"]=False
+        return()
+    
+    #---------------------------------------
+    # This is where the function code begins
+    #---------------------------------------
+    global logging
     # get the signal that we are interested in
     signal = signals_common.signals[str(sig_id)]
     if signal["sigclear"] and not signal["releaseonred"] and not signal["override"]:
         # Signal is Clear - we need to correctly set the signal arms that were created
         if signal["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            logging.info ("Signal "+str(sig_id)+": Changing Signal for MAIN route to PROCEED (signal is OFF)")
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='normal')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='hidden')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
+            if signal["mainroute"] is not None: update_main_signal(sig_id,True)
+            if signal["lhroute1"] is not None: update_lh_signal(sig_id,False)
+            if signal["rhroute1"] is not None: update_rh_signal(sig_id,False)
         elif signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2):
-            logging.info ("Signal "+str(sig_id)+": Changing Signal for LH route to PROCEED (signal is OFF)")
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='normal')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='hidden')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
+            if signal["mainroute"] is not None: update_main_signal(sig_id,False)
+            if signal["lhroute1"] is not None: update_lh_signal(sig_id,True)
+            if signal["rhroute1"] is not None: update_rh_signal(sig_id,False)
         elif signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2):
-            logging.info ("Signal "+str(sig_id)+": Changing Signal for RH route to PROCEED (signal is OFF)")
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='normal')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='hidden')
+            if signal["mainroute"] is not None: update_main_signal(sig_id,False)
+            if signal["lhroute1"] is not None: update_lh_signal(sig_id,False)
+            if signal["rhroute1"] is not None: update_rh_signal(sig_id,True)
     else: 
-        # Signal is at Danger - we need to correctly set the signal arms that were created
-        if signal["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            log_message = "Signal "+str(sig_id)+": Changing Signal for MAIN route to DANGER"
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
-        elif signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2):
-            log_message = "Signal "+str(sig_id)+": Changing Signal for LH route to DANGER"
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
-        elif signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2):
-            log_message = "Signal "+str(sig_id)+": Changing Signal for RH route to DANGER"
-            # Signals always have a signal arm for the Main Route
-            signal["canvas"].itemconfigure(signal["mainsigoff"],state='hidden')
-            signal["canvas"].itemconfigure(signal["mainsigon"],state='normal')
-            if signal["lhroute1"]:
-                signal["canvas"].itemconfigure(signal["lhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["lhsigon"],state='normal')
-            if signal["rhroute1"]:
-                signal["canvas"].itemconfigure(signal["rhsigoff"],state='hidden')
-                signal["canvas"].itemconfigure(signal["rhsigon"],state='normal')
-        # generate a log message specific to the case
-        if not signal["sigclear"]:
-            logging.info (log_message+" (signal is ON)")
-        elif signal["override"]:
-            logging.info (log_message+" (signal is OVERRIDEN)")
-        elif signal["releaseonred"]:
-            logging.info (log_message+" (signal is OFF - but subject to \'release on red\' approach control)")
-        else:
-            logging.info (log_message+" (unknown state - please report this as a bug report)")
-            
-    return ()
+        if signal["mainroute"] is not None: update_main_signal(sig_id,False)
+        if signal["lhroute1"] is not None: update_lh_signal(sig_id,False)
+        if signal["rhroute1"] is not None: update_rh_signal(sig_id,False)
 
+    # Only update the respective route indication if the route is actively set
+    # A route of 'NONE' signifies that the particular route indication isn't used
+    if signal["theatretext"] != "NONE":
+        if signal["sigclear"]:
+            logging.info ("Signal "+str(sig_id)+": Enabling theatre route indication of \'"+signal["theatretext"]+"\'")
+            refresh_theatre_route_indication (sig_id)            
+            dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=False)
+        else:
+            logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indication (signal is at DANGER)")
+            refresh_theatre_route_indication (sig_id)
+            # This is where we send the special character "#"- which should be mapped 
+            # to the DCC commands we need to send to inhibit the theatre route display
+            dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
+    return ()
 
 # -------------------------------------------------------------------------
 # Function to set (and update) the route indication for the signal
@@ -567,15 +588,16 @@ def update_semaphore_route_indication (sig_id,
     # Only update the respective route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
     if signal["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
-        logging.info ("Signal "+str(sig_id)+": Setting route to "+str(route_to_set).rpartition('.')[-1])
+        logging.info ("Signal "+str(sig_id)+": Setting semaphore route to "+str(route_to_set).rpartition('.')[-1])
         signals_common.signals[str(sig_id)]["routeset"] = route_to_set
+        # Refresh the signal drawing objects (which will also send the DCC commands to change the arms accordingly
         update_semaphore_signal(sig_id)
         update_semaphore_subsidary(sig_id)
         # Inhibit the main signal button if there is no theatre and the route does not have a main signal arm
         # Otherwise enable it - as long as the subsidary isn't already externally interlocked
         # We rely on the external interlocking code to ensure that signal is ON before any route change
-        if ( ((signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and not signal["lhroute1"])
-                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and not signal["rhroute1"]))
+        if ( ((signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and signal["lhroute1"] is None)
+                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and signal["rhroute1"] is None))
                 and not signal["hastheatre"]): 
             signals_common.signals[str(sig_id)]["sigbutton"].config(state="disabled")        
         elif not signals_common.signals[str(sig_id)]["siglocked"]:
@@ -583,41 +605,28 @@ def update_semaphore_route_indication (sig_id,
         # Inhibit the subsidary signal button if there is no theatre and the route does not have a subsidary arm
         # Otherwise enable it - as long as the subsidary isn't already externally interlocked
         # We rely on the external interlocking code to ensure that signal is ON before any route change
-        if ( ((signal["routeset"] in (signals_common.route_type.NONE,signals_common.route_type.MAIN) and not signal["subsidarymain"])
-                or (signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and not signal["subsidarylh1"])
-                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and not signal["subsidaryrh1"]))
+        if ( ((signal["routeset"] in (signals_common.route_type.NONE,signals_common.route_type.MAIN) and signal["subsidarymain"] is None)
+                or (signal["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2) and signal["subsidarylh1"] is None)
+                or (signal["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2) and signal["subsidaryrh1"] is None))
                 and not signal["hastheatre"]): 
             signals_common.signals[str(sig_id)]["subbutton"].config(state="disabled")        
         elif not signals_common.signals[str(sig_id)]["sublocked"]:
             signals_common.signals[str(sig_id)]["subbutton"].config(state="normal")
 
-            # stuff to do
-
-
-    # Only update the respective route indication if the route has been changed and has actively
+    # Only update the Theatre route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
     if signal["theatretext"] != theatre_text and theatre_text != "NONE":
-        logging.info ("Signal "+str(sig_id)+": Setting theatre route indication text to \'"+str(theatre_text)+"\'")
-        signal["theatretext"] = theatre_text
-        
-        # stuff to do
-        
-
-    # save the updates back to the dictionary of signals
-    signals_common.signals[str(sig_id)] = signal
-    
-    return()
-
-# -------------------------------------------------------------------------
-# Internal Function to update the drawing objects for the junction arms.
-# The arms will only be displayed if the signal was created with them.
-# (if not then the objects are hidden) and the function will have no effect)
-# -------------------------------------------------------------------------
-
-def refresh_semaphore_route_indication (sig_id):
-    
-    # stuff to do
-            
+        logging.info ("Signal "+str(sig_id)+": Setting theatre route text to \'"+str(theatre_text)+"\'")
+        signals_common.signals[str(sig_id)]["theatretext"] = theatre_text
+        # Only refresh the signal drawing objects if the signal is Clear
+        # Otherwise we'll leave the refresh until the signal is next changed
+        if signal["sigclear"] and not signal["releaseonred"] and not signal["override"]:
+            refresh_theatre_route_indication (sig_id)
+            # We always call the function to update the DCC route indication on a change in route
+            # to cater for DCC signal types that automatically enable/disable the route indication 
+            # depending on whether the signal is at danger or not
+            dcc_control.update_dcc_signal_theatre (sig_id, signals_common.signals[str(sig_id)]["theatretext"],
+                                        signal_change = False, sig_at_danger = not(signal["sigclear"]))
     return()
 
 # -------------------------------------------------------------------------
