@@ -604,7 +604,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
                 refresh_feather_route_indication (sig_id)
                 dcc_control.update_dcc_signal_route(sig_id,signal["routeset"],signal_change=True,sig_at_danger=False)
             elif new_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route indications (signal is at RED)")
+                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route indication (signal is at RED)")
                 refresh_feather_route_indication (sig_id)
                 # This is where we send the route type of "NONE" which should be mapped 
                 # to the DCC commands we need to send to inhibit the theatre route display
@@ -618,11 +618,11 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             # has transitioned either from RED or to RED.(This is OK as only signal types
             # with RED aspects can be created with feather or theatre route indications)
             if current_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Enabling theatre route indication for \'"+signal["theatretext"]+"\'")
+                logging.info ("Signal "+str(sig_id)+": Enabling theatre route indication of \'"+signal["theatretext"]+"\'")
                 refresh_theatre_route_indication (sig_id)            
                 dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=False)
             elif new_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indications (signal is at RED)")
+                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indication (signal is at RED)")
                 refresh_theatre_route_indication (sig_id)
                 # This is where we send the special character "#"- which should be mapped 
                 # to the DCC commands we need to send to inhibit the theatre route display
@@ -742,37 +742,35 @@ def update_colour_light_route_indication (sig_id,
     # Only update the respective route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
     if signal["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
-        logging.info ("Signal "+str(sig_id)+": Setting route to "+str(route_to_set).rpartition('.')[-1])
-        signal["routeset"] = route_to_set
+        logging.info ("Signal "+str(sig_id)+": Setting feather route indication to "+str(route_to_set).rpartition('.')[-1])
+        signals_common.signals[str(sig_id)]["routeset"] = route_to_set
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
-            logging.info ("Signal "+str(sig_id)+": Setting feather light route indication for "
-                      + str(signal["routeset"]).rpartition('.')[-1])
+            logging.info ("Signal "+str(sig_id)+": Changing feather light route indication to "
+                        + str(route_to_set).rpartition('.')[-1])
             refresh_feather_route_indication (sig_id)
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
         # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
-        dcc_control.update_dcc_signal_route (sig_id, signal["routeset"], signal_change = False,
-                          sig_at_danger = (signal["displayedaspect"] == aspect_type.RED))
+        dcc_control.update_dcc_signal_route (sig_id, route_to_set, signal_change = False,
+                                sig_at_danger = (signal["displayedaspect"]==aspect_type.RED))
             
     # Only update the respective route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
     if signal["theatretext"] != theatre_text and theatre_text != "NONE":
-        logging.info ("Signal "+str(sig_id)+": Setting theatre route indication text to \'"+str(theatre_text)+"\'")
-        signal["theatretext"] = theatre_text
+        logging.info ("Signal "+str(sig_id)+": Setting theatre route text to \'"+str(theatre_text)+"\'")
+        signals_common.signals[str(sig_id)]["theatretext"] = theatre_text
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
+            logging.info ("Signal "+str(sig_id)+": Changing theatre route indication to \'"+str(theatre_text)+"\'")
             refresh_theatre_route_indication (sig_id)
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
         # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
-        dcc_control.update_dcc_signal_theatre (sig_id, signal["theatretext"], signal_change = False,
-                                 sig_at_danger = (signal["displayedaspect"] == aspect_type.RED))
-
-    # save the updates back to the dictionary of signals
-    signals_common.signals[str(sig_id)] = signal
+        dcc_control.update_dcc_signal_theatre (sig_id, theatre_text, signal_change = False,
+                                sig_at_danger = (signal["displayedaspect"] == aspect_type.RED))
     
     return()
 
