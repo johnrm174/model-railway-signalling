@@ -107,15 +107,15 @@ def point_mapped(point_id):
 #    for the "special" character "#" which represents the mappings to apply when the
 #    theatre indicator is inhibited (when the signal is set to RED)
 #
-#        map_dcc_colour_light_signal (sig_id = 10,
-#                            danger = [[5,True],[6,False],[7,False],[8,False]],
-#                            proceed = [[5,False],[6,True],[7,False],[8,False]],
-#                            caution = [[5,False],[6,False],[7,True],[8,False]],
-#                            prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
-#                            THEATRE = [ ["#", [[9,False],[10,False]]],
-#                                        ["",[[9,False],[10,False]]],
-#                                        ["1",[[9,False],[10,True]]],
-#                                        ["2",[[9,True],[10,False]]] ]   )
+#        map_dcc_signal (sig_id = 10,
+#                        danger = [[5,True],[6,False],[7,False],[8,False]],
+#                        proceed = [[5,False],[6,True],[7,False],[8,False]],
+#                        caution = [[5,False],[6,False],[7,True],[8,False]],
+#                        prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
+#                        THEATRE = [ ["#", [[9,False],[10,False]]],
+#                                    ["",[[9,False],[10,False]]],
+#                                    ["1",[[9,False],[10,True]]],
+#                                    ["2",[[9,True],[10,False]]] ]   )
 #
 #    Event Driven example - a 4 aspect signal, where 2 addresses are used (the base address
 #    to select the Red or Green aspect and the base+1 address to set the Yellow or Double Yellow
@@ -190,7 +190,7 @@ def map_dcc_signal (sig_id:int,
                 str(signals_common.route_type.MAIN) : MAIN,
                 str(signals_common.route_type.NONE) : NONE,
                 "THEATRE" : THEATRE,
-                "subsidary" : subsidary }
+                "main_subsidary" : subsidary }
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
         
     return ()
@@ -199,7 +199,6 @@ def map_dcc_signal (sig_id:int,
 # Function to "map" a TrainTech" Event-driven signal to the appropriate DCC addresses/commands
 # This function provided to simplify the calling code - i.e. this does all the hard work for you
 #-----------------------------------------------------------------------------------------
-
 
 def map_traintech_signal (sig_id:int,
                           base_address:int,
@@ -243,11 +242,77 @@ def map_traintech_signal (sig_id:int,
                 "THEATRE" : [ [str(theatre_route), [[theatre_address,True],]],
                               ["#", [[theatre_address,False],]],
                               ["", [[theatre_address,False],]] ],
-                "subsidary" : 0 }
+                "main_subsidary" : 0 }
         # finally configure the feather route that is being configured
         new_dcc_mapping[str(feather_route)] = [[route_address,True]]
         dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
     return ()
+
+#-----------------------------------------------------------------------------------------
+# Function to "map" a semaphore signal to the appropriate DCC addresses/commands using
+# a simple one-to-one mapping of each signal arm with a DCC accessory address apart from
+# the theatre route display where we send can send either a signle DCC command or a
+# series of DCC commands to put the theatre route indicator into the correct state
+#
+#    Simple Example - a semaphore signal with main and subsidary arms for the primary route
+#    and a RH bracket with just a main signal arm, would be configured as below.
+#    This example also includes an example configuration for a theatre route indication
+#    which we will use to display "1" or "2" for routes. Note that we also need to include
+#    a mapping for the "special" character "#" which represents the mappings to apply when
+#    the theatre indicator is inhibited (when the signal is set to DANGER)
+#
+#        map_semaphore_signal (sig_id = 10,
+#                              main_signal_arm = 21,
+#                              main_subsidary_arm = 22
+#                              right_signal_arm = 23
+#                              THEATRE = [ ["#", [[24,False],[25,False]]],
+#                                          ["1",[[24,False],[25,True]]],
+#                                          ["2",[[24,True],[25,False]]] ]   )
+
+#-----------------------------------------------------------------------------------------
+
+def map_semaphore_signal (sig_id:int,
+                          main_signal:int = 0,
+                          main_subsidary:int = 0,
+                          left_signal:int = 0,
+                          left_subsidary:int = 0,
+                          right_signal:int = 0,
+                          right_subsidary:int = 0,
+                          THEATRE = [["#", [[0,False],]],]):
+
+    # Do some basic validation on the parameters we have been given
+    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
+    if sig_mapped(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
+    elif sig_id < 1:
+        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
+    else: 
+        addresses = [main_signal,main_subsidary,left_signal,left_subsidary,right_signal,right_subsidary]
+        for theatre_state in THEATRE:
+            for dcc_address in theatre_state[1]:
+                addresses = addresses + [dcc_address[0]]
+        addresses_valid = True
+        for entry in addresses:
+            if entry < 0 or entry > 2047:
+                logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry)+" - must be between 1 and 2047")
+                addresses_valid = False
+        
+        if addresses_valid:
+            # Create the DCC Mapping entry for the signal.
+            new_dcc_mapping = {
+                    "mapping_type" : dcc_signal_type.address_mapped,
+                    "auto_route_inhibit" : False,
+                    "main_signal"        : main_signal,
+                    "main_subsidary"     : main_subsidary,
+                    "left_signal"        : left_signal,
+                    "left_subsidary"     : left_subsidary,
+                    "right_signal"       : right_signal,
+                    "right_subsidary"    : right_subsidary,
+                    "THEATRE"            : THEATRE  }
+            
+            dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
+    return ()
+
 
 
 
@@ -300,7 +365,7 @@ def update_dcc_point(point_id:int, state:bool):
 # Function to send the appropriate DCC commands to set the state of a DCC Signal
 #------------------------------------------------------------------------------------------
 
-def update_dcc_signal(sig_id: int, state: signal_state_type):
+def update_dcc_signal_aspects(sig_id: int, state: signal_state_type):
     
     global logging
     
@@ -320,17 +385,17 @@ def update_dcc_signal(sig_id: int, state: signal_state_type):
 # Function to send the appropriate DCC commands to change the subsidary signal aspect
 #------------------------------------------------------------------------------------------
             
-def update_dcc_subsidary_signal (sig_id:int,state:bool):
+def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidary"):
         
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change subsidary signal aspect")
+        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
         # Retrieve the DCC mappings for our signal
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
         # Send the DCC commands to change the state 
-        if dcc_mapping["subsidary"] > 0:
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping["subsidary"],state)        
+        if dcc_mapping[element] > 0:
+            pi_sprog_interface.send_accessory_short_event (dcc_mapping[element],state)        
     return()
 
 #-----------------------------------------------------------------------------------------

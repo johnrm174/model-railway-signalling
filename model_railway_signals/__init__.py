@@ -49,7 +49,9 @@ from .pi_sprog_interface import request_dcc_power_off
 
 from .dcc_control import dcc_signal_type
 from .dcc_control import map_dcc_signal
+from .dcc_control import map_semaphore_signal
 from .dcc_control import map_traintech_signal
+from .dcc_control import map_semaphore_signal
 from .dcc_control import map_dcc_point
 
 __all__ = [
@@ -110,6 +112,7 @@ __all__ = [
         'request_dcc_power_off',
         'map_dcc_signal',
         'map_traintech_signal',
+        'map_semaphore_signal',
         'map_dcc_point'
            ]
 
