@@ -94,8 +94,10 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
     
     if point_switched(1):
+        set_route(1,route=route_type.LH1)
         set_route(2,route=route_type.LH1)
     else:
+        set_route(1,route=route_type.MAIN)
         set_route(2,route=route_type.MAIN)
 
     #-------------------------------------------------------------- 
@@ -132,8 +134,8 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if signal 2 (or its subsidary) is set to clear
-    if signal_clear(2) or subsidary_clear(2):
+    # Point 1 is locked if signal 1, signal 2 (or its subsidary) is set to clear
+    if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
         lock_point(1)
     else:
         unlock_point(1)
@@ -167,8 +169,8 @@ initialise_pi_sprog (dcc_debug_mode=debug_dcc)
 request_dcc_power_on()
 
 # Simple mapping of the main signal to a single DCC address
-map_semaphore_signal (sig_id = 1, main_signal = 1 )
-map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 10 , left_subsidary = 11)
+map_semaphore_signal (sig_id = 1, main_signal = 1 , left_signal = 10 )
+map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 11 , left_subsidary = 12)
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
 map_semaphore_signal (sig_id = 4, main_signal = 4 )
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
@@ -208,6 +210,7 @@ create_section(canvas,4,800,200,section_callback=main_callback_function)
 print ("Creating Signals")
 create_semaphore_signal (canvas,1,50,200,distant = True,
                          sig_callback=main_callback_function,
+                         lhroute1 = True,
                          sig_passed_button = True)
 create_semaphore_signal (canvas,2,275,200,
                          sig_callback=main_callback_function,
@@ -248,6 +251,7 @@ lock_signal(1)
 lock_signal(3)
 lock_subsidary(2)
 set_route (2,route_type.MAIN)
+set_route (1,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
