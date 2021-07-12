@@ -362,7 +362,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # Add the new signal to the dictionary of signals
         signals_common.signals[str(sig_id)] = new_signal
         
-        # Update the signal to display the initial aspects
+        # Update the signal to display the initial aspects - this will also cause the DCC commands to be sent
+        # to put the main signal arm into the default, "known" state (normally ON or OFF if fully automatic)
         update_semaphore_signal (sig_id)
         update_semaphore_subsidary(sig_id)
         
