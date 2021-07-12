@@ -6,6 +6,12 @@
 #           - with or without a position light subsidary signal
 #           - with or without route indication feathers (maximum of 5)
 #           - with or without a theatre type route indicator
+#           - With or without Release Control (Release on Red or Release on Yellow)
+#    Semaphore Signals - Home or Distant
+#           - with or without junction arms (RH and LH arms supported)
+#           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+#           - with or without a theatre type route indicator (for Home signals only)
+#           - With or without Release Control (Release on Red only)
 #    Ground Position Light Signals
 #           - groud position light or shunt ahead position light
 #           - either early or modern (post 1996) types
@@ -17,13 +23,17 @@
 #   signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
 #   signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
-# route_type (use for specifying the route - thise equate to the route feathers):
+# route_type (use for specifying the route):
 #   route_type.NONE   (no route indication - i.e. not used)
 #   route_type.MAIN   (main route)
 #   route_type.LH1    (immediate left)
 #   route_type.LH2    (far left)
 #   route_type.RH1    (immediate right)
 #   route_type.RH2    (rar right)
+# These equate to the route feathers for colour light signals or the Sempahore junction "arm":
+#   RH1 or RH2 make the RH junction arm and RH subsidary arm "active"
+#   LH1 or LH2 make the LH junction arm and LH subsidary arm "active"
+#   MAIN or NONE make the "main" signal arm and the "main" subsidary arm "active"
 # 
 # sig_callback_type (tells the calling program what has triggered the callback):
 #     sig_callback_type.sig_switched (signal has been switched)
@@ -55,6 +65,26 @@
 #                 when the signal is changed and the external programme will need to call the seperate 
 #                 'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
 #                 depend on the signal ahead - Default True 
+#       fully_automatic:bool - Creates a signal without any manual controls - Default False
+#
+# create_semaphore_signal - Creates a Semaphore signal
+#   Mandatory Parameters:
+#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#   Optional Parameters:
+#       distant:bool - Set to True to create a Distant signal - False to create a Home signal - default False
+#       orientation:int - Orientation in degrees (0 or 180) - Default is zero
+#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#                           Note that the callback function returns (item_id, callback type)
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       approach_release_button:bool - Creates an "Approach Release" button - Default False
+#       subsidarymain:bool - To create a subsidary signal on the post under the "main" signal - default False
+#       subsidarylh1:bool - To create a LH gantry with a subsidary signal - default False
+#       subsidaryrh1:bool - To create a RH gantry with a subsidary signal - default False
+#       lhroute1:bool - To create a LH gantry with a main (junction) signal - default False
+#       rhroute1:bool - To create a RH gantry with a main (junction) signal - default False
+#       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
 # 
 # create_ground_position_signal - create a ground position light signal
