@@ -48,8 +48,11 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 
 <pre>
 'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a
-           basic track schematic with interlocked signals/points. Also includes a simple DCC Mapping example
-           (1 signal and 2 points) and an external track sensor to provide a "signal passed" event.
+           basic track schematic with interlocked signals/points. Also includes DCC Mapping examples
+           (signals and points) and external track sensors to provide "signal passed" events.
+
+'test_semaphore_example.py' - effectively the same example as above, but using sempahore signals. 
+           Includes DCC Mapping examples for the Semaphore signals (different to colour lights).
 
 'test_approach_control.py' - an example of using automated "approach control" for junction signals. This 
            is where a signal displays a more restrictive aspect (either red or yellow) when a lower-speed 
@@ -115,11 +118,18 @@ fpl_active (point_id) - returns the state of the FPL (True/False) - to support p
 ## Signal Functions
 <pre>
 Currently supported types:
-   Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
-          - with or without a position light subsidary signal
-          - with or without route indication feathers (maximum of 5)
-          - with or without a theatre type route indicator
-   Ground Position Light Signals
+  Currently supported types:
+    Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
+           - with or without a position light subsidary signal
+           - with or without route indication feathers (maximum of 5)
+           - with or without a theatre type route indicator
+           - With or without Release Control (Release on Red or Release on Yellow)
+    Semaphore Signals - Home or Distant
+           - with or without junction arms (RH and LH arms supported)
+           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+           - with or without a theatre type route indicator (for Home signals only)
+           - With or without Release Control (Release on Red only)
+    Ground Position Light Signals
           - groud position light or shunt ahead position light
           - either early or modern (post 1996) types
 
@@ -130,13 +140,17 @@ signal_sub_type (use when creating colour light signals):
   signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
   signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 
-route_type (use for specifying the route - thise equate to the route feathers):
+route_type (use for specifying the route):
   route_type.NONE   (no route indication - i.e. not used)
   route_type.MAIN   (main route)
   route_type.LH1    (immediate left)
   route_type.LH2    (far left)
   route_type.RH1    (immediate right)
   route_type.RH2    (rar right)
+These equate to the route feathers for colour light signals or the Sempahore junction "arm":
+  RH1 or RH2 make the RH junction arm and RH subsidary arm "active"
+  LH1 or LH2 make the LH junction arm and LH subsidary arm "active"
+  MAIN or NONE make the "main" signal arm and the "main" subsidary arm "active"
 
 sig_callback_type (tells the calling program what has triggered the callback):
     sig_callback_type.sig_switched (signal has been switched)
@@ -168,6 +182,26 @@ create_colour_light_signal - Creates a colour light signal
                 when the signal is changed and the external programme will need to call the seperate 
                 'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
                 depend on the signal ahead - Default True 
+      fully_automatic:bool - Creates a signal without any manual controls - Default False
+
+create_semaphore_signal - Creates a Semaphore signal
+  Mandatory Parameters:
+      Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+      sig_id:int - The ID for the signal - also displayed on the signal button
+      x:int, y:int - Position of the point on the canvas (in pixels) 
+  Optional Parameters:
+      distant:bool - Set to True to create a Distant signal - False to create a Home signal - default False
+      orientation:int - Orientation in degrees (0 or 180) - Default is zero
+      sig_callback:name - Function to call when a signal event happens - Default is no callback
+                          Note that the callback function returns (item_id, callback type)
+      sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+      approach_release_button:bool - Creates an "Approach Release" button - Default False
+      subsidarymain:bool - To create a subsidary signal on the post under the "main" signal - default False
+      subsidarylh1:bool - To create a LH gantry with a subsidary signal - default False
+      subsidaryrh1:bool - To create a RH gantry with a subsidary signal - default False
+      lhroute1:bool - To create a LH gantry with a main (junction) signal - default False
+      rhroute1:bool - To create a RH gantry with a main (junction) signal - default False
+      theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
       fully_automatic:bool - Creates a signal without any manual controls - Default False
 
 create_ground_position_signal - create a ground position light signal
@@ -313,45 +347,61 @@ Not all signals/points that exist on the layout need to have a DCC Mapping confi
 has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
 schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
 <pre>
-  map_dcc_signal - Map a signal to one or more DCC Addresses
-     Mandatory Parameters:
-        sig_id:int - The ID for the signal to create a DCC mapping for
-     Optional Parameters:
-        auto_route_inhibit:bool - If the signal inhibits route indications at DANGER (default=False)
-        proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
-        danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-        caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-        prelim_caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-        LH1[[add:int,state:bool],] - List of DCC addresses/states for "LH45" (default = No Mapping)
-        LH2[[add:int,state:bool],] - List of DCC addresses/states for "LH90" (default = No Mapping)
-        RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
-        RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
-        MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
-        NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit routes (default = No Mapping)
-                Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
-                unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
-        THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
-                Each entry comprises the "character" and the associated list of DCC addresses/states
-                "#" is a special character - which means inhibit all indications (when signal is at danger)
-                Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
-                unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
-        subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
+map_dcc_signal - Map a signal to one or more DCC Addresses
+   Mandatory Parameters:
+      sig_id:int - The ID for the signal to create a DCC mapping for
+   Optional Parameters:
+      auto_route_inhibit:bool - If the signal inhibits route indications at DANGER (default=False)
+      proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
+      danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
+      caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
+      prelim_caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
+      LH1[[add:int,state:bool],] - List of DCC addresses/states for "LH45" (default = No Mapping)
+      LH2[[add:int,state:bool],] - List of DCC addresses/states for "LH90" (default = No Mapping)
+      RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
+      RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
+      MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
+      NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit routes (default = No Mapping)
+              Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
+              unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
+      THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
+              Each entry comprises the "character" and the associated list of DCC addresses/states
+              "#" is a special character - which means inhibit all indications (when signal is at danger)
+              Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
+              unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
+      subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
 
-  map_traintech_signal - Generate the mappings for a TrainTech signal
-     Mandatory Parameters:
-        sig_id:int - The ID for the signal to create a DCC mapping for
-        base_address:int - The base address of the signal (the signal will take 4 consecutive addresses)
-     Optional Parameters:
-        route_address:int - The address for the route indicator (Feather or Theatre) - Default = 0 (no indicator)
-        theatre_route:str - The character to be associated with the Theartre display - Default = "NONE" (no Text)
-        feather_route:route_type - The route to be associated with the feather - Default = NONE (no route)
+map_traintech_signal - Generate the mappings for a TrainTech signal
+   Mandatory Parameters:
+      sig_id:int - The ID for the signal to create a DCC mapping for
+      base_address:int - The base address of the signal (the signal will take 4 consecutive addresses)
+   Optional Parameters:
+      route_address:int - The address for the route indicator (Feather or Theatre) - Default = 0 (no indicator)
+      theatre_route:str - The character to be associated with the Theartre display - Default = "NONE" (no Text)
+      feather_route:route_type - The route to be associated with the feather - Default = NONE (no route)
 
-  map_dcc_point
-     Mandatory Parameters:
-        point_id:int - The ID for the point to create a DCC mapping for
-        address:int - the single DCC address for the point
-     Optional Parameters:
-        state_reversed:bool - Set to True to reverse the DCC logic (default = false)
+map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address mapped to each arm)
+   Mandatory Parameters:
+      sig_id:int - The ID for the signal to create a DCC mapping for
+      main_signal:int     - single DCC address for the main signal arm  (default = No Mapping)
+   Optional Parameters:
+      main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
+      left_signal:int     - single DCC address for the LH signal arm (default = No Mapping)
+      left_subsidary:int  - single DCC address for the LH subsidary arm (default = No Mapping)
+      right_signal:int    - single DCC address for the RH signal arm  (default = No Mapping)
+      right_subsidary:int - single DCC address for the RH subsidary arm (default = No Mapping)
+      THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
+              Each entry comprises the "character" and the associated list of DCC addresses/states
+              "#" is a special character - which means inhibit all indications (when signal is at danger)
+              Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
+              unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
+
+map_dcc_point
+   Mandatory Parameters:
+      point_id:int - The ID for the point to create a DCC mapping for
+      address:int - the single DCC address for the point
+   Optional Parameters:
+      state_reversed:bool - Set to True to reverse the DCC logic (default = false)
 </pre>
 
 ## Pi-Sprog Interface Functions
@@ -361,27 +411,27 @@ a fully-functional interface for All DCC command and control functions - just th
 of signals and points via a selection of common DCC Accessory decoders.Basic CV Programming is also supported - primarily 
 as an aid to testing, but for full decoder programming the recommendation is to use JRMI DecoderPro.
 <pre>
-  initialise_pi_sprog (Open the comms port to the Pi Sprog)
-     Optional Parameters:
-        port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
-        baud_rate:int - The baud rate to use for the serial port - Default = 115200,
-        dcc_debug_mode:bool - Sets an additional level of logging for the CBUS commands being sent to the Pi-SPROG. 
+initialise_pi_sprog (Open the comms port to the Pi Sprog)
+   Optional Parameters:
+      port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
+      baud_rate:int - The baud rate to use for the serial port - Default = 115200,
+      dcc_debug_mode:bool - Sets an additional level of logging for the CBUS commands being sent to the Pi-SPROG. 
                             - Will also Request and report the command station status (from the Pi-SPROG-3)
 
-  service_mode_write_cv (programmes a CV in direct bit mode and waits for response)
-             (events are only sent if we think the track power is currently switched on)
-             (if acknowledgement isn't received within 5 seconds then the request times out)
-     Mandatory Parameters:
-        cv:int - The CV (Configuration Variable) to be programmed
-        value:int - The value to programme
+service_mode_write_cv (programmes a CV in direct bit mode and waits for response)
+           (events are only sent if we think the track power is currently switched on)
+           (if acknowledgement isn't received within 5 seconds then the request times out)
+   Mandatory Parameters:
+      cv:int - The CV (Configuration Variable) to be programmed
+      value:int - The value to programme
 
-  request_dcc_power_on (sends a request to switch on the track power and waits for acknowledgement)
-         returns True if we have received acknowledgement that Track Power has been turned on
-         returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
+request_dcc_power_on (sends a request to switch on the track power and waits for acknowledgement)
+       returns True if we have received acknowledgement that Track Power has been turned on
+       returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
 
-  request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
-         returns True if we have received acknowledgement that Track Power has been turned off
-         returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
+request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
+       returns True if we have received acknowledgement that Track Power has been turned off
+       returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
 </pre>
 
 
