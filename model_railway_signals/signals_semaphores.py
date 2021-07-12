@@ -60,7 +60,7 @@ def sig_passed_button_event (sig_id,external_callback):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
     signals_common.pulse_signal_passed_button (sig_id)
-    raise_signal_passed_event(sig_id,external_callback)
+    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id,external_callback):
@@ -68,39 +68,6 @@ def approach_release_button_event (sig_id,external_callback):
     logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
     signals_common.pulse_signal_release_button (sig_id)
     raise_approach_release_event(sig_id,external_callback)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function for "signal updated events" - which are triggered whenever
-# the signal state is "changed" as part of a timed sequence - see the
-# "trigger_timed_semaphore_signal" function. Will also initiate an
-# external callback if one was specified when the signal was first created.
-# If not specified then we use the "null_callback" to do nothing
-# -------------------------------------------------------------------------
-
-def raise_signal_updated_event (sig_id:int, external_callback=null_callback):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Timed Signal Updated Event ********************************")
-    # Call the internal function to update and refresh the signal
-    update_semaphore_signal(sig_id)
-    # Make the external callback 
-    external_callback (sig_id, signals_common.sig_callback_type.sig_updated)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to to trigger a "signal passed" indication either when the signal
-# passed button has been clicked (i.e. from the sig_passed_button_event function
-# above) or when triggered as part of a timed signal sequence. Will call the
-# common function to pulse the signal passed button and initiate an external
-# callback if a callback was specified when the signal was created - If not
-# then the "null callback" will be called to do nothing
-# -------------------------------------------------------------------------
-
-def raise_signal_passed_event (sig_id:int, external_callback=null_callback):
-    # Call the internal function to update and refresh the signal
-    update_semaphore_signal(sig_id)
-    # Make the external callback 
-    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 # -------------------------------------------------------------------------
@@ -659,15 +626,20 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         # is to trigger a "signal Passed" event after the initial delay
         # Otherwise we'll trigger a "signal updated" event
         if start_delay > 0:
-            raise_signal_passed_event(sig_id, signals_common.signals[str(sig_id)]["externalcallback"])
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+            update_semaphore_signal(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         else:
-            raise_signal_updated_event(sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+            update_semaphore_signal(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         # Sleep until its time to clear the signal
         time.sleep (time_delay) 
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
-        # Now make the final external callback
-        raise_signal_updated_event (sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+        update_semaphore_signal(sig_id)
+        signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return ()
     
     # --------------------------------------------------------------

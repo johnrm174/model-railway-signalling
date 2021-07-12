@@ -87,7 +87,7 @@ def sig_passed_button_event (sig_id,external_callback):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
     signals_common.pulse_signal_passed_button (sig_id)
-    raise_signal_passed_event(sig_id,external_callback)
+    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id,external_callback):
@@ -95,44 +95,6 @@ def approach_release_button_event (sig_id,external_callback):
     logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
     signals_common.pulse_signal_release_button (sig_id)
     raise_approach_release_event(sig_id,external_callback)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function for "signal updated events" - which are triggered whenever
-# the signal state is "changed" as part of a timed sequence - see the
-# "trigger_timed_colour_light_signal" function. Will also initiate an
-# external callback if one was specified when the signal was first created.
-# If not specified then we use the "null_callback" to do nothing
-# -------------------------------------------------------------------------
-
-def raise_signal_updated_event (sig_id:int, external_callback=null_callback):
-    
-    global logging
-    
-    logging.info("Signal "+str(sig_id)+": Timed Signal Updated Event ********************************")
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]: 
-        update_colour_light_signal_aspect(sig_id)
-    # Make the external callback
-    external_callback (sig_id, signals_common.sig_callback_type.sig_updated)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to to trigger a "signal passed" indication either when the signal
-# passed button has been clicked (i.e. from the sig_passed_button_event function
-# above) or when triggered as part of a timed signal sequence. Will call the
-# common function to pulse the signal passed button and initiate an external
-# callback if a callback was specified when the signal was created - If not
-# then the "null callback" will be called to do nothing
-# -------------------------------------------------------------------------
-
-def raise_signal_passed_event (sig_id:int, external_callback=null_callback):
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]: 
-        update_colour_light_signal_aspect(sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 # -------------------------------------------------------------------------
@@ -857,26 +819,35 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         # Set the Override Aspect back to this initial aspect at the end of this thread
         signals_common.signals[str(sig_id)]["override"] = True
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        # If a start delay (>0) has been specified then we assume the intention
-        # is to trigger a "signal Passed" event after the initial delay
-        # Otherwise we'll trigger a "signal updated" event
+        # If a start delay (>0) has been specified then we assume the intention is to trigger a
+        # "signal Passed" event after the initial delay - Otherwise we'll trigger a "signal updated" event
         if start_delay > 0:
-            raise_signal_passed_event(sig_id, signals_common.signals[str(sig_id)]["externalcallback"])
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         else:
-            raise_signal_updated_event(sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         # Sleep until the next aspect change is due
         time.sleep (time_delay) 
         # Cycle through the aspects if its a 3 or 4 aspect signal
         if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
             signals_common.signals[str(sig_id)]["overriddenaspect"] = aspect_type.YELLOW
-            # Make an intermediate external callback
-            raise_signal_updated_event(sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+            # Call the internal function to update and refresh the signal - unless this signal is configured to
+            # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay) 
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = aspect_type.DOUBLE_YELLOW
-            # Make an intermediate external callback
-            raise_signal_updated_event(sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+            # Call the internal function to update and refresh the signal - unless this signal is configured to
+            # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay)              
         # We've finished - so clear the override on the signal
@@ -888,8 +859,12 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             signals_common.signals[str(sig_id)]["overriddenaspect"] = aspect_type.YELLOW
         else:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = aspect_type.RED
-        # Now make the final external callback
-        raise_signal_updated_event (sig_id,signals_common.signals[str(sig_id)]["externalcallback"]) 
+        # Call the internal function to update and refresh the signal - unless this signal is configured to
+        # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+        if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+        signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+
         return ()
     
     # --------------------------------------------------------------
