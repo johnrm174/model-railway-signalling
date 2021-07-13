@@ -579,12 +579,12 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             # has transitioned either from RED or to RED.(This is OK as only signal types
             # with RED aspects can be created with feather or theatre route indications)
             if current_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Enabling theatre route indication of \'"+signal["theatretext"]+"\'")
-                refresh_theatre_route_indication (sig_id)            
+                logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"+signal["theatretext"]+"\'")
+                signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
                 dcc_control.update_dcc_signal_theatre(sig_id,signal["theatretext"],signal_change=True,sig_at_danger=False)
             elif new_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route indication (signal is at RED)")
-                refresh_theatre_route_indication (sig_id)
+                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route display (signal is at RED)")
+                signal["canvas"].itemconfig (signal["theatre"],text="")
                 # This is where we send the special character "#"- which should be mapped 
                 # to the DCC commands we need to send to inhibit the theatre route display
                 dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
@@ -708,8 +708,7 @@ def update_colour_light_route_indication (sig_id,
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
-            logging.info ("Signal "+str(sig_id)+": Changing feather light route indication to "
-                        + str(route_to_set).rpartition('.')[-1])
+            logging.info ("Signal "+str(sig_id)+": Changing feather route display to "+ str(route_to_set).rpartition('.')[-1])
             refresh_feather_route_indication (sig_id)
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
@@ -726,7 +725,7 @@ def update_colour_light_route_indication (sig_id,
         # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
             logging.info ("Signal "+str(sig_id)+": Changing theatre route indication to \'"+str(theatre_text)+"\'")
-            refresh_theatre_route_indication (sig_id)
+            signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
         # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
@@ -767,25 +766,6 @@ def refresh_feather_route_indication (sig_id):
             signal["canvas"].itemconfig (signal["mainf"],fill="white")
             
     return()
-
-# -------------------------------------------------------------------------
-# Internal Function to update the displayed value of the theatre route indication.
-# The text will only be displayed if the signal was created with a theatre.
-# (if not then the text object is 'hidden' and the function will have no effect)
-# -------------------------------------------------------------------------
-
-def refresh_theatre_route_indication (sig_id):
-    
-    global logging
-
-    # get the signal that we are interested in
-    signal = signals_common.signals[str(sig_id)]
-    # Only display the route indication if the signal is not at RED
-    if signal["displayedaspect"] != aspect_type.RED:
-        signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
-    else:
-        signal["canvas"].itemconfig (signal["theatre"],text="")
-    return ()
 
 # -------------------------------------------------------------------------
 # Function to 'override' a colour light signal (changing it to RED) and then
