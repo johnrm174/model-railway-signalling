@@ -22,19 +22,15 @@ the DCC control aspects, a log level of DEBUG will show you the commands being s
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
 ## Installation
-To install use:
-<pre>
-$ pip install model-railway-signals
-</pre>
-or alternatively:
+For a first time installation use:
 <pre>
 $ python3 -m pip install model-railway-signals 
 </pre>
-You may need to ensure you have the latest version of pip installed:
+To upgrade to the latest version use:
 <pre>
-$ pip install --upgrade pip
+$ python3 -m pip install --upgrade model-railway-signals 
 </pre>
-or alternatively:
+You may need to ensure you have the latest version of pip installed:
 <pre>
 $ python3 -m pip install --upgrade pip
 </pre>
@@ -217,7 +213,7 @@ create_ground_position_signal - create a ground position light signal
       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
 
-set_route_ - Set (and change) the route indication (either feathers or theatre text)
+set_route - Set (and change) the route indication (either feathers or theatre text)
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
@@ -383,12 +379,12 @@ map_traintech_signal - Generate the mappings for a TrainTech signal
 map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address mapped to each arm)
    Mandatory Parameters:
       sig_id:int - The ID for the signal to create a DCC mapping for
-      main_signal:int     - single DCC address for the main signal arm  (default = No Mapping)
+      main_signal:int     - single DCC address for the main signal arm (default = No Mapping)
    Optional Parameters:
       main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
       left_signal:int     - single DCC address for the LH signal arm (default = No Mapping)
       left_subsidary:int  - single DCC address for the LH subsidary arm (default = No Mapping)
-      right_signal:int    - single DCC address for the RH signal arm  (default = No Mapping)
+      right_signal:int    - single DCC address for the RH signal arm (default = No Mapping)
       right_subsidary:int - single DCC address for the RH subsidary arm (default = No Mapping)
       THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
               Each entry comprises the "character" and the associated list of DCC addresses/states
