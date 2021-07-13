@@ -155,13 +155,13 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
 
     if ((callback_type == point_callback_type.point_switched and item_id==1 and point_switched(1)) or
-        (callback_type == sig_callback_type.sig_passed and item_id==4)):
+          (callback_type == sig_callback_type.sig_passed and item_id==4 and point_switched(1)) ):
         set_approach_control (4,release_on_yellow=True)
     if callback_type == point_callback_type.point_switched and item_id==1 and not point_switched(1):
         clear_approach_control (4)
 
-    if ((callback_type == point_callback_type.point_switched and item_id==11 and point_switched(11)) or
-        (callback_type == sig_callback_type.sig_passed and item_id==14)):
+    if ( (callback_type == point_callback_type.point_switched and item_id==11 and point_switched(11)) or
+           (callback_type == sig_callback_type.sig_passed and item_id==14 and point_switched(11)) ):
         set_approach_control (14,release_on_yellow=False)
     if callback_type == point_callback_type.point_switched and item_id==11 and not point_switched(11):
         clear_approach_control (14)
