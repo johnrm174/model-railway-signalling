@@ -615,22 +615,16 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         
         # Sleep until the initial "signal passed" event is due
         time.sleep (start_delay)
-        # Override the signal - When we raise the initial "signal_passed" or "Signal Updated" event
-        # then this will result in a update of the signal (either immediately or by the external
-        # programme acting on the callback if the signal is not set to refresh immediately)
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        # If a start delay (>0) has been specified then we assume the intention
-        # is to trigger a "signal Passed" event after the initial delay
-        # Otherwise we'll trigger a "signal updated" event
+        # If a start delay (>0) has been specified then we assume the intention is to trigger a "signal Passed"
+        # event after the initial delay. Otherwise we won't make any callbacks (on the basis that it would have
+        # been the calling programme that triggered the timed signal in the first place. Note that in this case
+        # we override the signal in the main code before starting the thread to ensure deterministic behavior
         if start_delay > 0:
+            signals_common.signals[str(sig_id)]["override"] = True
+            signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
             update_semaphore_signal(sig_id)
             signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        else:
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            update_semaphore_signal(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         # Sleep until its time to clear the signal
         time.sleep (time_delay) 
         signals_common.signals[str(sig_id)]["override"] = False
@@ -645,6 +639,15 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
     # --------------------------------------------------------------
 
     # Kick off the thread to override the signal and cycle through the aspects
+    # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
+    # to the external code (on the basis that it would have been the external code  that triggered the timed
+    # signal in the first place. For this particular case, we override the signal before starting the thread
+    # to ensure deterministic behavior (for start delays > 0 the signal is Overriden in the thread after the
+    # specified start delay and this will trigger a callback to be handled by the external code)
+    if start_delay == 0:
+        signals_common.signals[str(sig_id)]["override"] = True
+        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        update_semaphore_signal(sig_id)
     timed_signal_thread = threading.Thread (target=thread_to_cycle_signal,args=(sig_id,start_delay,time_delay))
     timed_signal_thread.start()
 

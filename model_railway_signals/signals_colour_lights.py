@@ -784,25 +784,22 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         
         # Sleep until the initial "signal passed" event is due
         time.sleep (start_delay)
-        # Override the signal - When we raise the initial "signal_passed" or "Signal Updated" event
-        # then this will result in a update of the signal (either immediately or by the external
-        # programme acting on the callback if the signal is not set to refresh immediately)
-        # The initial aspect (to display when overriden) will have been previously defined at signal
-        # creation time (RED apart from 2-aspect Distant signals - which are YELLOW). This will
-        # initially be applied to the signal - we then cycle through the aspects and then finally
-        # Set the Override Aspect back to this initial aspect at the end of this thread
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        # If a start delay (>0) has been specified then we assume the intention is to trigger a
-        # "signal Passed" event after the initial delay - Otherwise we'll trigger a "signal updated" event
+        # If a start delay (>0) has been specified then we assume the intention is to trigger a "signal Passed"
+        # event after the initial delay. Otherwise we won't make any callbacks (on the basis that it would have
+        # been the calling programme that triggered the timed signal in the first place. Note that in this case
+        # we override the signal in the main code before starting the thread to ensure deterministic behavior
+        # Once the signal is overriden we immediately update it - it doesn't make any sense for a timed signal
+        # not to refresh its aspects immediately (even if this was specified when the signal was created)
+        # The initial aspect (to display when overriden) will have been previously defined at signal creation
+        # time (RED apart from 2-aspect Distant signals - which are YELLOW). This will initially be applied
+        # to the signal - we then cycle through the aspects until we get back to PROCEED (normally green) and
+        # then finally set the Override Aspect back to its initial aspect (yellow or red) the end of this thread
         if start_delay > 0:
+            signals_common.signals[str(sig_id)]["override"] = True
+            signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            update_colour_light_signal_aspect(sig_id)
             signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        else:
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         # Sleep until the next aspect change is due
         time.sleep (time_delay) 
         # Cycle through the aspects if its a 3 or 4 aspect signal
@@ -811,7 +808,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             # Call the internal function to update and refresh the signal - unless this signal is configured to
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            update_colour_light_signal_aspect(sig_id)
             signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay) 
@@ -820,7 +817,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             # Call the internal function to update and refresh the signal - unless this signal is configured to
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+            update_colour_light_signal_aspect(sig_id)
             signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay)              
@@ -836,7 +833,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         # Call the internal function to update and refresh the signal - unless this signal is configured to
         # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal_aspect(sig_id)
+        update_colour_light_signal_aspect(sig_id)
         signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
 
         return ()
@@ -846,6 +843,16 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
     # --------------------------------------------------------------
 
     # Kick off the thread to override the signal and cycle through the aspects
+    # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
+    # to the external code (on the basis that it would have been the externalcode  that triggered the timed
+    # signal in the first place. For this particular case, we override the signal before starting the thread
+    # to ensure deterministic behavior (for start delays > 0 the signal is Overriden in the thread after the
+    # specified start delay and this will trigger a callback to be handled by the external code)
+    if start_delay == 0:
+        signals_common.signals[str(sig_id)]["override"] = True
+        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        update_colour_light_signal_aspect(sig_id)
+
     timed_signal_thread = threading.Thread (target=thread_to_cycle_aspects,args=(sig_id,start_delay,time_delay))
     timed_signal_thread.start()
 
