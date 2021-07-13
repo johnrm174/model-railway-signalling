@@ -73,15 +73,17 @@ def main_callback_function(item_id,callback_type):
     # allow for manual setting/resetting the track occupancy sections
     #--------------------------------------------------------------
     
-    if section_occupied(1):
-        set_signal_override(1)
-    else:
-        clear_signal_override(1)
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
         set_signal_override(2)
+        set_signal_override(1)
+    elif section_occupied(1):
+        clear_signal_override(2)
+        set_signal_override(1)
     else:
         clear_signal_override(2)
+        clear_signal_override(1)
+
     if section_occupied(4):
         set_signal_override(3)
         set_signal_override(4)
