@@ -194,7 +194,7 @@ print ("Creating Window and drawing canvas")
 
 root_window = Tk()
 root_window.title("Test Colour Light Signals")
-canvas = Canvas(root_window,height=850,width=1200)
+canvas = Canvas(root_window,height=850,width=1200,bg="grey85")
 canvas.pack()
 
 print ("Creating Buttons for the Test Functions")
