@@ -145,7 +145,7 @@ def main_callback_function(item_id,callback_type):
 print ("Creating Window and Canvas")
 window = Tk()
 window.title("Simple Interlocking Example")
-canvas = Canvas(window,height=400,width=1000,bg="grey50")
+canvas = Canvas(window,height=400,width=1000,bg="grey85")
 canvas.pack()
 
 # Initialise the Pi-SPROG-3 and define the DCC mappings for the signals and points we are
