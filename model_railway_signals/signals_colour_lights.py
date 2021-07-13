@@ -560,12 +560,12 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             # has transitioned either from RED or to RED.(This is OK as only signal types
             # with RED aspects can be created with feather or theatre route indications)
             if current_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Enabling feather light route indication for "
+                logging.info ("Signal "+str(sig_id)+": Enabling feather light route display for "
                       + str(signal["routeset"]).rpartition('.')[-1])
                 refresh_feather_route_indication (sig_id)
                 dcc_control.update_dcc_signal_route(sig_id,signal["routeset"],signal_change=True,sig_at_danger=False)
             elif new_aspect == aspect_type.RED:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route indication (signal is at RED)")
+                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route display (signal is at RED)")
                 refresh_feather_route_indication (sig_id)
                 # This is where we send the route type of "NONE" which should be mapped 
                 # to the DCC commands we need to send to inhibit the theatre route display
@@ -724,7 +724,7 @@ def update_colour_light_route_indication (sig_id,
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
         if signal["displayedaspect"] != aspect_type.RED:
-            logging.info ("Signal "+str(sig_id)+": Changing theatre route indication to \'"+str(theatre_text)+"\'")
+            logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'"+str(theatre_text)+"\'")
             signal["canvas"].itemconfig (signal["theatre"],text=signal["theatretext"])
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
