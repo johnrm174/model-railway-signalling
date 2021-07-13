@@ -128,6 +128,8 @@
 # 
 # signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
 # 
+# signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
+# 
 # subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
 # 
 # set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
@@ -243,6 +245,23 @@ def signal_clear (sig_id:int):
         # get the signal state to return
         sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
     return (sig_clear)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the signal overide
+# -------------------------------------------------------------------------
+
+def signal_overridden (sig_id:int):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+        sig_overridden = False
+    else:
+        # get the signal state to return
+        sig_overridden = signals_common.signals[str(sig_id)]["override"]
+    return (sig_overridden)
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
@@ -480,7 +499,7 @@ def toggle_signal (sig_id:int):
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            signals_colour_lights.toggle_semaphore_signal(sig_id)
+            signals_semaphores.toggle_semaphore_signal(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -501,7 +520,7 @@ def toggle_subsidary (sig_id:int):
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_subsidary_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            signals_colour_lights.toggle_semaphore_subsidary(sig_id)
+            signals_semaphores.toggle_semaphore_subsidary(sig_id)
 
     return()
 
