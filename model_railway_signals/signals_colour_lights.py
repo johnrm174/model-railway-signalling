@@ -108,15 +108,16 @@ def approach_release_button_event (sig_id,external_callback):
 
 def raise_approach_release_event (sig_id:int, external_callback=null_callback):
     # reset the state of the signal
-    logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-    signals_common.signals[str(sig_id)]["releaseonyel"] = False
-    signals_common.signals[str(sig_id)]["releaseonred"] = False
-    signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]: 
-        update_colour_light_signal_aspect(sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_released)
+    if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
+        signals_common.signals[str(sig_id)]["releaseonyel"] = False
+        signals_common.signals[str(sig_id)]["releaseonred"] = False
+        signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
+        # Call the internal function to update and refresh the signal - unless this signal
+        # is configured to be refreshed later (based on the aspect of the signal ahead)
+        if signals_common.signals[str(sig_id)]["refresh"]: 
+            update_colour_light_signal_aspect(sig_id)
+        external_callback (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------

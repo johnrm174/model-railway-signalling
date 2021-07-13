@@ -81,13 +81,14 @@ def approach_release_button_event (sig_id,external_callback):
 
 def raise_approach_release_event (sig_id:int, external_callback=null_callback):
     # reset the state of the signal
-    logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-    signals_common.signals[str(sig_id)]["releaseonred"] = False
-    signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
-    # Call the internal function to update and refresh the signal
-    update_semaphore_signal(sig_id)
-    # Make the external callback 
-    external_callback (sig_id, signals_common.sig_callback_type.sig_released)
+    if signals_common.signals[str(sig_id)]["releaseonred"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
+        signals_common.signals[str(sig_id)]["releaseonred"] = False
+        signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
+        # Call the internal function to update and refresh the signal
+        update_semaphore_signal(sig_id)
+        # Make the external callback 
+        external_callback (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
