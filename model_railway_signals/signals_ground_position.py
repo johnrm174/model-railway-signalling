@@ -109,17 +109,14 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")                  
     else:
-        
-        # set the font size for the buttons
-        myfont1 = tkinter.font.Font(size=common.fontsize)
-        myfont2 = tkinter.font.Font(size=1)
-            
+                    
         # Create the button objects and their callbacks
         button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1,
-                bg=common.bgraised, command=lambda:signal_button_event(sig_id,sig_callback))
-        button2 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
-                command=lambda:sig_passed_button_event(sig_id,sig_callback))
+                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                bg=common.bgraised,command=lambda:signal_button_event (sig_id,sig_callback))
+        # Signal Passed Button - We only want a small button - hence a small font size
+        button2 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
+                command=lambda:sig_passed_button_event (sig_id,sig_callback))
         # Create a dummy button for the "Subsisdary Button" (not used for this signal type)
         null_button = Button(canvas)
         

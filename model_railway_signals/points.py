@@ -231,15 +231,14 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 
     else: # we're good to go on and create the point
 
-        # set the font size for the buttons
-        myfont = tkinter.font.Font(size=common.fontsize)
         # Create the button objects and their callbacks
-        button1 = Button (canvas,text=str(point_id), state="normal", 
-                    relief="raised", font = myfont,bg= "grey85",
+        button1 = Button (canvas, text=str(point_id), state="normal", relief="raised",
+                    font=('Courier',common.fontsize,"normal"),bg= "grey85",
                     padx=common.xpadding, pady=common.ypadding,
                     command = lambda:change_button_event(point_id,point_callback))
         button2 = Button (canvas,text="L",state="normal", relief="sunken",
-                    padx=common.xpadding, pady=common.ypadding, font = myfont, bg = "white",
+                    font=('Courier',common.fontsize,"normal"), bg = "white",
+                    padx=common.xpadding, pady=common.ypadding, 
                     command = lambda:fpl_button_event(point_id,point_callback))
 
         #Create some drawing objects (depending on point type)

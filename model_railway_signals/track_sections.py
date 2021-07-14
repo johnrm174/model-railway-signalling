@@ -124,13 +124,9 @@ def create_section (canvas, section_id:int, x:int, y:int,
         logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
     else: # we're good to go on and create the section
         
-        # set the font size for the buttons
-        myfont = tkinter.font.Font(size = common.fontsize)
-
         # Create the button objects and their callbacks
-        button1 = Button (canvas,text=label, state="normal",
-                    padx=common.xpadding, pady=common.ypadding,
-                    relief="raised", font=myfont,
+        button1 = Button (canvas, text=label, state="normal", relief="raised",
+                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',common.fontsize,"normal"),
                     bg="grey", fg="grey", activebackground="grey", activeforeground="grey",
                     command = lambda:section_button_event(section_id,section_callback))
 

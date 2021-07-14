@@ -112,7 +112,7 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
         logging.info ("Signal "+str(sig_id)+": Clearing approach control")
         signals_common.signals[str(sig_id)]["releaseonyel"] = False
         signals_common.signals[str(sig_id)]["releaseonred"] = False
-        signals_common.signals[str(sig_id)]["sigbutton"].config(underline=-1)
+        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
         # Call the internal function to update and refresh the signal - unless this signal
         # is configured to be refreshed later (based on the aspect of the signal ahead)
         if signals_common.signals[str(sig_id)]["refresh"]: 
@@ -200,23 +200,19 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif approach_release_button and signal_subtype == signal_sub_type.distant:
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
     else:
-        # set the font size for the buttons
-        # We only want a small button for "Signal Passed" - hence a small font size
-        myfont1 = tkinter.font.Font(size=common.fontsize)
-        myfont2 = tkinter.font.Font(size=1)
 
         # Create the button objects and their callbacks
         button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1, bg=common.bgraised,
-                command=lambda:signal_button_event (sig_id,sig_callback))
+                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                bg=common.bgraised,command=lambda:signal_button_event (sig_id,sig_callback))
         button2 = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font = myfont1, bg=common.bgraised, 
-                command=lambda:subsidary_button_event (sig_id,sig_callback))
-        # Signal Passed Button
-        button3 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
+                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                bg=common.bgraised, command=lambda:subsidary_button_event (sig_id,sig_callback))
+        # Signal Passed Button - We only want a small button - hence a small font size
+        button3 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
                 command=lambda:sig_passed_button_event (sig_id,sig_callback))
-        # Approach release button
-        button4 = Button (canvas,font=myfont2,padx=1,pady=1,text = "O",
+        # Approach release button  - We only want a small button - hence a small font size
+        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
                 command=lambda:approach_release_button_event (sig_id,sig_callback))
         
         # Draw the signal base line & signal post   
@@ -878,7 +874,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
     else:
         # give an indication that the approach control has been set for the signal
-        signals_common.signals[str(sig_id)]["sigbutton"].config(underline=0)
+        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"underline"))
         if release_on_yellow:
             if not signals_common.signals[str(sig_id)]["releaseonyel"]:
                 logging.info ("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
