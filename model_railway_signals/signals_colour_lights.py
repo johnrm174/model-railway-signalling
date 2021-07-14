@@ -527,9 +527,10 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
                 new_aspect = aspect_type.GREEN
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying GREEN)")
 
-        # Finally we'll fallback to using "sigclear" which should be supported across all
-        # signal types - so this should allow mixing and matching of signals
-        elif not signals_common.signals[str(sig_ahead_id)]["sigclear"]:
+        # Finally we'll fallback to using "sigclear" and "override" which should be supported
+        # across all signal types - so this should allow mixing and matching of signals
+        elif ( not signals_common.signals[str(sig_ahead_id)]["sigclear"] or
+               signals_common.signals[str(sig_ahead_id)]["override"] ) :
             # Both 3/4 aspect signals (and 2 aspect distants) should display YELLOW
             new_aspect = aspect_type.YELLOW
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is ON)")
