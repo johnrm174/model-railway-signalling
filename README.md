@@ -254,6 +254,8 @@ subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to suppor
 
 signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
 
+approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
+
 set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
 
 clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
