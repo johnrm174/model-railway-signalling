@@ -156,6 +156,7 @@ def set_clear_signal_overrides(button):
         for I in range(1,36): set_signal_override(I)
         button.config(relief="sunken")
         signals_overriden = True
+    update_signals()
     return()
 
 #----------------------------------------------------------------------
@@ -166,10 +167,8 @@ def print_signal_state(button):
     print ("")
     print ("Current State of all signals is as follows")
     for I in range(1,36):
-        if signal_clear(I):
-            print ("Signal " + str(I) + " is OFF")
-        else:
-            print ("Signal " + str(I) + " is ON")
+        print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
+               str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
     return()
 
 #----------------------------------------------------------------------
@@ -180,10 +179,21 @@ def print_subsidary_state(button):
     print ("")
     print ("Current State of all subsidaries is as follows:")
     for I in range(1,36):
-        if subsidary_clear(I):
-            print ("Subsidary Signal " + str(I) + " is OFF")
-        else:
-            print ("Subsidary Signal " + str(I) + " is ON")
+        print ("Subsidary "+str(I)+ " : sig_clear = "+str(subsidary_clear(I)))
+    return()
+
+#----------------------------------------------------------------------
+# This is the callback function for toggling the signal states
+#----------------------------------------------------------------------
+
+def toggle_signals(button):
+    for I in range(1,36):toggle_signal(I)
+    update_signals
+    return()
+
+def toggle_subsidaries(button):
+    for I in range(1,36):toggle_subsidary(I)
+    update_signals
     return()
 
 #------------------------------------------------------------------------------------
@@ -201,23 +211,31 @@ print ("Creating Buttons for the Test Functions")
 
 button1 = Button (canvas, text="Lock All Signals",
         state="normal", relief="raised",command=lambda:lock_unlock_signals(button1))
-canvas.create_window (20,10,window=button1,anchor=NW)
-
-button2 = Button (canvas, text="Overide All Signals",
-        state="normal", relief="raised",command=lambda:set_clear_signal_overrides(button2))
-canvas.create_window (400,10,window=button2,anchor=NW)
+canvas.create_window (10,10,window=button1,anchor=NW)
 
 button3 = Button (canvas, text="Lock All Subsidary Signals",
         state="normal", relief="raised",command=lambda:lock_unlock_subsidary(button3))
-canvas.create_window (180,10,window=button3,anchor=NW)
+canvas.create_window (150,10,window=button3,anchor=NW)
+
+button2 = Button (canvas, text="Overide All Signals",
+        state="normal", relief="raised",command=lambda:set_clear_signal_overrides(button2))
+canvas.create_window (360,10,window=button2,anchor=NW)
 
 button4 = Button (canvas, text="Print Signal State",
         state="normal", relief="raised",command=lambda:print_signal_state(button4))
-canvas.create_window (580,10,window=button4,anchor=NW)
+canvas.create_window (520,10,window=button4,anchor=NW)
 
 button5 = Button (canvas, text="Print Subsidary State",
         state="normal", relief="raised",command=lambda:print_subsidary_state(button5))
-canvas.create_window (750,10,window=button5,anchor=NW)
+canvas.create_window (670,10,window=button5,anchor=NW)
+
+button6 = Button (canvas, text="Toggle Signals",
+        state="normal", relief="raised",command=lambda:toggle_signals(button6))
+canvas.create_window (840,10,window=button6,anchor=NW)
+
+button7 = Button (canvas, text="Toggle Subsidaries",
+        state="normal", relief="raised",command=lambda:toggle_subsidaries(button7))
+canvas.create_window (970,10,window=button7,anchor=NW)
 
 
 print ("Drawing Tracks")
