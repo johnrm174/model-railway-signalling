@@ -218,7 +218,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             if rhroute1: canvas.create_line(common.rotate_line(x,y,50,-7,70,-7,orientation),width=2,fill="white")
 
         # set the colour of the signal arm according to the signal type
-        if distant: arm_colour="gold"
+        if distant: arm_colour="goldenrod"
         else: arm_colour = "red"
         # Draw the signal arm for the main route
         mainsigon = canvas.create_line(common.rotate_line(x,y,+70,-19,+70,-32,orientation),fill=arm_colour,width=4)
