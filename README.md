@@ -5,13 +5,13 @@ detection via the GPIO ports on the Pi. For details of the "Public" API - scroll
 A simple interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
 The GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
 
-All of the functions for creating and managing 'signals', 'points' and 'sections' have been developed as a Python Package 
+All of the functions for creating and managing 'signals', 'points', 'sections' and sensors have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
 fully prototypical signalling schemes to be developed. The signals and points opjects can be easily mapped to one or more DCC 
 addresses in a manner that should be compatible with the majority of DCC signal/points decoders currently on the market. 
 Track sensors can also be easily integrated (via the Raspberry Pi's GPIO interface) to enable full automatic control.
 
-Most types of colour light signals (and ground position light signals) are supported. Semaphores are still on my TODO list.
+Most types of colour light signals (and ground position light signals) are supported. Semaphore Signals are now also supported.
 
 Note that I have tried to make the package platform independent so you can use it to develop your own layout signalling schemes 
 without a Raspberry Pi or the associated Pi-SPROG-3 DCC Command station (track sensors can be manually 'triggered' via the
@@ -57,6 +57,14 @@ Some examples are included in the repository: https://github.com/johnrm174/model
            and onto the divergent route. Examples of "Approach on Red" and "Approach on Yellow" are provided. 
            For "Approach on yellow", the signals behind will show the correct flashing yellow aspects.
 
+'test_semaphore_approach_control' - Similar to the above, but this simulates/automates the series of 
+           signals within a block section (e.g. outer home, inner home, starter, advanced starter etc). 
+           In this scenario, the distant and home signals should never be cleared for an approaching train 
+           if a subsequent home signal (in the same 'Block Section') is set to DANGER. In this case each 
+           preceding home signal (and the distant) would remain ON to slow down the train on the approach
+           to the first home signal. As the signal is approached, the signal would then be cleared to 
+           enable the train to continue (at low speed) towards the next home signal.
+
 'test_harman-signalist_sc1.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. 
            Enables the various modes to be selected (includes programming of CVs) and then tested. I used 
            this decoder as it provided the most flexibility for some of my more complex signal types.
@@ -64,9 +72,10 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 
 'test_colour_light_signals.py'- developed primarily for testing, but it does provide an example of every 
            signal type and all the control features currently supported.
-</pre>
-Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
 
+</pre>
+
+Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
 
 ## Point Functions
 <pre>
