@@ -130,6 +130,8 @@
 # 
 # signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
 # 
+# approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
+# 
 # subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
 # 
 # set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
@@ -262,6 +264,29 @@ def signal_overridden (sig_id:int):
         # get the signal state to return
         sig_overridden = signals_common.signals[str(sig_id)]["override"]
     return (sig_overridden)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the approach control
+# -------------------------------------------------------------------------
+
+def approach_control_set (sig_id:int):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+        approach_control_active = False
+    else:
+        # get the signal state to return - only supported for semaphores and colour_lights
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"]
+                                       or signals_common.signals[str(sig_id)]["releaseonyellow"])
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"])
+        else:
+            approach_control_active = False
+    return (approach_control_active)
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
