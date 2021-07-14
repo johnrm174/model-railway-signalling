@@ -76,17 +76,9 @@ def main_callback_function(item_id,callback_type):
         set_signal_override(2)
     else:
         clear_signal_override(2)
-    # Also Override the distant signal if any home signals ahead are set to DANGER
-    if (section_occupied(1) or not signal_clear(2) or signal_overridden(2)
-            or point_switched(1) and (not signal_clear(5) or signal_overridden(5))
-            or not point_switched(1) and (not signal_clear(6) or signal_overridden(6))
-            or not signal_clear(3) or signal_overridden(3) or not signal_clear(4) or signal_overridden(4) ):
-        set_signal_override(1)
-    else:
-        clear_signal_override(1)
 
     #--------------------------------------------------------------
-    # Refresh Signal 4 based on the route settings
+    # Refresh Signal 4 route based on the route settings
     #--------------------------------------------------------------
     
     if point_switched(1):
@@ -103,64 +95,59 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if Signal 4 is clear
+    # Point 1 is locked if Signal 4 is not set to DANGER
     if signal_clear(4):
         lock_point(1)
     else:
         unlock_point(1)
 
     #-------------------------------------------------------------- 
-    # Here is the approach control code - this simulates/automates a series of
-    # of signals within a block section (e.g. outer home, inner home, starter,
-    # advanced starter etc). In this scenario, the distant and home signals
-    # should not be cleared for an approaching train if a subsequent home signal
-    # is set to DANGER. The signalman would instead set the distant signal to
-    # CAUTION and each home preceding home signal to DANGER in order to slow
-    # down the approaching train. As the train approaches each home signal the
-    # signal would be cleared to enable the train to continue (at low speed)
-    # towards the next home signal
+    # Set Approach control for the home signals - This simulates/automates the series of 
+    # signals within a block section (e.g. outer home, inner home, starter, advanced starter etc). 
+    # In this scenario, the distant and home signals should never be cleared for an approaching train 
+    # if a subsequent home signal (in the same 'Block Section') is set to DANGER. In this case each 
+    # preceding home signal (and the distant) would remain ON to slow down the train on the approach
+    # to the first home signal. As the signal is approached, the signal would then be cleared to 
+    # enable the train to continue (at low speed) towards the next home signal
     #--------------------------------------------------------------
 
     if callback_type in (sig_callback_type.sig_switched, sig_callback_type.sig_updated,
-                            sig_callback_type.sig_passed, section_callback_type.section_switched):
-        if point_switched(1):
-            if ( signal_clear(5) and not signal_overridden(5)
-                  and signal_clear(4) and not signal_overridden(4)
-                    and signal_clear(3) and not signal_overridden(3) ):
-                clear_approach_control(4)
-                clear_approach_control(3)
-                clear_approach_control(2)
-            elif not signal_clear(5) or signal_overridden(5):
-                set_approach_control(4)
-                set_approach_control(3)
-                set_approach_control(2)
-            elif not signal_clear(4) or signal_overridden(4):
-                clear_approach_control(4)
-                set_approach_control(3)
-                set_approach_control(2)
-            elif not signal_clear(3) or signal_overridden(3):
-                clear_approach_control(4)
-                clear_approach_control(3)
-                set_approach_control(2)
+                        sig_callback_type.sig_passed, section_callback_type.section_switched):
+        
+        if point_switched(1) and (not signal_clear(5) or signal_overridden(5)):
+            set_approach_control(4)
+        elif not point_switched(1) and (not signal_clear(6) or signal_overridden(6)):
+            set_approach_control(4)
         else:
-            if (signal_clear(6) and not signal_overridden(6)
-                and signal_clear(4) and not signal_overridden(4)
-                  and signal_clear(3) and not signal_overridden(3) ):
-                clear_approach_control(4)
-                clear_approach_control(3)
-                clear_approach_control(2)
-            elif not signal_clear(6) or signal_overridden(6):
-                set_approach_control(4)
-                set_approach_control(3)
-                set_approach_control(2)
-            elif not signal_clear(4) or signal_overridden(4):
-                clear_approach_control(4)
-                set_approach_control(3)
-                set_approach_control(2)
-            elif not signal_clear(3) or signal_overridden(3):
-                clear_approach_control(4)
-                clear_approach_control(3)
-                set_approach_control(2)
+            clear_approach_control(4)
+
+        if not signal_clear(4) or signal_overridden(4) or approach_control_set(4):
+            set_approach_control(3)
+        else:
+            clear_approach_control(3)
+
+        if not signal_clear(3) or signal_overridden(3) or approach_control_set(3):
+            set_approach_control(2)
+        else:
+            clear_approach_control(2)
+            
+    #--------------------------------------------------------------
+    # Finally - Override the distant signals if any home signals ahead are set
+    # to DANGER or if the train has just entered the section immediately past
+    # the signal. We do this at the end as the code is dependent on the current
+    # approach control and override states of the other signals (which we set above)
+    #--------------------------------------------------------------
+
+    if section_occupied(1):
+        set_signal_override(1)
+    elif ( not signal_clear(2) or signal_overridden(2) or approach_control_set(2) or
+           not signal_clear(3) or signal_overridden(3) or approach_control_set(3) or
+           not signal_clear(4) or signal_overridden(4) or approach_control_set(4) or
+           (point_switched(1) and (not signal_clear(5) or signal_overridden(5))) or
+           (not point_switched(1) and (not signal_clear(6) or signal_overridden(6))) ): 
+        set_signal_override(1)
+    else:
+        clear_signal_override(1)
         
     return()
 
