@@ -16,6 +16,7 @@ from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
+from .signals_ground_disc import create_ground_disc_signal
 from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
@@ -75,6 +76,7 @@ __all__ = [
         'create_colour_light_signal',
         'create_semaphore_signal',
         'create_ground_position_signal',
+        'create_ground_disc_signal',
         'set_route',
         'update_signal',
         'lock_signal',

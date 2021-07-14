@@ -182,6 +182,7 @@
 from . import signals_common
 from . import signals_colour_lights
 from . import signals_ground_position
+from . import signals_ground_disc
 from . import signals_semaphores
 
 from tkinter import *
@@ -281,7 +282,7 @@ def approach_control_set (sig_id:int):
         # get the signal state to return - only supported for semaphores and colour_lights
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"]
-                                       or signals_common.signals[str(sig_id)]["releaseonyellow"])
+                                       or signals_common.signals[str(sig_id)]["releaseonyel"])
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"])
         else:
@@ -438,6 +439,8 @@ def set_signal_override (*sig_ids:int):
                     signals_ground_position.update_ground_position_light_signal (sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
                     signals_semaphores.update_semaphore_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+                    signals_ground_disc.update_ground_disc_signal (sig_id)
         return()
 
 # -------------------------------------------------------------------------
@@ -471,6 +474,9 @@ def clear_signal_override (*sig_ids:int):
                     signals_ground_position.update_ground_position_light_signal (sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
                     signals_semaphores.update_semaphore_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+                    signals_ground_disc.update_ground_disc_signal (sig_id)
+
     return()
 
 # -------------------------------------------------------------------------
@@ -517,6 +523,8 @@ def toggle_signal (sig_id:int):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal to toggle does not exist")
+    elif signals_common.signals[str(sig_id)]["automatic"] == True:
+        logging.warning ("Signal "+str(sig_id)+": Cannot Toggle a fully automatic signal")
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
@@ -525,6 +533,9 @@ def toggle_signal (sig_id:int):
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.toggle_semaphore_signal(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+            signals_ground_disc.toggle_ground_disc_signal (sig_id)
+
     return()
 
 # -------------------------------------------------------------------------
@@ -543,7 +554,7 @@ def toggle_subsidary (sig_id:int):
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.toggle_subsidary_signal(sig_id)
+            signals_colour_lights.toggle_colour_light_subsidary(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.toggle_semaphore_subsidary(sig_id)
 
