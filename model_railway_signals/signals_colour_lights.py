@@ -60,6 +60,13 @@ class aspect_type(enum.Enum):
     FLASHING_DOUBLE_YELLOW = 6
 
 # -------------------------------------------------------------------------
+# Define a Thread lock for coordinating aspect changes between the main code
+# that sets the aspect and the Thread to flash any Yellow / Double Yellow aspects
+# -------------------------------------------------------------------------
+
+aspect_thread_lock = threading.Lock()
+
+# -------------------------------------------------------------------------
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
@@ -129,13 +136,11 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
 # -------------------------------------------------------------------------
 
 def toggle_colour_light_signal (sig_id:int, external_callback = null_callback):
-    # Call the common function to toggle the signal state and button object
     signals_common.toggle_signal(sig_id)
     # Call the internal function to update and refresh the signal - unless this signal
     # is configured to be refreshed later (based on the aspect of the signal ahead)
     if signals_common.signals[str(sig_id)]["refresh"]: 
         update_colour_light_signal_aspect(sig_id)
-    # Make the external callback
     external_callback (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
@@ -149,11 +154,8 @@ def toggle_colour_light_signal (sig_id:int, external_callback = null_callback):
 # -------------------------------------------------------------------------
 
 def toggle_colour_light_subsidary (sig_id:int, external_callback = null_callback):
-    # Call the common function to toggle the signal state and button object
     signals_common.toggle_subsidary (sig_id)
-    # Call the internal function to update and refresh the signal
     update_colour_light_subsidary_signal (sig_id)
-    # Make the external callback 
     external_callback (sig_id, signals_common.sig_callback_type.sub_switched)
     return ()
 
@@ -182,7 +184,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 refresh_immediately = True,
                                 fully_automatic:bool=False):
     global logging
-    
+
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating Colour Light Signal")
     if signals_common.sig_exists(sig_id):
@@ -329,7 +331,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Manual signals are set to ON and display their "danger/caution aspect)
         # We also disable the signal button for fully automatic signals
         if fully_automatic:
-            button1.config(state="disabled",relief="sunken", bd=0)
+            button1.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
             signal_clear = True
         else:
             signal_clear = False
@@ -384,7 +386,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         
         # Add the new signal to the dictionary of signals
         signals_common.signals[str(sig_id)] = new_signal
-    
         # Update the signal aspects to reflect the initial state. This will
         # also send the DCC commands to put the DCC signal into the initial state
         update_colour_light_signal_aspect (sig_id)
@@ -439,6 +440,11 @@ def update_colour_light_subsidary_signal (sig_id:int):
 def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 
     global logging
+    global aspect_thread_lock
+
+    # ---------------------------------------------------------------------------------
+    #  First deal with the Signal ON, Overridden or "Release on Red" cases
+    # ---------------------------------------------------------------------------------
     
     # If signal is set to "ON" then change to RED unless it is a 2 aspect distant
     # signal - in which case we want to set it to YELLOW
@@ -464,6 +470,10 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         new_aspect = aspect_type.RED
         log_message = " (signal is OFF - but subject to \'release on red\' approach control)"
 
+    # ---------------------------------------------------------------------------------
+    #  From here, the Signal is CLEAR - but could still be of any type
+    # ---------------------------------------------------------------------------------
+
     # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
     # we can ignore the signal ahead and set it to its "clear" aspect
     elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.home:
@@ -473,12 +483,22 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.red_ylw:
         new_aspect = aspect_type.YELLOW
         log_message = " (signal is OFF and 2-aspect R/Y)"
+        
+    # ---------------------------------------------------------------------------------
+    # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
+    # ---------------------------------------------------------------------------------
 
     # Set to YELLOW if the signal is subject to "Release on YELLOW" approach control
     elif signals_common.signals[str(sig_id)]["releaseonyel"]:
         new_aspect = aspect_type.YELLOW
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
 
+    # ---------------------------------------------------------------------------------
+    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
+    # Not subject to "release on yellow" approach control - so will display the "normal" 
+    # aspects based on the signal ahead (if one has been specified)
+    # ---------------------------------------------------------------------------------
+    
     # If no signal ahead has been specified then we can also set the signal
     # to its "clear" aspect (this includes 2 aspect distant signals as well
     # as the remaining 3 and 4 aspect signals types)
@@ -487,38 +507,42 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         log_message = " (signal is OFF and no signal ahead specified)"
 
     else:
-        # Signal is clear, not overriden, a valid signal ahead has been specified
-        # and is either a 3 or 4 aspect signal or a 2 aspect distant signal
-        # We therefore need to take into account the aspect of the signal ahead
-
+        
         # We can only use the displayed aspect of the signal ahead if its a colour
         # light signal (other signal types may not support these signal attributes. 
         if signals_common.signals[str(sig_ahead_id)]["sigtype"] == signals_common.sig_type.colour_light:
             if signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.RED:
-                # Both 3/4 aspect signals (and 2 aspect distants) should display YELLOW
+                # All remaining signal types (3/4 aspects and 2 aspect distants) should display YELLOW
                 new_aspect = aspect_type.YELLOW
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying RED)")
-            elif (signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.YELLOW
-                            and signals_common.signals[str(sig_ahead_id)]["releaseonyel"]):
-                # Signal ahead showing yellow but subject to "release on yellow" approach control
-                # We therefore need to set this signal to flashing single yellow
-                new_aspect = aspect_type.FLASHING_YELLOW
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
-                                   " is subject to approach control (release on yellow)")
-            elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-                if signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.YELLOW:
-                    # 4 aspect signals will display a DOUBLE YELLOW aspect
+                
+            elif signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.YELLOW:
+                if signals_common.signals[str(sig_ahead_id)]["releaseonyel"]:
+                    # Signal ahead showing yellow but subject to "release on yellow" approach control
+                    # All remaining types (3/4 aspects and 2 aspect distants) should display FLASHING YELLOW
+                    new_aspect = aspect_type.FLASHING_YELLOW
+                    log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
+                                       " is subject to approach control (release on yellow)")
+                elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
+                    # 4 aspect signals should display a DOUBLE YELLOW aspect
                     new_aspect = aspect_type.DOUBLE_YELLOW
                     log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying YELLOW)")
-                elif signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.FLASHING_YELLOW:
+                else:
+                    # 3 aspect signals and 2 aspect distant signals should display GREEN
+                    new_aspect = aspect_type.GREEN
+                    log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying YELLOW)")
+                    
+            elif signals_common.signals[str(sig_ahead_id)]["displayedaspect"] == aspect_type.FLASHING_YELLOW:
+                if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
                     # 4 aspect signals will display a FLASHING DOUBLE YELLOW aspect
                     new_aspect = aspect_type.FLASHING_DOUBLE_YELLOW
                     log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING YELLOW)")
                 else:
+                    # 3 aspect signals and 2 aspect distant signals should display GREEN
                     new_aspect = aspect_type.GREEN
                     log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying GREEN)")
-
             else:
+                # Aspect of the signal ahead must be green - has no effect on the signal we are updating
                 new_aspect = aspect_type.GREEN
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying GREEN)")
 
@@ -531,10 +555,12 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is ON)")
 
         else:
+            # Both 3/4 aspect signals (and 2 aspect distants) should display GREEN
             new_aspect = aspect_type.GREEN
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is OFF)")
 
     current_aspect = signals_common.signals[str(sig_id)]["displayedaspect"]
+        
     # Only refresh the signal if the aspect has been changed
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to "
@@ -595,9 +621,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 # this list as and when the aspects are changed. We use a lock to ensure
 # that this is done as determinalistically as possible
 # -------------------------------------------------------------------------
-aspect_thread_lock = threading.Lock()
 
 def flash_aspects_thread():
+    global aspect_thread_lock
     while True:
         aspect_thread_lock.acquire()
         for signal in signals_common.signals:
