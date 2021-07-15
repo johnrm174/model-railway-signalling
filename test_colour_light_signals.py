@@ -12,7 +12,7 @@ import threading
 import time
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
 
 # Global variables to thrack the state of the test functions
 
