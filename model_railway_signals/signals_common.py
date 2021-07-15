@@ -79,11 +79,13 @@ def toggle_signal (sig_id:int):
     if signals[str(sig_id)]["sigclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
         signals[str(sig_id)]["sigclear"] = False
-        signals[str(sig_id)]["sigbutton"].config(relief="raised",bg=common.bgraised)
+        if not signals[str(sig_id)]["automatic"]:
+            signals[str(sig_id)]["sigbutton"].config(relief="raised",bg=common.bgraised)
     else:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
         signals[str(sig_id)]["sigclear"] = True
-        signals[str(sig_id)]["sigbutton"].config(relief="sunken",bg=common.bgsunken)
+        if not signals[str(sig_id)]["automatic"]:
+            signals[str(sig_id)]["sigbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
 
 # -------------------------------------------------------------------------

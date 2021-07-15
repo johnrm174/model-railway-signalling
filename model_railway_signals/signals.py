@@ -523,8 +523,6 @@ def toggle_signal (sig_id:int):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal to toggle does not exist")
-    elif signals_common.signals[str(sig_id)]["automatic"] == True:
-        logging.warning ("Signal "+str(sig_id)+": Cannot Toggle a fully automatic signal")
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
