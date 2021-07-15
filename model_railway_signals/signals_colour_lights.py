@@ -30,8 +30,8 @@ from . import dcc_control
 from tkinter import *
 import enum
 import time
-import threading
 import logging
+import threading
 
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
@@ -58,13 +58,6 @@ class aspect_type(enum.Enum):
     DOUBLE_YELLOW = 4
     FLASHING_YELLOW = 5
     FLASHING_DOUBLE_YELLOW = 6
-
-# -------------------------------------------------------------------------
-# Define a Thread lock for coordinating aspect changes between the main code
-# that sets the aspect and the Thread to flash any Yellow / Double Yellow aspects
-# -------------------------------------------------------------------------
-
-aspect_thread_lock = threading.Lock()
 
 # -------------------------------------------------------------------------
 # Define a null callback function for internal use
@@ -440,7 +433,6 @@ def update_colour_light_subsidary_signal (sig_id:int):
 def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 
     global logging
-    global aspect_thread_lock
 
     # ---------------------------------------------------------------------------------
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
@@ -507,7 +499,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         log_message = " (signal is OFF and no signal ahead specified)"
 
     else:
-        
+    
         # We can only use the displayed aspect of the signal ahead if its a colour
         # light signal (other signal types may not support these signal attributes. 
         if signals_common.signals[str(sig_ahead_id)]["sigtype"] == signals_common.sig_type.colour_light:
@@ -565,11 +557,9 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to "
                       + str(new_aspect).rpartition('.')[-1] + log_message)
-        # Update the signal aspect - use a threadlock to ensure we coordinate the
-        # update with the flash_aspects_thread in a deterministic manner 
-        aspect_thread_lock.acquire()
+        
+        # Update the signal aspect - This should be an immutable type so we shouldn't need a Thread Lock 
         signals_common.signals[str(sig_id)]["displayedaspect"] = new_aspect
-        aspect_thread_lock.release()
         refresh_signal_aspects (sig_id)
 
         # Only update the respective route indication if the route is actively set
@@ -623,9 +613,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 # -------------------------------------------------------------------------
 
 def flash_aspects_thread():
-    global aspect_thread_lock
     while True:
-        aspect_thread_lock.acquire()
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
                 if signals_common.signals[signal]["displayedaspect"] == aspect_type.FLASHING_YELLOW:
@@ -633,10 +621,7 @@ def flash_aspects_thread():
                 if signals_common.signals[signal]["displayedaspect"] == aspect_type.FLASHING_DOUBLE_YELLOW:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
-        aspect_thread_lock.release()
-
         time.sleep (0.25)
-        aspect_thread_lock.acquire()
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
                 if signals_common.signals[signal]["displayedaspect"] == aspect_type.FLASHING_YELLOW:
@@ -644,7 +629,6 @@ def flash_aspects_thread():
                 if signals_common.signals[signal]["displayedaspect"] == aspect_type.FLASHING_DOUBLE_YELLOW:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
-        aspect_thread_lock.release()
         time.sleep (0.25)
     return()
 
