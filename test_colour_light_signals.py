@@ -12,7 +12,7 @@ import threading
 import time
 import logging
 #logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 
 # Global variables to thrack the state of the test functions
 
@@ -270,23 +270,23 @@ canvas.create_window (970,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Set Approach control Red",
         state="normal", relief="raised",command=lambda:set_all_approach_control_red())
-canvas.create_window (20,820,window=button,anchor=NW)
+canvas.create_window (20,830,window=button,anchor=NW)
 
 button = Button (canvas, text="Set Approach control Yel",
         state="normal", relief="raised",command=lambda:set_all_approach_control_yellow())
-canvas.create_window (220,820,window=button,anchor=NW)
+canvas.create_window (220,830,window=button,anchor=NW)
 
 button = Button (canvas, text="Clear Approach control ",
         state="normal", relief="raised",command=lambda:clear_all_approach_control())
-canvas.create_window (420,820,window=button,anchor=NW)
+canvas.create_window (420,830,window=button,anchor=NW)
 
 button = Button (canvas, text="Set Appr cntl Red - 5,6,15,17",
         state="normal", relief="raised",command=lambda:set_sigs_approach_control_red())
-canvas.create_window (610,820,window=button,anchor=NW)
+canvas.create_window (610,830,window=button,anchor=NW)
 
 button = Button (canvas, text="Set App cntl Yel - 5,6,15,17",
         state="normal", relief="raised",command=lambda:set_sigs_approach_control_yellow())
-canvas.create_window (840,820,window=button,anchor=NW)
+canvas.create_window (840,830,window=button,anchor=NW)
 
 print ("Drawing Tracks")
 
@@ -302,9 +302,11 @@ canvas.create_text (600,720,text="The 'Signal Passed' button for Signals 5, 10, 
                     " triggers a 'Timed Signal' for that signal - with no start delay")
 canvas.create_text (600,740,text="The 'Signal Passed' button for Signals 3, 8, 13, 18, 23, 28, 33" +
                     " triggers a 'Timed Signal' for the signal ahead - with a 3 second start delay")
-canvas.create_text (600,760,text="Signals 3, 5, 8, 10, 13, 15, 18, 20, 23, 25, are 'Fully Automatic' signals" +
-                    " - No manual controls but they can be overrided")
-canvas.create_text (600,780,text="All signals are 'updated' based on the signal ahead" +
+canvas.create_text (600,760,text="Note that Ground Position signals don't support Timed Signal events" +
+                    " but these are triggered to provide a level of negative testing")
+canvas.create_text (600,780,text="Signals 3, 5, 8, 10, 15, 20, 25, are 'Fully Automatic' signals" +
+                    " - No manual controls but they can be toggled and overridden")
+canvas.create_text (600,800,text="All signals are 'updated' based on the signal ahead" +
                     " - This is to test the correct aspects are displayed")
 
 print ("Creating Signals")
@@ -370,6 +372,8 @@ create_colour_light_signal (canvas,10,1000,150, sig_callback=signal_button,
                             orientation=180)
 # 3rd row of signals 
 canvas.create_text (200,240,text="Signal 11 is a 2 Aspect Home - Signal Ahead\nhas no effect on the aspect displayed")
+canvas.create_text (1000,240,text="Signal 15 is a 2 Aspect Home ")
+
 create_colour_light_signal (canvas,11,200,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.home,
                             theatre_route_indicator=True,
@@ -384,7 +388,6 @@ create_colour_light_signal (canvas,13,600,300, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
                             refresh_immediately = False,
-                            fully_automatic=True,
                             sig_passed_button=True,
                             position_light = True)
 create_colour_light_signal (canvas,14,800,300, sig_callback=signal_button,
@@ -403,7 +406,8 @@ create_colour_light_signal (canvas,15,1000,300, sig_callback=signal_button,
                             position_light = True)
 
 # 4th row of signals
-canvas.create_text (1000,410,text="Signal 20 is a 2 Aspect Distance - Signal Ahead\nwill have an effect on the aspect displayed")
+canvas.create_text (175,410,text="Signal 16 is a 2 Aspect Distant Signal")
+canvas.create_text (1000,410,text="Signal 20 is a 2 Aspect Distant - Signal Ahead\nwill have an effect on the aspect displayed")
 create_colour_light_signal (canvas,16,200,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.distant,
                             orientation=180,
@@ -419,7 +423,6 @@ create_colour_light_signal (canvas,18,600,350, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
                             refresh_immediately = False,
-                            fully_automatic=True,
                             sig_passed_button=True,
                             orientation=180,
                             position_light = True)
@@ -439,6 +442,8 @@ create_colour_light_signal (canvas,20,1000,350, sig_callback=signal_button,
 
 # 5th row of signals 
 canvas.create_text (200,525,text="Signal 21 is a 2 Aspect RED/YLW - Signal Ahead\nwill have no effect on the aspect displayed")
+canvas.create_text (1000,525,text="Signal 25 is a 2 Aspect RED/YLW ")
+
 create_colour_light_signal (canvas,21,200,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.red_ylw,
                             refresh_immediately = False,
@@ -452,7 +457,6 @@ create_colour_light_signal (canvas,23,600,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
                             refresh_immediately = False,
-                            fully_automatic=True,
                             sig_passed_button=True,
                             position_light = True)
 create_colour_light_signal (canvas,24,800,500, sig_callback=signal_button,
@@ -501,7 +505,7 @@ update_signals()
 print ("Starting the Thread to continually cycle through the route indications")
 
 x = threading.Thread (target=thread_to_cycle_routes,args=(2,2))
-#x.start()
+x.start()
 
 print ("Entering main event loop")
 
