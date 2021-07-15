@@ -28,7 +28,6 @@ from . import signals_common
 from . import dcc_control
 
 from tkinter import *
-import tkinter.font
 import time
 import threading
 import logging
@@ -168,7 +167,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
     else:
         
-        # We rely on a value of None later in the code so sat any "False values" to None
+        # We use a value of None to signify that a particular arm doesn't exist for the signal or
+        #use True/False to represent the current state of the signal arm if it does exist.
         if subsidarymain == False: subsidarymain = None
         if subsidarylh1 == False: subsidarylh1 = None
         if subsidaryrh1 == False: subsidaryrh1 = None
@@ -249,16 +249,13 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if rhroute1 is None: canvas.itemconfigure(rhsigon,state='hidden')
                              
         # Draw the theatre route indicator box if one is specified for the signal
-        # The text object is created anyway - and 'hidden' later if not required
+        # The text object is created anyway - but 'hidden' if not required for this particular signal
         point_coords = common.rotate_point (x,y,+29,-22,orientation)
         if theatre_route_indicator:
-            line_coords = common.rotate_line (x,y,+20,-14,+40,-30,orientation) 
-            canvas.create_rectangle (line_coords,fill="black")
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                     angle = orientation-90,state='normal')
+            canvas.create_rectangle (common.rotate_line (x,y,+20,-14,+40,-30,orientation),fill="black")
+            theatre = canvas.create_text (point_coords,fill="white",text="",angle = orientation-90,state='normal')
         else:
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                     angle = orientation-90,state='hidden')
+            theatre = canvas.create_text (point_coords,fill="white",text="",angle = orientation-90,state='hidden')
             
         # Set the initial state of the signal Arms if they have been created
         if fully_automatic: mainroute = True
@@ -440,11 +437,10 @@ def update_semaphore_subsidary (sig_id:int):
 def update_semaphore_signal (sig_id:int):
 
     global logging
-    global signal_has_changed
     
     def update_main_signal(sig_id,set_to_clear):
         global logging
-        global signal_has_changed
+        signal_has_changed = False
         if set_to_clear and signals_common.signals[str(sig_id)]["mainroute"]==False:
             logging.info ("Signal "+str(sig_id)+": Changing signal arm for MAIN route to PROCEED")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["mainsigoff"],state='normal')
@@ -459,11 +455,11 @@ def update_semaphore_signal (sig_id:int):
             dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
             signals_common.signals[str(sig_id)]["mainroute"]=False
             signal_has_changed = True
-        return()
+        return(signal_has_changed)
     
     def update_lh_signal(sig_id,set_to_clear):
         global logging
-        global signal_has_changed
+        signal_has_changed = False
         if set_to_clear and signals_common.signals[str(sig_id)]["lhroute1"]==False:
             logging.info ("Signal "+str(sig_id)+": Changing signal arm for LH route to PROCEED")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["lhsigoff"],state='normal')
@@ -478,11 +474,11 @@ def update_semaphore_signal (sig_id:int):
             dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
             signals_common.signals[str(sig_id)]["lhroute1"]=False
             signal_has_changed = True
-        return()
+        return(signal_has_changed)
     
     def update_rh_signal(sig_id,set_to_clear):
         global logging
-        global signal_has_changed
+        signal_has_changed = False
         if set_to_clear and signals_common.signals[str(sig_id)]["rhroute1"]==False:
             logging.info ("Signal "+str(sig_id)+": Changing signal arm for RH route to PROCEED")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["rhsigoff"],state='normal')
@@ -497,31 +493,33 @@ def update_semaphore_signal (sig_id:int):
             dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
             signals_common.signals[str(sig_id)]["rhroute1"]=False
             signal_has_changed = True
-        return()
+        return(signal_has_changed)
     
     #---------------------------------------
     # This is where the function code begins
     #---------------------------------------
-    signal_has_changed = False
+    
+    # Initially set the "signal has changed" flags to False
+    change1, change2, change3 = False, False, False,
     if (signals_common.signals[str(sig_id)]["sigclear"]
             and not signals_common.signals[str(sig_id)]["releaseonred"]
             and not signals_common.signals[str(sig_id)]["override"]):
         # Signal is Clear - we need to correctly set the signal arms that were created
         if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,True)
-            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
-            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["mainroute"] is not None: change1 = update_main_signal(sig_id,True)
+            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: change2 = update_lh_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: change3 = update_rh_signal(sig_id,False)
         elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2):
-            if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,False)
-            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,True)
-            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["mainroute"] is not None: change1 = update_main_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: change2 = update_lh_signal(sig_id,True)
+            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: change3 = update_rh_signal(sig_id,False)
         elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2):
-            if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,False)
-            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
-            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,True)
+            if signals_common.signals[str(sig_id)]["mainroute"] is not None: change1 = update_main_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: change2 = update_lh_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: change3 = update_rh_signal(sig_id,True)
         # We only need to enable the route display if the main signal aspects have actually
         # been changed in response to a change in the internal state of the signal
-        if signal_has_changed == True and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
+        if (change1 or change2 or change3) and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
             logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"
                                            + signals_common.signals[str(sig_id)]["theatretext"]+"\'")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
@@ -529,12 +527,12 @@ def update_semaphore_signal (sig_id:int):
             dcc_control.update_dcc_signal_theatre(sig_id,signals_common.signals[str(sig_id)]["theatretext"],
                                                               signal_change=True,sig_at_danger=False)
     else: 
-        if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,False)
-        if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
-        if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
+        if signals_common.signals[str(sig_id)]["mainroute"] is not None: change1 = update_main_signal(sig_id,False)
+        if signals_common.signals[str(sig_id)]["lhroute1"] is not None: change2 = update_lh_signal(sig_id,False)
+        if signals_common.signals[str(sig_id)]["rhroute1"] is not None: change3 = update_rh_signal(sig_id,False)
         # We only need to enable the route display if the main signal aspects have actually
         # been changed in response to a change in the internal state of the signal
-        if signal_has_changed == True and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
+        if (change1 or change2 or change3) and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
             logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route display (signal is at DANGER)")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],text="")
             # This is where we send the special character "#"- which should be mapped 
@@ -560,7 +558,7 @@ def update_semaphore_route_indication (sig_id,
     if signals_common.signals[str(sig_id)]["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
         logging.info ("Signal "+str(sig_id)+": Setting semaphore route to "+str(route_to_set).rpartition('.')[-1])
         signals_common.signals[str(sig_id)]["routeset"] = route_to_set
-        # Refresh the signal drawing objects (which will also send the DCC commands to change the arms accordingly
+        # Refresh the signal drawing objects (which will also send the DCC commands to change the arms accordingly)
         # Log messages will also be generated for each change - so we don't need lo log anything extra here
         update_semaphore_signal(sig_id)
         update_semaphore_subsidary(sig_id)
@@ -573,7 +571,7 @@ def update_semaphore_route_indication (sig_id,
         # Only refresh the signal drawing objects if the signal is Clear
         # Otherwise we'll leave the refresh until the signal is next changed
         if (signals_common.signals[str(sig_id)]["sigclear"]
-                and not signals_common.signals[str(sig_id)]["releaseonred"]
+            and not signals_common.signals[str(sig_id)]["releaseonred"]
                 and not signals_common.signals[str(sig_id)]["override"]):
             logging.info ("Signal "+str(sig_id)+": Changing theatre route indication to \'"+str(theatre_text)+"\'")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
