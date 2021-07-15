@@ -28,7 +28,6 @@ from . import signals_common
 from . import dcc_control
 
 from tkinter import *
-import tkinter.font
 import enum
 import time
 import threading
