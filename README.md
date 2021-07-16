@@ -21,6 +21,8 @@ the DCC control aspects, a log level of DEBUG will show you the commands being s
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
+![What is this](README_screenshot1.png)
+
 ## Installation
 For a first time installation use:
 <pre>
