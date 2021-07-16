@@ -183,6 +183,26 @@ create_section(canvas,3,625,200,section_callback=main_callback_function)
 create_section(canvas,4,925,200,section_callback=main_callback_function)
 create_section(canvas,5,925,150,section_callback=main_callback_function)
 
+# Initialise the Pi-SPROG-3 and define the DCC mappings for the signals and points we are
+# going to create (if not running on a Pi-SPROG this will generate an error message, but
+# the software will still work albeit without sending any DCC Commands to the Pi-SPROG)
+# Mappings should be created first so that when the signals and points are created then
+# the appropriate DCC bus commands will be sent to set the initial aspects correctly
+print ("Initialising Pi Sprog and creating DCC Mappings")
+initialise_pi_sprog ()
+request_dcc_power_on()
+
+# Simple mapping of the main signal to a single DCC address
+map_semaphore_signal (sig_id = 1, main_signal = 1 )
+map_semaphore_signal (sig_id = 2, main_signal = 2 )
+map_semaphore_signal (sig_id = 3, main_signal = 3 )
+map_semaphore_signal (sig_id = 4, main_signal = 4 , left_signal = 14 , left_subsidary = 15)
+map_semaphore_signal (sig_id = 5, main_signal = 5 )
+map_semaphore_signal (sig_id = 6, main_signal = 6 )
+
+# Points are simply mapped to single addresses
+map_dcc_point (1, 100)
+
 print ("Creating Signals")
 
 # Create the Signals for the top line
