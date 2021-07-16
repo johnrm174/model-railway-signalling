@@ -103,7 +103,7 @@ create_point - Creates a point object and returns a list of the tkinter drawing 
       reverse:bool - If the switching logic is to be reversed - Default is False
       fpl:bool - If the point is to have a Facing point lock (FPL) - Default is False (no FPL)
       also_switch:int - the Id of another point to automatically switch with this point - Default none
-      auto:bool - If the point is to be fully automatic (e.g switched by another point - Default False.
+      auto:bool - If the point is to be fully automatic (e.g switched by another point) - Default False.
 
 lock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
 
@@ -122,21 +122,55 @@ fpl_active (point_id) - returns the state of the FPL (True/False) - to support p
 
 ## Signal Functions
 <pre>
-Currently supported types:
-  Currently supported types:
+Currently supported signal types:
+
     Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
-           - with or without a position light subsidary signal
-           - with or without route indication feathers (maximum of 5)
-           - with or without a theatre type route indicator
-           - With or without Release Control (Release on Red or Release on Yellow)
+          - with or without a position light subsidary signal
+          - with or without route indication feathers (maximum of 5)
+          - with or without a theatre type route indicator
+          - With or without a "Signal Passed" Button
+          - With or without a "Approach Release" Button
+          - Main signal manual or fully automatic
+
     Semaphore Signals - Home or Distant
-           - with or without junction arms (RH and LH arms supported)
-           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
-           - with or without a theatre type route indicator (for Home signals only)
-           - With or without Release Control (Release on Red only)
+          - with or without junction arms (RH and LH arms supported)
+          - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+          - with or without a theatre type route indicator (for Home signals only)
+          - With or without a "Approach Release" Button
+          - Main signal manual or fully automatic
+
     Ground Position Light Signals
-          - groud position light or shunt ahead position light
+          - normal ground position light or shunt ahead position light
           - either early or modern (post 1996) types
+
+    Ground Disc Signals
+          - normal ground disc (red banner) or shunt ahead ground disc (yellow banner)
+
+Summary of features supported by each signal type:
+
+    Colour Light signals
+           - set_route_indication (Route Type and theatre text)
+           - update_signal (based on a signal Ahead) - apart from 2 Aspect Home and Red/Yellow
+           - lock_subsidary_signal / unlock_subsidary_signal
+           - lock_signal / unlock_signal
+           - set_signal_override / clear_signal_override
+           - set_approach_control (Release on Red or Yellow) / clear_approch_control
+           - trigger_timed_signal
+    Semaphore signals:
+           - set_route_indication (Route Type and theatre text)
+           - lock_subsidary_signal / unlock_subsidary_signal
+           - lock_signal / unlock_signal
+           - set_signal_override / clear_signal_override
+           - set_approach_control (Release on Red Only) / clear_approch_control
+           - trigger_timed_signal
+    Ground Position Colour Light signals:
+           - lock_signal / unlock_signal
+           - set_signal_override / clear_signal_override
+    Ground Disc signals
+           - lock_signal / unlock_signal
+           - set_signal_override / clear_signal_override
+
+Public types and functions:
 
 signal_sub_type (use when creating colour light signals):
   signal_sub_type.home         (2 aspect - Red/Green)
@@ -221,6 +255,18 @@ create_ground_position_signal - create a ground position light signal
       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
+
+create_ground_disc_signal - Creates a ground disc type shunting signal
+  Mandatory Parameters:
+      Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+      sig_id:int - The ID for the signal - also displayed on the signal button
+      x:int, y:int - Position of the point on the canvas (in pixels) 
+ Optional Parameters:
+      orientation:int- Orientation in degrees (0 or 180) - Default is zero
+      sig_callback:name - Function to call when a signal event happens - Default is no callback
+                        Note that the callback function returns (item_id, callback type)
+      sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+      shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default False (red banner)
 
 set_route - Set (and change) the route indication (either feathers or theatre text)
   Mandatory Parameters:

@@ -8,7 +8,7 @@
 #           - with or without a theatre type route indicator
 #           - with or without a manual control button
 #
-# Common features supported by Colour Light signals
+# Common features supported by Semaphore signals
 #           - set_route_indication (Route Type and theatre text)
 #           - lock_subsidary_signal / unlock_subsidary_signal
 #           - lock_signal / unlock_signal

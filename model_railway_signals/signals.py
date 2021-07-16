@@ -6,16 +6,24 @@
 #           - with or without a position light subsidary signal
 #           - with or without route indication feathers (maximum of 5)
 #           - with or without a theatre type route indicator
-#           - With or without Release Control (Release on Red or Release on Yellow)
+#           - With or without a "Signal Passed" Button
+#           - With or without a "Approach Release" Button
+#           - Main signal manual or fully automatic
 #    Semaphore Signals - Home or Distant
 #           - with or without junction arms (RH and LH arms supported)
 #           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
 #           - with or without a theatre type route indicator (for Home signals only)
-#           - With or without Release Control (Release on Red only)
-#    Ground Position Light Signals
-#           - groud position light or shunt ahead position light
+#           - With or without a "Signal Passed" Button
+#           - With or without a "Approach Release" Button
+#           - Main signal manual or fully automatic
+#     Ground Position Light Signals
+#           - normal groud position light or shunt ahead position light
 #           - either early or modern (post 1996) types
-# 
+#           - With or without a "Signal Passed" Button
+#     Ground Disc Signals
+#           - normal ground disc (red banner) or shunt ahead ground disc (yellow banner)
+#           - With or without a "Signal Passed" Button
+#
 # signal_sub_type (use when creating colour light signals):
 #   signal_sub_type.home         (2 aspect - Red/Green)
 #   signal_sub_type.distant      (2 aspect - Yellow/Green
@@ -99,8 +107,20 @@
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
 #       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
 #       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
-# 
-# set_route_ - Set (and change) the route indication (either feathers or theatre text)
+#
+# create_ground_disc_signal - Creates a ground disc type shunting signal
+#   Mandatory Parameters:
+#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#  Optional Parameters:
+#       orientation:int- Orientation in degrees (0 or 180) - Default is zero
+#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#                         Note that the callback function returns (item_id, callback type)
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default False (red banner)
+#
+# set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
@@ -476,7 +496,6 @@ def clear_signal_override (*sig_ids:int):
                     signals_semaphores.update_semaphore_signal (sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
                     signals_ground_disc.update_ground_disc_signal (sig_id)
-
     return()
 
 # -------------------------------------------------------------------------
@@ -533,7 +552,6 @@ def toggle_signal (sig_id:int):
             signals_semaphores.toggle_semaphore_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
             signals_ground_disc.toggle_ground_disc_signal (sig_id)
-
     return()
 
 # -------------------------------------------------------------------------
@@ -555,7 +573,6 @@ def toggle_subsidary (sig_id:int):
             signals_colour_lights.toggle_colour_light_subsidary(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.toggle_semaphore_subsidary(sig_id)
-
     return()
 
 # -------------------------------------------------------------------------

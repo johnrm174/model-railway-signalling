@@ -558,7 +558,8 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         logging.info ("Signal "+str(sig_id)+": Changing aspect to "
                       + str(new_aspect).rpartition('.')[-1] + log_message)
         
-        # Update the signal aspect - This should be an immutable type so we shouldn't need a Thread Lock 
+        # Update the current aspect - note that this dictionary element is also used by the
+        # Flash Aspects Thread, but as it is a single element, it should be thread safe
         signals_common.signals[str(sig_id)]["displayedaspect"] = new_aspect
         refresh_signal_aspects (sig_id)
 
@@ -875,8 +876,10 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     global logging
     
     # do some basic validation specific to this function for colour light signals
-    if signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control for a 2 aspect distant signal")
+    if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect distant signal")
+    elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
+        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
