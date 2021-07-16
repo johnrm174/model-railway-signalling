@@ -180,10 +180,9 @@ map_traintech_signal (sig_id = 3, base_address = 9)
 # Signal 4 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
 map_traintech_signal (sig_id = 4, base_address = 13)
 
-# Signal 5 shows you how a TrainTech signal mapping is configured "under the hood"
-# note that if it had a route indication you should also set 'auto_route_inhibit = True'
-
-# Signal 5 (addresses 17,18,19,20) - uses the simplified traintech signal mapping function
+# Signal 5 (addresses 17,18,19,20) shows you how a TrainTech signal mapping is configured "under the hood"
+# note that if it had a route indication you should also include 'auto_route_inhibit = True' as TrainTech
+# signals automatically inhibit the feather when the signal is set to DANGER
 map_dcc_signal (sig_id = 5,
                 danger = [[17,False]],
                 proceed = [[17,True]],

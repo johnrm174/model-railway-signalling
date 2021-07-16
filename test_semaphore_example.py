@@ -165,7 +165,6 @@ canvas.pack()
 # the software will still work albeit without sending any DCC Commands to the Pi-SPROG)
 # Mappings should be created first so that when the signals and points are created then
 # the appropriate DCC bus commands will be sent to set the initial aspects correctly
-
 print ("Initialising Pi Sprog and creating DCC Mappings")
 initialise_pi_sprog (dcc_debug_mode=debug_dcc)
 request_dcc_power_on()
