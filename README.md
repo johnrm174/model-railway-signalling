@@ -430,7 +430,6 @@ map_dcc_signal - Map a signal to one or more DCC Addresses
               unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
       subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
 
-
     An example DCC mapping for a  Signalist SC1 decoder with a base address of 1 (CV1=5) is included below.
     This assumes the decoder is configured in "8 individual output" Mode (CV38=8). In this example we are using
     outputs A,B,C,D to drive our signal with E & F driving the feather indications. The Signallist SC1 uses 8 
@@ -459,7 +458,6 @@ map_dcc_signal - Map a signal to one or more DCC Addresses
                 THEATRE = [ ["#",[[5,False],[6,False]]],
                             ["1",[[6,False],[5,True]]],
                             ["2",[[5,False],[6,True]]]  ] )
-
 
 map_traintech_signal - Generate the mappings for a TrainTech signal
    Mandatory Parameters:
