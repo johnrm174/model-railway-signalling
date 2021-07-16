@@ -5,18 +5,18 @@ detection via the GPIO ports on the Pi. For details of the "Public" API - scroll
 A simple interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
 The GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
 
-All of the functions for creating and managing 'signals', 'points', 'sections' and sensors have been developed as a Python Package 
+All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
 fully prototypical signalling schemes to be developed. The signals and points opjects can be easily mapped to one or more DCC 
 addresses in a manner that should be compatible with the majority of DCC signal/points decoders currently on the market. 
 Track sensors can also be easily integrated (via the Raspberry Pi's GPIO interface) to enable full automatic control.
 
-Most types of colour light signals (and ground position light signals) are supported. Semaphore Signals are now also supported.
+Most types of colour light signals, semaphore signals, ground position light signals and ground disc signals are supported.
 
 Note that I have tried to make the package platform independent so you can use it to develop your own layout signalling schemes 
 without a Raspberry Pi or the associated Pi-SPROG-3 DCC Command station (track sensors can be manually 'triggered' via the
 layout schematic to ensure your code is doing what its supposed to do). Full logging is provided to help you develop/debug 
-your own schemes - just set the log level to info to see what the package is doing 'under the hood'. And when you do enable
+your own schemes - just set the log level to INFO to see what the package is doing 'under the hood'. And when you do enable
 the DCC control aspects, a log level of DEBUG will show you the commands being sent out to the Pi-SPROG-3
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
@@ -131,18 +131,15 @@ Currently supported signal types:
           - With or without a "Signal Passed" Button
           - With or without a "Approach Release" Button
           - Main signal manual or fully automatic
-
     Semaphore Signals - Home or Distant
           - with or without junction arms (RH and LH arms supported)
           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
           - with or without a theatre type route indicator (for Home signals only)
           - With or without a "Approach Release" Button
           - Main signal manual or fully automatic
-
     Ground Position Light Signals
           - normal ground position light or shunt ahead position light
           - either early or modern (post 1996) types
-
     Ground Disc Signals
           - normal ground disc (red banner) or shunt ahead ground disc (yellow banner)
 
@@ -151,24 +148,29 @@ Summary of features supported by each signal type:
     Colour Light signals
            - set_route_indication (Route Type and theatre text)
            - update_signal (based on a signal Ahead) - apart from 2 Aspect Home and Red/Yellow
-           - lock_subsidary_signal / unlock_subsidary_signal
+           - toggle_signal / toggle_subsidary
+           - lock_subsidary / unlock_subsidary
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
-           - set_approach_control (Release on Red or Yellow) / clear_approch_control
+           - set_approach_control (Release on Red or Yellow) / clear_approach_control
            - trigger_timed_signal
+           - query signal state (signal_clear, subsidary_clear, signal_overridden, approach_control_set)
     Semaphore signals:
            - set_route_indication (Route Type and theatre text)
-           - lock_subsidary_signal / unlock_subsidary_signal
+           - lock_subsidary / unlock_subsidary
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
-           - set_approach_control (Release on Red Only) / clear_approch_control
+           - set_approach_control (Release on Red Only) / clear_approach_control
            - trigger_timed_signal
+           - query signal state (signal_clear, subsidary_clear, signal_overridden, approach_control_set)
     Ground Position Colour Light signals:
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
+           - query signal state (signal_clear, signal_overridden)
     Ground Disc signals
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
+           - query signal state (signal_clear, signal_overridden)
 
 Public types and functions:
 
@@ -219,9 +221,9 @@ create_colour_light_signal - Creates a colour light signal
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
       refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
                 when the signal is changed and the external programme will need to call the seperate 
-                'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
-                depend on the signal ahead - Default True 
-      fully_automatic:bool - Creates a signal without any manual controls - Default False
+                'update_signal' function. Primarily intended for use with  3/4 aspect signals, where the
+                displayed aspect will depend on the signal ahead if the signal is clear - Default True 
+      fully_automatic:bool - Creates a signal without a manual control button - Default False
 
 create_semaphore_signal - Creates a Semaphore signal
   Mandatory Parameters:
@@ -229,19 +231,19 @@ create_semaphore_signal - Creates a Semaphore signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the point on the canvas (in pixels) 
   Optional Parameters:
-      distant:bool - Set to True to create a Distant signal - False to create a Home signal - default False
+      distant:bool - Set to True for a Distant signal - False for a Home signal - default False
       orientation:int - Orientation in degrees (0 or 180) - Default is zero
       sig_callback:name - Function to call when a signal event happens - Default is no callback
                           Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
       approach_release_button:bool - Creates an "Approach Release" button - Default False
       subsidarymain:bool - To create a subsidary signal on the post under the "main" signal - default False
-      subsidarylh1:bool - To create a LH gantry with a subsidary signal - default False
-      subsidaryrh1:bool - To create a RH gantry with a subsidary signal - default False
-      lhroute1:bool - To create a LH gantry with a main (junction) signal - default False
-      rhroute1:bool - To create a RH gantry with a main (junction) signal - default False
+      subsidarylh1:bool - To create a LH post with a subsidary signal - default False
+      subsidaryrh1:bool - To create a RH post with a subsidary signal - default False
+      lhroute1:bool - To create a LH post with a main (junction) signal - default False
+      rhroute1:bool - To create a RH post with a main (junction) signal - default False
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-      fully_automatic:bool - Creates a signal without any manual controls - Default False
+      fully_automatic:bool - Creates a signal without a manual control button - Default False
 
 create_ground_position_signal - create a ground position light signal
   Mandatory Parameters:
@@ -256,7 +258,7 @@ create_ground_position_signal - create a ground position light signal
       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
 
-create_ground_disc_signal - Creates a ground disc type shunting signal
+create_ground_disc_signal - Creates a ground disc type signal
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       sig_id:int - The ID for the signal - also displayed on the signal button
@@ -280,7 +282,7 @@ update_signal - update the aspect of a signal ( based on the aspect of a signal 
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
-      sig_ahead_id:int - The ID for the signal "ahead" of the one we want to set
+      sig_ahead_id:int - The ID for the signal "ahead" of the one to be updated
 
 toggle_signal(sig_id) - use for route setting (can use 'signal_clear' to find the state first)
 
@@ -322,12 +324,12 @@ trigger_timed_signal - Sets the signal to DANGER and then cycles through the asp
 
 set_approach_control - Puts the signal into "Approach Control" Mode where the signal will display a particular
                        aspect/state (either Red or Yellow) to approaching trains. As the Train approaches the
-                       signal, the signal will be "released" to display the normal aspect. Normally used for
-                       diverging routes which have a lower speed restriction to the main line. When a signal
+                       signal, the signal should then be "released" to display the normal aspect. Normally used
+                       for diverging routes which have a lower speed restriction to the main line. When a signal
                        is set in "approach control" mode then the signals behind will display the appropriate
                        aspects when updated (based on the signal ahead). for "Release on Red" these would be 
                        the normal aspects. For "Release on Yellow", assuming 4 aspect signals, the signals  
-                       behind will display flashing single yellow and flashing double yellow 
+                       behind will display flashing single yellow and flashing double yellow aspects.
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
@@ -373,8 +375,8 @@ create_sensor - Creates a sensor object
       sensor_id:int - The ID to be used for the sensor 
       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
   Optional Parameters:
-      sensor_timeout:float - The time period during which further triggers are ignored (default = 3 seconds)
-      trigger_period:float - The duration that the sensor needs to remain active before raising a trigger (default = 0.001 seconds)
+      sensor_timeout:float - The time during which further triggers are ignored (default = 3 seconds)
+      trigger_period:float - The time that the sensor needs to remain active (default = 0.001 seconds)
       sensor_callback - The function to call when the sensor triggers (default is no callback)
                         Note that the callback function returns (item_id, callback type)
 
@@ -426,6 +428,37 @@ map_dcc_signal - Map a signal to one or more DCC Addresses
               unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
       subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
 
+
+    An example DCC mapping for a  Signalist SC1 decoder with a base address of 1 (CV1=5) is included below.
+    This assumes the decoder is configured in "8 individual output" Mode (CV38=8). In this example we are using
+    outputs A,B,C,D to drive our signal with E & F driving the feather indications. The Signallist SC1 uses 8 
+    consecutive addresses in total (which equate to DCC addresses 1 to 8 for this example). The DCC addresses for
+    each LED are: RED = 1, Green = 2, YELLOW1 = 3, YELLOW2 = 4, Feather1 = 5, Feather2 = 6.
+
+           map_dcc_signal (sig_id = 2,
+                danger = [[1,True],[2,False],[3,False],[4,False]],
+                proceed = [[1,False],[2,True],[3,False],[4,False]],
+                caution = [[1,False],[2,False],[3,True],[4,False]],
+                prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
+                LH1 = [[5,True],[6,False]], 
+                MAIN = [[6,True],[5,False]], 
+                NONE = [[5,False],[6,False]] )
+
+     A second example DCC mapping, but this time with a Feather Route Indication, is shown below. In this case,
+     the main signal aspects are configured identically to the first example. The only difference is the THEATRE
+     mapping - where a display of "1" is enabled by DCC Address 5 and "2" by DCC Address 6. Note the special "#"
+     character mapping - which defines the DCC commands that need to be sent to inhibit the theatre display.
+
+            map_dcc_signal (sig_id = 2,
+                danger = [[1,True],[2,False],[3,False],[4,False]],
+                proceed = [[1,False],[2,True],[3,False],[4,False]],
+                caution = [[1,False],[2,False],[3,True],[4,False]],
+                prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
+                THEATRE = [ ["#",[[5,False],[6,False]]],
+                            ["1",[[6,False],[5,True]]],
+                            ["2",[[5,False],[6,True]]]  ] )
+
+
 map_traintech_signal - Generate the mappings for a TrainTech signal
    Mandatory Parameters:
       sig_id:int - The ID for the signal to create a DCC mapping for
@@ -451,6 +484,16 @@ map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address
               Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
               unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
 
+     Semaphore signal DCC mappings assume that each main/subsidary signal arm is mapped to a seperate DCC address.
+     In this example, we are mapping a signal with MAIN and LH signal arms and a subsidary arm for the MAIN route.
+     Note that if the semaphore signal had a theatre type route indication, then this would be mapped in exactly
+     the same was as for the Colour Light Signal example above)
+
+           map_semaphore_signal (sig_id = 2, 
+                        main_signal = 1 , 
+                        left_signal = 2 , 
+                        main_subsidary = 3)
+
 map_dcc_point
    Mandatory Parameters:
       point_id:int - The ID for the point to create a DCC mapping for
@@ -462,29 +505,32 @@ map_dcc_point
 ## Pi-Sprog Interface Functions
 
 This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi UART. It does not provide
-a fully-functional interface for All DCC command and control functions - just the minimum set needed to support the driving
-of signals and points via a selection of common DCC Accessory decoders.Basic CV Programming is also supported - primarily 
-as an aid to testing, but for full decoder programming the recommendation is to use JRMI DecoderPro.
+a fully-functional interface for all DCC command and control functions - just the minimum set needed to support the driving
+of signals and points via a selection of common DCC Accessory decoders. Basic CV Programming is also supported - primarily 
+as an aid to testing. For full decoder programming the recommendation is to use JRMI DecoderPro.
 <pre>
-initialise_pi_sprog (Open the comms port to the Pi Sprog)
+initialise_pi_sprog - Open and configures the serial comms port to the Pi Sprog
    Optional Parameters:
       port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
       baud_rate:int - The baud rate to use for the serial port - Default = 115200,
-      dcc_debug_mode:bool - Sets an additional level of logging for the CBUS commands being sent to the Pi-SPROG. 
-                            - Will also Request and report the command station status (from the Pi-SPROG-3)
+      dcc_debug_mode:bool - Set to True to log the CBUS commands being sent to the Pi-SPROG (default = False). 
+                          - If set to True, this initialisation function will also Request and report the 
+                            command station status (from the Pi-SPROG-3)
 
-service_mode_write_cv (programmes a CV in direct bit mode and waits for response)
-           (events are only sent if we think the track power is currently switched on)
-           (if acknowledgement isn't received within 5 seconds then the request times out)
+service_mode_write_cv - programmes a CV in direct bit mode and waits for response
+                      (events are only sent if we think the track power is currently switched on)
+                      (if acknowledgement isn't received within 5 seconds then the request times out)
    Mandatory Parameters:
       cv:int - The CV (Configuration Variable) to be programmed
       value:int - The value to programme
 
-request_dcc_power_on (sends a request to switch on the track power and waits for acknowledgement)
+request_dcc_power_on - sends a request to switch on the track power and waits for acknowledgement
+                     (requests are only sent if the Pi Sprog Comms Port has been successfully opened/configured)
        returns True if we have received acknowledgement that Track Power has been turned on
        returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
 
-request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
+request_dcc_power_off - sends a request to switch off the track power and waits for acknowledgement
+                     (requests are only sent if the Pi Sprog Comms Port has been successfully opened/configured)
        returns True if we have received acknowledgement that Track Power has been turned off
        returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
 </pre>
