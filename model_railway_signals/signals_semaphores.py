@@ -17,12 +17,6 @@
 #           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-
-#import common
-#import signals_common
-#import dcc_control
 from . import common
 from . import signals_common
 from . import dcc_control
@@ -36,37 +30,37 @@ import logging
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id, external_callback):
-    return (sig_id, external_callback)
+def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+    return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
 # Callbacks for processing button pushes
 # -------------------------------------------------------------------------
 
-def signal_button_event (sig_id,external_callback):
+def signal_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
-    toggle_semaphore_signal(sig_id,external_callback)
+    toggle_semaphore_signal(sig_id)
     return ()
 
-def subsidary_button_event (sig_id,external_callback):
+def subsidary_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Subsidary Button Event ************************************")
-    toggle_semaphore_subsidary(sig_id,external_callback)
+    toggle_semaphore_subsidary(sig_id)
     return ()
 
-def sig_passed_button_event (sig_id,external_callback):
+def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
     signals_common.pulse_signal_passed_button (sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id,signals_common.sig_callback_type.sig_passed)
     return ()
 
-def approach_release_button_event (sig_id,external_callback):
+def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
     signals_common.pulse_signal_release_button (sig_id)
-    raise_approach_release_event(sig_id,external_callback)
+    raise_approach_release_event(sig_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -78,7 +72,7 @@ def approach_release_button_event (sig_id,external_callback):
 # then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def raise_approach_release_event (sig_id:int, external_callback=null_callback):
+def raise_approach_release_event (sig_id:int):
     # reset the state of the signal
     if signals_common.signals[str(sig_id)]["releaseonred"]:
         logging.info ("Signal "+str(sig_id)+": Clearing approach control")
@@ -86,9 +80,8 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
         signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
         # Call the internal function to update and refresh the signal
         update_semaphore_signal(sig_id)
-        # Make the external callback 
-        external_callback (sig_id, signals_common.sig_callback_type.sig_released)
-    return ()
+        signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
+        return ()
 
 # -------------------------------------------------------------------------
 # Function to flip the state of a signal either when the signal button
@@ -99,13 +92,10 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
 # created - If not then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def toggle_semaphore_signal (sig_id:int, external_callback = null_callback):
-    # Call the common function to toggle the signal state and button object
+def toggle_semaphore_signal (sig_id:int):
     signals_common.toggle_signal(sig_id)
-    # Call the internal function to update and refresh the signal
     update_semaphore_signal(sig_id)
-    # Make the external callback 
-    external_callback (sig_id, signals_common.sig_callback_type.sig_switched)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -118,12 +108,9 @@ def toggle_semaphore_signal (sig_id:int, external_callback = null_callback):
 # -------------------------------------------------------------------------
 
 def toggle_semaphore_subsidary (sig_id:int, external_callback = null_callback):
-    # Call the common function to toggle the signal state and button object
     signals_common.toggle_subsidary (sig_id)
-    # Call the internal function to update and refresh the signal
     update_semaphore_subsidary (sig_id)
-    # Make the external callback 
-    external_callback (sig_id, signals_common.sig_callback_type.sub_switched)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
     return ()
 
 # ---------------------------------------------------------------------------------
@@ -167,42 +154,15 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
     else:
         
-        # We use a value of None to signify that a particular arm doesn't exist for the signal or
-        #use True/False to represent the current state of the signal arm if it does exist.
+        create_subsidary_button = subsidarymain or subsidarylh1 or subsidaryrh1
+        
+        # We use a value of None to signify that a particular arm doesn't isn't to be created for the signal
+        # uIf it is to be created, we use True/False to represent the current state of the signal arm.
         if subsidarymain == False: subsidarymain = None
         if subsidarylh1 == False: subsidarylh1 = None
         if subsidaryrh1 == False: subsidaryrh1 = None
         if lhroute1 == False: lhroute1 = None
         if rhroute1 == False: rhroute1 = None
-
-        # Create the button objects and their callbacks
-        button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised,command=lambda:signal_button_event (sig_id,sig_callback))
-        button2 = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised, command=lambda:subsidary_button_event (sig_id,sig_callback))
-        # Signal Passed Button - We only want a small button - hence a small font size
-        button3 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:sig_passed_button_event (sig_id,sig_callback))
-        # Approach release button  - We only want a small button - hence a small font size
-        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:approach_release_button_event (sig_id,sig_callback))
-        
-        # Create the 'windows' in which the buttons are displayed
-        # We adjust the  positions if the signal supports a position light button
-        if subsidarymain is not None or subsidarylh1 is not None or subsidaryrh1 is not None:
-            point_coords = common.rotate_point (x,y,-35,-20,orientation) 
-            canvas.create_window (point_coords,anchor=E,window=button1)
-            but2win = canvas.create_window (point_coords,anchor=W,window=button2)
-        else:
-            point_coords = common.rotate_point (x,y,-20,-20,orientation) 
-            canvas.create_window (point_coords,window=button1)
-            but2win = canvas.create_window (point_coords,window=button2,state="hidden")
-        # The following buttons get 'hidden' later if they are not required for the signal
-        but3win = canvas.create_window (x,y,window=button3)
-        point_coords = common.rotate_point (x,y,-50,0,orientation) 
-        but4win = canvas.create_window (point_coords,window=button4)
         
         # Draw the signal base line & signal post   
         canvas.create_line(common.rotate_line(x,y,0,0,0,-22,orientation),width=2,fill="white")
@@ -239,9 +199,13 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         lhsubon = canvas.create_line(common.rotate_line(x,y,+50,-34,+50,-43,orientation),fill=arm_colour,width=3)
         lhsuboff = canvas.create_line(common.rotate_line(x,y,+50,-34,+55,-43,orientation),fill=arm_colour,width=3,state='hidden')
 
-        # Hide any drawing objects we don't need for this particular signal
-        if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
+        # Approach release button  - We only want a small button - hence a small font size
+        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
+                command=lambda:approach_release_button_event (sig_id,sig_callback))
+        but4win = canvas.create_window (common.rotate_point (x,y,-50,0,orientation),window=button4)
         if not approach_release_button: canvas.itemconfigure(but4win,state='hidden')
+
+        # Hide any otherdrawing objects we don't need for this particular signal
         if subsidarymain is None: canvas.itemconfigure(mainsubon,state='hidden')
         if subsidarylh1 is None: canvas.itemconfigure(lhsubon,state='hidden')
         if subsidaryrh1 is None: canvas.itemconfigure(rhsubon,state='hidden')
@@ -258,82 +222,70 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             theatre = canvas.create_text (point_coords,fill="white",text="",angle = orientation-90,state='hidden')
             
         # Set the initial state of the signal Arms if they have been created
-        if fully_automatic: mainroute = True
-        else: mainroute = False
+        mainroute = False
         if subsidarymain is not None: subsidarymain = False
         if subsidarylh1 is not None: subsidarylh1 = False
         if subsidaryrh1 is not None: subsidaryrh1 = False
         if lhroute1 is not None: lhroute1 = False
         if rhroute1 is not None: rhroute1 = False
     
-        # If its a fully automatic signal then set the initial state to Clear and inhibit the button
-        # Also set the current state of the main route to the opposite of what we need for the signal
-        # this will ensure that the signal gets "changed" when we update it and the appropriate DCC
-        # commands sent out to put the signal into the correct initial (known) state
-        if fully_automatic:
-            signal_clear = True
-            mainroute = False
-            button1.config(state="disabled",relief="sunken", bd=0)
-        else:
-            signal_clear = False
-            mainroute = True
-
+        # Create all of the signal elements common to all signal types
+        signals_common.create_common_signal_elements (canvas, sig_id, x, y,
+                                       signal_type = signals_common.sig_type.semaphore,
+                                       sig_callback = signal_button_event,
+                                       sub_callback = subsidary_button_event,
+                                       passed_callback = sig_passed_button_event,
+                                       ext_callback = sig_callback,
+                                       orientation = orientation,
+                                       subsidary = create_subsidary_button,
+                                       sig_passed_button = sig_passed_button,
+                                       automatic = fully_automatic)
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
-        new_signal = {"canvas" : canvas,                           # MANDATORY - canvas object
-                      "sigtype" : signals_common.sig_type.semaphore,   # MANDATORY - The type of the signal 
-                      "sigclear" : signal_clear,                   # MANDATORY - The Internal state of the signal
-                      "automatic" : fully_automatic,               # MANDATORY - Whether the signal has manual control
-                      "subclear" : False,                          # MANDATORY - Internal state of Subsidary Signal
-                      "override" : False,                          # MANDATORY - Internal "Override" State
-                      "siglocked" : False,                         # MANDATORY - Current state of signal interlocking 
-                      "sublocked" : False,                         # MANDATORY - Current state of subsidary interlocking
-                      "sigbutton" : button1,                       # MANDATORY - Button Drawing object (main Signal)
-                      "subbutton" : button2,                       # MANDATORY - Button drawing object (subsidary signal)
-                      "releaseonred" : False,                      # SHARED - State of the "Approach Release for the signal
-                      "routeset" : signals_common.route_type.NONE, # SHARED - Initial Route setting to display (none)
-                      "theatretext" : "NONE",                      # SHARED - Initial Route setting to display (none)
-                      "passedbutton" : button3,                    # SHARED - Button drawing object
-                      "releasebutton" : button4,                   # SHARED - Button drawing object
-                      "theatre"       : theatre,                   # SHARED - Text drawing object
-                      "externalcallback" : sig_callback,           # Type-specific - Callback for timed signal events
-                      "distant"       : distant,                   # Type-specific - subtype of the signal (home/distant)
-                      "theatreenabled" : False,                     # Type-specific - details of the signal configuration
-                      "subsidarymain" : subsidarymain,             # Type-specific - details of the signal configuration
-                      "subsidarylh1"  : subsidarylh1,              # Type-specific - details of the signal configuration
-                      "subsidaryrh1"  : subsidaryrh1,              # Type-specific - details of the signal configuration
-                      "mainroute"     : mainroute,                 # Type-specific - details of the signal configuration
-                      "lhroute1"      : lhroute1,                  # Type-specific - details of the signal configuration
-                      "rhroute1"      : rhroute1,                  # Type-specific - details of the signal configuration
-                      "mainsigon"  : mainsigon,                    # Type-specific - drawing object
-                      "mainsigoff" : mainsigoff,                   # Type-specific - drawing object
-                      "lhsigon"    : lhsigon,                      # Type-specific - drawing object
-                      "lhsigoff"   : lhsigoff,                     # Type-specific - drawing object
-                      "rhsigon"    : rhsigon,                      # Type-specific - drawing object
-                      "rhsigoff"   : rhsigoff,                     # Type-specific - drawing object
-                      "mainsubon"  : mainsubon,                    # Type-specific - drawing object
-                      "mainsuboff" : mainsuboff,                   # Type-specific - drawing object
-                      "lhsubon"    : lhsubon,                      # Type-specific - drawing object
-                      "lhsuboff"   : lhsuboff,                     # Type-specific - drawing object
-                      "rhsubon"    : rhsubon,                      # Type-specific - drawing object
-                      "rhsuboff"   : rhsuboff }                    # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["releaseonred" ]  = False                          # SHARED - State of the "Approach Release for the signal
+        signals_common.signals[str(sig_id)]["routeset"]       = signals_common.route_type.NONE # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["theatretext"]    = "NONE"                         # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["releasebutton"]  = button4                        # SHARED - Button drawing object
+        signals_common.signals[str(sig_id)]["theatre"]        = theatre                        # SHARED - Text drawing object
+        signals_common.signals[str(sig_id)]["distant"]        = distant                        # Type-specific - subtype of the signal (home/distant)
+        signals_common.signals[str(sig_id)]["theatreenabled"] = False                          # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["subsidarymain"]  = subsidarymain                  # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["subsidarylh1"]   = subsidarylh1                   # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["subsidaryrh1"]   = subsidaryrh1                   # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["mainroute"]      = mainroute                      # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["lhroute1"]       = lhroute1                       # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["rhroute1"]       = rhroute1                       # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["mainsigon"]      = mainsigon                      # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsigoff"]     = mainsigoff                     # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhsigon" ]       = lhsigon                        # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhsigoff"]       = lhsigoff                       # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhsigon" ]       = rhsigon                        # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhsigoff" ]      = rhsigoff                       # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsubon"]      = mainsubon                      # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsuboff"]     = mainsuboff                     # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhsubon"]        = lhsubon                        # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhsuboff"]       = lhsuboff                       # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhsubon"]        = rhsubon                        # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhsuboff"]       = rhsuboff                       # Type-specific - drawing object
         
-        # Add the new signal to the dictionary of signals
-        signals_common.signals[str(sig_id)] = new_signal
-        
+        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect - this will also
+        # cause the DCC commands to be sent out to "change" the signal to OFF when we subsequently update it
+        # If its not automatic then send the DCC commands to put the signal in its default ON state
+        if fully_automatic:
+            signals_common.toggle_signal(sig_id)
+        else:
+            dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
         # Update the signal to display the initial aspects - this will also cause the DCC commands to be sent
-        # to put the main signal arm into the default, "known" state (normally ON or OFF if fully automatic)
+        # to put the main signal arm into the default "OFF" state if its an automatic signal
         update_semaphore_signal (sig_id)
         update_semaphore_subsidary(sig_id)
-        
         # Send the DCC commands to put everything but the main signal arm into the initial "known" state
-        if new_signal["lhroute1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
-        if new_signal["rhroute1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
-        if new_signal["subsidarymain"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
-        if new_signal["subsidarylh1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
-        if new_signal["subsidaryrh1"] is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
-        
+        if lhroute1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
+        if rhroute1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
+        if subsidarymain is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
+        if subsidarylh1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
+        if subsidaryrh1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
         # If there is a theatre route indicator we also need to ensure we send the appropriate
         # DCC commands to set this into a known state (always off initially)
         if theatre_route_indicator: dcc_control.update_dcc_signal_theatre (sig_id,"#")
@@ -625,14 +577,14 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
             signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
             update_semaphore_signal(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         # Sleep until its time to clear the signal
         time.sleep (time_delay) 
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
         update_semaphore_signal(sig_id)
-        signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return ()
     
     # --------------------------------------------------------------

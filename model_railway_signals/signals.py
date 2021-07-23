@@ -194,11 +194,6 @@
 # 
 # -------------------------------------------------------------------------
    
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-#import signals_common
-#import signals_colour_lights
-#import signals_ground_position
 from . import signals_common
 from . import signals_colour_lights
 from . import signals_ground_position
@@ -455,7 +450,7 @@ def set_signal_override (*sig_ids:int):
                     # call to update the signal aspect accordingly (based on the signal ahead)
                     if signals_common.signals[str(sig_id)]["refresh"]:
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
-                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
                     signals_semaphores.update_semaphore_signal (sig_id)
@@ -490,7 +485,7 @@ def clear_signal_override (*sig_ids:int):
                     # call to update the signal aspect accordingly (based on the signal ahead)
                     if signals_common.signals[str(sig_id)]["refresh"]:
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
-                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
                     signals_semaphores.update_semaphore_signal (sig_id)
@@ -546,7 +541,7 @@ def toggle_signal (sig_id:int):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_colour_light_signal(sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.toggle_semaphore_signal(sig_id)

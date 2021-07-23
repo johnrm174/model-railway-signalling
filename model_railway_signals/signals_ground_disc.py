@@ -10,11 +10,6 @@
 #           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-#import signals_common
-#import dcc_control
-#import common
 from . import signals_common
 from . import dcc_control
 from . import common
@@ -26,24 +21,24 @@ import logging
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id, ext_callback):
-    return (sig_id, ext_callback)
+def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+    return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
 # Callbacks for processing button pushes
 # -------------------------------------------------------------------------
 
-def signal_button_event (sig_id,external_callback):
+def signal_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
-    toggle_ground_disc_signal(sig_id,external_callback)
+    toggle_ground_disc_signal(sig_id)
     return ()
 
-def sig_passed_button_event (sig_id,external_callback):
+def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
     signals_common.pulse_signal_passed_button (sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 # -------------------------------------------------------------------------
@@ -53,13 +48,10 @@ def sig_passed_button_event (sig_id,external_callback):
 # If not specified then we use the "null callback" to do nothing
 # -------------------------------------------------------------------------
 
-def toggle_ground_disc_signal (sig_id:int,ext_callback=null_callback):
-    # Call the common function to toggle the signal state and button object
+def toggle_ground_disc_signal (sig_id:int):
     signals_common.toggle_signal(sig_id)
-    # Call the internal function to update and refresh the signal
     update_ground_disc_signal (sig_id)
-    # Now make the external callback
-    ext_callback(sig_id, signals_common.sig_callback_type.sig_switched)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -85,15 +77,6 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")                  
     else:
-        # Create the button objects and their callbacks
-        button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised,command=lambda:signal_button_event(sig_id,sig_callback))
-        # Signal Passed Button - We only want a small button - hence a small font size
-        button2 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:sig_passed_button_event(sig_id,sig_callback))
-        # Create a dummy button for the "Subsisdary Button" (not used for this signal type)
-        null_button = Button(canvas)
         
         # Draw the signal base
         canvas.create_line (common.rotate_line (x,y,0,0,0,-11,orientation),width=2)
@@ -105,35 +88,20 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         else: arm_colour = "red"
         sigon = canvas.create_line(common.rotate_line(x,y,+13,-21,+13,-5,orientation),fill=arm_colour,width=3)
         sigoff = canvas.create_line(common.rotate_line(x,y,+18,-19,+8,-7,orientation),fill=arm_colour,width=3)
-        
-        # Create the 'window' in which the signal button is displayed
-        point_coords = common.rotate_point (x,y,-25,-20,orientation) 
-        canvas.create_window (point_coords,window=button1)
-        
-        # Create the 'window' for the Signal Passed Button - but hide it if not required
-        but2win = canvas.create_window (x,y,window=button2)
-        if not sig_passed_button: canvas.itemconfigure(but2win,state='hidden')
-        
-        # Compile a dictionary of everything we need to track for the signal
-        # Note that all MANDATORY attributes are signals_common to ALL signal types
-        # All SHARED attributes are signals_common to more than one signal Types
-        new_signal = {"canvas" : canvas,                      # MANDATORY - canvas object
-                      "sigtype": signals_common.sig_type.ground_disc,   # MANDATORY - The type of the signal
-                      "sigclear" : False,                     # MANDATORY - The Internal state of the signal
-                      "automatic" : False,                    # MANDATORY - If signal is fully automatic (not used for this sig type)
-                      "subclear" : False,                     # MANDATORY - Subsidary Signal State (not used for this sig type)
-                      "override" : False,                     # MANDATORY - Override" State (not used for this sig type)
-                      "siglocked" : False,                    # MANDATORY - Current state of interlocking 
-                      "sublocked" : False,                    # MANDATORY - Current state of interlocking (not used for this sig type)
-                      "sigbutton" : button1,                  # MANDATORY - Button drawing object (main signal button)
-                      "subbutton" : null_button,              # MANDATORY - Subsidary signal Button (not used for this sig type)
-                      "passedbutton" : button2,               # SHARED - Button drawing object
-                      "shuntahead" : shunt_ahead,             # Type-specific - Type of signal (normal or shunt-ahead)
-                      "sigon" : sigon,                        # Type-specific - drawing object
-                      "sigoff" : sigoff   }                   # Type-specific - drawing object
-        
-        # Add the new signal to the dictionary of signals
-        signals_common.signals[str(sig_id)] = new_signal
+
+        # Create all of the signal elements common to all signal types
+        signals_common.create_common_signal_elements (canvas, sig_id, x, y,
+                                       signal_type = signals_common.sig_type.ground_disc,
+                                       sig_callback = signal_button_event,
+                                       sub_callback = null_callback,
+                                       passed_callback = sig_passed_button_event,
+                                       ext_callback = sig_callback,
+                                       orientation = orientation,
+                                       sig_passed_button = sig_passed_button)
+        # Add all of the signal-specific elements we need to manage Ground Position light signal types
+        signals_common.signals[str(sig_id)]["shuntahead"] = shunt_ahead     # Type-specific - Type of signal (normal or shunt-ahead)
+        signals_common.signals[str(sig_id)]["sigon"]      = sigon           # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigoff"]     = sigoff          # Type-specific - drawing object
         
         # We now need to refresh the signal drawing objects to reflect the initial state
         update_ground_disc_signal (sig_id)

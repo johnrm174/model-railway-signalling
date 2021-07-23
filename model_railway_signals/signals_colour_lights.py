@@ -17,12 +17,6 @@
 #           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-
-#import common
-#import signals_common
-#import dcc_control
 from . import common
 from . import signals_common
 from . import dcc_control
@@ -63,37 +57,37 @@ class aspect_type(enum.Enum):
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id, external_callback):
-    return (sig_id, external_callback)
+def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+    return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
 # Callbacks for processing button pushes
 # -------------------------------------------------------------------------
 
-def signal_button_event (sig_id,external_callback):
+def signal_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
-    toggle_colour_light_signal(sig_id,external_callback)
+    toggle_colour_light_signal(sig_id)
     return ()
 
-def subsidary_button_event (sig_id,external_callback):
+def subsidary_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Subsidary Button Event ************************************")
-    toggle_colour_light_subsidary(sig_id,external_callback)
+    toggle_colour_light_subsidary(sig_id)
     return ()
 
-def sig_passed_button_event (sig_id,external_callback):
+def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
     signals_common.pulse_signal_passed_button (sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_passed)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id,signals_common.sig_callback_type.sig_passed)
     return ()
 
-def approach_release_button_event (sig_id,external_callback):
+def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
     signals_common.pulse_signal_release_button (sig_id)
-    raise_approach_release_event(sig_id,external_callback)
+    raise_approach_release_event(sig_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -105,7 +99,7 @@ def approach_release_button_event (sig_id,external_callback):
 # then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def raise_approach_release_event (sig_id:int, external_callback=null_callback):
+def raise_approach_release_event (sig_id:int):
     # reset the state of the signal
     if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
         logging.info ("Signal "+str(sig_id)+": Clearing approach control")
@@ -116,7 +110,7 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
         # is configured to be refreshed later (based on the aspect of the signal ahead)
         if signals_common.signals[str(sig_id)]["refresh"]: 
             update_colour_light_signal_aspect(sig_id)
-        external_callback (sig_id, signals_common.sig_callback_type.sig_released)
+        signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
@@ -128,13 +122,13 @@ def raise_approach_release_event (sig_id:int, external_callback=null_callback):
 # created - If not then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def toggle_colour_light_signal (sig_id:int, external_callback = null_callback):
+def toggle_colour_light_signal (sig_id:int):
     signals_common.toggle_signal(sig_id)
     # Call the internal function to update and refresh the signal - unless this signal
     # is configured to be refreshed later (based on the aspect of the signal ahead)
     if signals_common.signals[str(sig_id)]["refresh"]: 
         update_colour_light_signal_aspect(sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sig_switched)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -146,10 +140,10 @@ def toggle_colour_light_signal (sig_id:int, external_callback = null_callback):
 # created - If not then the "null callback" will be called to do nothing
 # -------------------------------------------------------------------------
 
-def toggle_colour_light_subsidary (sig_id:int, external_callback = null_callback):
+def toggle_colour_light_subsidary (sig_id:int):
     signals_common.toggle_subsidary (sig_id)
     update_colour_light_subsidary_signal (sig_id)
-    external_callback (sig_id, signals_common.sig_callback_type.sub_switched)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
     return ()
 
 # ---------------------------------------------------------------------------------
@@ -194,20 +188,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif approach_release_button and signal_subtype == signal_sub_type.distant:
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
     else:
-
-        # Create the button objects and their callbacks
-        button1 = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised,command=lambda:signal_button_event (sig_id,sig_callback))
-        button2 = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
-                state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                bg=common.bgraised, command=lambda:subsidary_button_event (sig_id,sig_callback))
-        # Signal Passed Button - We only want a small button - hence a small font size
-        button3 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:sig_passed_button_event (sig_id,sig_callback))
-        # Approach release button  - We only want a small button - hence a small font size
-        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:approach_release_button_event (sig_id,sig_callback))
         
         # Draw the signal base line & signal post   
         line_coords = common.rotate_line (x,y,0,0,0,-20,orientation) 
@@ -225,27 +205,21 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
             canvas.create_polygon (points, outline="black", fill="black")
         
-        # Draw the position light aspects
-        # These get 'hidden' later if they are not required for the signal
+        # Draw the position light aspects (but hide then if the signal doesn't have a subsidary)
         line_coords = common.rotate_line (x,y,+18,-27,+24,-21,orientation) 
         poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black")
         line_coords = common.rotate_line (x,y,+14,-14,+20,-20,orientation) 
         poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black")
+        if not position_light:
+            canvas.itemconfigure(poslight1,state='hidden')
+            canvas.itemconfigure(poslight2,state='hidden')
              
-        # Create the 'windows' in which the buttons are displayed
-        # These get 'hidden' later if they are not required for the signal
-        # We adjust the  positions if the signal supports a position light button
-        if position_light:
-            point_coords = common.rotate_point (x,y,-35,-20,orientation) 
-            canvas.create_window (point_coords,anchor=E,window=button1)
-            but2win = canvas.create_window (point_coords,anchor=W,window=button2)
-        else:
-            point_coords = common.rotate_point (x,y,-20,-20,orientation) 
-            canvas.create_window (point_coords,window=button1)
-            but2win = canvas.create_window (point_coords,window=button2)
-        but3win = canvas.create_window (x,y,window=button3)
-        point_coords = common.rotate_point (x,y,-50,0,orientation) 
+        # Approach release button  - We only want a small button - hence a small font size
+        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
+                command=lambda:approach_release_button_event (sig_id))
+        point_coords = common.rotate_point (x,y,-50,0,orientation)
         but4win = canvas.create_window (point_coords,window=button4)
+        if not approach_release_button: canvas.itemconfigure(but4win,state='hidden')
 
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
@@ -260,7 +234,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         
         # Hide the aspects we don't need and define the 'offset' for the route indications based on
         # the signal type - so that the feathers and theatre route indicator sit on top of the signal
-        
         # If its a 2 aspect signal we need to hide the green and the 2nd yellow aspect
         # We also need to 'reassign" the other aspects if its a Home or Distant signal
         if signal_subtype in (signal_sub_type.home, signal_sub_type.distant, signal_sub_type.red_ylw):
@@ -272,17 +245,14 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             elif signal_subtype == signal_sub_type.distant:
                 grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
                 yel = red  # Reassign the Yellow aspect to aspect#1 (normally red in 3/4 aspect signals)
-
         # If its a 3 aspect signal we  need to hide the 2nd yellow aspect
         elif signal_subtype == signal_sub_type.three_aspect:
             canvas.itemconfigure(yel2,state='hidden')
             offset = -10
-            
         else: # its a 4 aspect signal
             offset = 0
 
-        # now draw the feathers (x has been adjusted for the no of aspects)            
-        # These get 'hidden' later if they are not required for the signal
+        # Now draw the feathers (x has been adjusted for the no of aspects)            
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+85,-20,orientation) 
         main = canvas.create_line (line_coords,width=3,fill="black")
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-10,orientation) 
@@ -293,7 +263,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         lhf45 = canvas.create_line (line_coords,width=3,fill="black")
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-35,orientation) 
         lhf90 = canvas.create_line (line_coords,width=3,fill="black")
-        
+        # Hide any feather drawing objects we don't need for this particular signal
+        if not mainfeather: canvas.itemconfigure(main,state='hidden')
+        if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')
+        if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
+        if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
+        if not rhfeather90: canvas.itemconfigure(rhf90,state='hidden')
+
         # Draw the theatre route indicator box if one is specified for the signal
         # The text object is created anyway - and 'hidden' later if not required
         point_coords = common.rotate_point (x,y,offset+80,-20,orientation)        
@@ -306,29 +282,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             theatre = canvas.create_text (point_coords,fill="white",text="",
                                     angle = orientation-90,state='hidden')
             
-        # Hide any drawing objects we don't need for this particular signal
-        if not position_light:
-            canvas.itemconfigure(but2win,state='hidden')
-            canvas.itemconfigure(poslight1,state='hidden')
-            canvas.itemconfigure(poslight2,state='hidden')
-        if not mainfeather: canvas.itemconfigure(main,state='hidden')
-        if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')
-        if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
-        if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
-        if not rhfeather90: canvas.itemconfigure(rhf90,state='hidden')
-        if not sig_passed_button: canvas.itemconfigure(but3win,state='hidden')
-        if not approach_release_button: canvas.itemconfigure(but4win,state='hidden')
-        
-        # Set the initial state of the signal depending on whether its fully automatic or not
-        # Fully automatic signals are set to OFF to display their "clear" aspect
-        # Manual signals are set to ON and display their "danger/caution aspect)
-        # We also disable the signal button for fully automatic signals
-        if fully_automatic:
-            button1.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
-            signal_clear = True
-        else:
-            signal_clear = False
-                
         # Set the "Override" Aspect - this is the default aspect that will be displayed
         # by the signal when it is overridden - This will be RED apart from 2 aspect
         # Distant signals where it will be YELLOW
@@ -337,48 +290,47 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         else:
             override_aspect = aspect_type.RED
 
-        # Compile a dictionary of everything we need to track for the signal
-        # Note that setting a "displayedaspect" of RED is valid for all 2 aspects
+        # Create all of the signal elements common to all signal types
+        signals_common.create_common_signal_elements (canvas, sig_id, x, y,
+                                       signal_type = signals_common.sig_type.colour_light,
+                                       sig_callback = signal_button_event,
+                                       sub_callback = subsidary_button_event,
+                                       passed_callback = sig_passed_button_event,
+                                       ext_callback = sig_callback,
+                                       orientation = orientation,
+                                       subsidary = position_light,
+                                       sig_passed_button = sig_passed_button,
+                                       automatic = fully_automatic)
+
+        # Add all of the signal-specific elements we need to manage colour light signal types
+        # Note that setting a "displayedaspect" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
-        # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
-        
-        new_signal = {"canvas" : canvas,                           # MANDATORY - canvas object
-                      "sigtype" : signals_common.sig_type.colour_light,   # MANDATORY - The type of the signal 
-                      "sigclear" : signal_clear,                   # MANDATORY - The Internal state of the signal
-                      "automatic" : fully_automatic,               # MANDATORY - Whether the signal has manual control
-                      "subclear" : False,                          # MANDATORY - Internal state of Subsidary Signal
-                      "override" : False,                          # MANDATORY - Internal "Override" State
-                      "siglocked" : False,                         # MANDATORY - Current state of signal interlocking 
-                      "sublocked" : False,                         # MANDATORY - Current state of subsidary interlocking
-                      "sigbutton" : button1,                       # MANDATORY - Button Drawing object (main Signal)
-                      "subbutton" : button2,                       # MANDATORY - Button drawing object (subsidary signal)
-                      "releaseonred" : False,                      # SHARED - State of the "Approach Release for the signal
-                      "releaseonyel" : False,                      # SHARED - State of the "Approach Release for the signal
-                      "routeset" : signals_common.route_type.NONE, # SHARED - Initial Route setting to display (none)
-                      "theatretext" : "NONE",                      # SHARED - Initial Route setting to display (none)
-                      "passedbutton" : button3,                    # SHARED - Button drawing object
-                      "releasebutton" : button4,                   # SHARED - Button drawing object
-                      "theatre" : theatre,                         # SHARED - Text drawing object
-                      "displayedaspect" : aspect_type.NOTSET,     # Type-specific - Signal aspect to display
-                      "overriddenaspect" : override_aspect,        # Type-specific - The 'Overridden' aspect
-                      "externalcallback" : sig_callback,           # Type-specific - Callback for timed signal events
-                      "subtype" : signal_subtype ,                 # Type-specific - subtype of the signal
-                      "refresh" : refresh_immediately,             # Type-specific - controls when aspects are updated
-                      "grn" : grn,                                 # Type-specific - drawing object
-                      "yel" : yel,                                 # Type-specific - drawing object
-                      "red" : red,                                 # Type-specific - drawing object
-                      "yel2" : yel2,                               # Type-specific - drawing object
-                      "pos1" : poslight1,                          # Type-specific - drawing object
-                      "pos2" : poslight2,                          # Type-specific - drawing object
-                      "mainf": main,                               # Type-specific - drawing object
-                      "lhf45": lhf45,                              # Type-specific - drawing object
-                      "lhf90": lhf90,                              # Type-specific - drawing object
-                      "rhf45": rhf45,                              # Type-specific - drawing object
-                      "rhf90": rhf90 }                             # Type-specific - drawing object
-        
-        # Add the new signal to the dictionary of signals
-        signals_common.signals[str(sig_id)] = new_signal
+        signals_common.signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
+        signals_common.signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
+        signals_common.signals[str(sig_id)]["routeset"] = signals_common.route_type.NONE # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["theatretext"] = "NONE"                      # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["releasebutton"] = button4                   # SHARED - Button drawing object
+        signals_common.signals[str(sig_id)]["theatre"] = theatre                         # SHARED - TkInter Text drawing object
+        signals_common.signals[str(sig_id)]["displayedaspect"] = aspect_type.NOTSET      # Type-specific - Signal aspect to display
+        signals_common.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
+        signals_common.signals[str(sig_id)]["subtype"] = signal_subtype                  # Type-specific - subtype of the signal
+        signals_common.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
+        signals_common.signals[str(sig_id)]["grn"] = grn                                 # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["yel"] = yel                                 # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["red"] = red                                 # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["yel2"] = yel2                               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["pos1"] = poslight1                          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["pos2"] = poslight2                          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainf"] = main                              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhf45"] = lhf45                             # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lhf90"] = lhf90                             # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhf45"] = rhf45                             # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rhf90"] = rhf90                             # Type-specific - drawing object
+
+        # If the signal is fully automatic themn toggle to OFF to display a "clear" aspect
+        # Manual signals remain set to ON to display their "danger/caution aspect
+        if fully_automatic: signals_common.toggle_signal(sig_id)
         # Update the signal aspects to reflect the initial state. This will
         # also send the DCC commands to put the DCC signal into the initial state
         update_colour_light_signal_aspect (sig_id)
@@ -386,7 +338,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # also send the DCC commands to put the DCC signal into the initial state
         if position_light:update_colour_light_subsidary_signal (sig_id)
         # If there are route indicators we also need to ensure we send the appropriate
-        # DCC commands to set the these into a known state (always off)
+        # DCC commands to set the these into a known state (always off) as no route
+        # for the signal has yet been configured
         if theatre_route_indicator: dcc_control.update_dcc_signal_theatre (sig_id,"#")
         if mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90:
             dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE)
@@ -641,7 +594,7 @@ flash_aspects.start()
 # updating the signal drawing objects associated with each aspect
 # -------------------------------------------------------------------------
 
-def refresh_signal_aspects (sig_id):
+def refresh_signal_aspects (sig_id:int):
 
     if signals_common.signals[str(sig_id)]["displayedaspect"] == aspect_type.RED:
         # Change the signal to display the RED aspect
@@ -697,7 +650,7 @@ def refresh_signal_aspects (sig_id):
 # already been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_colour_light_route_indication (sig_id,
+def update_colour_light_route_indication (sig_id:int,
             route_to_set:signals_common.route_type = signals_common.route_type.NONE,
                                           theatre_text:str ="NONE"):
     global logging
@@ -743,7 +696,7 @@ def update_colour_light_route_indication (sig_id,
 # (if not then the objects are hidden' and the function will have no effect)
 # -------------------------------------------------------------------------
 
-def refresh_feather_route_indication (sig_id):
+def refresh_feather_route_indication (sig_id:int):
     
     global logging
 
@@ -806,7 +759,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
             update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         # Sleep until the next aspect change is due
         time.sleep (time_delay) 
         # Cycle through the aspects if its a 3 or 4 aspect signal
@@ -816,7 +769,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay) 
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
@@ -825,7 +778,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
             # Sleep until the next aspect change is due
             time.sleep (time_delay)              
         # We've finished - so clear the override on the signal
@@ -841,7 +794,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
         update_colour_light_signal_aspect(sig_id)
-        signals_common.signals[str(sig_id)]["externalcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
 
         return ()
     
