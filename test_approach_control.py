@@ -90,7 +90,7 @@ def main_callback_function(item_id,callback_type):
         else:
             clear_signal_override(I)
     if (point_switched(1) and section_occupied(5)) or (not point_switched(1) and section_occupied(4)):
-          set_signal_override(4)
+        set_signal_override(4)
     else:
         clear_signal_override(4)
     if (point_switched(11) and section_occupied(15)) or (not point_switched(11) and section_occupied(14)):
@@ -155,13 +155,13 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
 
     if ((callback_type == point_callback_type.point_switched and item_id==1 and point_switched(1)) or
-        (callback_type == sig_callback_type.sig_passed and item_id==4)):
+          (callback_type == sig_callback_type.sig_passed and item_id==4 and point_switched(1)) ):
         set_approach_control (4,release_on_yellow=True)
     if callback_type == point_callback_type.point_switched and item_id==1 and not point_switched(1):
         clear_approach_control (4)
 
-    if ((callback_type == point_callback_type.point_switched and item_id==11 and point_switched(11)) or
-        (callback_type == sig_callback_type.sig_passed and item_id==14)):
+    if ( (callback_type == point_callback_type.point_switched and item_id==11 and point_switched(11)) or
+           (callback_type == sig_callback_type.sig_passed and item_id==14 and point_switched(11)) ):
         set_approach_control (14,release_on_yellow=False)
     if callback_type == point_callback_type.point_switched and item_id==11 and not point_switched(11):
         clear_approach_control (14)
@@ -176,7 +176,7 @@ def main_callback_function(item_id,callback_type):
 print ("Creating Window and Canvas")
 window = Tk()
 window.title("An example of using Approach Control")
-canvas = Canvas(window,height=600,width=1100)
+canvas = Canvas(window,height=600,width=1100,bg="grey85")
 canvas.pack()
 
 # Initialise the Pi-SPROG-3 and define the DCC mappings for the signals and points we are

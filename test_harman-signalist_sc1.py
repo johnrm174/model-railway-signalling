@@ -235,7 +235,7 @@ print ("Creating Window and drawing canvas")
 
 root_window = Tk()
 root_window.title("Test DCC Colour Light Signals")
-canvas = Canvas(root_window,height=400,width=1000)
+canvas = Canvas(root_window,height=400,width=1000,bg="grey85")
 canvas.pack()
 
 print ("Creating Buttons for the Test Functions")

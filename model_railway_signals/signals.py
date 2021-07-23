@@ -6,10 +6,24 @@
 #           - with or without a position light subsidary signal
 #           - with or without route indication feathers (maximum of 5)
 #           - with or without a theatre type route indicator
-#    Ground Position Light Signals
-#           - groud position light or shunt ahead position light
+#           - With or without a "Signal Passed" Button
+#           - With or without a "Approach Release" Button
+#           - Main signal manual or fully automatic
+#    Semaphore Signals - Home or Distant
+#           - with or without junction arms (RH and LH arms supported)
+#           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+#           - with or without a theatre type route indicator (for Home signals only)
+#           - With or without a "Signal Passed" Button
+#           - With or without a "Approach Release" Button
+#           - Main signal manual or fully automatic
+#     Ground Position Light Signals
+#           - normal groud position light or shunt ahead position light
 #           - either early or modern (post 1996) types
-# 
+#           - With or without a "Signal Passed" Button
+#     Ground Disc Signals
+#           - normal ground disc (red banner) or shunt ahead ground disc (yellow banner)
+#           - With or without a "Signal Passed" Button
+#
 # signal_sub_type (use when creating colour light signals):
 #   signal_sub_type.home         (2 aspect - Red/Green)
 #   signal_sub_type.distant      (2 aspect - Yellow/Green
@@ -17,13 +31,17 @@
 #   signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
 #   signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
-# route_type (use for specifying the route - thise equate to the route feathers):
+# route_type (use for specifying the route):
 #   route_type.NONE   (no route indication - i.e. not used)
 #   route_type.MAIN   (main route)
 #   route_type.LH1    (immediate left)
 #   route_type.LH2    (far left)
 #   route_type.RH1    (immediate right)
 #   route_type.RH2    (rar right)
+# These equate to the route feathers for colour light signals or the Sempahore junction "arm":
+#   RH1 or RH2 make the RH junction arm and RH subsidary arm "active"
+#   LH1 or LH2 make the LH junction arm and LH subsidary arm "active"
+#   MAIN or NONE make the "main" signal arm and the "main" subsidary arm "active"
 # 
 # sig_callback_type (tells the calling program what has triggered the callback):
 #     sig_callback_type.sig_switched (signal has been switched)
@@ -56,6 +74,26 @@
 #                 'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
 #                 depend on the signal ahead - Default True 
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
+#
+# create_semaphore_signal - Creates a Semaphore signal
+#   Mandatory Parameters:
+#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#   Optional Parameters:
+#       distant:bool - Set to True to create a Distant signal - False to create a Home signal - default False
+#       orientation:int - Orientation in degrees (0 or 180) - Default is zero
+#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#                           Note that the callback function returns (item_id, callback type)
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       approach_release_button:bool - Creates an "Approach Release" button - Default False
+#       subsidarymain:bool - To create a subsidary signal on the post under the "main" signal - default False
+#       subsidarylh1:bool - To create a LH gantry with a subsidary signal - default False
+#       subsidaryrh1:bool - To create a RH gantry with a subsidary signal - default False
+#       lhroute1:bool - To create a LH gantry with a main (junction) signal - default False
+#       rhroute1:bool - To create a RH gantry with a main (junction) signal - default False
+#       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
+#       fully_automatic:bool - Creates a signal without any manual controls - Default False
 # 
 # create_ground_position_signal - create a ground position light signal
 #   Mandatory Parameters:
@@ -69,8 +107,20 @@
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
 #       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
 #       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
-# 
-# set_route_ - Set (and change) the route indication (either feathers or theatre text)
+#
+# create_ground_disc_signal - Creates a ground disc type shunting signal
+#   Mandatory Parameters:
+#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#  Optional Parameters:
+#       orientation:int- Orientation in degrees (0 or 180) - Default is zero
+#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#                         Note that the callback function returns (item_id, callback type)
+#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
+#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default False (red banner)
+#
+# set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
@@ -97,6 +147,10 @@
 # unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
 # signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
+# 
+# signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
+# 
+# approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
 # 
 # subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
 # 
@@ -148,6 +202,8 @@
 from . import signals_common
 from . import signals_colour_lights
 from . import signals_ground_position
+from . import signals_ground_disc
+from . import signals_semaphores
 
 from tkinter import *
 import logging
@@ -192,6 +248,8 @@ def set_route (sig_id:int, route:signals_common.route_type = signals_common.rout
         # Call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_route_indication (sig_id,route,theatre_text)           
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.update_semaphore_route_indication (sig_id,route,theatre_text)
     return()
 
 # -------------------------------------------------------------------------
@@ -210,6 +268,46 @@ def signal_clear (sig_id:int):
         # get the signal state to return
         sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
     return (sig_clear)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the signal overide
+# -------------------------------------------------------------------------
+
+def signal_overridden (sig_id:int):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+        sig_overridden = False
+    else:
+        # get the signal state to return
+        sig_overridden = signals_common.signals[str(sig_id)]["override"]
+    return (sig_overridden)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the approach control
+# -------------------------------------------------------------------------
+
+def approach_control_set (sig_id:int):
+    
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+        approach_control_active = False
+    else:
+        # get the signal state to return - only supported for semaphores and colour_lights
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"]
+                                       or signals_common.signals[str(sig_id)]["releaseonyel"])
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"])
+        else:
+            approach_control_active = False
+    return (approach_control_active)
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
@@ -359,6 +457,10 @@ def set_signal_override (*sig_ids:int):
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                    signals_semaphores.update_semaphore_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+                    signals_ground_disc.update_ground_disc_signal (sig_id)
         return()
 
 # -------------------------------------------------------------------------
@@ -390,6 +492,10 @@ def clear_signal_override (*sig_ids:int):
                         signals_colour_lights.update_colour_light_signal_aspect(sig_id)
                 elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
                     signals_ground_position.update_ground_position_light_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                    signals_semaphores.update_semaphore_signal (sig_id)
+                elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+                    signals_ground_disc.update_ground_disc_signal (sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -419,6 +525,8 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
             # Call the signal type-specific functions to trigger the signal
             if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                 signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_semaphores.trigger_timed_semaphore_signal (sig_id,start_delay,time_delay)
     return()
 
 # -------------------------------------------------------------------------
@@ -440,6 +548,10 @@ def toggle_signal (sig_id:int):
             signals_colour_lights.toggle_colour_light_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_pos_light:
             signals_ground_position.toggle_ground_position_light_signal (sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.toggle_semaphore_signal(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+            signals_ground_disc.toggle_ground_disc_signal (sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -458,7 +570,9 @@ def toggle_subsidary (sig_id:int):
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.toggle_subsidary_signal(sig_id)
+            signals_colour_lights.toggle_colour_light_subsidary(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.toggle_semaphore_subsidary(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -477,6 +591,8 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.set_approach_control(sig_id,release_on_yellow)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.set_approach_control(sig_id,release_on_yellow)
     return()
 
 # -------------------------------------------------------------------------
@@ -495,6 +611,8 @@ def clear_approach_control (sig_id:int):
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.raise_approach_release_event (sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.raise_approach_release_event (sig_id)
     return()
 
 ##########################################################################################

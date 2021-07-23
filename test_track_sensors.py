@@ -34,7 +34,7 @@ print ("Creating Window and Canvas")
 
 window = Tk()
 window.title("Test Track Sensors")
-canvas = Canvas(window,height=300,width=300)
+canvas = Canvas(window,height=300,width=300,bg="grey85")
 canvas.pack()
 
 print ("Creating Track Sections")

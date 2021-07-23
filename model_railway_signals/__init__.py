@@ -14,7 +14,9 @@ from .signals_common import pulse_signal_passed_button
 from .signals_common import pulse_signal_release_button
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
+from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
+from .signals_ground_disc import create_ground_disc_signal
 from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
@@ -25,6 +27,8 @@ from .signals import unlock_subsidary
 from .signals import toggle_subsidary
 from .signals import signal_clear
 from .signals import subsidary_clear
+from .signals import signal_overridden
+from .signals import approach_control_set
 from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import set_approach_control
@@ -46,9 +50,10 @@ from .pi_sprog_interface import service_mode_write_cv
 from .pi_sprog_interface import request_dcc_power_on
 from .pi_sprog_interface import request_dcc_power_off
 
-from .dcc_control import dcc_signal_type
 from .dcc_control import map_dcc_signal
+from .dcc_control import map_semaphore_signal
 from .dcc_control import map_traintech_signal
+from .dcc_control import map_semaphore_signal
 from .dcc_control import map_dcc_point
 
 __all__ = [
@@ -69,7 +74,9 @@ __all__ = [
         'sig_callback_type',
       # Public signal functions
         'create_colour_light_signal',
+        'create_semaphore_signal',
         'create_ground_position_signal',
+        'create_ground_disc_signal',
         'set_route',
         'update_signal',
         'lock_signal',
@@ -80,6 +87,8 @@ __all__ = [
         'toggle_subsidary',
         'signal_clear',
         'subsidary_clear',
+        'signal_overridden',
+        'approach_control_set',
         'set_signal_override',
         'clear_signal_override',
         'set_approach_control',
@@ -99,8 +108,6 @@ __all__ = [
       # public track_sensor functions
         'create_track_sensor',
         'track_sensor_active',
-      # Public DCC control types
-        'dcc_signal_type',
       # Public DCC control functions
         'initialise_pi_sprog',
         'service_mode_write_cv',
@@ -108,6 +115,7 @@ __all__ = [
         'request_dcc_power_off',
         'map_dcc_signal',
         'map_traintech_signal',
+        'map_semaphore_signal',
         'map_dcc_point'
            ]
 

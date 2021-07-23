@@ -73,47 +73,59 @@ def main_callback_function(item_id,callback_type):
     # allow for manual setting/resetting the track occupancy sections
     #--------------------------------------------------------------
     
-    if section_occupied(1):
-        set_signal_override(1)
-    else:
-        clear_signal_override(1)
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
         set_signal_override(2)
+        set_signal_override(1)
+    elif section_occupied(1):
+        clear_signal_override(2)
+        set_signal_override(1)
     else:
         clear_signal_override(2)
+        clear_signal_override(1)
+
     if section_occupied(4):
         set_signal_override(3)
         set_signal_override(4)
     else:
         clear_signal_override(3)
         clear_signal_override(4)
-
+    
     #--------------------------------------------------------------
-    # Refresh the signal aspects based on the route settings
-    # The order is important - Need to work back along the route
+    # Update the route based on the point settings 
     #--------------------------------------------------------------
-    update_signal(3, sig_ahead_id=5)
-    update_signal(4, sig_ahead_id=5)
     
     if point_switched(1):
+        set_route(1,route=route_type.LH1)
         set_route(2,route=route_type.LH1)
-        update_signal(2,sig_ahead_id=3)
     else:
+        set_route(1,route=route_type.MAIN)
         set_route(2,route=route_type.MAIN)
-        update_signal(2,sig_ahead_id=4)
 
-    update_signal(1, sig_ahead_id=2)
-    
     #-------------------------------------------------------------- 
     # Process the signal/point interlocking
     #--------------------------------------------------------------
     
+    # Signal 1 is locked (at danger) if the signal 1 is at Danger and Signal 2 is at Danger
+    # We do it this way as nothing should prevent signals from being returned to Danger
+    if not signal_clear(1) and not signal_clear(2):
+        lock_signal(1)
+    else:
+        unlock_signal(1)
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
+    # There is only a subsidary arm for the LH divergent route so we also need to
+    # lock the subsidary signal if point 1 is set for the main route
     if not fpl_active(1):
         lock_signal(2)
-    else:
+        lock_subsidary(2)
+    elif not point_switched(1):
         unlock_signal(2)
+        lock_subsidary(2)
+    else:
+        if subsidary_clear(2): lock_signal(2)
+        else: unlock_signal(2)
+        if signal_clear(2): lock_subsidary(2)
+        else: unlock_subsidary(2)
     # Signal 3 is locked (at danger) if point 2 is set against it 
     if not point_switched(2):
         lock_signal(3)
@@ -124,8 +136,8 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if signal 2 is set to clear
-    if signal_clear(2):
+    # Point 1 is locked if signal 1, signal 2 (or its subsidary) is set to clear
+    if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
         lock_point(1)
     else:
         unlock_point(1)
@@ -144,7 +156,7 @@ def main_callback_function(item_id,callback_type):
 # Create the Window and canvas
 print ("Creating Window and Canvas")
 window = Tk()
-window.title("Simple Interlocking Example")
+window.title("Simple Interlocking Example - with Semaphores")
 canvas = Canvas(window,height=400,width=1000,bg="grey85")
 canvas.pack()
 
@@ -153,41 +165,16 @@ canvas.pack()
 # the software will still work albeit without sending any DCC Commands to the Pi-SPROG)
 # Mappings should be created first so that when the signals and points are created then
 # the appropriate DCC bus commands will be sent to set the initial aspects correctly
-
 print ("Initialising Pi Sprog and creating DCC Mappings")
 initialise_pi_sprog (dcc_debug_mode=debug_dcc)
 request_dcc_power_on()
 
-# Signal 2 assumes a Signalist SC1 decoder with a base address of 1 (CV1=5)
-# and set to "8 individual output" Mode (CV38=8). In this example we are using
-# outputs A,B,C,D to drive our signal with E & F driving the feather indications
-# The Signallist SC1 uses 8 consecutive addresses in total (which equate to DCC
-# addresses 1 to 8 for this example) - but we only need to use the first 6
-map_dcc_signal (sig_id = 2,
-                danger = [[1,True],[2,False],[3,False],[4,False]],
-                proceed = [[1,False],[2,True],[3,False],[4,False]],
-                caution = [[1,False],[2,False],[3,True],[4,False]],
-                prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                LH1 = [[5,True],[6,False]], MAIN = [[6,True],[5,False]], NONE = [[5,False],[6,False]] )
-
-# Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
-# and can take up to 4 consecutive addresses (if you include the flashing aspects)
-
-# Signal 1 (addresses 22,23,24,25) - uses the simplified traintech signal mapping function
-map_traintech_signal (sig_id = 1, base_address = 22)
-# Signal 3 (addresses 9,10,11,12) - uses the simplified traintech signal mapping function
-map_traintech_signal (sig_id = 3, base_address = 9)
-# Signal 4 (addresses 13,14,15,16) - uses the simplified traintech signal mapping function
-map_traintech_signal (sig_id = 4, base_address = 13)
-
-# Signal 5 (addresses 17,18,19,20) shows you how a TrainTech signal mapping is configured "under the hood"
-# note that if it had a route indication you should also include 'auto_route_inhibit = True' as TrainTech
-# signals automatically inhibit the feather when the signal is set to DANGER
-map_dcc_signal (sig_id = 5,
-                danger = [[17,False]],
-                proceed = [[17,True]],
-                caution = [[18,True]],
-                prelim_caution = [[18,False]])
+# Simple mapping of the main signal to a single DCC address
+map_semaphore_signal (sig_id = 1, main_signal = 1 , left_signal = 10 )
+map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 11 , left_subsidary = 12)
+map_semaphore_signal (sig_id = 3, main_signal = 3 )
+map_semaphore_signal (sig_id = 4, main_signal = 4 )
+map_semaphore_signal (sig_id = 5, main_signal = 5 )
 
 # Points are simply mapped to single addresses
 map_dcc_point (1, 100)
@@ -222,33 +209,24 @@ create_section(canvas,4,800,200,section_callback=main_callback_function)
 # The "callback" is the name of the function (above) that will be called when something has changed
 # Signal 2 is the signal just before the point - so it needs a route indication
 print ("Creating Signals")
-create_colour_light_signal (canvas,1,50,200,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False)
-create_colour_light_signal (canvas,2,275,200,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False,
-                            lhfeather45=True,
-                            mainfeather=True)
-create_colour_light_signal (canvas,3,600,150,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False)
-create_colour_light_signal (canvas,4,600,200,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            sig_passed_button = True,
-                            refresh_immediately = False)
-create_colour_light_signal (canvas,5,900,200,
-                            signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            fully_automatic=True,
-                            sig_passed_button=True)
+create_semaphore_signal (canvas,1,50,200,distant = True,
+                         sig_callback=main_callback_function,
+                         lhroute1 = True,
+                         sig_passed_button = True)
+create_semaphore_signal (canvas,2,275,200,
+                         sig_callback=main_callback_function,
+                         subsidarylh1 = True,
+                         lhroute1 = True,
+                         sig_passed_button = True)
+create_semaphore_signal (canvas,3,600,150,
+                         sig_callback=main_callback_function,
+                         sig_passed_button = True)
+create_semaphore_signal (canvas,4,600,200,
+                         sig_callback=main_callback_function,
+                         sig_passed_button = True)
+create_semaphore_signal (canvas,5,900,200,
+                         sig_callback=main_callback_function,
+                         sig_passed_button=True)
 
 # Map external track sensors for the signals - For simplicity, we'll give them the same ID as the signal
 print ("Creating external Track Sensor Mappings")
@@ -270,8 +248,11 @@ create_track_sensor (5, gpio_channel = 8,
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Route and Interlocking")
+lock_signal(1)
 lock_signal(3)
+lock_subsidary(2)
 set_route (2,route_type.MAIN)
+set_route (1,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
