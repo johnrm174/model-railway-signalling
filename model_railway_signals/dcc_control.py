@@ -76,25 +76,11 @@
 #
 #----------------------------------------------------------------------
 
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-
-#import signals_common
-#import pi_sprog_interface
 from . import signals_common
 from . import pi_sprog_interface
 
 import enum
 import logging
-    
-# The Possible states for a main signal
-class signal_state_type(enum.Enum):
-    danger = 1
-    proceed = 2
-    caution = 3
-    prelim_caution = 4
-    flash_caution = 5
-    flash_prelim_caution = 6
     
 # Define empty dictionaries for the mappings and dcc addresses
 dcc_signal_mappings:dict = {}
@@ -188,12 +174,12 @@ def map_dcc_signal (sig_id:int,
             # signal DCC mapping for a semaphore signal - or vice versa
             new_dcc_mapping = {
                 "auto_route_inhibit" : auto_route_inhibit,                          # Mandatory for all signal types
-                str(signal_state_type.danger)         :       danger,               # Specific to Colour Light Signal Mappings
-                str(signal_state_type.proceed)        :       proceed,              # Specific to Colour Light Signal Mappings
-                str(signal_state_type.caution)        :       caution,              # Specific to Colour Light Signal Mappings
-                str(signal_state_type.prelim_caution) :       prelim_caution,       # Specific to Colour Light Signal Mappings
-                str(signal_state_type.flash_caution)  :       flash_caution,        # Specific to Colour Light Signal Mappings
-                str(signal_state_type.flash_prelim_caution) : flash_prelim_caution, # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.danger)         :       danger,               # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.proceed)        :       proceed,              # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.caution)        :       caution,              # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.prelim_caution) :       prelim_caution,       # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.flash_caution)  :       flash_caution,        # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.flash_prelim_caution) : flash_prelim_caution, # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.LH1)    :       LH1,                  # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.LH2)    :       LH2,                  # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.RH1)    :       RH1,                  # Specific to Colour Light Signal Mappings
@@ -244,12 +230,12 @@ def map_traintech_signal (sig_id:int,
         # signal DCC mapping for a semaphore signal - or vice versa
         new_dcc_mapping = {
                 "auto_route_inhibit" : True,                                            # Mandatory for all signal types
-                str(signal_state_type.danger)         :       [[base_address,False]],   # Specific to Colour Light Signal Mappings
-                str(signal_state_type.proceed)        :       [[base_address,True]],    # Specific to Colour Light Signal Mappings
-                str(signal_state_type.caution)        :       [[base_address+1,True]],  # Specific to Colour Light Signal Mappings
-                str(signal_state_type.prelim_caution) :       [[base_address+1,False]], # Specific to Colour Light Signal Mappings
-                str(signal_state_type.flash_caution)  :       [[base_address+3,True]],  # Specific to Colour Light Signal Mappings
-                str(signal_state_type.flash_prelim_caution) : [[base_address+3,False]], # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.danger)         :       [[base_address,False]],   # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.proceed)        :       [[base_address,True]],    # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.caution)        :       [[base_address+1,True]],  # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.prelim_caution) :       [[base_address+1,False]], # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.flash_caution)  :       [[base_address+3,True]],  # Specific to Colour Light Signal Mappings
+                str(signals_common.signal_state_type.flash_prelim_caution) : [[base_address+3,False]], # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.LH1)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.LH2)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
                 str(signals_common.route_type.RH1)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
@@ -329,12 +315,12 @@ def map_semaphore_signal (sig_id:int,
             # signal DCC mapping for a semaphore signal - or vice versa
             new_dcc_mapping = {
                     "auto_route_inhibit" : False,                                   # Mandatory for all signal types
-                    str(signal_state_type.danger)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signal_state_type.proceed)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signal_state_type.caution)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signal_state_type.prelim_caution) :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signal_state_type.flash_caution)  :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signal_state_type.flash_prelim_caution) : [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.danger)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.proceed)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.caution)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.prelim_caution) :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.flash_caution)  :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.flash_prelim_caution) : [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.LH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.LH2)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.RH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
@@ -403,7 +389,7 @@ def update_dcc_point(point_id:int, state:bool):
 # Function to send the appropriate DCC commands to set the state of a DCC Signal
 #------------------------------------------------------------------------------------------
 
-def update_dcc_signal_aspects(sig_id: int, state: signal_state_type):
+def update_dcc_signal_aspects(sig_id: int, state: signals_common.signal_state_type):
     
     global logging
     

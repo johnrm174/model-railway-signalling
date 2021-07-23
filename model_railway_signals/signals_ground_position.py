@@ -129,40 +129,43 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 def update_ground_position_light_signal (sig_id:int):
 
     global logging
-
-    # Only set the signal to its clear aspect if not overriden
-    if signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]:
+    
+    if (signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]
+         and signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.proceed):
+        # Signal is set to OFF, not overridden and is not already displaying a state of "Proceed" - we need to change it
         logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/WHITE")
         # indication is the same whether its a shunt ahead or a normal position light and whether its modern or pre-1996
         signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="white")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.proceed)
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
+        dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.proceed)
 
-    elif signals_common.signals[str(sig_id)]["shuntahead"]:
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="gold")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
-        # The "root" position light is also yellow for modern signals (pre-1996 its white)
-        if signals_common.signals[str(sig_id)]["moderntype"]:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to YELLOW/YELLOW")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="gold")
+    elif signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
+        # Signal is ON or Overidden, and is not already displaying a state of "Danger" - we need to change it
+        if signals_common.signals[str(sig_id)]["shuntahead"]:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="gold")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
+            # The "root" position light is also yellow for modern signals (pre-1996 its white)
+            if signals_common.signals[str(sig_id)]["moderntype"]:
+                logging.info ("Signal "+str(sig_id)+": Changing aspect to YELLOW/YELLOW")
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="gold")
+            else:
+                logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/YELLOW")
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
         else:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/YELLOW")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
-        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.danger)
-
-    else:
-        # signal is a normal ground position light signal - Aspect to display is Red
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="red")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
-        # The "root" pos light is also red for modern signals (pre-1996 its white)
-        if signals_common.signals[str(sig_id)]["moderntype"]:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to RED/RED")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="red")
-        else:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/RED")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
-        dcc_control.update_dcc_signal_aspects(sig_id, dcc_control.signal_state_type.danger)
+            # signal is a normal ground position light signal - Aspect to display is Red
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="red")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
+            # The "root" pos light is also red for modern signals (pre-1996 its white)
+            if signals_common.signals[str(sig_id)]["moderntype"]:
+                logging.info ("Signal "+str(sig_id)+": Changing aspect to RED/RED")
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="red")
+            else:
+                logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/RED")
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
+        dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.danger)
 
     return ()
 

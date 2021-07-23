@@ -38,6 +38,20 @@ class sig_callback_type(enum.Enum):
     sig_updated = 4    # The signal aspect has been changed/updated via an override
     sig_released = 5   # The signal has been "released" on the approach of a train
 
+# -------------------------------------------------------------------------
+# Global Classes used internally when creating/updating signals or 
+# processing button change events - Will apply to more that one signal type
+# -------------------------------------------------------------------------
+
+# The Possible states for a main signal
+class signal_state_type(enum.Enum):
+    danger = 1
+    proceed = 2
+    caution = 3
+    prelim_caution = 4
+    flash_caution = 5
+    flash_prelim_caution = 6
+
 # Define the main signal types that can be created
 class sig_type(enum.Enum):
     colour_light = 1
@@ -198,18 +212,19 @@ def create_common_signal_elements (canvas,
         sig_button.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
-    signals[str(sig_id)]["canvas"]       = canvas              # MANDATORY - canvas object
-    signals[str(sig_id)]["automatic"]    = automatic           # MANDATORY - Whether the signal has manual control
-    signals[str(sig_id)]["sigtype"]      = signal_type         # MANDATORY - The type of the signal 
-    signals[str(sig_id)]["sigclear"]     = False               # MANDATORY - The Internal state of the signal
-    signals[str(sig_id)]["subclear"]     = False               # MANDATORY - Internal state of Subsidary Signal
-    signals[str(sig_id)]["override"]     = False               # MANDATORY - Internal "Override" State
-    signals[str(sig_id)]["siglocked"]    = False               # MANDATORY - Current state of signal interlocking 
-    signals[str(sig_id)]["sublocked"]    = False               # MANDATORY - Current state of subsidary interlocking
-    signals[str(sig_id)]["sigbutton"]    = sig_button          # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["subbutton"]    = sub_button          # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["passedbutton"] = passed_button       # MANDATORY - Button drawing object (subsidary signal)
-    signals[str(sig_id)]["extcallback"]  = ext_callback        # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["canvas"]       = canvas                   # MANDATORY - canvas object
+    signals[str(sig_id)]["automatic"]    = automatic                # MANDATORY - True = signal is fully automatic 
+    signals[str(sig_id)]["sigtype"]      = signal_type              # MANDATORY - Type of the signal
+    signals[str(sig_id)]["sigstate"]     = None                     # MANDATORY - Displayed 'state' of the signal    
+    signals[str(sig_id)]["sigclear"]     = False                    # MANDATORY - State of the main signal control (ON/OFF)
+    signals[str(sig_id)]["subclear"]     = False                    # MANDATORY - State of the subsidary sgnal control (ON/OFF)
+    signals[str(sig_id)]["override"]     = False                    # MANDATORY - Signal is "Overridden" (overrides main signal control)
+    signals[str(sig_id)]["siglocked"]    = False                    # MANDATORY - State of signal interlocking 
+    signals[str(sig_id)]["sublocked"]    = False                    # MANDATORY - State of subsidary interlocking
+    signals[str(sig_id)]["sigbutton"]    = sig_button               # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["subbutton"]    = sub_button               # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["passedbutton"] = passed_button            # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["extcallback"]  = ext_callback             # MANDATORY - The External Callback to use for the signal
     
     return()
 #################################################################################################

@@ -453,9 +453,10 @@ def update_semaphore_signal (sig_id:int):
     
     if (signals_common.signals[str(sig_id)]["sigclear"]
             and not signals_common.signals[str(sig_id)]["releaseonred"]
-            and not signals_common.signals[str(sig_id)]["override"]):
-        # Deal with the cases where a route is set that the signal does not support
-        # in this case, the sensible thing to do is to change the main signal arm
+                and not signals_common.signals[str(sig_id)]["override"] ):
+        # Signal is OFF and not Overidden. We don't check the displayed state of the signal before deciding whether
+        # it needsto be changed or not as the individual functions to update each arm will implement that logic
+        # First deal with the case of a route  that the signal does not support - we change the main signal arm instead
         if ( (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2)
                 and signals_common.signals[str(sig_id)]["lhroute1"] is None ) or
              (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2)
@@ -476,6 +477,9 @@ def update_semaphore_signal (sig_id:int):
             if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,False)
             if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
             if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,True)
+        # Set the internal signal state to reflect the displayed aspect
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
+
         # We only need to enable the route display if the route display is currently disabled
         # All changes to the indication are made in the update_semaphore_route_indication function
         if not signals_common.signals[str(sig_id)]["theatreenabled"] and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
@@ -486,10 +490,19 @@ def update_semaphore_signal (sig_id:int):
             signals_common.signals[str(sig_id)]["theatreenabled"] = True
             dcc_control.update_dcc_signal_theatre(sig_id,signals_common.signals[str(sig_id)]["theatretext"],
                                                               signal_change=True,sig_at_danger=False)
-    else: 
+            
+    else:
+        # Signal is ON or Overidden. We don't check the displayed state of the signal before deciding whether
+        # it needsto be changed or not as the individual functions to update each arm will implement that logic
         if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,False)
         if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
         if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
+        # Set the internal signal state to reflect the displayed aspect
+        if signals_common.signals[str(sig_id)]["distant"]:
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.caution
+        else:
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
+
         # We only need to disable the route display if the route display is currently enabled
         if signals_common.signals[str(sig_id)]["theatreenabled"] and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
             logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route display (signal is at DANGER)")

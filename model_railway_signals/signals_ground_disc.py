@@ -117,19 +117,22 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
 
 def update_ground_disc_signal (sig_id:int):
     global logging
-    # Only set the signal to its clear aspect if not overriden
-    if signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]:            
+    if (signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]
+         and signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.proceed):
+        # Signal is ON or Overidden, and is not already displaying a state of "Danger" - we need to change it
         logging.info ("Signal "+str(sig_id)+": Changing aspect to CLEAR")
         signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='normal')
         signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='hidden')    
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
         dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
-    else:
+    elif signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
         if signals_common.signals[str(sig_id)]["shuntahead"]:
             logging.info ("Signal "+str(sig_id)+": Changing aspect to SHUNT AHEAD")
         else:
             logging.info ("Signal "+str(sig_id)+": Changing aspect to DANGER")
         signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='hidden')
         signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
         dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
     return ()
 
