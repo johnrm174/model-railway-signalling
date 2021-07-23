@@ -405,8 +405,17 @@ def update_semaphore_subsidary (sig_id:int):
     
     global logging
     if signals_common.signals[str(sig_id)]["subclear"]:
-        # Subsidary is Clear - we need to correctly set the subsidary arms that were created
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
+        # Deal with the cases where a route is set that the signal does not support
+        # in this case, the sensible thing to do is to change the main subsidary arm
+        if ( (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2)
+                and signals_common.signals[str(sig_id)]["subsidarylh1"] is None ) or
+             (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2)
+                and signals_common.signals[str(sig_id)]["subsidaryrh1"] is None ) ):
+            if signals_common.signals[str(sig_id)]["subsidarymain"] is not None: update_main_subsidary(sig_id,True)
+            if signals_common.signals[str(sig_id)]["subsidarylh1"] is not None: update_lh_subsidary(sig_id,False)
+            if signals_common.signals[str(sig_id)]["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,False)
+            # Subsidary is Clear - we need to correctly set the subsidary arms that were created
+        elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
             if signals_common.signals[str(sig_id)]["subsidarymain"] is not None: update_main_subsidary(sig_id,True)
             if signals_common.signals[str(sig_id)]["subsidarylh1"] is not None: update_lh_subsidary(sig_id,False)
             if signals_common.signals[str(sig_id)]["subsidaryrh1"] is not None: update_rh_subsidary(sig_id,False)
@@ -490,13 +499,20 @@ def update_semaphore_signal (sig_id:int):
     # This is where the function code begins
     #---------------------------------------
     
-    # Initially set the "signal has changed" flags to False
-    change1, change2, change3 = False, False, False,
     if (signals_common.signals[str(sig_id)]["sigclear"]
             and not signals_common.signals[str(sig_id)]["releaseonred"]
             and not signals_common.signals[str(sig_id)]["override"]):
+        # Deal with the cases where a route is set that the signal does not support
+        # in this case, the sensible thing to do is to change the main signal arm
+        if ( (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.LH1,signals_common.route_type.LH2)
+                and signals_common.signals[str(sig_id)]["lhroute1"] is None ) or
+             (signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.RH1,signals_common.route_type.RH2)
+                and signals_common.signals[str(sig_id)]["rhroute1"] is None ) ):
+            if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,True)
+            if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
+            if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
         # Signal is Clear - we need to correctly set the signal arms that were created
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
+        elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
             if signals_common.signals[str(sig_id)]["mainroute"] is not None: update_main_signal(sig_id,True)
             if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
             if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
