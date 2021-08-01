@@ -45,12 +45,12 @@ class sig_callback_type(enum.Enum):
 
 # The Possible states for a main signal
 class signal_state_type(enum.Enum):
-    danger = 1
-    proceed = 2
-    caution = 3
-    prelim_caution = 4
-    flash_caution = 5
-    flash_prelim_caution = 6
+    DANGER = 1
+    PROCEED = 2
+    CAUTION = 3
+    PRELIM_CAUTION = 4
+    FLASH_CAUTION = 5
+    FLASH_PRELIM_CAUTION = 6
 
 # Define the main signal types that can be created
 class sig_type(enum.Enum):

@@ -93,11 +93,20 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         point_coords5 = common.rotate_point (x,y,+5,-5,orientation) 
         points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
         canvas.create_polygon (points, outline="black")
-        # Draw the position lights - we'll set the initial aspect later
-        posroot = canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill="grey",outline="black")
-        posoff = canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="grey",outline="black")
-        poson = canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill="grey",outline="black")
-        
+        # Create the position light "off" aspects (i.e. not-lit)
+        canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill="grey",outline="black")
+        canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="grey",outline="black")
+        canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill="grey",outline="black")
+        # Draw the "DANGER" and "PROCEED" aspects (initially hidden
+        if shunt_ahead: danger_colour = "gold"
+        else: danger_colour = "red"
+        if modern_type: root_colour = danger_colour
+        else: root_colour = "white"
+        sigoff1 = canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill="white",outline="black",state="hidden")
+        sigoff2 = canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="white",outline="black",state="hidden")
+        sigon1 = canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill=root_colour,outline="black",state="hidden")
+        sigon2 = canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill=danger_colour,outline="black",state="hidden")
+
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
                                        signal_type = signals_common.sig_type.ground_position,
@@ -108,11 +117,10 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                        orientation = orientation,
                                        sig_passed_button = sig_passed_button)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals_common.signals[str(sig_id)]["posroot"]    = posroot           # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["poson"]      = poson             # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["posoff"]     = posoff            # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["shuntahead"] = shunt_ahead       # Type-specific - defines subtype of signal
-        signals_common.signals[str(sig_id)]["moderntype"] = modern_type       # Type-specific - defines subtype of signal
+        signals_common.signals[str(sig_id)]["sigoff1"]  = sigoff1         # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigoff2"]  = sigoff2         # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigon1"]   = sigon1          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
         
         # Refresh the signal drawing objects to reflect the initial state
         update_ground_position_light_signal (sig_id)
@@ -130,42 +138,35 @@ def update_ground_position_light_signal (sig_id:int):
 
     global logging
     
-    if (signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]
-         and signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.proceed):
-        # Signal is set to OFF, not overridden and is not already displaying a state of "Proceed" - we need to change it
-        logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/WHITE")
-        # indication is the same whether its a shunt ahead or a normal position light and whether its modern or pre-1996
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="white")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="grey")
-        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
-        dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.proceed)
+    # Establish what the signal should be displaying based on the state
+    if not signals_common.signals[str(sig_id)]["sigclear"]:   
+        aspect_to_set = signals_common.signal_state_type.DANGER
+        log_message = " (signal is ON)"
+    elif signals_common.signals[str(sig_id)]["override"]:
+        aspect_to_set = signals_common.signal_state_type.DANGER
+        log_message = " (signal is OVERRIDDEN)"
+    else:
+        aspect_to_set = signals_common.signal_state_type.PROCEED
+        log_message = " (signal is OFF)"
+        
+    # Only refresh the signal if the aspect has been changed
+    if aspect_to_set != signals_common.signals[str(sig_id)]["sigstate"]:
+        logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
+        signals_common.signals[str(sig_id)]["sigstate"] = aspect_to_set
 
-    elif signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
-        # Signal is ON or Overidden, and is not already displaying a state of "Danger" - we need to change it
-        if signals_common.signals[str(sig_id)]["shuntahead"]:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="gold")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
-            # The "root" position light is also yellow for modern signals (pre-1996 its white)
-            if signals_common.signals[str(sig_id)]["moderntype"]:
-                logging.info ("Signal "+str(sig_id)+": Changing aspect to YELLOW/YELLOW")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="gold")
-            else:
-                logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/YELLOW")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
-        else:
-            # signal is a normal ground position light signal - Aspect to display is Red
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["poson"],fill="red")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posoff"],fill="grey")
-            # The "root" pos light is also red for modern signals (pre-1996 its white)
-            if signals_common.signals[str(sig_id)]["moderntype"]:
-                logging.info ("Signal "+str(sig_id)+": Changing aspect to RED/RED")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="red")
-            else:
-                logging.info ("Signal "+str(sig_id)+": Changing aspect to WHITE/RED")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["posroot"],fill="white")
-        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
-        dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.danger)
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="normal")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="normal")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="hidden")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="hidden")
+            dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.PROCEED)
+
+        elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="hidden")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="hidden")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="normal")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="normal")
+            dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.DANGER)
 
     return ()
 

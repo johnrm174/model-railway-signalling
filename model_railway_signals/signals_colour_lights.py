@@ -40,20 +40,6 @@ class signal_sub_type(enum.Enum):
     four_aspect = 5
 
 # -------------------------------------------------------------------------
-# Classes used internally when creating/updating colour light signals
-# -------------------------------------------------------------------------
-
-# Define the aspects applicable to colour light signals
-class aspect_type(enum.Enum):  
-    NOTSET = 0
-    RED = 1
-    YELLOW = 2
-    GREEN = 3
-    DOUBLE_YELLOW = 4
-    FLASHING_YELLOW = 5
-    FLASHING_DOUBLE_YELLOW = 6
-
-# -------------------------------------------------------------------------
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
@@ -286,9 +272,9 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # by the signal when it is overridden - This will be RED apart from 2 aspect
         # Distant signals where it will be YELLOW
         if signal_subtype == signal_sub_type.distant:
-            override_aspect = signals_common.signal_state_type.caution
+            override_aspect = signals_common.signal_state_type.CAUTION
         else:
-            override_aspect = signals_common.signal_state_type.danger
+            override_aspect = signals_common.signal_state_type.DANGER
 
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
@@ -394,10 +380,10 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # signal - in which case we want to set it to YELLOW
     if not signals_common.signals[str(sig_id)]["sigclear"]:
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
-            new_aspect = signals_common.signal_state_type.caution
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (signal is ON and 2-aspect distant)"
         else:
-            new_aspect = signals_common.signal_state_type.danger
+            new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (signal is ON)"
 
     # If signal is Overriden the set the signal to its overriden aspect
@@ -411,7 +397,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # Set to RED if the signal is subject to "Release on Red" approach control
     # We'll do this here as this could also apply to 2 aspect home or Red/Yellow
     elif signals_common.signals[str(sig_id)]["releaseonred"]:
-        new_aspect = signals_common.signal_state_type.danger
+        new_aspect = signals_common.signal_state_type.DANGER
         log_message = " (signal is OFF - but subject to \'release on red\' approach control)"
 
     # ---------------------------------------------------------------------------------
@@ -421,11 +407,11 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
     # we can ignore the signal ahead and set it to its "clear" aspect
     elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.home:
-        new_aspect = signals_common.signal_state_type.proceed
+        new_aspect = signals_common.signal_state_type.PROCEED
         log_message = " (signal is OFF and 2-aspect home)"
 
     elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.red_ylw:
-        new_aspect = signals_common.signal_state_type.caution
+        new_aspect = signals_common.signal_state_type.CAUTION
         log_message = " (signal is OFF and 2-aspect R/Y)"
         
     # ---------------------------------------------------------------------------------
@@ -434,7 +420,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 
     # Set to YELLOW if the signal is subject to "Release on YELLOW" approach control
     elif signals_common.signals[str(sig_id)]["releaseonyel"]:
-        new_aspect = signals_common.signal_state_type.caution
+        new_aspect = signals_common.signal_state_type.CAUTION
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
 
     # ---------------------------------------------------------------------------------
@@ -447,44 +433,44 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # to its "clear" aspect (this includes 2 aspect distant signals as well
     # as the remaining 3 and 4 aspect signals types)
     elif sig_ahead_id == 0:
-        new_aspect = signals_common.signal_state_type.proceed
+        new_aspect = signals_common.signal_state_type.PROCEED
         log_message = "\' (signal is OFF and no signal ahead specified)"
 
     else:
         # A valid signal ahead has been specified - we need to take it into account
-        if signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.danger:
+        if signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             # All remaining signal types (3/4 aspects and 2 aspect distants) should display YELLOW
-            new_aspect = signals_common.signal_state_type.caution
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'danger\')")
             
-        elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.caution:
+        elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
             if signals_common.signals[str(sig_ahead_id)]["releaseonyel"]:
                 # Signal ahead showing yellow but subject to "release on yellow" approach control
                 # All remaining types (3/4 aspects and 2 aspect distants) should display FLASHING YELLOW
-                new_aspect = signals_common.signal_state_type.flash_caution
+                new_aspect = signals_common.signal_state_type.FLASH_CAUTION
                 log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+
                                    " is subject to approach control (release on yellow)")
             elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
                 # 4 aspect signals should display a DOUBLE YELLOW aspect
-                new_aspect = signals_common.signal_state_type.prelim_caution
+                new_aspect = signals_common.signal_state_type.PRELIM_CAUTION
                 log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'caution\')")
             else:
                 # 3 aspect signals and 2 aspect distant signals should display GREEN
-                new_aspect = signals_common.signal_state_type.proceed
+                new_aspect = signals_common.signal_state_type.PROCEED
                 log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'caution\')")
                 
-        elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.flash_caution:
+        elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
             if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
                 # 4 aspect signals will display a FLASHING DOUBLE YELLOW aspect
-                new_aspect = signals_common.signal_state_type.flash_prelim_caution
+                new_aspect = signals_common.signal_state_type.FLASH_PRELIM_CAUTION
                 log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'flashing_caution\')")
             else:
                 # 3 aspect signals and 2 aspect distant signals should display GREEN
-                new_aspect = signals_common.signal_state_type.proceed
+                new_aspect = signals_common.signal_state_type.PROCEED
                 log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'proceed\')")
         else:
             # Aspect of the signal ahead must be green - has no effect on the signal we are updating
-            new_aspect = signals_common.signal_state_type.proceed
+            new_aspect = signals_common.signal_state_type.PROCEED
             log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'proceed\')")
 
     current_aspect = signals_common.signals[str(sig_id)]["sigstate"]
@@ -506,13 +492,13 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             # changes if we need to enable/disable the route display (i.e. if the signal
             # has transitioned either from RED or to RED.(This is OK as only signal types
             # with RED aspects can be created with feather or theatre route indications)
-            if current_aspect == signals_common.signal_state_type.danger:
+            if current_aspect == signals_common.signal_state_type.DANGER:
                 logging.info ("Signal "+str(sig_id)+": Enabling feather light route display for "
                       + str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
                 refresh_feather_route_indication (sig_id)
                 dcc_control.update_dcc_signal_route(sig_id,signals_common.signals[str(sig_id)]["routeset"],
                                                           signal_change=True,sig_at_danger=False)
-            elif new_aspect == signals_common.signal_state_type.danger:
+            elif new_aspect == signals_common.signal_state_type.DANGER:
                 logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route display (signal is at RED)")
                 refresh_feather_route_indication (sig_id)
                 # This is where we send the route type of "NONE" which should be mapped 
@@ -526,14 +512,14 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             # changes if we need to enable/disable the route display (i.e. if the signal
             # has transitioned either from RED or to RED.(This is OK as only signal types
             # with RED aspects can be created with feather or theatre route indications)
-            if current_aspect == signals_common.signal_state_type.danger:
+            if current_aspect == signals_common.signal_state_type.DANGER:
                 logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"
                                    + signals_common.signals[str(sig_id)]["theatretext"]+"\'")
                 signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
                                                                 text=signals_common.signals[str(sig_id)]["theatretext"])
                 dcc_control.update_dcc_signal_theatre(sig_id,signals_common.signals[str(sig_id)]["theatretext"],
                                                               signal_change=True,sig_at_danger=False)
-            elif new_aspect == signals_common.signal_state_type.danger:
+            elif new_aspect == signals_common.signal_state_type.DANGER:
                 logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route display (signal is at RED)")
                 signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],text="")
                 # This is where we send the special character "#"- which should be mapped 
@@ -553,17 +539,17 @@ def flash_aspects_thread():
     while True:
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.flash_caution:
+                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.flash_prelim_caution:
+                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
         time.sleep (0.25)
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.flash_caution:
+                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.flash_prelim_caution:
+                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
         time.sleep (0.25)
@@ -579,50 +565,50 @@ flash_aspects.start()
 
 def refresh_signal_aspects (sig_id:int):
 
-    if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.danger:
+    if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
         # Change the signal to display the RED aspect
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="red")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.danger)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.DANGER)
         
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.caution:
+    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
         # Change the signal to display the Yellow aspect
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.CAUTION)
         
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.prelim_caution:
+    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PRELIM_CAUTION:
         # Change the signal to display the Double Yellow aspect
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.prelim_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.PRELIM_CAUTION)
         
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.flash_caution:
+    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
         # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.flash_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.FLASH_CAUTION)
         
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.flash_prelim_caution:
+    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
         # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.flash_prelim_caution)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.FLASH_PRELIM_CAUTION)
 
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.proceed:
+    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
         # Change the signal to display the Green aspect
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="green")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.proceed)
+        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.PROCEED)
 
     return ()
 
@@ -645,14 +631,14 @@ def update_colour_light_route_indication (sig_id:int,
         signals_common.signals[str(sig_id)]["routeset"] = route_to_set
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
-        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
+        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
             logging.info ("Signal "+str(sig_id)+": Changing feather route display to "+ str(route_to_set).rpartition('.')[-1])
             refresh_feather_route_indication (sig_id)
         # We always call the function to update the DCC route indication on a change in route
         # to cater for DCC signal types that automatically enable/disable the route indication 
         # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
         dcc_control.update_dcc_signal_route (sig_id, route_to_set, signal_change = False,
-                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"]==signals_common.signal_state_type.danger))
+                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"]==signals_common.signal_state_type.DANGER))
             
     # Only update the respective route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
@@ -661,7 +647,7 @@ def update_colour_light_route_indication (sig_id:int,
         signals_common.signals[str(sig_id)]["theatretext"] = theatre_text
         # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
         # Otherwise we'll leave the refresh until the signal aspect is next changed
-        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
+        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
             logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'"+str(theatre_text)+"\'")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
                                                         text=signals_common.signals[str(sig_id)]["theatretext"])
@@ -669,7 +655,7 @@ def update_colour_light_route_indication (sig_id:int,
         # to cater for DCC signal types that automatically enable/disable the route indication 
         # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
         dcc_control.update_dcc_signal_theatre (sig_id, theatre_text, signal_change = False,
-                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.danger))
+                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER))
     
     return()
 
@@ -690,7 +676,7 @@ def refresh_feather_route_indication (sig_id:int):
     signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf90"],fill="black")
     signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["mainf"],fill="black")
     # Only display the route indication if the signal is not at RED
-    if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
+    if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
         if signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
             signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf45"],fill="white")
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
@@ -747,7 +733,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         time.sleep (time_delay) 
         # Cycle through the aspects if its a 3 or 4 aspect signal
         if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.caution
+            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
             # Call the internal function to update and refresh the signal - unless this signal is configured to
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
@@ -756,7 +742,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             # Sleep until the next aspect change is due
             time.sleep (time_delay) 
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.prelim_caution
+            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
             # Call the internal function to update and refresh the signal - unless this signal is configured to
             # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
@@ -770,9 +756,9 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.caution
+            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
         else:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.danger
+            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
         # Call the internal function to update and refresh the signal - unless this signal is configured to
         # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")

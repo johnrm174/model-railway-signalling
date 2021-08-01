@@ -478,7 +478,7 @@ def update_semaphore_signal (sig_id:int):
             if signals_common.signals[str(sig_id)]["lhroute1"] is not None: update_lh_signal(sig_id,False)
             if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,True)
         # Set the internal signal state to reflect the displayed aspect
-        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
+        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
 
         # We only need to enable the route display if the route display is currently disabled
         # All changes to the indication are made in the update_semaphore_route_indication function
@@ -499,9 +499,9 @@ def update_semaphore_signal (sig_id:int):
         if signals_common.signals[str(sig_id)]["rhroute1"] is not None: update_rh_signal(sig_id,False)
         # Set the internal signal state to reflect the displayed aspect
         if signals_common.signals[str(sig_id)]["distant"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.caution
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
         else:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
 
         # We only need to disable the route display if the route display is currently enabled
         if signals_common.signals[str(sig_id)]["theatreenabled"] and signals_common.signals[str(sig_id)]["theatretext"] != "NONE":

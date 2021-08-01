@@ -2,7 +2,7 @@
 # This module is used for creating Track Sensor objects (Sensors) mapped to GPIO Pins
 #
 # sensor_callback_type (tells the calling program what has triggered the callback):
-#     track_sensor_callback_type.sensor_triggered - The section has been toggled by the user
+#     track_sensor_callback_type.sensor_triggered - The sensor has been externally triggered
 # 
 # create_sensor - Creates a sensor object
 #   Mandatory Parameters:
@@ -54,8 +54,8 @@ channels: dict = {}
 # This is called on events if an external callback hasn't neen specified
 # -------------------------------------------------------------------------
 
-def sensor_null(sensor_id, sensor_callback = track_sensor_callback_type.null_event):
-    return(sensor_id, sensor_callback)
+def null_callback(sensor_id,callback_type=track_sensor_callback_type.null_event):
+    return(sensor_id,callback_type)
 
 # -------------------------------------------------------------------------
 # Internal functionsto check if mapping exists for a sensor channel
@@ -99,8 +99,8 @@ def track_sensor_triggered (gpio_channel):
             sensor_id = channels[str(gpio_channel)]["sensor_id"]
             if track_sensor_active(sensor_id):
                 # Start a new timeout thread and make the external callback
-                x = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
-                x.start()
+                timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
+                timeout_thread.start()
                 logging.info("Sensor "+str(sensor_id)+": Triggered Event ********************************************")
                 ext_callback = channels[str(gpio_channel)]["callback"]
                 ext_callback(sensor_id,track_sensor_callback_type.sensor_triggered)
@@ -113,14 +113,13 @@ def track_sensor_triggered (gpio_channel):
 # -------------------------------------------------------------------------
 
 def create_track_sensor (sensor_id:int, gpio_channel:int,
-                         sensor_callback = sensor_null,
+                         sensor_callback = null_callback,
                          sensor_timeout:float = 3.0,
                          trigger_period:float = 0.001):
     
     global channels # the dictionary of sensors
     global logging
     global raspberry_pi
-    # also uses fontsize, xpadding, ypadding imported from "common"
 
     # Validate the parameters we have been given
     logging.info ("Sensor "+str(sensor_id)+": Creating track sensor mapping")
@@ -140,11 +139,11 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
                 logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to Channel "+str(channel))
                 sensor_mapped = True
         if not sensor_mapped:
-            # A quick and dirty way of getting the code to run on Windows for development
-            # As the Windows version of python doesn't include the RPi specific GPIO package
             if raspberry_pi:
                 GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-                GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
+                if sensor_callback != null_callback:
+                    # only bother creating an event if an external callback was specified
+                    GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
             else:
                 logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
 

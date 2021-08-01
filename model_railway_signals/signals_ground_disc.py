@@ -99,9 +99,8 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                        orientation = orientation,
                                        sig_passed_button = sig_passed_button)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals_common.signals[str(sig_id)]["shuntahead"] = shunt_ahead     # Type-specific - Type of signal (normal or shunt-ahead)
-        signals_common.signals[str(sig_id)]["sigon"]      = sigon           # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigoff"]     = sigoff          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigon"] = sigon           # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigoff"] = sigoff         # Type-specific - drawing object
         
         # We now need to refresh the signal drawing objects to reflect the initial state
         update_ground_disc_signal (sig_id)
@@ -117,23 +116,30 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
 
 def update_ground_disc_signal (sig_id:int):
     global logging
-    if (signals_common.signals[str(sig_id)]["sigclear"] and not signals_common.signals[str(sig_id)]["override"]
-         and signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.proceed):
-        # Signal is ON or Overidden, and is not already displaying a state of "Danger" - we need to change it
-        logging.info ("Signal "+str(sig_id)+": Changing aspect to CLEAR")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='normal')
-        signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='hidden')    
-        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.proceed
-        dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
-    elif signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.danger:
-        if signals_common.signals[str(sig_id)]["shuntahead"]:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to SHUNT AHEAD")
-        else:
-            logging.info ("Signal "+str(sig_id)+": Changing aspect to DANGER")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='hidden')
-        signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
-        signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.danger
-        dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
+    
+    # Establish what the signal should be displaying based on the state
+    if not signals_common.signals[str(sig_id)]["sigclear"]:   
+        aspect_to_set = signals_common.signal_state_type.DANGER
+        log_message = " (signal is ON)"
+    elif signals_common.signals[str(sig_id)]["override"]:
+        aspect_to_set = signals_common.signal_state_type.DANGER
+        log_message = " (signal is OVERRIDDEN)"
+    else:
+        aspect_to_set = signals_common.signal_state_type.PROCEED
+        log_message = " (signal is OFF)"
+
+    # Only refresh the signal if the aspect has been changed
+    if aspect_to_set != signals_common.signals[str(sig_id)]["sigstate"]:
+        logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
+        signals_common.signals[str(sig_id)]["sigstate"] = aspect_to_set
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='normal')
+            signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='hidden')    
+            dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
+        elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='hidden')
+            signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
+            dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
     return ()
 
 
