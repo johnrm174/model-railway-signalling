@@ -24,7 +24,6 @@
 
 from . import common
 from tkinter import *
-import tkinter.font
 import enum
 import logging
 

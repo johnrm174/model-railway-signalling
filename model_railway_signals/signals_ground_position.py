@@ -25,37 +25,38 @@ import logging
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+def null_callback (sig_id:int,callback_type):
     return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
-# Callbacks for processing button pushes
+# Callbacks for processing button pushes - Will also make an external 
+# callback if one was specified when the signal was created. If not, 
+# then the null_callback function will be called to "do nothing"
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
+    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
     toggle_ground_position_light_signal(sig_id)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 def sig_passed_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     signals_common.pulse_signal_passed_button (sig_id)
     signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 # -------------------------------------------------------------------------
-# Callback function to flip the state of a signal when the signal
-# button is clicked - Will change state of the signal and initiate an
-# external callback if one was specified when the signal was first created
-# If not specified then we use the "null callback" to do nothing
+# Function to toggle the state of a signal - Called following a signal
+# button event (see above). Can also be called externally for to toggle
+# the state of the signal - to enable automated route setting functions
 # -------------------------------------------------------------------------
 
 def toggle_ground_position_light_signal (sig_id:int):
     signals_common.toggle_signal(sig_id)
     update_ground_position_light_signal (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -93,11 +94,11 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         point_coords5 = common.rotate_point (x,y,+5,-5,orientation) 
         points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
         canvas.create_polygon (points, outline="black")
-        # Create the position light "off" aspects (i.e. not-lit)
-        canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill="grey",outline="black")
+        # Create the position light "dark" aspects (i.e. when particular aspect is "not-lit")
+        # We don't need to create a "dark" aspect for the "root" position light as this is always lit
         canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="grey",outline="black")
         canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill="grey",outline="black")
-        # Draw the "DANGER" and "PROCEED" aspects (initially hidden
+        # Draw the "DANGER" and "PROCEED" aspects (initially hidden)
         if shunt_ahead: danger_colour = "gold"
         else: danger_colour = "red"
         if modern_type: root_colour = danger_colour
@@ -116,6 +117,7 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                        ext_callback = sig_callback,
                                        orientation = orientation,
                                        sig_passed_button = sig_passed_button)
+        
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
         signals_common.signals[str(sig_id)]["sigoff1"]  = sigoff1         # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["sigoff2"]  = sigoff2         # Type-specific - drawing object

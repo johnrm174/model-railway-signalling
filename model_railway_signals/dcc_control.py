@@ -206,7 +206,7 @@ def map_traintech_signal (sig_id:int,
                           base_address:int,
                           route_address:int = 0,
                           theatre_route = "NONE",
-                          feather_route = signals_common.route_type.NONE):
+                          feather_route = None):
 
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Train Tech Signal")
@@ -223,7 +223,7 @@ def map_traintech_signal (sig_id:int,
     else:
         # We only need to map the address for the feather OR the theatre (can't have both)
         theatre_address = route_address
-        if feather_route == signals_common.route_type.NONE: route_address = 0
+        if feather_route is None: route_address = 0
         else: theatre_address = 0
         # Create the DCC Mapping entry for the signal. We assign the "superset" of all possible dictionary entries
         # to handle user errors without raising exceptions (e.g. if the user inadvertaintly creates a colour light
@@ -315,12 +315,12 @@ def map_semaphore_signal (sig_id:int,
             # signal DCC mapping for a semaphore signal - or vice versa
             new_dcc_mapping = {
                     "auto_route_inhibit" : False,                                   # Mandatory for all signal types
-                    str(signals_common.signal_state_type.danger)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.proceed)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.caution)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.prelim_caution) :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.flash_caution)  :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.flash_prelim_caution) : [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.DANGER)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.PROCEED)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.CAUTION)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.PRELIM_CAUTION) :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.FLASH_CAUTION)  :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                    str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.LH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.LH2)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
                     str(signals_common.route_type.RH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings

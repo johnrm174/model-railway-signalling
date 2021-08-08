@@ -14,6 +14,7 @@
 # create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
 #                make up the point (so calling programs can later update them if required (e.g. change 
 #                the colour of the lines to represent the route that has been set up)
+#                Returned list comprises: [straight blade, switched blade, straight route ,switched route]
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       point_id:int - The ID for the point - also displayed on the point button
@@ -49,7 +50,6 @@ from . import dcc_control
 from . import common
 
 from tkinter import *
-import tkinter.font
 import enum
 import logging
 
@@ -209,6 +209,12 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     elif also_switch == point_id:
         logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' is the same as the point to create")
         point_objects = [0,0,0,0]
+    elif also_switch > 0 and not point_exists(also_switch):
+        logging.error ("Point "+str(point_id)+": Point "+str(also_switch)+" to /'also switch/' has not yet been created")
+        point_objects = [0,0,0,0]
+    elif also_switch > 0 and not points[str(also_switch)]["automatic"]:
+        logging.error ("Point "+str(point_id)+": Point "+str(also_switch)+" point to /'also switch/' is not an auto-switched point")
+        point_objects = [0,0,0,0]
     elif orientation != 0 and orientation != 180:
         logging.error ("Point "+str(point_id)+": Invalid orientation angle - only 0 and 180 currently supported")
         point_objects = [0,0,0,0]
@@ -301,12 +307,11 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         new_point = {"canvas" : canvas,                # canvas object
                       "blade1" : blade1,               # drawing object
                       "blade2" : blade2,               # drawing object
-                      "route1" : route1,               # drawing object
-                      "route2" : route2,               # drawing object
                       "changebutton" : point_button,   # drawing object
                       "lockbutton" : fpl_button,       # drawing object
                       "alsoswitch" : also_switch,      # the next point to automatically switch
                       "extcallback" : point_callback,  # The external callback to make on an event
+                      "automatic" : auto,              # Whether the point is automatic - used for validation
                       "locked" : False,                # The initial "interlocking" state of the point
                       "switched" : False,              # The initial "switched" state of the point
                       "fpllock" : fpl }                # the initial state of the Facing point Lock (None = No FPL)

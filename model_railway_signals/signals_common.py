@@ -4,6 +4,7 @@
 # -------------------------------------------------------------------------
 
 from . import common
+from . import dcc_control
 from tkinter import *    
 import enum
 import time
@@ -21,7 +22,7 @@ import logging
 # by subsidary "arms" either side of the main signal arm
 
 class route_type(enum.Enum):
-    NONE = 0         # No route indication (when signal is at RED)
+    NONE = 0         # internal use - to "inhibit" route indications when signal is at DANGER)
     MAIN = 1         # Main route
     LH1 = 2          # immediate left
     LH2 = 3          # far left
@@ -143,8 +144,8 @@ def pulse_signal_passed_button (sig_id:int):
     else:
         button = signals[str(sig_id)]["passedbutton"]
         # Call the thread to pulse the button
-        x = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
-        x.start()
+        pulse_button_thread = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
+        pulse_button_thread.start()
     return ()
 
 # -------------------------------------------------------------------------
@@ -227,5 +228,73 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["extcallback"]  = ext_callback             # MANDATORY - The External Callback to use for the signal
     
     return()
+
+# -------------------------------------------------------------------------
+# Common Function to generate all the signal elements for a theatre route
+# display (shared by Colour Light and semaphore signal types)
+# -------------------------------------------------------------------------
+
+def create_theatre_route_elements (canvas,sig_id:int,x:int,y:int,xoff:int,yoff:int,
+                                   orientation:int=0,has_theatre:bool=False):
+
+    # Draw the theatre route indicator box only if one is specified for this particular signal
+    # The text object is created anyway - but 'hidden' if not required for this particular signal
+
+    point_coords = common.rotate_point(x,y,xoff,yoff,orientation)
+    if has_theatre:
+        canvas.create_rectangle (common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation),fill="black")
+        theatreobject = canvas.create_text (point_coords,fill="white",text="",angle=orientation-90,state='normal')
+    else:
+        theatreobject = canvas.create_text (point_coords,fill="white",text="",angle=orientation-90,state='hidden')
+        has_theatre = None 
+
+    signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
+    signals[str(sig_id)]["theatreobject"]  = theatreobject       # SHARED - Text drawing object
+    signals[str(sig_id)]["theatreenabled"] = has_theatre         # SHARED - State of the Theatre display
+        
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to update a theatre route indicator either on signal
+# update or route change (shared by Colour Light and semaphore signal types)
+# -------------------------------------------------------------------------
+
+def update_theatre_route_indication (sig_id,theatre_text:str="NONE"):
+
+    # Only update the Theatre route indication if one exists for the signal
+    if signals[str(sig_id)]["theatreenabled"] is not None:
+        
+        # First deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
+        if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] == True:
+            logging.info ("Signal "+str(sig_id)+": Disabling theatre route display (signal is at DANGER)")
+            signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="hidden")
+            signals[str(sig_id)]["theatreenabled"] = False
+            # This is where we send the special character to inhibit the theatre route indication
+            dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
+
+        elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] == False:
+            logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"+signals[str(sig_id)]["theatretext"]+"\'")
+            signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
+            signals[str(sig_id)]["theatreenabled"] = True
+            dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=True,sig_at_danger=False)
+
+        # Deal with route changes - but only if the theatre text has changed
+        if theatre_text != "NONE" and theatre_text != signals[str(sig_id)]["theatretext"]:
+
+            signals[str(sig_id)]["canvas"].itemconfig(signals[str(sig_id)]["theatreobject"],text=theatre_text)
+            signals[str(sig_id)]["theatretext"] = theatre_text
+
+            if signals[str(sig_id)]["theatreenabled"] == True:
+                logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'" + theatre_text + "\'")
+                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=False)
+                    
+            else:
+                logging.info ("Signal "+str(sig_id)+": Setting theatre route to \'" + theatre_text + "\'")
+                # We always call the function to update the DCC route indication on a change in route even if the signal
+                # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
+                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=True)
+
+    return()
+
 #################################################################################################
 

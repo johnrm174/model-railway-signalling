@@ -92,6 +92,7 @@ point_callback_type (tells the calling program what has triggered the callback):
 create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
                make up the point (so calling programs can later update them if required (e.g. change 
                the colour of the lines to represent the route that has been set up)
+               Returned list comprises: [straight blade, switched blade, straight route ,switched route]
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       point_id:int - The ID for the point - also displayed on the point button

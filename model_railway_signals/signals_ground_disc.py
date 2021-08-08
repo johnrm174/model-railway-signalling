@@ -21,37 +21,38 @@ import logging
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+def null_callback (sig_id:int,callback_type):
     return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
-# Callbacks for processing button pushes
+# Callbacks for processing button pushes - Will also make an external 
+# callback if one was specified when the signal was created. If not, 
+# then the null_callback function will be called to "do nothing"
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
+    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
     toggle_ground_disc_signal(sig_id)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 def sig_passed_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     signals_common.pulse_signal_passed_button (sig_id)
     signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_passed)
     return ()
 
 # -------------------------------------------------------------------------
-# Callback function to flip the state of a signal when the signal
-# button is clicked - Will change state of the signal and initiate an
-# external callback if one was specified when the signal was first created
-# If not specified then we use the "null callback" to do nothing
+# Function to toggle the state of a signal - Called following a signal
+# button event (see above). Can also be called externally for to toggle
+# the state of the signal - to enable automated route setting functions
 # -------------------------------------------------------------------------
 
 def toggle_ground_disc_signal (sig_id:int):
     signals_common.toggle_signal(sig_id)
     update_ground_disc_signal (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -98,11 +99,12 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                        ext_callback = sig_callback,
                                        orientation = orientation,
                                        sig_passed_button = sig_passed_button)
+
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
         signals_common.signals[str(sig_id)]["sigon"] = sigon           # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["sigoff"] = sigoff         # Type-specific - drawing object
-        
-        # We now need to refresh the signal drawing objects to reflect the initial state
+
+        # Refresh the signal drawing objects to reflect the initial state
         update_ground_disc_signal (sig_id)
        
     return ()

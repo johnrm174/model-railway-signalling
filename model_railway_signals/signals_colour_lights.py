@@ -43,69 +43,47 @@ class signal_sub_type(enum.Enum):
 # Define a null callback function for internal use
 # -------------------------------------------------------------------------
 
-def null_callback (sig_id:int,callback_type=signals_common.sig_callback_type.null_event):
+def null_callback (sig_id:int,callback_type):
     return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
-# Callbacks for processing button pushes
+# Callbacks for processing button pushes - Will also make an external 
+# callback if one was specified when the signal was created. If not, 
+# then the null_callback function will be called to "do nothing"
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Button Event ***************************************")
+    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
     toggle_colour_light_signal(sig_id)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 def subsidary_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Subsidary Button Event ************************************")
+    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
     toggle_colour_light_subsidary(sig_id)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
     return ()
 
 def sig_passed_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Button Event ********************************")
+    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     signals_common.pulse_signal_passed_button (sig_id)
     signals_common.signals[str(sig_id)]['extcallback'] (sig_id,signals_common.sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Approach Release Button Event ********************************")
-    signals_common.pulse_signal_release_button (sig_id)
-    raise_approach_release_event(sig_id)
+    logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
+    clear_approach_control(sig_id)
+    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
-# Function to to trigger a "approach release" event either when the approach
-# release button has been clicked (i.e. from the approach_release_button_event
-# function above) or when triggered as part of a timed signal sequence. Will call the
-# common function to pulse the signal passed button and initiate an external
-# callback if a callback was specified when the signal was created - If not
-# then the "null callback" will be called to do nothing
-# -------------------------------------------------------------------------
-
-def raise_approach_release_event (sig_id:int):
-    # reset the state of the signal
-    if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
-        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-        signals_common.signals[str(sig_id)]["releaseonyel"] = False
-        signals_common.signals[str(sig_id)]["releaseonred"] = False
-        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
-        # Call the internal function to update and refresh the signal - unless this signal
-        # is configured to be refreshed later (based on the aspect of the signal ahead)
-        if signals_common.signals[str(sig_id)]["refresh"]: 
-            update_colour_light_signal_aspect(sig_id)
-        signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to flip the state of a signal either when the signal button
-# has been clicked (i.e. from the signal_button_event function above) or
-# when called from external code (e.g. automated route setting functions)
-# Will change state of the signal and initiate an external callback in the
-# case of a button push (if a callback was specified when the signal was
-# created - If not then the "null callback" will be called to do nothing
+# Functions to toggle the state of a signal - Called following a signal
+# button event (see above). Can also be called externally for to toggle
+# the state of the signal - to enable automated route setting functions
 # -------------------------------------------------------------------------
 
 def toggle_colour_light_signal (sig_id:int):
@@ -114,22 +92,17 @@ def toggle_colour_light_signal (sig_id:int):
     # is configured to be refreshed later (based on the aspect of the signal ahead)
     if signals_common.signals[str(sig_id)]["refresh"]: 
         update_colour_light_signal_aspect(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
     return ()
 
 # -------------------------------------------------------------------------
-# Function to flip the state of a subsidary either when the subsidary button
-# has been clicked (i.e. from the subsidary_button_event function above) or
-# when called from external code (e.g. automated route setting functions)
-# Will change state of the subsidary and initiate an external callback in the
-# case of a button push (if a callback was specified when the signal was
-# created - If not then the "null callback" will be called to do nothing
+# Function to toggle the state of the subsidary - Called following a signal
+# button event (see above). Can also be called externally for to toggle
+# the state of the signal - to enable automated route setting functions
 # -------------------------------------------------------------------------
 
 def toggle_colour_light_subsidary (sig_id:int):
     signals_common.toggle_subsidary (sig_id)
     update_colour_light_subsidary_signal (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
     return ()
 
 # ---------------------------------------------------------------------------------
@@ -158,6 +131,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 fully_automatic:bool=False):
     global logging
 
+    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
+    
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating Colour Light Signal")
     if signals_common.sig_exists(sig_id):
@@ -166,10 +141,9 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Signal ID must be greater than zero")
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")          
-    elif (lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or mainfeather) and theatre_route_indicator:
+    elif signal_has_feathers and theatre_route_indicator:
         logging.error ("Signal "+str(sig_id)+": Signal can only have Feathers OR a Theatre Route Indicator")
-    elif ((lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90 or theatre_route_indicator) and
-           signal_subtype == signal_sub_type.distant):
+    elif (signal_has_feathers or theatre_route_indicator) and signal_subtype == signal_sub_type.distant:
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Route Indicators")
     elif approach_release_button and signal_subtype == signal_sub_type.distant:
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
@@ -255,18 +229,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if not lhfeather90: canvas.itemconfigure(lhf90,state='hidden')
         if not rhfeather45: canvas.itemconfigure(rhf45,state='hidden')
         if not rhfeather90: canvas.itemconfigure(rhf90,state='hidden')
-
-        # Draw the theatre route indicator box if one is specified for the signal
-        # The text object is created anyway - and 'hidden' later if not required
-        point_coords = common.rotate_point (x,y,offset+80,-20,orientation)        
-        if theatre_route_indicator:
-            line_coords = common.rotate_line (x,y,offset+71,-12,offset+89,-28,orientation) 
-            canvas.create_rectangle (line_coords,fill="black")
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                    angle = orientation-90,state='normal')
-        else:
-            theatre = canvas.create_text (point_coords,fill="white",text="",
-                                    angle = orientation-90,state='hidden')
             
         # Set the "Override" Aspect - this is the default aspect that will be displayed
         # by the signal when it is overridden - This will be RED apart from 2 aspect
@@ -288,19 +250,24 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic)
 
+        # Create the signal elements for a Theatre Route indicator
+        signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
+                                orientation = orientation,has_theatre = theatre_route_indicator)
+        
+        if not signal_has_feathers: signal_has_feathers = None
+        
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
         # All SHARED attributes are signals_common to more than one signal Types
         signals_common.signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
         signals_common.signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-        signals_common.signals[str(sig_id)]["routeset"] = signals_common.route_type.NONE # SHARED - Initial Route setting to display (none)
-        signals_common.signals[str(sig_id)]["theatretext"] = "NONE"                      # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["routeset"] = None                           # SHARED - Initial Route setting to display (none)
         signals_common.signals[str(sig_id)]["releasebutton"] = button4                   # SHARED - Button drawing object
-        signals_common.signals[str(sig_id)]["theatre"] = theatre                         # SHARED - TkInter Text drawing object
         signals_common.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
         signals_common.signals[str(sig_id)]["subtype"] = signal_subtype                  # Type-specific - subtype of the signal
         signals_common.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
+        signals_common.signals[str(sig_id)]["featherenabled"] = signal_has_feathers      # Type-specific - controls when aspects are updated
         signals_common.signals[str(sig_id)]["grn"] = grn                                 # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["yel"] = yel                                 # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["red"] = red                                 # Type-specific - drawing object
@@ -325,7 +292,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # If there are route indicators we also need to ensure we send the appropriate
         # DCC commands to set the these into a known state (always off) as no route
         # for the signal has yet been configured
-        if theatre_route_indicator: dcc_control.update_dcc_signal_theatre (sig_id,"#")
         if mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90:
             dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE)
 
@@ -344,17 +310,14 @@ def update_colour_light_subsidary_signal (sig_id:int):
     
     global logging
     
-    # get the signals that we are interested in
-    # We just need to update the drawing objects - not our reference to them
-    signal = signals_common.signals[str(sig_id)]
-    if signal["subclear"]:
+    if signals_common.signals[str(sig_id)]["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
-        signal["canvas"].itemconfig (signal["pos1"],fill="white")
-        signal["canvas"].itemconfig (signal["pos2"],fill="white")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="white")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos2"],fill="white")
         dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")  
     else:
-        signal["canvas"].itemconfig (signal["pos1"],fill="grey")
-        signal["canvas"].itemconfig (signal["pos2"],fill="grey")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="grey")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos2"],fill="grey")
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK/DARK")
         dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
     return ()
@@ -376,8 +339,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
     # ---------------------------------------------------------------------------------
     
-    # If signal is set to "ON" then change to RED unless it is a 2 aspect distant
-    # signal - in which case we want to set it to YELLOW
+    # If signal is set to "ON" then its DANGER (or CAUTION if its a 2 aspect distant)
     if not signals_common.signals[str(sig_id)]["sigclear"]:
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
             new_aspect = signals_common.signal_state_type.CAUTION
@@ -387,14 +349,11 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
             log_message = " (signal is ON)"
 
     # If signal is Overriden the set the signal to its overriden aspect
-    # The overriden aspect would normally be RED - unless its been triggered
-    # as a 'timed' signal - in which case the associated thread will be cycling
-    # the 'override' through the aspects all the way back to GREEN
     elif signals_common.signals[str(sig_id)]["override"]:
         new_aspect = signals_common.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
 
-    # Set to RED if the signal is subject to "Release on Red" approach control
+    # Set to DANGER if the signal is subject to "Release on Red" approach control
     # We'll do this here as this could also apply to 2 aspect home or Red/Yellow
     elif signals_common.signals[str(sig_id)]["releaseonred"]:
         new_aspect = signals_common.signal_state_type.DANGER
@@ -418,7 +377,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # From here, the Signal is CLEAR and is a 2 aspect Distant or a 3/4 aspect signal
     # ---------------------------------------------------------------------------------
 
-    # Set to YELLOW if the signal is subject to "Release on YELLOW" approach control
+    # Set to CAUTION if the signal is subject to "Release on YELLOW" approach control
     elif signals_common.signals[str(sig_id)]["releaseonyel"]:
         new_aspect = signals_common.signal_state_type.CAUTION
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
@@ -429,102 +388,62 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # aspects based on the signal ahead (if one has been specified)
     # ---------------------------------------------------------------------------------
     
-    # If no signal ahead has been specified then we can also set the signal
-    # to its "clear" aspect (this includes 2 aspect distant signals as well
-    # as the remaining 3 and 4 aspect signals types)
+    # If no signal ahead has been specified then we can set the signal to its "clear" aspect
+    # (Applies to 2 aspect distant signals as well as the remaining 3 and 4 aspect signals types)
     elif sig_ahead_id == 0:
         new_aspect = signals_common.signal_state_type.PROCEED
-        log_message = "\' (signal is OFF and no signal ahead specified)"
+        log_message = " (signal is OFF and no signal ahead specified)"
 
     else:
         # A valid signal ahead has been specified - we need to take it into account
         if signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
-            # All remaining signal types (3/4 aspects and 2 aspect distants) should display YELLOW
+            # All remaining signal types (3/4 aspects and 2 aspect distants) should display CAUTION
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'danger\')")
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
             
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
             if signals_common.signals[str(sig_ahead_id)]["releaseonyel"]:
-                # Signal ahead showing yellow but subject to "release on yellow" approach control
-                # All remaining types (3/4 aspects and 2 aspect distants) should display FLASHING YELLOW
+                # Signal ahead showing CAUTION but subject to "release on yellow" approach control
+                # All remaining types (3/4 aspects and 2 aspect distants) should display FLASHING CAUTION
                 new_aspect = signals_common.signal_state_type.FLASH_CAUTION
-                log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
                                    " is subject to approach control (release on yellow)")
             elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-                # 4 aspect signals should display a DOUBLE YELLOW aspect
+                # 4 aspect signals should display a PRELIM_CAUTION aspect
                 new_aspect = signals_common.signal_state_type.PRELIM_CAUTION
-                log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'caution\')")
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
             else:
-                # 3 aspect signals and 2 aspect distant signals should display GREEN
+                # 3 aspect signals and 2 aspect distant signals should display PROCEED
                 new_aspect = signals_common.signal_state_type.PROCEED
-                log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'caution\')")
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
                 
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
             if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-                # 4 aspect signals will display a FLASHING DOUBLE YELLOW aspect
+                # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect
                 new_aspect = signals_common.signal_state_type.FLASH_PRELIM_CAUTION
-                log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'flashing_caution\')")
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
             else:
-                # 3 aspect signals and 2 aspect distant signals should display GREEN
+                # 3 aspect signals and 2 aspect distant signals should display PROCEED
                 new_aspect = signals_common.signal_state_type.PROCEED
-                log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'proceed\')")
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
         else:
-            # Aspect of the signal ahead must be green - has no effect on the signal we are updating
+            # A signal ahead state is either PRELIM_CAUTION, FLASH PRELIM CAUTION or PROCEED
+            # These states have have no effect on the signal we are updating - Soignal will show PROCEED
             new_aspect = signals_common.signal_state_type.PROCEED
-            log_message = ("\' (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying \'proceed\')")
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
+                      + str(signals_common.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
 
     current_aspect = signals_common.signals[str(sig_id)]["sigstate"]
         
     # Only refresh the signal if the aspect has been changed
     if new_aspect != current_aspect:
-        logging.info ("Signal "+str(sig_id)+": Changing aspect to \'"
-                      + str(new_aspect).rpartition('.')[-1] + log_message)
-        
+        logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
         # Update the current aspect - note that this dictionary element is also used by the
         # Flash Aspects Thread, but as it is a single element, it should be thread safe
         signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
         refresh_signal_aspects (sig_id)
-
-        # Only update the respective route indication if the route is actively set
-        # A route of 'NONE' signifies that the particular route indication isn't used
-        if signals_common.signals[str(sig_id)]["routeset"] != signals_common.route_type.NONE:
-            # We only refresh the feather and theatre route indications on signal aspect
-            # changes if we need to enable/disable the route display (i.e. if the signal
-            # has transitioned either from RED or to RED.(This is OK as only signal types
-            # with RED aspects can be created with feather or theatre route indications)
-            if current_aspect == signals_common.signal_state_type.DANGER:
-                logging.info ("Signal "+str(sig_id)+": Enabling feather light route display for "
-                      + str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
-                refresh_feather_route_indication (sig_id)
-                dcc_control.update_dcc_signal_route(sig_id,signals_common.signals[str(sig_id)]["routeset"],
-                                                          signal_change=True,sig_at_danger=False)
-            elif new_aspect == signals_common.signal_state_type.DANGER:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route display (signal is at RED)")
-                refresh_feather_route_indication (sig_id)
-                # This is where we send the route type of "NONE" which should be mapped 
-                # to the DCC commands we need to send to inhibit the theatre route display
-                dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE,signal_change=True,sig_at_danger=True)
-
-        # Only update the respective route indication if the route is actively set
-        # A route of 'NONE' signifies that the particular route indication isn't used
-        if signals_common.signals[str(sig_id)]["theatretext"] != "NONE":
-            # We only refresh the feather and theatre route indications on signal aspect
-            # changes if we need to enable/disable the route display (i.e. if the signal
-            # has transitioned either from RED or to RED.(This is OK as only signal types
-            # with RED aspects can be created with feather or theatre route indications)
-            if current_aspect == signals_common.signal_state_type.DANGER:
-                logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"
-                                   + signals_common.signals[str(sig_id)]["theatretext"]+"\'")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
-                                                                text=signals_common.signals[str(sig_id)]["theatretext"])
-                dcc_control.update_dcc_signal_theatre(sig_id,signals_common.signals[str(sig_id)]["theatretext"],
-                                                              signal_change=True,sig_at_danger=False)
-            elif new_aspect == signals_common.signal_state_type.DANGER:
-                logging.info ("Signal "+str(sig_id)+": Inhibiting theatre route display (signal is at RED)")
-                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],text="")
-                # This is where we send the special character "#"- which should be mapped 
-                # to the DCC commands we need to send to inhibit the theatre route display
-                dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
+        refresh_feather_route_indication(sig_id)
+        signals_common.update_theatre_route_indication(sig_id)
             
     return ()
 
@@ -620,42 +539,11 @@ def refresh_signal_aspects (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_colour_light_route_indication (sig_id:int,
-            route_to_set:signals_common.route_type = signals_common.route_type.NONE,
+            route_to_set:signals_common.route_type = None,
                                           theatre_text:str ="NONE"):
-    global logging
     
-    # Only update the respective route indication if the route has been changed and has actively
-    # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
-    if signals_common.signals[str(sig_id)]["routeset"] != route_to_set and route_to_set != signals_common.route_type.NONE:
-        logging.info ("Signal "+str(sig_id)+": Setting feather route indication to "+str(route_to_set).rpartition('.')[-1])
-        signals_common.signals[str(sig_id)]["routeset"] = route_to_set
-        # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
-        # Otherwise we'll leave the refresh until the signal aspect is next changed
-        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
-            logging.info ("Signal "+str(sig_id)+": Changing feather route display to "+ str(route_to_set).rpartition('.')[-1])
-            refresh_feather_route_indication (sig_id)
-        # We always call the function to update the DCC route indication on a change in route
-        # to cater for DCC signal types that automatically enable/disable the route indication 
-        # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
-        dcc_control.update_dcc_signal_route (sig_id, route_to_set, signal_change = False,
-                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"]==signals_common.signal_state_type.DANGER))
-            
-    # Only update the respective route indication if the route has been changed and has actively
-    # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
-    if signals_common.signals[str(sig_id)]["theatretext"] != theatre_text and theatre_text != "NONE":
-        logging.info ("Signal "+str(sig_id)+": Setting theatre route text to \'"+str(theatre_text)+"\'")
-        signals_common.signals[str(sig_id)]["theatretext"] = theatre_text
-        # Only refresh the signal drawing objects if the the displayed aspect is not "RED"
-        # Otherwise we'll leave the refresh until the signal aspect is next changed
-        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
-            logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'"+str(theatre_text)+"\'")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["theatre"],
-                                                        text=signals_common.signals[str(sig_id)]["theatretext"])
-        # We always call the function to update the DCC route indication on a change in route
-        # to cater for DCC signal types that automatically enable/disable the route indication 
-        # depending on whether the signal is at danger or not (e.g. TrainTech Signals)
-        dcc_control.update_dcc_signal_theatre (sig_id, theatre_text, signal_change = False,
-                        sig_at_danger = (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER))
+    signals_common.update_theatre_route_indication(sig_id,theatre_text)
+    refresh_feather_route_indication (sig_id, route_to_set)
     
     return()
 
@@ -665,28 +553,59 @@ def update_colour_light_route_indication (sig_id:int,
 # (if not then the objects are hidden' and the function will have no effect)
 # -------------------------------------------------------------------------
 
-def refresh_feather_route_indication (sig_id:int):
+def refresh_feather_route_indication (sig_id:int, route_to_set = None):
     
     global logging
+    
+    # Only update the Feather route indication if one exists for the signal
+    if signals_common.signals[str(sig_id)]["featherenabled"] is not None:
+        
+        # First deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
+        if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER
+                     and signals_common.signals[str(sig_id)]["featherenabled"] == True):
+            logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route display (signal is at RED)")
+            signals_common.signals[str(sig_id)]["featherenabled"] = False
+            dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE,signal_change=True,sig_at_danger=True)
+        elif (signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER
+                        and signals_common.signals[str(sig_id)]["featherenabled"] == False):
+            logging.info ("Signal "+str(sig_id)+": Enabling feather light route display for "
+                      + str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
+            signals_common.signals[str(sig_id)]["featherenabled"] = True
+            dcc_control.update_dcc_signal_route(sig_id,signals_common.signals[str(sig_id)]["routeset"],
+                                                          signal_change=True,sig_at_danger=False)
+            
+        # Deal with route changes - but only if the Route has actually been changed
+        if route_to_set is not None and route_to_set != signals_common.signals[str(sig_id)]["routeset"]:
+            signals_common.signals[str(sig_id)]["routeset"] = route_to_set
+            if signals_common.signals[str(sig_id)]["featherenabled"] == True:
+                logging.info ("Signal "+str(sig_id)+": Changing feather route display to "+ str(route_to_set).rpartition('.')[-1])
+                dcc_control.update_dcc_signal_route (sig_id, signals_common.signals[str(sig_id)]["routeset"],
+                                                        signal_change = False, sig_at_danger = False)
+            else:
+                logging.info ("Signal "+str(sig_id)+": Setting feather route to "+str(route_to_set).rpartition('.')[-1])
+                # We always call the function to update the DCC route indication on a change in route even if the signal
+                # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
+                dcc_control.update_dcc_signal_route (sig_id, signals_common.signals[str(sig_id)]["routeset"],
+                                                        signal_change = False, sig_at_danger = True)
 
-    # initially set all the indications to OFF - we'll then set what we need
-    signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf45"],fill="black")
-    signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf90"],fill="black")
-    signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf45"],fill="black")
-    signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf90"],fill="black")
-    signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["mainf"],fill="black")
-    # Only display the route indication if the signal is not at RED
-    if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
-        if signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf45"],fill="white")
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf90"],fill="white")
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH1:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf45"],fill="white")
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH2:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf90"],fill="white")
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.MAIN:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["mainf"],fill="white")
+        # initially set all the indications to OFF - we'll then set what we need
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf45"],fill="black")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf90"],fill="black")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf45"],fill="black")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf90"],fill="black")
+        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["mainf"],fill="black")
+        # Only display the route indication if the signal is not at RED
+        if signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER:
+            if signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf45"],fill="white")
+            elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["lhf90"],fill="white")
+            elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH1:
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf45"],fill="white")
+            elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH2:
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["rhf90"],fill="white")
+            elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.MAIN:
+                signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["mainf"],fill="white")
             
     return()
 
@@ -826,5 +745,26 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
             update_colour_light_signal_aspect(sig_id)
             
     return()
+
+# -------------------------------------------------------------------------
+# Function to "release" a signal (that was subject to automatic approach
+# control). Called following an approach_release_button_event (see above).
+# Can also be called externally (e.g. following the triggering of a track
+# sensor to enable semi automation of signals along the route
+# -------------------------------------------------------------------------
+
+def clear_approach_control (sig_id:int):
+    # reset the state of the signal
+    if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
+        signals_common.pulse_signal_release_button (sig_id)
+        signals_common.signals[str(sig_id)]["releaseonyel"] = False
+        signals_common.signals[str(sig_id)]["releaseonred"] = False
+        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
+        # Call the internal function to update and refresh the signal - unless this signal
+        # is configured to be refreshed later (based on the aspect of the signal ahead)
+        if signals_common.signals[str(sig_id)]["refresh"]: 
+            update_colour_light_signal_aspect(sig_id)
+    return ()
 
 ###############################################################################

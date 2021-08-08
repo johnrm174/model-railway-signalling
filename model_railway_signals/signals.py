@@ -232,7 +232,7 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # Calls the signal type-specific functions depending on the signal type
 # -------------------------------------------------------------------------
 
-def set_route (sig_id:int, route:signals_common.route_type = signals_common.route_type.NONE, theatre_text:str ="NONE"):
+def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str ="NONE"):
     
     global logging
     
@@ -342,7 +342,7 @@ def lock_signal (*sig_ids:int):
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
                 if signals_common.signals[str(sig_id)]["sigclear"]:
-                    logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF")            
+                    logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF - Locking Anyway")            
                 # Disable the Signal button to lock it
                 signals_common.signals[str(sig_id)]["sigbutton"].config(state="disabled")
                 signals_common.signals[str(sig_id)]["siglocked"] = True
@@ -392,7 +392,7 @@ def lock_subsidary (*sig_ids:int):
                 # If signal/point locking has been correctly implemented it should
                 # only be possible to lock a signal that is "ON" (i.e. at DANGER)
                 if signals_common.signals[str(sig_id)]["subclear"]:
-                    logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF")            
+                    logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")            
                 # Disable the Button to lock the subsidary signal
                 signals_common.signals[str(sig_id)]["subbutton"].config(state="disabled")        
                 signals_common.signals[str(sig_id)]["sublocked"] = True
@@ -605,9 +605,9 @@ def clear_approach_control (sig_id:int):
     else:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.raise_approach_release_event (sig_id)
+            signals_colour_lights.clear_approach_control (sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            signals_semaphores.raise_approach_release_event (sig_id)
+            signals_semaphores.clear_approach_control (sig_id)
     return()
 
 ##########################################################################################
