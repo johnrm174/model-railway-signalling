@@ -158,10 +158,6 @@
 # 
 # clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
 # 
-# pulse_signal_passed_button (sig_id) - Pulses the signal passed button - use to indicate track sensor events
-# 
-# pulse_signal_release_button (sig_id) - Pulses the approach release button - use to indicate track sensor events
-# 
 # trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
 #                       - If a start delay >0 is specified then a 'sig_passed' callback event is generated
 #                       - when the signal is changed to DANGER - For each subsequent aspect change (all the
@@ -242,9 +238,11 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
     else:
         # Call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.update_colour_light_route_indication (sig_id,route,theatre_text)           
+            signals_colour_lights.update_feather_route_indication (sig_id,route)
+            signals_common.update_theatre_route_indication(sig_id,theatre_text)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.update_semaphore_route_indication (sig_id,route,theatre_text)
+            signals_common.update_theatre_route_indication(sig_id,theatre_text)
     return()
 
 # -------------------------------------------------------------------------
@@ -385,7 +383,7 @@ def lock_subsidary (*sig_ids:int):
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Subsidary signal to lock does not exist")
-        else:
+        elif signals_common.signals[str(sig_id)]["hassubsidary"]:
             # Only lock it if its not already locked
             if not signals_common.signals[str(sig_id)]["sublocked"]:
                 logging.info ("Signal "+str(sig_id)+": Locking subsidary")
@@ -412,7 +410,7 @@ def unlock_subsidary (*sig_ids:int):
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": Subsidary signal to unlock does not exist")
-        else:
+        elif signals_common.signals[str(sig_id)]["hassubsidary"]:
             # Only unlock it if its not already locked
             if signals_common.signals[str(sig_id)]["sublocked"]:
                 logging.info ("Signal "+str(sig_id)+": Unlocking subsidary")
@@ -562,7 +560,7 @@ def toggle_subsidary (sig_id:int):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Subsidary signal to toggle does not exist")
-    else:
+    elif signals_common.signals[str(sig_id)]["hassubsidary"]:
         # now call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.toggle_colour_light_subsidary(sig_id)
@@ -608,6 +606,48 @@ def clear_approach_control (sig_id:int):
             signals_colour_lights.clear_approach_control (sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.clear_approach_control (sig_id)
+    return()
+
+# -------------------------------------------------------------------------
+# Functions called from the Sensors Module to trigger either signal passed
+# otr signal released events automatically when a sensor is triggered
+# Calls the signal type-specific functions depending on the signal type
+# Note that these are internal functions - not part of the public API
+# -------------------------------------------------------------------------
+
+def trigger_signal_passed_event (sig_id:int):
+
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal to trigger an event for does not exist")
+    else:
+        # now call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            signals_colour_lights.sig_passed_button_event(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
+            signals_ground_position.sig_passed_button_event(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.sig_passed_button_event(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
+            signals_ground_disc.sig_passed_button_event(sig_id)
+    return()
+
+
+def trigger_signal_approach_event (sig_id:int):
+
+    global logging
+    
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal to trigger an event for does not exist")
+    else:
+        # now call the signal type-specific functions to update the signal
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            signals_colour_lights.approach_release_button_event(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            signals_semaphores.approach_release_button_event(sig_id)
     return()
 
 ##########################################################################################

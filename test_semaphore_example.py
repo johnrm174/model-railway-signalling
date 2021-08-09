@@ -39,16 +39,9 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
-
-    # If its an external track sensor event then pulse the associated "signal passed"
-    # button - Here we use a straightforward 1-1 mapping as we gave our sensors the
-    # same IDs as their associated signals when we created them
-    if callback_type == track_sensor_callback_type.sensor_triggered:
-        pulse_signal_passed_button(item_id)
         
     # Now deal with the track occupancy
-    if (callback_type == sig_callback_type.sig_passed
-           or callback_type == track_sensor_callback_type.sensor_triggered):
+    if callback_type == sig_callback_type.sig_passed:
         if item_id == 1:
             set_section_occupied(1)
         elif item_id == 2:
@@ -106,8 +99,8 @@ def main_callback_function(item_id,callback_type):
     # Process the signal/point interlocking
     #--------------------------------------------------------------
     
-    # Signal 1 is locked (at danger) if the signal 1 is at Danger and Signal 2 is at Danger
-    # We do it this way as nothing should prevent signals from being returned to Danger
+    # Signal 1 is locked (at danger) if signal 2 is set to  Danger - i.e. the home signal
+    # needs to be CLEARED before the associated distant can be CLEARED.
     if not signal_clear(1) and not signal_clear(2):
         lock_signal(1)
     else:
@@ -230,21 +223,11 @@ create_semaphore_signal (canvas,5,900,200,
 
 # Map external track sensors for the signals - For simplicity, we'll give them the same ID as the signal
 print ("Creating external Track Sensor Mappings")
-create_track_sensor (1, gpio_channel = 4,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (2, gpio_channel = 5,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (3, gpio_channel = 6,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (4, gpio_channel = 7,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (5, gpio_channel = 8,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
+create_track_sensor (1, gpio_channel = 4, signal_passed = 1)
+create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
+create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
+create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
+create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Route and Interlocking")

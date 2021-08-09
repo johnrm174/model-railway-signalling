@@ -311,10 +311,6 @@ set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (mult
 
 clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
 
-pulse_signal_passed_button (sig_id) - Pulses the signal passed button - use to indicate track sensor events
-
-pulse_signal_release_button (sig_id) - Pulses the approach release button - use to indicate track sensor events
-
 trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
                       - If a start delay >0 is specified then a 'sig_passed' callback event is generated
                       - when the signal is changed to DANGER - For each subsequent aspect change (all the
@@ -378,10 +374,13 @@ create_sensor - Creates a sensor object
       sensor_id:int - The ID to be used for the sensor 
       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
   Optional Parameters:
-      sensor_timeout:float - The time during which further triggers are ignored (default = 3 seconds)
-      trigger_period:float - The time that the sensor needs to remain active (default = 0.001 seconds)
-      sensor_callback - The function to call when the sensor triggers (default is no callback)
-                        Note that the callback function returns (item_id, callback type)
+      sensor_timeout:float - The time period during which further triggers are ignored - default = 3.0 secs
+      trigger_period:float - Duration that the sensor needs to remain active before triggering - default = 0.001 secs
+      signal_passed:int    - Raise a "signal passed" event for the specified signal ID when triggered - default = None
+      signal_approach:int  - Raise an "approach release" event for the specified signal ID when triggered - default = None
+      sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
+                                  Note that the callback function returns (item_id, callback type)
+
 
 sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
 </pre>

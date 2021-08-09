@@ -9,10 +9,12 @@
 #       sensor_id:int - The ID to be used for the sensor 
 #       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
 #   Optional Parameters:
-#       sensor_timeout:float - The time period during which further triggers are ignored (default = 3.0 seconds)
-#       trigger_period:float - The duration that the sensor needs to remain active before raising a trigger (default = 0.001 seconds)
-#       sensor_callback - The function to call when the sensor triggers (default is no callback)
-#                         Note that the callback function returns (item_id, callback type)
+#       sensor_timeout:float - The time period during which further triggers are ignored - default = 3.0 secs
+#       trigger_period:float - Duration that the sensor needs to remain active before triggering - default = 0.001 secs
+#       signal_passed:int    - Raise a "signal passed" event for the specified signal ID when triggered - default = None
+#       signal_approach:int  - Raise an "approach release" event for the specified signal ID when triggered - default = None
+#       sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
+#                               Note that the callback function returns (item_id, callback type)
 # 
 # sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
 #
@@ -22,6 +24,7 @@ import enum
 import time
 import threading
 import logging
+from . import signals
 
 # We can only use GPIO interface if we're running on a Raspberry Pi
 # Other Platforms don't include the RPi specific GPIO package
@@ -40,7 +43,6 @@ raspberry_pi = is_raspberrypi()
 # -------------------------------------------------------------------------
     
 class track_sensor_callback_type(enum.Enum):
-    null_event = 30
     sensor_triggered = 31   # The sensor has been triggered
     
 # -------------------------------------------------------------------------
@@ -54,14 +56,14 @@ channels: dict = {}
 # This is called on events if an external callback hasn't neen specified
 # -------------------------------------------------------------------------
 
-def null_callback(sensor_id,callback_type=track_sensor_callback_type.null_event):
+def null_callback(sensor_id:int,callback_type):
     return(sensor_id,callback_type)
 
 # -------------------------------------------------------------------------
 # Internal functionsto check if mapping exists for a sensor channel
 # -------------------------------------------------------------------------
 
-def channel_mapped(channel):
+def channel_mapped(channel:int):
     return (str(channel) in channels.keys() )
 
 # -------------------------------------------------------------------------
@@ -71,7 +73,7 @@ def channel_mapped(channel):
 # If  not in the timouut period then the external callback will be made
 # -------------------------------------------------------------------------
 
-def track_sensor_triggered (gpio_channel):
+def track_sensor_triggered (gpio_channel:int):
     
     global channels # the dictionary of mapped channels
     global logging
@@ -101,8 +103,13 @@ def track_sensor_triggered (gpio_channel):
                 # Start a new timeout thread and make the external callback
                 timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
                 timeout_thread.start()
-                logging.info("Sensor "+str(sensor_id)+": Triggered Event ********************************************")
-                channels[str(gpio_channel)]["callback"] (sensor_id,track_sensor_callback_type.sensor_triggered)
+                logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
+                if channels[str(gpio_channel)]["signal_passed"] > 0:
+                    signals.trigger_signal_passed_event(channels[str(gpio_channel)]["signal_passed"])
+                elif channels[str(gpio_channel)]["signal_approach"] > 0:
+                    signals.trigger_signal_approach_event(channels[str(gpio_channel)]["signal_approach"])
+                else:
+                    channels[str(gpio_channel)]["callback"] (sensor_id,track_sensor_callback_type.sensor_triggered)
     return()
 
 # -------------------------------------------------------------------------
@@ -113,6 +120,8 @@ def track_sensor_triggered (gpio_channel):
 
 def create_track_sensor (sensor_id:int, gpio_channel:int,
                          sensor_callback = null_callback,
+                         signal_passed:int = 0,
+                         signal_approach:int = 0,
                          sensor_timeout:float = 3.0,
                          trigger_period:float = 0.001):
     
@@ -131,6 +140,12 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         # We don't use GPIO 0, 1, 2, 3 as these are the I2C (which we might want to use later)
         logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Channel "+str(gpio_channel)
                         + " - Channels (Channel number must be between 4 and 26 - also 14 & 15 are reserved)")
+    elif signal_passed < 0 or signal_approach < 0:
+        logging.error ("Sensor "+str(sensor_id)+": Signal ID (if specified) must be greater than zero")
+    elif signal_passed > 0 and signal_approach > 0:
+        logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
+    elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
+        logging.error ("Sensor "+str(sensor_id)+": Cannot specify a sensor_callback AND map to a signal event")
     else:
         sensor_mapped = False
         for channel in channels.keys():
@@ -140,19 +155,21 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         if not sensor_mapped:
             if raspberry_pi:
                 GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-                if sensor_callback != null_callback:
-                    # only bother creating an event if an external callback was specified
+                # only bother creating an event if an external callback was specified
+                if sensor_callback != null_callback or signal_passed > 0 or signal_approach > 0:
                     GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
             else:
                 logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
 
             # Add the to the dictionaries of sensors and channels
-            channels[str(gpio_channel)] = {"sensor_id"      : sensor_id,
-                                           "callback"       : sensor_callback,
-                                           "trigger_period" : trigger_period,
-                                           "timeout_value"  : sensor_timeout,
-                                           "timeout_active" : False}
-    return()
+            channels[str(gpio_channel)] = {"sensor_id"       : sensor_id,
+                                           "callback"        : sensor_callback,
+                                           "signal_approach" : signal_approach,
+                                           "signal_passed"   : signal_passed,
+                                           "trigger_period"  : trigger_period,
+                                           "timeout_value"   : sensor_timeout,
+                                           "timeout_active"  : False}
+    return() 
 
 # -------------------------------------------------------------------------
 # Externally called function to return the state of a sensor object 

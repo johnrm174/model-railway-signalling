@@ -32,7 +32,6 @@ class route_type(enum.Enum):
 # Define the different callbacks types for the signal
 # Used for identifying the event that has triggered the callback
 class sig_callback_type(enum.Enum):
-    null_event = 0     # Used internally
     sig_switched = 1   # The signal has been switched by the user
     sub_switched = 2   # The subsidary signal has been switched by the user
     sig_passed = 3     # The "signal passed" has been activated by the user
@@ -72,7 +71,7 @@ signals:dict = {}
 # Used by most externally-called functions to validate the Sig_ID
 # -------------------------------------------------------------------------
 
-def sig_exists(sig_id):
+def sig_exists(sig_id:int):
     return (str(sig_id) in signals.keys() )
 
 # -------------------------------------------------------------------------
@@ -84,6 +83,7 @@ def toggle_signal (sig_id:int):
     
     global logging
     # Update the state of the signal button - Common to ALL signal types
+    # The Signal Clear boolean value will always be either True or False
     if signals[str(sig_id)]["sigclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
         signals[str(sig_id)]["sigclear"] = False
@@ -105,7 +105,7 @@ def toggle_signal (sig_id:int):
 def toggle_subsidary (sig_id:int):
     
     global logging
-    # Update the state of the subsidary button - Common to ALL signal types
+    # Update the state of the subsidary button - Common to ALL signal types.
     if signals[str(sig_id)]["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling subsidary to ON")
         signals[str(sig_id)]["subclear"] = False
@@ -117,11 +117,11 @@ def toggle_subsidary (sig_id:int):
     return ()
 
 #-------------------------------------------------------------------------
-# Thread to "Pulse" a TKINTER" Button - used to provide a clear
-# visual indication when "signal passed" events have been triggered
+# Thread to "Pulse" the colour of a TKINTER" Button - used to provide a clear visual
+# indication when "signal passed" or "signal released" events have been triggered
 # -------------------------------------------------------------------------
 
-def thread_to_pulse_button (button, duration):
+def thread_to_pulse_button (button, duration:float):
     button.config(bg="red")
     time.sleep (duration)
     button.config(bg=common.bgraised)
@@ -158,10 +158,14 @@ def pulse_signal_release_button (sig_id:int):
     
     global logging
     logging.info ("Signal "+str(sig_id)+": Pulsing approach release button")
-    button = signals[str(sig_id)]["releasebutton"]
-    # Call the thread to pulse the button
-    x = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
-    x.start()
+    # Validate the signal exists 
+    if not sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": Signal does not exist")
+    else:
+        button = signals[str(sig_id)]["releasebutton"]
+        # Call the thread to pulse the button
+        pulse_button_thread = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
+        pulse_button_thread.start()
     return ()
 
 # -------------------------------------------------------------------------
@@ -172,12 +176,12 @@ def pulse_signal_release_button (sig_id:int):
 def create_common_signal_elements (canvas,
                                    sig_id: int,
                                    x:int, y:int,
-                                   signal_type,
+                                   signal_type:sig_type,
                                    sig_callback,
                                    sub_callback,
                                    passed_callback,
                                    ext_callback,
-                                   orientation:int = 0,
+                                   orientation:int,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False):
@@ -209,23 +213,24 @@ def create_common_signal_elements (canvas,
     else:
         canvas.create_window(x,y,window=passed_button)
     # Disable the main signal button if the signal is fully automatic
-    if automatic:
-        sig_button.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
+    if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
+    
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
-    signals[str(sig_id)]["canvas"]       = canvas                   # MANDATORY - canvas object
-    signals[str(sig_id)]["automatic"]    = automatic                # MANDATORY - True = signal is fully automatic 
-    signals[str(sig_id)]["sigtype"]      = signal_type              # MANDATORY - Type of the signal
-    signals[str(sig_id)]["sigstate"]     = None                     # MANDATORY - Displayed 'state' of the signal    
-    signals[str(sig_id)]["sigclear"]     = False                    # MANDATORY - State of the main signal control (ON/OFF)
-    signals[str(sig_id)]["subclear"]     = False                    # MANDATORY - State of the subsidary sgnal control (ON/OFF)
-    signals[str(sig_id)]["override"]     = False                    # MANDATORY - Signal is "Overridden" (overrides main signal control)
-    signals[str(sig_id)]["siglocked"]    = False                    # MANDATORY - State of signal interlocking 
-    signals[str(sig_id)]["sublocked"]    = False                    # MANDATORY - State of subsidary interlocking
-    signals[str(sig_id)]["sigbutton"]    = sig_button               # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["subbutton"]    = sub_button               # MANDATORY - Button Drawing object (main Signal)
-    signals[str(sig_id)]["passedbutton"] = passed_button            # MANDATORY - Button drawing object (subsidary signal)
-    signals[str(sig_id)]["extcallback"]  = ext_callback             # MANDATORY - The External Callback to use for the signal
+    signals[str(sig_id)]["canvas"]       = canvas               # MANDATORY - canvas object
+    signals[str(sig_id)]["automatic"]    = automatic            # MANDATORY - True = signal is fully automatic 
+    signals[str(sig_id)]["sigtype"]      = signal_type          # MANDATORY - Type of the signal
+    signals[str(sig_id)]["sigstate"]     = None                 # MANDATORY - Displayed 'state' of the signal   
+    signals[str(sig_id)]["sigclear"]     = False                # MANDATORY - State of the main signal control (ON/OFF)
+    signals[str(sig_id)]["hassubsidary"] = subsidary            # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
+    signals[str(sig_id)]["subclear"]     = False                # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
+    signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" (overrides main signal control)
+    signals[str(sig_id)]["siglocked"]    = False                # MANDATORY - State of signal interlocking 
+    signals[str(sig_id)]["sublocked"]    = False                # MANDATORY - State of subsidary interlocking
+    signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
+    signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["extcallback"]  = ext_callback         # MANDATORY - The External Callback to use for the signal
     
     return()
 
@@ -235,7 +240,7 @@ def create_common_signal_elements (canvas,
 # -------------------------------------------------------------------------
 
 def create_theatre_route_elements (canvas,sig_id:int,x:int,y:int,xoff:int,yoff:int,
-                                   orientation:int=0,has_theatre:bool=False):
+                                   orientation:int,has_theatre:bool):
 
     # Draw the theatre route indicator box only if one is specified for this particular signal
     # The text object is created anyway - but 'hidden' if not required for this particular signal
@@ -246,11 +251,11 @@ def create_theatre_route_elements (canvas,sig_id:int,x:int,y:int,xoff:int,yoff:i
         theatreobject = canvas.create_text (point_coords,fill="white",text="",angle=orientation-90,state='normal')
     else:
         theatreobject = canvas.create_text (point_coords,fill="white",text="",angle=orientation-90,state='hidden')
-        has_theatre = None 
 
     signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
+    signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
     signals[str(sig_id)]["theatreobject"]  = theatreobject       # SHARED - Text drawing object
-    signals[str(sig_id)]["theatreenabled"] = has_theatre         # SHARED - State of the Theatre display
+    signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display
         
     return()
 
@@ -262,17 +267,18 @@ def create_theatre_route_elements (canvas,sig_id:int,x:int,y:int,xoff:int,yoff:i
 def update_theatre_route_indication (sig_id,theatre_text:str="NONE"):
 
     # Only update the Theatre route indication if one exists for the signal
-    if signals[str(sig_id)]["theatreenabled"] is not None:
+    if signals[str(sig_id)]["hastheatre"]:
         
         # First deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
-        if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] == True:
+        # We test for Not True and Not False to support the initial state when the signal is created (state = None)
+        if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != False:
             logging.info ("Signal "+str(sig_id)+": Disabling theatre route display (signal is at DANGER)")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="hidden")
             signals[str(sig_id)]["theatreenabled"] = False
             # This is where we send the special character to inhibit the theatre route indication
             dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
 
-        elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] == False:
+        elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != True:
             logging.info ("Signal "+str(sig_id)+": Enabling theatre route display of \'"+signals[str(sig_id)]["theatretext"]+"\'")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
             signals[str(sig_id)]["theatreenabled"] = True

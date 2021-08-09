@@ -76,6 +76,7 @@ def sig_passed_button_event (sig_id:int):
 def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
+    signals_common.pulse_signal_release_button (sig_id)
     clear_approach_control(sig_id)
     signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
@@ -131,10 +132,9 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 fully_automatic:bool=False):
     global logging
 
-    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
-    
-    # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating Colour Light Signal")
+    # Do some basic validation on the parameters we have been given
+    signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
     if signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal already exists")
     elif sig_id < 1:
@@ -253,21 +253,20 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
                                 orientation = orientation,has_theatre = theatre_route_indicator)
-        
-        if not signal_has_feathers: signal_has_feathers = None
-        
+                
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
         # All SHARED attributes are signals_common to more than one signal Types
         signals_common.signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
         signals_common.signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-        signals_common.signals[str(sig_id)]["routeset"] = None                           # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["routeset"] = signals_common.route_type.MAIN # SHARED - Initial Route setting to display (none)
         signals_common.signals[str(sig_id)]["releasebutton"] = button4                   # SHARED - Button drawing object
         signals_common.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
         signals_common.signals[str(sig_id)]["subtype"] = signal_subtype                  # Type-specific - subtype of the signal
         signals_common.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
-        signals_common.signals[str(sig_id)]["featherenabled"] = signal_has_feathers      # Type-specific - controls when aspects are updated
+        signals_common.signals[str(sig_id)]["hasfeathers"] = signal_has_feathers         # Type-specific - If there is a Feather Route display
+        signals_common.signals[str(sig_id)]["featherenabled"] = None                     # Type-specific - State of the Feather Route display
         signals_common.signals[str(sig_id)]["grn"] = grn                                 # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["yel"] = yel                                 # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["red"] = red                                 # Type-specific - drawing object
@@ -283,17 +282,10 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # If the signal is fully automatic themn toggle to OFF to display a "clear" aspect
         # Manual signals remain set to ON to display their "danger/caution aspect
         if fully_automatic: signals_common.toggle_signal(sig_id)
-        # Update the signal aspects to reflect the initial state. This will
+        # Update the signal and subsidary aspects to reflect the initial state. This will
         # also send the DCC commands to put the DCC signal into the initial state
         update_colour_light_signal_aspect (sig_id)
-        # If there is a subsidary then update to reflect the initial state. This will
-        # also send the DCC commands to put the DCC signal into the initial state
-        if position_light:update_colour_light_subsidary_signal (sig_id)
-        # If there are route indicators we also need to ensure we send the appropriate
-        # DCC commands to set the these into a known state (always off) as no route
-        # for the signal has yet been configured
-        if mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90:
-            dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE)
+        if position_light: update_colour_light_subsidary_signal (sig_id)
 
     return ()
 
@@ -309,7 +301,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 def update_colour_light_subsidary_signal (sig_id:int):
     
     global logging
-    
     if signals_common.signals[str(sig_id)]["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="white")
@@ -419,7 +410,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
                 
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
             if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-                # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect
+                # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect 
                 new_aspect = signals_common.signal_state_type.FLASH_PRELIM_CAUTION
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying FLASHING_CAUTION)")
             else:
@@ -442,7 +433,7 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
         # Flash Aspects Thread, but as it is a single element, it should be thread safe
         signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
         refresh_signal_aspects (sig_id)
-        refresh_feather_route_indication(sig_id)
+        update_feather_route_indication(sig_id)
         signals_common.update_theatre_route_indication(sig_id)
             
     return ()
@@ -532,43 +523,31 @@ def refresh_signal_aspects (sig_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Function to set (and update) the route indication for the signal
-# Calls the internal functions to update the route feathers and the
-# theatre route indication. This Function assumes the Sig_ID has
-# already been validated by the calling programme
-# -------------------------------------------------------------------------
-
-def update_colour_light_route_indication (sig_id:int,
-            route_to_set:signals_common.route_type = None,
-                                          theatre_text:str ="NONE"):
-    
-    signals_common.update_theatre_route_indication(sig_id,theatre_text)
-    refresh_feather_route_indication (sig_id, route_to_set)
-    
-    return()
-
-# -------------------------------------------------------------------------
-# Internal Function to update the drawing objects for the feather indicators.
+# Function to update the drawing objects for the feather indicators.
 # The feathers will only be displayed if the signal was created with them.
 # (if not then the objects are hidden' and the function will have no effect)
+# This function is designed to be called either on a signal state change
+# (ie. either to/from DANGER) or to effect a change of route
 # -------------------------------------------------------------------------
 
-def refresh_feather_route_indication (sig_id:int, route_to_set = None):
+def update_feather_route_indication (sig_id:int, route_to_set = None):
     
     global logging
     
     # Only update the Feather route indication if one exists for the signal
-    if signals_common.signals[str(sig_id)]["featherenabled"] is not None:
+    if signals_common.signals[str(sig_id)]["hasfeathers"]:
         
         # First deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
+        # We test for Not True and Not False to support the initial state when the signal is created (state = None)
         if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER
-                     and signals_common.signals[str(sig_id)]["featherenabled"] == True):
-            logging.info ("Signal "+str(sig_id)+": Inhibiting feather light route display (signal is at RED)")
+                     and signals_common.signals[str(sig_id)]["featherenabled"] != False):
+            logging.info ("Signal "+str(sig_id)+": Disabling feather route display (signal is at RED)")
             signals_common.signals[str(sig_id)]["featherenabled"] = False
             dcc_control.update_dcc_signal_route(sig_id,signals_common.route_type.NONE,signal_change=True,sig_at_danger=True)
+            
         elif (signals_common.signals[str(sig_id)]["sigstate"] != signals_common.signal_state_type.DANGER
-                        and signals_common.signals[str(sig_id)]["featherenabled"] == False):
-            logging.info ("Signal "+str(sig_id)+": Enabling feather light route display for "
+                        and signals_common.signals[str(sig_id)]["featherenabled"] != True):
+            logging.info ("Signal "+str(sig_id)+": Enabling feather route display for "
                       + str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1])
             signals_common.signals[str(sig_id)]["featherenabled"] = True
             dcc_control.update_dcc_signal_route(sig_id,signals_common.signals[str(sig_id)]["routeset"],
@@ -757,7 +736,6 @@ def clear_approach_control (sig_id:int):
     # reset the state of the signal
     if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
         logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-        signals_common.pulse_signal_release_button (sig_id)
         signals_common.signals[str(sig_id)]["releaseonyel"] = False
         signals_common.signals[str(sig_id)]["releaseonred"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))

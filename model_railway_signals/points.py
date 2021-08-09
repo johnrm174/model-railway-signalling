@@ -63,7 +63,6 @@ class point_type(enum.Enum):
     
 # Define the different callbacks types for the point
 class point_callback_type(enum.Enum):
-    null_event = 10
     point_switched = 11   # The point has been switched by the user
     fpl_switched = 12     # The facing point lock has been switched by the user
 
@@ -79,7 +78,7 @@ points: dict = {}
 # Used in Most externally-called functions to validate the Point_ID
 # -------------------------------------------------------------------------
 
-def point_exists(point_id):
+def point_exists(point_id:int):
     return (str(point_id) in points.keys() )
 
 # -------------------------------------------------------------------------
@@ -88,7 +87,7 @@ def point_exists(point_id):
 # i.e to cover the case of no FPL or an auto point
 # -------------------------------------------------------------------------
 
-def null_callback(point_id,callback_type=point_callback_type.null_event):
+def null_callback(point_id:int,callback_type):
     return(point_id,callback_type)
 
 # -------------------------------------------------------------------------
@@ -171,8 +170,13 @@ def toggle_point (point_id:int):
             dcc_control.update_dcc_point(point_id,False)
         
         # Now change any other points we need (i.e. points switched with this one)
+        # We should have validated the Point exists at point creation time
         if points[str(point_id)]["alsoswitch"] != 0:
-            toggle_point(points[str(point_id)]["alsoswitch"])
+            if not point_exists(points[str(point_id)]["alsoswitch"]):
+                logging.error ("Point "+str(point_id)+": Toggle Point - Point "
+                        +str(points[str(point_id)]["alsoswitch"]) +" to also switch does not exist")
+            else:   
+                toggle_point(points[str(point_id)]["alsoswitch"])
 
     return()
 
@@ -209,10 +213,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     elif also_switch == point_id:
         logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' is the same as the point to create")
         point_objects = [0,0,0,0]
-    elif also_switch > 0 and not point_exists(also_switch):
-        logging.error ("Point "+str(point_id)+": Point "+str(also_switch)+" to /'also switch/' has not yet been created")
-        point_objects = [0,0,0,0]
-    elif also_switch > 0 and not points[str(also_switch)]["automatic"]:
+    elif also_switch > 0 and point_exists(also_switch) and not points[str(also_switch)]["automatic"]:
         logging.error ("Point "+str(point_id)+": Point "+str(also_switch)+" point to /'also switch/' is not an auto-switched point")
         point_objects = [0,0,0,0]
     elif orientation != 0 and orientation != 180:
@@ -221,9 +222,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     elif fpl and auto:
         logging.error ("Point "+str(point_id)+": Automatic point should be created without a facing point lock")
         point_objects = [0,0,0,0]
-
     else:
-
         # Create the button objects and their callbacks
         point_button = Button (canvas, text=str(point_id), state="normal", relief="raised",
                     font=('Courier',common.fontsize,"normal"),bg= "grey85",
@@ -317,16 +316,14 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                       "fpllock" : fpl }                # the initial state of the Facing point Lock (None = No FPL)
 
         # Add the new point to the dictionary of points
-        points[str(point_id)] = new_point 
-
+        points[str(point_id)] = new_point
+        # Set the initial state of the point
+        dcc_control.update_dcc_point(point_id,False)
         # We'll also return a list of identifiers for the drawing objects
         # so we can change the colour of them later if required
         # [blade straight, blade switched, route straight, route switched]
         point_objects=[blade1,blade2,route1,route2]
         
-        # Set the initial state of the point
-        dcc_control.update_dcc_point(point_id,False)
-
     return(point_objects)
 
 # -------------------------------------------------------------------------

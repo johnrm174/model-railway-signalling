@@ -33,7 +33,6 @@ import logging
     
 # Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
-    null_event = 20
     section_switched = 21   # The section has been manually switched by the user
     
 # -------------------------------------------------------------------------
@@ -48,7 +47,7 @@ sections: dict = {}
 # Used if this is not specified when the section is created
 # -------------------------------------------------------------------------
 
-def null_callback(section_id, callback_type = section_callback_type.null_event):
+def null_callback(section_id:int, callback_type):
     return(section_id, callback_type)
 
 # -------------------------------------------------------------------------
@@ -56,7 +55,7 @@ def null_callback(section_id, callback_type = section_callback_type.null_event):
 # Used in Most externally-called functions to validate the section ID
 # -------------------------------------------------------------------------
 
-def section_exists(section_id):
+def section_exists(section_id:int):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------

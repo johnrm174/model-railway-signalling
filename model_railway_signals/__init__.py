@@ -10,8 +10,6 @@ from .points import toggle_fpl
 
 from .signals_common import route_type
 from .signals_common import sig_callback_type
-from .signals_common import pulse_signal_passed_button
-from .signals_common import pulse_signal_release_button
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
@@ -94,8 +92,6 @@ __all__ = [
         'set_approach_control',
         'clear_approach_control',
         'trigger_timed_signal',
-        'pulse_signal_passed_button',
-        'pulse_signal_release_button',
       # Public track_section types
         'section_callback_type',
       # Public track_section functions

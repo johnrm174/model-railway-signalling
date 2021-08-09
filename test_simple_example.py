@@ -36,19 +36,13 @@ debug_dcc = False
 
 def main_callback_function(item_id,callback_type):
 
+    print ("Callback into main program")
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
-
-    # If its an external track sensor event then pulse the associated "signal passed"
-    # button - Here we use a straightforward 1-1 mapping as we gave our sensors the
-    # same IDs as their associated signals when we created them
-    if callback_type == track_sensor_callback_type.sensor_triggered:
-        pulse_signal_passed_button(item_id)
         
-    # Now deal with the track occupancy
-    if (callback_type == sig_callback_type.sig_passed
-           or callback_type == track_sensor_callback_type.sensor_triggered):
+    # First deal with the track occupancy
+    if (callback_type == sig_callback_type.sig_passed):
         if item_id == 1:
             set_section_occupied(1)
         elif item_id == 2:
@@ -93,8 +87,9 @@ def main_callback_function(item_id,callback_type):
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     #--------------------------------------------------------------
-    update_signal(3, sig_ahead_id=5)
-    update_signal(4, sig_ahead_id=5)
+    
+    update_signal(3, sig_ahead_id = 5 )
+    update_signal(4, sig_ahead_id = 5)
     
     if point_switched(1):
         set_route(2,route=route_type.LH1)
@@ -206,67 +201,57 @@ canvas.create_line(400,200,675,200,fill="black",width=3) # Main Line
 canvas.create_line(675,150,700,175,fill="black",width=3) # 45 degree line from end of loop to second point
 # Create (and draw) the second point - a right hand point rotated by 180 degrees
 # No facing point lock needed for this point as direction of travel is left to right
-create_point(canvas,2,point_type.RH, 700,200,"black",
-                    point_callback=main_callback_function,orientation=180) 
+create_point(canvas,2,point_type.RH, 700,200,"black",point_callback=main_callback_function,orientation=180) 
 # Draw the continuation of the Main Line 
 canvas.create_line(725,200,1000,200,fill="black",width=3) # 45 degree line from point to start of loop
 
 # Create the track occupancy sections
 print ("Creating the track Occupancy Sections")
-create_section(canvas,1,175,200,section_callback=main_callback_function)
-create_section(canvas,2,500,150,section_callback=main_callback_function)
-create_section(canvas,3,500,200,section_callback=main_callback_function)
-create_section(canvas,4,800,200,section_callback=main_callback_function)
+create_section (canvas,1,175,200,section_callback = main_callback_function)
+create_section (canvas,2,500,150,section_callback = main_callback_function)
+create_section (canvas,3,500,200,section_callback = main_callback_function)
+create_section (canvas,4,800,200,section_callback = main_callback_function)
 
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed
 # Signal 2 is the signal just before the point - so it needs a route indication
 print ("Creating Signals")
-create_colour_light_signal (canvas,1,50,200,
+create_colour_light_signal (canvas, 1, 50, 200,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
+                            sig_callback = main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
-create_colour_light_signal (canvas,2,275,200,
+create_colour_light_signal (canvas, 2, 275, 200,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
+                            sig_callback = main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False,
-                            lhfeather45=True,
-                            mainfeather=True)
-create_colour_light_signal (canvas,3,600,150,
+                            lhfeather45 = True,
+                            mainfeather = True)
+create_colour_light_signal (canvas, 3, 600, 150,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
+                            sig_callback = main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
-create_colour_light_signal (canvas,4,600,200,
+create_colour_light_signal (canvas, 4, 600, 200,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
+                            sig_callback = main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False)
-create_colour_light_signal (canvas,5,900,200,
+create_colour_light_signal (canvas, 5, 900, 200,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback=main_callback_function,
-                            fully_automatic=True,
-                            sig_passed_button=True)
+                            sig_callback = main_callback_function,
+                            fully_automatic = True,
+                            sig_passed_button = True)
 
 # Map external track sensors for the signals - For simplicity, we'll give them the same ID as the signal
+# We'll also map them to the associated "signal passed" events rather than using their own callback
 print ("Creating external Track Sensor Mappings")
-create_track_sensor (1, gpio_channel = 4,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (2, gpio_channel = 5,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (3, gpio_channel = 6,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (4, gpio_channel = 7,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
-create_track_sensor (5, gpio_channel = 8,
-                    sensor_callback = main_callback_function,
-                    sensor_timeout = 3.0)
+create_track_sensor (1, gpio_channel = 4, signal_passed = 1)
+create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
+create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
+create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
+create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
 print ("Setting Initial Route and Interlocking")

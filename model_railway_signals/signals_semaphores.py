@@ -63,6 +63,7 @@ def sig_passed_button_event (sig_id:int):
 def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
+    signals_common.pulse_signal_release_button (sig_id)
     clear_approach_control(sig_id)
     signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
     return ()
@@ -130,7 +131,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
     else:
         
-        create_subsidary_button = subsidarymain or subsidarylh1 or subsidaryrh1
+        # Check to see if the signal supports a subsidary (this can be on any route arm)
+        has_subsidary = subsidarymain or subsidarylh1 or subsidaryrh1
         
         # We use a value of None to signify that a particular arm doesn't isn't to be created for the signal
         # uIf it is to be created, we use True/False to represent the current state of the signal arm.
@@ -189,22 +191,25 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if rhroute1 is None: canvas.itemconfigure(rhsigon,state='hidden')
                              
         # Set the initial state of the signal Arms if they have been created
-        mainroute = False
-        if subsidarymain is not None: subsidarymain = False
-        if subsidarylh1 is not None: subsidarylh1 = False
-        if subsidaryrh1 is not None: subsidaryrh1 = False
-        if lhroute1 is not None: lhroute1 = False
-        if rhroute1 is not None: rhroute1 = False
+        # We set them in the "wrong" state initially, so that when the signal arms
+        # are first updated they get "changed" to the correct aspects and send out
+        # the DCC commands to put the layout signals into their corresponding state
+        mainroute = not fully_automatic
+        if subsidarymain is not None: subsidarymain = True 
+        if subsidarylh1 is not None: subsidarylh1 = True
+        if subsidaryrh1 is not None: subsidaryrh1 = True
+        if lhroute1 is not None: lhroute1 = True
+        if rhroute1 is not None: rhroute1 = True
     
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
-                                       signal_type = signals_common.sig_type.semaphore,
                                        sig_callback = signal_button_event,
                                        sub_callback = subsidary_button_event,
                                        passed_callback = sig_passed_button_event,
                                        ext_callback = sig_callback,
+                                       signal_type = signals_common.sig_type.semaphore,
                                        orientation = orientation,
-                                       subsidary = create_subsidary_button,
+                                       subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic)
         
@@ -216,7 +221,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
         signals_common.signals[str(sig_id)]["releaseonred" ]  = False                          # SHARED - State of the "Approach Release for the signal
-        signals_common.signals[str(sig_id)]["routeset"]       = None                           # SHARED - Initial Route setting to display (none)
+        signals_common.signals[str(sig_id)]["routeset"]       = signals_common.route_type.MAIN # SHARED - Initial Route setting to display (none)
         signals_common.signals[str(sig_id)]["releasebutton"]  = button4                        # SHARED - Button drawing object
         signals_common.signals[str(sig_id)]["distant"]        = distant                        # Type-specific - subtype of the signal (home/distant)
         signals_common.signals[str(sig_id)]["subsidarymain"]  = subsidarymain                  # Type-specific - details of the signal configuration
@@ -238,23 +243,12 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.signals[str(sig_id)]["rhsubon"]        = rhsubon                        # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rhsuboff"]       = rhsuboff                       # Type-specific - drawing object
         
-        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect - this will also
-        # cause the DCC commands to be sent out to "change" the signal to OFF when we subsequently update it
-        # If its not automatic then send the DCC commands to put the signal in its default ON state
-        if fully_automatic:
-            signals_common.toggle_signal(sig_id)
-        else:
-            dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
+        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect 
+        if fully_automatic: signals_common.toggle_signal(sig_id)
         # Update the signal to display the initial aspects - this will also cause the DCC commands to be sent
-        # to put the main signal arm into the default "OFF" state if its an automatic signal
-        update_semaphore_signal (sig_id)
+        # to put all the mapped signal arms (main and subsidary) into their correct states
+        update_semaphore_signal(sig_id)
         update_semaphore_subsidary(sig_id)
-        # Send the DCC commands to put everything but the main signal arm into the initial "known" state
-        if lhroute1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_signal")
-        if rhroute1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_signal")
-        if subsidarymain is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
-        if subsidarylh1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
-        if subsidaryrh1 is not None: dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
 
     return ()
 
@@ -273,13 +267,13 @@ def update_semaphore_subsidary (sig_id:int):
         global logging
         # We explicitly test for True or False as "None" signifies the signal arm does not exist
         if set_to_clear and signals_common.signals[str(sig_id)]["subsidarymain"]==False:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to PROCEED")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to OFF")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["mainsuboff"],state='normal')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["mainsubon"],state='hidden')
             dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")
             signals_common.signals[str(sig_id)]["subsidarymain"]=True
         elif not set_to_clear and signals_common.signals[str(sig_id)]["subsidarymain"]==True:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to DANGER")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for MAIN route to ON")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["mainsuboff"],state='hidden')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["mainsubon"],state='normal')
             dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
@@ -290,13 +284,13 @@ def update_semaphore_subsidary (sig_id:int):
         global logging
         # We explicitly test for True or False as "None" signifies the signal arm does not exist
         if set_to_clear and signals_common.signals[str(sig_id)]["subsidarylh1"]==False:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to PROCEED")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to OFF")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["lhsuboff"],state='normal')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["lhsubon"],state='hidden')
             dcc_control.update_dcc_signal_element(sig_id,True,element="left_subsidary")
             signals_common.signals[str(sig_id)]["subsidarylh1"]=True
         elif not set_to_clear and signals_common.signals[str(sig_id)]["subsidarylh1"]==True:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to DANGER")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for LH route to ON")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["lhsuboff"],state='hidden')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["lhsubon"],state='normal')
             dcc_control.update_dcc_signal_element(sig_id,False,element="left_subsidary")
@@ -307,13 +301,13 @@ def update_semaphore_subsidary (sig_id:int):
         global logging
         # We explicitly test for True or False as "None" signifies the signal arm does not exist
         if set_to_clear and signals_common.signals[str(sig_id)]["subsidaryrh1"]==False:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to PROCEED")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to OFF")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["rhsuboff"],state='normal')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["rhsubon"],state='hidden')
             dcc_control.update_dcc_signal_element(sig_id,True,element="right_subsidary")
             signals_common.signals[str(sig_id)]["subsidaryrh1"]=True
         elif not set_to_clear and signals_common.signals[str(sig_id)]["subsidaryrh1"]==True:
-            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to DANGER")
+            logging.info ("Signal "+str(sig_id)+": Changing subsidary for RH route to ON")
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["rhsuboff"],state='hidden')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["rhsubon"],state='normal')
             dcc_control.update_dcc_signal_element(sig_id,False,element="right_subsidary")
@@ -325,9 +319,11 @@ def update_semaphore_subsidary (sig_id:int):
     #---------------------------------------
     
     global logging
-    
-    if signals_common.signals[str(sig_id)]["subclear"]:
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN, None):
+    # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
+    if signals_common.signals[str(sig_id)]["subclear"] == True:
+        # If the signal does not support different Routes (None) or the calling programme tries to set
+        # the route to signals_common.route_type.NONE then we assume the MAIN Route (i.e. main signal arm)
+        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE,None):
             update_main_subsidary(sig_id,True)
             update_lh_subsidary(sig_id,False)
             update_rh_subsidary(sig_id,False)
@@ -339,7 +335,7 @@ def update_semaphore_subsidary (sig_id:int):
             update_main_subsidary(sig_id,False)
             update_lh_subsidary(sig_id,False)
             update_rh_subsidary(sig_id,True)
-    else: 
+    elif signals_common.signals[str(sig_id)]["subclear"] == False: 
         # The subsidary signal is at danger
         update_main_subsidary(sig_id,False)
         update_lh_subsidary(sig_id,False)
@@ -393,7 +389,7 @@ def update_semaphore_signal (sig_id:int):
 # Function to Refresh the displayed signal aspect according the signal state
 # -------------------------------------------------------------------------
 
-def refresh_signal_aspects (sig_id:int,log_message):
+def refresh_signal_aspects (sig_id:int,log_message:str,route_to_set:signals_common.route_type=None):
     
     global logging
     
@@ -466,7 +462,9 @@ def refresh_signal_aspects (sig_id:int,log_message):
             update_rh_signal(sig_id,False,log_message)
             
         # The following code covers the case where a main signal arm exists for the route that is set
-        elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,None):
+        # If the signal does not support different Routes (None) or the calling programme tries to set
+        # the route to signals_common.route_type.NONE then we assume the MAIN Route (i.e. main signal arm)
+        elif signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE,None):
             update_main_signal(sig_id,True,log_message)
             update_lh_signal(sig_id,False,log_message)
             update_rh_signal(sig_id,False,log_message)
@@ -513,10 +511,6 @@ def update_semaphore_route_indication (sig_id,route_to_set:signals_common.route_
         # Also update the subsidary aspects for route changes (as these may be represented by different subsidary arms)
         update_semaphore_subsidary(sig_id)
         
-    # Call the common function to update the theatre route indicator elements
-    # (if the signal has a theatre route indicator - otherwise no effect)
-    signals_common.update_theatre_route_indication(sig_id,theatre_text)
-
     return()
 
 # -------------------------------------------------------------------------
@@ -612,10 +606,8 @@ def clear_approach_control (sig_id:int):
     # reset the state of the signal
     if signals_common.signals[str(sig_id)]["releaseonred"]:
         logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-        signals_common.pulse_signal_release_button (sig_id)
         signals_common.signals[str(sig_id)]["releaseonred"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
-        # Call the internal function to update and refresh the signal
         update_semaphore_signal(sig_id)
         return ()
 
