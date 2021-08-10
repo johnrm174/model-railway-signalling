@@ -36,6 +36,8 @@ debug_dcc = False
 
 def main_callback_function(item_id,callback_type):
 
+    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
@@ -108,6 +110,7 @@ def main_callback_function(item_id,callback_type):
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
     # There is only a subsidary arm for the LH divergent route so we also need to
     # lock the subsidary signal if point 1 is set for the main route
+    # finally we interlock the main and subsidary signals with each other
     if not fpl_active(1):
         lock_signal(2)
         lock_subsidary(2)

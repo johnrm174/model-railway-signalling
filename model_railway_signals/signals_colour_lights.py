@@ -173,14 +173,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if not position_light:
             canvas.itemconfigure(poslight1,state='hidden')
             canvas.itemconfigure(poslight2,state='hidden')
-             
-        # Approach release button  - We only want a small button - hence a small font size
-        button4 = Button (canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"),
-                command=lambda:approach_release_button_event (sig_id))
-        point_coords = common.rotate_point (x,y,-50,0,orientation)
-        but4win = canvas.create_window (point_coords,window=button4)
-        if not approach_release_button: canvas.itemconfigure(but4win,state='hidden')
-
+    
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
         line_coords = common.rotate_line (x,y,+40,-25,+30,-15,orientation) 
@@ -254,14 +247,14 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
                                 orientation = orientation,has_theatre = theatre_route_indicator)
                 
+        # Create the signal elements to support Approach Control
+        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
+                    approach_callback = approach_release_button_event, approach_button = approach_release_button)
+
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
         # All SHARED attributes are signals_common to more than one signal Types
-        signals_common.signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
-        signals_common.signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-        signals_common.signals[str(sig_id)]["routeset"] = signals_common.route_type.MAIN # SHARED - Initial Route setting to display (none)
-        signals_common.signals[str(sig_id)]["releasebutton"] = button4                   # SHARED - Button drawing object
         signals_common.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
         signals_common.signals[str(sig_id)]["subtype"] = signal_subtype                  # Type-specific - subtype of the signal
         signals_common.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
@@ -561,7 +554,7 @@ def update_feather_route_indication (sig_id:int, route_to_set = None):
                 dcc_control.update_dcc_signal_route (sig_id, signals_common.signals[str(sig_id)]["routeset"],
                                                         signal_change = False, sig_at_danger = False)
             else:
-                logging.info ("Signal "+str(sig_id)+": Setting feather route to "+str(route_to_set).rpartition('.')[-1])
+                logging.info ("Signal "+str(sig_id)+": Setting signal route to "+str(route_to_set).rpartition('.')[-1])
                 # We always call the function to update the DCC route indication on a change in route even if the signal
                 # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
                 dcc_control.update_dcc_signal_route (sig_id, signals_common.signals[str(sig_id)]["routeset"],
@@ -694,8 +687,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     
     global logging
-    
-    # do some basic validation specific to this function for colour light signals
+    # do some additional validation specific to this function for colour light signals
     if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect distant signal")
     elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
@@ -705,21 +697,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
         logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
     else:
-        # give an indication that the approach control has been set for the signal
-        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"underline"))
-        if release_on_yellow:
-            if not signals_common.signals[str(sig_id)]["releaseonyel"]:
-                logging.info ("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
-            signals_common.signals[str(sig_id)]["releaseonyel"] = True
-            signals_common.signals[str(sig_id)]["releaseonred"] = False
-        else:
-            if not signals_common.signals[str(sig_id)]["releaseonred"]:
-                logging.info ("Signal "+str(sig_id)+": Setting approach control (release on red)")
-            signals_common.signals[str(sig_id)]["releaseonred"] = True
-            signals_common.signals[str(sig_id)]["releaseonyel"] = False
-        # We only refresh the aspect if the signal is configured to refresh when switched
-        # Otherwise, it will be the responsibility of the calling programme to make another
-        # call to update the signal aspect accordingly (based on the signal ahead)
+        signals_common.set_approach_control(sig_id,release_on_yellow)
+        # Call the internal function to update and refresh the signal - unless this signal
+        # is configured to be refreshed later (based on the aspect of the signal ahead)
         if signals_common.signals[str(sig_id)]["refresh"]:
             update_colour_light_signal_aspect(sig_id)
             
@@ -733,16 +713,11 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
-    # reset the state of the signal
-    if signals_common.signals[str(sig_id)]["releaseonred"] or signals_common.signals[str(sig_id)]["releaseonyel"]:
-        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-        signals_common.signals[str(sig_id)]["releaseonyel"] = False
-        signals_common.signals[str(sig_id)]["releaseonred"] = False
-        signals_common.signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
-        # Call the internal function to update and refresh the signal - unless this signal
-        # is configured to be refreshed later (based on the aspect of the signal ahead)
-        if signals_common.signals[str(sig_id)]["refresh"]: 
-            update_colour_light_signal_aspect(sig_id)
+    signals_common.clear_approach_control(sig_id)
+    # Call the internal function to update and refresh the signal - unless this signal
+    # is configured to be refreshed later (based on the aspect of the signal ahead)
+    if signals_common.signals[str(sig_id)]["refresh"]: 
+        update_colour_light_signal_aspect(sig_id)
     return ()
 
 ###############################################################################

@@ -36,7 +36,7 @@ debug_dcc = False
 
 def main_callback_function(item_id,callback_type):
 
-    print ("Callback into main program")
+    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
@@ -105,10 +105,15 @@ def main_callback_function(item_id,callback_type):
     #--------------------------------------------------------------
     
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
+    # We also interlock the subsidary with the main signal aspect
     if not fpl_active(1):
         lock_signal(2)
+        lock_subsidary(2)
     else:
-        unlock_signal(2)
+        if signal_clear(2): lock_subsidary(2)
+        else: unlock_subsidary(2)
+        if subsidary_clear(2): lock_signal(2)
+        else: unlock_signal(2)
     # Signal 3 is locked (at danger) if point 2 is set against it 
     if not point_switched(2):
         lock_signal(3)
@@ -119,8 +124,8 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Point 1 is locked if signal 2 is set to clear
-    if signal_clear(2):
+    # Point 1 is locked if signal 2 (or its subsidary) is set to clear
+    if signal_clear(2) or subsidary_clear(2):
         lock_point(1)
     else:
         unlock_point(1)
@@ -155,7 +160,8 @@ request_dcc_power_on()
 
 # Signal 2 assumes a Signalist SC1 decoder with a base address of 1 (CV1=5)
 # and set to "8 individual output" Mode (CV38=8). In this example we are using
-# outputs A,B,C,D to drive our signal with E & F driving the feather indications
+# outputs A,B,C,D to drive our signal with E driving the feather indication and
+# F driving the "Calling On" Subsidary aspect
 # The Signallist SC1 uses 8 consecutive addresses in total (which equate to DCC
 # addresses 1 to 8 for this example) - but we only need to use the first 6
 map_dcc_signal (sig_id = 2,
@@ -163,7 +169,8 @@ map_dcc_signal (sig_id = 2,
                 proceed = [[1,False],[2,True],[3,False],[4,False]],
                 caution = [[1,False],[2,False],[3,True],[4,False]],
                 prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                LH1 = [[5,True],[6,False]], MAIN = [[6,True],[5,False]], NONE = [[5,False],[6,False]] )
+                LH1 = [[5,True]], NONE = [[5,False]],
+                subsidary = 6)
 
 # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
 # and can take up to 4 consecutive addresses (if you include the flashing aspects)
@@ -226,8 +233,8 @@ create_colour_light_signal (canvas, 2, 275, 200,
                             sig_callback = main_callback_function,
                             sig_passed_button = True,
                             refresh_immediately = False,
-                            lhfeather45 = True,
-                            mainfeather = True)
+                            position_light = True,
+                            lhfeather45 = True)
 create_colour_light_signal (canvas, 3, 600, 150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback = main_callback_function,
@@ -254,9 +261,8 @@ create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
 create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
 
 # Set the initial interlocking conditions - in this case lock signal 3 as point 2 is set against it
-print ("Setting Initial Route and Interlocking")
+print ("Setting Initial Interlocking")
 lock_signal(3)
-set_route (2,route_type.MAIN)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")

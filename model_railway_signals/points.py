@@ -116,25 +116,21 @@ def change_button_event (point_id:int):
 
 def toggle_fpl (point_id:int):
 
-    global points # the dictionary of points
+    global points 
     global logging
-    
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not exist")
+    elif not points[str(point_id)]["fpllock"]:
+        logging.info ("Point "+str(point_id)+": Activating FPL")
+        points[str(point_id)]["changebutton"].config(state="disabled") 
+        points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
+        points[str(point_id)]["fpllock"]=True 
     else:
-        # We test for True and False as "None" = No FPL to toggle
-        if points[str(point_id)]["fpllock"] == False:
-            logging.info ("Point "+str(point_id)+": Activating FPL")
-            points[str(point_id)]["changebutton"].config(state="disabled") 
-            points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
-            points[str(point_id)]["fpllock"]=True 
-        elif points[str(point_id)]["fpllock"] == True:
-            logging.info ("Point "+str(point_id)+": Clearing FPL")
-            points[str(point_id)]["changebutton"].config(state="normal")  
-            points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
-            points[str(point_id)]["fpllock"]=False
-            
+        logging.info ("Point "+str(point_id)+": Clearing FPL")
+        points[str(point_id)]["changebutton"].config(state="normal")  
+        points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
+        points[str(point_id)]["fpllock"]=False
     return()
 
 # -------------------------------------------------------------------------
@@ -147,28 +143,26 @@ def toggle_fpl (point_id:int):
 
 def toggle_point (point_id:int):
     
-    global points # the dictionary of points
+    global points
     global logging
-    
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle Point - Point does not exist")
     else:   
-        if points[str(point_id)]["switched"] == False:
+        if not points[str(point_id)]["switched"]:
             logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
             points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
             points[str(point_id)]["switched"] = True
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
             dcc_control.update_dcc_point(point_id,True)
-        elif points[str(point_id)]["switched"] == True:
+        else:
             logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
             points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
             points[str(point_id)]["switched"] = False
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
             dcc_control.update_dcc_point(point_id,False)
-        
         # Now change any other points we need (i.e. points switched with this one)
         # We should have validated the Point exists at point creation time
         if points[str(point_id)]["alsoswitch"] != 0:
@@ -177,7 +171,6 @@ def toggle_point (point_id:int):
                         +str(points[str(point_id)]["alsoswitch"]) +" to also switch does not exist")
             else:   
                 toggle_point(points[str(point_id)]["alsoswitch"])
-
     return()
 
 # -------------------------------------------------------------------------
@@ -195,10 +188,9 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                   point_callback = null_callback, also_switch:int = 0,
                   reverse:bool=False,auto:bool=False,fpl:bool=False):
     
-    global points # the dictionary of points
+    global points
     global logging
     # also uses common.fontsize, common.xpadding, common.ypadding imported from "common"
-    
     logging.info ("Point "+str(point_id)+": Creating Point")
     # Do some basic validation on the parameters we have been given
     if point_exists(point_id):
@@ -298,10 +290,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 
         # Hide the line for the switched route (display it later when we need it)
         canvas.itemconfig(blade2,state="hidden")
-        
-        # We use the "None" state to represent that the point does not have a FPL
-        if not fpl: fpl=None
-        
+                
         # Compile a dictionary of everything we need to track
         new_point = {"canvas" : canvas,                # canvas object
                       "blade1" : blade1,               # drawing object
@@ -311,9 +300,10 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                       "alsoswitch" : also_switch,      # the next point to automatically switch
                       "extcallback" : point_callback,  # The external callback to make on an event
                       "automatic" : auto,              # Whether the point is automatic - used for validation
+                      "hasfpl" : fpl,                  # Whether the point has a facing point lock
                       "locked" : False,                # The initial "interlocking" state of the point
                       "switched" : False,              # The initial "switched" state of the point
-                      "fpllock" : fpl }                # the initial state of the Facing point Lock (None = No FPL)
+                      "fpllock" : fpl }                # the initial state of the Facing point Lock (locked if it has FPL)
 
         # Add the new point to the dictionary of points
         points[str(point_id)] = new_point
@@ -339,20 +329,19 @@ def lock_point (*point_ids:int):
     for point_id in point_ids:
         # Validate the point exists 
         if not point_exists(point_id):
-            logging.error ("Point "+str(point_id)+": Point to lock does not exist")
-        else:   
-            if points[str(point_id)]["locked"] == False:
-                logging.info ("Point "+str(point_id)+": Locking point")
-                if points[str(point_id)]["fpllock"] is None:
-                    # If the point doesn't have a FPL we just inhibit the change button
-                    points[str(point_id)]["changebutton"].config(state="disabled")
-                elif points[str(point_id)]["fpllock"] == False:
-                    # If the FPL is not already active then we need to activate it (with a warning)
-                    logging.warning ("Point "+str(point_id)+": FPL not activated - Activating FPL before locking")
-                    toggle_fpl (point_id)
-                    # Now inhibit the FPL button to stop it being manually unlocked
-                    points[str(point_id)]["lockbutton"].config(state="disabled") 
-                points[str(point_id)]["locked"] = True
+            logging.error ("Point "+str(point_id)+": lock_point - Point does not exist")
+        elif not points[str(point_id)]["locked"]:
+            logging.info ("Point "+str(point_id)+": Locking point")
+            if not points[str(point_id)]["hasfpl"]:
+                # If the point doesn't have a FPL we just inhibit the change button
+                points[str(point_id)]["changebutton"].config(state="disabled")
+            elif not points[str(point_id)]["fpllock"]:
+                # If the FPL is not already active then we need to activate it (with a warning)
+                logging.warning ("Point "+str(point_id)+": FPL not activated - Activating FPL before locking")
+                toggle_fpl (point_id)
+            # Now inhibit the FPL button to stop it being manually unlocked
+            points[str(point_id)]["lockbutton"].config(state="disabled") 
+            points[str(point_id)]["locked"] = True
     return()
 
 # -------------------------------------------------------------------------
@@ -365,17 +354,16 @@ def unlock_point (*point_ids:int):
     for point_id in point_ids:
         # Validate the point exists
         if not point_exists(point_id):
-            logging.error ("Point "+str(point_id)+": Point to unlock does not exist")
-        else:   
-            if points[str(point_id)]["locked"] == True:
-                logging.info ("Point "+str(point_id)+": Unlocking point")
-                if points[str(point_id)]["fpllock"] is None:
-                    # If the point doesn't have FPL we need to re-enable the change button
-                    points[str(point_id)]["changebutton"].config(state="normal")
-                elif points[str(point_id)]["fpllock"] == True:
-                    # If the point has FPL we just need to re-enable the FPL button
-                    points[str(point_id)]["lockbutton"].config(state="normal") 
-                points[str(point_id)]["locked"] = False
+            logging.error ("Point "+str(point_id)+": unlock_point - Point does not exist")
+        elif points[str(point_id)]["locked"]:
+            logging.info ("Point "+str(point_id)+": Unlocking point")
+            if not points[str(point_id)]["hasfpl"]:
+                # If the point doesn't have FPL we need to re-enable the change button
+                points[str(point_id)]["changebutton"].config(state="normal")
+            else:
+                # If the point has FPL we just need to re-enable the FPL button
+                points[str(point_id)]["lockbutton"].config(state="normal") 
+            points[str(point_id)]["locked"] = False
     return ()
 
 # -------------------------------------------------------------------------
@@ -387,7 +375,7 @@ def point_switched (point_id:int):
     global logging
     # Validate the point exists
     if not point_exists(point_id):
-        logging.error ("Point "+str(point_id)+": Point does not exist")
+        logging.error ("Point "+str(point_id)+": point_switched - Point does not exist")
         switched = False
     else:   
         switched = points[str(point_id)]["switched"]
@@ -403,9 +391,9 @@ def fpl_active(point_id:int):
     global logging
     # Validate the point exists
     if not point_exists(point_id):
-        logging.error ("Point "+str(point_id)+": Point does not exist")
+        logging.error ("Point "+str(point_id)+": fpl_active - Point does not exist")
         locked = False
-    elif points[str(point_id)]["fpllock"] is None:
+    elif not points[str(point_id)]["hasfpl"]:
         # Point does not have a FPL - always return True in this case
         locked = True
     else:
