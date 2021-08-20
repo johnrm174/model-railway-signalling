@@ -83,8 +83,8 @@ def toggle_section (section_id:int):
         # section is on
         logging.info ("Section "+str(section_id)+": Changing to CLEAR")
         sections[str(section_id)]["occupied"] = False
-        sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey",
-                                            activebackground="grey", activeforeground="grey")
+        sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey40",
+                                            activebackground="grey", activeforeground="grey40")
     else:
         # section is off
         logging.info ("Section "+str(section_id)+": Changing to OCCUPIED")
@@ -118,7 +118,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         # Create the button objects and their callbacks
         section_button = Button (canvas, text=label, state="normal", relief="raised",
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',common.fontsize,"normal"),
-                    bg="grey", fg="grey", activebackground="grey", activeforeground="grey",
+                    bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id))
         canvas.create_window (x,y,window=section_button) 
 

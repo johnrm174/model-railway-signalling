@@ -140,8 +140,6 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         # We don't use GPIO 0, 1, 2, 3 as these are the I2C (which we might want to use later)
         logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Channel "+str(gpio_channel)
                         + " - Channels (Channel number must be between 4 and 26 - also 14 & 15 are reserved)")
-    elif signal_passed < 0 or signal_approach < 0:
-        logging.error ("Sensor "+str(sensor_id)+": Signal ID (if specified) must be greater than zero")
     elif signal_passed > 0 and signal_approach > 0:
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
