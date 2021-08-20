@@ -121,6 +121,8 @@ def toggle_fpl (point_id:int):
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not exist")
+    elif not points[str(point_id)]["hasfpl"]:
+        logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not have a facing point lock")
     elif not points[str(point_id)]["fpllock"]:
         logging.info ("Point "+str(point_id)+": Activating FPL")
         points[str(point_id)]["changebutton"].config(state="disabled") 
@@ -141,36 +143,46 @@ def toggle_fpl (point_id:int):
 # point to switch if one was specified when the point was created
 # -------------------------------------------------------------------------
 
-def toggle_point (point_id:int):
+def toggle_point (point_id:int, switched_by_another_point = False):
     
     global points
     global logging
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle Point - Point does not exist")
+    elif points[str(point_id)]["automatic"] and not switched_by_another_point:
+        logging.error ("Point "+str(point_id)+": Toggle Point - Point is automatic - should be switched by another point")
     else:   
         if not points[str(point_id)]["switched"]:
-            logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
+            if switched_by_another_point:
+                logging.info ("Point "+str(point_id)+": Also changing point to SWITCHED")
+            else:
+                logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
             points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
             points[str(point_id)]["switched"] = True
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
             dcc_control.update_dcc_point(point_id,True)
         else:
-            logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
+            if switched_by_another_point:
+                logging.info ("Point "+str(point_id)+": Also changing point to NORMAL")
+            else:
+                logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
             points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
             points[str(point_id)]["switched"] = False
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
             points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
             dcc_control.update_dcc_point(point_id,False)
         # Now change any other points we need (i.e. points switched with this one)
-        # We should have validated the Point exists at point creation time
         if points[str(point_id)]["alsoswitch"] != 0:
             if not point_exists(points[str(point_id)]["alsoswitch"]):
                 logging.error ("Point "+str(point_id)+": Toggle Point - Point "
                         +str(points[str(point_id)]["alsoswitch"]) +" to also switch does not exist")
+            elif not points[str(points[str(point_id)]["alsoswitch"])]["automatic"]:
+                logging.error ("Point "+str(point_id)+": Toggle Point - Point "
+                        +str(points[str(point_id)]["alsoswitch"]) +" to also switch is not automatic")
             else:   
-                toggle_point(points[str(point_id)]["alsoswitch"])
+                toggle_point(points[str(point_id)]["alsoswitch"],switched_by_another_point=True)
     return()
 
 # -------------------------------------------------------------------------
@@ -199,14 +211,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     elif point_id < 1:
         logging.error ("Point "+str(point_id)+": Point ID must be greater than zero")
         point_objects = [0,0,0,0]
-    elif also_switch < 0:
-        logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' must be greater than zero")
-        point_objects = [0,0,0,0]
     elif also_switch == point_id:
-        logging.error ("Point "+str(point_id)+": ID for point to /'also switch/' is the same as the point to create")
-        point_objects = [0,0,0,0]
-    elif also_switch > 0 and point_exists(also_switch) and not points[str(also_switch)]["automatic"]:
-        logging.error ("Point "+str(point_id)+": Point "+str(also_switch)+" point to /'also switch/' is not an auto-switched point")
+        logging.error ("Point "+str(point_id)+": ID for point to \'also switch\' is the same as the point to create")
         point_objects = [0,0,0,0]
     elif orientation != 0 and orientation != 180:
         logging.error ("Point "+str(point_id)+": Invalid orientation angle - only 0 and 180 currently supported")
