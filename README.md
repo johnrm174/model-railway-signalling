@@ -21,7 +21,7 @@ the DCC control aspects, a log level of DEBUG will show you the commands being s
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
-![What is this](README_screenshot1.png)
+![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
 ## Installation
 For a first time installation use:
@@ -75,6 +75,9 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 'test_colour_light_signals.py'- developed primarily for testing, but it does provide an example of every 
            signal type and all the control features currently supported.
 
+'test_semaphore_signals.py'- similar to the above developed primarily for testing, but it does provide  
+           an example of every signal type and all the control features currently supported.
+
 </pre>
 
 Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
@@ -92,6 +95,7 @@ point_callback_type (tells the calling program what has triggered the callback):
 create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
                make up the point (so calling programs can later update them if required (e.g. change 
                the colour of the lines to represent the route that has been set up)
+               Returned list comprises: [straight blade, switched blade, straight route ,switched route]
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       point_id:int - The ID for the point - also displayed on the point button
@@ -159,10 +163,12 @@ Summary of features supported by each signal type:
            - query signal state (signal_clear, subsidary_clear, signal_overridden, approach_control_set)
     Semaphore signals:
            - set_route_indication (Route Type and theatre text)
+           - update_signal (based on a signal Ahead) - for home signals with a secondary distant arm
+           - toggle_signal / toggle_subsidary
            - lock_subsidary / unlock_subsidary
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
-           - set_approach_control (Release on Red Only) / clear_approach_control
+           - set_approach_control (Release on Red only) / clear_approach_control
            - trigger_timed_signal
            - query signal state (signal_clear, subsidary_clear, signal_overridden, approach_control_set)
     Ground Position Colour Light signals:
@@ -190,17 +196,14 @@ route_type (use for specifying the route):
   route_type.LH2    (far left)
   route_type.RH1    (immediate right)
   route_type.RH2    (rar right)
-These equate to the route feathers for colour light signals or the Sempahore junction "arm":
-  RH1 or RH2 make the RH junction arm and RH subsidary arm "active"
-  LH1 or LH2 make the LH junction arm and LH subsidary arm "active"
-  MAIN or NONE make the "main" signal arm and the "main" subsidary arm "active"
+These equate to the colour light signal route feathers or the Sempahore junction "arms"
 
 sig_callback_type (tells the calling program what has triggered the callback):
     sig_callback_type.sig_switched (signal has been switched)
     sig_callback_type.sub_switched (subsidary signal has been switched)
-    sig_callback_type.sig_passed ("signal passed" button activated - or triggered by a Timed signal)
+    sig_callback_type.sig_passed ("signal passed" button / sensor event - or triggered by Timed signal)
     sig_callback_type.sig_updated (signal aspect has been updated as part of a timed sequence)
-    sig_callback_type.sig_released (signal "approach release" button has been activated)
+    sig_callback_type.sig_released (signal "approach release" button / sensor event)
 
 create_colour_light_signal - Creates a colour light signal
   Mandatory Parameters:
@@ -223,7 +226,7 @@ create_colour_light_signal - Creates a colour light signal
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
       refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
                 when the signal is changed and the external programme will need to call the seperate 
-                'update_signal' function. Primarily intended for use with  3/4 aspect signals, where the
+                'update_signal' function. Primarily intended for use with 3/4 aspect signals, where the
                 displayed aspect will depend on the signal ahead if the signal is clear - Default True 
       fully_automatic:bool - Creates a signal without a manual control button - Default False
 
@@ -239,12 +242,26 @@ create_semaphore_signal - Creates a Semaphore signal
                           Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
       approach_release_button:bool - Creates an "Approach Release" button - Default False
-      subsidarymain:bool - To create a subsidary signal on the post under the "main" signal - default False
-      subsidarylh1:bool - To create a LH post with a subsidary signal - default False
-      subsidaryrh1:bool - To create a RH post with a subsidary signal - default False
-      lhroute1:bool - To create a LH post with a main (junction) signal - default False
-      rhroute1:bool - To create a RH post with a main (junction) signal - default False
+      lh1_signal:bool - To create a LH1 post with a main (junction) signal - default False
+      lh2_signal:bool - To create a LH2 post with a main (junction) signal - default False
+      rh1_signal:bool - To create a RH1 post with a main (junction) signal - default False
+      rh2_signal:bool - To create a RH2 post with a main (junction) signal - default False
+      main_subsidary:bool - To create a subsidary signal under the "main" signal - default False
+      lh1_subsidary:bool - To create a LH1 post with a subsidary signal - default False
+      lh2_subsidary:bool - To create a LH2 post with a subsidary signal - default False
+      rh1_subsidary:bool - To create a RH1 post with a subsidary signal - default False
+      rh2_subsidary:bool - To create a RH2 post with a subsidary signal - default False
+      main_distant:bool - To create a secondary distant signal (for the signal ahead) - default False
+      lh1_distant:bool - To create a LH1 secondary distant signal (for the signal ahead) - default False
+      lh2_distant:bool - To create a LH2 secondary distant signal (for the signal ahead) - default False
+      rh1_distant:bool - To create a RH1 secondary distant signal (for the signal ahead) - default False
+      rh2_distant:bool - To create a RH2 secondary distant signal (for the signal ahead) - default False
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
+      refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
+                when the signal is changed and the external programme will need to call the seperate 
+                'update_signal' function. Primarily intended for use with home signals that have a
+                secondary distant arm, which will reflect the state of the signal ahead (i.e. if the
+                signal ahead is at DANGER then the secondary distant arm will be ON) - Default True 
       fully_automatic:bool - Creates a signal without a manual control button - Default False
 
 create_ground_position_signal - create a ground position light signal
@@ -281,6 +298,7 @@ set_route - Set (and change) the route indication (either feathers or theatre te
 
 update_signal - update the aspect of a signal ( based on the aspect of a signal ahead)
               - intended for 3 and 4 aspect and 2 aspect distant colour light signals
+              - also for semaphore home signals created with with secondary distant arms
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
@@ -309,10 +327,6 @@ approach_control_set (sig_id) - returns the approach control state (True='active
 set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
 
 clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
-
-pulse_signal_passed_button (sig_id) - Pulses the signal passed button - use to indicate track sensor events
-
-pulse_signal_release_button (sig_id) - Pulses the approach release button - use to indicate track sensor events
 
 trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
                       - If a start delay >0 is specified then a 'sig_passed' callback event is generated
@@ -377,10 +391,13 @@ create_sensor - Creates a sensor object
       sensor_id:int - The ID to be used for the sensor 
       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
   Optional Parameters:
-      sensor_timeout:float - The time during which further triggers are ignored (default = 3 seconds)
-      trigger_period:float - The time that the sensor needs to remain active (default = 0.001 seconds)
-      sensor_callback - The function to call when the sensor triggers (default is no callback)
-                        Note that the callback function returns (item_id, callback type)
+      sensor_timeout:float - The time period during which further triggers are ignored - default = 3.0 secs
+      trigger_period:float - Duration that the sensor needs to remain active before triggering - default = 0.001 secs
+      signal_passed:int    - Raise a "signal passed" event for the specified signal ID when triggered - default = None
+      signal_approach:int  - Raise an "approach release" event for the specified signal ID when triggered - default = None
+      sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
+                                  Note that the callback function returns (item_id, callback type)
+
 
 sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
 </pre>
@@ -474,10 +491,19 @@ map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address
       main_signal:int     - single DCC address for the main signal arm (default = No Mapping)
    Optional Parameters:
       main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
-      left_signal:int     - single DCC address for the LH signal arm (default = No Mapping)
-      left_subsidary:int  - single DCC address for the LH subsidary arm (default = No Mapping)
-      right_signal:int    - single DCC address for the RH signal arm (default = No Mapping)
-      right_subsidary:int - single DCC address for the RH subsidary arm (default = No Mapping)
+      main_distant:int    - single DCC address for the main secondary distant arm (default = No Mapping)
+      lh1_signal:int      - single DCC address for the LH1 signal arm (default = No Mapping)
+      lh1_subsidary:int   - single DCC address for the LH1 subsidary arm (default = No Mapping)
+      lh1_distant:int     - single DCC address for the LH1 secondary distant arm (default = No Mapping)
+      lh2_signal:int      - single DCC address for the LH2 signal arm (default = No Mapping)
+      lh2_subsidary:int   - single DCC address for the LH2 subsidary arm (default = No Mapping)
+      lh2_distant:int     - single DCC address for the LH2 secondary distant arm (default = No Mapping)
+      rh1_signal:int      - single DCC address for the RH1 signal arm  (default = No Mapping)
+      rh1_subsidary:int   - single DCC address for the RH1 subsidary arm (default = No Mapping)
+      rh1_distant:int     - single DCC address for the RH1 secondary distant arm (default = No Mapping)
+      rh2_signal:int      - single DCC address for the RH2 signal arm  (default = No Mapping)
+      rh2_subsidary:int   - single DCC address for the RH2 subsidary arm (default = No Mapping)
+      rh2_distant:int     - single DCC address for the RH2 secondary distant arm (default = No Mapping)
       THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
               Each entry comprises the "character" and the associated list of DCC addresses/states
               "#" is a special character - which means inhibit all indications (when signal is at danger)
@@ -491,7 +517,7 @@ map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address
 
            map_semaphore_signal (sig_id = 2, 
                         main_signal = 1 , 
-                        left_signal = 2 , 
+                        lh1_signal = 2 , 
                         main_subsidary = 3)
 
 map_dcc_point

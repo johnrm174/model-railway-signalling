@@ -8,41 +8,18 @@
 
 from tkinter import *
 from model_railway_signals import *
-import threading
-import time
 import logging
-#logging.basicConfig(format='%(levelname)s:%(funcName)s: %(message)s',level=logging.DEBUG)
+
+# Set the logging level
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
 
 # Global variables to thrack the state of the test functions
-
 signals_locked = False
 signals_overriden = False
 subsidaries_locked = False
-
-#----------------------------------------------------------------------
-# This is the thread to continiually cycle through the route indications
-#----------------------------------------------------------------------
-
-def thread_to_cycle_routes (time_delay, null):
-
-    while True:
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.LH2,"1")
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.LH1,"2")
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.MAIN,"M")
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.RH1,"3")
-        time.sleep (time_delay)
-        for I in range(1,36):
-            set_route (I,route_type.RH2,"4")
-    return()
+route_display = [route_type.MAIN,route_type.LH1,route_type.LH2,route_type.RH1,route_type.RH2]
+theatre_text = ["M","1","2","3","4"]
+route_index = 0
 
 #----------------------------------------------------------------------
 # Function to update the signal aspects based on the signal ahead
@@ -50,43 +27,30 @@ def thread_to_cycle_routes (time_delay, null):
 
 def update_signals():
 
+    print ("")
+    print ("Updating Signals based on the Signal Ahead")
+    print ("Signal 25,26 and 50 will Error (negative tests)")
     update_signal (4,5)
     update_signal (3,4)
     update_signal (2,3)
     update_signal (1,2)
-    
     update_signal (7,6)
     update_signal (8,7)
     update_signal (9,8)
     update_signal (10,9)
-    
     update_signal (14,15)
     update_signal (13,14)
     update_signal (12,13)
     update_signal (11,12)
-
     update_signal (17,16)
     update_signal (18,17)
     update_signal (19,18)
     update_signal (20,19)
-    
-    update_signal (24,25)
-    update_signal (23,24)
-    update_signal (22,23)
-    update_signal (21,22)
-    
-    # These are the Ground Position signals
-    # This will have no effect but we test anyway
-    update_signal (29,30)
-    update_signal (28,29)
-    update_signal (27,28)
+    # Negative Tests
+    update_signal (25,50)
     update_signal (26,27)
-    
-    update_signal (32,31)
-    update_signal (33,32)
-    update_signal (34,33)
-    update_signal (35,34)
-    
+    update_signal (50,35)
+
     return ()
 
 #----------------------------------------------------------------------
@@ -94,7 +58,8 @@ def update_signals():
 #----------------------------------------------------------------------
 
 def signal_button(sig_id, sig_callback):
-    
+    print ("")
+    print ("Callback into main program - Item: "+str(sig_id)+" - Callback Type: "+str(sig_callback))
     # Deal with the timed signals
     if sig_callback == sig_callback_type.sig_passed:
         if sig_id in (5,10,15,20,25,30,35):
@@ -103,10 +68,28 @@ def signal_button(sig_id, sig_callback):
             trigger_timed_signal(sig_id+1,3,3)
         elif sig_id in (8,18,33):
             trigger_timed_signal(sig_id-1,3,3)
-    
     # Update the signals based on the signal ahead
     update_signals ()
 
+    return()
+
+#----------------------------------------------------------------------
+# This is the Callback Function to cycle through the route indications
+#----------------------------------------------------------------------
+
+def change_route_display ():
+    global route_index
+    print ("")
+    print ("Changing Feather and Theatre Route Indications")
+    print ("Signal 26 and 50 will Error (Negative Tests)")
+    if route_index < 4:
+        route_index = route_index+1
+    else:
+        route_index = 0
+    for I in range(1,27):
+        set_route (I,route_display[route_index],theatre_text[route_index])
+    # Negative signal doesn't exist tests
+    set_route (50,route_display[route_index],theatre_text[route_index])
     return()
 
 #----------------------------------------------------------------------
@@ -117,11 +100,19 @@ def lock_unlock_signals():
     global signals_locked
     global lock_signals_button
     if signals_locked:
+        print ("")
+        print ("Unocking all Signals")
+        print ("Signal 50 will Error (negative tests)")
         for I in range(1,36): unlock_signal(I)
+        unlock_signal(50)
         lock_signals_button.config(relief="raised")
         signals_locked = False
     else:
+        print ("")
+        print ("Locking all Signals")
+        print ("Signal 50 will Error (negative tests)")
         for I in range(1,36): lock_signal(I)
+        lock_signal(50)
         lock_signals_button.config(relief="sunken")
         signals_locked = True
     return()
@@ -134,11 +125,19 @@ def lock_unlock_subsidary():
     global subsidaries_locked
     global lock_subsidary_button
     if subsidaries_locked:
-        for I in range(1,36): unlock_subsidary(I)
+        print ("")
+        print ("Unlocking all Subsidary Signals")
+        print ("Signals 10, 26 and 50 will Error (negative tests)")
+        for I in range(10,27): unlock_subsidary(I)
+        unlock_subsidary(50)
         lock_subsidary_button.config(relief="raised")
         subsidaries_locked = False
     else:
-        for I in range(1,36): lock_subsidary(I)
+        print ("")
+        print ("Locking all Subsidary Signals")
+        print ("Signals 10, 26 and 50 will Error (negative tests)")
+        for I in range(10,27): lock_subsidary(I)
+        lock_subsidary(50)
         lock_subsidary_button.config(relief="sunken")
         subsidaries_locked = True
     return()
@@ -151,11 +150,19 @@ def set_clear_signal_overrides():
     global signals_overriden
     global set_signal_override_button
     if signals_overriden:
+        print ("")
+        print ("Clearing all Signal Overrides")
+        print ("Signal 50 will Error (negative tests)")
         for I in range(1,36): clear_signal_override(I)
+        clear_signal_override(50)
         set_signal_override_button.config(relief="raised")
         signals_overriden = False
     else:
+        print ("")
+        print ("Overriding All Signals")
+        print ("Signal 50 will Error (negative tests)")
         for I in range(1,36): set_signal_override(I)
+        set_signal_override(50)
         set_signal_override_button.config(relief="sunken")
         signals_overriden = True
     update_signals()
@@ -168,7 +175,8 @@ def set_clear_signal_overrides():
 def print_signal_state():
     print ("")
     print ("Current State of all signals is as follows")
-    for I in range(1,36):
+    print ("Signal 36 will Error (negative tests)")
+    for I in range(1,37):
         print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
                str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
     return()
@@ -180,8 +188,10 @@ def print_signal_state():
 def print_subsidary_state():
     print ("")
     print ("Current State of all subsidaries is as follows:")
-    for I in range(1,36):
+    print ("Signals 10, 26 and 50 will Error (negative tests)")
+    for I in range(10,27):
         print ("Subsidary "+str(I)+ " : sig_clear = "+str(subsidary_clear(I)))
+    print ("Subsidary "+str(50)+ " : sig_clear = "+str(subsidary_clear(50)))
     return()
 
 #----------------------------------------------------------------------
@@ -189,13 +199,19 @@ def print_subsidary_state():
 #----------------------------------------------------------------------
 
 def toggle_signals():
-    for I in range(1,36):toggle_signal(I)
+    print ("")
+    print ("Toggling All Signals")
+    print ("Signal 36 will Error (negative tests)")
+    for I in range(1,37):toggle_signal(I)
     update_signals()
     return()
 
 def toggle_subsidaries():
-    for I in range(1,36):toggle_subsidary(I)
-    update_signals()
+    print ("")
+    print ("Toggling All Subsidary Signals")
+    print ("Signals 10, 26 and 50 will Error (negative tests)")
+    for I in range(10,27):toggle_subsidary(I)
+    toggle_subsidary(50)
     return()
 
 #----------------------------------------------------------------------
@@ -203,27 +219,43 @@ def toggle_subsidaries():
 #----------------------------------------------------------------------
 
 def set_sigs_approach_control_red():
+    print ("")
+    print ("Setting \'Release on Red\' Approach Control for signals 5,6,15,17")
     for I in (5,6,15,17):set_approach_control(I)
     update_signals()
     return()
 
 def set_sigs_approach_control_yellow():
-    for I in (5,6,15,17):set_approach_control(I,release_on_yellow=True)
+    print ("")
+    print ("Setting \'Release on Yellow\' Approach Control for signals 5,6,14,17")
+    for I in (5,6,14,17):set_approach_control(I,release_on_yellow=True)
     update_signals()
     return()
 
 def set_all_approach_control_red():
-    for I in range(1,36):set_approach_control(I)
+    print ("")
+    print ("Setting \'Release on Red\' Approach Control for All signals")
+    print ("Signals 16, 20, 26 and 50 will Error (negative tests)")
+    for I in range(1,27):set_approach_control(I)
+    set_approach_control(50)
     update_signals()
     return()
 
 def set_all_approach_control_yellow():
-    for I in range(1,36):set_approach_control(I,release_on_yellow=True)
+    print ("")
+    print ("Setting \'Release on Yellow\' Approach Control for All signals")
+    print ("Signals 11, 15, 16, 20, 21, 25, 26 and 50 will Error (negative tests)")
+    for I in range(1,27):set_approach_control(I,release_on_yellow=True)
+    set_approach_control(50,release_on_yellow=True)
     update_signals()
     return()
 
 def clear_all_approach_control():
-    for I in range(1,36):clear_approach_control(I)
+    print ("")
+    print ("Clearing Approach Control for All signals")
+    print ("Signals 26 and 50 will Error (negative tests)")
+    for I in range(1,27):clear_approach_control(I)
+    clear_approach_control(50)
     update_signals()
     return()
 
@@ -268,25 +300,29 @@ button = Button (canvas, text="Toggle Subsidaries",
         state="normal", relief="raised",command=lambda:toggle_subsidaries())
 canvas.create_window (970,10,window=button,anchor=NW)
 
-button = Button (canvas, text="Set Approach control Red",
+button = Button (canvas, text="Set App Cntl Red",
         state="normal", relief="raised",command=lambda:set_all_approach_control_red())
-canvas.create_window (20,830,window=button,anchor=NW)
+canvas.create_window (20,850,window=button,anchor=NW)
 
-button = Button (canvas, text="Set Approach control Yel",
+button = Button (canvas, text="Set App Cntl Yel",
         state="normal", relief="raised",command=lambda:set_all_approach_control_yellow())
-canvas.create_window (220,830,window=button,anchor=NW)
+canvas.create_window (170,850,window=button,anchor=NW)
 
-button = Button (canvas, text="Clear Approach control ",
+button = Button (canvas, text="Clear App Cntl ",
         state="normal", relief="raised",command=lambda:clear_all_approach_control())
-canvas.create_window (420,830,window=button,anchor=NW)
+canvas.create_window (310,850,window=button,anchor=NW)
 
-button = Button (canvas, text="Set Appr cntl Red - 5,6,15,17",
+button = Button (canvas, text="Set App cntl Red - 5,6,15,17",
         state="normal", relief="raised",command=lambda:set_sigs_approach_control_red())
-canvas.create_window (610,830,window=button,anchor=NW)
+canvas.create_window (450,850,window=button,anchor=NW)
 
-button = Button (canvas, text="Set App cntl Yel - 5,6,15,17",
+button = Button (canvas, text="Set App cntl Yel - 5,6,14,17",
         state="normal", relief="raised",command=lambda:set_sigs_approach_control_yellow())
-canvas.create_window (840,830,window=button,anchor=NW)
+canvas.create_window (680,850,window=button,anchor=NW)
+
+button = Button (canvas, text="Change Route Display",
+        state="normal", relief="raised",command=lambda:change_route_display())
+canvas.create_window (900,850,window=button,anchor=NW)
 
 print ("Drawing Tracks")
 
@@ -306,8 +342,9 @@ canvas.create_text (600,760,text="Note that Ground Position signals don't suppor
                     " but these are triggered to provide a level of negative testing")
 canvas.create_text (600,780,text="Signals 3, 5, 8, 10, 15, 20, 25, are 'Fully Automatic' signals" +
                     " - No manual controls but they can be toggled and overridden")
-canvas.create_text (600,800,text="All signals are 'updated' based on the signal ahead" +
+canvas.create_text (600,800,text="All Main Colour Light signals apart from Signals 21-25 are 'updated' based on the signal ahead" +
                     " - This is to test the correct aspects are displayed")
+canvas.create_text (600,820,text="All Signals apart from Signals 21-25 and 31-35 will generate Callbacks into the main programme")
 
 print ("Creating Signals")
 
@@ -440,31 +477,28 @@ create_colour_light_signal (canvas,20,1000,350, sig_callback=signal_button,
                             orientation=180,
                             position_light = True)
 
-# 5th row of signals 
+# 5th row of signals
+# These do not have callbacks and are set to refresh immediately
 canvas.create_text (200,525,text="Signal 21 is a 2 Aspect RED/YLW - Signal Ahead\nwill have no effect on the aspect displayed")
 canvas.create_text (1000,525,text="Signal 25 is a 2 Aspect RED/YLW ")
 
-create_colour_light_signal (canvas,21,200,500, sig_callback=signal_button,
+create_colour_light_signal (canvas,21,200,500,
                             signal_subtype=signal_sub_type.red_ylw,
-                            refresh_immediately = False,
                             position_light = True)
-create_colour_light_signal (canvas,22,400,500, sig_callback=signal_button,
+create_colour_light_signal (canvas,22,400,500,
                             signal_subtype=signal_sub_type.four_aspect,
                             lhfeather45=True,lhfeather90=True,
-                            refresh_immediately = False,
                             position_light = True)
-create_colour_light_signal (canvas,23,600,500, sig_callback=signal_button,
+create_colour_light_signal (canvas,23,600,500,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,lhfeather45=True,
-                            refresh_immediately = False,
                             sig_passed_button=True,
                             position_light = True)
-create_colour_light_signal (canvas,24,800,500, sig_callback=signal_button,
+create_colour_light_signal (canvas,24,800,500,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
-                            refresh_immediately = False,
                             position_light = True)
-create_colour_light_signal (canvas,25,1000,500, sig_callback=signal_button,
+create_colour_light_signal (canvas,25,1000,500,
                             signal_subtype=signal_sub_type.red_ylw,
                             sig_passed_button=True,
                             fully_automatic=True,
@@ -485,30 +519,24 @@ create_ground_position_signal (canvas,30,1000,600, sig_callback=signal_button,
                             sig_passed_button=True)
 
 # 7th row of signals (ground position signals)
-create_ground_position_signal (canvas,31,200,650, sig_callback=signal_button,
+# These do not have callbacks defined
+create_ground_position_signal (canvas,31,200,650,
                             shunt_ahead = False, modern_type = False, orientation = 180)
-create_ground_position_signal (canvas,32,400,650, sig_callback=signal_button,
+create_ground_position_signal (canvas,32,400,650,
                             shunt_ahead = True, modern_type = False, orientation = 180)
-create_ground_position_signal (canvas,33,600,650, sig_callback=signal_button,
+create_ground_position_signal (canvas,33,600,650,
                             shunt_ahead = False, modern_type = True, orientation = 180,
                             sig_passed_button=True)
-create_ground_position_signal (canvas,34,800,650, sig_callback=signal_button,
+create_ground_position_signal (canvas,34,800,650,
                             shunt_ahead = True, modern_type = True, orientation = 180)
-create_ground_position_signal (canvas,35,1000,650, sig_callback=signal_button,
+create_ground_position_signal (canvas,35,1000,650,
                             shunt_ahead = False, modern_type = False, orientation = 180,
                             sig_passed_button=True)
 
 print ("Setting the initial aspects for all the signals (based on the signal ahead")
-
 update_signals()
 
-print ("Starting the Thread to continually cycle through the route indications")
-
-x = threading.Thread (target=thread_to_cycle_routes,args=(2,2))
-x.start()
-
 print ("Entering main event loop")
-
 root_window.mainloop()
 
 # ------------------------------------------------------
