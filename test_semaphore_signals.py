@@ -23,6 +23,27 @@ theatre_text = ["M","1","2","3","4"]
 route_index = 0
 
 #----------------------------------------------------------------------
+# This is the main callback function for when something changes
+# i.e. a point or signal "button" has been clicked on the display
+#----------------------------------------------------------------------
+
+def update_signals_based_on_signal_ahead():
+    update_signal(1,2)
+    update_signal(13,14)
+    update_signal(12,14)
+    update_signal(50,1)
+    update_signal(51,10)
+    update_signal(52,11)
+    return()
+
+def main_callback_function(item_id,callback_type):
+
+    print ("")
+    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+    update_signals_based_on_signal_ahead()
+    return()
+
+#----------------------------------------------------------------------
 # This is the Callback Function to cycle through the route indications
 #----------------------------------------------------------------------
 
@@ -40,24 +61,7 @@ def change_route_display ():
         set_route (I,route_display[route_index],theatre_text[route_index])
     # Negative signal doesn't exist tests
     set_route (99,route_display[route_index],theatre_text[route_index])
-    return()
-
-#----------------------------------------------------------------------
-# This is the main callback function for when something changes
-# i.e. a point or signal "button" has been clicked on the display
-#----------------------------------------------------------------------
-
-def main_callback_function(item_id,callback_type):
-
-    print ("")
-    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-    update_signal(1,2)
-    update_signal(13,14)
-    update_signal(12,14)
-    update_signal(50,1)
-    update_signal(51,10)
-    update_signal(52,11)
-    
+    update_signals_based_on_signal_ahead()
     return()
 
 #----------------------------------------------------------------------
@@ -135,6 +139,7 @@ def set_clear_signal_overrides():
         set_signal_override(99)
         set_signal_override_button.config(relief="sunken")
         signals_overriden = True
+    update_signals_based_on_signal_ahead()
     return()
 
 #----------------------------------------------------------------------
@@ -174,6 +179,7 @@ def toggle_signals():
     print ("Signal 23 will Error (negative tests)")
     print ("Errors will also be logged when clearing a signal for a non-supported route (i.e. no main arm exists for the route)")
     for I in range(1,24):toggle_signal(I)
+    update_signals_based_on_signal_ahead()
     return()
 
 def toggle_subsidaries():
@@ -184,6 +190,7 @@ def toggle_subsidaries():
     for I in range(1,13):toggle_subsidary(I)
     toggle_subsidary(19)
     toggle_subsidary(99)
+    update_signals_based_on_signal_ahead()
     return()
 
 #----------------------------------------------------------------------
@@ -197,6 +204,7 @@ def set_all_approach_control_red():
     for I in range(1,12):set_approach_control(I)
     set_approach_control(19)
     set_approach_control(99)
+    update_signals_based_on_signal_ahead()
     return()
 
 def set_all_approach_control_yellow():
@@ -205,6 +213,7 @@ def set_all_approach_control_yellow():
     print ("Signals 10, 14, 15, 19 and 99 will Error (negative tests)")
     for I in range(10,20):set_approach_control(I,release_on_yellow=True)
     set_approach_control (99,release_on_yellow=True)
+    update_signals_based_on_signal_ahead()
     return()
 
 def clear_all_approach_control():
@@ -213,6 +222,7 @@ def clear_all_approach_control():
     print ("Signals 19 and 99 will Error (negative tests)")
     for I in range(1,20):clear_approach_control(I)
     clear_approach_control(99)
+    update_signals_based_on_signal_ahead()
     return()
 
 #------------------------------------------------------------------------------------
@@ -483,12 +493,7 @@ create_ground_disc_signal (canvas, 22, 775, 650,
                            orientation = 180)
 
 print ("Setting initial signal states")
-update_signal(1,2)
-update_signal(13,14)
-update_signal(12,14)
-update_signal(50,1)
-update_signal(51,10)
-update_signal(52,11)
+update_signals_based_on_signal_ahead()
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
