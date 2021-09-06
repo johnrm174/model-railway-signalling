@@ -7,8 +7,6 @@ from . import common
 from . import dcc_control
 from tkinter import *    
 import enum
-import time
-import threading
 import logging
 
 # -------------------------------------------------------------------------
@@ -118,17 +116,6 @@ def toggle_subsidary (sig_id:int):
         signals[str(sig_id)]["subclear"] = True
         signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
-
-#-------------------------------------------------------------------------
-# Thread to "Pulse" the colour of a TKINTER" Button - used to provide a clear visual
-# indication when "signal passed" or "signal released" events have been triggered
-# -------------------------------------------------------------------------
-
-def thread_to_pulse_button (button, duration:float):
-    button.config(bg="red")
-    time.sleep (duration)
-    button.config(bg=common.bgraised)
-    return ()
     
 # -------------------------------------------------------------------------
 # Common function to generate a "signal passed" visual indication by pulsing
@@ -139,9 +126,8 @@ def thread_to_pulse_button (button, duration:float):
 
 def pulse_signal_passed_button (sig_id:int):
     button = signals[str(sig_id)]["passedbutton"]
-    # Call the thread to pulse the button
-    pulse_button_thread = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
-    pulse_button_thread.start()
+    root = signals[str(sig_id)]["canvas"].master
+    root.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
     return ()
 
 # -------------------------------------------------------------------------
@@ -151,10 +137,9 @@ def pulse_signal_passed_button (sig_id:int):
 # -------------------------------------------------------------------------
 
 def pulse_signal_release_button (sig_id:int):
-    button = signals[str(sig_id)]["releasebutton"]
-    # Call the thread to pulse the button
-    pulse_button_thread = threading.Thread(target=thread_to_pulse_button,args=(button, 1.0))
-    pulse_button_thread.start()
+    signals[str(sig_id)]["releasebutton"].config(bg="red")
+    root = signals[str(sig_id)]["canvas"].master
+    root.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
     return ()
 
 # -------------------------------------------------------------------------
