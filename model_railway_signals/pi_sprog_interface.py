@@ -107,7 +107,6 @@ def thread_to_send_buffered_data ():
 
 def thread_to_read_received_data ():
 
-    global pi_cbus_node
     global track_power_on
     global service_mode_status
     global logging
@@ -273,9 +272,11 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
         if debug:
             logging.info ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
             send_cbus_command (mj_pri=2, min_pri=2, op_code=12)
+            # Wait for the Pi-Sprog to respond and the rx data thread to print out the response
             time.sleep (1.0)
             logging.info ("Pi-SPROG: Sending QNN command (Query Node Number)")
             send_cbus_command (mj_pri=2, min_pri=3, op_code=13)
+            # Wait for the Pi-Sprog to respond and the rx data thread to print out the response
             time.sleep (1.0)
         return()
     except Exception: pass
@@ -452,8 +453,8 @@ def send_DCC_accessory_decoder_packet (address:int, active:bool, output_channel:
         low_addr = address & 0x3F
         high_addr = (( ~ address) >> 6) & 0x07
         
-        byte1 = (0x80 | low_addr);
-        byte2 = (0x80 | (high_addr << 4) | (active << 3) | output_channel & 0x07);
+        byte1 = (0x80 | low_addr)
+        byte2 = (0x80 | (high_addr << 4) | (active << 3) | output_channel & 0x07)
         byte3 = (byte1 ^ byte2)
         
         #  Send a RDCC3 Command (Request 3-Byte DCC Packet) via the CBUS
@@ -483,7 +484,7 @@ def send_DCC_accessory_decoder_packet (address:int, active:bool, output_channel:
 # (either via research or Test) whether the Pi-SPROG-3 supports the RDDC4 Command 
 #------------------------------------------------------------------------------
 
-def send_extended_DCC_accessory_decoder_packet (address:int, aspect:int, repeat:int = 3):
+def send_extended_DCC_accessory_decoder_packet (address:int, aspect:int, repeat:int = 3, alt_address = False):
 
     global track_power_on
     global logging
@@ -496,23 +497,19 @@ def send_extended_DCC_accessory_decoder_packet (address:int, aspect:int, repeat:
         
     elif track_power_on:
         
-#        #Interpretation 1
-#        address -= 1; 
-#        low_addr = (address & 0x03); 
-#        board_addr = (address >> 2) + 1; 
+        # DCC Address interpretation 1 and 2
+        address -= 1
+        low_addr = (address & 0x03)
+        board_addr = (address >> 2)
+        if alt_address: board_addr = board_addr+1
 
-        # Interpretation 2
-        address -= 1; 
-        low_addr = (address & 0x03);  
-        board_addr = (address >> 2); 
+        mid_addr = board_addr & 0x3F
+        high_addr = ((~board_addr) >> 6) & 0x07
 
-        mid_addr = board_addr & 0x3F;
-        high_addr = ((~board_addr) >> 6) & 0x07;
-
-        byte1 = (0x80 | mid_addr);
-        byte2 = (0x01 | (high_addr << 4) | (low_addr << 1));
-        byte3 = (0x1F & aspect);
-        byte4 = (byte1 ^ byte2 ^ byte3);
+        byte1 = (0x80 | mid_addr)
+        byte2 = (0x01 | (high_addr << 4) | (low_addr << 1))
+        byte3 = (0x1F & aspect)
+        byte4 = (byte1 ^ byte2 ^ byte3)
         
         #  Send a RDCC4 Command (Request 4-Byte DCC Packet) via the CBUS
         logging.debug ("PI >> SPROG - RDCC4 (Send 4 Byte DCC Packet) : Address:"

@@ -31,6 +31,8 @@ debug_dcc = False
 
 def main_callback_function(item_id,callback_type):
 
+    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------

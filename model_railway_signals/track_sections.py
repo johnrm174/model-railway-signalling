@@ -22,13 +22,8 @@
 #
 # --------------------------------------------------------------------------------
 
-# change the way we import depending on whether we are running locally or not
-# We do this so we can run the python code checker over the module when developing
-#import common
 from . import common
-
 from tkinter import *
-import tkinter.font
 import enum
 import logging
 
@@ -38,7 +33,6 @@ import logging
     
 # Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
-    null_event = 20
     section_switched = 21   # The section has been manually switched by the user
     
 # -------------------------------------------------------------------------
@@ -53,25 +47,26 @@ sections: dict = {}
 # Used if this is not specified when the section is created
 # -------------------------------------------------------------------------
 
-def section_null(section_id, section_callback = section_callback_type.null_event):
-    return(section_id, section_callback)
+def null_callback(section_id:int, callback_type):
+    return(section_id, callback_type)
 
 # -------------------------------------------------------------------------
 # Internal Function to check if a section exists in the list of section
 # Used in Most externally-called functions to validate the section ID
 # -------------------------------------------------------------------------
 
-def section_exists(section_id):
+def section_exists(section_id:int):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------
 # Callback for processing Button presses (manual toggling of Track Sections
 # -------------------------------------------------------------------------
 
-def section_button_event (section_id:int,external_callback):
+def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Manual Update *****************************")
-    toggle_section(section_id,external_callback)
+    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************")
+    toggle_section(section_id)
+    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_switched)
     return ()
 
 # -------------------------------------------------------------------------
@@ -79,27 +74,23 @@ def section_button_event (section_id:int,external_callback):
 # the section and initiate an external callback if one is specified
 # -------------------------------------------------------------------------
 
-def toggle_section (section_id:int, ext_callback=section_null):
+def toggle_section (section_id:int):
     
     global sections # the dictionary of sections
     global logging
     
-    # get the section that we are interested in
-    section = sections[str(section_id)]
-    if section["occupied"] == True:  # section is on
+    if sections[str(section_id)]["occupied"]:
+        # section is on
         logging.info ("Section "+str(section_id)+": Changing to CLEAR")
-        section["occupied"] = False
-        section["button1"].config(relief="raised", bg="grey", fg="grey",
-                        activebackground="grey", activeforeground="grey")
-    else:  # section is off
+        sections[str(section_id)]["occupied"] = False
+        sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey40",
+                                            activebackground="grey", activeforeground="grey40")
+    else:
+        # section is off
         logging.info ("Section "+str(section_id)+": Changing to OCCUPIED")
-        section["occupied"] = True
-        section["button1"].config(relief="sunken", bg="black",fg="white",
-                        activebackground="black", activeforeground="white")
-    # update the dictionary of sections with the new state  
-    sections[str(section_id)] = section;
-    # Now make the external callback
-    ext_callback(section_id,section_callback_type.section_switched)
+        sections[str(section_id)]["occupied"] = True
+        sections[str(section_id)]["button1"].config(relief="sunken", bg="black",fg="white",
+                                            activebackground="black", activeforeground="white")
     return()
 
 # -------------------------------------------------------------------------
@@ -109,7 +100,7 @@ def toggle_section (section_id:int, ext_callback=section_null):
 # -------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int,
-                    section_callback = section_null,
+                    section_callback = null_callback,
                     label:str = "Train On Line"):
     
     global sections # the dictionary of sections
@@ -122,25 +113,21 @@ def create_section (canvas, section_id:int, x:int, y:int,
         logging.error ("Section "+str(section_id)+": Section already exists")
     elif section_id < 1:
         logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
-    else: # we're good to go on and create the section
+    else:
         
         # Create the button objects and their callbacks
-        button1 = Button (canvas, text=label, state="normal", relief="raised",
-                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',common.fontsize,"normal"),
-                    bg="grey", fg="grey", activebackground="grey", activeforeground="grey",
-                    command = lambda:section_button_event(section_id,section_callback))
-
-        # Create some drawing objects (depending on section type)
-        canvas.create_window (x,y,window=button1) 
+        section_button = Button (canvas, text=label, state="normal", relief="raised",
+                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',8,"normal"),
+                    bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
+                    command = lambda:section_button_event(section_id))
+        canvas.create_window (x,y,window=section_button) 
 
         # Compile a dictionary of everything we need to track
-        new_section = {"canvas" : canvas,               # canvas object
-                      "button1" : button1,              # drawing object
-                      "occupied" : False }
+        sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
+                                     "button1" : section_button,          # drawing object
+                                     "extcallback" : section_callback,    # External callback to make
+                                     "occupied" : False }                 # Current state
 
-        # Add the new section to the dictionary of sections
-        sections[str(section_id)] = new_section 
-        
     return()
 
 # -------------------------------------------------------------------------
@@ -154,12 +141,10 @@ def section_occupied (section_id:int):
     
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section does not exist")
+        logging.error ("Section "+str(section_id)+": section_occupied - Section does not exist")
         occupied = False
     else:   
-        # get the section that we are interested in
-        section = sections[str(section_id)]
-        occupied = section["occupied"]
+        occupied = sections[str(section_id)]["occupied"]
     return(occupied)
 
 # -------------------------------------------------------------------------
@@ -172,7 +157,7 @@ def set_section_occupied (section_id:int):
     
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section to set to Occupied does not exist")
+        logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")
     elif not section_occupied(section_id):
         toggle_section(section_id)
     return()
@@ -180,8 +165,8 @@ def set_section_occupied (section_id:int):
 def clear_section_occupied (section_id:int):
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section to set to Clear does not exist")
-    if section_occupied(section_id,):
+        logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
+    elif section_occupied(section_id):
         toggle_section(section_id)
     return()
 
