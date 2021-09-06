@@ -190,9 +190,12 @@ def create_common_signal_elements (canvas,
     # if the signal doesn't have an associated subsidary. The Button positions are adjusted
     # accordingly so they always remain in the "right" position relative to the signal
     if subsidary:
-        button_position = common.rotate_point (x,y,-35,-20,orientation) 
+        if orientation == 0 or sig_id < 10:
+            button_position = common.rotate_point (x,y,-25,-20,orientation) 
+        else:
+            button_position = common.rotate_point (x,y,-35,-20,orientation) 
         canvas.create_window(button_position,anchor=E,window=sig_button)
-        canvas.create_window(button_position,anchor=W,window=sub_button)
+        canvas.create_window(button_position,anchor=W,window=sub_button)            
     else:
         button_position = common.rotate_point (x,y,-20,-20,orientation) 
         canvas.create_window(button_position,window=sig_button)
@@ -337,7 +340,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
         signals[str(sig_id)]["releaseonyel"] = True
         signals[str(sig_id)]["releaseonred"] = False
     else:
-        if not signals_common.signals[str(sig_id)]["releaseonred"]:
+        if not signals[str(sig_id)]["releaseonred"]:
             logging.info ("Signal "+str(sig_id)+": Setting approach control (release on red)")
         signals[str(sig_id)]["releaseonred"] = True
         signals[str(sig_id)]["releaseonyel"] = False

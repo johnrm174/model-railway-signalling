@@ -57,10 +57,19 @@
 #         main_signal:int     - single DCC address for the main signal arm  (default = No Mapping)
 #      Optional Parameters:
 #         main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
-#         left_signal:int     - single DCC address for the LH signal arm (default = No Mapping)
-#         left_subsidary:int  - single DCC address for the LH subsidary arm (default = No Mapping)
-#         right_signal:int    - single DCC address for the RH signal arm  (default = No Mapping)
-#         right_subsidary:int - single DCC address for the RH subsidary arm (default = No Mapping)
+#         main_distant:int    - single DCC address for the main secondary distant arm (default = No Mapping)
+#         lh1_signal:int      - single DCC address for the LH1 signal arm (default = No Mapping)
+#         lh1_subsidary:int   - single DCC address for the LH1 subsidary arm (default = No Mapping)
+#         lh1_distant:int     - single DCC address for the LH1 secondary distant arm (default = No Mapping)
+#         lh2_signal:int      - single DCC address for the LH2 signal arm (default = No Mapping)
+#         lh2_subsidary:int   - single DCC address for the LH2 subsidary arm (default = No Mapping)
+#         lh2_distant:int     - single DCC address for the LH2 secondary distant arm (default = No Mapping)
+#         rh1_signal:int      - single DCC address for the RH1 signal arm  (default = No Mapping)
+#         rh1_subsidary:int   - single DCC address for the RH1 subsidary arm (default = No Mapping)
+#         rh1_distant:int     - single DCC address for the RH1 secondary distant arm (default = No Mapping)
+#         rh2_signal:int      - single DCC address for the RH2 signal arm  (default = No Mapping)
+#         rh2_subsidary:int   - single DCC address for the RH2 subsidary arm (default = No Mapping)
+#         rh2_distant:int     - single DCC address for the RH2 secondary distant arm (default = No Mapping)
 #         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
 #                 Each entry comprises the "character" and the associated list of DCC addresses/states
 #                 "#" is a special character - which means inhibit all indications (when signal is at danger)
@@ -81,7 +90,12 @@ from . import pi_sprog_interface
 
 import enum
 import logging
-    
+
+# Define the internal Type for the DCC Signal mappings
+class mapping_type(enum.Enum):
+    SEMAPHORE = 1   # One to one mapping of DCC Addresses to each signal element 
+    COLOUR_LIGHT = 2   # Each aspect is mapped to a sequence of one or more DCC Addresses/states
+
 # Define empty dictionaries for the mappings and dcc addresses
 dcc_signal_mappings:dict = {}
 dcc_point_mappings:dict = {}
@@ -154,7 +168,8 @@ def map_dcc_signal (sig_id:int,
     else:
         # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
         # within the valid DCC accessory address range od 1 and 2047
-        addresses = danger + proceed + caution + prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE
+        addresses = ( danger + proceed + caution + prelim_caution + flash_caution +
+                      flash_prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE )
         for theatre_state in THEATRE:
             addresses = addresses + theatre_state[1]
         addresses_valid = True
@@ -162,37 +177,28 @@ def map_dcc_signal (sig_id:int,
             if entry[0] < 0 or entry[0] > 2047:
                 logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry[0])+" - must be between 1 and 2047")
                 addresses_valid = False
-            elif entry[1] not in (True,False):
-                logging.error ("Signal "+str(sig_id)+": Invalid DCC State "+str(entry[1])+" - must be between True or False")
-                addresses_valid = False
         if (subsidary < 0 or subsidary > 2047):
             logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for subsidary"+str(address)+" - must be between 1 and 2047")
             addresses_valid = False
         if addresses_valid:
-            # Create the DCC Mapping entry for the signal. We assign the "superset" of all possible dictionary entries
-            # to handle user errors without raising exceptions (e.g. if the user inadvertaintly creates a colour light
-            # signal DCC mapping for a semaphore signal - or vice versa
+            # Create the DCC Mapping entry for the signal
             new_dcc_mapping = {
-                "auto_route_inhibit" : auto_route_inhibit,                          # Mandatory for all signal types
-                str(signals_common.signal_state_type.DANGER)         :       danger,               # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.PROCEED)        :       proceed,              # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.CAUTION)        :       caution,              # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.PRELIM_CAUTION) :       prelim_caution,       # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.FLASH_CAUTION)  :       flash_caution,        # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.LH1)    :       LH1,                  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.LH2)    :       LH2,                  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.RH1)    :       RH1,                  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.RH2)    :       RH2,                  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.MAIN)   :       MAIN,                 # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.NONE)   :       NONE,                 # Specific to Colour Light Signal Mappings
-                "main_subsidary"                      :       subsidary,                    # Common to both Semaphore and Colour Lights 
-                "main_signal"                         :       0,                    # Specific to Semaphore Signal Mappings
-                "left_signal"                         :       0,                    # Specific to Semaphore Signal Mappings
-                "left_subsidary"                      :       0,                    # Specific to Semaphore Signal Mappings
-                "right_signal"                        :       0,                    # Specific to Semaphore Signal Mappings
-                "right_subsidary"                     :       0,                    # Specific to Semaphore Signal Mappings
-                "THEATRE"                             : THEATRE    }                # Common to both Semaphore and Colour Lights                  
+                "mapping_type" : mapping_type.COLOUR_LIGHT,                                        # Common to Colour_Light & Semaphore Mappings
+                "auto_route_inhibit" : auto_route_inhibit,                                         # Common to Colour_Light & Semaphore Mappings
+                "main_subsidary" :  subsidary,                                                     # Common to Colour_Light & Semaphore Mappings 
+                "THEATRE" : THEATRE,                                                               # Common to Colour_Light & Semaphore Mappings                  
+                str(signals_common.signal_state_type.DANGER) : danger,                             # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.PROCEED) : proceed,                           # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.CAUTION) : caution,                           # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.PRELIM_CAUTION) : prelim_caution,             # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.FLASH_CAUTION) : flash_caution,               # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour_Light Mappings
+                str(signals_common.route_type.LH1) : LH1,                                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.LH2) : LH2,                                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.RH1) : RH1,                                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.RH2) : RH2,                                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
+                str(signals_common.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
         
     return ()
@@ -206,7 +212,7 @@ def map_traintech_signal (sig_id:int,
                           base_address:int,
                           route_address:int = 0,
                           theatre_route = "NONE",
-                          feather_route = None):
+                          feather_route = signals_common.route_type.NONE):
 
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Train Tech Signal")
@@ -223,34 +229,28 @@ def map_traintech_signal (sig_id:int,
     else:
         # We only need to map the address for the feather OR the theatre (can't have both)
         theatre_address = route_address
-        if feather_route is None: route_address = 0
+        if feather_route is signals_common.route_type.NONE: route_address = 0
         else: theatre_address = 0
-        # Create the DCC Mapping entry for the signal. We assign the "superset" of all possible dictionary entries
-        # to handle user errors without raising exceptions (e.g. if the user inadvertaintly creates a colour light
-        # signal DCC mapping for a semaphore signal - or vice versa
+        # Create the DCC Mapping entry for the signal
         new_dcc_mapping = {
-                "auto_route_inhibit" : True,                                            # Mandatory for all signal types
-                str(signals_common.signal_state_type.DANGER)         :       [[base_address,False]],   # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.PROCEED)        :       [[base_address,True]],    # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.CAUTION)        :       [[base_address+1,True]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.PRELIM_CAUTION) :       [[base_address+1,False]], # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.FLASH_CAUTION)  :       [[base_address+3,True]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[base_address+3,False]], # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.LH1)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.LH2)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.RH1)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.RH2)    :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
-                str(signals_common.route_type.MAIN)   :       [[route_address,False]],  # Specific to Colour Light Signal Mappings 
-                str(signals_common.route_type.NONE)   :       [[route_address,False]],  # Specific to Colour Light Signal Mappings
-                "main_subsidary"                      :       0,                        # Common to both Semaphore and Colour Lights 
-                "main_signal"                         :       0,                        # Specific to Semaphore Signal Mappings
-                "left_signal"                         :       0,                        # Specific to Semaphore Signal Mappings
-                "left_subsidary"                      :       0,                        # Specific to Semaphore Signal Mappings
-                "right_signal"                        :       0,                        # Specific to Semaphore Signal Mappings
-                "right_subsidary"                     :       0,                        # Specific to Semaphore Signal Mappings
-                "THEATRE" :        [ [str(theatre_route), [[theatre_address,True],]],   # Common to both Semaphore and Colour Lights
-                                     ["#", [[theatre_address,False],]],
-                                     ["", [[theatre_address,False],]] ]      }
+                "mapping_type" : mapping_type.COLOUR_LIGHT,                                           # Common to Colour_Light & Semaphore Mappings
+                "auto_route_inhibit" : True,                                                          # Common to Colour_Light & Semaphore Mappings
+                "main_subsidary" : 0,                                                                 # Common to Colour_Light & Semaphore Mappings 
+                "THEATRE" : [ [str(theatre_route), [[theatre_address,True],]],                        # Common to Colour_Light & Semaphore Mappings
+                              ["#", [[theatre_address,False],]],
+                              ["", [[theatre_address,False],]]    ],
+                str(signals_common.signal_state_type.DANGER) : [[base_address,False]],                 # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.PROCEED) : [[base_address,True]],                 # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.CAUTION) : [[base_address+1,True]],               # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.PRELIM_CAUTION) : [[base_address+1,False]],       # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.FLASH_CAUTION) : [[base_address+3,True]],         # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[base_address+3,False]], # Specific to Colour_Light Mappings
+                str(signals_common.route_type.LH1) : [[route_address,False]],                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.LH2) : [[route_address,False]],                          # Specific to Colour_Light Mappingss
+                str(signals_common.route_type.RH1) : [[route_address,False]],                          # Specific to Colour_Light Mappings
+                str(signals_common.route_type.RH2) : [[route_address,False]],                          # Specific to Colour_Light Mappingss
+                str(signals_common.route_type.MAIN) : [[route_address,False]],                         # Specific to Colour_Light Mappings 
+                str(signals_common.route_type.NONE) : [[route_address,False]] }                        # Specific to Colour_Light Mappings
         
         # Configure the DCC Command  for the feather route indicator that we want to configured
         new_dcc_mapping[str(feather_route)] = [[route_address,True]]
@@ -268,28 +268,29 @@ def map_traintech_signal (sig_id:int,
 #
 #    Simple Example - a semaphore signal with main and subsidary arms for the primary route
 #    and a RH bracket with just a main signal arm, would be configured as below.
-#    This example also includes an example configuration for a theatre route indication
-#    which we will use to display "1" or "2" for routes. Note that we also need to include
-#    a mapping for the "special" character "#" which represents the mappings to apply when
-#    the theatre indicator is inhibited (when the signal is set to DANGER)
 #
 #        map_semaphore_signal (sig_id = 10,
 #                              main_signal_arm = 21,
 #                              main_subsidary_arm = 22
-#                              right_signal_arm = 23
-#                              THEATRE = [ ["#", [[24,False],[25,False]]],
-#                                          ["1",[[24,False],[25,True]]],
-#                                          ["2",[[24,True],[25,False]]] ]   )
-
+#                              rh1_signal_arm = 23  )
 #-----------------------------------------------------------------------------------------
 
 def map_semaphore_signal (sig_id:int,
                           main_signal:int = 0,
+                          lh1_signal:int = 0,
+                          lh2_signal:int = 0,
+                          rh1_signal:int = 0,
+                          rh2_signal:int = 0,
                           main_subsidary:int = 0,
-                          left_signal:int = 0,
-                          left_subsidary:int = 0,
-                          right_signal:int = 0,
-                          right_subsidary:int = 0,
+                          lh1_subsidary:int = 0,
+                          lh2_subsidary:int = 0,
+                          rh1_subsidary:int = 0,
+                          rh2_subsidary:int = 0,
+                          main_distant:int = 0,
+                          lh1_distant:int = 0,
+                          lh2_distant:int = 0,
+                          rh1_distant:int = 0,
+                          rh2_distant:int = 0,
                           THEATRE = [["#", [[0,False],]],]):
 
     # Do some basic validation on the parameters we have been given
@@ -299,7 +300,8 @@ def map_semaphore_signal (sig_id:int,
     elif sig_id < 1:
         logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
     else: 
-        addresses = [main_signal,main_subsidary,left_signal,left_subsidary,right_signal,right_subsidary]
+        addresses = [main_signal,main_subsidary,lh1_signal,lh1_subsidary,rh1_signal,rh1_subsidary,
+                     lh2_signal,lh2_subsidary,rh2_signal,rh2_subsidary]
         for theatre_state in THEATRE:
             for dcc_address in theatre_state[1]:
                 addresses = addresses + [dcc_address[0]]
@@ -310,30 +312,26 @@ def map_semaphore_signal (sig_id:int,
                 addresses_valid = False
         
         if addresses_valid:
-            # Create the DCC Mapping entry for the signal. We assign the "superset" of all possible dictionary entries
-            # to handle user errors without raising exceptions (e.g. if the user inadvertaintly creates a colour light
-            # signal DCC mapping for a semaphore signal - or vice versa
+            # Create the DCC Mapping entry for the signal.
             new_dcc_mapping = {
-                    "auto_route_inhibit" : False,                                   # Mandatory for all signal types
-                    str(signals_common.signal_state_type.DANGER)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.PROCEED)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.CAUTION)        :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.PRELIM_CAUTION) :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.FLASH_CAUTION)  :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.LH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.LH2)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.RH1)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.RH2)    :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.MAIN)   :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    str(signals_common.route_type.NONE)   :       [[0,False],],     # Specific to Colour Light Signal Mappings
-                    "main_subsidary"                      :       main_subsidary,   # Common to both Semaphore and Colour Lights 
-                    "main_signal"                         :       main_signal,      # Specific to Semaphore Signal Mappings
-                    "left_signal"                         :       left_signal,      # Specific to Semaphore Signal Mappings
-                    "left_subsidary"                      :       left_subsidary,   # Specific to Semaphore Signal Mappings
-                    "right_signal"                        :       right_signal,     # Specific to Semaphore Signal Mappings
-                    "right_subsidary"                     :       right_subsidary,  # Specific to Semaphore Signal Mappings
-                    "THEATRE"                             :       THEATRE  }        # Common to both Semaphore and Colour Lights
+                "mapping_type" : mapping_type.SEMAPHORE,     # Common to Colour_Light & Semaphore Mappings
+                "auto_route_inhibit" : False,                # Common to Colour_Light & Semaphore Mappings
+                "main_subsidary" :  main_subsidary,          # Common to Colour_Light & Semaphore Mappings 
+                "THEATRE"       : THEATRE,                   # Common to Colour_Light & Semaphore Mappings                                      str(signals_common.signal_state_type.DANGER)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                "main_signal"   : main_signal,               # Specific to Semaphore Signal Mappings
+                "main_distant"  : main_distant,              # Specific to Semaphore Signal Mappings
+                "lh1_signal"    : lh1_signal,                # Specific to Semaphore Signal Mappings
+                "lh1_subsidary" : lh1_subsidary,             # Specific to Semaphore Signal Mappings
+                "lh1_distant"   : lh1_distant,               # Specific to Semaphore Signal Mappings
+                "lh2_signal"    : lh2_signal,                # Specific to Semaphore Signal Mappings
+                "lh2_subsidary" : lh2_subsidary,             # Specific to Semaphore Signal Mappings
+                "lh2_distant"   : lh2_distant,               # Specific to Semaphore Signal Mappings
+                "rh1_signal"    : rh1_signal,                # Specific to Semaphore Signal Mappings
+                "rh1_subsidary" : rh1_subsidary,             # Common to both Semaphore and Colour Lights
+                "rh1_distant"   : rh1_distant,               # Specific to Semaphore Signal Mappings
+                "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
+                "rh2_subsidary" : rh2_subsidary,             # Common to both Semaphore and Colour Lights
+                "rh2_distant"   : rh2_distant }              # Specific to Semaphore Signal Mappings
 
             # Finally save the DCC mapping into the dictionary of mappings 
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
@@ -394,17 +392,23 @@ def update_dcc_signal_aspects(sig_id: int, state: signals_common.signal_state_ty
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
-        # Retrieve the DCC mappings for our signal
+        # Retrieve the DCC mappings for our signal and validate its the correct mapping
+        # This function should only be called for Colour Light Signal Types
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        # Send the DCC commands to change the state
-        for entry in dcc_mapping[str(state)]:
-            if entry[0] > 0:
-                pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+        if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
+            logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
+        else:
+            logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
+            # Send the DCC commands to change the state
+            for entry in dcc_mapping[str(state)]:
+                if entry[0] > 0: pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
     return()
 
 #-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to change the subsidary signal aspect
+# Function to send the appropriate DCC commands to change a single element of a signal
+# This function primarily used for semaphore signals where each signal "arm" is normally
+# mapped to a single DCC address. Also used for the subsidary aspect of main colour light
+# signals where this subsidary aspect is normally mapped to a single DCC Address
 #------------------------------------------------------------------------------------------
             
 def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidary"):
@@ -412,12 +416,15 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
     global logging
     
     if sig_mapped(sig_id):
-        logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
-        # Retrieve the DCC mappings for our signal
+        # Retrieve the DCC mappings for our signal and validate its the correct mapping
+        # This function should only be called for anything other than the "main_subsidary" for Semaphore Signal Types
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        # Send the DCC commands to change the state 
-        if dcc_mapping[element] > 0:
-            pi_sprog_interface.send_accessory_short_event (dcc_mapping[element],state)        
+        if element != "main_subsidary" and dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
+            logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
+        else:
+            logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
+            # Send the DCC commands to change the state 
+            if dcc_mapping[element] > 0: pi_sprog_interface.send_accessory_short_event (dcc_mapping[element],state)        
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -436,20 +443,23 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
     global logging
     
     if sig_mapped(sig_id):
-        # Retrieve the DCC mappings for our signal
+        # Retrieve the DCC mappings for our signal and validate its the correct mapping
+        # This function should only be called for Colour Light Signal Types
         dcc_mapping = dcc_signal_mappings[str(sig_id)]
-        # Only send commands to enable/disable route if we need to:
-        # All signals - Any route change when the signal is not at DANGER
-        # Auto inhibit signals - additionally route changes when signal is at DANGER
-        # Non auto inhibit signals - additionally all signal changes to/from DANGER
-        if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
-             (not dcc_mapping["auto_route_inhibit"] and signal_change) or
-             (not sig_at_danger and not signal_change) ):
-            logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
-            # Send the DCC commands to change the state if required
-            for entry in dcc_mapping[str(route)]:
-                if entry[0] > 0:
-                    pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+        if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
+            logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
+        else:
+            # Only send commands to enable/disable route if we need to:
+            # All signals - Any route change when the signal is not at DANGER
+            # Auto inhibit signals - additionally route changes when signal is at DANGER
+            # Non auto inhibit signals - additionally all signal changes to/from DANGER
+            if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
+                 (not dcc_mapping["auto_route_inhibit"] and signal_change) or
+                 (not sig_at_danger and not signal_change) ):
+                logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
+                # Send the DCC commands to change the state if required
+                for entry in dcc_mapping[str(route)]:
+                    if entry[0] > 0: pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -468,7 +478,8 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
     global logging
     
     if sig_mapped(sig_id):
-        # Retrieve the DCC mappings for our signal
+        # Retrieve the DCC mappings for our signal. We don't need to validate the mapping type
+        # as Theatre route displays are supported by both Colour Light and Semaphore signal types 
         dcc_mapping = dcc_signal_mappings[str(sig_id)]       
         # Only send commands to enable/disable route if we need to:
         # All signals - Any route change when the signal is not at DANGER
@@ -482,8 +493,7 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
                     for command in entry[1]:
-                        if command[0] > 0:
-                             pi_sprog_interface.send_accessory_short_event (command[0],command[1])
+                        if command[0] > 0: pi_sprog_interface.send_accessory_short_event (command[0],command[1])
     return()
 
 #######################################################################################

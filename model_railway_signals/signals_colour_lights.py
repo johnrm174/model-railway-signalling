@@ -295,14 +295,14 @@ def update_colour_light_subsidary_signal (sig_id:int):
     
     global logging
     if signals_common.signals[str(sig_id)]["subclear"]:
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to WHITE/WHITE")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to PROCEED")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="white")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos2"],fill="white")
         dcc_control.update_dcc_signal_element(sig_id,True,element="main_subsidary")  
     else:
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos2"],fill="grey")
-        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK/DARK")
+        logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to DARK")
         dcc_control.update_dcc_signal_element(sig_id,False,element="main_subsidary")
     return ()
 
@@ -318,6 +318,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
 def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
 
     global logging
+    global aspects_thread_lock
 
     # ---------------------------------------------------------------------------------
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
@@ -422,8 +423,8 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     # Only refresh the signal if the aspect has been changed
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
-        # Update the current aspect - note that this dictionary element is also used by the
-        # Flash Aspects Thread, but as it is a single element, it should be thread safe
+        # Update the current aspect - note that this dictionary element is also used by the Flash Aspects Thread
+        # As its a single element it should be relatively thread safe (i.e. risk of update "issues" extremely small)
         signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
         refresh_signal_aspects (sig_id)
         update_feather_route_indication(sig_id)
@@ -432,10 +433,13 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     return ()
 
 # -------------------------------------------------------------------------
-# Thread for changing flashing aspects - uses a list of Tkinter drawing
-# objects to flash on a regular basis - objects are addedto /removed from
-# this list as and when the aspects are changed. We use a lock to ensure
-# that this is done as determinalistically as possible
+# Thread for cycling the flashing aspects. As it only uses a single element
+# from the signal dictionary ("sigstate") it should be relatively threadsafe.
+# I have experimented with using a Threadlock for the duration of each change
+# but there does seem to be some sort of underlying issue with accessing the
+# Tkinter drawing aspects from a seperate thread when the main thread is "locked"
+# (i.e. the attempts to '.itemconfigure' just seem to hang) so have abandoned 
+# this for the time being - Will plan to re-visit if it ever becomes a problem
 # -------------------------------------------------------------------------
 
 def flash_aspects_thread():
@@ -443,7 +447,7 @@ def flash_aspects_thread():
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
                 if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                   signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
+                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
                 if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
@@ -451,13 +455,13 @@ def flash_aspects_thread():
         for signal in signals_common.signals:
             if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
                 if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                   signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
+                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
                 if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
                     signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
         time.sleep (0.25)
     return()
-
+        
 flash_aspects = threading.Thread(target = flash_aspects_thread)
 flash_aspects.start()
 
@@ -625,8 +629,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         # Cycle through the aspects if its a 3 or 4 aspect signal
         if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
-            # Call the internal function to update and refresh the signal - unless this signal is configured to
-            # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+            # Call the internal function to update and refresh the signal - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_colour_light_signal_aspect(sig_id)
             signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
@@ -634,8 +637,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             time.sleep (time_delay) 
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
-            # Call the internal function to update and refresh the signal - unless this signal is configured to
-            # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+            # Call the internal function to update and refresh the signal - Then make the external callback
             logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_colour_light_signal_aspect(sig_id)
             signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
@@ -650,8 +652,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
         else:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
-        # Call the internal function to update and refresh the signal - unless this signal is configured to
-        # be refreshed later (based on the aspect of the signal ahead) - Then make the external callback
+        # Call the internal function to update and refresh the signal - Then make the external callback
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
         update_colour_light_signal_aspect(sig_id)
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
@@ -689,13 +690,13 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     global logging
     # do some additional validation specific to this function for colour light signals
     if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect distant signal")
+        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect distant signal")
     elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
+        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
+        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
     elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
-        logging.warning("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
+        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
     else:
         signals_common.set_approach_control(sig_id,release_on_yellow)
         # Call the internal function to update and refresh the signal - unless this signal

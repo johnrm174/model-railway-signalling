@@ -31,6 +31,8 @@ debug_dcc = False
 
 def main_callback_function(item_id,callback_type):
 
+    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+
     #--------------------------------------------------------------
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
@@ -114,7 +116,7 @@ def main_callback_function(item_id,callback_type):
     if callback_type in (sig_callback_type.sig_switched, sig_callback_type.sig_updated,
                         sig_callback_type.sig_passed, section_callback_type.section_switched):
         
-        if point_switched(1) and (not signal_clear(5) or signal_overridden(5)):
+        if point_switched(1):
             set_approach_control(4)
         elif not point_switched(1) and (not signal_clear(6) or signal_overridden(6)):
             set_approach_control(4)
@@ -196,7 +198,7 @@ request_dcc_power_on()
 map_semaphore_signal (sig_id = 1, main_signal = 1 )
 map_semaphore_signal (sig_id = 2, main_signal = 2 )
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
-map_semaphore_signal (sig_id = 4, main_signal = 4 , left_signal = 14 , left_subsidary = 15)
+map_semaphore_signal (sig_id = 4, main_signal = 4 , lh1_signal = 14 , lh1_subsidary = 15)
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
 map_semaphore_signal (sig_id = 6, main_signal = 6 )
 
@@ -221,7 +223,7 @@ create_semaphore_signal (canvas,4,725,200,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
                             approach_release_button = True,
-                            lhroute1 = True)
+                            lh1_signal = True)
 create_semaphore_signal (canvas,5,1000,150,
                             sig_callback=main_callback_function,
                             sig_passed_button=True)

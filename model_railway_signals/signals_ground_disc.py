@@ -85,7 +85,7 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         # Draw the White disc of the signal
         posroot = canvas.create_oval(common.rotate_line (x,y,+5,-21,+21,-5,orientation),fill="white",outline="black")
         # Draw the banner arms for the signal
-        if shunt_ahead: arm_colour="goldenrod"
+        if shunt_ahead: arm_colour="yellow3"
         else: arm_colour = "red"
         sigon = canvas.create_line(common.rotate_line(x,y,+13,-21,+13,-5,orientation),fill=arm_colour,width=3)
         sigoff = canvas.create_line(common.rotate_line(x,y,+18,-19,+8,-7,orientation),fill=arm_colour,width=3)

@@ -68,17 +68,22 @@ def main_callback_function(item_id,callback_type):
     # allow for manual setting/resetting the track occupancy sections
     #--------------------------------------------------------------
     
+    # Distant signal 1 is overridden if ANY sections ahead of the signal are occupied
+    # or the final home signal is Overridden at Danger
+    if ((section_occupied(2) and point_switched(1)) or
+            (section_occupied(3) and not point_switched(1)) or
+            (section_occupied(1) or section_occupied(4)) or
+            signal_overridden(5) ):
+        set_signal_override(1)
+    else:
+        clear_signal_override(1)
+    # Home signal 2 is only overridden if the section directly ahead is occupied
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
         set_signal_override(2)
-        set_signal_override(1)
-    elif section_occupied(1):
-        clear_signal_override(2)
-        set_signal_override(1)
     else:
         clear_signal_override(2)
-        clear_signal_override(1)
-
+    # Home signals 3 and 4 are only overridden if the section directly ahead is occupied
     if section_occupied(4):
         set_signal_override(3)
         set_signal_override(4)
@@ -101,12 +106,6 @@ def main_callback_function(item_id,callback_type):
     # Process the signal/point interlocking
     #--------------------------------------------------------------
     
-    # Signal 1 is locked (at danger) if signal 2 is set to  Danger - i.e. the home signal
-    # needs to be CLEARED before the associated distant can be CLEARED.
-    if not signal_clear(1) and not signal_clear(2):
-        lock_signal(1)
-    else:
-        unlock_signal(1)
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
     # There is only a subsidary arm for the LH divergent route so we also need to
     # lock the subsidary signal if point 1 is set for the main route
@@ -132,6 +131,16 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
+    # Signal 1 is locked (at danger) if any of the home signals ahead are at DANGER.
+    if (signal_clear(2) and signal_clear(5) and
+         ( (signal_clear(3) and point_switched(1)) or
+           (signal_clear(4) and not point_switched(1)) ) ):
+        unlock_signal(1)
+    else:
+        # if a home signal ahead has been switched to DANGER we return the distant to Danger
+        if signal_clear(1): toggle_signal(1)
+        lock_signal(1)
+
     # Point 1 is locked if signal 1, signal 2 (or its subsidary) is set to clear
     if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
         lock_point(1)
@@ -166,8 +175,8 @@ initialise_pi_sprog (dcc_debug_mode=debug_dcc)
 request_dcc_power_on()
 
 # Simple mapping of the main signal to a single DCC address
-map_semaphore_signal (sig_id = 1, main_signal = 1 , left_signal = 10 )
-map_semaphore_signal (sig_id = 2, main_signal = 2 , left_signal = 11 , left_subsidary = 12)
+map_semaphore_signal (sig_id = 1, main_signal = 1 , lh1_signal = 10 )
+map_semaphore_signal (sig_id = 2, main_signal = 2 , lh1_signal = 11 , lh1_subsidary = 12)
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
 map_semaphore_signal (sig_id = 4, main_signal = 4 )
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
@@ -207,12 +216,12 @@ create_section(canvas,4,800,200,section_callback=main_callback_function)
 print ("Creating Signals")
 create_semaphore_signal (canvas,1,50,200,distant = True,
                          sig_callback=main_callback_function,
-                         lhroute1 = True,
+                         lh1_signal = True,
                          sig_passed_button = True)
 create_semaphore_signal (canvas,2,275,200,
                          sig_callback=main_callback_function,
-                         subsidarylh1 = True,
-                         lhroute1 = True,
+                         lh1_subsidary = True,
+                         lh1_signal = True,
                          sig_passed_button = True)
 create_semaphore_signal (canvas,3,600,150,
                          sig_callback=main_callback_function,

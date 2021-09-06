@@ -79,7 +79,7 @@ def toggle_section (section_id:int):
     global sections # the dictionary of sections
     global logging
     
-    if sections[str(section_id)]["occupied"] == True:
+    if sections[str(section_id)]["occupied"]:
         # section is on
         logging.info ("Section "+str(section_id)+": Changing to CLEAR")
         sections[str(section_id)]["occupied"] = False
@@ -117,7 +117,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         
         # Create the button objects and their callbacks
         section_button = Button (canvas, text=label, state="normal", relief="raised",
-                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',common.fontsize,"normal"),
+                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',8,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id))
         canvas.create_window (x,y,window=section_button) 
@@ -141,7 +141,7 @@ def section_occupied (section_id:int):
     
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section does not exist")
+        logging.error ("Section "+str(section_id)+": section_occupied - Section does not exist")
         occupied = False
     else:   
         occupied = sections[str(section_id)]["occupied"]
@@ -157,7 +157,7 @@ def set_section_occupied (section_id:int):
     
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section to set to Occupied does not exist")
+        logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")
     elif not section_occupied(section_id):
         toggle_section(section_id)
     return()
@@ -165,8 +165,8 @@ def set_section_occupied (section_id:int):
 def clear_section_occupied (section_id:int):
     # Validate the section exists
     if not section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section to set to Clear does not exist")
-    if section_occupied(section_id):
+        logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
+    elif section_occupied(section_id):
         toggle_section(section_id)
     return()
 

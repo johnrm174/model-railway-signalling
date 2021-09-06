@@ -123,16 +123,19 @@ def toggle_fpl (point_id:int):
         logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not exist")
     elif not points[str(point_id)]["hasfpl"]:
         logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not have a facing point lock")
-    elif not points[str(point_id)]["fpllock"]:
-        logging.info ("Point "+str(point_id)+": Activating FPL")
-        points[str(point_id)]["changebutton"].config(state="disabled") 
-        points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
-        points[str(point_id)]["fpllock"]=True 
     else:
-        logging.info ("Point "+str(point_id)+": Clearing FPL")
-        points[str(point_id)]["changebutton"].config(state="normal")  
-        points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
-        points[str(point_id)]["fpllock"]=False
+        if points[str(point_id)]["locked"]:
+            logging.warning ("Point "+str(point_id)+": Toggle FPL - Point is externally locked - Toggling FPL anyway")
+        if not points[str(point_id)]["fpllock"]:
+            logging.info ("Point "+str(point_id)+": Activating FPL")
+            points[str(point_id)]["changebutton"].config(state="disabled") 
+            points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
+            points[str(point_id)]["fpllock"]=True 
+        else:
+            logging.info ("Point "+str(point_id)+": Clearing FPL")
+            points[str(point_id)]["changebutton"].config(state="normal")  
+            points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
+            points[str(point_id)]["fpllock"]=False
     return()
 
 # -------------------------------------------------------------------------
@@ -152,7 +155,11 @@ def toggle_point (point_id:int, switched_by_another_point = False):
         logging.error ("Point "+str(point_id)+": Toggle Point - Point does not exist")
     elif points[str(point_id)]["automatic"] and not switched_by_another_point:
         logging.error ("Point "+str(point_id)+": Toggle Point - Point is automatic - should be switched by another point")
-    else:   
+    else:
+        if points[str(point_id)]["locked"]:
+            logging.warning ("Point "+str(point_id)+": Toggle Point - Point is externally locked - Toggling anyway")
+        elif points[str(point_id)]["hasfpl"] and points[str(point_id)]["fpllock"]:
+            logging.warning ("Point "+str(point_id)+": Toggle Point - Facing Point Lock is active - Toggling anyway")
         if not points[str(point_id)]["switched"]:
             if switched_by_another_point:
                 logging.info ("Point "+str(point_id)+": Also changing point to SWITCHED")
@@ -246,17 +253,17 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             # Create the button windows in the correct relative positions for a Right Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
-                point_coords = common.rotate_point (x,y,0,-20,orientation)
+                point_coords = common.rotate_point (x,y,-10,-20,orientation)
                 canvas.create_window (point_coords,window=point_button,state='hidden') 
                 canvas.create_window (point_coords,window=fpl_button,state='hidden')
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
-                point_coords = common.rotate_point (x,y,0,-20,orientation)
+                point_coords = common.rotate_point (x,y,-10,-20,orientation)
                 canvas.create_window (point_coords,anchor=W,window=point_button) 
                 canvas.create_window (point_coords,anchor=E,window=fpl_button)
             else:
                 # Point has no FPL so the FPL button is "hidden"
-                point_coords = common.rotate_point (x,y,0,-20,orientation)
+                point_coords = common.rotate_point (x,y,-10,-20,orientation)
                 canvas.create_window (point_coords,window=point_button) 
                 canvas.create_window (point_coords,window=fpl_button,state='hidden')
 
@@ -273,17 +280,17 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             # Create the button windows in the correct relative positions for a Left Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
-                point_coords = common.rotate_point (x,y,0,+20,orientation)
+                point_coords = common.rotate_point (x,y,-10,+20,orientation)
                 canvas.create_window (point_coords,window=point_button,state='hidden') 
                 canvas.create_window (point_coords,window=fpl_button,state='hidden')
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
-                point_coords = common.rotate_point (x,y,0,+20,orientation)
+                point_coords = common.rotate_point (x,y,-10,+20,orientation)
                 canvas.create_window (point_coords,anchor=W,window=point_button) 
                 canvas.create_window (point_coords,anchor=E,window=fpl_button)
             else:
                 # Point has no FPL so the FPL button is "hidden"
-                point_coords = common.rotate_point (x,y,0,+20,orientation)
+                point_coords = common.rotate_point (x,y,-10,+20,orientation)
                 canvas.create_window (point_coords,window=point_button) 
                 canvas.create_window (point_coords,window=fpl_button,state='hidden')
                 
