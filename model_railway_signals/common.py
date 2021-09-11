@@ -32,7 +32,7 @@ def find_root_window (canvas):
 # thread) and then handled in the main Tkinter thread (to keep everything threadsafe).
 # We use the tkinter event_generate method to generate a custom event in the main
 # tkinter event loop in conjunction with a (threadsafe) queue to pass the callback function
-# Use as follows: raise_callback_in_tkinter_thread (lambda: my_callback_function(arg1,arg2))
+# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
 #-------------------------------------------------------------------------
 
 def handle_callback_in_tkinter_thread(*args):
