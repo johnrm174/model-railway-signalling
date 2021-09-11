@@ -214,56 +214,6 @@ from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Externally called Function to update a signal according the state of the
-# Signal ahead - Intended mainly for Coulour Light Signal types so we can
-# ensure the "CLEAR" aspect reflects the aspect of ths signal ahead
-# Calls the signal type-specific functions depending on the signal type
-# Function applicable only to main Colour Light signal types
-# -------------------------------------------------------------------------
-
-def update_signal (sig_id:int, sig_ahead_id:int = 0):
-    
-    global logging
-    # Validate the signal exists (and the one ahead if specified)
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
-    elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
-        logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
-    elif sig_id == sig_ahead_id: 
-        logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
-    # Call the signal type-specific functions to update the signal (only colour lights supported currently)
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id )
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id )
-    else:
-        logging.error ("Signal "+str(sig_id)+": update_signal - Function not supported by signal type")
-    return()
-
-# -------------------------------------------------------------------------
-# Externally called function to set the route indication for the signal
-# Calls the signal type-specific functions depending on the signal type
-# Function applicable to Main Colour Light and Semaphore signal types
-# -------------------------------------------------------------------------
-
-def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
-    
-    global logging
-    # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
-        # Call the signal type-specific functions to update the signal
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        signals_colour_lights.update_feather_route_indication (sig_id,route)
-        signals_common.update_theatre_route_indication(sig_id,theatre_text)
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        signals_semaphores.update_semaphore_route_indication (sig_id,route)
-        signals_common.update_theatre_route_indication(sig_id,theatre_text)
-    else:
-        logging.error ("Signal "+str(sig_id)+": set_route - Function not supported by signal type")
-    return()
-
-# -------------------------------------------------------------------------
 # Externally called function to Return the current state of the signal
 # Function applicable to ALL signal types
 # -------------------------------------------------------------------------
@@ -473,8 +423,7 @@ def set_signal_override (*sig_ids:int):
             elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
                 signals_ground_position.update_ground_position_signal (sig_id)
             elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
-                signals_ground_disc.update_ground_disc_signal (sig_id)
-                    
+                signals_ground_disc.update_ground_disc_signal (sig_id)  
         return()
 
 # -------------------------------------------------------------------------
@@ -497,7 +446,6 @@ def clear_signal_override (*sig_ids:int):
             # Clear the override and change the button colour
             signals_common.signals[str(sig_id)]["override"] = False
             signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
-            
             # now call the signal type-specific functions to update the signal
             if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
                 # We only refresh colour light signals if they are configured to refresh when switched
@@ -515,40 +463,7 @@ def clear_signal_override (*sig_ids:int):
                 signals_ground_position.update_ground_position_signal (sig_id)
             elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
                 signals_ground_disc.update_ground_disc_signal (sig_id)
-                
     return() 
-
-# -------------------------------------------------------------------------
-# Externally called Function to 'override' a signal (changing it to 'ON') after
-# a specified time delay and then clearing the override the signal after another
-# specified time delay. In the case of colour light signals, this will cause the
-# signal to cycle through the supported aspects all the way back to GREEN. When
-# the Override is cleared, the signal will revert to its previously displayed aspect
-# This is to support the automation of 'exit' signals on a layout
-# A 'sig_passed' callback event will be generated when the signal is overriden if
-# and only if a start delay (> 0) is specified. For each subsequent aspect change
-# a'sig_updated' callback event will be generated
-# Function applicable to Colour Light and Semaphore signal types
-# -------------------------------------------------------------------------
-
-def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    
-    global logging
-    # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
-    elif signals_common.signals[str(sig_id)]["override"]:
-        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal is already overriden - not triggering")
-    # Call the signal type-specific functions to trigger the timed signal sequence
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
-        signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
-    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
-        signals_semaphores.trigger_timed_semaphore_signal (sig_id,start_delay,time_delay)
-    else:
-        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Function not supported by signal type")
-    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Toggle the state of a main signal
@@ -607,11 +522,11 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     # call the signal type-specific functions to update the signal
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
         # do some additional validation specific to this function for colour light signals
-        if signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
+        if signals_common.signals[str(sig_id)]["subtype"]==signals_colour_lights.signal_sub_type.distant:
             logging.error("Signal "+str(sig_id)+": Can't set approach control for a 2 aspect distant signal")
-        elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
+        elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signals_colour_lights.signal_sub_type.home:
             logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a 2 aspect home signal")
-        elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
+        elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signals_colour_lights.signal_sub_type.red_ylw:
             logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a 2 aspect red/yellow signal")
         else:
             signals_common.set_approach_control(sig_id,release_on_yellow)            
@@ -649,35 +564,85 @@ def clear_approach_control (sig_id:int):
     return()
 
 # -------------------------------------------------------------------------
-# Functions called from the Sensors Module to trigger either signal passed
-# otr signal released events automatically when a sensor is triggered
+# Externally called Function to update a signal according the state of the
+# Signal ahead - Intended mainly for Coulour Light Signal types so we can
+# ensure the "CLEAR" aspect reflects the aspect of ths signal ahead
 # Calls the signal type-specific functions depending on the signal type
-# Note that these are internal functions - not part of the public API
+# Function applicable only to main Colour Light signal types
 # -------------------------------------------------------------------------
 
-def trigger_signal_passed_event (sig_id:int):
-
+def update_signal (sig_id:int, sig_ahead_id:int = 0):
+    
     global logging
-    # Validate the signal exists
+    # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": trigger_signal_passed_event - Signal does not exist")
-    # call the signal type-specific functions to update the signal
-    signals_common.sig_passed_button_event(sig_id)
+        logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
+    elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
+        logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
+    elif sig_id == sig_ahead_id: 
+        logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
+    # Call the signal type-specific functions to update the signal (only colour lights supported currently)
+    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id )
+    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id )
+    else:
+        logging.error ("Signal "+str(sig_id)+": update_signal - Function not supported by signal type")
     return()
 
-def trigger_signal_approach_event (sig_id:int):
+# -------------------------------------------------------------------------
+# Externally called function to set the route indication for the signal
+# Calls the signal type-specific functions depending on the signal type
+# Function applicable to Main Colour Light and Semaphore signal types
+# -------------------------------------------------------------------------
 
+def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
+    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": trigger_signal_approach_event - Signal does not exist")
-    # call the signal type-specific functions to update the signal
+        logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
+        # Call the signal type-specific functions to update the signal
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        signals_common.approach_release_button_event(sig_id)
+        signals_colour_lights.update_feather_route_indication (sig_id,route)
+        signals_common.update_theatre_route_indication(sig_id,theatre_text)
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        signals_common.approach_release_button_event(sig_id)
+        signals_semaphores.update_semaphore_route_indication (sig_id,route)
+        signals_common.update_theatre_route_indication(sig_id,theatre_text)
     else:
-        logging.error ("Signal "+str(sig_id)+": trigger_signal_approach_event - Function not supported by signal type")
+        logging.error ("Signal "+str(sig_id)+": set_route - Function not supported by signal type")
+    return()
+
+# -------------------------------------------------------------------------
+# Externally called Function to 'override' a signal (changing it to 'ON') after
+# a specified time delay and then clearing the override the signal after another
+# specified time delay. In the case of colour light signals, this will cause the
+# signal to cycle through the supported aspects all the way back to GREEN. When
+# the Override is cleared, the signal will revert to its previously displayed aspect
+# This is to support the automation of 'exit' signals on a layout
+# A 'sig_passed' callback event will be generated when the signal is overriden if
+# and only if a start delay (> 0) is specified. For each subsequent aspect change
+# a'sig_updated' callback event will be generated
+# Function applicable to Colour Light and Semaphore signal types
+# -------------------------------------------------------------------------
+
+def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
+    
+    global logging
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
+    elif signals_common.signals[str(sig_id)]["override"]:
+        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal is already overriden - not triggering")
+    # Call the signal type-specific functions to trigger the timed signal sequence
+    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+        logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
+        signals_colour_lights.trigger_timed_colour_light_signal (sig_id,start_delay,time_delay)
+    elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+        logging.info ("Signal "+str(sig_id)+": Triggering Timed Signal")
+        signals_semaphores.trigger_timed_semaphore_signal (sig_id,start_delay,time_delay)
+    else:
+        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Function not supported by signal type")
     return()
 
 ##########################################################################################

@@ -105,14 +105,18 @@ def subsidary_button_event (sig_id:int):
 def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    pulse_signal_passed_button (sig_id)
+    # Pulse the signal passed button to provide a visual indication
+    signals[str(sig_id)]["passedbutton"].config(bg="red")
+    common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    pulse_signal_release_button (sig_id)
+    # Pulse the approach release button to provide a visual indication
+    signals[str(sig_id)]["releasebutton"].config(bg="red")
+    common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
     clear_approach_control(sig_id)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
     return ()
@@ -173,31 +177,6 @@ def toggle_subsidary (sig_id:int):
         signals_colour_lights.update_colour_light_subsidary(sig_id)
     elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
         signals_semaphores.update_semaphore_subsidary_arms(sig_id)
-    return ()
-    
-# -------------------------------------------------------------------------
-# Common function to generate a "signal passed" visual indication by pulsing
-# the signal passed button (if the signal was created with one). Called on
-# "Signal Passed" Button Events and external "signal passed" events. As we
-# expect this function to be called from external code we validate the call
-# -------------------------------------------------------------------------
-
-def pulse_signal_passed_button (sig_id:int):
-    signals[str(sig_id)]["passedbutton"].config(bg="red")
-    root = signals[str(sig_id)]["canvas"].master
-    root.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
-    return ()
-
-# -------------------------------------------------------------------------
-# Shared function to generate a "approach release" visual indication by pulsing
-# the approach release button (if the signal was created with one). Called on
-# "approach release" Button Events and external "approach release" events
-# -------------------------------------------------------------------------
-
-def pulse_signal_release_button (sig_id:int):
-    signals[str(sig_id)]["releasebutton"].config(bg="red")
-    root = signals[str(sig_id)]["canvas"].master
-    root.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
     return ()
 
 # -------------------------------------------------------------------------

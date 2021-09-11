@@ -1,7 +1,8 @@
 #----------------------------------------------------------------------
 # This programme provides a simple Test programme to check everything
 # works correctly for applications that may use multiple windows.
-# Also Tests the Sensor Callback functions into the main Tkinter thread
+# Also Tests the Sensor Callback functions are correctly injected
+# back into the main Tkinter thread
 # ---------------------------------------------------------------------
 
 from tkinter import *

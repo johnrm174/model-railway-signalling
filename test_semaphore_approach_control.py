@@ -53,7 +53,7 @@ def main_callback_function(item_id,callback_type):
             else:
                 set_section_occupied(4)
         elif item_id == 5:
-            trigger_timed_signal (5,0,5)
+            trigger_timed_signal (5,5,5)
             clear_section_occupied(5)
         elif item_id == 6:
             trigger_timed_signal (6,0,5)

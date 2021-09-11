@@ -7,12 +7,12 @@ import math
 import queue
 
 #-------------------------------------------------------------------------
-# Function to find and store the tkinter "root" window as this is needed
-# to schedule events in the main tkinter event loop using the after method
-# and also for passing events back into the main tkinter loop. We use these
-# methods to ensure all interaction with the drawing objects is done from
-# the main (tkinter) thread - on the basis that all information out there
-# seems to conclude that tkinter is not thread safe
+# Function to find and store the tkinter "root" window as this is used to
+# schedule callback events in the main tkinter event loop using the 'after' 
+# method and also for feeding custom callback functions into the main tkinter
+# thread. We do this as all the information out there on the internet concludes
+# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
+# objects should be done from within the main tkinter thread.
 #-------------------------------------------------------------------------
 
 root_window = None
@@ -28,10 +28,11 @@ def find_root_window (canvas):
     return(root_window)
 
 #-------------------------------------------------------------------------
-# Functions to raise a custom callback remotely (from another thread) and then handle
-# it in the main Tkinter thread (to keep everything threadsafe). Use as follows:
-# raise_callback_in_tkinter_thread (lambda: my_callback_function(arg1,arg2))
-# to call back into your function from the tkinter thread
+# Functions to allow custom callback functions to be passed in (from an external
+# thread) and then handled in the main Tkinter thread (to keep everything threadsafe).
+# We use the tkinter event_generate method to generate a custom event in the main
+# tkinter event loop in conjunction with a (threadsafe) queue to pass the callback function
+# Use as follows: raise_callback_in_tkinter_thread (lambda: my_callback_function(arg1,arg2))
 #-------------------------------------------------------------------------
 
 def handle_callback_in_tkinter_thread(*args):
@@ -42,7 +43,7 @@ def handle_callback_in_tkinter_thread(*args):
     callback()
     return()
     
-def raise_callback_in_tkinter_thread(callback_function):
+def execute_function_in_tkinter_thread(callback_function):
     global root_window
     global event_queue
     callback = event_queue.put(callback_function)

@@ -30,7 +30,7 @@ import enum
 # any approach control aspects) only once after the first signal has been created
 # -------------------------------------------------------------------------
 
-flash_aspects_running = False
+flash_aspects_started = False
 
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
@@ -216,7 +216,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if position_light: update_colour_light_subsidary(sig_id)
         # When we have created the first colour_light signal we're good to start the 
         # scheduled functions to deal with any approach control flashing aspects
-        if not flash_aspects_running: flash_aspects_on()
+        if not flash_aspects_started: flash_aspects_on()
 
     return ()
 
@@ -256,7 +256,6 @@ def update_colour_light_subsidary (sig_id:int):
 def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
 
     global logging
-    global aspects_thread_lock
 
     # ---------------------------------------------------------------------------------
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
@@ -391,8 +390,8 @@ def flash_aspects_off():
     return()
 
 def flash_aspects_on():
-    global flash_aspects_running
-    flash_aspects_running = True
+    global flash_aspects_started
+    flash_aspects_started = True
     for signal in signals_common.signals:
         if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
             if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
