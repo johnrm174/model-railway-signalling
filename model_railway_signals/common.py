@@ -3,8 +3,51 @@
 # are used across multiple modules in the model_railway_signalling package
 # -------------------------------------------------------------------------
 
-# Specify the external Modules we need to import
 import math
+import queue
+
+#-------------------------------------------------------------------------
+# Function to find and store the tkinter "root" window as this is needed
+# to schedule events in the main tkinter event loop using the after method
+# and also for passing events back into the main tkinter loop. We use these
+# methods to ensure all interaction with the drawing objects is done from
+# the main (tkinter) thread - on the basis that all information out there
+# seems to conclude that tkinter is not thread safe
+#-------------------------------------------------------------------------
+
+root_window = None
+event_queue = queue.Queue()
+
+def find_root_window (canvas):
+    global root_window
+    parent = canvas.master
+    while parent.master:
+        parent = parent.master
+    root_window = parent
+    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    return(root_window)
+
+#-------------------------------------------------------------------------
+# Functions to raise a custom callback remotely (from another thread) and then handle
+# it in the main Tkinter thread (to keep everything threadsafe). Use as follows:
+# raise_callback_in_tkinter_thread (lambda: my_callback_function(arg1,arg2))
+# to call back into your function from the tkinter thread
+#-------------------------------------------------------------------------
+
+def handle_callback_in_tkinter_thread(*args):
+    try:
+       callback = event_queue.get(False)
+    except event_queue.Empty:
+        return()
+    callback()
+    return()
+    
+def raise_callback_in_tkinter_thread(callback_function):
+    global root_window
+    global event_queue
+    callback = event_queue.put(callback_function)
+    root_window.event_generate("<<ExtCallback>>", when="tail")
+    return()
 
 # -------------------------------------------------------------------------
 # Global variables for how the signals/points/sections buttons appear

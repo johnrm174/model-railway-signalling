@@ -78,7 +78,6 @@ def toggle_section (section_id:int):
     
     global sections # the dictionary of sections
     global logging
-    
     if sections[str(section_id)]["occupied"]:
         # section is on
         logging.info ("Section "+str(section_id)+": Changing to CLEAR")
@@ -105,29 +104,26 @@ def create_section (canvas, section_id:int, x:int, y:int,
     
     global sections # the dictionary of sections
     global logging
-    # also uses fontsize, xpadding, ypadding imported from "common"
-
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
+    # Find and store the root window (when the first signal is created)
+    if common.root_window is None: common.find_root_window(canvas)
     # Verify that a section with the same ID does not already exist
     if section_exists(section_id):
         logging.error ("Section "+str(section_id)+": Section already exists")
     elif section_id < 1:
         logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
     else:
-        
         # Create the button objects and their callbacks
         section_button = Button (canvas, text=label, state="normal", relief="raised",
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',8,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id))
         canvas.create_window (x,y,window=section_button) 
-
         # Compile a dictionary of everything we need to track
         sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
                                      "button1" : section_button,          # drawing object
                                      "extcallback" : section_callback,    # External callback to make
                                      "occupied" : False }                 # Current state
-
     return()
 
 # -------------------------------------------------------------------------
@@ -138,7 +134,6 @@ def section_occupied (section_id:int):
     
     global sections # the dictionary of sections
     global logging
-    
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_occupied - Section does not exist")
@@ -154,7 +149,6 @@ def section_occupied (section_id:int):
 def set_section_occupied (section_id:int):
     
     global logging
-    
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")

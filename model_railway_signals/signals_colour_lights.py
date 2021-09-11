@@ -22,10 +22,15 @@ from . import signals_common
 from . import dcc_control
 
 from tkinter import *
-import enum
-import time
 import logging
-import threading
+import enum
+
+# -------------------------------------------------------------------------
+# Global variable to ensure we only start the tkinter scheduled tasks (to flash 
+# any approach control aspects) only once after the first signal has been created
+# -------------------------------------------------------------------------
+
+flash_aspects_running = False
 
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
@@ -39,73 +44,6 @@ class signal_sub_type(enum.Enum):
     three_aspect = 4
     four_aspect = 5
 
-# -------------------------------------------------------------------------
-# Define a null callback function for internal use
-# -------------------------------------------------------------------------
-
-def null_callback (sig_id:int,callback_type):
-    return (sig_id,callback_type)
-
-# -------------------------------------------------------------------------
-# Callbacks for processing button pushes - Will also make an external 
-# callback if one was specified when the signal was created. If not, 
-# then the null_callback function will be called to "do nothing"
-# -------------------------------------------------------------------------
-
-def signal_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
-    toggle_colour_light_signal(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
-    return ()
-
-def subsidary_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
-    toggle_colour_light_subsidary(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
-    return ()
-
-def sig_passed_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    signals_common.pulse_signal_passed_button (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id,signals_common.sig_callback_type.sig_passed)
-    return ()
-
-def approach_release_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    signals_common.pulse_signal_release_button (sig_id)
-    clear_approach_control(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
-    return ()
-
-# -------------------------------------------------------------------------
-# Functions to toggle the state of a signal - Called following a signal
-# button event (see above). Can also be called externally for to toggle
-# the state of the signal - to enable automated route setting functions
-# -------------------------------------------------------------------------
-
-def toggle_colour_light_signal (sig_id:int):
-    signals_common.toggle_signal(sig_id)
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]: 
-        update_colour_light_signal_aspect(sig_id)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to toggle the state of the subsidary - Called following a signal
-# button event (see above). Can also be called externally for to toggle
-# the state of the signal - to enable automated route setting functions
-# -------------------------------------------------------------------------
-
-def toggle_colour_light_subsidary (sig_id:int):
-    signals_common.toggle_subsidary (sig_id)
-    update_colour_light_subsidary_signal (sig_id)
-    return ()
-
 # ---------------------------------------------------------------------------------
 # Externally called Function to create a Colour Light Signal 'object'. The Signal is
 # normally set to "NOT CLEAR" = RED (or YELLOW if its a 2 aspect distant signal)
@@ -117,7 +55,7 @@ def toggle_colour_light_subsidary (sig_id:int):
     
 def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 signal_subtype = signal_sub_type.four_aspect,
-                                sig_callback = null_callback,
+                                sig_callback = None,
                                 orientation:int = 0,
                                 sig_passed_button:bool=False,
                                 approach_release_button:bool=False,
@@ -234,9 +172,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
                                        signal_type = signals_common.sig_type.colour_light,
-                                       sig_callback = signal_button_event,
-                                       sub_callback = subsidary_button_event,
-                                       passed_callback = sig_passed_button_event,
                                        ext_callback = sig_callback,
                                        orientation = orientation,
                                        subsidary = position_light,
@@ -245,11 +180,11 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
-                                orientation = orientation,has_theatre = theatre_route_indicator)
+                                    orientation = orientation,has_theatre = theatre_route_indicator)
                 
         # Create the signal elements to support Approach Control
         signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
-                    approach_callback = approach_release_button_event, approach_button = approach_release_button)
+                                                            approach_button = approach_release_button)
 
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
@@ -277,8 +212,11 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if fully_automatic: signals_common.toggle_signal(sig_id)
         # Update the signal and subsidary aspects to reflect the initial state. This will
         # also send the DCC commands to put the DCC signal into the initial state
-        update_colour_light_signal_aspect (sig_id)
-        if position_light: update_colour_light_subsidary_signal (sig_id)
+        update_colour_light_signal (sig_id)
+        if position_light: update_colour_light_subsidary(sig_id)
+        # When we have created the first colour_light signal we're good to start the 
+        # scheduled functions to deal with any approach control flashing aspects
+        if not flash_aspects_running: flash_aspects_on()
 
     return ()
 
@@ -291,7 +229,7 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 # change therefore we don't track the displayed aspect of the subsidary
 #------------------------------------------------------------------
     
-def update_colour_light_subsidary_signal (sig_id:int):
+def update_colour_light_subsidary (sig_id:int):
     
     global logging
     if signals_common.signals[str(sig_id)]["subclear"]:
@@ -315,7 +253,7 @@ def update_colour_light_subsidary_signal (sig_id:int):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
+def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
 
     global logging
     global aspects_thread_lock
@@ -433,38 +371,38 @@ def update_colour_light_signal_aspect (sig_id:int ,sig_ahead_id:int=0):
     return ()
 
 # -------------------------------------------------------------------------
-# Thread for cycling the flashing aspects. As it only uses a single element
-# from the signal dictionary ("sigstate") it should be relatively threadsafe.
-# I have experimented with using a Threadlock for the duration of each change
-# but there does seem to be some sort of underlying issue with accessing the
-# Tkinter drawing aspects from a seperate thread when the main thread is "locked"
-# (i.e. the attempts to '.itemconfigure' just seem to hang) so have abandoned 
-# this for the time being - Will plan to re-visit if it ever becomes a problem
+# Functions for cycling the flashing aspects. Rather  than using a Thread to
+# cycle the aspects we use the tkinter 'after' method to scedule the next
+# update via the tkinter event queue. The first call to "flash_aspects_on"
+# is made after the first colour light signal has been successfully created
+# we do it like this so everything is running in the main tkinter thread as
+# all the information out there concludes tkinter is not thread safe
 # -------------------------------------------------------------------------
 
-def flash_aspects_thread():
-    while True:
-        for signal in signals_common.signals:
-            if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
-        time.sleep (0.25)
-        for signal in signals_common.signals:
-            if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-                if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-                    signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
-        time.sleep (0.25)
+def flash_aspects_off():
+    for signal in signals_common.signals:
+        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
+            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
+            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
+    common.root_window.after(250,lambda:flash_aspects_on())
+    return()
+
+def flash_aspects_on():
+    global flash_aspects_running
+    flash_aspects_running = True
+    for signal in signals_common.signals:
+        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
+            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
+            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
+                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
+    common.root_window.after(250,lambda:flash_aspects_off())
     return()
         
-flash_aspects = threading.Thread(target = flash_aspects_thread)
-flash_aspects.start()
-
 # -------------------------------------------------------------------------
 # Internal function to Refresh the displayed signal aspect by
 # updating the signal drawing objects associated with each aspect
@@ -600,125 +538,69 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
     
     global logging
 
-    # --------------------------------------------------------------
-    # Define the Python Thread to cycle through the aspects
-    # --------------------------------------------------------------
-    
-    def thread_to_cycle_aspects (sig_id, start_delay, time_delay):
+    # Schedule the start of the sequence (i.e. signal to danger)
+    common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
         
-        # Sleep until the initial "signal passed" event is due
-        time.sleep (start_delay)
-        # If a start delay (>0) has been specified then we assume the intention is to trigger a "signal Passed"
-        # event after the initial delay. Otherwise we won't make any callbacks (on the basis that it would have
-        # been the calling programme that triggered the timed signal in the first place. Note that in this case
-        # we override the signal in the main code before starting the thread to ensure deterministic behavior
-        # Once the signal is overriden we immediately update it - it doesn't make any sense for a timed signal
-        # not to refresh its aspects immediately (even if this was specified when the signal was created)
-        # The initial aspect (to display when overriden) will have been previously defined at signal creation
-        # time (RED apart from 2-aspect Distant signals - which are YELLOW). This will initially be applied
-        # to the signal - we then cycle through the aspects until we get back to PROCEED (normally green) and
-        # then finally set the Override Aspect back to its initial aspect (yellow or red) the end of this thread
-        if start_delay > 0:
-            signals_common.signals[str(sig_id)]["override"] = True
-            signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-            update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        # Sleep until the next aspect change is due
-        time.sleep (time_delay) 
-        # Cycle through the aspects if its a 3 or 4 aspect signal
-        if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
+    def timed_signal_sequence_start(start_delay, time_delay):
+        # Ensure the Overridden aspect is set correctly before we start
+        if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
-            # Call the internal function to update and refresh the signal - Then make the external callback
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-            # Sleep until the next aspect change is due
-            time.sleep (time_delay) 
+        else:
+            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
+        # Override the signal (to display its overridden aspect
+        signals_common.signals[str(sig_id)]["override"] = True
+        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
+        # to the external code (on the basis that it would have been the external code  that triggered the timed
+        # signal in the first place. For this particular case, we override the signal before starting the sequence
+        # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
+        # delay and this will trigger a callback to be handled by the external code)
+        if start_delay > 0: logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+        update_colour_light_signal(sig_id)
+        if start_delay > 0: signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
+        if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
+            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_yellow(time_delay))
+        else:
+            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
+        return()
+
+    def timed_signal_sequence_yellow (time_delay):
+        # This sequence step only applicable to 3 and 4 aspect signals
+        signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
+        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+        update_colour_light_signal(sig_id)
+        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+        # We only need to schedule the next DOUBLE YELLOW aspect for 4 aspect signals - otherwise schedule sequence completion
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
-            # Call the internal function to update and refresh the signal - Then make the external callback
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-            update_colour_light_signal_aspect(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-            # Sleep until the next aspect change is due
-            time.sleep (time_delay)              
-        # We've finished - so clear the override on the signal
-        # We ALWAYS set the Overriden aspect back to its initial condition as
-        # this is the aspect that will be used when the signal is next overriden
+            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_double_yellow(time_delay))
+        else:
+            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
+        return()
+    
+    def timed_signal_sequence_double_yellow (time_delay):
+        # This sequence step only applicable to 4 aspect signals
+        signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
+        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
+        update_colour_light_signal(sig_id)
+        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
+        # Schedule the next aspect change (which will be the sequence completion)
+        common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
+        return()
+    
+    def timed_signal_sequence_end(): 
+        # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
         else:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
-        # Call the internal function to update and refresh the signal - Then make the external callback
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        update_colour_light_signal_aspect(sig_id)
+        update_colour_light_signal(sig_id)
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-
-        return ()
-    
-    # --------------------------------------------------------------
-    # This is the start of the main function code
-    # --------------------------------------------------------------
-
-    # Kick off the thread to override the signal and cycle through the aspects
-    # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
-    # to the external code (on the basis that it would have been the externalcode  that triggered the timed
-    # signal in the first place. For this particular case, we override the signal before starting the thread
-    # to ensure deterministic behavior (for start delays > 0 the signal is Overriden in the thread after the
-    # specified start delay and this will trigger a callback to be handled by the external code)
-    if start_delay == 0:
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        update_colour_light_signal_aspect(sig_id)
-
-    timed_signal_thread = threading.Thread (target=thread_to_cycle_aspects,args=(sig_id,start_delay,time_delay))
-    timed_signal_thread.start()
+        return()
 
     return()
-
-# -------------------------------------------------------------------------
-# Externally called function to set the "approach conrol" for the signal
-# This function specific to colour light signals which support both
-# "release on yellow" and "release on red"
-# -------------------------------------------------------------------------
-
-def set_approach_control (sig_id:int, release_on_yellow:bool = False):
-    
-    global logging
-    # do some additional validation specific to this function for colour light signals
-    if release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect distant signal")
-    elif not release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.distant:
-        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on red) for a 2 aspect distant signal")
-    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.home:
-        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect home signal")
-    elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signal_sub_type.red_ylw:
-        logging.error("Signal "+str(sig_id)+": Can't set approach control (release on yellow) for a 2 aspect red/yellow signal")
-    else:
-        signals_common.set_approach_control(sig_id,release_on_yellow)
-        # Call the internal function to update and refresh the signal - unless this signal
-        # is configured to be refreshed later (based on the aspect of the signal ahead)
-        if signals_common.signals[str(sig_id)]["refresh"]:
-            update_colour_light_signal_aspect(sig_id)
-            
-    return()
-
-# -------------------------------------------------------------------------
-# Function to "release" a signal (that was subject to automatic approach
-# control). Called following an approach_release_button_event (see above).
-# Can also be called externally (e.g. following the triggering of a track
-# sensor to enable semi automation of signals along the route
-# -------------------------------------------------------------------------
-
-def clear_approach_control (sig_id:int):
-    signals_common.clear_approach_control(sig_id)
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]: 
-        update_colour_light_signal_aspect(sig_id)
-    return ()
 
 ###############################################################################

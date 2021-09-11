@@ -209,8 +209,9 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     
     global points
     global logging
-    # also uses common.fontsize, common.xpadding, common.ypadding imported from "common"
     logging.info ("Point "+str(point_id)+": Creating Point")
+    # Find and store the root window (when the first signal is created)
+    if common.root_window is None: common.find_root_window(canvas)
     # Do some basic validation on the parameters we have been given
     if point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Point already exists")

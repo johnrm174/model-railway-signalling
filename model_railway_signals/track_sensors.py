@@ -24,6 +24,7 @@ import enum
 import time
 import threading
 import logging
+from . import common
 from . import signals
 
 # We can only use GPIO interface if we're running on a Raspberry Pi
@@ -103,13 +104,22 @@ def track_sensor_triggered (gpio_channel:int):
                 # Start a new timeout thread and make the external callback
                 timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_channel, 0.001))
                 timeout_thread.start()
+                # Note that we call back into the main tkinter thread to process the event as all the information
+                # out there on tkinter concludes it isn't fully thread safe - so we do this to be belt and braces
+                # if for whatever reason a Tkinter window doesn't exist (e.g. the software is just being used for
+                # the sensor functionality, then we just make a callback in the thread we happen to be in
                 logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
-                if channels[str(gpio_channel)]["signal_passed"] > 0:
-                    signals.trigger_signal_passed_event(channels[str(gpio_channel)]["signal_passed"])
+                if common.root_window is None:
+                    channels[str(gpio_channel)]["callback"](sensor_id,track_sensor_callback_type.sensor_triggered)
+                elif channels[str(gpio_channel)]["signal_passed"] > 0:
+                    common.raise_callback_in_tkinter_thread(lambda: signals.trigger_signal_passed_event
+                                                                (channels[str(gpio_channel)]["signal_passed"]))
                 elif channels[str(gpio_channel)]["signal_approach"] > 0:
-                    signals.trigger_signal_approach_event(channels[str(gpio_channel)]["signal_approach"])
+                    common.raise_callback_in_tkinter_thread (lambda: signals.trigger_signal_approach_event
+                                                                (channels[str(gpio_channel)]["signal_approach"]))
                 else:
-                    channels[str(gpio_channel)]["callback"] (sensor_id,track_sensor_callback_type.sensor_triggered)
+                    common.raise_callback_in_tkinter_thread (lambda: channels[str(gpio_channel)]["callback"]
+                                                               (sensor_id,track_sensor_callback_type.sensor_triggered))
     return()
 
 # -------------------------------------------------------------------------
