@@ -3,8 +3,54 @@
 # are used across multiple modules in the model_railway_signalling package
 # -------------------------------------------------------------------------
 
-# Specify the external Modules we need to import
 import math
+import queue
+import logging
+
+#-------------------------------------------------------------------------
+# Function to find and store the tkinter "root" window as this is used to
+# schedule callback events in the main tkinter event loop using the 'after' 
+# method and also for feeding custom callback functions into the main tkinter
+# thread. We do this as all the information out there on the internet concludes
+# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
+# objects should be done from within the main tkinter thread.
+#-------------------------------------------------------------------------
+
+root_window = None
+event_queue = queue.Queue()
+
+def find_root_window (canvas):
+    global root_window
+    parent = canvas.master
+    while parent.master:
+        parent = parent.master
+    root_window = parent
+    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    return(root_window)
+
+#-------------------------------------------------------------------------
+# Functions to allow custom callback functions to be passed in (from an external
+# thread) and then handled in the main Tkinter thread (to keep everything threadsafe).
+# We use the tkinter event_generate method to generate a custom event in the main
+# tkinter event loop in conjunction with a (threadsafe) queue to pass the callback function
+# Use as follows: execute_function_in_tkinter_thread (lambda: my_function(arg1,arg2...))
+#-------------------------------------------------------------------------
+
+def handle_callback_in_tkinter_thread(*args):
+    try:
+       callback = event_queue.get(False)
+    except event_queue.Empty:
+        return()
+    callback()
+    return()
+    
+def execute_function_in_tkinter_thread(callback_function):
+    callback = event_queue.put(callback_function)
+    if root_window is not None:
+        root_window.event_generate("<<ExtCallback>>", when="tail")
+    else:
+        logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
+    return()
 
 # -------------------------------------------------------------------------
 # Global variables for how the signals/points/sections buttons appear

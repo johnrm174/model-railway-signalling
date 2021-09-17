@@ -22,44 +22,6 @@ from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Define a null callback function for internal use
-# -------------------------------------------------------------------------
-
-def null_callback (sig_id:int,callback_type):
-    return (sig_id,callback_type)
-
-# -------------------------------------------------------------------------
-# Callbacks for processing button pushes - Will also make an external 
-# callback if one was specified when the signal was created. If not, 
-# then the null_callback function will be called to "do nothing"
-# -------------------------------------------------------------------------
-
-def signal_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
-    toggle_ground_position_light_signal(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
-    return ()
-
-def sig_passed_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    signals_common.pulse_signal_passed_button (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_passed)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to toggle the state of a signal - Called following a signal
-# button event (see above). Can also be called externally for to toggle
-# the state of the signal - to enable automated route setting functions
-# -------------------------------------------------------------------------
-
-def toggle_ground_position_light_signal (sig_id:int):
-    signals_common.toggle_signal(sig_id)
-    update_ground_position_light_signal (sig_id)
-    return ()
-
-# -------------------------------------------------------------------------
 # Externally called function to create a Ground Position Signal (drawing objects
 # + state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
 # All attributes (that need to be tracked) are stored as a dictionary
@@ -67,7 +29,7 @@ def toggle_ground_position_light_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
-                                    sig_callback = null_callback,
+                                    sig_callback = None,
                                     orientation:int = 0,
                                     sig_passed_button: bool = False, 
                                     shunt_ahead: bool = False,
@@ -111,9 +73,6 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
                                        signal_type = signals_common.sig_type.ground_position,
-                                       sig_callback = signal_button_event,
-                                       sub_callback = null_callback,
-                                       passed_callback = sig_passed_button_event,
                                        ext_callback = sig_callback,
                                        orientation = orientation,
                                        sig_passed_button = sig_passed_button)
@@ -125,7 +84,7 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         signals_common.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
         
         # Refresh the signal drawing objects to reflect the initial state
-        update_ground_position_light_signal (sig_id)
+        update_ground_position_signal (sig_id)
        
     return ()
 
@@ -136,7 +95,7 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 # change therefore we don't track the displayed aspect of the signal
 # -------------------------------------------------------------------------
 
-def update_ground_position_light_signal (sig_id:int):
+def update_ground_position_signal (sig_id:int):
 
     global logging
     

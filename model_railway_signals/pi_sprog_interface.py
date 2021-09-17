@@ -84,7 +84,6 @@ output_buffer = queue.Queue()
 
 def thread_to_send_buffered_data ():
 
-    global output_buffer
     global transmit_delay
     global logging
     global debug

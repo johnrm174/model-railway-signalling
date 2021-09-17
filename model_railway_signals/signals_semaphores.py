@@ -22,76 +22,7 @@ from . import signals_common
 from . import dcc_control
 
 from tkinter import *
-import time
-import threading
 import logging
-
-# -------------------------------------------------------------------------
-# Define a null callback function for internal use
-# -------------------------------------------------------------------------
-
-def null_callback (sig_id:int,callback_type):
-    return (sig_id,callback_type)
-
-# -------------------------------------------------------------------------
-# Callbacks for processing button pushes - Will also make an external 
-# callback if one was specified when the signal was created. If not, 
-# then the null_callback function will be called to "do nothing"
-# -------------------------------------------------------------------------
-
-def signal_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
-    toggle_semaphore_signal(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_switched)
-    return ()
-
-def subsidary_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
-    toggle_semaphore_subsidary(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sub_switched)
-    return ()
-
-def sig_passed_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    signals_common.pulse_signal_passed_button (sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id,signals_common.sig_callback_type.sig_passed)
-    return ()
-
-def approach_release_button_event (sig_id:int):
-    global logging
-    logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    signals_common.pulse_signal_release_button (sig_id)
-    clear_approach_control(sig_id)
-    signals_common.signals[str(sig_id)]['extcallback'] (sig_id, signals_common.sig_callback_type.sig_released)
-    return ()
-
-# -------------------------------------------------------------------------
-# Functions to toggle the state of a signal - Called following a signal
-# button event (see above). Can also be called externally for to toggle
-# the state of the signal - to enable automated route setting functions
-# -------------------------------------------------------------------------
-
-def toggle_semaphore_signal (sig_id:int):
-    signals_common.toggle_signal(sig_id)
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]:
-        update_semaphore_signal(sig_id)
-    return ()
-
-# -------------------------------------------------------------------------
-# Function to toggle the state of the subsidary - Called following a signal
-# button event (see above). Can also be called externally for to toggle
-# the state of the signal - to enable automated route setting functions
-# -------------------------------------------------------------------------
-
-def toggle_semaphore_subsidary (sig_id:int, external_callback = null_callback):
-    signals_common.toggle_subsidary (sig_id)
-    update_semaphore_subsidary_arms (sig_id)
-    return ()
 
 # ---------------------------------------------------------------------------------
 # Externally called Function to create a Semaphore Signal 'object'. The Signal is
@@ -103,7 +34,7 @@ def toggle_semaphore_subsidary (sig_id:int, external_callback = null_callback):
     
 def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 distant:bool=False,
-                                sig_callback = null_callback,
+                                sig_callback = None,
                                 orientation:int = 0,
                                 sig_passed_button:bool=False,
                                 approach_release_button:bool=False,
@@ -292,9 +223,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
 
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
-                                       sig_callback = signal_button_event,
-                                       sub_callback = subsidary_button_event,
-                                       passed_callback = sig_passed_button_event,
                                        ext_callback = sig_callback,
                                        signal_type = signals_common.sig_type.semaphore,
                                        orientation = orientation,
@@ -304,11 +232,11 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = post_offset,
-                                orientation = orientation,has_theatre = theatre_route_indicator)
+                                        orientation = orientation,has_theatre = theatre_route_indicator)
                    
         # Create the signal elements to support Approach Control
         signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
-                    approach_callback = approach_release_button_event, approach_button = approach_release_button)
+                                                        approach_button = approach_release_button)
 
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
@@ -681,7 +609,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
 # already been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_semaphore_route_indication (sig_id,route_to_set:signals_common.route_type=None):
+def update_semaphore_route_indication (sig_id,route_to_set = None):
 
     global logging
     
@@ -713,86 +641,32 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
     
     global logging
 
-    # --------------------------------------------------------------
-    # Define the Python Thread to cycle through the aspects
-    # --------------------------------------------------------------
-    
-    def thread_to_cycle_signal (sig_id, start_delay, time_delay):
+    # Schedule the start of the sequence (i.e. signal to danger)
+    common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
         
-        # Sleep until the initial "signal passed" event is due
-        time.sleep (start_delay)
-        # If a start delay (>0) has been specified then we assume the intention is to trigger a "signal Passed"
-        # event after the initial delay. Otherwise we won't make any callbacks (on the basis that it would have
-        # been the calling programme that triggered the timed signal in the first place. Note that in this case
-        # we override the signal in the main code before starting the thread to ensure deterministic behavior
-        if start_delay > 0:
-            signals_common.signals[str(sig_id)]["override"] = True
-            signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-            update_semaphore_signal(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        # Sleep until its time to clear the signal
-        time.sleep (time_delay) 
+    def timed_signal_sequence_start(start_delay, time_delay):
+        # Override the signal (to display its overridden aspect
+        signals_common.signals[str(sig_id)]["override"] = True
+        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
+        # to the external code (on the basis that it would have been the external code  that triggered the timed
+        # signal in the first place. For this particular case, we override the signal before starting the sequence
+        # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
+        # delay and this will trigger a callback to be handled by the external code)
+        if start_delay > 0: logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+        update_semaphore_signal(sig_id)
+        if start_delay > 0: signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        # We need to schedule the sequence completion (i.e. back to clear
+        common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
+        return()
+
+    def timed_signal_sequence_end(): 
+        # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
         update_semaphore_signal(sig_id)
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-        return ()
-    
-    # --------------------------------------------------------------
-    # This is the start of the main function code
-    # --------------------------------------------------------------
-
-    # Kick off the thread to override the signal and cycle through the aspects
-    # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
-    # to the external code (on the basis that it would have been the external code  that triggered the timed
-    # signal in the first place. For this particular case, we override the signal before starting the thread
-    # to ensure deterministic behavior (for start delays > 0 the signal is Overriden in the thread after the
-    # specified start delay and this will trigger a callback to be handled by the external code)
-    if start_delay == 0:
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        update_semaphore_signal(sig_id)
-    timed_signal_thread = threading.Thread (target=thread_to_cycle_signal,args=(sig_id,start_delay,time_delay))
-    timed_signal_thread.start() 
-
-    return()
-
-# -------------------------------------------------------------------------
-# Externally called function to set the "approach conrol" for the signal
-# This function for semaphores will only support "release on red"
-# -------------------------------------------------------------------------
-
-def set_approach_control (sig_id:int, release_on_yellow:bool = False):
-    
-    global logging
-    # Do some additional validation specific to this function for semaphore signals
-    if signals_common.signals[str(sig_id)]["distant"] and not release_on_yellow:
-        logging.error("Signal "+str(sig_id)+": Can't set \'release on red\' approach control for a distant signal")
-    elif not signals_common.signals[str(sig_id)]["distant"] and release_on_yellow:
-        logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a home signal")
-    else:
-        signals_common.set_approach_control(sig_id,release_on_yellow)
-        # Call the internal function to update and refresh the signal - unless this signal
-        # is configured to be refreshed later (based on the aspect of the signal ahead)
-        if signals_common.signals[str(sig_id)]["refresh"]:
-            update_semaphore_signal(sig_id)
-    return()
-
-# -------------------------------------------------------------------------
-# Function to "release" a signal (that was subject to automatic approach
-# control). Called following an approach_release_button_event (see above).
-# Can also be called externally (e.g. following the triggering of a track
-# sensor to enable semi automation of signals along the route
-# -------------------------------------------------------------------------
-
-def clear_approach_control (sig_id:int):
-    signals_common.clear_approach_control(sig_id)
-    # Call the internal function to update and refresh the signal - unless this signal
-    # is configured to be refreshed later (based on the aspect of the signal ahead)
-    if signals_common.signals[str(sig_id)]["refresh"]:
-        update_semaphore_signal(sig_id)
-    return ()
+        return()
 
 ###############################################################################

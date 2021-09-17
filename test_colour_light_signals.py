@@ -11,7 +11,7 @@ from model_railway_signals import *
 import logging
 
 # Set the logging level
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 
 # Global variables to thrack the state of the test functions
 signals_locked = False
@@ -344,7 +344,7 @@ canvas.create_text (600,780,text="Signals 3, 5, 8, 10, 15, 20, 25, are 'Fully Au
                     " - No manual controls but they can be toggled and overridden")
 canvas.create_text (600,800,text="All Main Colour Light signals apart from Signals 21-25 are 'updated' based on the signal ahead" +
                     " - This is to test the correct aspects are displayed")
-canvas.create_text (600,820,text="All Signals apart from Signals 21-25 and 31-35 will generate Callbacks into the main programme")
+canvas.create_text (600,820,text="All Signals apart from Signals 21-24 and 31-34 will generate Callbacks into the main programme")
 
 print ("Creating Signals")
 
@@ -498,7 +498,7 @@ create_colour_light_signal (canvas,24,800,500,
                             signal_subtype=signal_sub_type.four_aspect,
                             rhfeather45=True,rhfeather90=True,
                             position_light = True)
-create_colour_light_signal (canvas,25,1000,500,
+create_colour_light_signal (canvas,25,1000,500, sig_callback=signal_button,
                             signal_subtype=signal_sub_type.red_ylw,
                             sig_passed_button=True,
                             fully_automatic=True,
@@ -529,7 +529,7 @@ create_ground_position_signal (canvas,33,600,650,
                             sig_passed_button=True)
 create_ground_position_signal (canvas,34,800,650,
                             shunt_ahead = True, modern_type = True, orientation = 180)
-create_ground_position_signal (canvas,35,1000,650,
+create_ground_position_signal (canvas,35,1000,650, sig_callback=signal_button,
                             shunt_ahead = False, modern_type = False, orientation = 180,
                             sig_passed_button=True)
 
