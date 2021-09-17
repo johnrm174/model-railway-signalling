@@ -34,11 +34,13 @@ def lock_unlock_points():
     print (" ")
     if points_locked:
         print ("Unlocking All Points")
+        print ("Error will be raised for Point 10 as it doesn't exist")
         for I in range(1,20): unlock_point(I)
         lock_points_button.config(relief="raised")
         points_locked = False
     else:
         print ("Locking All Points")
+        print ("Error will be raised for Point 10 as it doesn't exist")
         for I in range(1,20): lock_point(I)
         lock_points_button.config(relief="sunken")
         points_locked = True
@@ -51,12 +53,17 @@ def lock_unlock_points():
 def toggle_points():
     print ("")
     print ("Toggling All Points")
+    print ("Error will be raised for Point 10 as it doesn't exist")
+    print ("Warnings will be raised for any points that have an active FPL or are externally locked")
     for I in range(1,20): toggle_point(I)
     return()
 
 def toggle_point_fpls():
     print ("")
     print ("Toggling All Facing Point Locks")
+    print ("Error will be raised for Point 10 as it doesn't exist")
+    print ("Errors will be raised for Points without a facing point lock")
+    print ("Warnings will  be raised for any points that are externally locked")
     for I in range(1,20): toggle_fpl(I)
     return()
 
@@ -67,6 +74,7 @@ def toggle_point_fpls():
 def print_point_states():
     print ("")
     print ("Current State of all points is as follows")
+    print ("Error will be raised for Point 10 as it doesn't exist")
     for I in range(1,20):
         print ("Point "+str(I)+ " : point_switched = "+str(point_switched(I))+", fpl_active = "+ str(fpl_active(I)))
     return()
@@ -130,7 +138,7 @@ create_point(canvas,18,point_type.RH,450,400,"black",orientation=180,point_callb
 create_point(canvas,19,point_type.RH,500,400,"black",orientation=180,also_switch=50, fpl=True, reverse=True)
 canvas.create_text(325,470,text=" Points 8, 9, 18 and 19 are created \'reversed\'")
 
-print("Negative Tests for Creating Track Sections to test validation:")
+print("Negative Tests for Creating Points to test validation:")
 
 create_point(canvas,0,point_type.LH,100,250,"black")
 create_point(canvas,1,point_type.RH,50,250,"black")

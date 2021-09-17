@@ -210,7 +210,7 @@ def set_all_approach_control_red():
 def set_all_approach_control_yellow():
     print ("")
     print ("Setting \'Release on Yellow\' Approach Control for signals 10-19")
-    print ("Signals 10, 14, 15, 19 and 99 will Error (negative tests)")
+    print ("Signals 10 - 19 and 99 will Error (negative tests)")
     for I in range(10,20):set_approach_control(I,release_on_yellow=True)
     set_approach_control (99,release_on_yellow=True)
     update_signals_based_on_signal_ahead()

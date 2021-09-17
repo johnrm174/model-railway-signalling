@@ -350,7 +350,7 @@ def lock_subsidary (*sig_ids:int):
         elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
             logging.error ("Signal "+str(sig_id)+": lock_subsidary - Signal does not have a subsidary")
         # Only lock if the signal has a subsidary and it is currently unlocked
-        elif signals_common.signals[str(sig_id)]["hassubsidary"] and not signals_common.signals[str(sig_id)]["sublocked"]:
+        elif not signals_common.signals[str(sig_id)]["sublocked"]:
             logging.info ("Signal "+str(sig_id)+": Locking subsidary")
             # If signal/point locking has been correctly implemented it should
             # only be possible to lock a signal that is "ON" (i.e. at DANGER)
@@ -378,7 +378,7 @@ def unlock_subsidary (*sig_ids:int):
         elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
             logging.error ("Signal "+str(sig_id)+": unlock_subsidary - Signal does not have a subsidary")
         # Only unlock if the signal has a subsidary and it is currently locked
-        elif signals_common.signals[str(sig_id)]["hassubsidary"] and signals_common.signals[str(sig_id)]["sublocked"]:
+        elif signals_common.signals[str(sig_id)]["sublocked"]:
             logging.info ("Signal "+str(sig_id)+": Unlocking subsidary")
             # Re-enable the Button to unlock the subsidary signal
             signals_common.signals[str(sig_id)]["subbutton"].config(state="normal")
@@ -534,7 +534,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
         # Do some additional validation specific to this function for semaphore signals
         if signals_common.signals[str(sig_id)]["distant"]:
             logging.error("Signal "+str(sig_id)+": Can't set approach control for a semaphore distant signal")
-        elif not signals_common.signals[str(sig_id)]["distant"] and release_on_yellow:
+        elif release_on_yellow:
             logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a semaphore home signal")
         else:
             signals_common.set_approach_control(sig_id)

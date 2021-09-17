@@ -76,7 +76,7 @@ def channel_mapped(channel:int):
 
 def track_sensor_triggered (gpio_channel:int):
     
-    global channels # the dictionary of mapped channels
+    global channels
     global logging
     
     # Thread to "lock" the sensor for the specified timeout period
@@ -110,15 +110,14 @@ def track_sensor_triggered (gpio_channel:int):
                 # If a Tkinter window hasn't been created (i.e. the model_railway_signals package is just being 
                 # used for the sensor functionality, then we make a callback in the thread we happen to be in
                 logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
-                if common.root_window is None:
-                    # Tkinter window doesn't exist (or if it does, no signals or points objects have been created)
-                    channels[str(gpio_channel)]["callback"](sensor_id,track_sensor_callback_type.sensor_triggered)
-                elif channels[str(gpio_channel)]["signal_passed"] > 0:
+                
+                if channels[str(gpio_channel)]["signal_passed"] > 0:
                     sig_id = channels[str(gpio_channel)]["signal_passed"]
                     if not signals_common.sig_exists(sig_id):
                         logging.error ("Signal "+str(sig_id)+": trigger_signal_passed_event - Signal does not exist")
                     else:
                         # Raise a signal passed event in the main tkinter thread (if the signal exists)
+                        # If the signal exists then we know there is a main tkinter root window
                         common.execute_function_in_tkinter_thread(lambda:signals_common.sig_passed_button_event(sig_id))
                 elif channels[str(gpio_channel)]["signal_approach"] > 0:
                     sig_id = channels[str(gpio_channel)]["signal_approach"]
@@ -126,15 +125,18 @@ def track_sensor_triggered (gpio_channel:int):
                         logging.error ("Signal "+str(sig_id)+": trigger_signal_approach_event - Signal does not exist")
                     elif (signals_common.signals[str(sig_id)]["sigtype"] in
                           (signals_common.sig_type.colour_light, signals_common.sig_type.semaphore) ):
+                        # If the signal exists then we know there is a main tkinter root window
                         # Raise a signal approach event in the main tkinter thread (if the signal exists)
                         common.execute_function_in_tkinter_thread(lambda:signals_common.approach_release_button_event(sig_id))
                     else:
                         logging.error ("Signal "+str(sig_id)+": trigger_signal_approach_event - Function not supported by signal type")
-
-                else:
-                    # in the main tkinter thread
+                elif common.root_window is not None:
+                    # Raise a callback in the main tkinter thread as long as we know the main root window
                     common.execute_function_in_tkinter_thread (lambda: channels[str(gpio_channel)]["callback"]
                                                             (sensor_id,track_sensor_callback_type.sensor_triggered))
+                else: 
+                    # Raise a callback in the current gpio event thread
+                    channels[str(gpio_channel)]["callback"](sensor_id,track_sensor_callback_type.sensor_triggered)
     return()
 
 # -------------------------------------------------------------------------
@@ -150,7 +152,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
                          sensor_timeout:float = 3.0,
                          trigger_period:float = 0.001):
     
-    global channels # the dictionary of sensors
+    global channels 
     global logging
     global raspberry_pi
 

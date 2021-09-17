@@ -337,9 +337,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 # -------------------------------------------------------------------------
 
 def lock_point (*point_ids:int):
-    global points # the dictionary of points
+    global points 
     global logging
-    
     for point_id in point_ids:
         # Validate the point exists 
         if not point_exists(point_id):
@@ -363,7 +362,7 @@ def lock_point (*point_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_point (*point_ids:int):
-    global points # the dictionary of points
+    global points 
     global logging
     for point_id in point_ids:
         # Validate the point exists
@@ -385,7 +384,6 @@ def unlock_point (*point_ids:int):
 # -------------------------------------------------------------------------
 
 def point_switched (point_id:int):
-    global points # the dictionary of points
     global logging
     # Validate the point exists
     if not point_exists(point_id):
@@ -401,7 +399,6 @@ def point_switched (point_id:int):
 # -------------------------------------------------------------------------
 
 def fpl_active(point_id:int):
-    global points # the dictionary of points
     global logging
     # Validate the point exists
     if not point_exists(point_id):

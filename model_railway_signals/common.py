@@ -5,6 +5,7 @@
 
 import math
 import queue
+import logging
 
 #-------------------------------------------------------------------------
 # Function to find and store the tkinter "root" window as this is used to
@@ -44,10 +45,11 @@ def handle_callback_in_tkinter_thread(*args):
     return()
     
 def execute_function_in_tkinter_thread(callback_function):
-    global root_window
-    global event_queue
     callback = event_queue.put(callback_function)
-    root_window.event_generate("<<ExtCallback>>", when="tail")
+    if root_window is not None:
+        root_window.event_generate("<<ExtCallback>>", when="tail")
+    else:
+        logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
     return()
 
 # -------------------------------------------------------------------------

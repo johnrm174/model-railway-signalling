@@ -64,6 +64,9 @@ create_track_sensor (6, gpio_channel = 9, signal_passed = 3)
 create_track_sensor (7, gpio_channel = 10, sensor_callback = main_callback_function)
 create_track_sensor (8, gpio_channel = 11, sensor_callback = main_callback_function)
 
+print ("Negative test - passing a callback to the tkinter thread before we have created any signal")
+common.execute_function_in_tkinter_thread (lambda: main_callback_function(1,2))
+                
 print ("Creating Signals")
 create_colour_light_signal (canvas3, 1, 100, 200,
                             signal_subtype = signal_sub_type.four_aspect,
