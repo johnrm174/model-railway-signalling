@@ -59,7 +59,7 @@ def execute_function_in_tkinter_thread(callback_function):
 # -------------------------------------------------------------------------
 
 fontsize = 9  # Used by the Signals, Points and sections modules
-xpadding = 3  # Used by the Signals, Points and sections modules
+xpadding = 4  # Used by the Signals, Points and sections modules
 ypadding = 3  # Used by the Signals, Points and sections modules
 bgraised = "grey85"   # Used by the Signals and Points modules
 bgsunken = "white"    # Used by the Signals and Points modules

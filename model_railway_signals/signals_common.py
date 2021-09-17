@@ -134,13 +134,15 @@ def toggle_signal (sig_id:int):
     if signals[str(sig_id)]["sigclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
         signals[str(sig_id)]["sigclear"] = False
+        signals[str(sig_id)]["sigbutton"].config(bg=common.bgraised)
         if not signals[str(sig_id)]["automatic"]:
-            signals[str(sig_id)]["sigbutton"].config(relief="raised",bg=common.bgraised)
+            signals[str(sig_id)]["sigbutton"].config(relief="raised")
     else:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
         signals[str(sig_id)]["sigclear"] = True
+        signals[str(sig_id)]["sigbutton"].config(bg=common.bgsunken)
         if not signals[str(sig_id)]["automatic"]:
-            signals[str(sig_id)]["sigbutton"].config(relief="sunken",bg=common.bgsunken)
+            signals[str(sig_id)]["sigbutton"].config(relief="sunken")
     # call the signal type-specific functions to update the signal (note that we only update
     # Semaphore and colour light signals if they are configured to update immediately)
     if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
@@ -241,14 +243,22 @@ def create_common_signal_elements (canvas,
                                    orientation:int,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
-                                   automatic:bool=False):
+                                   automatic:bool=False,
+                                   distant_button_offset:int=0):
     global signals
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
+    # Assign the button labels. if a distant_button_offset has been defined then this represents the 
+    # special case of a semaphore distant signal being created on the same "post" as a semaphore
+    # home signal. On this case we label the button as "D" to differentiate it from the main
+    # home signal button and then apply the offset to deconflict with the home signal buttons
+    if distant_button_offset !=0 : main_button_text = "D"
+    elif sig_id < 10: main_button_text = "0" + str(sig_id)
+    else: main_button_text = str(sig_id)
     # Create the Signal and Subsidary Button objects and their callbacks
-    sig_button = Button (canvas, text=str(sig_id), padx=common.xpadding, pady=common.ypadding,
+    sig_button = Button (canvas, text=main_button_text, padx=common.xpadding, pady=common.ypadding,
                 state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                 bg=common.bgraised, command=lambda:signal_button_event(sig_id))
     sub_button = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
@@ -260,15 +270,20 @@ def create_common_signal_elements (canvas,
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button is "hidden"
     # if the signal doesn't have an associated subsidary. The Button positions are adjusted
     # accordingly so they always remain in the "right" position relative to the signal
-    if subsidary:
-        if orientation == 0 or sig_id < 10:
-            button_position = common.rotate_point (x,y,-25,-20,orientation) 
-        else:
-            button_position = common.rotate_point (x,y,-35,-20,orientation) 
+    # Note that we have to cater for the special case of a semaphore distant signal being
+    # created on the same post as a semaphore home signal. In this case (signified by a
+    # distant_button_offset), we apply the offset to deconflict with the home signal buttons
+    if distant_button_offset != 0:
+        button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
+        canvas.create_window(button_position,window=sig_button)
+        canvas.create_window(button_position,window=sub_button,state='hidden')
+    elif subsidary:
+        if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
+        else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
         canvas.create_window(button_position,anchor=E,window=sig_button)
         canvas.create_window(button_position,anchor=W,window=sub_button)            
     else:
-        button_position = common.rotate_point (x,y,-20,-20,orientation) 
+        button_position = common.rotate_point (x,y,-20,-25,orientation) 
         canvas.create_window(button_position,window=sig_button)
         canvas.create_window(button_position,window=sub_button,state='hidden')
     # Signal passed button is created on the track at the base of the signal

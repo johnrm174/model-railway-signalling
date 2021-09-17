@@ -34,6 +34,7 @@ import logging
     
 def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 distant:bool=False,
+                                associated_home:int = 0,
                                 sig_callback = None,
                                 orientation:int = 0,
                                 sig_passed_button:bool=False,
@@ -47,11 +48,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 lh2_subsidary:bool=False,
                                 rh1_subsidary:bool=False,
                                 rh2_subsidary:bool=False,
-                                main_distant:bool=False,
-                                lh1_distant:bool=False,
-                                lh2_distant:bool=False,
-                                rh1_distant:bool=False,
-                                rh2_distant:bool=False,
                                 theatre_route_indicator:bool=False,
                                 refresh_immediately:bool = True,
                                 fully_automatic:bool=False):
@@ -61,9 +57,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     logging.info ("Signal "+str(sig_id)+": Creating Semaphore Signal")
 
     has_subsidary = main_subsidary or lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary
-    has_secondary_distant_arms = main_distant or lh1_distant or lh2_distant or rh1_distant or rh2_distant
     has_junction_arms = (lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary or
-                         lh1_distant or lh2_distant or rh1_distant or rh2_distant or
                          lh1_signal or lh2_signal or rh1_signal or rh2_signal )
 
     if signals_common.sig_exists(sig_id):
@@ -78,13 +72,16 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have a Theatre Route Indicator")
     elif distant and has_subsidary:
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have subsidary signals")
-    elif distant and has_secondary_distant_arms:
-        logging.error ("Signal "+str(sig_id)+": Distant signals should not have secondary distant arms")
     elif distant and approach_release_button:
         logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
-    elif ( (lh1_distant and not lh1_signal) or (lh2_distant and not lh2_signal) or
-           (rh1_distant and not rh1_signal) or (rh1_distant and not rh1_signal) ):
-        logging.error ("Signal "+str(sig_id)+": A secondary distant arm must have an associated main distant arm")
+    elif associated_home > 0 and not distant:
+        logging.error ("Signal "+str(sig_id)+": Can only specify an associated signal for a distant signal")
+    elif associated_home > 0 and not signals_common.sig_exists(associated_home):
+        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" does not exist")
+    elif associated_home > 0 and signals_common.signals[str(associated_home)]["sigtype"] != signals_common.sig_type.semaphore:
+        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a semaphore type")
+    elif associated_home > 0 and signals_common.signals[str(associated_home)]["distant"]:
+        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a home signal")
     else:
         
         # We use a value of None to signify that a particular arm doesn't isn't to be created for the signal
@@ -98,92 +95,87 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if rh1_signal == False: rh1_signal = None
         if lh2_signal == False: lh2_signal = None
         if rh2_signal == False: rh2_signal = None
-        if main_distant == False: main_distant = None
-        if lh1_distant == False: lh1_distant = None
-        if rh1_distant == False: rh1_distant = None
-        if lh2_distant == False: lh2_distant = None
-        if rh2_distant == False: rh2_distant = None
         
-        # Work out the offset for the post depending on the combination of signal arms
-        if (rh2_signal is None and rh2_subsidary is None and rh1_signal is None and rh1_subsidary is None):
+        # Work out the offset for the post depending on the combination of signal arms. Note that if
+        # this is a distant signal associated with another home signal then we'll use the post offset
+        # for the existing signal (as there may be a different combination of home arms)
+        if associated_home > 0:
+            postoffset = signals_common.signals[str(associated_home)]["postoffset"]
+        elif (rh2_signal is None and rh2_subsidary is None and rh1_signal is None and rh1_subsidary is None):
             if lh2_signal is not None or lh2_subsidary is not None:
-                post_offset = -8
+                postoffset = -8
             elif lh1_signal is not None or lh1_subsidary is not None:
-                post_offset = -15
+                postoffset = -15
             else:
-                post_offset = -20
+                postoffset = -20
         elif rh2_signal is not None or rh2_subsidary is not None:
-            post_offset = -37
+            postoffset = -37
         elif (rh2_signal is None and rh2_subsidary is None) and (lh2_signal is None and lh2_subsidary is None):
-            post_offset = -22
+            postoffset = -22
         else:
-            post_offset = -22
-        lh2_offset = post_offset-28 
-        lh1_offset = post_offset-14
-        rh1_offset = post_offset+14
-        rh2_offset = post_offset+28 
+            postoffset = -22
+        lh2offset = postoffset-28 
+        lh1offset = postoffset-14
+        rh1offset = postoffset+14
+        rh2offset = postoffset+28 
 
-        # Draw the signal base line & signal post   
-        canvas.create_line(common.rotate_line(x,y,0,0,0,post_offset,orientation),width=2,fill="white")
-        canvas.create_line(common.rotate_line(x,y,0,post_offset,+70,post_offset,orientation),width=3,fill="white")
-        # Draw the rest of the gantry to support other arms as required
-        if lh2_signal is not None or lh2_subsidary is not None:
-            canvas.create_line(common.rotate_line(x,y,30,post_offset,30,lh2_offset,orientation),width=2,fill="white")
-            canvas.create_line(common.rotate_line(x,y,30,lh2_offset,40,lh2_offset,orientation),width=2,fill="white")
-            if lh2_signal: canvas.create_line(common.rotate_line(x,y,40,lh2_offset,65,lh2_offset,orientation),width=2,fill="white")
-        if lh1_signal is not None or lh1_subsidary is not None:
-            canvas.create_line(common.rotate_line(x,y,30,post_offset,30,lh1_offset,orientation),width=2,fill="white")
-            canvas.create_line(common.rotate_line(x,y,30,lh1_offset,40,lh1_offset,orientation),width=2,fill="white")
-            if lh1_signal: canvas.create_line(common.rotate_line(x,y,40,lh1_offset,65,lh1_offset,orientation),width=2,fill="white")
-        if rh2_signal is not None or rh2_subsidary is not None:
-            canvas.create_line(common.rotate_line(x,y,30,post_offset,30,rh2_offset,orientation),width=2,fill="white")
-            canvas.create_line(common.rotate_line(x,y,30,rh2_offset,40,rh2_offset,orientation),width=2,fill="white")
-            if rh2_signal: canvas.create_line(common.rotate_line(x,y,40,rh2_offset,65,rh2_offset,orientation),width=2,fill="white")
-        if rh1_signal is not None or rh1_subsidary is not None:
-            canvas.create_line(common.rotate_line(x,y,30,post_offset,30,rh1_offset,orientation),width=2,fill="white")
-            canvas.create_line(common.rotate_line(x,y,30,rh1_offset,40,rh1_offset,orientation),width=2,fill="white")
-            if rh1_signal: canvas.create_line(common.rotate_line(x,y,40,rh1_offset,65,rh1_offset,orientation),width=2,fill="white")
+        # Draw the signal base & signal post (unless this is a distant associated with an existing signal
+        # in which case the signal base and post will already have been drawn when the home signal was created
+        if associated_home == 0:
+            canvas.create_line(common.rotate_line(x,y,0,0,0,postoffset,orientation),width=2,fill="white")
+            canvas.create_line(common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation),width=3,fill="white")
+            # Draw the rest of the gantry to support other arms as required
+            if lh2_signal is not None or lh2_subsidary is not None:
+                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation),width=2,fill="white")
+                canvas.create_line(common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation),width=2,fill="white")
+                if lh2_signal: canvas.create_line(common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation),width=2,fill="white")
+            if lh1_signal is not None or lh1_subsidary is not None:
+                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation),width=2,fill="white")
+                canvas.create_line(common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation),width=2,fill="white")
+                if lh1_signal: canvas.create_line(common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation),width=2,fill="white")
+            if rh2_signal is not None or rh2_subsidary is not None:
+                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation),width=2,fill="white")
+                canvas.create_line(common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation),width=2,fill="white")
+                if rh2_signal: canvas.create_line(common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation),width=2,fill="white")
+            if rh1_signal is not None or rh1_subsidary is not None:
+                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation),width=2,fill="white")
+                canvas.create_line(common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation),width=2,fill="white")
+                if rh1_signal: canvas.create_line(common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation),width=2,fill="white")
 
         # set the colour of the signal arm according to the signal type
-        distant_colour="yellow"
-        if distant: arm_colour=distant_colour
+        if distant: arm_colour="yellow"
         else: arm_colour = "red"
+        # If this is a distant signal associated with an existing home signal then the distant arms need
+        # to be created underneath the main home signal arms - we therefore need to apply an offset
+        if associated_home > 0: armoffset = -10
+        else: armoffset = 0
+            
         # Draw the signal arm for the main route
-        mainsigon = canvas.create_line(common.rotate_line(x,y,+65,post_offset+3,+65,post_offset-8,orientation),fill=arm_colour,width=4)
-        mainsigoff = canvas.create_line(common.rotate_line(x,y,+65,post_offset+3,+72,post_offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        maindiston = canvas.create_line(common.rotate_line(x,y,+55,post_offset+3,+55,post_offset-8,orientation),fill=distant_colour,width=4)
-        maindistoff = canvas.create_line(common.rotate_line(x,y,+55,post_offset+3,+62,post_offset-8,orientation),fill=distant_colour,width=4,state='hidden')
+        mainsigon = canvas.create_line(common.rotate_line(x,y,65+armoffset,postoffset+3,65+armoffset,postoffset-8,orientation),fill=arm_colour,width=4)
+        mainsigoff = canvas.create_line(common.rotate_line(x,y,65+armoffset,postoffset+3,72+armoffset,postoffset-8,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arm for the main route
-        mainsubon = canvas.create_line(common.rotate_line(x,y,+43,post_offset+3,+43,post_offset-6,orientation),fill=arm_colour,width=3)
-        mainsuboff = canvas.create_line(common.rotate_line(x,y,+43,post_offset+3,+48,post_offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        mainsubon = canvas.create_line(common.rotate_line(x,y,+43,postoffset+3,+43,postoffset-6,orientation),fill=arm_colour,width=3)
+        mainsuboff = canvas.create_line(common.rotate_line(x,y,+43,postoffset+3,+48,postoffset-6,orientation),fill=arm_colour,width=3,state='hidden')
         # Draw the signal arms for the RH routes
-        rh1sigon = canvas.create_line(common.rotate_line(x,y,+60,rh1_offset+2,+60,rh1_offset-8,orientation),fill=arm_colour,width=4)
-        rh1sigoff = canvas.create_line(common.rotate_line(x,y,+60,rh1_offset+2,+67,rh1_offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        rh1diston = canvas.create_line(common.rotate_line(x,y,+50,rh1_offset+3,+50,rh1_offset-8,orientation),fill=distant_colour,width=4)
-        rh1distoff = canvas.create_line(common.rotate_line(x,y,+50,rh1_offset+3,+57,rh1_offset-8,orientation),fill=distant_colour,width=4,state='hidden')
-        rh2sigon = canvas.create_line(common.rotate_line(x,y,+60,rh2_offset+2,+60,rh2_offset-8,orientation),fill=arm_colour,width=4)
-        rh2sigoff = canvas.create_line(common.rotate_line(x,y,+60,rh2_offset+2,+67,rh2_offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        rh2diston = canvas.create_line(common.rotate_line(x,y,+50,rh2_offset+3,+50,rh2_offset-8,orientation),fill=distant_colour,width=4)
-        rh2distoff = canvas.create_line(common.rotate_line(x,y,+50,rh2_offset+3,+57,rh2_offset-8,orientation),fill=distant_colour,width=4,state='hidden')
+        rh1sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh1offset+2,60+armoffset,rh1offset-8,orientation),fill=arm_colour,width=4)
+        rh1sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh1offset+2,67+armoffset,rh1offset-8,orientation),fill=arm_colour,width=4,state='hidden')
+        rh2sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh2offset+2,60+armoffset,rh2offset-8,orientation),fill=arm_colour,width=4)
+        rh2sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh2offset+2,67+armoffset,rh2offset-8,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arms for the RH routes
-        rh1subon = canvas.create_line(common.rotate_line(x,y,+38,rh1_offset+2,+38,rh1_offset-6,orientation),fill=arm_colour,width=3)
-        rh1suboff = canvas.create_line(common.rotate_line(x,y,+38,rh1_offset+2,+43,rh1_offset-6,orientation),fill=arm_colour,width=3,state='hidden')
-        rh2subon = canvas.create_line(common.rotate_line(x,y,+38,rh2_offset+2,+38,rh2_offset-6,orientation),fill=arm_colour,width=3)
-        rh2suboff = canvas.create_line(common.rotate_line(x,y,+38,rh2_offset+2,+43,rh2_offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        rh1subon = canvas.create_line(common.rotate_line(x,y,+38,rh1offset+2,+38,rh1offset-6,orientation),fill=arm_colour,width=3)
+        rh1suboff = canvas.create_line(common.rotate_line(x,y,+38,rh1offset+2,+43,rh1offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        rh2subon = canvas.create_line(common.rotate_line(x,y,+38,rh2offset+2,+38,rh2offset-6,orientation),fill=arm_colour,width=3)
+        rh2suboff = canvas.create_line(common.rotate_line(x,y,+38,rh2offset+2,+43,rh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
         # Draw the signal arms for the LH routes
-        lh1sigon = canvas.create_line(common.rotate_line(x,y,+60,lh1_offset+2,+60,lh1_offset-8,orientation),fill=arm_colour,width=4)
-        lh1sigoff = canvas.create_line(common.rotate_line(x,y,+60,lh1_offset+2,+67,lh1_offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        lh1diston = canvas.create_line(common.rotate_line(x,y,+50,lh1_offset+3,+50,lh1_offset-8,orientation),fill=distant_colour,width=4)
-        lh1distoff = canvas.create_line(common.rotate_line(x,y,+50,lh1_offset+3,+57,lh1_offset-8,orientation),fill=distant_colour,width=4,state='hidden')
-        lh2sigon = canvas.create_line(common.rotate_line(x,y,+60,lh2_offset+2,+60,lh2_offset-8,orientation),fill=arm_colour,width=4)
-        lh2sigoff = canvas.create_line(common.rotate_line(x,y,+60,lh2_offset+2,+67,lh2_offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        lh2diston = canvas.create_line(common.rotate_line(x,y,+50,lh2_offset+3,+50,lh2_offset-8,orientation),fill=distant_colour,width=4)
-        lh2distoff = canvas.create_line(common.rotate_line(x,y,+50,lh2_offset+3,+57,lh2_offset-8,orientation),fill=distant_colour,width=4,state='hidden')
+        lh1sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh1offset+2,60+armoffset,lh1offset-8,orientation),fill=arm_colour,width=4)
+        lh1sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh1offset+2,67+armoffset,lh1offset-8,orientation),fill=arm_colour,width=4,state='hidden')
+        lh2sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh2offset+2,60+armoffset,lh2offset-8,orientation),fill=arm_colour,width=4)
+        lh2sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh2offset+2,67+armoffset,lh2offset-8,orientation),fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arms for the LH routes
-        lh1subon = canvas.create_line(common.rotate_line(x,y,+38,lh1_offset+2,+38,lh1_offset-6,orientation),fill=arm_colour,width=3)
-        lh1suboff = canvas.create_line(common.rotate_line(x,y,+38,lh1_offset+2,+43,lh1_offset-6,orientation),fill=arm_colour,width=3,state='hidden')
-        lh2subon = canvas.create_line(common.rotate_line(x,y,+38,lh2_offset+2,+38,lh2_offset-6,orientation),fill=arm_colour,width=3)
-        lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2_offset+2,+43,lh2_offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        lh1subon = canvas.create_line(common.rotate_line(x,y,+38,lh1offset+2,+38,lh1offset-6,orientation),fill=arm_colour,width=3)
+        lh1suboff = canvas.create_line(common.rotate_line(x,y,+38,lh1offset+2,+43,lh1offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        lh2subon = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+38,lh2offset-6,orientation),fill=arm_colour,width=3)
+        lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
 
         # Hide any otherdrawing objects we don't need for this particular signal
         if main_subsidary is None: canvas.itemconfigure(mainsubon,state='hidden')
@@ -195,11 +187,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if rh1_signal is None: canvas.itemconfigure(rh1sigon,state='hidden')
         if lh2_signal is None: canvas.itemconfigure(lh2sigon,state='hidden')
         if rh2_signal is None: canvas.itemconfigure(rh2sigon,state='hidden')
-        if main_distant is None: canvas.itemconfigure(maindiston,state='hidden')
-        if lh1_distant is None: canvas.itemconfigure(lh1diston,state='hidden')
-        if rh1_distant is None: canvas.itemconfigure(rh1diston,state='hidden')
-        if lh2_distant is None: canvas.itemconfigure(lh2diston,state='hidden')
-        if rh2_distant is None: canvas.itemconfigure(rh2diston,state='hidden')
                              
         # Set the initial state of the signal Arms if they have been created
         # We set them in the "wrong" state initially, so that when the signal arms
@@ -215,12 +202,17 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if rh1_signal is not None: rh1_signal = True
         if lh2_signal is not None: lh2_signal = True
         if rh2_signal is not None: rh2_signal = True
-        if main_distant is not None: main_distant = True
-        if lh1_distant is not None: lh1_distant = True
-        if rh1_distant is not None: rh1_distant = True
-        if lh2_distant is not None: lh2_distant = True
-        if rh2_distant is not None: rh2_distant = True
 
+        # If this is a distant signal associated with another home signal then we need to adjust the
+        # position of the signal button to "deconflict" with the buttons of the home signal
+        if associated_home > 0:
+            if signals_common.signals[str(associated_home)]["hassubsidary"]:
+                button_offset = -65
+            else:
+                button_offset = -45
+        else:
+            button_offset = 0
+            
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
                                        ext_callback = sig_callback,
@@ -228,10 +220,11 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        orientation = orientation,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic)
+                                       automatic = fully_automatic,
+                                       distant_button_offset = button_offset)
         
         # Create the signal elements for a Theatre Route indicator
-        signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = post_offset,
+        signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,
                                         orientation = orientation,has_theatre = theatre_route_indicator)
                    
         # Create the signal elements to support Approach Control
@@ -241,54 +234,43 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
-        signals_common.signals[str(sig_id)]["refresh"]        = refresh_immediately            # Type-specific - if signal should be refreshed on a change
-        signals_common.signals[str(sig_id)]["distant"]        = distant                        # Type-specific - subtype of the signal (home/distant)
-        signals_common.signals[str(sig_id)]["main_subsidary"] = main_subsidary                 # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh1_subsidary"]  = lh1_subsidary                  # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh1_subsidary"]  = rh1_subsidary                  # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh2_subsidary"]  = lh2_subsidary                  # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh2_subsidary"]  = rh2_subsidary                  # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["main_signal"]    = main_signal                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh1_signal"]     = lh1_signal                     # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh1_signal"]     = rh1_signal                     # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh2_signal"]     = lh2_signal                     # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh2_signal"]     = rh2_signal                     # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["main_distant"]    = main_distant                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh1_distant"]    = lh1_distant                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh1_distant"]    = rh1_distant                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["lh2_distant"]    = lh2_distant                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["rh2_distant"]    = rh2_distant                    # Type-specific - details of the signal configuration
-        signals_common.signals[str(sig_id)]["mainsigon"]      = mainsigon                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["mainsigoff"]     = mainsigoff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1sigon"]       = lh1sigon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1sigoff"]      = lh1sigoff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2sigon"]       = lh2sigon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2sigoff"]      = lh2sigoff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1sigon"]       = rh1sigon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1sigoff"]      = rh1sigoff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2sigon"]       = rh2sigon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2sigoff"]      = rh2sigoff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["maindiston"]     = maindiston                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["maindistoff"]    = maindistoff                    # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1diston"]      = lh1diston                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1distoff"]     = lh1distoff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2diston"]      = lh2diston                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2distoff"]     = lh2distoff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1diston"]      = rh1diston                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1distoff"]     = rh1distoff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2diston"]      = rh2diston                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2distoff"]     = rh2distoff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["mainsubon"]      = mainsubon                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["mainsuboff"]     = mainsuboff                     # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1subon"]       = lh1subon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh1suboff"]      = lh1suboff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2subon"]       = lh2subon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["lh2suboff"]      = lh2suboff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1subon"]       = rh1subon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh1suboff"]      = rh1suboff                      # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2subon"]       = rh2subon                       # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["rh2suboff"]      = rh2suboff                      # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["refresh"]          = refresh_immediately    # Type-specific - if signal should be refreshed on a change
+        signals_common.signals[str(sig_id)]["distant"]          = distant                # Type-specific - subtype of the signal (home/distant)
+        signals_common.signals[str(sig_id)]["associatedsignal"] = associated_home        # Type-specific - subtype of the signal (home/distant)
+        signals_common.signals[str(sig_id)]["main_subsidary"]   = main_subsidary         # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["lh1_subsidary"]    = lh1_subsidary          # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["rh1_subsidary"]    = rh1_subsidary          # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["lh2_subsidary"]    = lh2_subsidary          # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["rh2_subsidary"]    = rh2_subsidary          # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["main_signal"]      = main_signal            # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["lh1_signal"]       = lh1_signal             # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["rh1_signal"]       = rh1_signal             # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["lh2_signal"]       = lh2_signal             # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["rh2_signal"]       = rh2_signal             # Type-specific - details of the signal configuration
+        signals_common.signals[str(sig_id)]["postoffset"]       = postoffset             # Type-specific - used for drawing associated distants
+        signals_common.signals[str(sig_id)]["mainsigon"]        = mainsigon              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsigoff"]       = mainsigoff             # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh1sigon"]         = lh1sigon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh1sigoff"]        = lh1sigoff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh2sigon"]         = lh2sigon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh2sigoff"]        = lh2sigoff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh1sigon"]         = rh1sigon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh1sigoff"]        = rh1sigoff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh2sigon"]         = rh2sigon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh2sigoff"]        = rh2sigoff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsubon"]        = mainsubon              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["mainsuboff"]       = mainsuboff             # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh1subon"]         = lh1subon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh1suboff"]        = lh1suboff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh2subon"]         = lh2subon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["lh2suboff"]        = lh2suboff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh1subon"]         = rh1subon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh1suboff"]        = rh1suboff              # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh2subon"]         = rh2subon               # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["rh2suboff"]        = rh2suboff              # Type-specific - drawing object
         
+        # if there is an associated signal then we also need to update that signal to refer back to this one
+        if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
         # If the signal is fully automatic then toggle to OFF to display a "clear" aspect 
         if fully_automatic: signals_common.toggle_signal(sig_id)
         # Update the signal to display the initial aspects - this will also cause the DCC commands to be sent
@@ -394,16 +376,8 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
 
 def update_main_signal_arms(sig_id:int, log_message:str=""):
     global logging
-    
     # When Home/Distant signal is set to PROCEED - the main signal arms will reflect the route
-    # When a Home Signal is set to CAUTION - the main signal arms will reflect the route
-    # (the CAUTION aspect is represented by the corresponding secondary (seperate) Distant arm) 
-    # When a Distant signal is set to CAUTION - The main signal arms will always be ON        
-
-    if ( signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED or
-          (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION and
-             not signals_common.signals[str(sig_id)]["distant"]) ):
-        
+    if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
         if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", True, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
@@ -450,78 +424,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
             update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
-            
     return()
-
-# -------------------------------------------------------------------------
-# Internal Function to update each of the secondary (Distant) arms supported by
-# a signal to reflect the state of the signal, taking into account the state of
-# the signal ahead - e.g. if the signal is OFF, but the signal ahead is showing
-# a DANGER aspect then the state of the signal will be CAUTION rather than CLEAR
-# As per the main signal Arms, the actual distant arm that is changed will
-# depend on the route that the particular distant arm is associated with.
-# Calls the Update_Signal_Arm function to update the state of each arm
-# -------------------------------------------------------------------------
-
-def update_secondary_signal_arms (sig_id:int,log_message:str=""):
-    global logging
-
-    if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
-        
-        # for PROCEED, the state of any secondary distant arms will reflect the state of the main arms
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
-            update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", True, log_message)
-            update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-            update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-            update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-            update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
-            update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-            update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", True, log_message)
-            update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-            update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-            update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
-            update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-            update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-            update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", True, log_message)
-            update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-            update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH1:
-            update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-            update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-            update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-            update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", True, log_message)
-            update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-        elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH2:
-            update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-            update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-            update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-            update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-            update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", True, log_message)
-            
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
-        
-        # If the (Home) signal is at Danger - any distant arms (for the sig ahead) are also "ON"
-        # i.e. effectively "slotted" with the home signal so they are always showing "Caution"
-        update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-        update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-        update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-        update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-        update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-        
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
-
-        # If the signal is set to CAUTION (i.e. OFF but based on a signal ahead displaying DANGER)
-        # then any secondary distant arms should also be set to DANGER (this will realistically
-        # only apply to home signals as distant signals won't have secondary distant arms)
-        update_signal_arm (sig_id, "main_distant", "maindistoff", "maindiston", False, log_message)
-        update_signal_arm (sig_id, "lh1_distant", "lh1distoff", "lh1diston", False, log_message)
-        update_signal_arm (sig_id, "lh2_distant", "lh2distoff", "lh2diston", False, log_message)
-        update_signal_arm (sig_id, "rh1_distant", "rh1distoff", "rh1diston", False, log_message)
-        update_signal_arm (sig_id, "rh2_distant", "rh2distoff", "rh2diston", False, log_message)
-
-    return ()
 
 # -------------------------------------------------------------------------
 # Function to Refresh the displayed signal aspect according the signal state
@@ -536,6 +439,8 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
     
     global logging
     
+    # Get the ID of the associated signal (to make the following code more readable)
+    associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
     # Establish what the signal should be displaying based on the state
     if  signals_common.signals[str(sig_id)]["distant"]:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
@@ -544,9 +449,9 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
         elif signals_common.signals[str(sig_id)]["override"]:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION - distant signal is OVERRIDDEN)"
-        elif signals_common.signals[str(sig_id)]["releaseonyel"]:
+        elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
-            log_message = " (CAUTION - distant signal is subject to \'release on yellow\' approach control)"
+            log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" (at DANGER)")
         elif sig_ahead_id > 0 and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
@@ -564,27 +469,6 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
             log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
-        elif sig_ahead_id > 0:
-            if signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
-                # We only set the Home signal to CAUTION if there is a distant arm associated with the selected route
-                # otherwise the signal is set to CLEAR to reflect the displayed aspect of the signal
-                route = signals_common.signals[str(sig_id)]["routeset"]
-                if ( (route==signals_common.route_type.NONE and signals_common.signals[str(sig_id)]["main_distant"] is not None) or
-                     (route==signals_common.route_type.MAIN and signals_common.signals[str(sig_id)]["main_distant"] is not None) or
-                     (route==signals_common.route_type.LH1 and signals_common.signals[str(sig_id)]["lh1_distant"] is not None) or
-                     (route==signals_common.route_type.LH2 and signals_common.signals[str(sig_id)]["lh2_distant"] is not None) or
-                     (route==signals_common.route_type.RH1 and signals_common.signals[str(sig_id)]["rh1_distant"] is not None) or
-                     (route==signals_common.route_type.RH2 and signals_common.signals[str(sig_id)]["rh2_distant"] is not None) ):
-                    signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
-                    log_message = (" (CAUTION - home signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER")
-                else:
-                    signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
-                    log_message = (" (PROCEED - home signal is OFF and signal ahead "+str(sig_ahead_id)+" is at DANGER - but no distant "+
-                             "arm exists for route "+str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
-            else:
-                signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
-                log_message = (" (PROCEED - home signal is OFF and signal ahead "+str(sig_ahead_id)+" is OFF - route is set to " +
-                                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
         else:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED - home signal is OFF - route is set to " +
@@ -594,7 +478,13 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
     # We don't need to check the displayed state of the signal before deciding if it needs to be
     # changed as the individual functions called to update each arm will implement that logic
     update_main_signal_arms (sig_id,log_message)
-    update_secondary_signal_arms (sig_id,log_message)
+    
+    # If this is a home signal with an associated distant signal then we also need to refresh the
+    # distant signal as it is effectively "slotted" with the home signal - i.e. if the home signal is
+    # set to DANGER then the distant signal (on the same arm) should also show CAUTION
+    if not signals_common.signals[str(sig_id)]["distant"] and associated_signal > 0:
+        if signals_common.signals[str(associated_signal)]["refresh"]:
+            update_semaphore_signal(associated_signal)
     
     # Call the common function to update the theatre route indicator elements
     # (if the signal has a theatre route indicator - otherwise no effect)
@@ -621,10 +511,15 @@ def update_semaphore_route_indication (sig_id,route_to_set = None):
         # Refresh the signal drawing objects (which will also send the DCC commands to change the arms accordingly)
         # Log messages will also be generated for each change - so we don't need lo log anything extra here
         update_main_signal_arms(sig_id," (route has been changed to "+str(route_to_set).rpartition('.')[-1]+")")
-        update_secondary_signal_arms(sig_id," (route has been changed to "+str(route_to_set).rpartition('.')[-1]+")")
         # Also update the subsidary aspects for route changes (as these may be represented by different subsidary arms)
         update_semaphore_subsidary_arms(sig_id," (route has been changed to "+str(route_to_set).rpartition('.')[-1]+")")
-        
+        # If this is a home signal with an associated distant signal then we also need to set the route for
+        # the distant signal as it is effectively on the same post and "slotted" with the home signal
+        # Get the ID of the associated signal (to make the following code more readable)
+        associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
+        if not signals_common.signals[str(sig_id)]["distant"] and associated_signal > 0:
+            if signals_common.signals[str(associated_signal)]["refresh"]:
+                update_semaphore_route_indication (associated_signal,route_to_set)
     return()
 
 # -------------------------------------------------------------------------
