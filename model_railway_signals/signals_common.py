@@ -134,15 +134,15 @@ def toggle_signal (sig_id:int):
     if signals[str(sig_id)]["sigclear"]:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to ON")
         signals[str(sig_id)]["sigclear"] = False
-        signals[str(sig_id)]["sigbutton"].config(bg=common.bgraised)
         if not signals[str(sig_id)]["automatic"]:
+            signals[str(sig_id)]["sigbutton"].config(bg=common.bgraised)
             signals[str(sig_id)]["sigbutton"].config(relief="raised")
     else:
         logging.info ("Signal "+str(sig_id)+": Toggling signal to OFF")
         signals[str(sig_id)]["sigclear"] = True
-        signals[str(sig_id)]["sigbutton"].config(bg=common.bgsunken)
         if not signals[str(sig_id)]["automatic"]:
             signals[str(sig_id)]["sigbutton"].config(relief="sunken")
+            signals[str(sig_id)]["sigbutton"].config(bg=common.bgsunken)
     # call the signal type-specific functions to update the signal (note that we only update
     # Semaphore and colour light signals if they are configured to update immediately)
     if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
@@ -275,7 +275,8 @@ def create_common_signal_elements (canvas,
     # distant_button_offset), we apply the offset to deconflict with the home signal buttons
     if distant_button_offset != 0:
         button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
-        canvas.create_window(button_position,window=sig_button)
+        if not automatic: canvas.create_window(button_position,window=sig_button)
+        else:canvas.create_window(button_position,window=sig_button,state='hidden')
         canvas.create_window(button_position,window=sub_button,state='hidden')
     elif subsidary:
         if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
@@ -292,7 +293,7 @@ def create_common_signal_elements (canvas,
     else:
         canvas.create_window(x,y,window=passed_button,state='hidden')
     # Disable the main signal button if the signal is fully automatic
-    if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgsunken,bd=0)
+    if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]       = canvas               # MANDATORY - canvas object

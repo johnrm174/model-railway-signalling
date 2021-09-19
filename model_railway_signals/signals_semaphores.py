@@ -82,6 +82,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a semaphore type")
     elif associated_home > 0 and signals_common.signals[str(associated_home)]["distant"]:
         logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a home signal")
+    elif associated_home > 0 and sig_passed_button:
+        logging.error ("Signal "+str(sig_id)+": Cannot create a signal passed button if associated with another signal")
     else:
         
         # We use a value of None to signify that a particular arm doesn't isn't to be created for the signal
@@ -377,7 +379,12 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
 def update_main_signal_arms(sig_id:int, log_message:str=""):
     global logging
     # When Home/Distant signal is set to PROCEED - the main signal arms will reflect the route
-    if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
+    # Also the case of a home signal associated with a distant signal (i.e on the same post). In
+    # this case if the home signal is at DANGER and the distant signal is at CAUTION then the state
+    # of the Home signal will be set to caution - in this case we need to set the home arms to OFF
+    if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED or
+         (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION and
+           not signals_common.signals[str(sig_id)]["distant"]) ):
         if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", True, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
@@ -435,14 +442,14 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
+def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associated_signal:bool=False):
     
     global logging
     
     # Get the ID of the associated signal (to make the following code more readable)
     associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
     # Establish what the signal should be displaying based on the state
-    if  signals_common.signals[str(sig_id)]["distant"]:
+    if signals_common.signals[str(sig_id)]["distant"]:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION - distant signal is ON)"
@@ -451,7 +458,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
             log_message = " (CAUTION - distant signal is OVERRIDDEN)"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" (at DANGER)")
+            log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         elif sig_ahead_id > 0 and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
@@ -469,22 +476,28 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0):
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
             log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
+        elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.CAUTION:
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            log_message = (" (CAUTION - home signal is OFF but associated signal "+str(associated_signal)+" is at DANGER")
         else:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED - home signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
-    
+
     # Now refresh the displayed aspect (passing in the log message to be displayed)
     # We don't need to check the displayed state of the signal before deciding if it needs to be
     # changed as the individual functions called to update each arm will implement that logic
     update_main_signal_arms (sig_id,log_message)
     
-    # If this is a home signal with an associated distant signal then we also need to refresh the
-    # distant signal as it is effectively "slotted" with the home signal - i.e. if the home signal is
-    # set to DANGER then the distant signal (on the same arm) should also show CAUTION
-    if not signals_common.signals[str(sig_id)]["distant"] and associated_signal > 0:
+    # If this signal is an associated with another signal then we also need to refresh the other signal
+    # Associated distant signals need to be updated as they are "slotted" with the home signal - i.e. if the
+    # home signal is set to DANGER then the distant signal (on the same arm) should show CAUTION
+    # Associated Home signals need to be updated as the internal state of home signals relies on the state of
+    # the distant signal and the home signal (i.e. Home is OFF but distant is ON - State is therefore CAUTION
+    # We set a flag for the recursive call so we don't end up in a circular recursion
+    if associated_signal > 0 and not updating_associated_signal:
         if signals_common.signals[str(associated_signal)]["refresh"]:
-            update_semaphore_signal(associated_signal)
+            update_semaphore_signal(associated_signal,updating_associated_signal=True)
     
     # Call the common function to update the theatre route indicator elements
     # (if the signal has a theatre route indicator - otherwise no effect)

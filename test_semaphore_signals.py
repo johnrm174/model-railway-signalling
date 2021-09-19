@@ -332,8 +332,7 @@ create_semaphore_signal (canvas,23,250,150,
                         sig_callback = main_callback_function,
                         distant = True,
                         associated_home = 1,
-                        refresh_immediately = True,
-                        sig_passed_button = True )
+                        refresh_immediately = True)
 
 create_semaphore_signal (canvas,2,425,150,
                         main_subsidary = True,
@@ -368,8 +367,7 @@ create_semaphore_signal (canvas,24,775,150,
                         distant = True,
                         associated_home = 4,
                         refresh_immediately = False,
-                         fully_automatic = True,
-                        sig_passed_button = True )
+                        fully_automatic = True)
 
 create_semaphore_signal (canvas,5,950,150,
                         main_subsidary = True,
@@ -387,7 +385,6 @@ create_colour_light_signal (canvas,51,1100,250,refresh_immediately = False,
 
 create_semaphore_signal (canvas,6,250,250,
                         sig_callback = main_callback_function,
-                        main_subsidary = True,
                         orientation = 180,
                         sig_passed_button = True )
 
@@ -395,8 +392,7 @@ create_semaphore_signal (canvas,25,250,250,
                         sig_callback = main_callback_function,
                         orientation = 180,
                         distant = True,
-                        associated_home = 6,
-                        sig_passed_button = True )
+                        associated_home = 6)
 
 create_semaphore_signal (canvas,7,425,250,
                         main_subsidary = True,
@@ -429,8 +425,7 @@ create_semaphore_signal (canvas,26,775,250,
                         orientation = 180,
                         sig_callback = main_callback_function,
                         distant = True,
-                        associated_home = 9,
-                        sig_passed_button = True )
+                        associated_home = 9)
 
 create_semaphore_signal (canvas,10,950,250,
                         main_subsidary = True,
