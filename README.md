@@ -46,13 +46,14 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 
 <pre>
 'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a
-           basic track schematic with interlocked signals/points. Also includes DCC Mapping examples
-           (signals and points) and external track sensors to provide "signal passed" events.
+           basic track schematic with interlocked signals/points and semi-automation of signals using 
+           external track sensors to provide "signal passed" events as the train progresses across the 
+           schematic. Also includes DCC Mapping examples (for both signals and points).
 
 'test_semaphore_example.py' - effectively the same example as above, but using sempahore signals. 
            Includes DCC Mapping examples for the Semaphore signals (different to colour lights).
 
-'test_approach_control.py' - an example of using automated "approach control" for junction signals. This 
+'test_approach_control.py' - an example of using "approach control" for automation of junction signals. This 
            is where a signal displays a more restrictive aspect (either red or yellow) when a lower-speed 
            divergent route is set, forcing the approaching train to slow down and be prepared to stop. As 
            the train approaches, the signal is "released", allowing the train to proceed past the signal 
@@ -138,8 +139,8 @@ Currently supported signal types:
           - With or without a "Approach Release" Button
           - Main signal manual or fully automatic
     Semaphore Signals - Home or Distant
-          - with or without junction arms (RH and LH arms supported)
-          - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+          - with or without junction arms (RH1, RH2, LH1, LH2 arms supported)
+          - with or without subsidaries (Main, LH1, LH2, RH1, RH2 arms supported) - Home signals only
           - with or without a theatre type route indicator (for Home signals only)
           - With or without a "Approach Release" Button
           - Main signal manual or fully automatic
@@ -209,7 +210,7 @@ create_colour_light_signal - Creates a colour light signal
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       sig_id:int - The ID for the signal - also displayed on the signal button
-      x:int, y:int - Position of the point on the canvas (in pixels) 
+      x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
       signal_subtype:sig_sub_type - type of signal to create - Default is signal_sub_type.four_aspect
       orientation:int- Orientation in degrees (0 or 180) - Default is zero
@@ -236,26 +237,28 @@ create_semaphore_signal - Creates a Semaphore signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the point on the canvas (in pixels) 
   Optional Parameters:
-      distant:bool - Set to True for a Distant signal - False for a Home signal - default False
+      distant:bool - True to create a Distant signal - False to create Home signal - default False
+      associated_home:bool - Option only valid when creating distant signals - Set to True to associate
+                             the distant signal with a previously created home signal - default False
+                             (this option enables a distant signal to "share" the same post as the
+                              home signal - specify the same x and y coordinates as the home signal) 
       orientation:int - Orientation in degrees (0 or 180) - Default is zero
       sig_callback:name - Function to call when a signal event happens - Default is no callback
                           Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
       approach_release_button:bool - Creates an "Approach Release" button - Default False
-      lh1_signal:bool - To create a LH1 post with a main (junction) signal - default False
-      lh2_signal:bool - To create a LH2 post with a main (junction) signal - default False
-      rh1_signal:bool - To create a RH1 post with a main (junction) signal - default False
-      rh2_signal:bool - To create a RH2 post with a main (junction) signal - default False
+      main_signal:bool - To create a signal arm for the main route - default True
+                      (Only set this to False for the case of creating a distant signal "associated 
+                       with" a home signal where a distant arm for the main route is not required)
+      lh1_signal:bool - To create a LH1 post with a main (junction) arm - default False
+      lh2_signal:bool - To create a LH2 post with a main (junction) arm - default False
+      rh1_signal:bool - To create a RH1 post with a main (junction) arm - default False
+      rh2_signal:bool - To create a RH2 post with a main (junction) arm - default False
       main_subsidary:bool - To create a subsidary signal under the "main" signal - default False
-      lh1_subsidary:bool - To create a LH1 post with a subsidary signal - default False
-      lh2_subsidary:bool - To create a LH2 post with a subsidary signal - default False
-      rh1_subsidary:bool - To create a RH1 post with a subsidary signal - default False
-      rh2_subsidary:bool - To create a RH2 post with a subsidary signal - default False
-      main_distant:bool - To create a secondary distant signal (for the signal ahead) - default False
-      lh1_distant:bool - To create a LH1 secondary distant signal (for the signal ahead) - default False
-      lh2_distant:bool - To create a LH2 secondary distant signal (for the signal ahead) - default False
-      rh1_distant:bool - To create a RH1 secondary distant signal (for the signal ahead) - default False
-      rh2_distant:bool - To create a RH2 secondary distant signal (for the signal ahead) - default False
+      lh1_subsidary:bool - To create a LH1 post with a subsidary arm - default False
+      lh2_subsidary:bool - To create a LH2 post with a subsidary arm - default False
+      rh1_subsidary:bool - To create a RH1 post with a subsidary arm - default False
+      rh2_subsidary:bool - To create a RH2 post with a subsidary arm - default False
       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
       refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
                 when the signal is changed and the external programme will need to call the seperate 
@@ -268,7 +271,7 @@ create_ground_position_signal - create a ground position light signal
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       sig_id:int - The ID for the signal - also displayed on the signal button
-      x:int, y:int - Position of the point on the canvas (in pixels) 
+      x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
       orientation:int- Orientation in degrees (0 or 180) - Default is zero
       sig_callback:name - Function to call when a signal event happens - Default is no callback
@@ -281,7 +284,7 @@ create_ground_disc_signal - Creates a ground disc type signal
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       sig_id:int - The ID for the signal - also displayed on the signal button
-      x:int, y:int - Position of the point on the canvas (in pixels) 
+      x:int, y:int - Position of the signal on the canvas (in pixels) 
  Optional Parameters:
       orientation:int- Orientation in degrees (0 or 180) - Default is zero
       sig_callback:name - Function to call when a signal event happens - Default is no callback
@@ -294,7 +297,7 @@ set_route - Set (and change) the route indication (either feathers or theatre te
       sig_id:int - The ID for the signal
   Optional Parameters:
       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default 'NONE'
-      theatre_text:str  - The text to display in the theatre route indicator - default "NONE"
+      theatre_text:str - The text to display in the theatre route indicator - default "NONE"
 
 update_signal - update the aspect of a signal ( based on the aspect of a signal ahead)
               - intended for 3 and 4 aspect and 2 aspect distant colour light signals
@@ -491,19 +494,14 @@ map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address
       main_signal:int     - single DCC address for the main signal arm (default = No Mapping)
    Optional Parameters:
       main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
-      main_distant:int    - single DCC address for the main secondary distant arm (default = No Mapping)
       lh1_signal:int      - single DCC address for the LH1 signal arm (default = No Mapping)
       lh1_subsidary:int   - single DCC address for the LH1 subsidary arm (default = No Mapping)
-      lh1_distant:int     - single DCC address for the LH1 secondary distant arm (default = No Mapping)
       lh2_signal:int      - single DCC address for the LH2 signal arm (default = No Mapping)
       lh2_subsidary:int   - single DCC address for the LH2 subsidary arm (default = No Mapping)
-      lh2_distant:int     - single DCC address for the LH2 secondary distant arm (default = No Mapping)
       rh1_signal:int      - single DCC address for the RH1 signal arm  (default = No Mapping)
       rh1_subsidary:int   - single DCC address for the RH1 subsidary arm (default = No Mapping)
-      rh1_distant:int     - single DCC address for the RH1 secondary distant arm (default = No Mapping)
       rh2_signal:int      - single DCC address for the RH2 signal arm  (default = No Mapping)
       rh2_subsidary:int   - single DCC address for the RH2 subsidary arm (default = No Mapping)
-      rh2_distant:int     - single DCC address for the RH2 secondary distant arm (default = No Mapping)
       THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
               Each entry comprises the "character" and the associated list of DCC addresses/states
               "#" is a special character - which means inhibit all indications (when signal is at danger)

@@ -10,7 +10,6 @@ from model_railway_signals import *
 from model_railway_signals import common
 import logging
 import threading
-import time
 
 #----------------------------------------------------------------------
 # Here is where we configure the logging - to see what's going on 

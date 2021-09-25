@@ -10,8 +10,8 @@
 #           - With or without a "Approach Release" Button
 #           - Main signal manual or fully automatic
 #    Semaphore Signals - Home or Distant
-#           - with or without junction arms (RH and LH arms supported)
-#           - with or without subsidaries (Main, LH or RH arms supported - for Home signals only)
+#           - with or without junction arms (RH1, RH2, LH1, LH2 arms supported)
+#           - with or without subsidaries (Main, LH1, LH2, RH1, RH2 arms supported) - Home signals only
 #           - with or without a theatre type route indicator (for Home signals only)
 #           - With or without a "Signal Passed" Button
 #           - With or without a "Approach Release" Button
@@ -39,9 +39,6 @@
 #   route_type.RH1    (immediate right)
 #   route_type.RH2    (rar right)
 # These equate to the route feathers for colour light signals or the Sempahore junction "arm":
-#   RH1 or RH2 make the RH junction arm and RH subsidary arm "active"
-#   LH1 or LH2 make the LH junction arm and LH subsidary arm "active"
-#   MAIN or NONE make the "main" signal arm and the "main" subsidary arm "active"
 # 
 # sig_callback_type (tells the calling program what has triggered the callback):
 #     sig_callback_type.sig_switched (signal has been switched)
@@ -54,7 +51,7 @@
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
 #       signal_subtype:sig_sub_type - type of signal to create - Default is signal_sub_type.four_aspect
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
@@ -79,41 +76,42 @@
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       distant:bool - Set to True to create a Distant signal - False to create a Home signal - default False
+#       distant:bool - True to create a Distant signal - False to create a Home signal - default False
+#       associated_home:bool - Option only valid when creating distant signals - Set to True to associate
+#                              the distant signal with a previously created home signal - default False
+#                              (this option enables a distant signal to "share" the same post as the
+#                               home signal - specify the same x and y coordinates as the home signal) 
 #       orientation:int - Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default is no callback
 #                           Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-#       approach_release_button:bool - Creates an "Approach Release" button - Default False
-#       lh1_signal:bool - To create a LH1 post with a main (junction) signal - default False
-#       lh2_signal:bool - To create a LH2 post with a main (junction) signal - default False
-#       rh1_signal:bool - To create a RH1 post with a main (junction) signal - default False
-#       rh2_signal:bool - To create a RH2 post with a main (junction) signal - default False
+#       approach_release_button:bool - Option only valid for home signals - Creates an "Approach Release"
+#                                      button in front of the signal - Default False
+#       main_signal:bool - To create a signal arm for the main route - default True
+#                       (Only set this to False for the case of creating a distant signal "associated 
+#                        with" a home signal where a distant arm for the main route is not required)
+#       lh1_signal:bool - To create a LH1 post with a main (junction) arm - default False
+#       lh2_signal:bool - To create a LH2 post with a main (junction) arm - default False
+#       rh1_signal:bool - To create a RH1 post with a main (junction) arm - default False
+#       rh2_signal:bool - To create a RH2 post with a main (junction) arm - default False
 #       main_subsidary:bool - To create a subsidary signal under the "main" signal - default False
-#       lh1_subsidary:bool - To create a LH1 post with a subsidary signal - default False
-#       lh2_subsidary:bool - To create a LH2 post with a subsidary signal - default False
-#       rh1_subsidary:bool - To create a RH1 post with a subsidary signal - default False
-#       rh2_subsidary:bool - To create a RH2 post with a subsidary signal - default False
-#       main_distant:bool - To create a secondary distant signal (for the signal ahead) - default False
-#       lh1_distant:bool - To create a LH1 secondary distant signal (for the signal ahead) - default False
-#       lh2_distant:bool - To create a LH2 secondary distant signal (for the signal ahead) - default False
-#       rh1_distant:bool - To create a RH1 secondary distant signal (for the signal ahead) - default False
-#       rh2_distant:bool - To create a RH2 secondary distant signal (for the signal ahead) - default False
+#       lh1_subsidary:bool - To create a LH1 post with a subsidary arm - default False
+#       lh2_subsidary:bool - To create a LH2 post with a subsidary arm - default False
+#       rh1_subsidary:bool - To create a RH1 post with a subsidary arm - default False
+#       rh2_subsidary:bool - To create a RH2 post with a subsidary arm - default False
 #       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-#       refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
+#       refresh_immediately:bool - When set to False the signal aspects will NOT be automatically updated 
 #                 when the signal is changed and the external programme will need to call the seperate 
-#                 'update_signal' function. Primarily intended for use with home signals that have a
-#                 secondary distant arm, which will reflect the state of the signal ahead (i.e. if the
-#                 signal ahead is at DANGER then the secondary distant arm will be ON) - Default True
+#                 'update_signal' function. Primarily intended for use with distant signals - Default True
 #       fully_automatic:bool - Creates a signal without any manual controls - Default False
 # 
 # create_ground_position_signal - create a ground position light signal
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default is no callback
@@ -126,7 +124,7 @@
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #  Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default is no callback
@@ -478,12 +476,14 @@ def toggle_signal (sig_id:int):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal does not exist")
+    elif signals_common.signals[str(sig_id)]["automatic"]:
+        logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal is automatic - use set/clear signal override instead")
     else:
         if signals_common.signals[str(sig_id)]["siglocked"]:
             logging.warning ("Signal "+str(sig_id)+": toggle_signal - Signal is locked - Toggling anyway")
         # call the signal type-specific functions to update the signal
         signals_common.toggle_signal(sig_id)
-        return()
+    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Toggle the state of a subsidary signal
@@ -533,9 +533,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
         # Do some additional validation specific to this function for semaphore signals
         if signals_common.signals[str(sig_id)]["distant"]:
-            logging.error("Signal "+str(sig_id)+": Can't set approach control for a semaphore distant signal")
+            logging.error("Signal "+str(sig_id)+": Can't set approach control for semaphore distant signals")
         elif release_on_yellow:
-            logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a semaphore home signal")
+            logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
         else:
             signals_common.set_approach_control(sig_id)
     else:

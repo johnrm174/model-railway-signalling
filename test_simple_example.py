@@ -27,7 +27,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 # This will show the actual 'CBUS Grid Connect' protocol commands being sent and received
 # Useful for comparing with the console output in the JMRI application for advanced debugging
 # Note that the main logging level also needs to be set to DEBUG to generate these messages
-debug_dcc = True
+debug_dcc = False
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
