@@ -5,6 +5,7 @@
 
 from tkinter import *
 from model_railway_signals import *
+from model_railway_signals import common
 
 import logging
 import time
@@ -30,8 +31,12 @@ def report_sensor_status_thread():
 #------------------------------------------------------------------------------------
 
 def main_callback_function(item_id,callback_type):
-
+    global main_thread
+    
     print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+    callback_thread = threading.get_ident()
+    print ("Main Thread "+str(main_thread)+" and Callback Thread "+str(callback_thread)+" should be identical" )
+
     if callback_type == section_callback_type.section_switched:
         if item_id == 17: set_section_occupied(23)
         if item_id == 18: clear_section_occupied(23)
@@ -51,28 +56,31 @@ print ("Creating Window and Canvas")
 
 window = Tk()
 window.title("Test Track Sensors and Track Sections")
-canvas = Canvas(window,height=650,width=500,bg="grey85")
+canvas = Canvas(window,height=680,width=500,bg="grey85")
 canvas.pack()
+
+print ("Negative test - passing a callback to the tkinter thread before we have created any signal")
+common.execute_function_in_tkinter_thread (lambda: main_callback_function(1,2))
 
 print ("Creating signals - to automatically trigger from sensors 9 - 16")
 
-canvas.create_line(0,550,500,550,fill="black",width=3) 
-canvas.create_line(0,600,500,600,fill="black",width=3) 
-create_colour_light_signal (canvas, 1, 100, 550,
+canvas.create_line(0,570,500,570,fill="black",width=3) 
+canvas.create_line(0,620,500,620,fill="black",width=3) 
+create_colour_light_signal (canvas, 1, 100, 570,
                             signal_subtype = signal_sub_type.home,
                             sig_callback = main_callback_function,
                             sig_passed_button = True,
                             approach_release_button = True)
-create_colour_light_signal (canvas, 2, 300, 550,
+create_colour_light_signal (canvas, 2, 300, 570,
                             signal_subtype = signal_sub_type.three_aspect,
                             sig_callback = main_callback_function,
                             sig_passed_button = True,
                             approach_release_button = True)
-create_semaphore_signal (canvas,3,100,600,
+create_semaphore_signal (canvas,3,100,620,
                          sig_callback=main_callback_function,
                          sig_passed_button = True,
                          approach_release_button = True)
-create_semaphore_signal (canvas,4,300,600,
+create_semaphore_signal (canvas,4,300,620,
                          sig_callback=main_callback_function,
                          sig_passed_button = True,
                          approach_release_button = True)
@@ -109,7 +117,8 @@ canvas.create_text(250,400,text="Clicking on Section 24 will report the state of
 canvas.create_text(250,420,text="The following are ONLY triggered by the external sensors - NOT Sections")
 canvas.create_text(250,440,text="Sensor 1 triggers a signal approach event for a non-existant signal")
 canvas.create_text(250,460,text="Sensor 2 triggers a signal passed event for a non-existant signal")
-canvas.create_text(250,480,text="Sensors 9-16 trigger signal approach & passed events for the signals")
+canvas.create_text(250,480,text="Sensors 3-6 triggers a sennsor callback event for the sensor")
+canvas.create_text(250,500,text="Sensors 9-16 trigger signal approach & passed events for the signals")
 create_track_sensor (1,gpio_channel=4,sensor_timeout=1.0,signal_approach=5) # negative test - sig doesn't exist
 create_track_sensor (2,gpio_channel=5,sensor_timeout=1.0,signal_passed=5) # negative test - sig doesn't exist
 create_track_sensor (3,gpio_channel=6,sensor_timeout=1.0,sensor_callback=main_callback_function)
@@ -139,6 +148,9 @@ create_track_sensor (15,gpio_channel=22,signal_passed=4,sensor_callback=main_cal
 report_sensor_status = threading.Thread(target = report_sensor_status_thread)
 report_sensor_status.start()
 
+
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
+main_thread = threading.get_ident()
+print("Main Thread is: " + str(main_thread))
 window.mainloop()

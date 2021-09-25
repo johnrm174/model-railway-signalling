@@ -154,7 +154,7 @@ def toggle_point (point_id:int, switched_by_another_point = False):
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle Point - Point does not exist")
     elif points[str(point_id)]["automatic"] and not switched_by_another_point:
-        logging.error ("Point "+str(point_id)+": Toggle Point - Point is automatic - should be switched by another point")
+        logging.error ("Point "+str(point_id)+": Toggle Point - Point is automatic (should  be \'also switched\' by another point)")
     else:
         if points[str(point_id)]["locked"]:
             logging.warning ("Point "+str(point_id)+": Toggle Point - Point is externally locked - Toggling anyway")
@@ -162,7 +162,7 @@ def toggle_point (point_id:int, switched_by_another_point = False):
             logging.warning ("Point "+str(point_id)+": Toggle Point - Facing Point Lock is active - Toggling anyway")
         if not points[str(point_id)]["switched"]:
             if switched_by_another_point:
-                logging.info ("Point "+str(point_id)+": Also changing point to SWITCHED")
+                logging.info ("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
             else:
                 logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
             points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
@@ -172,7 +172,7 @@ def toggle_point (point_id:int, switched_by_another_point = False):
             dcc_control.update_dcc_point(point_id,True)
         else:
             if switched_by_another_point:
-                logging.info ("Point "+str(point_id)+": Also changing point to NORMAL")
+                logging.info ("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
             else:
                 logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
             points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
@@ -183,12 +183,13 @@ def toggle_point (point_id:int, switched_by_another_point = False):
         # Now change any other points we need (i.e. points switched with this one)
         if points[str(point_id)]["alsoswitch"] != 0:
             if not point_exists(points[str(point_id)]["alsoswitch"]):
-                logging.error ("Point "+str(point_id)+": Toggle Point - Point "
-                        +str(points[str(point_id)]["alsoswitch"]) +" to also switch does not exist")
+                logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
+                        +str(points[str(point_id)]["alsoswitch"]) +" as that point does not exist")
             elif not points[str(points[str(point_id)]["alsoswitch"])]["automatic"]:
-                logging.error ("Point "+str(point_id)+": Toggle Point - Point "
-                        +str(points[str(point_id)]["alsoswitch"]) +" to also switch is not automatic")
+                logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
+                        +str(points[str(point_id)]["alsoswitch"]) +" as that point is not automatic")
             else:   
+                logging.info ("Point "+str(point_id)+": Also changing point "+str(points[str(point_id)]["alsoswitch"]))
                 toggle_point(points[str(point_id)]["alsoswitch"],switched_by_another_point=True)
     return()
 

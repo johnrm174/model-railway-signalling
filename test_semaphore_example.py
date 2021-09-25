@@ -61,22 +61,13 @@ def main_callback_function(item_id,callback_type):
         elif item_id == 5:
             trigger_timed_signal (5,0,3)
             clear_section_occupied(4)
-            
+
     #--------------------------------------------------------------
     # Override signals based on track occupancy - we could use
     # the signal passed events to do this but we also need to
     # allow for manual setting/resetting the track occupancy sections
     #--------------------------------------------------------------
     
-    # Distant signal 1 is overridden if ANY sections ahead of the signal are occupied
-    # or the final home signal is Overridden at Danger
-    if ((section_occupied(2) and point_switched(1)) or
-            (section_occupied(3) and not point_switched(1)) or
-            (section_occupied(1) or section_occupied(4)) or
-            signal_overridden(5) ):
-        set_signal_override(1)
-    else:
-        clear_signal_override(1)
     # Home signal 2 is only overridden if the section directly ahead is occupied
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
@@ -89,8 +80,17 @@ def main_callback_function(item_id,callback_type):
         set_signal_override(4)
     else:
         clear_signal_override(3)
-        clear_signal_override(4)
-    
+        clear_signal_override(4) 
+    # Distant signal 1 is overridden (to DANGER) if ANY home signals ahead are
+    # at Danger or the section immediately ahead of the signal is Occupied
+    if ( section_occupied(1) or (not signal_clear(2) or signal_overridden(2)) or 
+         (point_switched(1) and (not signal_clear(3) or signal_overridden(3))) or
+         (not point_switched(1) and (not signal_clear(4) or signal_overridden(4))) or 
+         (not signal_clear(5) or signal_overridden(5)) ):
+        set_signal_override(1)
+    else:
+        clear_signal_override(1)
+
     #--------------------------------------------------------------
     # Update the route based on the point settings 
     #--------------------------------------------------------------
@@ -131,14 +131,15 @@ def main_callback_function(item_id,callback_type):
         lock_signal(4)
     else:
         unlock_signal(4)
-    # Signal 1 is locked (at danger) if any of the home signals ahead are at DANGER.
-    if (signal_clear(2) and signal_clear(5) and
+    # If Signal 1 (distant) is clear then it we unlock it so it can be returned to danger at any time
+    # if it is at danger, we lock it if any of the home signals ahead are at DANGER.
+    if signal_clear(1):
+        unlock_signal(1)
+    elif (signal_clear(2) and signal_clear(5) and
          ( (signal_clear(3) and point_switched(1)) or
            (signal_clear(4) and not point_switched(1)) ) ):
         unlock_signal(1)
     else:
-        # if a home signal ahead has been switched to DANGER we return the distant to Danger
-        if signal_clear(1): toggle_signal(1)
         lock_signal(1)
 
     # Point 1 is locked if signal 1, signal 2 (or its subsidary) is set to clear

@@ -207,12 +207,14 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.signals[str(sig_id)]["rhf45"] = rhf45                             # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rhf90"] = rhf90                             # Type-specific - drawing object
 
-        # If the signal is fully automatic themn toggle to OFF to display a "clear" aspect
-        # Manual signals remain set to ON to display their "danger/caution aspect
+        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect (this will refresh
+        # the signal to display the correct aspects and send the DCC commands to update the signal accordingly.
+        # If not automatic we still need to refresh the signal to display the correct initial aspects and send
+        # the DCC commands to update the signal accordingly
         if fully_automatic: signals_common.toggle_signal(sig_id)
+        else: update_colour_light_signal (sig_id)
         # Update the signal and subsidary aspects to reflect the initial state. This will
         # also send the DCC commands to put the DCC signal into the initial state
-        update_colour_light_signal (sig_id)
         if position_light: update_colour_light_subsidary(sig_id)
         # When we have created the first colour_light signal we're good to start the 
         # scheduled functions to deal with any approach control flashing aspects
@@ -534,13 +536,9 @@ def update_feather_route_indication (sig_id:int, route_to_set = None):
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    
-    global logging
-
-    # Schedule the start of the sequence (i.e. signal to danger)
-    common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
         
     def timed_signal_sequence_start(start_delay, time_delay):
+        global logging
         # Ensure the Overridden aspect is set correctly before we start
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
@@ -565,6 +563,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         return()
 
     def timed_signal_sequence_yellow (time_delay):
+        global logging
         # This sequence step only applicable to 3 and 4 aspect signals
         signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
@@ -578,6 +577,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         return()
     
     def timed_signal_sequence_double_yellow (time_delay):
+        global logging
         # This sequence step only applicable to 4 aspect signals
         signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
         logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
@@ -588,6 +588,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         return()
     
     def timed_signal_sequence_end(): 
+        global logging
         # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
@@ -600,6 +601,12 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return()
 
+    # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
+    # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
+    if start_delay > 0:
+        common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+    else:
+        timed_signal_sequence_start(start_delay, time_delay)
     return()
 
 ###############################################################################

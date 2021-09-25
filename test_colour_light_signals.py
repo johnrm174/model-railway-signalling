@@ -11,7 +11,7 @@ from model_railway_signals import *
 import logging
 
 # Set the logging level
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
 
 # Global variables to thrack the state of the test functions
 signals_locked = False
@@ -29,7 +29,7 @@ def update_signals():
 
     print ("")
     print ("Updating Signals based on the Signal Ahead")
-    print ("Signal 25,26 and 50 will Error (negative tests)")
+    print ("Signal 25,26 and 36 will Error (negative tests)")
     update_signal (4,5)
     update_signal (3,4)
     update_signal (2,3)
@@ -47,9 +47,10 @@ def update_signals():
     update_signal (19,18)
     update_signal (20,19)
     # Negative Tests
-    update_signal (25,50)
+    update_signal (25,36)
+    update_signal (25,25)
     update_signal (26,27)
-    update_signal (50,35)
+    update_signal (36,35)
 
     return ()
 
@@ -81,15 +82,14 @@ def change_route_display ():
     global route_index
     print ("")
     print ("Changing Feather and Theatre Route Indications")
-    print ("Signal 26 and 50 will Error (Negative Tests)")
+    print ("Errors will be raised for Signals 26-35 as ground signals do not support this function")
+    print ("Error will be raised for Signal 36 as it doesn't exist")
     if route_index < 4:
         route_index = route_index+1
     else:
         route_index = 0
-    for I in range(1,27):
+    for I in range(1,37):
         set_route (I,route_display[route_index],theatre_text[route_index])
-    # Negative signal doesn't exist tests
-    set_route (50,route_display[route_index],theatre_text[route_index])
     return()
 
 #----------------------------------------------------------------------
@@ -102,17 +102,16 @@ def lock_unlock_signals():
     if signals_locked:
         print ("")
         print ("Unocking all Signals")
-        print ("Signal 50 will Error (negative tests)")
-        for I in range(1,36): unlock_signal(I)
-        unlock_signal(50)
+        print ("Error will be raised for Signal 36 as it doesn't exist")
+        for I in range(1,37): unlock_signal(I)
         lock_signals_button.config(relief="raised")
         signals_locked = False
     else:
         print ("")
         print ("Locking all Signals")
-        print ("Signal 50 will Error (negative tests)")
-        for I in range(1,36): lock_signal(I)
-        lock_signal(50)
+        print ("Warnings will be raised for all signals switched to CLEAR (including all automatic signals)")
+        print ("Error will be raised for Signal 36 as it doesn't exist")
+        for I in range(1,37): lock_signal(I)
         lock_signals_button.config(relief="sunken")
         signals_locked = True
     return()
@@ -127,17 +126,18 @@ def lock_unlock_subsidary():
     if subsidaries_locked:
         print ("")
         print ("Unlocking all Subsidary Signals")
-        print ("Signals 10, 26 and 50 will Error (negative tests)")
-        for I in range(10,27): unlock_subsidary(I)
-        unlock_subsidary(50)
+        print ("Errors will be raised for Signals 1-10 and 26-35 as they don't have subsidaries")
+        print ("Error will be raised for Signal 36 as it doesn't exist ")
+        for I in range(1,37): unlock_subsidary(I)
         lock_subsidary_button.config(relief="raised")
         subsidaries_locked = False
     else:
         print ("")
         print ("Locking all Subsidary Signals")
-        print ("Signals 10, 26 and 50 will Error (negative tests)")
-        for I in range(10,27): lock_subsidary(I)
-        lock_subsidary(50)
+        print ("Errors will be raised for Signals 1-10 and 26-35 as they don't have subsidaries")
+        print ("Warnings will be raised for all subsidary signals switched to CLEAR")
+        print ("Error will be raised for Signal 36 as it doesn't exist ")
+        for I in range(1,37): lock_subsidary(I)
         lock_subsidary_button.config(relief="sunken")
         subsidaries_locked = True
     return()
@@ -152,17 +152,15 @@ def set_clear_signal_overrides():
     if signals_overriden:
         print ("")
         print ("Clearing all Signal Overrides")
-        print ("Signal 50 will Error (negative tests)")
-        for I in range(1,36): clear_signal_override(I)
-        clear_signal_override(50)
+        print ("Error will be raised for Signal 36 as it doesn't exist ")
+        for I in range(1,37): clear_signal_override(I)
         set_signal_override_button.config(relief="raised")
         signals_overriden = False
     else:
         print ("")
         print ("Overriding All Signals")
-        print ("Signal 50 will Error (negative tests)")
-        for I in range(1,36): set_signal_override(I)
-        set_signal_override(50)
+        print ("Error will be raised for Signal 36 as it doesn't exist ")
+        for I in range(1,37): set_signal_override(I)
         set_signal_override_button.config(relief="sunken")
         signals_overriden = True
     update_signals()
@@ -174,8 +172,8 @@ def set_clear_signal_overrides():
 
 def print_signal_state():
     print ("")
-    print ("Current State of all signals is as follows")
-    print ("Signal 36 will Error (negative tests)")
+    print ("Printing state of all main signals")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
     for I in range(1,37):
         print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
                str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
@@ -187,11 +185,11 @@ def print_signal_state():
 
 def print_subsidary_state():
     print ("")
-    print ("Current State of all subsidaries is as follows:")
-    print ("Signals 10, 26 and 50 will Error (negative tests)")
-    for I in range(10,27):
-        print ("Subsidary "+str(I)+ " : sig_clear = "+str(subsidary_clear(I)))
-    print ("Subsidary "+str(50)+ " : sig_clear = "+str(subsidary_clear(50)))
+    print ("Printing state of all subsidary signals")
+    print ("Errors will be raised for Signals 1-10 and 26-35 as they don't have subsidaries")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
+    for I in range(1,37):
+        print ("Signal "+str(I)+ " : subsidary_clear = "+str(subsidary_clear(I)))
     return()
 
 #----------------------------------------------------------------------
@@ -201,7 +199,8 @@ def print_subsidary_state():
 def toggle_signals():
     print ("")
     print ("Toggling All Signals")
-    print ("Signal 36 will Error (negative tests)")
+    print ("Errors will be raised for Signals 3, 5, 8, 10, 15, 20, 25 as they are fully automatic")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
     for I in range(1,37):toggle_signal(I)
     update_signals()
     return()
@@ -209,9 +208,9 @@ def toggle_signals():
 def toggle_subsidaries():
     print ("")
     print ("Toggling All Subsidary Signals")
-    print ("Signals 10, 26 and 50 will Error (negative tests)")
-    for I in range(10,27):toggle_subsidary(I)
-    toggle_subsidary(50)
+    print ("Errors will be raised for Signals 1-10 and 26-35 as they don't have subsidaries")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
+    for I in range(1,37):toggle_subsidary(I)
     return()
 
 #----------------------------------------------------------------------
@@ -235,18 +234,20 @@ def set_sigs_approach_control_yellow():
 def set_all_approach_control_red():
     print ("")
     print ("Setting \'Release on Red\' Approach Control for All signals")
-    print ("Signals 16, 20, 26 and 50 will Error (negative tests)")
-    for I in range(1,27):set_approach_control(I)
-    set_approach_control(50)
+    print ("Errors will be raised for Signals 16,20 as the signal does not support this function ")
+    print ("Errors will be raised for Signals 26-35 as ground signals do not support this function ")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
+    for I in range(1,37):set_approach_control(I)
     update_signals()
     return()
 
 def set_all_approach_control_yellow():
     print ("")
     print ("Setting \'Release on Yellow\' Approach Control for All signals")
-    print ("Signals 11, 15, 16, 20, 21, 25, 26 and 50 will Error (negative tests)")
-    for I in range(1,27):set_approach_control(I,release_on_yellow=True)
-    set_approach_control(50,release_on_yellow=True)
+    print ("Errors will be raised for Signals 11,15,16,20,21,25 as they do not support this function")
+    print ("Errors will be raised for Signals 26 - 35 as ground signals do not support this function ")
+    print ("Error will be raised for Signal 36 as it doesn't exist ")
+    for I in range(1,37):set_approach_control(I,release_on_yellow=True)
     update_signals()
     return()
 
@@ -533,7 +534,23 @@ create_ground_position_signal (canvas,35,1000,650, sig_callback=signal_button,
                             shunt_ahead = False, modern_type = False, orientation = 180,
                             sig_passed_button=True)
 
-print ("Setting the initial aspects for all the signals (based on the signal ahead")
+print (" ")
+print ("Negative tests for creating signals")
+create_ground_position_signal (canvas,0,500,500)
+create_ground_position_signal (canvas,1,500,500)
+create_ground_position_signal (canvas,90,500,500, orientation = 90)
+
+
+create_colour_light_signal (canvas,0,500,500)
+create_colour_light_signal (canvas,1,500,500)
+create_colour_light_signal (canvas,90,500,500, orientation = 90)
+create_colour_light_signal (canvas,91,500,500, rhfeather45=True, theatre_route_indicator = True)
+create_colour_light_signal (canvas,92,500,500, signal_subtype = signal_sub_type.distant, rhfeather45=True)
+create_colour_light_signal (canvas,93,500,500, signal_subtype = signal_sub_type.distant, theatre_route_indicator = True)
+create_colour_light_signal (canvas,94,500,500, signal_subtype = signal_sub_type.distant, approach_release_button = True)
+
+print (" ")
+print ("Setting the initial aspects for all the signals (based on the signal ahead)")
 update_signals()
 
 print ("Entering main event loop")

@@ -57,19 +57,14 @@
 #         main_signal:int     - single DCC address for the main signal arm  (default = No Mapping)
 #      Optional Parameters:
 #         main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
-#         main_distant:int    - single DCC address for the main secondary distant arm (default = No Mapping)
 #         lh1_signal:int      - single DCC address for the LH1 signal arm (default = No Mapping)
 #         lh1_subsidary:int   - single DCC address for the LH1 subsidary arm (default = No Mapping)
-#         lh1_distant:int     - single DCC address for the LH1 secondary distant arm (default = No Mapping)
 #         lh2_signal:int      - single DCC address for the LH2 signal arm (default = No Mapping)
 #         lh2_subsidary:int   - single DCC address for the LH2 subsidary arm (default = No Mapping)
-#         lh2_distant:int     - single DCC address for the LH2 secondary distant arm (default = No Mapping)
 #         rh1_signal:int      - single DCC address for the RH1 signal arm  (default = No Mapping)
 #         rh1_subsidary:int   - single DCC address for the RH1 subsidary arm (default = No Mapping)
-#         rh1_distant:int     - single DCC address for the RH1 secondary distant arm (default = No Mapping)
 #         rh2_signal:int      - single DCC address for the RH2 signal arm  (default = No Mapping)
 #         rh2_subsidary:int   - single DCC address for the RH2 subsidary arm (default = No Mapping)
-#         rh2_distant:int     - single DCC address for the RH2 secondary distant arm (default = No Mapping)
 #         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
 #                 Each entry comprises the "character" and the associated list of DCC addresses/states
 #                 "#" is a special character - which means inhibit all indications (when signal is at danger)
@@ -286,11 +281,6 @@ def map_semaphore_signal (sig_id:int,
                           lh2_subsidary:int = 0,
                           rh1_subsidary:int = 0,
                           rh2_subsidary:int = 0,
-                          main_distant:int = 0,
-                          lh1_distant:int = 0,
-                          lh2_distant:int = 0,
-                          rh1_distant:int = 0,
-                          rh2_distant:int = 0,
                           THEATRE = [["#", [[0,False],]],]):
 
     # Do some basic validation on the parameters we have been given
@@ -319,21 +309,14 @@ def map_semaphore_signal (sig_id:int,
                 "main_subsidary" :  main_subsidary,          # Common to Colour_Light & Semaphore Mappings 
                 "THEATRE"       : THEATRE,                   # Common to Colour_Light & Semaphore Mappings                                      str(signals_common.signal_state_type.DANGER)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
                 "main_signal"   : main_signal,               # Specific to Semaphore Signal Mappings
-                "main_distant"  : main_distant,              # Specific to Semaphore Signal Mappings
                 "lh1_signal"    : lh1_signal,                # Specific to Semaphore Signal Mappings
                 "lh1_subsidary" : lh1_subsidary,             # Specific to Semaphore Signal Mappings
-                "lh1_distant"   : lh1_distant,               # Specific to Semaphore Signal Mappings
                 "lh2_signal"    : lh2_signal,                # Specific to Semaphore Signal Mappings
                 "lh2_subsidary" : lh2_subsidary,             # Specific to Semaphore Signal Mappings
-                "lh2_distant"   : lh2_distant,               # Specific to Semaphore Signal Mappings
                 "rh1_signal"    : rh1_signal,                # Specific to Semaphore Signal Mappings
                 "rh1_subsidary" : rh1_subsidary,             # Common to both Semaphore and Colour Lights
-                "rh1_distant"   : rh1_distant,               # Specific to Semaphore Signal Mappings
                 "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
-                "rh2_subsidary" : rh2_subsidary,             # Common to both Semaphore and Colour Lights
-                "rh2_distant"   : rh2_distant }              # Specific to Semaphore Signal Mappings
-
-            # Finally save the DCC mapping into the dictionary of mappings 
+                "rh2_subsidary" : rh2_subsidary }            # Finally save the DCC mapping into the dictionary of mappings 
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
 
     return ()

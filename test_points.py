@@ -13,7 +13,7 @@ points_locked = False
 # Here is where we configure the logging - to see what's going on 
 #----------------------------------------------------------------------
 
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO) 
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING) 
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -21,6 +21,7 @@ logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO)
 #----------------------------------------------------------------------
 
 def main_callback_function(item_id,callback_type):
+    print (" ")
     print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     return()
 
@@ -41,6 +42,7 @@ def lock_unlock_points():
     else:
         print ("Locking All Points")
         print ("Error will be raised for Point 10 as it doesn't exist")
+        print ("Warnings will be raised for any points that do not have the FPL active")
         for I in range(1,20): lock_point(I)
         lock_points_button.config(relief="sunken")
         points_locked = True
@@ -53,8 +55,13 @@ def lock_unlock_points():
 def toggle_points():
     print ("")
     print ("Toggling All Points")
+    print ("Error will be raised for Point 8 as the point to \'also switch \' (point 9) is not automatic")
+    print ("Errors will be raised for Points 6,7,8 as they are automatic (can only be switchd with another point")
     print ("Error will be raised for Point 10 as it doesn't exist")
-    print ("Warnings will be raised for any points that have an active FPL or are externally locked")
+    print ("Error will be raised for Point 18 as the point to \'also switch \' (point 50) does not exist")
+    print ("Errors will be raised for Points 16,17,18 as they are automatic (can only be switchd with another point")
+    print ("Warnings will be raised for any points that have an active FPL")
+    print ("Warnings will be raised for any points that are externally locked")
     for I in range(1,20): toggle_point(I)
     return()
 
@@ -63,7 +70,7 @@ def toggle_point_fpls():
     print ("Toggling All Facing Point Locks")
     print ("Error will be raised for Point 10 as it doesn't exist")
     print ("Errors will be raised for Points without a facing point lock")
-    print ("Warnings will  be raised for any points that are externally locked")
+    print ("Warnings will be raised for any points that are externally locked")
     for I in range(1,20): toggle_fpl(I)
     return()
 
@@ -122,7 +129,7 @@ create_point(canvas,5,point_type.RH,300,200,"black",point_callback=main_callback
 create_point(canvas,6,point_type.RH,350,200,"black",point_callback=main_callback_function,auto=True, also_switch=7)
 create_point(canvas,7,point_type.RH,400,200,"black",point_callback=main_callback_function,auto=True, also_switch=8)
 create_point(canvas,8,point_type.RH,450,200,"black",point_callback=main_callback_function,auto=True, also_switch=9, reverse=True)
-create_point(canvas,9,point_type.RH,500,200,"black",also_switch=50, reverse=True)
+create_point(canvas,9,point_type.RH,500,200,"black",reverse=True)
 
 canvas.create_text(325,280,text=" Points 11, 13 and 15 will generate callbacks to the main programme")
 canvas.create_text(325,300,text=" Point 15 will also switch Points 16,17,18, 19 (19 will fail as this is not automatic)")
@@ -134,10 +141,11 @@ create_point(canvas,14,point_type.RH,250,400,"black",orientation=180)
 create_point(canvas,15,point_type.RH,300,400,"black",orientation=180,point_callback=main_callback_function, also_switch=16)
 create_point(canvas,16,point_type.RH,350,400,"black",orientation=180,point_callback=main_callback_function,auto=True, also_switch=17)
 create_point(canvas,17,point_type.RH,400,400,"black",orientation=180,point_callback=main_callback_function,auto=True, also_switch=18)
-create_point(canvas,18,point_type.RH,450,400,"black",orientation=180,point_callback=main_callback_function,auto=True, also_switch=19, reverse=True)
-create_point(canvas,19,point_type.RH,500,400,"black",orientation=180,also_switch=50, fpl=True, reverse=True)
+create_point(canvas,18,point_type.RH,450,400,"black",orientation=180,point_callback=main_callback_function,auto=True, also_switch=50, reverse=True)
+create_point(canvas,19,point_type.RH,500,400,"black",orientation=180,fpl=True, reverse=True)
 canvas.create_text(325,470,text=" Points 8, 9, 18 and 19 are created \'reversed\'")
 
+print (" ")
 print("Negative Tests for Creating Points to test validation:")
 
 create_point(canvas,0,point_type.LH,100,250,"black")
@@ -147,5 +155,6 @@ create_point(canvas,21,point_type.RH,50,250,"black", orientation=90)
 create_point(canvas,22,point_type.RH,50,250,"black", fpl=True, auto=True)
 
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
+print (" ")
 print ("Entering Main Event Loop")
 window.mainloop()

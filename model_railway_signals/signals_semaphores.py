@@ -39,6 +39,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 orientation:int = 0,
                                 sig_passed_button:bool=False,
                                 approach_release_button:bool=False,
+                                main_signal:bool=True,
                                 lh1_signal:bool=False,
                                 lh2_signal:bool=False,
                                 rh1_signal:bool=False,
@@ -84,10 +85,13 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a home signal")
     elif associated_home > 0 and sig_passed_button:
         logging.error ("Signal "+str(sig_id)+": Cannot create a signal passed button if associated with another signal")
+    elif associated_home == 0 and not main_signal:
+        logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
     else:
         
-        # We use a value of None to signify that a particular arm doesn't isn't to be created for the signal
-        # uIf it is to be created, we use True/False to represent the current state of the signal arm.
+        # We use a value of None to signify that a particular arm isn't to be created for the signal
+        # If it is to be created, we use True/False to represent the current state of the signal arm.
+        if main_signal == False: main_signal = None
         if main_subsidary == False: main_subsidary = None
         if lh1_subsidary == False: lh1_subsidary = None
         if rh1_subsidary == False: rh1_subsidary = None
@@ -100,7 +104,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
-        # for the existing signal (as there may be a different combination of home arms)
+        # for the existing signal (as there may be a different combination of home arms specified)
+        # This to cater for the situation where not all home arms have an associated distant arm
         if associated_home > 0:
             postoffset = signals_common.signals[str(associated_home)]["postoffset"]
         elif (rh2_signal is None and rh2_subsidary is None and rh1_signal is None and rh1_subsidary is None):
@@ -121,8 +126,9 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         rh1offset = postoffset+14
         rh2offset = postoffset+28 
 
-        # Draw the signal base & signal post (unless this is a distant associated with an existing signal
-        # in which case the signal base and post will already have been drawn when the home signal was created
+        # Draw the signal base & signal post (unless this is a distant associated with an existing home signal
+        # in which case the signal base & post will already have been drawn when the home signal was created
+        # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
             canvas.create_line(common.rotate_line(x,y,0,0,0,postoffset,orientation),width=2,fill="white")
             canvas.create_line(common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation),width=3,fill="white")
@@ -147,8 +153,9 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # set the colour of the signal arm according to the signal type
         if distant: arm_colour="yellow"
         else: arm_colour = "red"
+        
         # If this is a distant signal associated with an existing home signal then the distant arms need
-        # to be created underneath the main home signal arms - we therefore need to apply an offset
+        # to be created underneath the main home signal arms - we therefore need to apply a vertical offset
         if associated_home > 0: armoffset = -10
         else: armoffset = 0
             
@@ -180,6 +187,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
 
         # Hide any otherdrawing objects we don't need for this particular signal
+        if main_signal is None: canvas.itemconfigure(mainsigon,state='hidden')
         if main_subsidary is None: canvas.itemconfigure(mainsubon,state='hidden')
         if lh1_subsidary is None: canvas.itemconfigure(lh1subon,state='hidden')
         if rh1_subsidary is None: canvas.itemconfigure(rh1subon,state='hidden')
@@ -194,7 +202,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # We set them in the "wrong" state initially, so that when the signal arms
         # are first updated they get "changed" to the correct aspects and send out
         # the DCC commands to put the layout signals into their corresponding state
-        main_signal = not fully_automatic
+        if main_signal is not None: main_signal = not fully_automatic
         if main_subsidary is not None: main_subsidary = True 
         if lh1_subsidary is not None: lh1_subsidary = True
         if rh1_subsidary is not None: rh1_subsidary = True
@@ -273,11 +281,15 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # if there is an associated signal then we also need to update that signal to refer back to this one
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
-        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect 
+        
+        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect (this will refresh
+        # the signal to display the correct aspects and send the DCC commands to put all mapped signal arms
+        # into their correct states. If not automatic we still need to refresh the signal to display the
+        # correct aspects and send the DCC commands to put all mapped signal arms into their correct states
         if fully_automatic: signals_common.toggle_signal(sig_id)
-        # Update the signal to display the initial aspects - this will also cause the DCC commands to be sent
-        # to put all the mapped signal arms (main and subsidary) into their correct states
-        update_semaphore_signal(sig_id)
+        else: update_semaphore_signal(sig_id)
+        # Refresh the subsidary signal arms to display the initial aspects and send the DCC commands
+        # to put all mapped signal arms into their correct states
         update_semaphore_subsidary_arms(sig_id)
 
     return ()
@@ -478,7 +490,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associat
             log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.CAUTION:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - home signal is OFF but associated signal "+str(associated_signal)+" is at DANGER")
+            log_message = (" (CAUTION - home signal is OFF but associated distant signal "+str(associated_signal)+" is at CAUTION")
         else:
             signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED - home signal is OFF - route is set to " +
@@ -531,8 +543,7 @@ def update_semaphore_route_indication (sig_id,route_to_set = None):
         # Get the ID of the associated signal (to make the following code more readable)
         associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
         if not signals_common.signals[str(sig_id)]["distant"] and associated_signal > 0:
-            if signals_common.signals[str(associated_signal)]["refresh"]:
-                update_semaphore_route_indication (associated_signal,route_to_set)
+            update_semaphore_route_indication (associated_signal,route_to_set)
     return()
 
 # -------------------------------------------------------------------------
@@ -547,12 +558,8 @@ def update_semaphore_route_indication (sig_id,route_to_set = None):
 
 def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     
-    global logging
-
-    # Schedule the start of the sequence (i.e. signal to danger)
-    common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
-        
     def timed_signal_sequence_start(start_delay, time_delay):
+        global logging
         # Override the signal (to display its overridden aspect
         signals_common.signals[str(sig_id)]["override"] = True
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
@@ -568,7 +575,8 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
         return()
 
-    def timed_signal_sequence_end(): 
+    def timed_signal_sequence_end():
+        global logging
         # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
         signals_common.signals[str(sig_id)]["override"] = False
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
@@ -576,5 +584,14 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         update_semaphore_signal(sig_id)
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return()
+
+    # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
+    # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
+    if start_delay > 0:
+        common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+    else:
+        timed_signal_sequence_start(start_delay, time_delay)
+    return()
+
 
 ###############################################################################

@@ -276,16 +276,19 @@ create_colour_light_signal (canvas,1,50,200,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,2,275,200,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,3,500,200,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,4,725,200,
                             signal_subtype = signal_sub_type.four_aspect,
@@ -310,16 +313,19 @@ create_colour_light_signal (canvas,11,50,400,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,12,275,400,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,13,500,400,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=main_callback_function,
                             sig_passed_button = True,
+                            fully_automatic = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas,14,725,400,
                             signal_subtype = signal_sub_type.four_aspect,
@@ -342,7 +348,14 @@ create_colour_light_signal (canvas,16,1000,400,
 print ("Setting Initial Route and Interlocking")
 set_route (4,route=route_type.MAIN)
 set_route (14,theatre_text="2")
-
+update_signal(4,sig_ahead_id=6)
+update_signal(3,sig_ahead_id=4)
+update_signal(2,sig_ahead_id=3)
+update_signal(1,sig_ahead_id=2)
+update_signal(14,sig_ahead_id=16)
+update_signal(13,sig_ahead_id=14)
+update_signal(12,sig_ahead_id=13)
+update_signal(11,sig_ahead_id=12)
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
 window.mainloop()

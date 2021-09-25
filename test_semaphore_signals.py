@@ -12,7 +12,7 @@ import logging
 
 
 # Set the logging level
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO) 
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING) 
 
 # Global variables to thrack the state of the test functions
 signals_locked = False
@@ -28,17 +28,28 @@ route_index = 0
 #----------------------------------------------------------------------
 
 def update_signals_based_on_signal_ahead():
+    print (" ")
     print ("Updating Signals on the signal ahead")
-    update_signal(13,14)
-    update_signal(12,14)
+    print ("Errors will be raised for Signals 25, 10,11 and 24 (negative tests)")
+    update_signal(101,2)
     update_signal(50,1)
+    update_signal(104,5)
     update_signal(51,10)
+    update_signal(13,15)
+    update_signal(14,15)
     update_signal(52,11)
-    update_signal(24,5)
+    update_signal(118,17)
+    update_signal(119,18)
+    # Negative Tests
+    update_signal (25,1)
+    update_signal (10,25)
+    update_signal (11,11)
+    update_signal (24,23)
     return()
 
 def main_callback_function(item_id,callback_type):
-    print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+    print(" ")
+    print("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     update_signals_based_on_signal_ahead()
     return()
 
@@ -50,16 +61,17 @@ def change_route_display ():
     global route_index
     print ("")
     print ("Changing Signal Route  Indications")
-    print ("Signal 19-22 and 99 will Error (Negative Tests)")
-    print ("Errors will also be logged if the route is not supported (i.e. no main or subsidaryarm exists for the route)")
+    print ("Errors will be raised for Signals 21-24 as ground signals do not support this function")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    print ("Errors will also be logged if the route is not supported (i.e. no main or subsidary arm exists for the route)")
     if route_index < 4:
         route_index = route_index+1
     else:
         route_index = 0
-    for I in range(1,27):
+    for I in range(1,26):
         set_route (I,route_display[route_index],theatre_text[route_index])
-    # Negative signal doesn't exist tests
-    set_route (99,route_display[route_index],theatre_text[route_index])
+    # No need to update the "associated distants" (whether or not they are set to refresh automatically)
+    # As the route indication is updated at the same time as the route indication for the home signal
     update_signals_based_on_signal_ahead()
     return()
 
@@ -73,17 +85,20 @@ def lock_unlock_signals():
     if signals_locked:
         print ("")
         print ("Unocking all Signals")
-        print ("Signal 99 will Error (negative tests)")
-        for I in range(1,27): unlock_signal(I)
-        unlock_signal(99)
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): unlock_signal(I)
+        # We also update any "associated distants" 
+        for I in (101,104,106,110,115,118,119): unlock_signal(I)
         lock_signals_button.config(relief="raised")
         signals_locked = False
     else:
         print ("")
         print ("Locking all Signals")
-        print ("Signal 99 will Error (negative tests)")
-        for I in range(1,27): lock_signal(I)
-        lock_signal(99)
+        print ("Warnings will be raised for all signals switched to CLEAR (including all automatic signals)")
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): lock_signal(I)
+        # We also update any "associated distants"
+        for I in (101,104,106,110,115,118,119): lock_signal(I)
         lock_signals_button.config(relief="sunken")
         signals_locked = True
     return()
@@ -98,19 +113,19 @@ def lock_unlock_subsidary():
     if subsidaries_locked:
         print ("")
         print ("Unlocking all Subsidary Signals")
-        print ("Signals 11, 12, 19 and 99 will Error (negative tests)")
-        for I in range(1,13): unlock_subsidary(I)
-        unlock_subsidary(19)
-        unlock_subsidary(99)
+        print ("Errors will be raised for Signals 4,6 and 13-24 as they don't have subsidaries")
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): unlock_subsidary(I)
+        # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
         lock_subsidary_button.config(relief="raised")
         subsidaries_locked = False
     else:
         print ("")
         print ("Locking all Subsidary Signals")
-        print ("Signals 11, 12, 19 and 99 will Error (negative tests)")
-        for I in range(1,13): lock_subsidary(I)
-        lock_subsidary(19)
-        lock_subsidary(99)
+        print ("Errors will be raised for Signals  4,6 and 13-24 as they don't have subsidaries")
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): lock_subsidary(I)
+        # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
         lock_subsidary_button.config(relief="sunken")
         subsidaries_locked = True
     return()
@@ -125,17 +140,19 @@ def set_clear_signal_overrides():
     if signals_overriden:
         print ("")
         print ("Clearing all Signal Overrides")
-        print ("Signal 99 will Error (negative tests)")
-        for I in range(1,27): clear_signal_override(I)
-        clear_signal_override(99)
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): clear_signal_override(I)
+        # We also update any "associated distants" 
+        for I in (101,104,106,110,115,118,119): clear_signal_override(I)
         set_signal_override_button.config(relief="raised")
         signals_overriden = False
     else:
         print ("")
         print ("Overriding All Signals")
-        print ("Signal 99 will Error (negative tests)")
-        for I in range(1,27): set_signal_override(I)
-        set_signal_override(99)
+        print ("Error will be raised for Signal 25 as it doesn't exist")
+        for I in range(1,26): set_signal_override(I)
+        # We also update any "associated distants" 
+        for I in (101,104,106,110,115,118,119): set_signal_override(I)
         set_signal_override_button.config(relief="sunken")
         signals_overriden = True
     update_signals_based_on_signal_ahead()
@@ -147,9 +164,13 @@ def set_clear_signal_overrides():
 
 def print_signal_state():
     print ("")
-    print ("Current State of all signals is as follows")
-    print ("Signal 23 will Error (negative tests)")
-    for I in range(1,27):
+    print ("Printing state of all main signals")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    for I in range(1,26):
+        print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
+               str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
+    # We also print the state of any "associated distants" 
+    for I in (101,104,106,110,115,118,119):
         print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
                str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
     return()
@@ -160,12 +181,12 @@ def print_signal_state():
 
 def print_subsidary_state():
     print ("")
-    print ("Current State of all subsidaries is as follows:")
-    print ("Signals 11, 12, 19 and 99 will Error (negative tests)")
-    for I in range(1,13):
-        print ("Subsidary "+str(I)+ " : sig_clear = "+str(subsidary_clear(I)))
-    print ("Subsidary "+str(19)+ " : sig_clear = "+str(subsidary_clear(19)))
-    print ("Subsidary "+str(99)+ " : sig_clear = "+str(subsidary_clear(99)))
+    print ("Printing state of all subsidary signals")
+    print ("Errors will be raised for Signals  4,6 and 13-24 as they don't have subsidaries")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    for I in range(1,26):
+        print ("Subsidary "+str(I)+ " : subsidary_clear = "+str(subsidary_clear(I)))
+    # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
     return()
 
 #----------------------------------------------------------------------
@@ -175,20 +196,23 @@ def print_subsidary_state():
 def toggle_signals():
     print ("")
     print ("Toggling All Signals")
-    print ("Signal 23 will Error (negative tests)")
-    print ("Errors will also be logged when clearing a signal for a non-supported route (i.e. no main arm exists for the route)")
-    for I in range(1,27):toggle_signal(I)
+    print ("Errors will be raised for Signals 11-13 and 118,119 as they are automatic signals")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    print ("Errors will also be raised when setting a route non-supported by the signal (i.e. no main arm exists for the route)")
+    for I in range(1,26):toggle_signal(I)
+    # We also update any "associated distants"
+    for I in (101,104,106,110,115,118,119): toggle_signal(I)
     update_signals_based_on_signal_ahead()
     return()
 
 def toggle_subsidaries():
     print ("")
     print ("Toggling All Subsidary Signals")
-    print ("Signals 11, 12, 19 and 99 will Error (negative tests)")
-    print ("Errors will also be logged when clearing a subsidary for a non-supported route (i.e. no subsidary arm exists for the route)")
-    for I in range(1,13):toggle_subsidary(I)
-    toggle_subsidary(19)
-    toggle_subsidary(99)
+    print ("Errors will be raised for Signals  4,6 and 13-24 as they don't have subsidaries")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    print ("Errors will also be raised when setting a route non-supported by the signal (i.e. no subsidary arm exists for the route)")
+    for I in range(1,26):toggle_subsidary(I)
+    # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
     update_signals_based_on_signal_ahead()
     return()
 
@@ -198,29 +222,32 @@ def toggle_subsidaries():
 
 def set_all_approach_control_red():
     print ("")
-    print ("Setting \'Release on Red\' Approach Control for signals 1-11")
-    print ("Signals 11, 19 and 99 will Error (negative tests)")
-    for I in range(1,12):set_approach_control(I)
-    set_approach_control(19)
-    set_approach_control(99)
+    print ("Setting \'Release on Red\' Approach Control for signals")
+    print ("Errors will be raised for Signals 13,14,17,18,19,20 as they are distant signals")
+    print ("Errors will be raised for Signals 21-24 as ground signals do not support this function")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    for I in range(1,26):set_approach_control(I)
+    # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
     update_signals_based_on_signal_ahead()
     return()
 
 def set_all_approach_control_yellow():
     print ("")
-    print ("Setting \'Release on Yellow\' Approach Control for signals 10-19")
-    print ("Signals 10 - 19 and 99 will Error (negative tests)")
-    for I in range(10,20):set_approach_control(I,release_on_yellow=True)
-    set_approach_control (99,release_on_yellow=True)
+    print ("Setting \'Release on Yellow\' Approach Control for signals")
+    print ("Errors will be raised for all signals - as \'Release on Yellow\' is unsupported by all semaphore types")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    for I in range(1,26):set_approach_control(I,release_on_yellow=True)
+    # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
     update_signals_based_on_signal_ahead()
     return()
 
 def clear_all_approach_control():
     print ("")
     print ("Clearing Approach Control for All signals")
-    print ("Signals 19 and 99 will Error (negative tests)")
-    for I in range(1,20):clear_approach_control(I)
-    clear_approach_control(99)
+    print ("Errors will be raised for Signals 21-24 as ground signals do not support this function")
+    print ("Error will be raised for Signal 25 as it doesn't exist")
+    for I in range(1,26):clear_approach_control(I)
+    # We won't bother testing the "associated distants" - this would just be a duplicate negative test 
     update_signals_based_on_signal_ahead()
     return()
 
@@ -281,12 +308,20 @@ button = Button (canvas, text="Change Route Display",
         state="normal", relief="raised",command=lambda:change_route_display())
 canvas.create_window (900,800,window=button,anchor=NW)
 
-canvas.create_text (600,720,text="All Signals apart from Signals 15-18 and 21-22 will generate Callbacks into the main programme")
 canvas.create_text (250,170,text="Signal 50 is updated based on signal ahead 1")
-canvas.create_text (900,190,text="Signal 4 distant arms (sig 24) is updated based on signal ahead 5")
-canvas.create_text (975,310,text="Signal 51 is updated based on signal ahead 10")
+canvas.create_text (250,190,text="Signal 101 (distant) is associated (slotted) with signal 1")
+canvas.create_text (250,210,text="Signal 101 is updated based on signal ahead 2")
+canvas.create_text (900,170,text="Signal 104 (distant) is associated (slotted) with signal 4")
+canvas.create_text (900,190,text="Signal 104 is updated based on signal ahead 5")
+canvas.create_text (250,310,text="Signal 106 (distant) is associated (slotted) with signal 6")
+canvas.create_text (975,310,text="Signal 110 (distant) is associated (slotted) with signal 10")
+canvas.create_text (975,330,text="Signal 51 is updated based on signal ahead 10")
 canvas.create_text (175,430,text="Signal 52 is updated based on signal ahead 11 ")
-canvas.create_text (700,430,text="Signals 12 and 13 are automatic distant signals both updated based on signal ahead 14")
+canvas.create_text (800,430,text="Signals 13 and 14 are automatic distant signals both updated based on signal ahead 15")
+canvas.create_text (800,450,text="Signal 115 (distant) is associated (slotted) with signal 15 - and is set to refresh immediately")
+canvas.create_text (600,560,text="Signal 118 (fully automatic distant) is associated (slotted) with signal 18 - and is updated based on signal ahead 17")
+canvas.create_text (600,580,text="Signal 119 (fully automatic distant) is associated (slotted) with signal 19 - and is updated based on signal ahead 18")
+canvas.create_text (600,720,text="All Signals apart from Signals 16,20,23,24 will generate Callbacks into the main programme")
 
 print ("Drawing Schematic")
 
@@ -298,16 +333,15 @@ canvas.create_line(0,650,1200,650,fill="black",width=3)
 
 print ("Creating DCC Mappings")
 
-map_semaphore_signal (1, main_signal=1, main_subsidary=2, main_distant=3,
+map_semaphore_signal (1, main_signal=1, main_subsidary=2,
                 lh1_signal=4, lh2_signal=5, rh1_signal=6, rh2_signal=7,
-                lh1_distant=8, lh2_distant=9, rh1_distant=10, rh2_distant=11,
                 lh1_subsidary=12, lh2_subsidary=13, rh1_subsidary=14, rh2_subsidary=15)
 
 print ("Creating Signals")
 
 # ----------------------------------------------------------------
 
-create_colour_light_signal (canvas,50,100,150,refresh_immediately = False,
+create_colour_light_signal (canvas,50,50,150,refresh_immediately = False,
                             sig_callback = main_callback_function, fully_automatic=True,)
 
 create_semaphore_signal (canvas,1,250,150,
@@ -321,18 +355,17 @@ create_semaphore_signal (canvas,1,250,150,
                         lh2_signal = True,
                         rh2_signal = True,
                         sig_callback = main_callback_function,
-                        refresh_immediately = True,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,23,250,150,
+create_semaphore_signal (canvas,101,250,150,
                         lh1_signal = True,
                         rh1_signal = True,
                         lh2_signal = True,
                         rh2_signal = True,
                         sig_callback = main_callback_function,
                         distant = True,
-                        associated_home = 1,
-                        refresh_immediately = True)
+                        refresh_immediately = False,
+                        associated_home = 1)
 
 create_semaphore_signal (canvas,2,425,150,
                         main_subsidary = True,
@@ -361,34 +394,39 @@ create_semaphore_signal (canvas,4,775,150,
                         approach_release_button =True,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,24,775,150,
+create_semaphore_signal (canvas,104,775,150,
                         lh1_signal = True,
+                        lh2_signal = True,
+                        rh1_signal = True,
                         sig_callback = main_callback_function,
                         distant = True,
                         associated_home = 4,
-                        refresh_immediately = False,
-                        fully_automatic = True)
+                        refresh_immediately = False)
 
 create_semaphore_signal (canvas,5,950,150,
                         main_subsidary = True,
                         lh1_subsidary = True,
                         lh1_signal = True,
+                        rh1_subsidary = True,
+                        rh1_signal = True,
+                        rh2_subsidary = True,
+                        rh2_signal = True,
                         sig_callback = main_callback_function,
                         approach_release_button =True,
                         sig_passed_button = True )
 
 # ----------------------------------------------------------------
 
-create_colour_light_signal (canvas,51,1100,250,refresh_immediately = False,
+create_colour_light_signal (canvas,51,1150,250,refresh_immediately = False,
                             sig_callback = main_callback_function, orientation = 180,
-                            signal_subtype = signal_sub_type.distant, fully_automatic=True,)
+                            signal_subtype = signal_sub_type.three_aspect, fully_automatic=True,)
 
 create_semaphore_signal (canvas,6,250,250,
                         sig_callback = main_callback_function,
                         orientation = 180,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,25,250,250,
+create_semaphore_signal (canvas,106,250,250,
                         sig_callback = main_callback_function,
                         orientation = 180,
                         distant = True,
@@ -396,8 +434,8 @@ create_semaphore_signal (canvas,25,250,250,
 
 create_semaphore_signal (canvas,7,425,250,
                         main_subsidary = True,
-                        rh1_subsidary = True,
                         rh1_signal = True,
+                        lh1_subsidary = True,
                         orientation = 180,
                         sig_callback = main_callback_function,
                         sig_passed_button = True )
@@ -414,18 +452,11 @@ create_semaphore_signal (canvas,8,600,250,
 create_semaphore_signal (canvas,9,775,250,
                         main_subsidary = True,
                         lh1_subsidary = True,
-                        rh1_signal = True,
+                        rh1_subsidary = True,
                         orientation = 180,
                         sig_callback = main_callback_function,
                         approach_release_button =True,
                         sig_passed_button = True )
-
-create_semaphore_signal (canvas,26,775,250,
-                        rh1_signal = True,
-                        orientation = 180,
-                        sig_callback = main_callback_function,
-                        distant = True,
-                        associated_home = 9)
 
 create_semaphore_signal (canvas,10,950,250,
                         main_subsidary = True,
@@ -435,85 +466,134 @@ create_semaphore_signal (canvas,10,950,250,
                         approach_release_button =True,
                         sig_passed_button = True )
 
+create_semaphore_signal (canvas,110,950,250,
+                        orientation = 180,
+                        sig_callback = main_callback_function,
+                        distant = True,
+                        associated_home = 10)
+
 # ----------------------------------------------------------------
 
-create_colour_light_signal (canvas,52,100,400, refresh_immediately=False, fully_automatic=True,
+create_colour_light_signal (canvas,52,50,400, refresh_immediately=False, fully_automatic=True,
                             sig_callback = main_callback_function)
 
 create_semaphore_signal (canvas,11,250,400,
-                        distant = True,
                         sig_callback = main_callback_function,
-                        sig_passed_button = True )
+                        main_subsidary = True,
+                        lh1_subsidary = True,
+                        lh2_subsidary = True,
+                        sig_passed_button = True,
+                        fully_automatic = True)
 
-create_semaphore_signal (canvas,12,500,400,
+create_semaphore_signal (canvas,12,425,400,
+                        sig_callback = main_callback_function,
+                        main_subsidary = True,
+                        rh1_subsidary = True,
+                        rh2_subsidary = True,
+                        refresh_immediately = False,
+                        sig_passed_button = True,
+                        fully_automatic = True)
+
+create_semaphore_signal (canvas,13,600,400,
                         distant = True,
                         lh1_signal = True,
                         rh1_signal = True,
-                        sig_callback = main_callback_function,
-                        fully_automatic = True,
                         refresh_immediately = False,
+                        fully_automatic = True,
+                        sig_callback = main_callback_function,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,13,675,400,
+create_semaphore_signal (canvas,14,775,400,
                         distant = True,
+                        rh1_signal = True,
                         lh1_signal = True,
                         refresh_immediately = False,
-                        fully_automatic = True,
                         sig_callback = main_callback_function,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,14,850,400,
+create_semaphore_signal (canvas,15,950,400,
                         rh1_signal = True,
+                        lh1_signal = True,
                         sig_callback = main_callback_function,
+                        sig_passed_button = True )
+
+create_semaphore_signal (canvas,115,950,400,
+                        sig_callback = main_callback_function,
+                        main_signal = False,
+                        rh1_signal = True,
+                        lh1_signal = True,
+                        distant = True,
+                        associated_home = 15)
+
+# ----------------------------------------------------------------
+
+create_semaphore_signal (canvas,16,250,500,
+                        orientation = 180,
+                        sig_passed_button = True )
+
+create_semaphore_signal (canvas,17,425,500,
+                        lh1_signal = True,
+                        rh1_signal = True,
+                        orientation = 180,
+                        sig_callback = main_callback_function,
+                        sig_passed_button = True )
+
+create_semaphore_signal (canvas,18,600,500,
+                        lh1_signal = True,
+                        orientation = 180,
+                        sig_callback = main_callback_function,
+                        sig_passed_button = True )
+
+create_semaphore_signal (canvas,118,600,500,
+                        lh1_signal = True,
+                        orientation = 180,
+                        fully_automatic = True,
+                        refresh_immediately = False,
+                        distant = True,
+                        associated_home = 18)
+
+create_semaphore_signal (canvas,19,775,500,
+                        rh1_signal = True,
+                        orientation = 180,
+                        sig_callback = main_callback_function,
+                        sig_passed_button = True )
+
+create_semaphore_signal (canvas,119,775,500,
+                        rh1_signal = True,
+                        orientation = 180,
+                        fully_automatic = True,
+                        refresh_immediately = False,
+                        distant = True,
+                        associated_home = 19)
+
+create_semaphore_signal (canvas,20,950,500,
+                        rh1_signal = True,
+                        lh1_signal = True,
+                        orientation = 180,
                         sig_passed_button = True )
 
 # ----------------------------------------------------------------
 
-create_semaphore_signal (canvas,15,250,500,
-                        orientation = 180,
-                        sig_passed_button = True )
-
-create_semaphore_signal (canvas,16,425,500,
-                        distant = True,
-                        lh1_signal = True,
-                        rh1_signal = True,
-                        orientation = 180,
-                        sig_passed_button = True )
-
-create_semaphore_signal (canvas,17,600,500,
-                        distant = True,
-                        lh1_signal = True,
-                        orientation = 180,
-                        sig_passed_button = True )
-
-create_semaphore_signal (canvas,18,775,500,
-                        distant = True,
-                        rh1_signal = True,
-                        orientation = 180,
-                        sig_passed_button = True )
-
-# ----------------------------------------------------------------
-
-create_ground_disc_signal (canvas,19,250,650,
+create_ground_disc_signal (canvas,21,250,650,
                            sig_callback=main_callback_function,
                            orientation = 0,
                            sig_passed_button = True,
                            shunt_ahead = True)
 
-create_ground_disc_signal (canvas, 20, 425, 650,
+create_ground_disc_signal (canvas, 22, 425, 650,
                            sig_callback=main_callback_function,
                            orientation = 0,
                            sig_passed_button = True)
 
-create_ground_disc_signal (canvas, 21, 600, 650,
+create_ground_disc_signal (canvas, 23, 600, 650,
                            orientation = 180,
                            shunt_ahead = True)
 
-create_ground_disc_signal (canvas, 22, 775, 650,
+create_ground_disc_signal (canvas, 24, 775, 650,
                            orientation = 180)
 
+print (" ")
 print ("Create Semaphore Signals - Negative Tests")
-
 create_semaphore_signal (canvas,0,500,500)
 create_semaphore_signal (canvas,1,500,500)
 create_semaphore_signal (canvas,90,500,500, orientation = 90)
@@ -524,6 +604,12 @@ create_semaphore_signal (canvas,94,500,500, distant=True, approach_release_butto
 create_semaphore_signal (canvas,95,500,500, distant=False, associated_home = 1)
 create_semaphore_signal (canvas,96,500,500, distant=True, associated_home = 21)
 create_semaphore_signal (canvas,97,500,500, distant=True, associated_home = 13)
+create_semaphore_signal (canvas,98,500,500, distant=True, associated_home = 98)
+create_semaphore_signal (canvas,99,500,500, main_signal = False)
+create_ground_disc_signal (canvas,0,500,500)
+create_ground_disc_signal (canvas,1,500,500)
+create_ground_disc_signal (canvas,90,500,500, orientation = 90)
+print (" ")
 
 print ("Setting initial signal states")
 update_signals_based_on_signal_ahead()
