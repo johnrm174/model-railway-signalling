@@ -20,6 +20,7 @@
 from . import common
 from . import signals_common
 from . import dcc_control
+from . import mqtt_interface
 
 from tkinter import *
 import logging
@@ -176,16 +177,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                        orientation = orientation,
                                        subsidary = position_light,
                                        sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic)
+                                       automatic = fully_automatic,
+                                       approach_button = approach_release_button)
 
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
                                     orientation = orientation,has_theatre = theatre_route_indicator)
                 
-        # Create the signal elements to support Approach Control
-        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
-                                                            approach_button = approach_release_button)
-
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
@@ -363,12 +361,22 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
     if new_aspect != current_aspect:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(new_aspect).rpartition('.')[-1] + log_message)
         # Update the current aspect - note that this dictionary element is also used by the Flash Aspects Thread
-        # As its a single element it should be relatively thread safe (i.e. risk of update "issues" extremely small)
         signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
         refresh_signal_aspects (sig_id)
+        # Update the Theatre & Feather route indications as these are inhibited/enabled for transitions to/from DANGER
         update_feather_route_indication(sig_id)
         signals_common.update_theatre_route_indication(sig_id)
-            
+        signals_common.update_theatre_route_indication(sig_id)
+        # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
+        # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
+        dcc_control.update_dcc_signal_aspects(sig_id)
+        
+    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
+    # function gets called for each signal state change - even if this does not reflect in an aspect change
+    mqtt_interface.publish_signal_state(sig_id)            
+
     return ()
 
 # -------------------------------------------------------------------------
@@ -417,7 +425,6 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.DANGER)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
         # Change the signal to display the Yellow aspect
@@ -425,7 +432,6 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.CAUTION)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PRELIM_CAUTION:
         # Change the signal to display the Double Yellow aspect
@@ -433,20 +439,17 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.PRELIM_CAUTION)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
         # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.FLASH_CAUTION)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
         # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.FLASH_PRELIM_CAUTION)
 
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
         # Change the signal to display the Green aspect
@@ -454,7 +457,6 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="green")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
-        dcc_control.update_dcc_signal_aspects(sig_id, signals_common.signal_state_type.PROCEED)
 
     return ()
 

@@ -82,6 +82,7 @@
 
 from . import signals_common
 from . import pi_sprog_interface
+from . import mqtt_interface
 
 import enum
 import logging
@@ -370,7 +371,7 @@ def update_dcc_point(point_id:int, state:bool):
 # Function to send the appropriate DCC commands to set the state of a DCC Signal
 #------------------------------------------------------------------------------------------
 
-def update_dcc_signal_aspects(sig_id: int, state: signals_common.signal_state_type):
+def update_dcc_signal_aspects(sig_id: int):
     
     global logging
     
@@ -383,8 +384,15 @@ def update_dcc_signal_aspects(sig_id: int, state: signals_common.signal_state_ty
         else:
             logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
             # Send the DCC commands to change the state
-            for entry in dcc_mapping[str(state)]:
-                if entry[0] > 0: pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+            for entry in dcc_mapping[str(signals_common.signals[str(sig_id)]["sigstate"])]:
+                if entry[0] > 0:
+                    # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+                    # Note that the commands will only be sent if the pi-sprog interface is configured
+                    pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
+                    # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+                    # Note that the commands will only be published if networking is configured and
+                    # the node this software is running on is not configured as a "pi-sprog" node
+                    mqtt_interface.publish_accessory_short_event(entry[0],entry[1])        
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -407,7 +415,14 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
         else:
             logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
             # Send the DCC commands to change the state 
-            if dcc_mapping[element] > 0: pi_sprog_interface.send_accessory_short_event (dcc_mapping[element],state)        
+            if dcc_mapping[element] > 0:
+                # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+                # Note that the commands will only be sent if the pi-sprog interface is configured
+                pi_sprog_interface.send_accessory_short_event(dcc_mapping[element],state)
+                # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+                # Note that the commands will only be published if networking is configured and
+                # the node this software is running on is not configured as a "pi-sprog" node
+                mqtt_interface.publish_accessory_short_event(dcc_mapping[element],state)       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -442,7 +457,14 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
                 logging.info ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
                 # Send the DCC commands to change the state if required
                 for entry in dcc_mapping[str(route)]:
-                    if entry[0] > 0: pi_sprog_interface.send_accessory_short_event (entry[0],entry[1])
+                    if entry[0] > 0:
+                        # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+                        # Note that the commands will only be sent if the pi-sprog interface is configured
+                        pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
+                        # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+                        # Note that the commands will only be published if networking is configured and
+                        # the node this software is running on is not configured as a "pi-sprog" node
+                        mqtt_interface.publish_accessory_short_event(entry[0],entry[1])       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -476,7 +498,14 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
                     for command in entry[1]:
-                        if command[0] > 0: pi_sprog_interface.send_accessory_short_event (command[0],command[1])
+                        if command[0] > 0:
+                            # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
+                            # Note that the commands will only be sent if the pi-sprog interface is configured
+                            pi_sprog_interface.send_accessory_short_event(command[0],command[1])
+                            # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+                            # Note that the commands will only be published if networking is configured and
+                            # the node this software is running on is not configured as a "pi-sprog" node
+                            mqtt_interface.publish_accessory_short_event(command[0],command[1])       
     return()
 
 #######################################################################################

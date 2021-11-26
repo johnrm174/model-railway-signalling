@@ -20,6 +20,7 @@
 from . import common
 from . import signals_common
 from . import dcc_control
+from . import mqtt_interface
 
 from tkinter import *
 import logging
@@ -231,15 +232,12 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic,
-                                       distant_button_offset = button_offset)
+                                       distant_button_offset = button_offset,
+                                       approach_button = approach_release_button)
         
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,
                                         orientation = orientation,has_theatre = theatre_route_indicator)
-                   
-        # Create the signal elements to support Approach Control
-        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
-                                                        approach_button = approach_release_button)
 
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
@@ -463,57 +461,63 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associat
     # Establish what the signal should be displaying based on the state
     if signals_common.signals[str(sig_id)]["distant"]:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION - distant signal is ON)"
         elif signals_common.signals[str(sig_id)]["override"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION - distant signal is OVERRIDDEN)"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         elif sig_ahead_id > 0 and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
         else:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
+            new_aspect = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED - distant signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
     else:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
+            new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (DANGER - home signal is ON)"
         elif signals_common.signals[str(sig_id)]["override"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
+            new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (DANGER - home signal is OVERRIDDEN)"
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.DANGER
+            new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.CAUTION:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.CAUTION
+            new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - home signal is OFF but associated distant signal "+str(associated_signal)+" is at CAUTION")
         else:
-            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
+            new_aspect = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED - home signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
 
-    # Now refresh the displayed aspect (passing in the log message to be displayed)
-    # We don't need to check the displayed state of the signal before deciding if it needs to be
-    # changed as the individual functions called to update each arm will implement that logic
-    update_main_signal_arms (sig_id,log_message)
-    
-    # If this signal is an associated with another signal then we also need to refresh the other signal
-    # Associated distant signals need to be updated as they are "slotted" with the home signal - i.e. if the
-    # home signal is set to DANGER then the distant signal (on the same arm) should show CAUTION
-    # Associated Home signals need to be updated as the internal state of home signals relies on the state of
-    # the distant signal and the home signal (i.e. Home is OFF but distant is ON - State is therefore CAUTION
-    # We set a flag for the recursive call so we don't end up in a circular recursion
-    if associated_signal > 0 and not updating_associated_signal:
-        if signals_common.signals[str(associated_signal)]["refresh"]:
-            update_semaphore_signal(associated_signal,updating_associated_signal=True)
-    
-    # Call the common function to update the theatre route indicator elements
-    # (if the signal has a theatre route indicator - otherwise no effect)
-    signals_common.update_theatre_route_indication(sig_id)
+    current_aspect = signals_common.signals[str(sig_id)]["sigstate"]
+
+    # Now refresh the displayed aspect (passing in the log message to be displayed) if the aspect has changed
+    if new_aspect != current_aspect:
+        signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
+        update_main_signal_arms (sig_id,log_message)
+        # If this signal is an associated with another signal then we also need to refresh the other signal
+        # Associated distant signals need to be updated as they are "slotted" with the home signal - i.e. if the
+        # home signal is set to DANGER then the distant signal (on the same arm) should show CAUTION
+        # Associated Home signals need to be updated as the internal state of home signals relies on the state of
+        # the distant signal and the home signal (i.e. Home is OFF but distant is ON - State is therefore CAUTION
+        # We set a flag for the recursive call so we don't end up in a circular recursion
+        if associated_signal > 0 and not updating_associated_signal:
+            if signals_common.signals[str(associated_signal)]["refresh"]:
+                update_semaphore_signal(associated_signal,updating_associated_signal=True)
+        # Call the common function to update the theatre route indicator elements
+        # (if the signal has a theatre route indicator - otherwise no effect)
+        signals_common.update_theatre_route_indication(sig_id)
+        
+    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
+    # function gets called for each signal state change - even if this does not reflect in an aspect change
+    mqtt_interface.publish_signal_state(sig_id)            
 
     return()
 

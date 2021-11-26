@@ -54,6 +54,13 @@ from .dcc_control import map_traintech_signal
 from .dcc_control import map_semaphore_signal
 from .dcc_control import map_dcc_point
 
+from .mqtt_interface import configure_networking
+from .mqtt_interface import subscribe_to_dcc_command_feed
+from .mqtt_interface import subscribe_to_signal_updates
+from .mqtt_interface import subscribe_to_signal_passed_events
+from .mqtt_interface import set_signals_to_publish_state
+from .mqtt_interface import set_signals_to_publish_passed_events
+
 __all__ = [
       # Public point types
         'point_type',
@@ -112,6 +119,13 @@ __all__ = [
         'map_dcc_signal',
         'map_traintech_signal',
         'map_semaphore_signal',
-        'map_dcc_point'
+        'map_dcc_point',
+      # Public networking functions
+        'configure_networking',
+        'subscribe_to_dcc_command_feed',
+        'subscribe_to_signal_updates',
+        'subscribe_to_signal_passed_events',
+        'set_signals_to_publish_state',
+        'set_signals_to_publish_passed_events',
            ]
 

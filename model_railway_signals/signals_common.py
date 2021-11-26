@@ -5,12 +5,14 @@
 
 from . import common
 from . import dcc_control
+from . import mqtt_interface
 from . import signals_colour_lights
 from . import signals_semaphores
 from . import signals_ground_position
 from . import signals_ground_disc
 
-from tkinter import *    
+from tkinter import *
+from typing import Union
 import logging
 import enum
 
@@ -55,6 +57,7 @@ class signal_state_type(enum.Enum):
 
 # Define the main signal types that can be created
 class sig_type(enum.Enum):
+    remote_signal = 0
     colour_light = 1
     ground_position = 2
     semaphore = 3                 
@@ -69,11 +72,24 @@ signals:dict = {}
 
 # -------------------------------------------------------------------------
 # Common Function to check if a Signal exists in the dictionary of Signals
-# Used by most externally-called functions to validate the Sig_ID
+# Used by most externally-called functions to validate the Sig_ID. We allow
+# a string or an int to be passed in to cope with compound signal identifiers
+# This to support identifiers containing the node and ID of a remote signal
 # -------------------------------------------------------------------------
 
-def sig_exists(sig_id:int):
+def sig_exists(sig_id:Union[int,str]):
     return (str(sig_id) in signals.keys() )
+
+# -------------------------------------------------------------------------
+# Common Function to create a external signal identifier from the Sig_ID and
+# the remote application Node (that the signal exists on). This identifier
+# string can then be used as the "key" to look up the signal in the dictionary
+# of Signals Used to uniquely identify signals when applications have been
+# networked together via the MQTT interface/broker
+# -------------------------------------------------------------------------
+
+def remote_signal_identifier(sig_id:int,node:str = None):
+    return (node+"-"+str(sig_id))
 
 # -------------------------------------------------------------------------
 # Define a null callback function for internal use
@@ -108,6 +124,9 @@ def sig_passed_button_event (sig_id:int):
     # Pulse the signal passed button to provide a visual indication
     signals[str(sig_id)]["passedbutton"].config(bg="red")
     common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+    # mqtt interface has been successfully configured and the signal has been set to publish passed events
+    mqtt_interface.publish_signal_passed_event(sig_id)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
@@ -243,6 +262,7 @@ def create_common_signal_elements (canvas,
                                    orientation:int,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
+                                   approach_button:bool=False,
                                    automatic:bool=False,
                                    distant_button_offset:int=0):
     global signals
@@ -267,6 +287,9 @@ def create_common_signal_elements (canvas,
     # Signal Passed Button - We only want a small button - hence a small font size
     passed_button = Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                 command=lambda:sig_passed_button_event(sig_id))
+    # Create the approach release button - We only want a small button - hence a small font size
+    release_button = Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
+                command=lambda:approach_release_button_event (sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button is "hidden"
     # if the signal doesn't have an associated subsidary. The Button positions are adjusted
     # accordingly so they always remain in the "right" position relative to the signal
@@ -292,8 +315,14 @@ def create_common_signal_elements (canvas,
         canvas.create_window(x,y,window=passed_button)
     else:
         canvas.create_window(x,y,window=passed_button,state='hidden')
+    # Approach release button is positioned on the track ahead of the signal
+    if approach_button:
+        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=release_button)
+    else:
+        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=release_button,state="hidden")
     # Disable the main signal button if the signal is fully automatic
     if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
+
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]       = canvas               # MANDATORY - canvas object
@@ -311,29 +340,9 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
-    return()
-
-# -------------------------------------------------------------------------
-# Common Function to generate all the signal elements for Approach Control
-# (shared by Colour Light and semaphore signal types)
-# -------------------------------------------------------------------------
-
-def create_approach_control_elements (canvas,sig_id:int,
-                                      x:int,y:int,
-                                      orientation:int,
-                                      approach_button:bool):
-    global signals
-    # Create the approach release button - We only want a small button - hence a small font size
-    approach_release_button = Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
-                                        command=lambda:approach_release_button_event (sig_id))
-    if approach_button:
-        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button)
-    else:
-        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button,state="hidden")
-    # Add the Theatre elements to the dictionary of signal objects
-    signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
-    signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-    signals[str(sig_id)]["releasebutton"] = approach_release_button   # SHARED - Button drawing object
+    signals[str(sig_id)]["releaseonred"] = False                # MANDATORY - State of the "Approach Release for the signal
+    signals[str(sig_id)]["releaseonyel"] = False                # MANDATORY - State of the "Approach Release for the signal
+    signals[str(sig_id)]["releasebutton"] = approach_button     # MANDATORY - Button drawing object
     return()
 
 # -------------------------------------------------------------------------

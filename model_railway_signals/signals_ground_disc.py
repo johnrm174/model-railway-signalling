@@ -12,6 +12,7 @@
 
 from . import signals_common
 from . import dcc_control
+from . import mqtt_interface
 from . import common
 
 from tkinter import *
@@ -93,14 +94,23 @@ def update_ground_disc_signal (sig_id:int):
     if aspect_to_set != signals_common.signals[str(sig_id)]["sigstate"]:
         logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
         signals_common.signals[str(sig_id)]["sigstate"] = aspect_to_set
+        
         if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='normal')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='hidden')    
             dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
+            
         elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='hidden')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
             dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
+            
+    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
+    # function gets called for each signal state change - even if this does not reflect in an aspect change
+    mqtt_interface.publish_signal_state(sig_id)            
+        
     return ()
 
 
