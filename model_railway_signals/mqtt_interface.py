@@ -1,18 +1,23 @@
 #-----------------------------------------------------------------------------------------------
-# This module provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
-# multiple signalling applications (running on different computers)to share a single Pi-Sprog DCC interface.
-# For example, you could run a signalling application on a computer without a Pi-Sprog (e.g. a Windows Laptop)
-# and then configure that node to "publish" the DCC commands to be picked up by a Raspberry Pi Pi-Sprog Node
-# where the commands will then be forwarded to the pi-Sprog interface and out to the DCC bus.
-#
+# These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
+# multiple signalling applications (running on different computers) to share a single Pi-Sprog DCC interface
+# and to share signal states and signal updated events across a MQTT broker network.
+#  
+# For example, you could run one signalling application on a computer without a Pi-Sprog (e.g. a Windows Laptop),
+# configure that node to "publish" its DCC command feed to the network and then configure another node (this time hosted
+# on a Raspberry Pi) to "subscribe" to the same DCC command feed and then forwarded to its local pi-Sprog DCC interface.
+# 
+# You can also use these features to split larger layouts into multiple signalling areas whilst still being able to 
+# implement a level of automation between them - primarily being aware of the "state" of remote signals (for updating
+# signals based on the one ahead) and being notified when the remore signals have been passed (for track occupancy)
+# 
 # To use these networking functions, you can either set up a local MQTT broker on one of the host computers
 # on your local network or alternatively use an 'open source' broker out there on the internet - I've been
 # using a test broker at "mqtt.eclipseprojects.io" (note this has no security or authentication).
-#
+# 
 # If you do intend using an internet-based broker then it is important to configure it with an appropriate level
-# of security. This package does support basic username/password authentication when connecting in to the broker
-# but note that these are NOT ENCRYPTED when sending over the internet unless you are also using a SSL connection.
-#
+# of security. This package does support basic username/password authentication for connecting in to the broker
+# but note that these are NOT ENCRYPTED when sending over the internet unless you are also using a SSL connection.#
 #
 # configure_networking - Configures the local MQTT broker client and establishes a connection to the broker
 #   Mandatory Parameters:
@@ -26,10 +31,35 @@
 #       mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
 #
 # subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
-#                         All received commands are automatically forwarded to the local Pi-Sprog interface.
+#                         All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
 #   Mandatory Parameters:
-#       node:str - The name of the node to subscribe to
+#       node:str - The name of the node publishing the DCC command feed
 #
+# subscribe_to_signal_updates - Subscribe to a signal update feed for a specified node/signal 
+#   Mandatory Parameters:
+#       node:str - The name of the node publishing the signal state feed
+#       sig_callback:name - Function to call when a signal state update is received from the remote node
+#                    Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+#                    Where Item Identifier is a string in the following format "<node>-<sig_id>"
+#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+#
+# subscribe_to_signal_passed_events  - Subscribe to a signal passed event feed for a specified node/signal 
+#   Mandatory Parameters:
+#       node:str - The name of the node publishing the signal passed event feed
+#       sig_callback:name - Function to call when a signal passed event is received from the remote node
+#                    Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+#                    Where Item Identifier is a string in the following format "<node>-<sig_id>"
+#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+#
+# set_signals_to_publish_state - Enable a feed of signal state updates for a specified signal. These will then
+#                be automatically published to remote subscribers each time the state of the signal is changed
+#   Mandatory Parameters:
+#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+#
+# set_signals_to_publish_passed_events -  Enable a feed of signal updated events for a specified signal. These
+#         will then be automatically published to remote subscribers each time a signal passed event is raised
+#   Mandatory Parameters:
+#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
 #
 #-----------------------------------------------------------------------------------------------
 # Some Notes on QoS - we use QoS1 for all messages published to the server:
