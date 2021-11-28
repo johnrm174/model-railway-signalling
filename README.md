@@ -305,7 +305,12 @@ update_signal - update the aspect of a signal ( based on the aspect of a signal 
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
-      sig_ahead_id:int - The ID for the signal "ahead" of the one to be updated
+      sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to set - either an
+              integer representing the ID of the signal created on our schematic, or a string
+              representing the compound identifier of an signal on an external node (that we have
+              subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
+              Default = "None" (no signal ahead to take into account when updating the signal)
+
 
 toggle_signal(sig_id) - use for route setting (can use 'signal_clear' to find the state first)
 
@@ -319,13 +324,19 @@ lock_subsidary(*sig_id) - use for point/signal interlocking (multiple Signal_IDs
 
 unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
 
-signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
+signal_clear(sig_id) - returns the SWITCHED signal state (True='clear') - to support interlocking
+                       NOTE - This reflects the state of the Signal Manual Control Button
+
+signal_displaying_clear(sig_id) - returns the DISPLAYED signal state (True='clear') - to support automation
+                                  Use this function when you need to get the actual state of the signal
+
+signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support automation
+          Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
+
+approach_control_set (sig_id) - returns the approach control state (True='active') - to support automation
+          Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
 
 subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
-
-signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
-
-approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
 
 set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
 
@@ -559,5 +570,69 @@ request_dcc_power_off - sends a request to switch off the track power and waits 
        returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
 </pre>
 
+## MQTT Networking Functions
 
+We're now in the realm of features that no one (including myself) will probably ever use, but its been fun coding the feature.
 
+These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
+multiple signalling applications (running on different computers) to share a single Pi-Sprog DCC interface
+and to share signal states and signal updated events across a MQTT broker network.
+ 
+For example, you could run one signalling application on a computer without a Pi-Sprog (e.g. a Windows Laptop),
+configure that node to "publish" its DCC command feed to the network and then configure another node (this time hosted
+on a Raspberry Pi) to "subscribe" to the same DCC command feed and then forwarded to its local pi-Sprog DCC interface.
+
+You can also use these features to split larger layouts into multiple signalling areas whilst still being able to 
+implement a level of automation between them - primarily being aware of the "state" of remote signals (for updating
+signals based on the one ahead) and being notified when the remore signals have been passed (for track occupancy)
+
+To use these networking functions, you can either set up a local MQTT broker on one of the host computers
+on your local network or alternatively use an 'open source' broker out there on the internet - I've been
+using a test broker at "mqtt.eclipseprojects.io" (note this has no security or authentication).
+
+If you do intend using an internet-based broker then it is important to configure it with an appropriate level
+of security. This package does support basic username/password authentication for connecting in to the broker
+but note that these are NOT ENCRYPTED when sending over the internet unless you are also using a SSL connection.
+<pre>
+configure_networking - Configures the local MQTT broker client and establishes a connection to the broker
+  Mandatory Parameters:
+      broker_host:str - The fully qualified name/IP address of the MQTT broker host to be used
+      network_identifier:str - The name to use for our signalling network (can be any string)
+      node_identifier:str - The name to use for this particular node on the network (can be any string)
+  Optional Parameters:
+      broker_username:str - the username to log into the MQTT Broker (default = None)
+      broker_password:str - the password to log into the MQTT Broker (default = None)
+      publish_dcc_commands:bool - True to publish all DCC commands to the Broker (default = False)
+      mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
+
+subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
+                        All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
+  Mandatory Parameters:
+      node:str - The name of the node publishing the DCC command feed
+
+subscribe_to_signal_updates - Subscribe to a signal update feed for a specified node/signal 
+  Mandatory Parameters:
+      node:str - The name of the node publishing the signal state feed
+      sig_callback:name - Function to call when a signal state update is received from the remote node
+                   Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+                   Where Item Identifier is a string in the following format "<node>-<sig_id>"
+      *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+
+subscribe_to_signal_passed_events  - Subscribe to a signal passed event feed for a specified node/signal 
+  Mandatory Parameters:
+      node:str - The name of the node publishing the signal passed event feed
+      sig_callback:name - Function to call when a signal passed event is received from the remote node
+                   Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+                   Where Item Identifier is a string in the following format "<node>-<sig_id>"
+      *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+
+set_signals_to_publish_state - Enable a feed of signal state updates for a specified signal. These will then
+               be automatically published to remote subscribers each time the state of the signal is changed
+  Mandatory Parameters:
+      *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+
+set_signals_to_publish_passed_events -  Enable a feed of signal updated events for a specified signal. These
+        will then be automatically published to remote subscribers each time a signal passed event is raised
+  Mandatory Parameters:
+      *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+</pre>

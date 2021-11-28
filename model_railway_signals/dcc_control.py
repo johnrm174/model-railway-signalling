@@ -186,6 +186,7 @@ def map_dcc_signal (sig_id:int,
                 str(signals_common.signal_state_type.DANGER) : danger,                             # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.PROCEED) : proceed,                           # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.CAUTION) : caution,                           # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.CAUTION_APP_CNTL) : caution,                  # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.PRELIM_CAUTION) : prelim_caution,             # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.FLASH_CAUTION) : flash_caution,               # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour_Light Mappings
@@ -238,6 +239,7 @@ def map_traintech_signal (sig_id:int,
                 str(signals_common.signal_state_type.DANGER) : [[base_address,False]],                 # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.PROCEED) : [[base_address,True]],                 # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.CAUTION) : [[base_address+1,True]],               # Specific to Colour_Light Mappings
+                str(signals_common.signal_state_type.CAUTION_APP_CNTL) : [[base_address+1,True]],      # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.PRELIM_CAUTION) : [[base_address+1,False]],       # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.FLASH_CAUTION) : [[base_address+3,True]],         # Specific to Colour_Light Mappings
                 str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[base_address+3,False]], # Specific to Colour_Light Mappings

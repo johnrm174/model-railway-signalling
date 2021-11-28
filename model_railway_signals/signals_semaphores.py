@@ -22,6 +22,7 @@ from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
 
+from typing import Union
 from tkinter import *
 import logging
 
@@ -232,12 +233,15 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic,
-                                       distant_button_offset = button_offset,
-                                       approach_button = approach_release_button)
+                                       distant_button_offset = button_offset)
         
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,
                                         orientation = orientation,has_theatre = theatre_route_indicator)
+
+        # Create the signal elements to support Approach Control
+        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
+                                                        approach_button = approach_release_button)
 
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
@@ -452,7 +456,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associated_signal:bool=False):
+def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updating_associated_signal:bool=False):
     
     global logging
     
@@ -469,7 +473,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associat
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
-        elif sig_ahead_id > 0 and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
+        elif sig_ahead_id is not None and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
         else:
@@ -512,12 +516,9 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:int = 0, updating_associat
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
         signals_common.update_theatre_route_indication(sig_id)
-        
-    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
-    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
-    # function gets called for each signal state change - even if this does not reflect in an aspect change
-    mqtt_interface.publish_signal_state(sig_id)            
+        # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+        # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+        mqtt_interface.publish_signal_state(sig_id)            
 
     return()
 
@@ -564,17 +565,26 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
     
     def timed_signal_sequence_start(start_delay, time_delay):
         global logging
+        
         # Override the signal (to display its overridden aspect
         signals_common.signals[str(sig_id)]["override"] = True
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        
         # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
         # to the external code (on the basis that it would have been the external code  that triggered the timed
         # signal in the first place. For this particular case, we override the signal before starting the sequence
         # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
         # delay and this will trigger a callback to be handled by the external code)
-        if start_delay > 0: logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-        update_semaphore_signal(sig_id)
-        if start_delay > 0: signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        if start_delay > 0:
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+            update_semaphore_signal(sig_id)
+            # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+            # mqtt interface has been successfully configured and the signal has been set to publish passed events
+            mqtt_interface.publish_signal_passed_event(sig_id)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        else:
+            update_semaphore_signal(sig_id)
+
         # We need to schedule the sequence completion (i.e. back to clear
         common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
         return()

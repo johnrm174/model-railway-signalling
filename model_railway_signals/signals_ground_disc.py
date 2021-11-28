@@ -105,11 +105,9 @@ def update_ground_disc_signal (sig_id:int):
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
             dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")
             
-    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
-    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
-    # function gets called for each signal state change - even if this does not reflect in an aspect change
-    mqtt_interface.publish_signal_state(sig_id)            
+        # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+        # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+        mqtt_interface.publish_signal_state(sig_id)            
         
     return ()
 

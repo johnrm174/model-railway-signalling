@@ -21,7 +21,7 @@ import logging
 # A level of 'INFO' will tell you what the various 'model_railway_signalling' functions
 # are doing 'under the hood' - useful when developing/debugging a layout signalling
 # A level of 'DEBUG' will additionally report the DCC Bus commands being sent to the Pi-SPROG
-logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG) 
+logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.INFO) 
 
 #----------------------------------------------------------------------
 # This is the main callback function for when something changes
@@ -50,7 +50,7 @@ def main_callback_function(item_id,callback_type):
         elif item_id == 4:
             clear_section_occupied(3)
             set_section_occupied(4)
-        elif item_id == 5 and node=="Box1":
+        elif item_id == "Box1-5":
             clear_section_occupied(4)
             trigger_timed_signal(5,0,3)
             
@@ -81,7 +81,7 @@ def main_callback_function(item_id,callback_type):
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     #--------------------------------------------------------------
-    update_signal(4, sig_ahead_id = 5)
+    update_signal(4, sig_ahead_id = "Box1-5")
     update_signal(3, sig_ahead_id = 4)
     update_signal(2, sig_ahead_id = 3)
     update_signal(1, sig_ahead_id = 2)
@@ -105,23 +105,23 @@ request_dcc_power_on()
 
 # Signals 1,2,3,4 assume a TrainTech DCC 4 Aspect Signal - these are event driven
 # and can take up to 4 consecutive addresses (if you include the flashing aspects)
-# map_traintech_signal (sig_id = 1, base_address = 10)
-# map_traintech_signal (sig_id = 2, base_address = 20)
-# map_traintech_signal (sig_id = 3, base_address = 30)
-# map_traintech_signal (sig_id = 4, base_address = 40)
+map_traintech_signal (sig_id = 1, base_address = 10)
+map_traintech_signal (sig_id = 2, base_address = 20)
+map_traintech_signal (sig_id = 3, base_address = 30)
+map_traintech_signal (sig_id = 4, base_address = 40)
 
 print ("Initialising MQTT Client and connecting to external MQTT Message Broker")
 # Configure the MQTT Broker networking feature to allow this application node to act as a remote
 # DCC command station for other application nodes (i.e. forward received DCC commands to the Pi-Sprog) 
 configure_networking(broker_host ="mqtt.eclipseprojects.io", network_identifier="network1",
-                     node_identifier= "Box1",publish_dcc_commands=True, mqtt_enhanced_debugging=False )
+                     node_identifier= "Box1",publish_dcc_commands=False, mqtt_enhanced_debugging=False )
 
 # Subscribe to the external feed fo DCC commands from node 2
-subscribe_to_dcc_command_feed("Box1")
-set_signals_to_publish_state(1,10,11,12)
-set_signals_to_publish_passed_events(2,10,11,12)
-subscribe_to_signal_updates("Box1", main_callback_function,1,10,11,12)
-subscribe_to_signal_passed_events("Box1", main_callback_function,2,10,11,12)
+#subscribe_to_dcc_command_feed("Box1")
+set_signals_to_publish_state(1,2,3,4,5,10,11,12)
+set_signals_to_publish_passed_events(1,2,3,4,5,10,11,12)
+subscribe_to_signal_updates("Box1", main_callback_function,1,2,3,4,5,10,11,12)
+subscribe_to_signal_passed_events("Box1", main_callback_function,1,2,3,4,5,10,11,12)
                      
 print ("Drawing Schematic and creating points")
 # Draw the the Top Main line

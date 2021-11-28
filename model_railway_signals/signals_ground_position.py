@@ -132,11 +132,9 @@ def update_ground_position_signal (sig_id:int):
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
         dcc_control.update_dcc_signal_aspects(sig_id)
         
-    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
-    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
-    # function gets called for each signal state change - even if this does not reflect in an aspect change
-    mqtt_interface.publish_signal_state(sig_id)            
+        # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+        # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+        mqtt_interface.publish_signal_state(sig_id)            
         
     return ()
 

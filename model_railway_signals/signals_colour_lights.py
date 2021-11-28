@@ -22,6 +22,7 @@ from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
 
+from typing import Union
 from tkinter import *
 import logging
 import enum
@@ -177,13 +178,16 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                        orientation = orientation,
                                        subsidary = position_light,
                                        sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic,
-                                       approach_button = approach_release_button)
+                                       automatic = fully_automatic)
 
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
                                     orientation = orientation,has_theatre = theatre_route_indicator)
-                
+
+        # Create the signal elements to support Approach Control
+        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
+                                                            approach_button = approach_release_button)
+        
         # Add all of the signal-specific elements we need to manage colour light signal types
         # Note that setting a "sigstate" of RED is valid for all 2 aspect signals
         # as the associated drawing objects have been "swapped" by the code above
@@ -253,12 +257,13 @@ def update_colour_light_subsidary (sig_id:int):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
+def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
 
     global logging
 
     # ---------------------------------------------------------------------------------
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
+    #  as they will apply to all colour light signal types (2, 3 or 4 aspect)
     # ---------------------------------------------------------------------------------
     
     # If signal is set to "ON" then its DANGER (or CAUTION if its a 2 aspect distant)
@@ -276,13 +281,13 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
         log_message = " (signal is OVERRIDEN)"
 
     # Set to DANGER if the signal is subject to "Release on Red" approach control
-    # We'll do this here as this could also apply to 2 aspect home or Red/Yellow
+    # Note that this state should never apply to 2 aspect distant signals
     elif signals_common.signals[str(sig_id)]["releaseonred"]:
         new_aspect = signals_common.signal_state_type.DANGER
         log_message = " (signal is OFF - but subject to \'release on red\' approach control)"
 
     # ---------------------------------------------------------------------------------
-    #  From here, the Signal is CLEAR - but could still be of any type
+    #  From here, the Signal is Displaying "OFF" - but could still be of any type
     # ---------------------------------------------------------------------------------
 
     # If the signal is a 2 aspect home signal or a 2 aspect red/yellow signal
@@ -300,45 +305,50 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
     # ---------------------------------------------------------------------------------
 
     # Set to CAUTION if the signal is subject to "Release on YELLOW" approach control
+    # We use the special CAUTION_APPROACH_CONTROL for "update on signal ahead" purposes
     elif signals_common.signals[str(sig_id)]["releaseonyel"]:
-        new_aspect = signals_common.signal_state_type.CAUTION
+        new_aspect = signals_common.signal_state_type.CAUTION_APP_CNTL
         log_message = " (signal is OFF - but subject to \'release on yellow\' approach control)"
 
     # ---------------------------------------------------------------------------------
     # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
-    # Not subject to "release on yellow" approach control - so will display the "normal" 
-    # aspects based on the signal ahead (if one has been specified)
+    # and will display the "normal" aspects based on the signal ahead (if one has been specified)
     # ---------------------------------------------------------------------------------
     
     # If no signal ahead has been specified then we can set the signal to its "clear" aspect
     # (Applies to 2 aspect distant signals as well as the remaining 3 and 4 aspect signals types)
-    elif sig_ahead_id == 0:
+    elif sig_ahead_id is None:
         new_aspect = signals_common.signal_state_type.PROCEED
         log_message = " (signal is OFF and no signal ahead specified)"
 
+    # ---------------------------------------------------------------------------------
+    # From here Signal the Signal is CLEAR and is a 2 aspect Distant or 3/4 aspect signal
+    # and will display the "normal" aspects based on the signal ahead (one has been specified
+    # ---------------------------------------------------------------------------------
+        
     else:
-        # A valid signal ahead has been specified - we need to take it into account
+        
         if signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             # All remaining signal types (3/4 aspects and 2 aspect distants) should display CAUTION
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying DANGER)")
             
+        elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.CAUTION_APP_CNTL:
+            # All remaining signal types (3/4 aspects and 2 aspect distants) should display FLASHING CAUTION
+            new_aspect = signals_common.signal_state_type.FLASH_CAUTION
+            log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
+                               " is subject to approach control (release on yellow)") 
+            
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
-            if signals_common.signals[str(sig_ahead_id)]["releaseonyel"]:
-                # Signal ahead showing CAUTION but subject to "release on yellow" approach control
-                # All remaining types (3/4 aspects and 2 aspect distants) should display FLASHING CAUTION
-                new_aspect = signals_common.signal_state_type.FLASH_CAUTION
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+
-                                   " is subject to approach control (release on yellow)")
-            elif signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
+            if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
                 # 4 aspect signals should display a PRELIM_CAUTION aspect
                 new_aspect = signals_common.signal_state_type.PRELIM_CAUTION
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
             else:
                 # 3 aspect signals and 2 aspect distant signals should display PROCEED
                 new_aspect = signals_common.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
-                
+                log_message = (" (signal is OFF and signal ahead "+sig_ahead_identifier+" is displaying CAUTION)")
+                            
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
             if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
                 # 4 aspect signals will display a FLASHING PRELIM CAUTION aspect 
@@ -350,7 +360,7 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
                 log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying PROCEED)")
         else:
             # A signal ahead state is either PRELIM_CAUTION, FLASH PRELIM CAUTION or PROCEED
-            # These states have have no effect on the signal we are updating - Soignal will show PROCEED
+            # These states have have no effect on the signal we are updating - Signal will show PROCEED
             new_aspect = signals_common.signal_state_type.PROCEED
             log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying "
                       + str(signals_common.signals[str(sig_ahead_id)]["sigstate"]).rpartition('.')[-1] + ")")
@@ -370,12 +380,9 @@ def update_colour_light_signal (sig_id:int,sig_ahead_id:int=0):
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
         dcc_control.update_dcc_signal_aspects(sig_id)
-        
-    # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
-    # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-    # We do this every time the update_signal function is called (rather than just on aspect changes) as this
-    # function gets called for each signal state change - even if this does not reflect in an aspect change
-    mqtt_interface.publish_signal_state(sig_id)            
+        # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+        # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+        mqtt_interface.publish_signal_state(sig_id)            
 
     return ()
 
@@ -426,7 +433,8 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
         
-    elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION:
+    elif (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION
+            or signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION_APP_CNTL):
         # Change the signal to display the Yellow aspect
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
@@ -541,22 +549,33 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         
     def timed_signal_sequence_start(start_delay, time_delay):
         global logging
+        
         # Ensure the Overridden aspect is set correctly before we start
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
         else:
             signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
+            
         # Override the signal (to display its overridden aspect
         signals_common.signals[str(sig_id)]["override"] = True
         signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
+        
         # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
-        # to the external code (on the basis that it would have been the external code  that triggered the timed
+        # to the external code (on the basis that it would have been the external code that triggered the timed
         # signal in the first place. For this particular case, we override the signal before starting the sequence
         # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
         # delay and this will trigger a callback to be handled by the external code)
-        if start_delay > 0: logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-        update_colour_light_signal(sig_id)
-        if start_delay > 0: signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        if start_delay > 0:
+            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
+            # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
+            update_colour_light_signal(sig_id)
+            # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+            # mqtt interface has been successfully configured and the signal has been set to publish passed events
+            mqtt_interface.publish_signal_passed_event(sig_id)
+            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
+        else:
+            update_colour_light_signal(sig_id)
+            
         # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
         if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
             common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_yellow(time_delay))

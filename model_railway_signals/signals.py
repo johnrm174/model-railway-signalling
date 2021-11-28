@@ -144,7 +144,11 @@
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       sig_ahead_id:int - The ID for the signal "ahead" of the one we want to set
+#       sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to set - either an
+#               integer representing the ID of the signal created on our schematic, or a string
+#               representing the compound identifier of an signal on an external node (that we have
+#               subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
+#               Default = "None" (no signal ahead to take into account when updating the signal)
 # 
 # toggle_signal(sig_id) - use for route setting (can use 'signal_clear' to find the state first)
 # 
@@ -158,11 +162,17 @@
 # 
 # unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
-# signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
+# signal_clear(sig_id) - returns the SWITCHED signal state (True='clear') - to support interlocking
+#                        NOTE - This reflects the state of the Signal Manual Control Button
+#
+# signal_displaying_clear(sig_id) - returns the DISPLAYED signal state (True='clear') - to support automation
+#                                   Use this function when you need to get the actual state of the signal
 # 
-# signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
+# signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support automation
+#           Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
 # 
-# approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
+# approach_control_set (sig_id) - returns the approach control state (True='active') - to support automation
+#           Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
 # 
 # subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
 # 
@@ -208,12 +218,17 @@ from . import signals_ground_position
 from . import signals_ground_disc
 from . import signals_semaphores
 
+from typing import Union
 from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the signal
-# Function applicable to ALL signal types
+# Externally called function to Return the current SWITCHED state of the signal
+# (i.e. the state of the signal button - Used to enable interlocking functions)
+# Note that the DISPLAYED state of the signal may not be CLEAR if the signal is
+# overridden or subject to release on RED - See "signal_displaying_clear"
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int):
@@ -228,8 +243,29 @@ def signal_clear (sig_id:int):
     return (sig_clear)
 
 # -------------------------------------------------------------------------
+# Externally called function to Return the displayed state of the signal
+# (i.e. whether the signal is actually displaying a CLEAR aspect). Note that
+# this can be different to the state the signal has been manually set to (via
+# the signal button) - as it could be overridden or subject to Release on Red
+# Function applicable to ALL signal types - Including REMOTE SIGNALS
+# -------------------------------------------------------------------------
+
+def signal_displaying_clear (sig_id:Union[int,str]):
+    
+    global logging
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
+        sig_clear = False
+    else:
+        sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
+    return (sig_clear)
+
+# -------------------------------------------------------------------------
+# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
 # Externally called function to Return the current state of the signal overide
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def signal_overridden (sig_id:int):
@@ -244,8 +280,11 @@ def signal_overridden (sig_id:int):
     return (sig_overridden)
 
 # -------------------------------------------------------------------------
+# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
 # Externally called function to Return the current state of the approach control
-# Function applicable to ALL signal types (will return False if not supported)
+# Function applicable to ALL signal types created on the local schematic
+# (will return False if the particular signal type not supported)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def approach_control_set (sig_id:int):
@@ -267,7 +306,8 @@ def approach_control_set (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
 # signal - if the signal does not have one then the return will be FALSE
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def subsidary_clear (sig_id:int):
@@ -287,7 +327,8 @@ def subsidary_clear (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to Lock the signal (preventing it being cleared)
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
@@ -312,7 +353,8 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 # Externally called function to Unlock the main signal
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
@@ -335,7 +377,9 @@ def unlock_signal (*sig_ids:int):
 # Externally called function to Lock the subsidary signal
 # This is effectively a seperate signal from the main aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def lock_subsidary (*sig_ids:int):
@@ -363,7 +407,9 @@ def lock_subsidary (*sig_ids:int):
 # Externally called function to Unlock the subsidary signal
 # This is effectively a seperate signal from the main aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (*sig_ids:int):
@@ -387,9 +433,10 @@ def unlock_subsidary (*sig_ids:int):
 # Externally called function to Override a signal - effectively setting it
 # to RED (apart from 2 aspect distance signals - which are set to YELLOW)
 # Signal will display the overriden aspect no matter what its current setting is
-# Used to support automation - e.g. set asignal to Danger once a train has passed
+# Used to support automation - e.g. set a signal to Danger once a train has passed
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
@@ -428,7 +475,8 @@ def set_signal_override (*sig_ids:int):
 # Externally called function to Clear a Signal Override 
 # Signal will revert to its current manual setting (on/off) and aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
@@ -467,7 +515,8 @@ def clear_signal_override (*sig_ids:int):
 # Externally called function to Toggle the state of a main signal
 # to enable automated route setting from the external programme.
 # Use in conjunction with 'signal_clear' to find the state first
-# Function applicable to ALL Signal Types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
@@ -489,7 +538,9 @@ def toggle_signal (sig_id:int):
 # Externally called function to Toggle the state of a subsidary signal
 # to enable automated route setting from the external programme. Use
 # in conjunction with 'subsidary_signal_clear' to find the state first
-# Function applicable to ALL Signal Types (if they "hasvesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
@@ -510,7 +561,9 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to set the "approach conrol" for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Colour Light and Semaphore signal types
+# Function applicable to Colour Light and Semaphore signal types created on
+# the local schematic (will report an error if the particular signal type not
+# supported) Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
@@ -545,7 +598,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 # -------------------------------------------------------------------------
 # Externally called function to clear the "approach control" for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Colour Light and Semaphore signal types
+# Function applicable to Colour Light and Semaphore signal types created on
+# the local schematic (will have no effect on other signal types
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
@@ -568,24 +623,26 @@ def clear_approach_control (sig_id:int):
 # Signal ahead - Intended mainly for Coulour Light Signal types so we can
 # ensure the "CLEAR" aspect reflects the aspect of ths signal ahead
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable only to main Colour Light signal types
+# Function applicable only to Main colour Light and semaphore signal types
+# created on the local schematic - but either locally-created or REMOTE
+# Signals can be specified as the signal ahead
 # -------------------------------------------------------------------------
 
-def update_signal (sig_id:int, sig_ahead_id:int = 0):
+def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
     
     global logging
     # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
-    elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
+    elif sig_ahead_id != None and not signals_common.sig_exists(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
     elif sig_id == sig_ahead_id: 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
     # Call the signal type-specific functions to update the signal (only colour lights supported currently)
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id )
+        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id)
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id )
+        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id)
     else:
         logging.error ("Signal "+str(sig_id)+": update_signal - Function not supported by signal type")
     return()
@@ -593,7 +650,9 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # -------------------------------------------------------------------------
 # Externally called function to set the route indication for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Main Colour Light and Semaphore signal types
+# Function only applicable to Main Colour Light and Semaphore signal types
+# created on the local schematic (will raise an error if signal type not
+# supported. Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
@@ -623,7 +682,9 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 # A 'sig_passed' callback event will be generated when the signal is overriden if
 # and only if a start delay (> 0) is specified. For each subsequent aspect change
 # a'sig_updated' callback event will be generated
-# Function applicable to Colour Light and Semaphore signal types
+# Function only applicable to Main Colour Light and Semaphore signal types
+# created on the local schematic (will raise an error if signal type not
+# supported. Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
