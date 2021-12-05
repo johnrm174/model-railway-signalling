@@ -184,27 +184,36 @@ Summary of features supported by each signal type:
 Public types and functions:
 
 signal_sub_type (use when creating colour light signals):
-  signal_sub_type.home         (2 aspect - Red/Green)
-  signal_sub_type.distant      (2 aspect - Yellow/Green
-  signal_sub_type.red_ylw      (2 aspect - Red/Yellow
-  signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
-  signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
+    signal_sub_type.home         (2 aspect - Red/Green)
+    signal_sub_type.distant      (2 aspect - Yellow/Green
+    signal_sub_type.red_ylw      (2 aspect - Red/Yellow
+    signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
+    signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 
 route_type (use for specifying the route):
-  route_type.NONE   (no route indication - i.e. not used)
-  route_type.MAIN   (main route)
-  route_type.LH1    (immediate left)
-  route_type.LH2    (far left)
-  route_type.RH1    (immediate right)
-  route_type.RH2    (rar right)
-These equate to the colour light signal route feathers or the Sempahore junction "arms"
+    route_type.NONE   (no route indication - i.e. not used)
+    route_type.MAIN   (main route)
+    route_type.LH1    (immediate left)
+    route_type.LH2    (far left)
+    route_type.RH1    (immediate right)
+    route_type.RH2    (rar right)
+These equate to the route feathers for colour light signals or the Sempahore junction "arm":
+
+signal_state_type(enum.Enum):
+    DANGER               (colour light & semaphore signals)
+    PROCEED              (colour light & semaphore signals)
+    CAUTION              (colour light & semaphore signals)
+    PRELIM_CAUTION       (colour light signals only)
+    CAUTION_APP_CNTL     (colour light signals only - CAUTION but subject to RELEASE ON YELLOW)
+    FLASH_CAUTION        (colour light signals only- when the signal ahead is CAUTION_APP_CNTL)
+    FLASH_PRELIM_CAUTION (colour light signals only- when the signal ahead is FLASH_CAUTION)
 
 sig_callback_type (tells the calling program what has triggered the callback):
     sig_callback_type.sig_switched (signal has been switched)
     sig_callback_type.sub_switched (subsidary signal has been switched)
-    sig_callback_type.sig_passed ("signal passed" button / sensor event - or triggered by Timed signal)
+    sig_callback_type.sig_passed ("signal passed" button activated - or triggered by a Timed signal)
     sig_callback_type.sig_updated (signal aspect has been updated as part of a timed sequence)
-    sig_callback_type.sig_released (signal "approach release" button / sensor event)
+    sig_callback_type.sig_released (signal "approach release" button has been activated)
 
 create_colour_light_signal - Creates a colour light signal
   Mandatory Parameters:
@@ -299,51 +308,50 @@ set_route - Set (and change) the route indication (either feathers or theatre te
       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default 'NONE'
       theatre_text:str - The text to display in the theatre route indicator - default "NONE"
 
-update_signal - update the aspect of a signal ( based on the aspect of a signal ahead)
-              - intended for 3 and 4 aspect and 2 aspect distant colour light signals
-              - also for semaphore home signals created with with secondary distant arms
+update_signal - update the signalaspect based on the aspect of a signal ahead - Primarily
+                intended for 3/4 aspect colour light signals but can also be used to update 
+                2-aspect distant signals (semaphore or colour light) on the home signal ahead
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
-      sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to set - either an
-              integer representing the ID of the signal created on our schematic, or a string
-              representing the compound identifier of an signal on an external node (that we have
-              subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
-              Default = "None" (no signal ahead to take into account when updating the signal)
+      sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to update.
+               Either an integer representing the ID of the signal created on our schematic,
+               or a string representing the identifier of an signal on an external host/node
+               (subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
+               Default = "None" (no signal ahead to take into account when updating the signal)
 
+toggle_signal(sig_id) - to support route setting (use 'signal_clear' to find the switched state )
 
-toggle_signal(sig_id) - use for route setting (can use 'signal_clear' to find the state first)
+toggle_subsidary(sig_id) - to support route setting (use 'subsidary_clear' to find the switched state)
 
-toggle_subsidary(sig_id) - use for route setting (can use 'subsidary_clear' to find the state first)
+lock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-lock_signal(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+unlock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-unlock_signal(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+lock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-lock_subsidary(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+unlock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
+signal_clear(sig_id) - returns the SWITCHED state of the signal - i.e the state of the signal button
+                       (True='OFF') - use for external point/signal interlocking functions
 
-signal_clear(sig_id) - returns the SWITCHED signal state (True='clear') - to support interlocking
-                       NOTE - This reflects the state of the Signal Manual Control Button
+subsidary_clear(sig_id) - returns the SWITCHED state of the subsidary - i.e the state of the subsidary
+                        button (True='OFF') - use for external point/signal interlocking functions
 
-signal_displaying_clear(sig_id) - returns the DISPLAYED signal state (True='clear') - to support automation
-                                  Use this function when you need to get the actual state of the signal
+signal_state(sig_id) - returns the DISPLAYED state of the signal - This can be different to the SWITCHED
+                       state of the signal if the signal is OVERRIDDEN or subject to APPROACH CONTROL
+                       Use this function when you need to get the actual state (in terms of aspect)
+                       that the signal is displaying - returns 'signal_state_type' (see above)
 
-signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support automation
-          Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
+set_signal_override (sig_id*) - Overrides the signal to DANGER (can specify multiple sig_ids)
 
-approach_control_set (sig_id) - returns the approach control state (True='active') - to support automation
-          Function DEPRECATED (will be removed from future releases) - use signal_displaying_clear instead
+clear_signal_override (sig_id*) - Reverts signal to the non-overridden state (can specify multiple sig_ids)
 
-subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
-
-set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
-
-clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
+signal_overridden (sig_id) - returns the signal override state (True='overridden')
+              Function DEPRECATED (will be removed from future releases) - use signal_state instead
 
 trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
-                      - If a start delay >0 is specified then a 'sig_passed' callback event is generated
+                      - If a start delay > 0 is specified then a 'sig_passed' callback event is generated
                       - when the signal is changed to DANGER - For each subsequent aspect change (all the
                       - way back to PROCEED) a 'sig_updated' callback event will be generated
   Mandatory Parameters:
@@ -352,25 +360,26 @@ trigger_timed_signal - Sets the signal to DANGER and then cycles through the asp
       start_delay:int - Delay (in seconds) before changing to DANGER (default=5)
       time_delay:int - Delay (in seconds) for cycling through the aspects (default=5)
 
-set_approach_control - Puts the signal into "Approach Control" Mode where the signal will display a particular
-                       aspect/state (either Red or Yellow) to approaching trains. As the Train approaches the
-                       signal, the signal should then be "released" to display the normal aspect. Normally used
-                       for diverging routes which have a lower speed restriction to the main line. When a signal
-                       is set in "approach control" mode then the signals behind will display the appropriate
-                       aspects when updated (based on the signal ahead). for "Release on Red" these would be 
-                       the normal aspects. For "Release on Yellow", assuming 4 aspect signals, the signals  
-                       behind will display flashing single yellow and flashing double yellow aspects.
+set_approach_control - Used when a diverging route has a lower speed restriction to the main line
+                       Puts the signal into "Approach Control" Mode where the signal will display a more 
+                       restrictive aspect/state (either DANGER or CAUTION) to approaching trains. As the
+                       Train approaches, the signal will then be "released" to display its "normal" aspect.
+                       When a signal is in "approach control" mode the signals behind will display the 
+                       appropriate aspects (when updated based on the signal ahead). These would be the
+                       normal aspects for "Release on Red" but for "Release on Yellow", the signals behind  
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect (default=False)
 
 clear_approach_control - This "releases" the signal to display the normal aspect and should be called when
-                           a train is approaching the signal (so the signal clears in front of the driver)
-                           Note that signals can also be released when the "release control button" is activated
-                           (which is displayed just in front of the signal if specified at signal creation time)
-  Mandatory Parameters:
+                         a train is approaching the signal. Note that signals can also be released when the
+                         "release button" (displayed just in front of the signal if specified when the signal
+                         was created) is activated - manually or via an external sensor event
       sig_id:int - The ID for the signal
+
+approach_control_set (sig_id) - returns if the signal is subject to approach control (True='active')
+                 Function DEPRECATED (will be removed from future releases) - use signal_state instead
 </pre>
 
 ## Track Occupancy Functions
@@ -572,7 +581,8 @@ request_dcc_power_off - sends a request to switch off the track power and waits 
 
 ## MQTT Networking Functions
 
-We're now in the realm of features that no one (including myself) will probably ever use, but its been fun coding the feature.
+We're now in the realm of features that no one (including myself) will probably ever use but, hey its been fun 
+coding the feature and I've certainly learn't a lot about brokers for my next project
 
 These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
 multiple signalling applications (running on different computers) to share a single Pi-Sprog DCC interface
@@ -608,7 +618,7 @@ configure_networking - Configures the local MQTT broker client and establishes a
 subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
                         All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
   Mandatory Parameters:
-      node:str - The name of the node publishing the DCC command feed
+      *nodes:str - The name of the node publishing the DCC command feed (multiple nodes can be specified)
 
 subscribe_to_signal_updates - Subscribe to a signal update feed for a specified node/signal 
   Mandatory Parameters:

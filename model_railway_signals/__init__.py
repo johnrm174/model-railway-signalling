@@ -10,6 +10,7 @@ from .points import toggle_fpl
 
 from .signals_common import route_type
 from .signals_common import sig_callback_type
+from .signals_common import signal_state_type
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
@@ -25,6 +26,7 @@ from .signals import unlock_subsidary
 from .signals import toggle_subsidary
 from .signals import signal_clear
 from .signals import subsidary_clear
+from .signals import signal_state
 from .signals import signal_overridden
 from .signals import approach_control_set
 from .signals import set_signal_override
@@ -77,6 +79,7 @@ __all__ = [
         'route_type',
         'signal_sub_type',
         'sig_callback_type',
+        'signal_state_type',
       # Public signal functions
         'create_colour_light_signal',
         'create_semaphore_signal',
@@ -92,6 +95,7 @@ __all__ = [
         'toggle_subsidary',
         'signal_clear',
         'subsidary_clear',
+        'signal_state',
         'signal_overridden',
         'approach_control_set',
         'set_signal_override',

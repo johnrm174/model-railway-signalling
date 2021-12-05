@@ -113,22 +113,23 @@ def main_callback_function(item_id,callback_type):
     # enable the train to continue (at low speed) towards the next home signal
     #--------------------------------------------------------------
 
-    if callback_type in (sig_callback_type.sig_switched, sig_callback_type.sig_updated,
-                        sig_callback_type.sig_passed, section_callback_type.section_switched):
+    if callback_type in (point_callback_type.point_switched, point_callback_type.fpl_switched,
+                         section_callback_type.section_switched, sig_callback_type.sig_switched,
+                         sig_callback_type.sig_updated, sig_callback_type.sig_passed):
         
-        if point_switched(1):
+        if point_switched(1) and signal_state(5) != signal_state_type.PROCEED:
             set_approach_control(4)
-        elif not point_switched(1) and (not signal_clear(6) or signal_overridden(6)):
+        elif not point_switched(1) and signal_state(6) != signal_state_type.PROCEED:
             set_approach_control(4)
         else:
             clear_approach_control(4)
 
-        if not signal_clear(4) or signal_overridden(4) or approach_control_set(4):
+        if signal_state(4) != signal_state_type.PROCEED:
             set_approach_control(3)
         else:
             clear_approach_control(3)
 
-        if not signal_clear(3) or signal_overridden(3) or approach_control_set(3):
+        if signal_state(3) != signal_state_type.PROCEED:
             set_approach_control(2)
         else:
             clear_approach_control(2)
@@ -140,13 +141,7 @@ def main_callback_function(item_id,callback_type):
     # approach control and override states of the other signals (which we set above)
     #--------------------------------------------------------------
 
-    if section_occupied(1):
-        set_signal_override(1)
-    elif ( not signal_clear(2) or signal_overridden(2) or approach_control_set(2) or
-           not signal_clear(3) or signal_overridden(3) or approach_control_set(3) or
-           not signal_clear(4) or signal_overridden(4) or approach_control_set(4) or
-           (point_switched(1) and (not signal_clear(5) or signal_overridden(5))) or
-           (not point_switched(1) and (not signal_clear(6) or signal_overridden(6))) ): 
+    if section_occupied(1) or signal_state(2) != signal_state_type.PROCEED:
         set_signal_override(1)
     else:
         clear_signal_override(1)

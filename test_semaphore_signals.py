@@ -167,12 +167,12 @@ def print_signal_state():
     print ("Printing state of all main signals")
     print ("Error will be raised for Signal 25 as it doesn't exist")
     for I in range(1,26):
-        print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
-               str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
+        print ("Signal "+str(I)+ " : signal_clear = "+str(signal_clear(I))+
+               ", signal_state = "+  str(signal_state(I)))
     # We also print the state of any "associated distants" 
     for I in (101,104,106,110,115,118,119):
-        print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
-               str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
+        print ("Signal "+str(I)+ " : signal_clear = "+str(signal_clear(I))+
+               ", signal_state = "+  str(signal_state(I)))
     return()
 
 #----------------------------------------------------------------------
@@ -466,7 +466,7 @@ create_semaphore_signal (canvas,10,950,250,
                         approach_release_button =True,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,110,950,250,
+create_semaphore_signal (canvas,0,950,250,
                         orientation = 180,
                         sig_callback = main_callback_function,
                         distant = True,
@@ -482,8 +482,7 @@ create_semaphore_signal (canvas,11,250,400,
                         main_subsidary = True,
                         lh1_subsidary = True,
                         lh2_subsidary = True,
-                        sig_passed_button = True,
-                        fully_automatic = True)
+                        sig_passed_button = True)
 
 create_semaphore_signal (canvas,12,425,400,
                         sig_callback = main_callback_function,
@@ -491,8 +490,7 @@ create_semaphore_signal (canvas,12,425,400,
                         rh1_subsidary = True,
                         rh2_subsidary = True,
                         refresh_immediately = False,
-                        sig_passed_button = True,
-                        fully_automatic = True)
+                        sig_passed_button = True)
 
 create_semaphore_signal (canvas,13,600,400,
                         distant = True,

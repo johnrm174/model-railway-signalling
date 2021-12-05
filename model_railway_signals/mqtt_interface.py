@@ -33,7 +33,7 @@
 # subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
 #                         All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
 #   Mandatory Parameters:
-#       node:str - The name of the node publishing the DCC command feed
+#       *nodes:str - The name of the node publishing the DCC command feed (multiple nodes can be specified)
 #
 # subscribe_to_signal_updates - Subscribe to a signal update feed for a specified node/signal 
 #   Mandatory Parameters:
@@ -142,7 +142,7 @@ def on_disconnect(mqtt_client, userdata, rc):
     if rc==0:
         logging.info("MQTT-Client: Broker connection successfully terminated")
     else:
-        logging.warning("MQTT-Client: Unexpected broker disconnection – will attempt to re-connect")
+        logging.warning("MQTT-Client: Unexpected Disconnection from MQTT Broker")
     node_config["connected_to_broker"] = False
     return()
 
@@ -150,8 +150,12 @@ def on_connect(mqtt_client, userdata, flags, rc):
     global logging
     global node_config
     if rc == 0:
-        logging.info("MQTT-Client: Successfully connected to MQTT Broker")
+        logging.info("MQTT-Client: Connected to MQTT Broker")
         node_config["connected_to_broker"] = True
+        # As we set up our broker connection with 'cleansession=true' a disconnection will have removed
+        # all client connection information from the broked (including knowledge of the topics we have
+        # subscribed to - we therefore need to re-subscribe to all topics with this new connection
+        # Note that this means we will immediately receive all retained messages for those topics
         if len(node_config["subscribed_topics"]) > 0:
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["subscribed_topics"]:
@@ -176,6 +180,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
 def on_message(mqtt_client, obj, msg):
     global logging
     global node_config
+    global received_dcc_commands
     # Unpack the json message so we can extract the contents
     unpacked_json = json.loads(msg.payload)
     if node_config["enhanced_debugging"]:
@@ -186,6 +191,11 @@ def on_message(mqtt_client, obj, msg):
     
     if msg.topic.startswith("dcc_accessory_short_event"):
         source_node,dcc_address,dcc_state = unpacked_json
+        # We can't implement logic to process DCC commands only if "something has changed" in terms of the state of an address
+        # as we may have Event Driven signals (e.g. TrainTech) which rely on sending different states to different addresses
+        # to change the aspects (e.g. transition from CAUTION => PROCEED may be AddressX => TRUE and then PROCEED => CAUTION
+        # may be AddressY => TRUE so toggling between them would not be detected as a "change". This does mean that following
+        # disconnection/reconnection events we may get a flood od DCC messages that we have to process in turn
         if dcc_state: 
             logging.debug ("MQTT-Client: Received ASON command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
         else:
@@ -195,13 +205,15 @@ def on_message(mqtt_client, obj, msg):
         
     elif msg.topic.startswith("signal_updated_event"):
         sig_identifier,signal_state = unpacked_json
-        # Only process the state update if the state has changed (i.e. handle disconnect/connect)
+        # Only process the updated event if the state has changed - this is primarily to handle client re-connection
+        # events (following an unexpected disconnection) where we will immediately receive all retained messages
+        # on the topics we have re-subscribed to - even if we have already received them prior to the disconnection
         # Note that we receive the "Value" of the enumeration signal_state type rather than the descriptor
         if signals_common.signals[sig_identifier]["sigstate"] != signals_common.signal_state_type(signal_state): 
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type(signal_state)
             logging.info ("Signal "+sig_identifier+": Received signal state from MQTT Broker")
-            # Raise the callback in the main tkinter thread as long as we know the main root window
-            # Or as a fallback raise a callback in the current mqtt event thread
+            # Raise the callback in the main tkinter thread (as long as we know the main root window) to make
+            # it all threadsafe - Or as a fallback raise a callback in the current mqtt event thread
             if common.root_window is not None:
                 common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
                                                 (sig_identifier,signals_common.sig_callback_type.sig_updated))
@@ -210,8 +222,13 @@ def on_message(mqtt_client, obj, msg):
 
     elif msg.topic.startswith("signal_passed_event"):
         sig_identifier, = unpacked_json
+        # A signal passed event is an event in time - therefore these are not sent to the broker as retained messages
+        # and therefore we don't need to do anything specific to handle disconnection/re-connection events - if we've
+        # missed a signal passed event whilst we've been disconnected then its just bad luck!
         logging.info ("Signal "+sig_identifier+": Received \'signal passed\' event from MQTT Broker")
         if common.root_window is not None:
+            # Raise the callback in the main tkinter thread (as long as we know the main root window) to make
+            # it all threadsafe - Or as a fallback raise a callback in the current mqtt event thread
             common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
                                             (sig_identifier,signals_common.sig_callback_type.sig_passed))
         else:    
@@ -234,16 +251,16 @@ def configure_networking (broker_host:str,
     global node_config
     global mqtt_client
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
-    # Save all the information we need in a dictionary
     # Do some basic exception handling around opening the broker connection
     try:
-        mqtt_client = paho.mqtt.client.Client()
+        mqtt_client = paho.mqtt.client.Client(clean_session=True)
         mqtt_client.on_message = on_message    
         mqtt_client.on_connect = on_connect    
         mqtt_client.on_disconnect = on_disconnect    
         if mqtt_enhanced_debugging: mqtt_client.on_log = on_log
         if broker_username is not None: mqtt_client.username_pw_set(username=broker_username,password=broker_password)
-        mqtt_client.connect(broker_host, keepalive = 60)
+        mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
+        mqtt_client.connect(broker_host, keepalive = 10)
         mqtt_client.loop_start()
     except Exception as exception:
         logging.error("MQTT-Client: Failed to connect to broker - "+str(exception))
@@ -259,30 +276,35 @@ def configure_networking (broker_host:str,
                 node_config["network_configured"] = True
                 break
         if not node_config["connected_to_broker"]:
-            logging.error("MQTT-Client: Timeout connecting to broker")
+            logging.error("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
+        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
+        # to set up any subscriptions or publish any messages to the broker. We shouldn't need to do this but
+        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
+        time.sleep(0.1)
     return()
 
 #-----------------------------------------------------------------------------------------------
 # Public API Function to "subscribe" to the published DCC commands from another "Node"
 #-----------------------------------------------------------------------------------------------
 
-def subscribe_to_dcc_command_feed (node:str):    
+def subscribe_to_dcc_command_feed (*nodes:str):    
     global logging
     global node_config
     global mqtt_client
-    logging.info("MQTT-Client: Subscribe to dcc commands from \'"+node+"\'")
     if not node_config["network_configured"]:
         logging.error("MQTT-Client: Networking Disabled - Cannot subscribe to dcc commands")
     else:
-        # Subscribe to the 'dcc_accessory_short_event' topics from the specified node
-        # Topics are in the following format: "dcc_accessory_short_event/<network-ID>/<node-ID>/<dcc-address>
-        # We use a different topic for every dcc address so we can use "retained" messages to ensure when the
-        # application starts up we will always receive the latest "state" of each dcc address from the broker
-        # We wildcard the address (with a '+') to receive messages related to all DCC addresses for the node
-        topic = "dcc_accessory_short_event/"+node_config["network_identifier"]+"/"+node+"/+"
-        mqtt_client.subscribe(topic)
-        # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-        node_config["subscribed_topics"].append(topic)
+        for node in nodes:
+            logging.info("MQTT-Client: Subscribe to dcc command feed from \'"+node+"\'")
+            # Subscribe to the 'dcc_accessory_short_event' topics from the specified node
+            # Topics are in the following format: "dcc_accessory_short_event/<network-ID>/<node-ID>/<dcc-address>
+            # We use a different topic for every dcc address so we can use "retained" messages to ensure when the
+            # application starts up we will always receive the latest "state" of each dcc address from the broker
+            # We wildcard the address (with a '+') to receive messages related to all DCC addresses for the node
+            topic = "dcc_accessory_short_event/"+node_config["network_identifier"]+"/"+node+"/+"
+            mqtt_client.subscribe(topic)
+            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+            node_config["subscribed_topics"].append(topic)
     return()
 
 #-----------------------------------------------------------------------------------------------

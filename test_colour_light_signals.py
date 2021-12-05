@@ -175,8 +175,8 @@ def print_signal_state():
     print ("Printing state of all main signals")
     print ("Error will be raised for Signal 36 as it doesn't exist ")
     for I in range(1,37):
-        print ("Signal "+str(I)+ " : sig_clear = "+str(signal_clear(I))+", overridden = "+
-               str(signal_overridden(I))+", approach_control_set = "+str(approach_control_set(I)))
+        print ("Signal "+str(I)+ " : signal_clear = "+str(signal_clear(I))+
+               ", signal_state = "+  str(signal_state(I)))
     return()
 
 #----------------------------------------------------------------------
@@ -199,7 +199,6 @@ def print_subsidary_state():
 def toggle_signals():
     print ("")
     print ("Toggling All Signals")
-    print ("Errors will be raised for Signals 3, 5, 8, 10, 15, 20, 25 as they are fully automatic")
     print ("Error will be raised for Signal 36 as it doesn't exist ")
     for I in range(1,37):toggle_signal(I)
     update_signals()
