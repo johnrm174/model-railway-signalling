@@ -347,7 +347,7 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
             else:
                 # 3 aspect signals and 2 aspect distant signals should display PROCEED
                 new_aspect = signals_common.signal_state_type.PROCEED
-                log_message = (" (signal is OFF and signal ahead "+sig_ahead_identifier+" is displaying CAUTION)")
+                log_message = (" (signal is OFF and signal ahead "+str(sig_ahead_id)+" is displaying CAUTION)")
                             
         elif signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
             if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
@@ -375,7 +375,6 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
         refresh_signal_aspects (sig_id)
         # Update the Theatre & Feather route indications as these are inhibited/enabled for transitions to/from DANGER
         update_feather_route_indication(sig_id)
-        signals_common.update_theatre_route_indication(sig_id)
         signals_common.update_theatre_route_indication(sig_id)
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal

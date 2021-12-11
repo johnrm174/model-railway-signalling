@@ -244,9 +244,6 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 # Common Function to generate all the mandatory signal elements that will apply
 # to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
-# Common Function to generate all the mandatory signal elements that will apply
-# to all signal types (even if they are not used by the particular signal type)
-# -------------------------------------------------------------------------
 
 def create_common_signal_elements (canvas,
                                    sig_id: int,

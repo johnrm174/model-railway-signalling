@@ -284,7 +284,7 @@ def signal_overridden (sig_id:int):
     
     global logging
     # Validate the signal exists
-    logging.Warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
+    logging.warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_overridden - Signal does not exist")
         sig_overridden = False
@@ -303,7 +303,7 @@ def signal_overridden (sig_id:int):
 def approach_control_set (sig_id:int):
     
     global logging
-    logging.Warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
+    logging.warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": approach_control_set - Signal does not exist")
