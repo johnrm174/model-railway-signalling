@@ -5,12 +5,14 @@
 
 from . import common
 from . import dcc_control
+from . import mqtt_interface
 from . import signals_colour_lights
 from . import signals_semaphores
 from . import signals_ground_position
 from . import signals_ground_disc
 
-from tkinter import *    
+from tkinter import *
+from typing import Union
 import logging
 import enum
 
@@ -44,17 +46,20 @@ class sig_callback_type(enum.Enum):
 # processing button change events - Will apply to more that one signal type
 # -------------------------------------------------------------------------
 
-# The Possible states for a main signal
+# The superset of Possible states (displayed aspects) for a signal
+# CAUTION_APROACH_CONTROL represents approach control set with "Release On Yellow"
 class signal_state_type(enum.Enum):
     DANGER = 1
     PROCEED = 2
     CAUTION = 3
-    PRELIM_CAUTION = 4
-    FLASH_CAUTION = 5
-    FLASH_PRELIM_CAUTION = 6
+    CAUTION_APP_CNTL = 4
+    PRELIM_CAUTION = 5
+    FLASH_CAUTION = 6
+    FLASH_PRELIM_CAUTION = 7
 
 # Define the main signal types that can be created
 class sig_type(enum.Enum):
+    remote_signal = 0
     colour_light = 1
     ground_position = 2
     semaphore = 3                 
@@ -69,10 +74,12 @@ signals:dict = {}
 
 # -------------------------------------------------------------------------
 # Common Function to check if a Signal exists in the dictionary of Signals
-# Used by most externally-called functions to validate the Sig_ID
+# Used by most externally-called functions to validate the Sig_ID. We allow
+# a string or an int to be passed in to cope with compound signal identifiers
+# This to support identifiers containing the node and ID of a remote signal
 # -------------------------------------------------------------------------
 
-def sig_exists(sig_id:int):
+def sig_exists(sig_id:Union[int,str]):
     return (str(sig_id) in signals.keys() )
 
 # -------------------------------------------------------------------------
@@ -108,6 +115,9 @@ def sig_passed_button_event (sig_id:int):
     # Pulse the signal passed button to provide a visual indication
     signals[str(sig_id)]["passedbutton"].config(bg="red")
     common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+    # mqtt interface has been successfully configured and the signal has been set to publish passed events
+    mqtt_interface.publish_signal_passed_event(sig_id)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
@@ -230,6 +240,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
             if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
     return()
 
+# -------------------------------------------------------------------------
+# Common Function to generate all the mandatory signal elements that will apply
+# to all signal types (even if they are not used by the particular signal type)
 # -------------------------------------------------------------------------
 # Common Function to generate all the mandatory signal elements that will apply
 # to all signal types (even if they are not used by the particular signal type)

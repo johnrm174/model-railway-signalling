@@ -16,6 +16,7 @@
 
 from . import signals_common
 from . import dcc_control
+from . import mqtt_interface
 from . import common
 
 from tkinter import *
@@ -120,15 +121,21 @@ def update_ground_position_signal (sig_id:int):
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="normal")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="hidden")
-            dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.PROCEED)
 
         elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="normal")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="normal")
-            dcc_control.update_dcc_signal_aspects(sig_id,signals_common.signal_state_type.DANGER)
-
+            
+        # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
+        # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
+        dcc_control.update_dcc_signal_aspects(sig_id)
+        
+        # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
+        # be published if the MQTT interface has been successfully configured for publishing updates for this signal
+        mqtt_interface.publish_signal_state(sig_id)            
+        
     return ()
 
 ###############################################################################

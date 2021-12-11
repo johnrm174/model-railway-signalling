@@ -6,6 +6,19 @@
 import math
 import queue
 import logging
+from . import mqtt_interface
+from tkinter import messagebox
+
+#-------------------------------------------------------------------------
+# Function to catch the root window close event so we can perform an
+# orderly shutdown of the other threads running in the application
+#-------------------------------------------------------------------------
+
+def on_closing():
+    global root_window
+    if messagebox.askokcancel("Quit","Do you want to quit?"):
+        mqtt_interface.mqtt_shutdown()
+        root_window.destroy()
 
 #-------------------------------------------------------------------------
 # Function to find and store the tkinter "root" window as this is used to
@@ -25,7 +38,10 @@ def find_root_window (canvas):
     while parent.master:
         parent = parent.master
     root_window = parent
+    # bind the tkinter event for handling events raised in external threads
     root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    # Bind the window close event so we can perform an orderly shutdown
+    root_window.protocol("WM_DELETE_WINDOW",on_closing)
     return(root_window)
 
 #-------------------------------------------------------------------------

@@ -25,28 +25,37 @@
 #           - With or without a "Signal Passed" Button
 #
 # signal_sub_type (use when creating colour light signals):
-#   signal_sub_type.home         (2 aspect - Red/Green)
-#   signal_sub_type.distant      (2 aspect - Yellow/Green
-#   signal_sub_type.red_ylw      (2 aspect - Red/Yellow
-#   signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
-#   signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
+#     signal_sub_type.home         (2 aspect - Red/Green)
+#     signal_sub_type.distant      (2 aspect - Yellow/Green
+#     signal_sub_type.red_ylw      (2 aspect - Red/Yellow
+#     signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
+#     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
 # route_type (use for specifying the route):
-#   route_type.NONE   (no route indication - i.e. not used)
-#   route_type.MAIN   (main route)
-#   route_type.LH1    (immediate left)
-#   route_type.LH2    (far left)
-#   route_type.RH1    (immediate right)
-#   route_type.RH2    (rar right)
+#     route_type.NONE   (no route indication - i.e. not used)
+#     route_type.MAIN   (main route)
+#     route_type.LH1    (immediate left)
+#     route_type.LH2    (far left)
+#     route_type.RH1    (immediate right)
+#     route_type.RH2    (rar right)
 # These equate to the route feathers for colour light signals or the Sempahore junction "arm":
-# 
+#
+# signal_state_type(enum.Enum):
+#     DANGER               (colour light & semaphore signals)
+#     PROCEED              (colour light & semaphore signals)
+#     CAUTION              (colour light & semaphore signals)
+#     PRELIM_CAUTION       (colour light signals only)
+#     CAUTION_APP_CNTL     (colour light signals only - CAUTION but subject to RELEASE ON YELLOW)
+#     FLASH_CAUTION        (colour light signals only- when the signal ahead is CAUTION_APP_CNTL)
+#     FLASH_PRELIM_CAUTION (colour light signals only- when the signal ahead is FLASH_CAUTION)
+#
 # sig_callback_type (tells the calling program what has triggered the callback):
 #     sig_callback_type.sig_switched (signal has been switched)
 #     sig_callback_type.sub_switched (subsidary signal has been switched)
 #     sig_callback_type.sig_passed ("signal passed" button activated - or triggered by a Timed signal)
 #     sig_callback_type.sig_updated (signal aspect has been updated as part of a timed sequence)
 #     sig_callback_type.sig_released (signal "approach release" button has been activated)
-# 
+#
 # create_colour_light_signal - Creates a colour light signal
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
@@ -139,39 +148,50 @@
 #       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default 'NONE'
 #       theatre_text:str  - The text to display in the theatre route indicator - default "NONE"
 # 
-# update_signal - update the aspect of a signal ( based on the aspect of a signal ahead)
-#               - intended for 3 and 4 aspect and 2 aspect distant colour light signals
+# update_signal - update the signal aspect based on the aspect of a signal ahead - Primarily
+#                intended for 3/4 aspect colour light signals but can also be used to update 
+#                2-aspect distant signals (semaphore or colour light) on the home signal ahead
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       sig_ahead_id:int - The ID for the signal "ahead" of the one we want to set
+#       sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to update.
+#               Either an integer representing the ID of the signal created on our schematic,
+#               or a string representing the identifier of an signal on an external host/node
+#               (subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
+#               Default = "None" (no signal ahead to take into account when updating the signal)
+#
+# toggle_signal(sig_id) - to support route setting (use 'signal_clear' to find the switched state )
 # 
-# toggle_signal(sig_id) - use for route setting (can use 'signal_clear' to find the state first)
+# toggle_subsidary(sig_id) - to support route setting (use 'subsidary_clear' to find the switched state)
 # 
-# toggle_subsidary(sig_id) - use for route setting (can use 'subsidary_clear' to find the state first)
+# lock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
-# lock_signal(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+# unlock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
-# unlock_signal(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+# lock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
-# lock_subsidary(*sig_id) - use for point/signal interlocking (multiple Signal_IDs can be specified)
+# unlock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
 # 
-# unlock_subsidary(*sig_id) use for point/signal interlocking (multiple Signal_IDs can be specified)
+# signal_clear(sig_id) - returns the SWITCHED state of the signal - i.e the state of the signal button
+#                        (True='OFF') - use for external point/signal interlocking functions
+#
+# subsidary_clear(sig_id) - returns the SWITCHED state of the subsidary - i.e the state of the subsidary
+#                         button (True='OFF') - use for external point/signal interlocking functions
 # 
-# signal_clear(sig_id) - returns the signal state (True='clear') - to support interlocking
+# signal_state(sig_id) - returns the DISPLAYED state of the signal - This can be different to the SWITCHED
+#                        state of the signal if the signal is OVERRIDDEN or subject to APPROACH CONTROL
+#                        Use this function when you need to get the actual state (in terms of aspect)
+#                        that the signal is displaying - returns 'signal_state_type' (see above)
 # 
-# signal_overridden (sig_id) - returns the signal override state (True='overridden') - to support interlocking
+# set_signal_override (sig_id*) - Overrides the signal to DANGER (can specify multiple sig_ids)
+#
+# clear_signal_override (sig_id*) - Reverts signal to the non-overridden state (can specify multiple sig_ids)
 # 
-# approach_control_set (sig_id) - returns the approach control state (True='active') - to support interlocking
-# 
-# subsidary_clear(sig_id) - returns the subsidary state (True='clear') - to support interlocking
-# 
-# set_signal_override (sig_id*) - Overrides the signal and sets it to DANGER (multiple Signals can be specified)
-# 
-# clear_signal_override (sig_id*) - Reverts the signal to its controlled state (multiple Signals can be specified)
+# signal_overridden (sig_id) - returns the signal override state (True='overridden')
+#           Function DEPRECATED (will be removed from future releases) - use signal_state instead
 # 
 # trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
-#                       - If a start delay >0 is specified then a 'sig_passed' callback event is generated
+#                       - If a start delay > 0 is specified then a 'sig_passed' callback event is generated
 #                       - when the signal is changed to DANGER - For each subsequent aspect change (all the
 #                       - way back to PROCEED) a 'sig_updated' callback event will be generated
 #   Mandatory Parameters:
@@ -180,26 +200,28 @@
 #       start_delay:int - Delay (in seconds) before changing to DANGER (default=5)
 #       time_delay:int - Delay (in seconds) for cycling through the aspects (default=5)
 # 
-# set_approach_control - Puts the signal into "Approach Control" Mode where the signal will display a particular
-#                        aspect/state (either Red or Yellow) to approaching trains. As the Train approaches the
-#                        signal, the signal will be "released" to display the normal aspect. Normally used for
-#                        diverging routes which have a lower speed restriction to the main line. When a signal
-#                        is set in "approach control" mode then the signals behind will display the appropriate
-#                        aspects when updated (based on the signal ahead). for "Release on Red" these would be 
-#                        the normal aspects. For "Release on Yellow", assuming 4 aspect signals, the signals  
-#                        behind will display flashing single yellow and flashing double yellow 
+# set_approach_control - Used when a diverging route has a lower speed restriction to the main line
+#                        Puts the signal into "Approach Control" Mode where the signal will display a more 
+#                        restrictive aspect/state (either DANGER or CAUTION) to approaching trains. As the
+#                        Train approaches, the signal will then be "released" to display its "normal" aspect.
+#                        When a signal is in "approach control" mode the signals behind will display the 
+#                        appropriate aspects (when updated based on the signal ahead). These would be the
+#                        normal aspects for "Release on Red" but for "Release on Yellow", the signals behind  
+#                        would display flashing yellow and flashing double yellow (assuming 4 aspect signals)
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect (default=False)
 # 
 # clear_approach_control - This "releases" the signal to display the normal aspect and should be called when
-#                            a train is approaching the signal (so the signal clears in front of the driver)
-#                            Note that signals can also be released when the "release control button" is activated
-#                            (which is displayed just in front of the signal if specified at signal creation time)
-#   Mandatory Parameters:
+#                          a train is approaching the signal. Note that signals can also be released when the
+#                         "release button" (displayed just in front of the signal if specified when the signal
+#                          was created) is activated - manually or via an external sensor event#   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 # 
+# approach_control_set (sig_id) - returns if the signal is subject to approach control (True='active')
+#           Function DEPRECATED (will be removed from future releases) - use signal_state instead
+#
 # -------------------------------------------------------------------------
    
 from . import signals_common
@@ -208,12 +230,17 @@ from . import signals_ground_position
 from . import signals_ground_disc
 from . import signals_semaphores
 
+from typing import Union
 from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the signal
-# Function applicable to ALL signal types
+# Externally called function to Return the current SWITCHED state of the signal
+# (i.e. the state of the signal button - Used to enable interlocking functions)
+# Note that the DISPLAYED state of the signal may not be CLEAR if the signal is
+# overridden or subject to release on RED - See "signal_displaying_clear"
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int):
@@ -228,14 +255,36 @@ def signal_clear (sig_id:int):
     return (sig_clear)
 
 # -------------------------------------------------------------------------
+# Externally called function to Return the displayed state of the signal
+# (i.e. whether the signal is actually displaying a CLEAR aspect). Note that
+# this can be different to the state the signal has been manually set to (via
+# the signal button) - as it could be overridden or subject to Release on Red
+# Function applicable to ALL signal types - Including REMOTE SIGNALS
+# -------------------------------------------------------------------------
+
+def signal_state (sig_id:Union[int,str]):
+    
+    global logging
+    # Validate the signal exists
+    if not signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": signal_state - Signal does not exist")
+        sig_state = signals_common.signal_state_type.DANGER
+    else:
+        sig_state = signals_common.signals[str(sig_id)]["sigstate"]
+    return (sig_state)
+
+# -------------------------------------------------------------------------
+# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
 # Externally called function to Return the current state of the signal overide
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def signal_overridden (sig_id:int):
     
     global logging
     # Validate the signal exists
+    logging.Warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_overridden - Signal does not exist")
         sig_overridden = False
@@ -244,13 +293,17 @@ def signal_overridden (sig_id:int):
     return (sig_overridden)
 
 # -------------------------------------------------------------------------
+# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
 # Externally called function to Return the current state of the approach control
-# Function applicable to ALL signal types (will return False if not supported)
+# Function applicable to ALL signal types created on the local schematic
+# (will return False if the particular signal type not supported)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def approach_control_set (sig_id:int):
     
     global logging
+    logging.Warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": approach_control_set - Signal does not exist")
@@ -267,7 +320,8 @@ def approach_control_set (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
 # signal - if the signal does not have one then the return will be FALSE
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def subsidary_clear (sig_id:int):
@@ -287,7 +341,8 @@ def subsidary_clear (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to Lock the signal (preventing it being cleared)
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
@@ -312,7 +367,8 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 # Externally called function to Unlock the main signal
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
@@ -335,7 +391,9 @@ def unlock_signal (*sig_ids:int):
 # Externally called function to Lock the subsidary signal
 # This is effectively a seperate signal from the main aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def lock_subsidary (*sig_ids:int):
@@ -363,7 +421,9 @@ def lock_subsidary (*sig_ids:int):
 # Externally called function to Unlock the subsidary signal
 # This is effectively a seperate signal from the main aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types (if they "havesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (*sig_ids:int):
@@ -387,9 +447,10 @@ def unlock_subsidary (*sig_ids:int):
 # Externally called function to Override a signal - effectively setting it
 # to RED (apart from 2 aspect distance signals - which are set to YELLOW)
 # Signal will display the overriden aspect no matter what its current setting is
-# Used to support automation - e.g. set asignal to Danger once a train has passed
+# Used to support automation - e.g. set a signal to Danger once a train has passed
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
@@ -428,7 +489,8 @@ def set_signal_override (*sig_ids:int):
 # Externally called function to Clear a Signal Override 
 # Signal will revert to its current manual setting (on/off) and aspect
 # Multiple signal IDs can be specified in the call
-# Function applicable to ALL signal types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
@@ -467,7 +529,8 @@ def clear_signal_override (*sig_ids:int):
 # Externally called function to Toggle the state of a main signal
 # to enable automated route setting from the external programme.
 # Use in conjunction with 'signal_clear' to find the state first
-# Function applicable to ALL Signal Types
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
@@ -476,8 +539,6 @@ def toggle_signal (sig_id:int):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal does not exist")
-    elif signals_common.signals[str(sig_id)]["automatic"]:
-        logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal is automatic - use set/clear signal override instead")
     else:
         if signals_common.signals[str(sig_id)]["siglocked"]:
             logging.warning ("Signal "+str(sig_id)+": toggle_signal - Signal is locked - Toggling anyway")
@@ -489,7 +550,9 @@ def toggle_signal (sig_id:int):
 # Externally called function to Toggle the state of a subsidary signal
 # to enable automated route setting from the external programme. Use
 # in conjunction with 'subsidary_signal_clear' to find the state first
-# Function applicable to ALL Signal Types (if they "hasvesubsidary")
+# Function applicable to ALL signal types created on the local schematic
+# (will report an error if the specified signal does not have a subsidary)
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
@@ -510,7 +573,9 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 # Externally called function to set the "approach conrol" for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Colour Light and Semaphore signal types
+# Function applicable to Colour Light and Semaphore signal types created on
+# the local schematic (will report an error if the particular signal type not
+# supported) Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
@@ -545,7 +610,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 # -------------------------------------------------------------------------
 # Externally called function to clear the "approach control" for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Colour Light and Semaphore signal types
+# Function applicable to Colour Light and Semaphore signal types created on
+# the local schematic (will have no effect on other signal types
+# Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
@@ -568,24 +635,26 @@ def clear_approach_control (sig_id:int):
 # Signal ahead - Intended mainly for Coulour Light Signal types so we can
 # ensure the "CLEAR" aspect reflects the aspect of ths signal ahead
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable only to main Colour Light signal types
+# Function applicable only to Main colour Light and semaphore signal types
+# created on the local schematic - but either locally-created or REMOTE
+# Signals can be specified as the signal ahead
 # -------------------------------------------------------------------------
 
-def update_signal (sig_id:int, sig_ahead_id:int = 0):
+def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
     
     global logging
     # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
-    elif sig_ahead_id != 0 and not signals_common.sig_exists(sig_ahead_id): 
+    elif sig_ahead_id != None and not signals_common.sig_exists(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
     elif sig_id == sig_ahead_id: 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
     # Call the signal type-specific functions to update the signal (only colour lights supported currently)
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id )
+        signals_colour_lights.update_colour_light_signal (sig_id,sig_ahead_id)
     elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id )
+        signals_semaphores.update_semaphore_signal (sig_id,sig_ahead_id)
     else:
         logging.error ("Signal "+str(sig_id)+": update_signal - Function not supported by signal type")
     return()
@@ -593,7 +662,9 @@ def update_signal (sig_id:int, sig_ahead_id:int = 0):
 # -------------------------------------------------------------------------
 # Externally called function to set the route indication for the signal
 # Calls the signal type-specific functions depending on the signal type
-# Function applicable to Main Colour Light and Semaphore signal types
+# Function only applicable to Main Colour Light and Semaphore signal types
+# created on the local schematic (will raise an error if signal type not
+# supported. Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
@@ -623,7 +694,9 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 # A 'sig_passed' callback event will be generated when the signal is overriden if
 # and only if a start delay (> 0) is specified. For each subsequent aspect change
 # a'sig_updated' callback event will be generated
-# Function applicable to Colour Light and Semaphore signal types
+# Function only applicable to Main Colour Light and Semaphore signal types
+# created on the local schematic (will raise an error if signal type not
+# supported. Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
