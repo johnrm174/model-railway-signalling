@@ -25,6 +25,7 @@
 #       network_identifier:str - The name to use for our signalling network (can be any string)
 #       node_identifier:str - The name to use for this particular node on the network (can be any string)
 #   Optional Parameters:
+#       broker_port:int - The network port for the broker host (default = 1883)
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
 #       publish_dcc_commands:bool - True to publish all DCC commands to the Broker (default = False)
@@ -62,21 +63,6 @@
 #       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
 #
 #-----------------------------------------------------------------------------------------------
-# Some Notes on QoS - we use QoS1 for all messages published to the server:
-#      QoS0 - At most once: The message is delivered at most once, or it may not be delivered at all.
-#             Its delivery across the network is not acknowledged. The message is not stored.
-#             The message could be lost if the client is disconnected, or if the server fails.
-#             QoS0 is the fastest mode of transfer. It is sometimes called "fire and forget".
-#      QoS1 - At least once: The message is always delivered at least once.It might be delivered multiple
-#             times if there is a failure before an acknowledgment is received by the sender. The message
-#             must be stored locally at the sender, until the sender receives confirmation that the message
-#             has been published by the receiver. The message is stored in case the message must be sent again.
-#      QoS2 - Exactly once: The message is always delivered exactly once. The message must be stored locally
-#             at the sender, until the sender receives confirmation that the message has been published by
-#             the receiver. The message is stored in case the message must be sent again. QoS2 is the safest,
-#             but slowest mode of transfer. A more sophisticated handshaking and acknowledgement sequence is
-#             used than for QoS1 to ensure no duplication of messages occurs.
-#-----------------------------------------------------------------------------------------------
 
 import json
 import logging
@@ -95,6 +81,7 @@ node_config["network_identifier"] = None
 node_config["node_identifier"] = None   
 node_config["signals_to_publish_state_changes"] = []  
 node_config["signals_to_publish_passed_events"] = []
+node_config["list_of_published_dcc_addresses"] = []
 node_config["subscribed_topics"] = []
 node_config["enhanced_debugging"] = False
 node_config["publish_dcc_commands"] = False
@@ -140,7 +127,7 @@ def on_disconnect(mqtt_client, userdata, rc):
     global logging
     global node_config
     if rc==0:
-        logging.info("MQTT-Client: Broker connection successfully terminated")
+        logging.info("MQTT-Client: Broker connection terminated")
     else:
         logging.warning("MQTT-Client: Unexpected Disconnection from MQTT Broker")
     node_config["connected_to_broker"] = False
@@ -151,7 +138,6 @@ def on_connect(mqtt_client, userdata, flags, rc):
     global node_config
     if rc == 0:
         logging.info("MQTT-Client: Connected to MQTT Broker")
-        node_config["connected_to_broker"] = True
         # As we set up our broker connection with 'cleansession=true' a disconnection will have removed
         # all client connection information from the broked (including knowledge of the topics we have
         # subscribed to - we therefore need to re-subscribe to all topics with this new connection
@@ -160,6 +146,11 @@ def on_connect(mqtt_client, userdata, flags, rc):
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["subscribed_topics"]:
                 mqtt_client.subscribe(topic)
+        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
+        # to set up any subscriptions or publish any messages to the broker. We shouldn't need to do this but
+        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
+        time.sleep(0.1)
+        node_config["connected_to_broker"] = True
     elif rc == 1:
         logging.error("MQTT-Client: Connection refused – incorrect protocol version")
     elif rc == 2:
@@ -177,62 +168,79 @@ def on_connect(mqtt_client, userdata, flags, rc):
 # Received DCC Commands are forwarded on to the Pi-Sprog Interface (and then out to the DCC bus)
 #-----------------------------------------------------------------------------------------------
 
+def process_signal_updated_event(unpacked_json):
+    global logging
+    # Note that this function is executed in the main tkinter thread to make it all threadsafe
+    sig_identifier,signal_state = unpacked_json
+    # Only process the updated event if the state has changed - this is primarily to handle client re-connection
+    # events (following an unexpected disconnection) where we will immediately receive all retained messages
+    # on the topics we have re-subscribed to - even if we have already received them prior to the disconnection
+    # Note that we receive the "Value" of the enumeration signal_state type rather than the descriptor
+    if signals_common.signals[sig_identifier]["sigstate"] != signals_common.signal_state_type(signal_state): 
+        signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type(signal_state)
+        logging.info ("Signal "+sig_identifier+": Received updated state from MQTT Broker: "+
+                        str(signals_common.signals[sig_identifier]["sigstate"]).rpartition('.')[-1])
+        signals_common.signals[sig_identifier]["extcallback"](sig_identifier,signals_common.sig_callback_type.sig_updated)
+    return()
+
+#--------------------------------------------------------------------------------------------------------
+
 def on_message(mqtt_client, obj, msg):
     global logging
     global node_config
     global received_dcc_commands
-    # Unpack the json message so we can extract the contents
-    unpacked_json = json.loads(msg.payload)
-    if node_config["enhanced_debugging"]:
-        logging.debug("MQTT-Client: Successfully parsed received message:"+str(unpacked_json))
+    # Put some basic exception handling around the Json unpacking
+    try:
+        # Unpack the json message so we can extract the contents
+        unpacked_json = json.loads(msg.payload)
+    except Exception as exception:
+        # Note - this will be expected when a remote node shuts down and publishes
+        # a Null message to each topic to purge the broker queues of retained messages
+        logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
+    else:
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Successfully parsed received message:"+str(unpacked_json))
+            
+        # Process the messages according to the Topic they were received against - note that we
+        # will only be subscribed to topics associated with our unique-to-us network identifier
         
-    # Process the messages according to the Topic they were received against - note that we
-    # will only be subscribed to topics associated with our unique-to-us network identifier
-    
-    if msg.topic.startswith("dcc_accessory_short_event"):
-        source_node,dcc_address,dcc_state = unpacked_json
-        # We can't implement logic to process DCC commands only if "something has changed" in terms of the state of an address
-        # as we may have Event Driven signals (e.g. TrainTech) which rely on sending different states to different addresses
-        # to change the aspects (e.g. transition from CAUTION => PROCEED may be AddressX => TRUE and then PROCEED => CAUTION
-        # may be AddressY => TRUE so toggling between them would not be detected as a "change". This does mean that following
-        # disconnection/reconnection events we may get a flood od DCC messages that we have to process in turn
-        if dcc_state: 
-            logging.debug ("MQTT-Client: Received ASON command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
-        else:
-            logging.debug ("MQTT-Client: Received ASOF command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
-        # Forward the received DCC command on to the Pi-Sprog Interface (for transmission on the DCC Bus)
-        pi_sprog_interface.send_accessory_short_event(dcc_address,dcc_state)
-        
-    elif msg.topic.startswith("signal_updated_event"):
-        sig_identifier,signal_state = unpacked_json
-        # Only process the updated event if the state has changed - this is primarily to handle client re-connection
-        # events (following an unexpected disconnection) where we will immediately receive all retained messages
-        # on the topics we have re-subscribed to - even if we have already received them prior to the disconnection
-        # Note that we receive the "Value" of the enumeration signal_state type rather than the descriptor
-        if signals_common.signals[sig_identifier]["sigstate"] != signals_common.signal_state_type(signal_state): 
-            signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type(signal_state)
-            logging.info ("Signal "+sig_identifier+": Received signal state from MQTT Broker")
-            # Raise the callback in the main tkinter thread (as long as we know the main root window) to make
-            # it all threadsafe - Or as a fallback raise a callback in the current mqtt event thread
+        if msg.topic.startswith("dcc_accessory_short_event"):
+            source_node,dcc_address,dcc_state = unpacked_json
+            # We can't implement logic to process DCC commands only if "something has changed" in terms of the state of an address
+            # as we may have Event Driven signals (e.g. TrainTech) which rely on sending different states to different addresses
+            # to change the aspects (e.g. transition from CAUTION => PROCEED may be AddressX => TRUE and then PROCEED => CAUTION
+            # may be AddressY => TRUE so toggling between them would not be detected as a "change". This does mean that following
+            # disconnection/reconnection events we may get a flood od DCC messages that we have to process in turn.
+            if dcc_state: 
+                logging.debug ("MQTT-Client: Received ASON command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+            else:
+                logging.debug ("MQTT-Client: Received ASOF command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+            # Forward the received DCC command on to the Pi-Sprog Interface (for transmission on the DCC Bus)
+            # As the Pi-Sprog interface uses a seperate thread and an event queue to send messages then
+            # we don't need to worry about executing this function in the main tkinter thread
+            pi_sprog_interface.send_accessory_short_event(dcc_address,dcc_state)
+            
+        elif msg.topic.startswith("signal_updated_event"):
+            # Process the message in the main tkinter thread (as long as we know the main root window) to make
+            # everything threadsafe - or as a fallback raise a callback in the current mqtt event thread.
             if common.root_window is not None:
+                common.execute_function_in_tkinter_thread(lambda:process_signal_updated_event(unpacked_json))
+            else:    
+                process_signal_updated_event(unpacked_json)
+
+        elif msg.topic.startswith("signal_passed_event"):
+            sig_identifier, = unpacked_json
+            # A signal passed event is an event in time - therefore these are not sent to the broker as retained messages
+            # and therefore we don't need to do anything specific to handle disconnection/re-connection events - if we've
+            # missed a signal passed event whilst we've been disconnected then its just bad luck!
+            logging.info ("Signal "+sig_identifier+": Received \'signal passed\' event from MQTT Broker")
+            if common.root_window is not None:
+                # Raise the callback in the main tkinter thread (as long as we know the main root window) to make
+                # it all threadsafe - Or as a fallback raise a callback in the current mqtt event thread
                 common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
-                                                (sig_identifier,signals_common.sig_callback_type.sig_updated))
+                                                (sig_identifier,signals_common.sig_callback_type.sig_passed))
             else:    
                 signals_common.signals[sig_identifier]["extcallback"](sig_identifier,signals_common.sig_callback_type.sig_updated)
-
-    elif msg.topic.startswith("signal_passed_event"):
-        sig_identifier, = unpacked_json
-        # A signal passed event is an event in time - therefore these are not sent to the broker as retained messages
-        # and therefore we don't need to do anything specific to handle disconnection/re-connection events - if we've
-        # missed a signal passed event whilst we've been disconnected then its just bad luck!
-        logging.info ("Signal "+sig_identifier+": Received \'signal passed\' event from MQTT Broker")
-        if common.root_window is not None:
-            # Raise the callback in the main tkinter thread (as long as we know the main root window) to make
-            # it all threadsafe - Or as a fallback raise a callback in the current mqtt event thread
-            common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
-                                            (sig_identifier,signals_common.sig_callback_type.sig_passed))
-        else:    
-            signals_common.signals[sig_identifier]["extcallback"](sig_identifier,signals_common.sig_callback_type.sig_updated)
 
     return()
 
@@ -243,6 +251,7 @@ def on_message(mqtt_client, obj, msg):
 def configure_networking (broker_host:str,
                           network_identifier:str,
                           node_identifier:str,
+                          broker_port:int = 1883,
                           broker_username:str = None,
                           broker_password:str = None,
                           publish_dcc_commands:bool = False,
@@ -251,16 +260,16 @@ def configure_networking (broker_host:str,
     global node_config
     global mqtt_client
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
+    mqtt_client = paho.mqtt.client.Client(clean_session=True)
+    mqtt_client.on_message = on_message    
+    mqtt_client.on_connect = on_connect    
+    mqtt_client.on_disconnect = on_disconnect    
+    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
+    if mqtt_enhanced_debugging: mqtt_client.on_log = on_log
+    if broker_username is not None: mqtt_client.username_pw_set(username=broker_username,password=broker_password)
     # Do some basic exception handling around opening the broker connection
     try:
-        mqtt_client = paho.mqtt.client.Client(clean_session=True)
-        mqtt_client.on_message = on_message    
-        mqtt_client.on_connect = on_connect    
-        mqtt_client.on_disconnect = on_disconnect    
-        if mqtt_enhanced_debugging: mqtt_client.on_log = on_log
-        if broker_username is not None: mqtt_client.username_pw_set(username=broker_username,password=broker_password)
-        mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
-        mqtt_client.connect(broker_host, keepalive = 10)
+        mqtt_client.connect(broker_host,port=broker_port,keepalive = 10)
         mqtt_client.loop_start()
     except Exception as exception:
         logging.error("MQTT-Client: Failed to connect to broker - "+str(exception))
@@ -277,10 +286,47 @@ def configure_networking (broker_host:str,
                 break
         if not node_config["connected_to_broker"]:
             logging.error("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
-        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
-        # to set up any subscriptions or publish any messages to the broker. We shouldn't need to do this but
-        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
-        time.sleep(0.1)
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Externally called function to perform a gracefull shutdown of the MQTT networking
+# in terms of clearing out the publish topic queues (by sending null messages)
+#-----------------------------------------------------------------------------------------------
+
+def mqtt_shutdown():
+    global logging
+    global node_config
+    global mqtt_client
+    # Only shut down the mqtt networking if we configured it in the first place
+    if node_config["network_configured"]:
+        logging.info("MQTT-Client: Clearing message queues and shutting down")
+        # Clean out the message queues on the broker by publishing null messages (empty strings)
+        # to each of the topics that we have sent messages to during the lifetime of the session
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Cleaning up Signal Update message topics")
+        # Clear out the Signal Update event topics
+        for sig_id in node_config["signals_to_publish_state_changes"]:
+            sig_identifier = create_remote_signal_identifier(sig_id,node_config["node_identifier"])
+            message_topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
+            mqtt_client.publish(message_topic,payload=None,retain=True,qos=1)
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Cleaning up DCC Address message topics")
+        # Clear out the DCC Address event topics
+        for dcc_address in node_config["list_of_published_dcc_addresses"]:
+            message_topic = ( "dcc_accessory_short_event/"+node_config["network_identifier"]
+                                +"/"+node_config["node_identifier"]+"/"+str(dcc_address) )
+            mqtt_client.publish(message_topic,payload=None,retain=True,qos=1)
+        # Wait for everything to be published to the broker (we'll just use a sleep)
+        time.sleep(0.5)
+        mqtt_client.disconnect()
+        # Wait for disconnection acknowledgement (from on-disconnect callback function)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 5:
+            if not node_config["connected_to_broker"]:
+                break
+        if node_config["connected_to_broker"]:
+            logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
+        mqtt_client.loop_stop()
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -426,6 +472,10 @@ def publish_accessory_short_event(address:int, active:bool):
         if node_config["enhanced_debugging"]:
             logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,retain=True,qos=1)
+        # Maintain a list of all DCC addresses we have published. This is so we can purge the message
+        # queues on the broker (each DCC address is mapped to a topic) during a graceful shutdown
+        if address not in node_config["list_of_published_dcc_addresses"]:
+            node_config["list_of_published_dcc_addresses"].append(address)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -439,7 +489,8 @@ def publish_signal_state(sig_id:int):
     # Only publish the message if we have configured the MQTT network (successfully
     # established a connection to the broker) and set the signal to publish updates 
     if node_config["network_configured"] and sig_id in node_config["signals_to_publish_state_changes"]:
-        logging.info ("Signal "+str(sig_id)+": Publishing signal state update to MQTT Broker")
+        logging.info ("Signal "+str(sig_id)+": Publishing signal state update to MQTT Broker: "+
+                      str(signals_common.signals[str(sig_id)]["sigstate"]).rpartition('.')[-1])
         # The Sig-Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
         sig_identifier = create_remote_signal_identifier(sig_id,node_config["node_identifier"])
         # Encode the Message into JSON format (we send the "Value" of the enumeration signal_state type)

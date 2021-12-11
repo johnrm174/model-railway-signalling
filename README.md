@@ -1,9 +1,10 @@
 # model-railway-signalling
-A model railway signalling library written in Python for the Raspberry Pi with a DCC control of Signals and Points and train 
+A model railway signalling library written in Python for the Raspberry Pi with DCC control of Signals and Points and train 
 detection via the GPIO ports on the Pi. For details of the "Public" API - scroll down the page
 
 A simple interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
 The GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
+A MQTT interface enables multiple signalling applications to be networked together, sharing signal states and other events
 
 All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
@@ -610,6 +611,7 @@ configure_networking - Configures the local MQTT broker client and establishes a
       network_identifier:str - The name to use for our signalling network (can be any string)
       node_identifier:str - The name to use for this particular node on the network (can be any string)
   Optional Parameters:
+      broker_port:int - The network port for the broker host (default = 1883)
       broker_username:str - the username to log into the MQTT Broker (default = None)
       broker_password:str - the password to log into the MQTT Broker (default = None)
       publish_dcc_commands:bool - True to publish all DCC commands to the Broker (default = False)

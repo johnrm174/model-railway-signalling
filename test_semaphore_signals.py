@@ -196,7 +196,6 @@ def print_subsidary_state():
 def toggle_signals():
     print ("")
     print ("Toggling All Signals")
-    print ("Errors will be raised for Signals 11-13 and 118,119 as they are automatic signals")
     print ("Error will be raised for Signal 25 as it doesn't exist")
     print ("Errors will also be raised when setting a route non-supported by the signal (i.e. no main arm exists for the route)")
     for I in range(1,26):toggle_signal(I)

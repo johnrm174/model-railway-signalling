@@ -263,10 +263,13 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
         # if the above works (doesn't raise an exception) then we know the serial port has been opened
         serial_port_opened = True
         # Start the threads to send/receive buffered responses from the PI-SPROG
-        thread = threading.Thread (target=thread_to_read_received_data)
-        thread.start()
-        thread = threading.Thread (target=thread_to_send_buffered_data)
-        thread.start()
+        # We set them as Daemon threads so they will terminate with the main programme
+        rx_thread = threading.Thread (target=thread_to_read_received_data)
+        rx_thread.setDaemon(True)
+        rx_thread.start()
+        tx_thread = threading.Thread (target=thread_to_send_buffered_data)
+        tx_thread.setDaemon(True)
+        tx_thread.start()
         # If enhanced debugging is selected, we'll query the status of the command station
         if debug:
             logging.info ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
