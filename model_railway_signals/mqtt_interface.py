@@ -194,9 +194,10 @@ def on_message(mqtt_client, obj, msg):
         # Unpack the json message so we can extract the contents
         unpacked_json = json.loads(msg.payload)
     except Exception as exception:
-        # Note - this will be expected when a remote node shuts down and publishes
-        # a Null message to each topic to purge the broker queues of retained messages
-        logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
+        # Note - we will also get an exception when a remote node shuts down and publishes
+        # a 'None' message to each topic (to purge the broker queues of retained messages_
+        # So we only log the error message if the message payload is not empty (i.e. for other cases)
+        if msg.payload: logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
         if node_config["enhanced_debugging"]:
             logging.debug("MQTT-Client: Successfully parsed received message:"+str(unpacked_json))
@@ -317,15 +318,18 @@ def mqtt_shutdown():
                                 +"/"+node_config["node_identifier"]+"/"+str(dcc_address) )
             mqtt_client.publish(message_topic,payload=None,retain=True,qos=1)
         # Wait for everything to be published to the broker (we'll just use a sleep)
-        time.sleep(0.5)
-        mqtt_client.disconnect()
-        # Wait for disconnection acknowledgement (from on-disconnect callback function)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 5:
-            if not node_config["connected_to_broker"]:
-                break
         if node_config["connected_to_broker"]:
-            logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
+            time.sleep(0.5)
+            mqtt_client.disconnect()
+            # Wait for disconnection acknowledgement (from on-disconnect callback function)
+            timeout_start = time.time()
+            while time.time() < timeout_start + 5:
+                if not node_config["connected_to_broker"]:
+                    break
+            if node_config["connected_to_broker"]:
+                logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
+        else:
+            logging.error("MQTT-Client: Broker already disconnected - Shutting down anyway")
         mqtt_client.loop_stop()
     return()
 
