@@ -465,7 +465,7 @@ create_semaphore_signal (canvas,10,950,250,
                         approach_release_button =True,
                         sig_passed_button = True )
 
-create_semaphore_signal (canvas,0,950,250,
+create_semaphore_signal (canvas,110,950,250,
                         orientation = 180,
                         sig_callback = main_callback_function,
                         distant = True,
