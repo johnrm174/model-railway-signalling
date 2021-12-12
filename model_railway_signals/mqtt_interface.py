@@ -40,7 +40,7 @@
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the signal state feed
 #       sig_callback:name - Function to call when a signal state update is received from the remote node
-#                    Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+#                    Note that the callback function returns (item_identifier, sig_callback_type.sig_updated)
 #                    Where Item Identifier is a string in the following format "<node>-<sig_id>"
 #       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 #
@@ -129,7 +129,7 @@ def on_disconnect(mqtt_client, userdata, rc):
     if rc==0:
         logging.info("MQTT-Client: Broker connection terminated")
     else:
-        logging.warning("MQTT-Client: Unexpected Disconnection from MQTT Broker")
+        logging.warning("MQTT-Client: Unexpected disconnection from broker")
     node_config["connected_to_broker"] = False
     return()
 
@@ -273,7 +273,7 @@ def configure_networking (broker_host:str,
         mqtt_client.connect(broker_host,port=broker_port,keepalive = 10)
         mqtt_client.loop_start()
     except Exception as exception:
-        logging.error("MQTT-Client: Failed to connect to broker - "+str(exception))
+        logging.error("MQTT-Client: Error connecting to broker: "+str(exception)+" - No messages will be published/received")
     else:
         node_config["enhanced_debugging"] = mqtt_enhanced_debugging
         node_config["network_identifier"] = network_identifier
@@ -318,18 +318,15 @@ def mqtt_shutdown():
                                 +"/"+node_config["node_identifier"]+"/"+str(dcc_address) )
             mqtt_client.publish(message_topic,payload=None,retain=True,qos=1)
         # Wait for everything to be published to the broker (we'll just use a sleep)
+        time.sleep(0.5)
+        mqtt_client.disconnect()
+        # Wait for disconnection acknowledgement (from on-disconnect callback function)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 5:
+            if not node_config["connected_to_broker"]:
+                break
         if node_config["connected_to_broker"]:
-            time.sleep(0.5)
-            mqtt_client.disconnect()
-            # Wait for disconnection acknowledgement (from on-disconnect callback function)
-            timeout_start = time.time()
-            while time.time() < timeout_start + 5:
-                if not node_config["connected_to_broker"]:
-                    break
-            if node_config["connected_to_broker"]:
-                logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
-        else:
-            logging.error("MQTT-Client: Broker already disconnected - Shutting down anyway")
+            logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
         mqtt_client.loop_stop()
     return()
 
