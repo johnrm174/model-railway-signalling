@@ -4,7 +4,7 @@ detection via the GPIO ports on the Pi. For details of the "Public" API - scroll
 
 A simple interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
 The GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
-A MQTT interface enables multiple signalling applications to be networked together, sharing signal states and other events
+A MQTT interface enables multiple signalling applications to be networked together, sharing signal and track section states.
 
 All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
@@ -386,7 +386,8 @@ approach_control_set (sig_id) - returns if the signal is subject to approach con
 ## Track Occupancy Functions
 <pre>
 section_callback_type (tells the calling program what has triggered the callback):
-    section_callback_type.section_switched - The section has been toggled (occupied/clear) by the user
+     section_callback_type.section_switched - The section has been toggled by the user
+     section_callback_type.section_updated - The section label has been updated by the user
 
 create_section - Creates a Track Occupancy section object
   Mandatory Parameters:
@@ -396,13 +397,18 @@ create_section - Creates a Track Occupancy section object
   Optional Parameters:
       section_callback - The function to call if the section is manually toggled - default: null
                         Note that the callback function returns (item_id, callback type)
-      label - The label to display on the section when occupied - default: "Train On Line"
+      label - The label to display on the section when occupied - default: "OCCUPIED"
 
 section_occupied (section_id)- Returns the current state of the section (True=Occupied, False=Clear)
 
-set_section_occupied (section_id) - Sets the specified section to "occupied"
+set_section_occupied (section_id) - Sets the specified section to "OCCUPIED"
+  Mandatory Parameters:
+      section_id:int - The ID to be used for the section 
+  Optional Parameters:
+      label - An updated label to display when occupied - default: No Change
 
-clear_section_occupied (section_id)- Sets the specified section to "clear"
+clear_section_occupied (section_id) - Sets the specified section to "CLEAR"
+                  returns the current value of the Section Lable (as a string)
 </pre>
 
 ## Track Sensor Functions
@@ -421,7 +427,6 @@ create_sensor - Creates a sensor object
       signal_approach:int  - Raise an "approach release" event for the specified signal ID when triggered - default = None
       sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
                                   Note that the callback function returns (item_id, callback type)
-
 
 sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
 </pre>
@@ -626,7 +631,7 @@ subscribe_to_signal_updates - Subscribe to a signal update feed for a specified 
   Mandatory Parameters:
       node:str - The name of the node publishing the signal state feed
       sig_callback:name - Function to call when a signal state update is received from the remote node
-                   Note that the callback function returns (item_identifier, sig_callback_type.sig_passed)
+                   Note that the callback function returns (item_identifier, sig_callback_type.sig_updated)
                    Where Item Identifier is a string in the following format "<node>-<sig_id>"
       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 

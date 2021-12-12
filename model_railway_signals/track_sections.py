@@ -2,7 +2,8 @@
 # This module is used for creating and managing Track Occupancy objects (sections)
 #
 # section_callback_type (tells the calling program what has triggered the callback):
-#     section_callback_type.section_switched - The section has been toggled (occupied/clear) by the user
+#     section_callback_type.section_switched - The section has been toggled by the user
+#     section_callback_type.section_updated - The section label has been updated by the user
 # 
 # create_section - Creates a Track Occupancy section object
 #   Mandatory Parameters:
@@ -11,7 +12,7 @@
 #       x:int, y:int - Position of the section on the canvas (in pixels)
 #       section_callback - The function to call if the section is manually toggled - default: null
 #                         Note that the callback function returns (item_id, callback type)
-#       label - The label to display on the section when occupied - default: "Train On Line"
+#       label - The label to display on the section when occupied - default: "OCCUPIED"
 # 
 # section_occupied (section_id)- Returns the current state of the section (True=Occupied, False=Clear)
 # 
@@ -19,7 +20,7 @@
 #   Mandatory Parameters:
 #       section_id:int - The ID to be used for the section 
 #   Optional Parameters:
-#       label - The label to display on the section when occupied - default: No Change
+#       label -  An updated label to display when occupied - default: No Change
 # 
 # clear_section_occupied (section_id) - Sets the specified section to "clear"
 #                   returns the current value of the Section Lable (as a string)
@@ -37,7 +38,8 @@ import logging
     
 # Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
-    section_switched = 21   # The section has been manually switched by the user
+    section_switched = 21   # The section has been toggled by the user
+    section_updated = 22   # The section label has been updated the user
     
 # -------------------------------------------------------------------------
 # sections are to be added to a global dictionary when created
@@ -109,6 +111,7 @@ def update_identifier(section_id):
     global sections 
     global text_entry_box
     global entry_box_window
+    logging.info ("Section "+str(section_id)+": Track Section Label Updated ***********************")
     # Set the new label for the section button and set the width to the width it was created with
     # If we get back an empty string then set the label back to the default (OCCUPIED)
     new_section_label =text_entry_box.get()
@@ -116,9 +119,13 @@ def update_identifier(section_id):
     sections[str(section_id)]["button1"]["text"] = new_section_label
     sections[str(section_id)]["button1"].config(width=sections[str(section_id)]["labellength"])
     # Assume that by entering a value the user wants to set the section to OCCUPIED
-    if not sections[str(section_id)]["occupied"]: toggle_section(section_id)
-    # Make an external callback to indicate something has changed
-    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_switched)
+    if not sections[str(section_id)]["occupied"]:
+        toggle_section(section_id)
+        # Make an external callback to indicate the section has been switched
+        sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_switched)
+    else:
+        # Make an external callback to indicate the section label has been updated
+        sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     # Clean up by destroying the entry box and the window we created it in
     text_entry_box.destroy()
     sections[str(section_id)]["canvas"].delete(entry_box_window)
