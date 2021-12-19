@@ -156,7 +156,7 @@ def map_dcc_signal (sig_id:int,
     global logging
     
     # Do some basic validation on the parameters we have been given
-    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping")
+    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a colour light signal")
     if sig_mapped(sig_id):
         logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
     elif sig_id < 1:
