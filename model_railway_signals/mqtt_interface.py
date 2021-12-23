@@ -175,7 +175,8 @@ def process_signal_updated_event(unpacked_json):
     # Note that we receive the "Value" of the enumeration signal_state type rather than the descriptor
     if signals_common.signals[sig_identifier]["sigstate"] != signals_common.signal_state_type(signal_state): 
         signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type(signal_state)
-        logging.info ("Signal "+sig_identifier+": Received updated state from MQTT Broker: "+
+        logging.info ("Signal "+str(sig_identifier)+": Received Remote Signal State Update *****************************")
+        logging.info ("Signal "+sig_identifier+": Aspect has changed to : "+
                         str(signals_common.signals[sig_identifier]["sigstate"]).rpartition('.')[-1])
         signals_common.signals[sig_identifier]["extcallback"](sig_identifier,
                                 signals_common.sig_callback_type.sig_updated)
@@ -188,9 +189,12 @@ def process_section_updated_event(unpacked_json):
     if (track_sections.sections[section_identifier]["occupied"] != section_state or
               track_sections.sections[section_identifier]["labeltext"] != section_label ): 
         track_sections.sections[section_identifier]["occupied"] = section_state
-        track_sections.sections[section_identifier]["labeltext"] = section_label 
-        logging.info ("Section "+section_identifier+": Received updated state from MQTT Broker"
-                        +"- OCCUPIED:  "+ str(section_state) + "    LABEL: "+ section_label)
+        track_sections.sections[section_identifier]["labeltext"] = section_label
+        logging.info ("Section "+section_identifier+": Received Remote Section Update ***********************************")
+        if section_state:
+            logging.info ("Section "+str(section_identifier)+": Has changed to OCCUPIED - Label \'"+section_label+"\'")
+        else:
+            logging.info ("Section "+str(section_identifier)+": Has changed to CLEAR - Label \'"+section_label+"\'")
         track_sections.sections[section_identifier]["extcallback"](section_identifier,
                                   track_sections.section_callback_type.section_updated)
     return()
@@ -260,7 +264,7 @@ def on_message(mqtt_client, obj, msg):
         #--------------------------------------------------------------
         elif msg.topic.startswith("signal_passed_event"):
             sig_identifier, = unpacked_json
-            logging.info ("Signal "+sig_identifier+": Received \'signal passed\' event from MQTT Broker")
+            logging.info("Signal "+sig_identifier+": Received Remote Signal Passed Event ******************************")
             if common.root_window is not None:
                 common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
                                                 (sig_identifier,signals_common.sig_callback_type.sig_passed))
@@ -577,8 +581,7 @@ def publish_signal_state(sig_id:int):
     global mqtt_client
     # Only publish the state if the network is configured and the signal is set to publish updates 
     if node_config["network_configured"] and sig_id in node_config["signals_to_publish_state_changes"]:
-        logging.info ("Signal "+str(sig_id)+": Publishing state to MQTT Broker: "+
-                      str(signals_common.signals[str(sig_id)]["sigstate"]).rpartition('.')[-1])
+        logging.info ("Signal "+str(sig_id)+": Publishing state to MQTT Broker")
         # The Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
         sig_identifier = create_remote_item_identifier(sig_id,node_config["node_identifier"])
         # Encode the Message into JSON format (we send the "Value" of the enumeration signal_state type)
@@ -587,8 +590,7 @@ def publish_signal_state(sig_id:int):
         # We use a different topic for every signal so we can use "retained" messages to ensure when the
         # subscribing application starts up it will always receive the latest "state" of each signal
         message_topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
-        if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,retain=True,qos=1)
     return()
 
@@ -600,11 +602,9 @@ def publish_section_state(sec_id:int):
     global logging
     global node_config
     global mqtt_client
-    # Only publish the state if the network is configured and the section is set to publish updates 
+    # Only publish the state if the network is configured and the section is set to publish updates
     if node_config["network_configured"] and sec_id in node_config["sections_to_publish_state_changes"]:
-        logging.info ("Section "+str(sec_id)+": Publishing state to MQTT Broker "
-                      +"- OCCUPIED: "+str(track_sections.sections[str(sec_id)]["occupied"])
-                      +", LABEL: "+str(track_sections.sections[str(sec_id)]["labeltext"]))
+        logging.info ("Section "+str(sec_id)+": Publishing state to MQTT Broker")
         # The Identifier for a remote section is a string combining the the Node-ID and Sec-ID.
         section_identifier = create_remote_item_identifier(sec_id,node_config["node_identifier"])
         # Encode the Message into JSON format
@@ -615,8 +615,7 @@ def publish_section_state(sec_id:int):
         # We use a different topic for each section so we can use "retained" messages to ensure when the
         # subscribing application starts up it will always receive the latest "state" change
         message_topic = "section_updated_event/"+node_config["network_identifier"]+"/"+section_identifier
-        if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,retain=True,qos=1)
     return()
 
@@ -638,8 +637,7 @@ def publish_signal_passed_event(sig_id:int):
         # Publish to the appropriate topic: "signal_updated_event/<network-ID>/<sig_identifier>"
         # As these are transitory events - we do not publish to the Broker as "retained messages"
         message_topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+signal_identifier
-        if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,qos=1)
     return()
 

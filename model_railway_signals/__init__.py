@@ -38,6 +38,7 @@ from .signals import trigger_timed_signal
 from .track_sections import section_callback_type
 from .track_sections import create_section
 from .track_sections import section_occupied
+from .track_sections import section_label
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
 
@@ -110,6 +111,7 @@ __all__ = [
       # Public track_section functions
         'create_section',
         'section_occupied',
+        'section_label',
         'set_section_occupied',
         'clear_section_occupied',
       # public track_sensor types

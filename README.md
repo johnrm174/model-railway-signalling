@@ -1,16 +1,16 @@
 # model-railway-signalling
-A model railway signalling library written in Python for the Raspberry Pi with DCC control of Signals and Points and train 
-detection via the GPIO ports on the Pi. For details of the "Public" API - scroll down the page
+A model railway signalling library written in Python primarily intended for the Raspberry Pi, but will run on other platforms 
+(albeit without some of the external interfacing functions). For details of the "Public" API - scroll down the page
 
-A simple interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
-The GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
+An interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
+A GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
 A MQTT interface enables multiple signalling applications to be networked together, sharing signal and track section states.
 
 All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
 fully prototypical signalling schemes to be developed. The signals and points opjects can be easily mapped to one or more DCC 
 addresses in a manner that should be compatible with the majority of DCC signal/points decoders currently on the market. 
-Track sensors can also be easily integrated (via the Raspberry Pi's GPIO interface) to enable full automatic control.
+Track sensors can also be easily integrated to provide 'signal passed' events, enabling full automatic control.
 
 Most types of colour light signals, semaphore signals, ground position light signals and ground disc signals are supported.
 
@@ -97,7 +97,7 @@ point_callback_type (tells the calling program what has triggered the callback):
 create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
                make up the point (so calling programs can later update them if required (e.g. change 
                the colour of the lines to represent the route that has been set up)
-               Returned list comprises: [straight blade, switched blade, straight route ,switched route]
+             - Returned list comprises: [straight blade, switched blade, straight route ,switched route]
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
       point_id:int - The ID for the point - also displayed on the point button
@@ -113,19 +113,18 @@ create_point - Creates a point object and returns a list of the tkinter drawing 
       also_switch:int - the Id of another point to automatically switch with this point - Default none
       auto:bool - If the point is to be fully automatic (e.g switched by another point) - Default False.
 
-lock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+lock_point(*point_id:int) - use for point/signal interlocking (multiple Point_IDs can be specified)
 
-unlock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+unlock_point(*point_id:int) - use for point/signal interlocking (multiple Point_IDs can be specified)
 
-toggle_point(point_id) - use for route setting (can use 'point_switched' to find the state first)
+toggle_point(point_id:int) - use for route setting (can use 'point_switched' to find the state first)
 
-toggle_fpl(point_id) - use for route setting (can use 'fpl_active' to find the state first)
+toggle_fpl(point_id:int) - use for route setting (can use 'fpl_active' to find the state first)
 
-point_switched (point_id) - returns the state of the point (True/False) - to support point/signal interlocking
+point_switched (point_id:int) - returns the state of the point (True/False) - to support point/signal interlocking
 
-fpl_active (point_id) - returns the state of the FPL (True/False) - to support point/signal interlocking
-                      - Will always return True if the point does not have a Facing point Lock - to enable full 
-                      - interlocking logic to be written for layouts but then inhibited for simplified control 
+fpl_active (point_id:int) - returns the state of the FPL (True/False) - to support point/signal interlocking
+                          - Will always return True if the point does not have a Facing point Lock 
 </pre>
 
 ## Signal Functions
@@ -317,39 +316,38 @@ update_signal - update the signalaspect based on the aspect of a signal ahead - 
   Optional Parameters:
       sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to update.
                Either an integer representing the ID of the signal created on our schematic,
-               or a string representing the identifier of an signal on an external host/node
-               (subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
+               or a string representing the identifier of an signal on an external MQTT node
                Default = "None" (no signal ahead to take into account when updating the signal)
 
-toggle_signal(sig_id) - to support route setting (use 'signal_clear' to find the switched state )
+toggle_signal(sig_id:int) - to support route setting (use 'signal_clear' to find the switched state)
 
-toggle_subsidary(sig_id) - to support route setting (use 'subsidary_clear' to find the switched state)
+toggle_subsidary(sig_id:int) - to support route setting (use 'subsidary_clear' to find the switched state)
 
-lock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+lock_signal(*sig_id:int) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-unlock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+unlock_signal(*sig_id:int) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-lock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+lock_subsidary(*sig_id:int) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-unlock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+unlock_subsidary(*sig_id:int) - for point/signal interlocking (multiple Signal_IDs can be specified)
 
-signal_clear(sig_id) - returns the SWITCHED state of the signal - i.e the state of the signal button
+signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the signal button
                        (True='OFF') - use for external point/signal interlocking functions
 
-subsidary_clear(sig_id) - returns the SWITCHED state of the subsidary - i.e the state of the subsidary
+subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary - i.e the state of the subsidary
                         button (True='OFF') - use for external point/signal interlocking functions
 
-signal_state(sig_id) - returns the DISPLAYED state of the signal - This can be different to the SWITCHED
-                       state of the signal if the signal is OVERRIDDEN or subject to APPROACH CONTROL
-                       Use this function when you need to get the actual state (in terms of aspect)
-                       that the signal is displaying - returns 'signal_state_type' (see above)
+signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal - which can be different to
+                       the SWITCHED state if the signal is OVERRIDDEN or subject to APPROACH CONTROL.
+                       - Use this function when you need to get the actual state (in terms of aspect)
+                       that the signal is displaying - returns 'signal_state_type' (see above).
+                       - Note that for this function, the sig_id can be specified either as an integer 
+                       (representing the ID of a signal on the localschematic), or a string (representing
+                       the identifier of an signal on an external MQTT node)
 
-set_signal_override (sig_id*) - Overrides the signal to DANGER (can specify multiple sig_ids)
+set_signal_override (sig_id*:int) - Overrides the signal to DANGER (can specify multiple sig_ids)
 
-clear_signal_override (sig_id*) - Reverts signal to the non-overridden state (can specify multiple sig_ids)
-
-signal_overridden (sig_id) - returns the signal override state (True='overridden')
-              Function DEPRECATED (will be removed from future releases) - use signal_state instead
+clear_signal_override (sig_id*:int) - Reverts signal to the non-overridden state (can specify multiple sig_ids)
 
 trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
                       - If a start delay > 0 is specified then a 'sig_passed' callback event is generated
@@ -379,7 +377,10 @@ clear_approach_control - This "releases" the signal to display the normal aspect
                          was created) is activated - manually or via an external sensor event
       sig_id:int - The ID for the signal
 
-approach_control_set (sig_id) - returns if the signal is subject to approach control (True='active')
+signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
+                 Function DEPRECATED (will be removed from future releases) - use signal_state instead
+
+approach_control_set (sig_id:int) - returns if the signal is subject to approach control (True='active')
                  Function DEPRECATED (will be removed from future releases) - use signal_state instead
 </pre>
 
@@ -397,18 +398,36 @@ create_section - Creates a Track Occupancy section object
   Optional Parameters:
       section_callback - The function to call if the section is manually toggled - default: null
                         Note that the callback function returns (item_id, callback type)
-      label - The label to display on the section when occupied - default: "OCCUPIED"
+      label:str - The label to display on the section when occupied - default: "OCCUPIED"
 
-section_occupied (section_id)- Returns the current state of the section (True=Occupied, False=Clear)
+section_occupied (section_id:int/str)- Returns the current state of the section (True=Occupied)
+                  - Note that for this function, the section_id can be specified either as an integer 
+                    (representing the ID of a signal on the local schematic), or a string (representing
+                    the identifier of an signal on an external MQTT node)
 
-set_section_occupied (section_id) - Sets the specified section to "OCCUPIED"
+section_label (section_id:int/str)- Returns the 'label' of the section (as a string)
+                  - Note that for this function, the section_id can be specified either as an integer 
+                    (representing the ID of a signal on the local schematic), or a string (representing
+                    the identifier of an signal on an external MQTT node)
+
+set_section_occupied - Sets the specified section to "OCCUPIED" (and updates the 'label' if required)
   Mandatory Parameters:
       section_id:int - The ID to be used for the section 
   Optional Parameters:
-      label - An updated label to display when occupied - default: No Change
+      label:str - An updated label to display when occupied (if omitted the label will stay the same)
+      publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
+                   - Set to False if the Section has been configured to "mirror" a remote section
+                     subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 
-clear_section_occupied (section_id) - Sets the specified section to "CLEAR"
-                  returns the current value of the Section Lable (as a string)
+clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
+                     - returns the current value of the Section Lable (as a string) to allow this
+                       to be 'passed' to the next section via the set_section_occupied function)
+  Mandatory Parameters:
+      section_id:int - The ID to be used for the section 
+  Optional Parameters:
+      publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
+                   - Set to False if the Section has been configured to "mirror" a remote section
+                     subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 </pre>
 
 ## Track Sensor Functions
@@ -428,7 +447,7 @@ create_sensor - Creates a sensor object
       sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
                                   Note that the callback function returns (item_id, callback type)
 
-sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
+sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
 </pre>
 
 ## DCC Address Mapping Functions
@@ -587,9 +606,6 @@ request_dcc_power_off - sends a request to switch off the track power and waits 
 
 ## MQTT Networking Functions
 
-We're now in the realm of features that no one (including myself) will probably ever use but, hey its been fun 
-coding the feature and I've certainly learn't a lot about brokers for my next project
-
 These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
 multiple signalling applications (running on different computers) to share a single Pi-Sprog DCC interface
 and to share signal states and signal updated events across a MQTT broker network.
@@ -599,8 +615,9 @@ configure that node to "publish" its DCC command feed to the network and then co
 on a Raspberry Pi) to "subscribe" to the same DCC command feed and then forwarded to its local pi-Sprog DCC interface.
 
 You can also use these features to split larger layouts into multiple signalling areas whilst still being able to 
-implement a level of automation between them - primarily being aware of the "state" of remote signals (for updating
-signals based on the one ahead) and being notified when the remore signals have been passed (for track occupancy)
+implement a level of automation between them. Functions are provided to publishing and subscribing to the "state" 
+of signals (for updating signals based on the one ahead), the "state" of track occupancy sections (for "passing" 
+trains between signalling applications) and "signal passed" events (also for track occupancy)
 
 To use these networking functions, you can either set up a local MQTT broker on one of the host computers
 on your local network or alternatively use an 'open source' broker out there on the internet - I've been
@@ -623,9 +640,17 @@ configure_networking - Configures the local MQTT broker client and establishes a
       mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
 
 subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
-                        All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
+                    All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
   Mandatory Parameters:
       *nodes:str - The name of the node publishing the DCC command feed (multiple nodes can be specified)
+
+subscribe_to_section_updates - Subscribe to track section updates from another node on the network 
+  Mandatory Parameters:
+      node:str - The name of the node publishing the track section update feed(s)
+      sec_callback:name - Function to call when a section update is received from the remote node
+                   The callback function returns (item_identifier, section_callback_type.section_updated)
+                   where item_identifier is a string in the following format "<node>-<sec_id>",
+      *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
 
 subscribe_to_signal_updates - Subscribe to a signal update feed for a specified node/signal 
   Mandatory Parameters:
@@ -643,13 +668,19 @@ subscribe_to_signal_passed_events  - Subscribe to a signal passed event feed for
                    Where Item Identifier is a string in the following format "<node>-<sig_id>"
       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 
-set_signals_to_publish_state - Enable a feed of signal state updates for a specified signal. These will then
-               be automatically published to remote subscribers each time the state of the signal is changed
+set_sections_to_publish_state - Enable the publication of state updates for a specified track section.
+               All subsequent state changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *sec_ids:int - The track sections to publish (multiple Signal_IDs can be specified)
+
+set_signals_to_publish_state - Enable the publication of state updates for specified signals.
+               All subsequent state changes will be automatically published to remote subscribers
   Mandatory Parameters:
       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
 
-set_signals_to_publish_passed_events -  Enable a feed of signal updated events for a specified signal. These
-        will then be automatically published to remote subscribers each time a signal passed event is raised
+set_signals_to_publish_passed_events - Enable the publication of signal passed events for specified signals.
+               All subsequent events will be automatically published to remote subscribers
   Mandatory Parameters:
       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+
 </pre>

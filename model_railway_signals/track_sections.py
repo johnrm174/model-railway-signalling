@@ -9,22 +9,39 @@
 #       Canvas - The Tkinter Drawing canvas on which the section is to be displayed
 #       section_id:int - The ID to be used for the section 
 #       x:int, y:int - Position of the section on the canvas (in pixels)
+#   Optional Parameters:
 #       section_callback - The function to call if the section is manually toggled - default: null
 #                         Note that the callback function returns (item_id, callback type)
-#       label - The label to display on the section when occupied - default: "OCCUPIED"
+#       label:str - The label to display on the section when occupied - default: "OCCUPIED"
 # 
-# section_occupied (section_id)- Returns the current state of the section
-#                (Section Occupied = Value of the Section Label, Section Clear = False)
+# section_occupied (section_id:int/str)- Returns the current state of the section (True=Occupied, False=Clear)
+#                   - Note that for this function, the section_id can be specified either as an integer 
+#                     (representing the ID of a signal on the local schematic), or a string (representing
+#                     the identifier of an signal on an external MQTT node)
 # 
-# set_section_occupied (section_id) - Sets the specified section to "occupied"
+# section_label (section_id:int/str)- Returns the 'label' of the section (as a string)
+#                   - Note that for this function, the section_id can be specified either as an integer 
+#                     (representing the ID of a signal on the local schematic), or a string (representing
+#                     the identifier of an signal on an external MQTT node)
+# 
+# set_section_occupied - Sets the specified section to "OCCUPIED" (and updates the 'label' if required)
 #   Mandatory Parameters:
 #       section_id:int - The ID to be used for the section 
 #   Optional Parameters:
-#       label -  An updated label to display when occupied - default: No Change
+#       label:str - An updated label to display when occupied (if omitted the label will stay the same)
+#       publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
+#                    - Set to False if the Section has been configured to "mirror" a remote section
+#                      subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 # 
-# clear_section_occupied (section_id) - Sets the specified section to "clear"
-#                   returns the current value of the Section Lable (as a string)
-#
+# clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
+#                      - returns the current value of the Section Lable (as a string) to allow this
+#                        to be 'passed' to the next section via the set_section_occupied function)
+#   Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
+#   Optional Parameters:
+#       publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
+#                    - Set to False if the Section has been configured to "mirror" a remote section
+#                      subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 # --------------------------------------------------------------------------------
 
 from . import common
@@ -77,8 +94,12 @@ def section_exists(section_id:int):
 
 def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************")
+    logging.info ("Section "+str(section_id)+": Track Section Toggled ********************************************")
     toggle_section(section_id)
+    # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+    # be published if the MQTT interface has been configured for publishing updates for this track section
+    mqtt_interface.publish_section_state(section_id)
+    # Make the external callback (if one has been defined
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
 
@@ -92,19 +113,18 @@ def toggle_section (section_id:int):
     global logging
     if sections[str(section_id)]["occupied"]:
         # section is on
-        logging.info ("Section "+str(section_id)+": Changing to CLEAR")
+        logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label \'"
+                                         +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = False
         sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey40",
                                             activebackground="grey", activeforeground="grey40")
     else:
         # section is off
-        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED")
+        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label \'"
+                                         +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = True
         sections[str(section_id)]["button1"].config(relief="sunken", bg="black",fg="white",
                                             activebackground="black", activeforeground="white")
-    # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
-    # be published if the MQTT interface has been configured for publishing updates for this track section
-    mqtt_interface.publish_section_state(section_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -115,7 +135,7 @@ def update_identifier(section_id):
     global sections 
     global text_entry_box
     global entry_box_window
-    logging.info ("Section "+str(section_id)+": Track Section Label Updated ***********************")
+    logging.info ("Section "+str(section_id)+": Track Section Label Updated **************************************")
     # Set the new label for the section button and set the width to the width it was created with
     # If we get back an empty string then set the label back to the default (OCCUPIED)
     new_section_label =text_entry_box.get()
@@ -127,10 +147,9 @@ def update_identifier(section_id):
     # toggle_section function will also publish the section state & label changes to the MQTT Broker
     if not sections[str(section_id)]["occupied"]:
         toggle_section(section_id)
-    else:
-        # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
-        # be published if the MQTT interface has been configured for publishing updates for this track section
-        mqtt_interface.publish_section_state(section_id)
+    # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
+    # be published if the MQTT interface has been configured for publishing updates for this track section
+    mqtt_interface.publish_section_state(section_id)
     # Make an external callback to indicate the section has been switched
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     # Clean up by destroying the entry box and the window we created it in
@@ -188,7 +207,8 @@ def open_entry_box(section_id):
 
 def create_section (canvas, section_id:int, x:int, y:int,
                     section_callback = null_callback,
-                    label:str = "OCCUPIED"):
+                    label:str = "OCCUPIED",
+                    publish_on_creation:bool = True):
     global sections
     global logging
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
@@ -223,7 +243,10 @@ def create_section (canvas, section_id:int, x:int, y:int,
         section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         # Publish the initial section state to the broker (for other nodes to consume). Note that this will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        mqtt_interface.publish_section_state(section_id)
+        # We allow the publishing of the initial section state to be inhibited on creation. This is to cater
+        # for situations where the user is intending for a section on the local display to "mirror" a remote
+        # section (subscribed to via the MQTT broker) to eliminate possible race conditions on startup
+        if publish_on_creation: mqtt_interface.publish_section_state(section_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -239,35 +262,61 @@ def section_occupied (section_id:Union[int,str]):
     elif not sections[str(section_id)]["occupied"]:   
         occupied = False
     else:
-        occupied = sections[str(section_id)]["labeltext"]
+        occupied = True
     return(occupied)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the section
+# -------------------------------------------------------------------------
+
+def section_label (section_id:Union[int,str]):
+    global logging
+    # Validate the section exists
+    if not section_exists(section_id):
+        logging.error ("Section "+str(section_id)+": section_label - Section does not exist")
+        section_label=None
+    else:
+        section_label = sections[str(section_id)]["labeltext"]
+    return(section_label)
 
 # -------------------------------------------------------------------------
 # Externally called functions to Set and Clear a section
 # -------------------------------------------------------------------------
 
-def set_section_occupied (section_id:int,label:str=None):
+def set_section_occupied (section_id:int,label:str=None,publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")
     else:
-        # Update the lable to reflect the new state before toggling the section
-        # to ensure the updated state is published to any external nodes
-        if label is not None:
+        if not section_occupied(section_id):
+            # Need to toggle the section - ALSO update the label if that has been changed
+            if label is not None and sections[str(section_id)]["labeltext"] != label:
+                sections[str(section_id)]["button1"]["text"] = label
+                sections[str(section_id)]["labeltext"]= label
+            toggle_section(section_id)
+            # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+            # be published if the MQTT interface has been configured for publishing updates for this track section
+            if publish:mqtt_interface.publish_section_state(section_id)
+        elif label is not None and sections[str(section_id)]["labeltext"] != label:
+            # Section state remains unchanged but we need to update the Label
             sections[str(section_id)]["button1"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
-        if not section_occupied(section_id):
-            toggle_section(section_id)
+            # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
+            # be published if the MQTT interface has been configured for publishing updates for this track section
+            if publish:mqtt_interface.publish_section_state(section_id)
     return()
 
-def clear_section_occupied (section_id:int):
+def clear_section_occupied (section_id:int,publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
     elif section_occupied(section_id):
         toggle_section(section_id)
+        # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+        # be published if the MQTT interface has been configured for publishing updates for this track section
+        if publish: mqtt_interface.publish_section_state(section_id)
     return(sections[str(section_id)]["labeltext"])
 
 ###############################################################################
