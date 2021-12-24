@@ -382,6 +382,8 @@ def subscribe_to_dcc_command_feed (*nodes:str):
         logging.error("MQTT-Client: Networking Disabled - Cannot subscribe to dcc commands")
     else:
         for node in nodes:
+            # We're not going to bother validating if we've already subscribed to a node on the
+            # basis its one function call and no-one is likely to get this wrong surely
             logging.info("MQTT-Client: Subscribe to dcc command feed from \'"+node+"\'")
             # Subscribe to the 'dcc_accessory_short_event' topics from the specified node
             # Topics are in the following format: "dcc_accessory_short_event/<network-ID>/<node-ID>/<dcc-address>
@@ -409,14 +411,16 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             logging.info("MQTT-Client: Subscribing to signal "+str(sig_id)+" updates from \'"+node+"\'")
             # The Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
             sig_identifier = create_remote_item_identifier(sig_id,node)
-            # Subscribe to the 'signal_updated_event' topic for the specified signal
-            # Topic is in the following format: "signal_updated_event/<Network-ID>/<Sig-Identifier>"
-            topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
-            mqtt_client.subscribe(topic)
-            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-            node_config["subscribed_topics"].append(topic)
-            # We now "Create" a dummy signal object to hold the state of the signal.
-            if not signals_common.sig_exists(sig_identifier):
+            if signals_common.sig_exists(sig_identifier):
+                logging.warning("MQTT-Client: Already subscribed to signal "+str(sig_id)+" updates from \'"+node+"\'")
+            else:
+                # Subscribe to the 'signal_updated_event' topic for the specified signal
+                # Topic is in the following format: "signal_updated_event/<Network-ID>/<Sig-Identifier>"
+                topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
+                mqtt_client.subscribe(topic)
+                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+                node_config["subscribed_topics"].append(topic)
+                # We now "Create" a dummy signal object to hold the state of the signal.
                 signals_common.signals[sig_identifier] = {}
                 signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
                 signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
@@ -438,14 +442,16 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
             logging.info("MQTT-Client: Subscribing to section "+str(sec_id)+" updates from \'"+node+"\'")
             # The Identifier for a remote Track Section is a string combining the the Node-ID and Section-ID
             sec_identifier = create_remote_item_identifier(sec_id,node)
-            # Subscribe to the 'section_updated_event' topic for the specified track section
-            # Topic is in the following format: "section_updated_event/<Network-ID>/<Sig-Identifier>"
-            topic = "section_updated_event/"+node_config["network_identifier"]+"/"+sec_identifier
-            mqtt_client.subscribe(topic)
-            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-            node_config["subscribed_topics"].append(topic)
-            # We now "Create" a dummy section object to hold the state of the signal.
-            if not track_sections.section_exists(sec_identifier):
+            if track_sections.section_exists(sec_identifier):
+                logging.warning("MQTT-Client: Already subscribed to section "+str(sec_id)+" updates from \'"+node+"\'")
+            else:
+                # Subscribe to the 'section_updated_event' topic for the specified track section
+                # Topic is in the following format: "section_updated_event/<Network-ID>/<Sig-Identifier>"
+                topic = "section_updated_event/"+node_config["network_identifier"]+"/"+sec_identifier
+                mqtt_client.subscribe(topic)
+                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+                node_config["subscribed_topics"].append(topic)
+                # We now "Create" a dummy section object to hold the state of the signal.
                 track_sections.sections[sec_identifier] = {}
                 track_sections.sections[sec_identifier]["occupied"] = False
                 track_sections.sections[sec_identifier]["labeltext"] = "OCCUPIED"
@@ -467,14 +473,16 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             logging.info("MQTT-Client: Subscribing to signal "+str(sig_id)+" passed events from \'"+node+"\'")
             # The Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
             sig_identifier = create_remote_item_identifier(sig_id,node)
-            # Subscribe to the 'signal_passed_event' topic for the specified signal
-            # Topic is in the following format: "signal_passed_event/<Network-ID>/<Sig-Identifier>"
-            topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+sig_identifier
-            mqtt_client.subscribe(topic)
-            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-            node_config["subscribed_topics"].append(topic)
-            # We now "Create" a dummy signal object to hold the state of the signal.
-            if not signals_common.sig_exists(sig_identifier):
+            if signals_common.sig_exists(sig_identifier):
+                logging.warning("MQTT-Client: Already subscribed to signal "+str(sig_id)+" passed events from \'"+node+"\'")
+            else:
+                # Subscribe to the 'signal_passed_event' topic for the specified signal
+                # Topic is in the following format: "signal_passed_event/<Network-ID>/<Sig-Identifier>"
+                topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+sig_identifier
+                mqtt_client.subscribe(topic)
+                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+                node_config["subscribed_topics"].append(topic)
+                # We now "Create" a dummy signal object to hold the state of the signal.
                 signals_common.signals[sig_identifier] = {}
                 signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
                 signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
