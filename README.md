@@ -58,16 +58,14 @@ Some examples are included in the repository: https://github.com/johnrm174/model
            is where a signal displays a more restrictive aspect (either red or yellow) when a lower-speed 
            divergent route is set, forcing the approaching train to slow down and be prepared to stop. As 
            the train approaches, the signal is "released", allowing the train to proceed past the signal 
-           and onto the divergent route. Examples of "Approach on Red" and "Approach on Yellow" are provided. 
-           For "Approach on yellow", the signals behind will show the correct flashing yellow aspects.
+           and onto the divergent route. For Colour light signals, examples of "Approach on Red" and 
+           "Approach on Yellow" are provided (for "Approach on yellow", the signals behind will show the 
+           correct flashing yellow aspects. For Semaphore signals, an example of using approach control
+           for semi-automating all the home signals within a block section is provided
 
-'test_semaphore_approach_control' - Similar to the above, but this simulates/automates the series of 
-           signals within a block section (e.g. outer home, inner home, starter, advanced starter etc). 
-           In this scenario, the distant and home signals should never be cleared for an approaching train 
-           if a subsequent home signal (in the same 'Block Section') is set to DANGER. In this case each 
-           preceding home signal (and the distant) would remain ON to slow down the train on the approach
-           to the first home signal. As the signal is approached, the signal would then be cleared to 
-           enable the train to continue (at low speed) towards the next home signal.
+'test_networking_1/2.py' - an example of how to network multiple signalling applications (potentially hosted 
+           on seperate computers) together via an external MQTT broker. This demonstrates how signal states,
+           "signal passed" events and track occupancy sections can be shared between applications
 
 'test_harman-signalist_sc1.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. 
            Enables the various modes to be selected (includes programming of CVs) and then tested. I used 
@@ -80,9 +78,6 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 'test_semaphore_signals.py'- similar to the above developed primarily for testing, but it does provide  
            an example of every signal type and all the control features currently supported.
 
-'test_networking_1/2.py' - an example of how to network multiple signalling applications (potentially hosted 
-           on seperate computers) together via an external MQTT broker. This demonstrates how signal states,
-           "signal passed" events and track occupancy sections can be shared between applications
 </pre>
 
 Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
