@@ -165,7 +165,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
 
 #-----------------------------------------------------------------------------------------------
 # Internal Functions to decode the received json messages and update our internal data objects
-# Note that these functiona are executed in the main tkinter thread to make it all threadsafe
+# Note that these functions are executed in the main tkinter thread to make it all threadsafe
 #-----------------------------------------------------------------------------------------------
 
 def process_signal_updated_event(unpacked_json):
@@ -206,6 +206,7 @@ def process_signal_passed_event(unpacked_json):
     signals_common.signals[sig_identifier]["extcallback"](sig_identifier,
                             signals_common.sig_callback_type.sig_passed)
     return()
+
 #--------------------------------------------------------------------------------------------------------
 # Internal function to handle messages received from the MQTT Broker - detecting the message type
 # and then calling the appropriate functions to decode the message and update the local data objects
@@ -427,7 +428,7 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to signal updated published by another "Node"
+# Public API Function to "subscribe" to section updates published by another "Node"
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
@@ -456,7 +457,7 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to signal updated published by another "Node"
+# Public API Function to "subscribe" to signal passed events published by another "Node"
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):    
@@ -485,7 +486,7 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public Function to set all signal state (aspect) updates to be "published" for a signal
+# Public API Function to set all aspect changes to be "published" for a signal
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_state(*sig_ids:int):    
@@ -505,7 +506,7 @@ def set_signals_to_publish_state(*sig_ids:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public Function to set all signal state (aspect) updates to be "published" for a signal
+# Public API Function to set all section changes (label or state) to be "published" for a section
 #-----------------------------------------------------------------------------------------------
 
 def set_sections_to_publish_state(*sec_ids:int):    
@@ -525,7 +526,7 @@ def set_sections_to_publish_state(*sec_ids:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public  Function to set all "signal passed" events to be "published" for a signal
+# Public API Function to set all "signal passed" events to be "published" for a signal
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_passed_events(*sig_ids:int):    
@@ -599,7 +600,7 @@ def publish_signal_state(sig_id:int):
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Externally Called Function to Publish the state of a Track Section
+# Externally Called Function to Publish the state (label and OCCUPIED/CLEAR) of a Track Section
 #-----------------------------------------------------------------------------------------------
 
 def publish_section_state(sec_id:int):
