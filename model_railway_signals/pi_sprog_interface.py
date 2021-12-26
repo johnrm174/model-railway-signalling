@@ -113,73 +113,77 @@ def thread_to_read_received_data ():
     
     while True:
         # Read from the port until we get the GridConnect Protocol message termination character
-        byte_string = serial_port.read_until(b";")
-        # Print the Received message (if the appropriate debug level is set
-        if debug:logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
-        # Extract the OpCode - so we can decide what to do
-        op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
-        
-        # Process selected commands (note that only a subset is supported)
-        
-        if op_code == 227:  # Command Station Status Report
+        try:
+            byte_string = serial_port.read_until(b";")
+            # Print the Received message (if the appropriate debug level is set
+        except:
+            break
+        else:
+            if debug:logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
+            # Extract the OpCode - so we can decide what to do
+            op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
+            
+            # Process selected commands (note that only a subset is supported)
+            
+            if op_code == 227:  # Command Station Status Report
+                            
+                # Print out the status report (if the appropriate debug level is set)
+                print ("Pi-SPROG: Received STAT (Command Station Status Report)")
+                print ("    Node Id       :", int(chr(byte_string[9]) + chr(byte_string[10])
+                                            + chr(byte_string[11]) + chr(byte_string[12]),16))
+                print ("    CS Number     :", int(chr(byte_string[13]) + chr(byte_string[14]),16))
+                print ("    Version       :", int(chr(byte_string[17]) + chr(byte_string[18]),16), ".",
+                                              int(chr(byte_string[19]) + chr(byte_string[20]),16),".",
+                                              int(chr(byte_string[21]) + chr(byte_string[22]),16))
+                # Get the Flags - we only need the last hex character (to get the 4 bits)
+                flags = int(chr(byte_string[16]),16)
+                print ("    Reserved      :", ((flags & 0x080)==0x80))
+                print ("    Service Mode  :", ((flags & 0x040)==0x40))
+                print ("    Reset Done    :", ((flags & 0x02)==0x20))
+                print ("    Emg Stop Perf :", ((flags & 0x10)==0x10))
+                print ("    Bus On        :", ((flags & 0x08)==0x08))
+                print ("    Track On      :", ((flags & 0x04)==0x04))
+                print ("    Track Error   :", ((flags & 0x02)==0x02))
+                print ("    H/W Error     :", ((flags & 0x01)==0x01), "\r")
+
+            elif op_code == 182:  # Response to Query Node
                         
-            # Print out the status report (if the appropriate debug level is set)
-            print ("Pi-SPROG: Received STAT (Command Station Status Report)")
-            print ("    Node Id       :", int(chr(byte_string[9]) + chr(byte_string[10])
-                                        + chr(byte_string[11]) + chr(byte_string[12]),16))
-            print ("    CS Number     :", int(chr(byte_string[13]) + chr(byte_string[14]),16))
-            print ("    Version       :", int(chr(byte_string[17]) + chr(byte_string[18]),16), ".",
-                                          int(chr(byte_string[19]) + chr(byte_string[20]),16),".",
-                                          int(chr(byte_string[21]) + chr(byte_string[22]),16))
-            # Get the Flags - we only need the last hex character (to get the 4 bits)
-            flags = int(chr(byte_string[16]),16)
-            print ("    Reserved      :", ((flags & 0x080)==0x80))
-            print ("    Service Mode  :", ((flags & 0x040)==0x40))
-            print ("    Reset Done    :", ((flags & 0x02)==0x20))
-            print ("    Emg Stop Perf :", ((flags & 0x10)==0x10))
-            print ("    Bus On        :", ((flags & 0x08)==0x08))
-            print ("    Track On      :", ((flags & 0x04)==0x04))
-            print ("    Track Error   :", ((flags & 0x02)==0x02))
-            print ("    H/W Error     :", ((flags & 0x01)==0x01), "\r")
+                # Print out the status report (if the appropriate debug level is set)
+                print ("Pi-SPROG: Received PNN (Response to Query Node)")
+                print ("    Node Id   :", int(chr(byte_string[9]) + chr(byte_string[10])
+                                          + chr(byte_string[11]) + chr(byte_string[12]),16))
+                print ("    Mfctre ID :", int(chr(byte_string[13]) + chr(byte_string[14]),16))
+                print ("    Module ID :", int(chr(byte_string[15]) + chr(byte_string[16]),16))
+                # Get the Flags - we only need the last hex character (to get the 4 bits)
+                flags = int(chr(byte_string[18]),16)
+                print ("    Bldr Comp :", ((flags & 0x08)==0x08))
+                print ("    FLiM Mode :", ((flags & 0x04)==0x04))
+                print ("    Prod Node :", ((flags & 0x02)==0x02))
+                print ("    Cons Node :", ((flags & 0x01)==0x01), "\r")
 
-        elif op_code == 182:  # Response to Query Node
-                    
-            # Print out the status report (if the appropriate debug level is set)
-            print ("Pi-SPROG: Received PNN (Response to Query Node)")
-            print ("    Node Id   :", int(chr(byte_string[9]) + chr(byte_string[10])
-                                      + chr(byte_string[11]) + chr(byte_string[12]),16))
-            print ("    Mfctre ID :", int(chr(byte_string[13]) + chr(byte_string[14]),16))
-            print ("    Module ID :", int(chr(byte_string[15]) + chr(byte_string[16]),16))
-            # Get the Flags - we only need the last hex character (to get the 4 bits)
-            flags = int(chr(byte_string[18]),16)
-            print ("    Bldr Comp :", ((flags & 0x08)==0x08))
-            print ("    FLiM Mode :", ((flags & 0x04)==0x04))
-            print ("    Prod Node :", ((flags & 0x02)==0x02))
-            print ("    Cons Node :", ((flags & 0x01)==0x01), "\r")
+            elif op_code == 4:  # Track Power is OFF
+                
+                logging.info ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
+                track_power_on = False
 
-        elif op_code == 4:  # Track Power is OFF
-            
-            logging.info ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
-            track_power_on = False
-
-        elif op_code == 5:  # Track Power is ON
-            
-            logging.info ("Pi-SPROG: Received TON (Track ON) acknowledgement")
-            track_power_on = True
-            
-        elif op_code == 76:  # Service Mode Status response
-            
-            session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
-            service_mode_status = int(chr(byte_string[11]) + chr(byte_string[12]),16)
-            if service_mode_status == 0: status = "Reserved"
-            elif service_mode_status == 1: status = "No Acknowledge"
-            elif service_mode_status == 2: status = "Overload on Programming Track"
-            elif service_mode_status == 3: status = "Write Acknowledge"
-            elif service_mode_status == 4: status = "Busy"
-            elif service_mode_status == 5: status = "CV Out of Range"
-            else: status = "Unrecognised response code" + str (service_mode_status)
-            logging.debug ("Pi-SPROG: Received SSTAT (Service Mode Status) - Session: "
-                                   + str(session_id) + ", Status: " + status)
+            elif op_code == 5:  # Track Power is ON
+                
+                logging.info ("Pi-SPROG: Received TON (Track ON) acknowledgement")
+                track_power_on = True
+                
+            elif op_code == 76:  # Service Mode Status response
+                
+                session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
+                service_mode_status = int(chr(byte_string[11]) + chr(byte_string[12]),16)
+                if service_mode_status == 0: status = "Reserved"
+                elif service_mode_status == 1: status = "No Acknowledge"
+                elif service_mode_status == 2: status = "Overload on Programming Track"
+                elif service_mode_status == 3: status = "Write Acknowledge"
+                elif service_mode_status == 4: status = "Busy"
+                elif service_mode_status == 5: status = "CV Out of Range"
+                else: status = "Unrecognised response code" + str (service_mode_status)
+                logging.debug ("Pi-SPROG: Received SSTAT (Service Mode Status) - Session: "
+                                       + str(session_id) + ", Status: " + status)
     return()
 
 #------------------------------------------------------------------------------
