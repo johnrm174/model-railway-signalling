@@ -93,10 +93,8 @@ def main_callback_function(item_id,callback_type):
     else:
         set_route(2,route=route_type.MAIN)
         update_signal(2,sig_ahead_id=4)
-
     update_signal(1, sig_ahead_id=2)
     
-
     # Process the signal/point interlocking - Note that in this scheme we only allow
     # shunting from the loop line back into the siding (not back onto the main line
     
