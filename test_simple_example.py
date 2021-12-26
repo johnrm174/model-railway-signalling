@@ -62,15 +62,19 @@ def main_callback_function(item_id,callback_type):
     # Override signals based on track occupancy - we could use signal passed events but
     # we also need to allow for manual setting/resetting of the track occupancy sections
     
+    # Signal 1 is only overridden if the section ahead is occupied
     if section_occupied(1):
         set_signal_override(1)
     else:
         clear_signal_override(1)
+    # Signal 2 is only overridden if the section ahead is occupied
+    # Where the section ahead is determined by the setting of Point 1
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
         set_signal_override(2)
     else:
         clear_signal_override(2)
+    # Signals 3 and 4 are overridden if the section ahead is occupied
     if section_occupied(4):
         set_signal_override(3)
         set_signal_override(4)
@@ -135,7 +139,6 @@ def main_callback_function(item_id,callback_type):
 # This is where the code begins
 #------------------------------------------------------------------------------------
 
-# Create the Window and canvas
 print ("Creating Window and Canvas")
 window = Tk()
 window.title("Simple Interlocking Example")
@@ -183,6 +186,10 @@ map_dcc_signal (sig_id = 5,
                 proceed = [[17,True]],
                 caution = [[18,True]],
                 prelim_caution = [[18,False]])
+
+# Ground position signals 6 and 7 are simple mappings to a single DCC address
+map_dcc_signal (sig_id = 6,danger = [[30,False]],proceed = [[30,True]])
+map_dcc_signal (sig_id = 7,danger = [[31,False]],proceed = [[31,True]])
 
 # Points are simply mapped to single DCC addresses
 map_dcc_point (1, 100)
@@ -259,9 +266,9 @@ create_ground_position_signal (canvas, 7, 475, 150, orientation = 180,
                             sig_callback = main_callback_function)
 
 
+print ("Creating external Track Sensor Mappings")
 # Map external track sensors for the signals - For simplicity, we'll give them the same ID as the signal
 # We'll also map them to the associated "signal passed" events rather than using their own callback
-print ("Creating external Track Sensor Mappings")
 create_track_sensor (1, gpio_channel = 4, signal_passed = 1)
 create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
 create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
@@ -269,10 +276,10 @@ create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
 create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
 create_track_sensor (6, gpio_channel = 9, signal_passed = 6)
 
-# Set the initial interlocking conditions by running the main callback function
 print ("Setting Initial Interlocking")
+# Set the initial interlocking conditions by running the main callback function
 main_callback_function(None,None)
 
-# Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
+# Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
