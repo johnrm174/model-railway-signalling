@@ -46,10 +46,10 @@ To use the "public" functions for developing your own layout signalling system:
 Some examples are included in the repository: https://github.com/johnrm174/model-railway-signalling:
 
 <pre>
-'test_simple_example.py' - a simple example of how to use the "signals" and "points" modules to create a
-           basic track schematic with interlocked signals/points and semi-automation of signals using 
-           external track sensors to provide "signal passed" events as the train progresses across the 
-           schematic. Also includes DCC Mapping examples (for both signals and points).
+'test_simple_example.py' - a simple example of how to use the "signals" and "points" and "sections"
+           modules to create a basic track schematic with interlocked signals/points and semi-automation 
+           of signals using external sensors to provide "signal passed" events as the train progresses 
+           across the schematic. Also includes DCC Mapping examples (for both signals and points).
 
 'test_semaphore_example.py' - effectively the same example as above, but using sempahore signals. 
            Includes DCC Mapping examples for the Semaphore signals (different to colour lights).
@@ -80,6 +80,9 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 'test_semaphore_signals.py'- similar to the above developed primarily for testing, but it does provide  
            an example of every signal type and all the control features currently supported.
 
+'test_networking_1/2.py' - an example of how to network multiple signalling applications (potentially hosted 
+           on seperate computers) together via an external MQTT broker. This demonstrates how signal states,
+           "signal passed" events and track occupancy sections can be shared between applications
 </pre>
 
 Or alternatively, go to https://github.com/johnrm174/layout-signalling-scheme to see the scheme for my layout
