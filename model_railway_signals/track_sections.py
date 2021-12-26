@@ -2,7 +2,7 @@
 # This module is used for creating and managing Track Occupancy objects (sections)
 #
 # section_callback_type (tells the calling program what has triggered the callback):
-#     section_callback_type.section_switched - The section has been toggled (occupied/clear) by the user
+#     section_callback_type.section_updated - The section has been updated by the user
 # 
 # create_section - Creates a Track Occupancy section object
 #   Mandatory Parameters:
@@ -12,18 +12,37 @@
 #   Optional Parameters:
 #       section_callback - The function to call if the section is manually toggled - default: null
 #                         Note that the callback function returns (item_id, callback type)
-#       label - The label to display on the section when occupied - default: "Train On Line"
+#       editable:bool - Whether the section can be manually switched and/or edited (default = True)
+#       label:str - The label to display on the section when occupied - default: "OCCUPIED"
 # 
-# section_occupied (section_id)- Returns the current state of the section (True=Occupied, False=Clear)
+# section_occupied (section_id:int/str)- Returns the state of the section (True=Occupied, False=Clear)
+#                   - Note that for this function, the section_id can be specified either as an integer 
+#                     (representing the ID of a signal on the local schematic), or a string (representing
+#                     the identifier of an signal on an external MQTT node)
 # 
-# set_section_occupied (section_id) - Sets the specified section to "occupied"
+# section_label (section_id:int/str)- Returns the 'label' of the section (as a string)
+#                   - Note that for this function, the section_id can be specified either as an integer 
+#                     (representing the ID of a signal on the local schematic), or a string (representing
+#                     the identifier of an signal on an external MQTT node)
 # 
-# clear_section_occupied (section_id)- Sets the specified section to "clear"
+# set_section_occupied - Sets the specified section to "OCCUPIED" (and updates the 'label' if required)
+#   Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
+#   Optional Parameters:
+#       label:str - An updated label to display when occupied (if omitted the label will stay the same)
+# 
+# clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
+#                      - also returns the current value of the Section Lable (as a string) to allow this
+#                        to be 'passed' to the next section (via the set_section_occupied function)
+#   Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
 #
 # --------------------------------------------------------------------------------
 
 from . import common
+from . import mqtt_interface
 from tkinter import *
+from typing import Union
 import enum
 import logging
 
@@ -33,14 +52,20 @@ import logging
     
 # Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
-    section_switched = 21   # The section has been manually switched by the user
+    section_updated = 21   # The section has been updated by the user
     
 # -------------------------------------------------------------------------
 # sections are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
 
-# Define an empty dictionary 
 sections: dict = {}
+
+# -------------------------------------------------------------------------
+# Global references to the Entry box and the window we create it in
+# -------------------------------------------------------------------------
+
+text_entry_box = None
+entry_box_window = None
 
 # -------------------------------------------------------------------------
 # The default "External" callback for the section buttons
@@ -64,9 +89,13 @@ def section_exists(section_id:int):
 
 def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************")
+    logging.info ("Section "+str(section_id)+": Track Section Toggled ********************************************")
     toggle_section(section_id)
-    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_switched)
+    # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+    # be published if the MQTT interface has been configured for publishing updates for this track section
+    mqtt_interface.publish_section_state(section_id)
+    # Make the external callback (if one has been defined
+    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
 
 # -------------------------------------------------------------------------
@@ -75,21 +104,94 @@ def section_button_event (section_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_section (section_id:int):
-    
-    global sections # the dictionary of sections
+    global sections
     global logging
     if sections[str(section_id)]["occupied"]:
         # section is on
-        logging.info ("Section "+str(section_id)+": Changing to CLEAR")
+        logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label \'"
+                                         +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = False
         sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey40",
                                             activebackground="grey", activeforeground="grey40")
     else:
         # section is off
-        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED")
+        logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label \'"
+                                         +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = True
         sections[str(section_id)]["button1"].config(relief="sunken", bg="black",fg="white",
                                             activebackground="black", activeforeground="white")
+    return()
+
+# -------------------------------------------------------------------------
+# Internal function to get the new label text from the entry widget (on RETURN)
+# -------------------------------------------------------------------------
+
+def update_identifier(section_id):
+    global sections 
+    global text_entry_box
+    global entry_box_window
+    logging.info ("Section "+str(section_id)+": Track Section Label Updated **************************************")
+    # Set the new label for the section button and set the width to the width it was created with
+    # If we get back an empty string then set the label back to the default (OCCUPIED)
+    new_section_label =text_entry_box.get()
+    if new_section_label=="": new_section_label="OCCUPIED"
+    sections[str(section_id)]["labeltext"] = new_section_label
+    sections[str(section_id)]["button1"]["text"] = new_section_label
+    sections[str(section_id)]["button1"].config(width=sections[str(section_id)]["labellength"])
+    # Assume that by entering a value the user wants to set the section to OCCUPIED. Note that the
+    # toggle_section function will also publish the section state & label changes to the MQTT Broker
+    if not sections[str(section_id)]["occupied"]:
+        toggle_section(section_id)
+    # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
+    # be published if the MQTT interface has been configured for publishing updates for this track section
+    mqtt_interface.publish_section_state(section_id)
+    # Make an external callback to indicate the section has been switched
+    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
+    # Clean up by destroying the entry box and the window we created it in
+    text_entry_box.destroy()
+    sections[str(section_id)]["canvas"].delete(entry_box_window)
+    return()
+
+# -------------------------------------------------------------------------
+# Internal function to close the entry widget (on ESCAPE)
+# -------------------------------------------------------------------------
+
+def cancel_update(section_id):
+    global text_entry_box
+    global entry_box_window
+    # Clean up by destroying the entry box and the window we created it in
+    text_entry_box.destroy()
+    sections[str(section_id)]["canvas"].delete(entry_box_window)
+    return()
+
+# -------------------------------------------------------------------------
+# Internal function to create an entry widget (when button right clicked)
+# -------------------------------------------------------------------------
+
+def open_entry_box(section_id):
+    global text_entry_box
+    global entry_box_window
+    canvas = sections[str(section_id)]["canvas"]
+    # If another text entry box is already open then close that first
+    if entry_box_window is not None:
+        text_entry_box.destroy()
+        canvas.delete(entry_box_window)
+    # Set the font size and length for the text entry box
+    font_size = common.fontsize
+    label_length = sections[str(section_id)]["labellength"]
+    # Create the entry box and bind the RETURN and ESCAPE events to it
+    text_entry_box = Entry(canvas,width=label_length,font=('Ariel',font_size,"normal"))
+    text_entry_box.bind('<Return>', lambda event:update_identifier(section_id))
+    text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
+    # if the section button is already showing occupied then we EDIT the value
+    if sections[str(section_id)]["occupied"]:
+        text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
+    # Create a window on the canvas for the Entry box (overlaying the section button)
+    x =  sections[str(section_id)]["positionx"]
+    y =  sections[str(section_id)]["positiony"]
+    entry_box_window = canvas.create_window (x,y,window=text_entry_box)
+    # Force focus on the entry box so it will accept the keyboard entry immediately
+    text_entry_box.focus()
     return()
 
 # -------------------------------------------------------------------------
@@ -100,9 +202,9 @@ def toggle_section (section_id:int):
 
 def create_section (canvas, section_id:int, x:int, y:int,
                     section_callback = null_callback,
-                    label:str = "Train On Line"):
-    
-    global sections # the dictionary of sections
+                    label:str = "OCCUPIED",
+                    editable:bool = True):
+    global sections
     global logging
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
     # Find and store the root window (when the first signal is created)
@@ -114,55 +216,107 @@ def create_section (canvas, section_id:int, x:int, y:int,
         logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
     else:
         # Create the button objects and their callbacks
+        font_size = common.fontsize
         section_button = Button (canvas, text=label, state="normal", relief="raised",
-                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',8,"normal"),
+                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id))
-        canvas.create_window (x,y,window=section_button) 
+        canvas.create_window (x,y,window=section_button)
         # Compile a dictionary of everything we need to track
         sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
                                      "button1" : section_button,          # drawing object
                                      "extcallback" : section_callback,    # External callback to make
+                                     "labeltext" : label,                 # The Text to display (when OCCUPIED)
+                                     "labellength" : len(label),          # The fixed length for the button
+                                     "positionx" : x,                     # Position of the button on the canvas
+                                     "positiony" : y,                     # Position of the button on the canvas
                                      "occupied" : False }                 # Current state
+        # Fix the width of the button (if text is edited late this won't change)
+        section_button.config(width = sections[str(section_id)]["labellength"])
+        # Bind the Middle and Right Mouse clicks to the section button - to open the entry box
+        if editable:
+            # Only bind the events if the Section is editable
+            section_button.bind('<Button-2>', lambda event:open_entry_box(section_id))
+            section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
+        else:
+            # Disable the button (to toggle the section) if not editable
+            section_button.config(state="disabled")
+
     return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the section
 # -------------------------------------------------------------------------
 
-def section_occupied (section_id:int):
-    
-    global sections # the dictionary of sections
+def section_occupied (section_id:Union[int,str]):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_occupied - Section does not exist")
         occupied = False
-    else:   
-        occupied = sections[str(section_id)]["occupied"]
+    elif not sections[str(section_id)]["occupied"]:   
+        occupied = False
+    else:
+        occupied = True
     return(occupied)
+
+# -------------------------------------------------------------------------
+# Externally called function to Return the current state of the section
+# -------------------------------------------------------------------------
+
+def section_label (section_id:Union[int,str]):
+    global logging
+    # Validate the section exists
+    if not section_exists(section_id):
+        logging.error ("Section "+str(section_id)+": section_label - Section does not exist")
+        section_label=None
+    else:
+        section_label = sections[str(section_id)]["labeltext"]
+    return(section_label)
 
 # -------------------------------------------------------------------------
 # Externally called functions to Set and Clear a section
 # -------------------------------------------------------------------------
 
-def set_section_occupied (section_id:int):
-    
+def set_section_occupied (section_id:int,label:str=None):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")
-    elif not section_occupied(section_id):
-        toggle_section(section_id)
+    else:
+        if not section_occupied(section_id):
+            # Need to toggle the section - ALSO update the label if that has been changed
+            if label is not None and sections[str(section_id)]["labeltext"] != label:
+                sections[str(section_id)]["button1"]["text"] = label
+                sections[str(section_id)]["labeltext"]= label
+            toggle_section(section_id)
+            # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+            # be published if the MQTT interface has been configured for publishing updates for this track section
+            mqtt_interface.publish_section_state(section_id)
+        elif label is not None and sections[str(section_id)]["labeltext"] != label:
+            # Section state remains unchanged but we need to update the Label
+            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["labeltext"]= label
+            # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
+            # be published if the MQTT interface has been configured for publishing updates for this track section
+            mqtt_interface.publish_section_state(section_id)
     return()
 
 def clear_section_occupied (section_id:int):
+    global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
+        section_label = ""
     elif section_occupied(section_id):
         toggle_section(section_id)
-    return()
+        # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
+        # be published if the MQTT interface has been configured for publishing updates for this track section
+        mqtt_interface.publish_section_state(section_id)
+        section_label = sections[str(section_id)]["labeltext"]
+    else:
+        section_label = sections[str(section_id)]["labeltext"]
+    return(section_label)
 
 ###############################################################################
 

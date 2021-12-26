@@ -41,22 +41,20 @@ def main_callback_function(item_id,callback_type):
     # Deal with changes to the Track Occupancy
     #--------------------------------------------------------------
         
-    # First deal with the track occupancy
+    # We use the label of the cleared section (returned by the 'clear_section_occupied'
+    # function to set the label for the next section (i.e. 'pass' the current train along)
     if (callback_type == sig_callback_type.sig_passed):
         if item_id == 1:
-            set_section_occupied(1)
+            set_section_occupied(1,label=clear_section_occupied(5))
         elif item_id == 2:
-            clear_section_occupied(1)
             if point_switched(1):
-                set_section_occupied(2)
+                set_section_occupied(2,label=clear_section_occupied(1))
             else:
-                set_section_occupied(3)
+                set_section_occupied(3,label=clear_section_occupied(1))
         elif item_id == 3:
-            clear_section_occupied(2)
-            set_section_occupied(4)
+            set_section_occupied(4,label=clear_section_occupied(2))
         elif item_id == 4:
-            clear_section_occupied(3)
-            set_section_occupied(4)
+            set_section_occupied(4,label=clear_section_occupied(3))
         elif item_id == 5:
             trigger_timed_signal (5,0,3)
             clear_section_occupied(4)
@@ -218,6 +216,8 @@ create_section (canvas,1,175,200,section_callback = main_callback_function)
 create_section (canvas,2,500,150,section_callback = main_callback_function)
 create_section (canvas,3,500,200,section_callback = main_callback_function)
 create_section (canvas,4,800,200,section_callback = main_callback_function)
+canvas.create_text (100,70,text="Right Click to\nset next Train")
+create_section (canvas,5,100,100,section_callback = main_callback_function)
 
 # Create the Signals on the Schematic track plan
 # The "callback" is the name of the function (above) that will be called when something has changed

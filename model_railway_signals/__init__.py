@@ -38,6 +38,7 @@ from .signals import trigger_timed_signal
 from .track_sections import section_callback_type
 from .track_sections import create_section
 from .track_sections import section_occupied
+from .track_sections import section_label
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
 
@@ -58,8 +59,10 @@ from .dcc_control import map_dcc_point
 
 from .mqtt_interface import configure_networking
 from .mqtt_interface import subscribe_to_dcc_command_feed
+from .mqtt_interface import subscribe_to_section_updates
 from .mqtt_interface import subscribe_to_signal_updates
 from .mqtt_interface import subscribe_to_signal_passed_events
+from .mqtt_interface import set_sections_to_publish_state
 from .mqtt_interface import set_signals_to_publish_state
 from .mqtt_interface import set_signals_to_publish_passed_events
 
@@ -108,6 +111,7 @@ __all__ = [
       # Public track_section functions
         'create_section',
         'section_occupied',
+        'section_label',
         'set_section_occupied',
         'clear_section_occupied',
       # public track_sensor types
@@ -127,8 +131,10 @@ __all__ = [
       # Public networking functions
         'configure_networking',
         'subscribe_to_dcc_command_feed',
+        'subscribe_to_section_updates',
         'subscribe_to_signal_updates',
         'subscribe_to_signal_passed_events',
+        'set_sections_to_publish_state',
         'set_signals_to_publish_state',
         'set_signals_to_publish_passed_events',
            ]
