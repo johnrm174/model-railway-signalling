@@ -387,8 +387,7 @@ approach_control_set (sig_id:int) - returns if the signal is subject to approach
 ## Track Occupancy Functions
 <pre>
 section_callback_type (tells the calling program what has triggered the callback):
-     section_callback_type.section_switched - The section has been toggled by the user
-     section_callback_type.section_updated - The section label has been updated by the user
+     section_callback_type.section_updated - The section has been updated by the user
 
 create_section - Creates a Track Occupancy section object
   Mandatory Parameters:
@@ -398,9 +397,10 @@ create_section - Creates a Track Occupancy section object
   Optional Parameters:
       section_callback - The function to call if the section is manually toggled - default: null
                         Note that the callback function returns (item_id, callback type)
+      editable:bool - Whether the section can be manually switched and/or edited (default = True)
       label:str - The label to display on the section when occupied - default: "OCCUPIED"
 
-section_occupied (section_id:int/str)- Returns the current state of the section (True=Occupied)
+section_occupied (section_id:int/str)- Returns the state of the section (True=Occupied, False=Clear)
                   - Note that for this function, the section_id can be specified either as an integer 
                     (representing the ID of a signal on the local schematic), or a string (representing
                     the identifier of an signal on an external MQTT node)
@@ -415,19 +415,12 @@ set_section_occupied - Sets the specified section to "OCCUPIED" (and updates the
       section_id:int - The ID to be used for the section 
   Optional Parameters:
       label:str - An updated label to display when occupied (if omitted the label will stay the same)
-      publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
-                   - Set to False if the Section has been configured to "mirror" a remote section
-                     subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 
 clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-                     - returns the current value of the Section Lable (as a string) to allow this
-                       to be 'passed' to the next section via the set_section_occupied function)
+                     - also returns the current value of the Section Lable (as a string) to allow this
+                       to be 'passed' to the next section (via the set_section_occupied function)
   Mandatory Parameters:
       section_id:int - The ID to be used for the section 
-  Optional Parameters:
-      publish:bool - Controls whether the update is published to the MQTT Broker (default=True)
-                   - Set to False if the Section has been configured to "mirror" a remote section
-                     subscribed to via the MQTT Broker (to prevent the publish causing race conditions)
 </pre>
 
 ## Track Sensor Functions

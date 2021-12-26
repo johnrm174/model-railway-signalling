@@ -9,7 +9,7 @@
 # 
 # You can also use these features to split larger layouts into multiple signalling areas whilst still being able to 
 # implement a level of automation between them - primarily being aware of the "state" of remote signals (for updating
-# signals based on the one ahead) and the state of track occupancy sections)
+# signals based on the one ahead) and "signal passed" events (for updating track occupancy sections) 
 # 
 # To use these networking functions, you can either set up a local MQTT broker on one of the host computers
 # on your local network or alternatively use an 'open source' broker out there on the internet - I've been
@@ -21,9 +21,9 @@
 #
 # configure_networking - Configures the local MQTT broker client and establishes a connection to the broker
 #   Mandatory Parameters:
-#       broker_host:str - The fully qualified name/IP address of the MQTT broker host to be used
-#       network_identifier:str - The name to use for our signalling network (can be any string)
-#       node_identifier:str - The name to use for this particular node on the network (can be any string)
+#       broker_host:str - The fully qualified name/IP address of the MQTT broker host
+#       network_identifier:str - The name to use for the signalling network (can be any string)
+#       node_identifier:str - The name to use for a particular node on the network (can be any string)
 #   Optional Parameters:
 #       broker_port:int - The network port for the broker host (default = 1883)
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
@@ -40,40 +40,40 @@
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the track section update feed(s)
 #       sec_callback:name - Function to call when a section update is received from the remote node
-#                    The callback function returns (item_identifier, section_callback_type.section_updated)
-#                    where item_identifier is a string in the following format "<node>-<sec_id>",
-#       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
+#                    The callback function returns (item_identifier, section_callback_type.section_updated),
+#                    where item_identifier is a string in the following format "<node>-<sec_id>"
+#       *sec_ids:int - The section(s) to subscribe to (multiple Section_IDs can be specified)
 #
 # subscribe_to_signal_updates - Subscribe to signal updates from another node on the network 
 #   Mandatory Parameters:
-#       node:str - The name of the node publishing the signal state feed(s)
+#       node:str - The name of the node publishing the signal state update feed(s)
 #       sig_callback:name - Function to call when a signal update is received from the remote node
-#                    The callback function returns (item_identifier, sig_callback_type.sig_updated)
-#                    where item_identifier is a string in the following format "<node>-<sig_id>",
-#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+#                    The callback function returns (item_identifier, sig_callback_type.sig_updated),
+#                    where item_identifier is a string in the following format "<node>-<sig_id>"
+#       *sig_ids:int - The signal(s) to subscribe to (multiple Signal_IDs can be specified)
 #
-# subscribe_to_signal_passed_events  - Subscribe to a signal passed event feed for a specified node/signal 
+# subscribe_to_signal_passed_events  - Subscribe to a "signal passed" event feed for a specified node/signal 
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the signal passed event feed(s)
 #       sig_callback:name - Function to call when a signal passed event is received from the remote node
 #                    The callback function returns (item_identifier, sig_callback_type.sig_passed),
 #                    where Item Identifier is a string in the following format "<node>-<sig_id>"
-#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+#       *sig_ids:int - The signal(s) to subscribe to (multiple Signal_IDs can be specified)
 #
-# set_sections_to_publish_state - Enable the publication of state updates for a specified track section.
+# set_sections_to_publish_state - Enable the publication of state updates for specified track sections.
 #                All subsequent state changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sec_ids:int - The track sections to publish (multiple Signal_IDs can be specified)
+#       *sec_ids:int - The track section(s) to publish (multiple Signal_IDs can be specified)
 #
 # set_signals_to_publish_state - Enable the publication of state updates for specified signals.
 #                All subsequent state changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+#       *sig_ids:int - The signal(s) to publish (multiple Signal_IDs can be specified)
 #
 # set_signals_to_publish_passed_events - Enable the publication of signal passed events for specified signals.
 #                All subsequent events will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+#       *sig_ids:int - The signal(s) to publish (multiple Signal_IDs can be specified)
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -190,15 +190,22 @@ def process_section_updated_event(unpacked_json):
               track_sections.sections[section_identifier]["labeltext"] != section_label ): 
         track_sections.sections[section_identifier]["occupied"] = section_state
         track_sections.sections[section_identifier]["labeltext"] = section_label
-        logging.info ("Section "+section_identifier+": Received Remote Section Update ***********************************")
+        logging.info ("Section "+section_identifier+": Received Remote Section State Update ****************************")
         if section_state:
-            logging.info ("Section "+str(section_identifier)+": Has changed to OCCUPIED - Label \'"+section_label+"\'")
+            logging.info ("Section "+str(section_identifier)+": Changed to OCCUPIED (Label \'"+section_label+"\')")
         else:
-            logging.info ("Section "+str(section_identifier)+": Has changed to CLEAR - Label \'"+section_label+"\'")
+            logging.info ("Section "+str(section_identifier)+": Changed to CLEAR (Label \'"+section_label+"\')")
         track_sections.sections[section_identifier]["extcallback"](section_identifier,
                                   track_sections.section_callback_type.section_updated)
     return()
 
+def process_signal_passed_event(unpacked_json):
+    global logging
+    sig_identifier, = unpacked_json
+    logging.info("Signal "+sig_identifier+": Received Remote Signal Passed Event ******************************")
+    signals_common.signals[sig_identifier]["extcallback"](sig_identifier,
+                            signals_common.sig_callback_type.sig_passed)
+    return()
 #--------------------------------------------------------------------------------------------------------
 # Internal function to handle messages received from the MQTT Broker - detecting the message type
 # and then calling the appropriate functions to decode the message and update the local data objects
@@ -263,14 +270,10 @@ def on_message(mqtt_client, obj, msg):
         # signal_passed_event
         #--------------------------------------------------------------
         elif msg.topic.startswith("signal_passed_event"):
-            sig_identifier, = unpacked_json
-            logging.info("Signal "+sig_identifier+": Received Remote Signal Passed Event ******************************")
             if common.root_window is not None:
-                common.execute_function_in_tkinter_thread (lambda:signals_common.signals[sig_identifier]["extcallback"]
-                                                (sig_identifier,signals_common.sig_callback_type.sig_passed))
+                common.execute_function_in_tkinter_thread (lambda:process_signal_passed_event(unpacked_json))
             else:    
-                signals_common.signals[sig_identifier]["extcallback"](sig_identifier,
-                                                signals_common.sig_callback_type.sig_updated)
+                process_signal_passed_event(unpacked_json)
 
     return()
 
@@ -382,8 +385,6 @@ def subscribe_to_dcc_command_feed (*nodes:str):
         logging.error("MQTT-Client: Networking Disabled - Cannot subscribe to dcc commands")
     else:
         for node in nodes:
-            # We're not going to bother validating if we've already subscribed to a node on the
-            # basis its one function call and no-one is likely to get this wrong surely
             logging.info("MQTT-Client: Subscribe to dcc command feed from \'"+node+"\'")
             # Subscribe to the 'dcc_accessory_short_event' topics from the specified node
             # Topics are in the following format: "dcc_accessory_short_event/<network-ID>/<node-ID>/<dcc-address>
@@ -411,16 +412,14 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             logging.info("MQTT-Client: Subscribing to signal "+str(sig_id)+" updates from \'"+node+"\'")
             # The Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
             sig_identifier = create_remote_item_identifier(sig_id,node)
-            if signals_common.sig_exists(sig_identifier):
-                logging.warning("MQTT-Client: Already subscribed to signal "+str(sig_id)+" updates from \'"+node+"\'")
-            else:
-                # Subscribe to the 'signal_updated_event' topic for the specified signal
-                # Topic is in the following format: "signal_updated_event/<Network-ID>/<Sig-Identifier>"
-                topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
-                mqtt_client.subscribe(topic)
-                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-                node_config["subscribed_topics"].append(topic)
-                # We now "Create" a dummy signal object to hold the state of the signal.
+            # Subscribe to the 'signal_updated_event' topic for the specified signal
+            # Topic is in the following format: "signal_updated_event/<Network-ID>/<Sig-Identifier>"
+            topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
+            mqtt_client.subscribe(topic)
+            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+            node_config["subscribed_topics"].append(topic)
+            # "Create" a dummy signal object to hold the state of the signal.
+            if not signals_common.sig_exists(sig_identifier):
                 signals_common.signals[sig_identifier] = {}
                 signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
                 signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
@@ -442,16 +441,14 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
             logging.info("MQTT-Client: Subscribing to section "+str(sec_id)+" updates from \'"+node+"\'")
             # The Identifier for a remote Track Section is a string combining the the Node-ID and Section-ID
             sec_identifier = create_remote_item_identifier(sec_id,node)
-            if track_sections.section_exists(sec_identifier):
-                logging.warning("MQTT-Client: Already subscribed to section "+str(sec_id)+" updates from \'"+node+"\'")
-            else:
-                # Subscribe to the 'section_updated_event' topic for the specified track section
-                # Topic is in the following format: "section_updated_event/<Network-ID>/<Sig-Identifier>"
-                topic = "section_updated_event/"+node_config["network_identifier"]+"/"+sec_identifier
-                mqtt_client.subscribe(topic)
-                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-                node_config["subscribed_topics"].append(topic)
-                # We now "Create" a dummy section object to hold the state of the signal.
+            # Subscribe to the 'section_updated_event' topic for the specified track section
+            # Topic is in the following format: "section_updated_event/<Network-ID>/<Sig-Identifier>"
+            topic = "section_updated_event/"+node_config["network_identifier"]+"/"+sec_identifier
+            mqtt_client.subscribe(topic)
+            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+            node_config["subscribed_topics"].append(topic)
+            # "Create" a dummy section object to hold the state of the section.
+            if not track_sections.section_exists(sec_identifier):
                 track_sections.sections[sec_identifier] = {}
                 track_sections.sections[sec_identifier]["occupied"] = False
                 track_sections.sections[sec_identifier]["labeltext"] = "OCCUPIED"
@@ -473,16 +470,14 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             logging.info("MQTT-Client: Subscribing to signal "+str(sig_id)+" passed events from \'"+node+"\'")
             # The Identifier for a remote signal is a string combining the the Node-ID and Sig-ID.
             sig_identifier = create_remote_item_identifier(sig_id,node)
-            if signals_common.sig_exists(sig_identifier):
-                logging.warning("MQTT-Client: Already subscribed to signal "+str(sig_id)+" passed events from \'"+node+"\'")
-            else:
-                # Subscribe to the 'signal_passed_event' topic for the specified signal
-                # Topic is in the following format: "signal_passed_event/<Network-ID>/<Sig-Identifier>"
-                topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+sig_identifier
-                mqtt_client.subscribe(topic)
-                # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-                node_config["subscribed_topics"].append(topic)
-                # We now "Create" a dummy signal object to hold the state of the signal.
+            # Subscribe to the 'signal_passed_event' topic for the specified signal
+            # Topic is in the following format: "signal_passed_event/<Network-ID>/<Sig-Identifier>"
+            topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+sig_identifier
+            mqtt_client.subscribe(topic)
+            # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+            node_config["subscribed_topics"].append(topic)
+            # "Create" a dummy signal object to hold the state of the signal.
+            if not signals_common.sig_exists(sig_identifier):
                 signals_common.signals[sig_identifier] = {}
                 signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
                 signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
@@ -598,7 +593,8 @@ def publish_signal_state(sig_id:int):
         # We use a different topic for every signal so we can use "retained" messages to ensure when the
         # subscribing application starts up it will always receive the latest "state" of each signal
         message_topic = "signal_updated_event/"+node_config["network_identifier"]+"/"+sig_identifier
-        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,retain=True,qos=1)
     return()
 
@@ -623,7 +619,8 @@ def publish_section_state(sec_id:int):
         # We use a different topic for each section so we can use "retained" messages to ensure when the
         # subscribing application starts up it will always receive the latest "state" change
         message_topic = "section_updated_event/"+node_config["network_identifier"]+"/"+section_identifier
-        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,retain=True,qos=1)
     return()
 
@@ -645,7 +642,8 @@ def publish_signal_passed_event(sig_id:int):
         # Publish to the appropriate topic: "signal_updated_event/<network-ID>/<sig_identifier>"
         # As these are transitory events - we do not publish to the Broker as "retained messages"
         message_topic = "signal_passed_event/"+node_config["network_identifier"]+"/"+signal_identifier
-        logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+message_payload)
         mqtt_client.publish(message_topic,message_payload,qos=1)
     return()
 
