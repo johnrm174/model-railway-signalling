@@ -38,7 +38,8 @@ def find_root_window (canvas):
     while parent.master:
         # if this is a subsidary window, we still want to bind the window
         # close event to kill the applicatiion when the window is closed
-        parent.protocol("WM_DELETE_WINDOW",on_closing)
+        try: parent.protocol("WM_DELETE_WINDOW",on_closing)
+        except: pass
         parent = parent.master
     root_window = parent
     # bind the tkinter event for handling events raised in external threads
