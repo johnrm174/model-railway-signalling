@@ -180,6 +180,13 @@ window.title("Simple Interlocking Example - with Semaphores")
 canvas = Canvas(window,height=300,width=1075,bg="grey85")
 canvas.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. In this example, we're allowing
+# the user to select the file to load (and the file to save) via tkinter file dialogues.
+# As a filename of 'None' is specified then the default selection will be the name of
+# the main python script with a '.sig' extension (i.e. 'test_semaphore_example.sig')
+load_layout_state(file_name=None,load_file_dialog=True,save_file_dialog=True)
+
 print ("Initialising Pi Sprog and creating DCC Mappings")
 # If not running on a Pi-SPROG this will generate an error, but the programme
 # will still run - it just won't attempt to send any DCC Commands to the Pi-SPROG

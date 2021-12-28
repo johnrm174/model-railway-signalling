@@ -17,6 +17,7 @@
 from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
+from . import file_interface
 from . import common
 
 from tkinter import *
@@ -84,8 +85,15 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         signals_common.signals[str(sig_id)]["sigon1"]   = sigon1          # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
         
-        # Refresh the signal drawing objects to reflect the initial state
-        update_ground_position_signal (sig_id)
+        # Get the initial state for the signal (if layout state has been successfully loaded)
+        # if nothing has been loaded then the default state (as created) will be applied
+        loaded_state_sigclear,loaded_state_subclear = file_interface.get_initial_signal_state(sig_id)
+        # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
+        # Note that toggling the signal will set the signal on the schematic to the correct initial aspect
+        # and send the appropriate DCC commands to set the aspect of the external signal accordingly.
+        # Otherwise we need to update the signal to set the initial aspect and send out the DCC commands
+        if loaded_state_sigclear: signals_common.toggle_signal(sig_id)
+        else: update_ground_position_signal (sig_id)
        
     return ()
 

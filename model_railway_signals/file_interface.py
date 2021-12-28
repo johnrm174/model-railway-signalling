@@ -27,7 +27,7 @@ from . import points
 # Global variables to define what options are presented to the user on application quit
 #-------------------------------------------------------------------------------------------------
 
-filename = None
+filename_used_for_load = None
 save_as_option_enabled = True
 
 #-------------------------------------------------------------------------------------------------
@@ -45,45 +45,54 @@ def load_layout_state(file_name:str=None,
                       load_file_dialog:bool=False,
                       save_file_dialog:bool=False):
     global logging
-    global filename
+    global filename_used_for_load
     global save_as_option_enabled
     global layout_state
+    # Get the name of the main python script as a string
+    script_name = (__main__.__file__)
+    default_file_name = script_name.rsplit('.',1)[0]+'.sig'
     # If the 'save_file_dialog' option has been specified then we save this to a global variable
     # to trigger the save file dialogue on quit of the application
     save_as_option_enabled = save_file_dialog
     # We always prompt for load state on startup
-    if tkinter.messagebox.askokcancel("Load State","Do you want to load the last layout state?"):
+    if not tkinter.messagebox.askokcancel("Load State","Do you want to load the last layout state?"):
+        # if the user clicks on 'Cancel' then we still want to provide an option to save the layout
+        # state on application quit - either using the filename passed to us or the default filename
+        # derived from the name of the main python script (with a '.sig' extension)
+        if file_name: filename = file_name
+        else: filename = default_file_name
+    else:
         # If the 'load_file_dialog' option has been specified then we want to provide a default file
         # to the user in the dialog. This will be the provided filename (if one has been specified)
         # or a filename derived from the name of the main python script (with a '.sig' extension)
         # In both cases we check to make sure the file exists on disk before providing as an option
         if load_file_dialog:
-            if filename:
-                default_file_to_load = filename
-            else:
-                script_name = (__main__.__file__)
-                default_file_to_load = script_name.rsplit('.',1)[0]+'.sig'
+            if file_name: default_file_to_load = file_name
+            else: default_file_to_load = default_file_name
             if os.path.isfile (default_file_to_load):
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
                                     filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                     initialfile = default_file_to_load )
+                                    initialfile = default_file_to_load )
             else:
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
                                     filetypes=(('sig files','*.sig'),('all files','*.*')) )
+            # Note that the askopenfilename dialog returns the fully qualified filename
+            # (including the path) - we only need the name so strip out the path element
+            # This also makes it clearer to see the default filename in the file save dialog
+            if filename != () and filename != "":
+                path,name = os.path.split(filename)
+                filename = name            
         # If the 'load_file_dialog' hasn't been specified but a filename has been provided then we use that
-        elif file_name:
-            filename = file_name
+        elif file_name: filename = file_name
         # Fall back to a filename derived from the name of the main python script (with a '.sig' extension)
-        else:
-            script_name = (__main__.__file__)
-            filename = script_name.rsplit('.',1)[0]+'.sig'
-        # Test for an empty filename (i.e. user pressing cancel in file selection dialogue). Note that
-        # if the filename is empty, we set a filename derived from the name of the main python script
-        # (with a '.sig' extension) for the subsequent save of layout state on quit of the application
-        if filename == ():
+        else: filename = default_file_name
+        # if the user clicks on 'Cancel' in the load file dialog then we still want to provide an option
+        # to save the layout state on application quit - either using the filename passed to us or the
+        # default filename derived from the name of the main python script (with a '.sig' extension)
+        if filename == () or filename == "":
             logging.info("Load File - No file selected - Layout will be created in its default state")
-            script_name = (__main__.__file__)
-            filename = script_name.rsplit('.',1)[0]+'.sig'
+            if file_name: filename = file_name
+            else: filename = default_file_name
         else:
             # We have a valid filename so can proceed to try and open the file
             logging.info("Load File - Loading layout state information from '"+filename+"'")
@@ -102,6 +111,8 @@ def load_layout_state(file_name:str=None,
                 except Exception as exception:
                     logging.error("Load File - Couldn't read file - Layout will be created in its default state")
                     logging.error("Load File - Reported exception: "+str(exception))
+    # store the filename that was used (or attempted) - to use on application quit
+    filename_used_for_load = filename
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -120,8 +131,10 @@ def load_layout_state(file_name:str=None,
 
 def save_state_and_quit():
     global logging
-    global filename
+    global filename_used_for_load
     global save_as_option_enabled
+    # get the filename that was used/attempted to load state on application startup
+    filename = filename_used_for_load
     # if the global variable 'filename' is "None" then file loading/saving hasn't been configured by
     # the signalling application - we therefore just give the option to quit the application or cancel
     if filename is None:
@@ -142,11 +155,17 @@ def save_state_and_quit():
                 filename = tkinter.filedialog.asksaveasfilename(title='Save Layout State',
                                     filetypes=(('sig files','*.sig'),('all files','*.*')),
                                     initialfile = filename)
-            if filename == ():
+            if filename == () or filename == "":
                 # This is the case of the user pressing cancel in the file dialog.
                 # Assume that the user doesn't want to quit after all
                 quit_application = False
             else:
+                # Note that the asksaveasfilename dialog returns the fully qualified filename
+                # (including the path) - we only need the name so strip out the path element
+                # This also makes it clearer to see the default filename in the file save dialog
+                if filename != () and filename != "":
+                    path,name = os.path.split(filename)
+                    filename = name            
                 logging.info("Saving Layout State Information as '"+filename+"'")
                 # Compile a dictionary of everything we want to save. Note that we only need to save the
                 # current user settings for the points, signals and sections. The application code should
@@ -210,7 +229,7 @@ def get_initial_section_state(section_id):
             occupied = None
             label = None
         else:
-            logging.info("Section "+str(section_id)+": Successfully loaded initial state")
+            logging.info("Section "+str(section_id)+": Successfully oaded initial state from file")
     return(occupied,label)
 
 #-------------------------------------------------------------------------------------------------

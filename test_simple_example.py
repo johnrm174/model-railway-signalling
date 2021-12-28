@@ -143,7 +143,11 @@ window.title("Simple Interlocking Example")
 canvas = Canvas(window,height=300,width=1075,bg="grey85")
 canvas.pack()
 
-load_layout_state(load_file_dialog=False,save_file_dialog=False)
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. If file_name is 'None' then
+# the name of the main python script will be used with a '.sig' extension
+# For this example, the filename will be 'test_simple_example.sig'
+load_layout_state(file_name=None,load_file_dialog=False,save_file_dialog=False)
 
 print ("Initialising Pi Sprog and creating DCC Mappings")
 # If not running on a Pi-SPROG this will generate an error, but the programme

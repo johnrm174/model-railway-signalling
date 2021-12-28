@@ -216,15 +216,9 @@ def create_section (canvas, section_id:int, x:int, y:int,
     elif section_id < 1:
         logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
     else:
-        # Get the initial state for the section (if layout state has been successfully loaded)
-        # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state_occupied,loaded_label = file_interface.get_initial_section_state(section_id)
-        # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
-        if loaded_label: label_text = loaded_label
-        else: label_text = label
         # Create the button objects and their callbacks
         font_size = common.fontsize
-        section_button = Button (canvas, text=label_text, state="normal", relief="raised",
+        section_button = Button (canvas, text=label, state="normal", relief="raised",
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id), width = len(label))
@@ -233,7 +227,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
                                      "button1" : section_button,          # drawing object
                                      "extcallback" : section_callback,    # External callback to make
-                                     "labeltext" : label_text,            # The Text to display (when OCCUPIED)
+                                     "labeltext" : label,                 # The Text to display (when OCCUPIED)
                                      "labellength" : len(label),          # The fixed length for the button
                                      "positionx" : x,                     # Position of the button on the canvas
                                      "positiony" : y,                     # Position of the button on the canvas
@@ -246,6 +240,13 @@ def create_section (canvas, section_id:int, x:int, y:int,
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         else:
             section_button.config(state="disabled")
+        # Get the initial state for the section (if layout state has been successfully loaded)
+        # if nothing has been loaded then the default state (as created) will be applied
+        loaded_state_occupied,loaded_label = file_interface.get_initial_section_state(section_id)
+        # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
+        if loaded_label:
+            sections[str(section_id)]["labeltext"] = loaded_label
+            sections[str(section_id)]["button1"]["text"] = loaded_label
         # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
         if loaded_state_occupied: toggle_section(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only

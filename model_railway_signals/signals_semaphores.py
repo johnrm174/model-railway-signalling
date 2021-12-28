@@ -21,6 +21,7 @@ from . import common
 from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
+from . import file_interface
 
 from typing import Union
 from tkinter import *
@@ -204,7 +205,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # We set them in the "wrong" state initially, so that when the signal arms
         # are first updated they get "changed" to the correct aspects and send out
         # the DCC commands to put the layout signals into their corresponding state
-        if main_signal is not None: main_signal = not fully_automatic
+        if main_signal is not None: main_signal = True
         if main_subsidary is not None: main_subsidary = True 
         if lh1_subsidary is not None: lh1_subsidary = True
         if rh1_subsidary is not None: rh1_subsidary = True
@@ -283,17 +284,38 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # if there is an associated signal then we also need to update that signal to refer back to this one
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
-        
-        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect (this will refresh
-        # the signal to display the correct aspects and send the DCC commands to put all mapped signal arms
-        # into their correct states. If not automatic we still need to refresh the signal to display the
-        # correct aspects and send the DCC commands to put all mapped signal arms into their correct states
-        if fully_automatic: signals_common.toggle_signal(sig_id)
-        else: update_semaphore_signal(sig_id)
-        # Refresh the subsidary signal arms to display the initial aspects and send the DCC commands
-        # to put all mapped signal arms into their correct states
-        update_semaphore_subsidary_arms(sig_id)
 
+        # Get the initial state for the signal (if layout state has been successfully loaded)
+        # if nothing has been loaded then the default state (as created) will be applied
+        loaded_state_sigclear,loaded_state_subclear = file_interface.get_initial_signal_state(sig_id)
+        # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
+        # If no signal state was loaded and the signal is fully automatic then we also need to toggle the
+        # signal to display a CLEAR aspect (automatic signals are OFF for the default 'as created' state)
+        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
+        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
+        # If we're not toggling the signal then we need to update the signal to display the correct initial
+        # aspect and send out the DCC bus commands to change the aspect of the external DCC signal 
+
+        if main_signal is not None: main_signal = not fully_automatic
+
+        if loaded_state_sigclear:
+            signals_common.signals[str(sig_id)]["main_signal"] = False
+            signals_common.toggle_signal(sig_id)
+        elif fully_automatic:
+            signals_common.signals[str(sig_id)]["main_signal"] = False
+            signals_common.toggle_signal(sig_id)
+        elif refresh_immediately: update_semaphore_signal(sig_id)
+        
+        # Toggle the subsidary state if SWITCHED (loaded_state_subclear will be 'None' if no data was loaded)
+        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
+        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
+        # We test to see if there is a subsidary arm first (ths signal may not have one for the main route)
+        if loaded_state_subclear:
+            if signals_common.signals[str(sig_id)]["main_subsidary"] == True:
+                signals_common.signals[str(sig_id)]["main_subsidary"] = False
+            signals_common.toggle_subsidary(sig_id)
+        else: update_semaphore_subsidary_arms(sig_id)
+        
     return ()
 
 #-------------------------------------------------------------------

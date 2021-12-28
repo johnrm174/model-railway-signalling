@@ -309,6 +309,10 @@ window3.title("Window 3: An example of using 'Release on Red' Approach Control f
 canvas3 = Canvas(window3,height=300,width=1100,bg="grey85")
 canvas3.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. In this example, we're specifying the filename
+load_layout_state(file_name="approach_control_state.sig")
+
 print ("Initialising Pi Sprog")
 initialise_pi_sprog ()
 request_dcc_power_on()
