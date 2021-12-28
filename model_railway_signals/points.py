@@ -48,6 +48,7 @@
 
 from . import dcc_control
 from . import common
+from . import file_interface
 
 from tkinter import *
 import enum
@@ -139,11 +140,43 @@ def toggle_fpl (point_id:int):
     return()
 
 # -------------------------------------------------------------------------
-# Function to flip the route setting for the Point - called when the main
-# point button is pressed - Can also be called by the external programme
-# to enable automated route setting functions.
-# Will also recursivelly call itself to change the "also_switch"
-# point to switch if one was specified when the point was created
+# Internal Function to toggle the point blade drawing objects and update
+# the internal state of the point - called by the toggle_point function
+# Can also be called on point creation to set the initial (loaded) state
+# -------------------------------------------------------------------------
+
+def toggle_point_state(point_id:int, switched_by_another_point = False):
+
+    global points
+    global logging
+
+    if not points[str(point_id)]["switched"]:
+        if switched_by_another_point:
+            logging.info ("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
+        else:
+            logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
+        points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
+        points[str(point_id)]["switched"] = True
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
+        dcc_control.update_dcc_point(point_id,True)
+    else:
+        if switched_by_another_point:
+            logging.info ("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
+        else:
+            logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
+        points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
+        points[str(point_id)]["switched"] = False
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
+        dcc_control.update_dcc_point(point_id,False)
+    return
+
+# -------------------------------------------------------------------------
+# External function to flip the route setting for the Point - called when the main
+# the main point button is pressed - Can also be called by an external programme
+# to enable automated route setting functions (i.e this is a public API function).
+# Will also recursivelly call itself to change any "also_switch" points
 # -------------------------------------------------------------------------
 
 def toggle_point (point_id:int, switched_by_another_point = False):
@@ -160,26 +193,8 @@ def toggle_point (point_id:int, switched_by_another_point = False):
             logging.warning ("Point "+str(point_id)+": Toggle Point - Point is externally locked - Toggling anyway")
         elif points[str(point_id)]["hasfpl"] and points[str(point_id)]["fpllock"]:
             logging.warning ("Point "+str(point_id)+": Toggle Point - Facing Point Lock is active - Toggling anyway")
-        if not points[str(point_id)]["switched"]:
-            if switched_by_another_point:
-                logging.info ("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
-            else:
-                logging.info ("Point "+str(point_id)+": Changing point to SWITCHED")
-            points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
-            points[str(point_id)]["switched"] = True
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
-            dcc_control.update_dcc_point(point_id,True)
-        else:
-            if switched_by_another_point:
-                logging.info ("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
-            else:
-                logging.info ("Point "+str(point_id)+": Changing point to NORMAL")
-            points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
-            points[str(point_id)]["switched"] = False
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
-            points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
-            dcc_control.update_dcc_point(point_id,False)
+        # Call the internal function to toggle the point state and update the drawing objects
+        toggle_point_state (point_id,switched_by_another_point)
         # Now change any other points we need (i.e. points switched with this one)
         if points[str(point_id)]["alsoswitch"] != 0:
             if not point_exists(points[str(point_id)]["alsoswitch"]):
@@ -322,8 +337,18 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 
         # Add the new point to the dictionary of points
         points[str(point_id)] = new_point
-        # Set the initial state of the point
-        dcc_control.update_dcc_point(point_id,False)
+        
+        # Get the initial state for the point (if layout state has been successfully loaded)
+        # if nothing has been loaded then the default state (as created) will be applied
+        loaded_state_switched,loaded_state_fpl_active = file_interface.get_initial_point_state(point_id)
+        # Toggle the point state if SWITCHED (loaded_state_switched will be 'None' if no data was loaded)
+        # Note that Toggling the point will also send the DCC commands to set the initial state
+        if loaded_state_switched: toggle_point_state(point_id)
+        else: dcc_control.update_dcc_point(point_id,False)
+        # Toggle the FPL if FPL is ACTIVE (loaded_state_switched will be 'None' if no data was loaded)
+        # We toggle on False as points with FPLs are created with the FPL active by default
+        if fpl and loaded_state_fpl_active == False: toggle_fpl(point_id)
+        
         # We'll also return a list of identifiers for the drawing objects
         # so we can change the colour of them later if required
         # [blade straight, blade switched, route straight, route switched]

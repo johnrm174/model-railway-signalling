@@ -143,6 +143,8 @@ window.title("Simple Interlocking Example")
 canvas = Canvas(window,height=300,width=1075,bg="grey85")
 canvas.pack()
 
+load_layout_state(load_file_dialog=False,save_file_dialog=False)
+
 print ("Initialising Pi Sprog and creating DCC Mappings")
 # If not running on a Pi-SPROG this will generate an error, but the programme
 # will still run - it just won't attempt to send any DCC Commands to the Pi-SPROG

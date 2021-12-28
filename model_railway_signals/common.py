@@ -7,7 +7,7 @@ import math
 import queue
 import logging
 from . import mqtt_interface
-from tkinter import messagebox
+from . import file_interface
 
 #-------------------------------------------------------------------------
 # Function to catch the root window close event so we can perform an
@@ -16,9 +16,10 @@ from tkinter import messagebox
 
 def on_closing():
     global root_window
-    if messagebox.askokcancel("Quit","Do you want to quit?"):
+    if file_interface.save_state_and_quit():
         mqtt_interface.mqtt_shutdown()
         root_window.destroy()
+    return()
 
 #-------------------------------------------------------------------------
 # Function to find and store the tkinter "root" window as this is used to
