@@ -287,7 +287,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state_sigclear,loaded_state_subclear = file_interface.get_initial_signal_state(sig_id)
+        load_sigclear,load_subclear,load_relonred,load_relonyel = file_interface.get_initial_signal_state(sig_id)
         # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
         # If no signal state was loaded and the signal is fully automatic then we also need to toggle the
         # signal to display a CLEAR aspect (automatic signals are OFF for the default 'as created' state)
@@ -295,22 +295,19 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
         # If we're not toggling the signal then we need to update the signal to display the correct initial
         # aspect and send out the DCC bus commands to change the aspect of the external DCC signal 
-
-        if main_signal is not None: main_signal = not fully_automatic
-
-        if loaded_state_sigclear:
+        if load_sigclear:
             signals_common.signals[str(sig_id)]["main_signal"] = False
             signals_common.toggle_signal(sig_id)
         elif fully_automatic:
             signals_common.signals[str(sig_id)]["main_signal"] = False
             signals_common.toggle_signal(sig_id)
         elif refresh_immediately: update_semaphore_signal(sig_id)
-        
+        if load_relonred: signals_common.set_approach_control(sig_id,release_on_yellow=False)
         # Toggle the subsidary state if SWITCHED (loaded_state_subclear will be 'None' if no data was loaded)
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
         # We test to see if there is a subsidary arm first (ths signal may not have one for the main route)
-        if loaded_state_subclear:
+        if has_subsidary and load_subclear:
             if signals_common.signals[str(sig_id)]["main_subsidary"] == True:
                 signals_common.signals[str(sig_id)]["main_subsidary"] = False
             signals_common.toggle_subsidary(sig_id)

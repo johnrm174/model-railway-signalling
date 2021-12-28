@@ -502,6 +502,9 @@ window1_callback_function(None, None)
 
 print("Entering Main Event Loop")
 print("Main Thread is: " + str(threading.get_ident()))
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window1.focus_force()
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 window1.mainloop()
 

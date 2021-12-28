@@ -87,12 +87,12 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state_sigclear,loaded_state_subclear = file_interface.get_initial_signal_state(sig_id)
+        load_sigclear,load_subclear,load_relonred,load_relonyel = file_interface.get_initial_signal_state(sig_id)
         # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
         # Note that toggling the signal will set the signal on the schematic to the correct initial aspect
         # and send the appropriate DCC commands to set the aspect of the external signal accordingly.
         # Otherwise we need to update the signal to set the initial aspect and send out the DCC commands
-        if loaded_state_sigclear: signals_common.toggle_signal(sig_id)
+        if load_sigclear: signals_common.toggle_signal(sig_id)
         else: update_ground_position_signal (sig_id)
        
     return ()

@@ -283,6 +283,10 @@ print ("Setting Initial Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 main_callback_function(None,None)
 
-# Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window.focus_force()
+# Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
+

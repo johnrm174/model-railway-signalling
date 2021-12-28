@@ -1,6 +1,12 @@
 # ----------------------------------------------------------------------------------------------
-# This module is used for loading and saving layout 'State', enabling the current settings of
-# all signals, points and sections on the layout to be "preserved" until the next running session
+# This module is used for loading and saving layout 'State', enabling the main settings for
+# signals, points and sections on the layout to be "preserved" until the next running session
+# Note that only the following state information is maintained:
+#     - Points - switched state of the point and Facing Point Lock
+#     - Signals - switched state of the signal and its subsidary
+#               - approach control state (for the main signals)
+#     - Sections - switched state of the section (clear/occupied)
+#                - current label for the section (train identifier)
 #
 # A single function is called to configure the load/save behavior:
 # 
@@ -175,6 +181,15 @@ def save_state_and_quit():
                     signal_states[signal] ={}
                     signal_states[signal]["sigclear"] = signals_common.signals[signal]["sigclear"]
                     signal_states[signal]["subclear"] = signals_common.signals[signal]["subclear"]
+                    # Release on Red and Release on yellow are only supported for certain signal types
+                    if "releaseonred" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["releaseonred"] = signals_common.signals[signal]["releaseonred"]
+                    else:
+                        signal_states[signal]["releaseonred"] = None
+                    if "releaseonyel" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["releaseonyel"] = signals_common.signals[signal]["releaseonyel"]
+                    else:
+                        signal_states[signal]["releaseonyel"] = None
                 point_states = {}
                 for point in points.points:
                     point_states[point] ={}
@@ -229,7 +244,7 @@ def get_initial_section_state(section_id):
             occupied = None
             label = None
         else:
-            logging.info("Section "+str(section_id)+": Successfully oaded initial state from file")
+            logging.info("Section "+str(section_id)+": Successfully loaded initial state")
     return(occupied,label)
 
 #-------------------------------------------------------------------------------------------------
@@ -275,23 +290,31 @@ def get_initial_signal_state(sig_id):
         # This could be a valid condition if no file has been loaded - we therefore fail silently
         sigclear = None
         subclear = None
+        relonred = None
+        relonyel = None
     elif str(sig_id) not in layout_state["signals"].keys():
         # We know a file is loaded - therefore this is a valid error to report
         logging.warning("Signal "+str(sig_id)+": Loaded file missing data for signal - Default values will be set")
         sigclear = None
         subclear = None
+        relonred = None
+        relonyel = None
     else:
         # We use exception handling in case the data elements are missing or corrupted (i.e. the wrong type)
         try:
             sigclear = bool(layout_state["signals"][str(sig_id)]["sigclear"])
             subclear = bool(layout_state["signals"][str(sig_id)]["subclear"])
+            relonred = bool(layout_state["signals"][str(sig_id)]["releaseonred"])
+            relonyel = bool(layout_state["signals"][str(sig_id)]["releaseonyel"])
         except Exception as exception:
             logging.error("Signal "+str(sig_id)+": Loaded file data elements corrupted - Default values will be set")
             logging.error("Signal "+str(sig_id)+": Reported exception: "+str(exception))
             sigclear = None
             subclear = None
+            relonred = None
+            relonyel = None
         else:
             logging.info("Signal "+str(sig_id)+": Successfully loaded initial state ")
-    return(sigclear,subclear)
+    return(sigclear,subclear,relonred,relonyel)
 
 ############################################################################################################
