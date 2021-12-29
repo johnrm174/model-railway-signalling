@@ -242,16 +242,16 @@ def create_section (canvas, section_id:int, x:int, y:int,
             section_button.config(state="disabled")
         # Get the initial state for the section (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state_occupied,loaded_label = file_interface.get_initial_section_state(section_id)
+        loaded_state = file_interface.get_initial_section_state(section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
-        if loaded_label:
-            sections[str(section_id)]["labeltext"] = loaded_label
-            sections[str(section_id)]["button1"]["text"] = loaded_label
+        if loaded_state["labeltext"]:
+            sections[str(section_id)]["labeltext"] = loaded_state["labeltext"]
+            sections[str(section_id)]["button1"]["text"] = loaded_state["labeltext"]
         # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
-        if loaded_state_occupied: toggle_section(section_id)
+        if loaded_state["occupied"]: toggle_section(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        mqtt_interface.publish_section_state(section_id)
+        mqtt_interface.publish_section_state(section_id) 
 
     return()
 

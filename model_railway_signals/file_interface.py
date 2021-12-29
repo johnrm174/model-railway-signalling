@@ -181,7 +181,12 @@ def save_state_and_quit():
                     signal_states[signal] ={}
                     signal_states[signal]["sigclear"] = signals_common.signals[signal]["sigclear"]
                     signal_states[signal]["subclear"] = signals_common.signals[signal]["subclear"]
-                    # Release on Red and Release on yellow are only supported for certain signal types
+                    signal_states[signal]["override"] = signals_common.signals[signal]["override"]
+                    signal_states[signal]["siglocked"] = signals_common.signals[signal]["siglocked"]
+                    signal_states[signal]["sublocked"] = signals_common.signals[signal]["sublocked"]
+                    # Use the 'value' for  Enumeration types as the enumerations can't be converted
+                    signal_states[signal]["routeset"] = signals_common.signals[signal]["routeset"].value
+                    # Release on Red/yellow and theatre indicators are only supported for certain signal types
                     if "releaseonred" in signals_common.signals[signal].keys(): 
                         signal_states[signal]["releaseonred"] = signals_common.signals[signal]["releaseonred"]
                     else:
@@ -190,11 +195,16 @@ def save_state_and_quit():
                         signal_states[signal]["releaseonyel"] = signals_common.signals[signal]["releaseonyel"]
                     else:
                         signal_states[signal]["releaseonyel"] = None
+                    if "theatretext" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["theatretext"] = signals_common.signals[signal]["theatretext"]
+                    else:
+                        signal_states[signal]["theatretext"] = None
                 point_states = {}
                 for point in points.points:
                     point_states[point] ={}
                     point_states[point]["switched"] = points.points[point]["switched"]
                     point_states[point]["fpllock"] = points.points[point]["fpllock"]
+                    point_states[point]["locked"] = points.points[point]["locked"]
                 section_states = {}
                 for section in track_sections.sections:
                     section_states[section] ={}
@@ -224,28 +234,29 @@ def save_state_and_quit():
 
 def get_initial_section_state(section_id):
     global logging
+    section_state={}
     if "sections" not in layout_state.keys():
         # This could be a valid condition if no file has been loaded - we therefore fail silently
-        occupied = None
-        label = None
+        section_state["occupied"] = None
+        section_state["labeltext"] = None
     elif str(section_id) not in layout_state["sections"].keys():
         # We know a file is loaded - therefore this is a valid error to report
         logging.warning("Section "+str(section_id)+": Loaded file missing data for section - Default values will be set")
-        occupied = None
-        label = None
+        section_state["occupied"] = None
+        section_state["labeltext"] = None
     else:
         # We use exception handling in case the data elements are missing or corrupted (i.e. the wrong type)
         try:
-            occupied = bool(layout_state["sections"][str(section_id)]["occupied"])
-            label = str(layout_state["sections"][str(section_id)]["labeltext"])
+            section_state["occupied"] = bool(layout_state["sections"][str(section_id)]["occupied"])
+            section_state["labeltext"] = str(layout_state["sections"][str(section_id)]["labeltext"])
         except Exception as exception:
             logging.error("Section "+str(section_id)+": Loaded file data elements corrupted - Default values will be set")
             logging.error("Section "+str(section_id)+": Reported exception: "+str(exception))
-            occupied = None
-            label = None
+            section_state["occupied"] = None
+            section_state["labeltext"] = None
         else:
             logging.info("Section "+str(section_id)+": Successfully loaded initial state")
-    return(occupied,label)
+    return(section_state)
 
 #-------------------------------------------------------------------------------------------------
 # Function called on creation of a point object to return the initial state from the loaded
@@ -255,28 +266,33 @@ def get_initial_section_state(section_id):
 
 def get_initial_point_state(point_id):
     global logging
+    point_state={}
     if "points" not in layout_state.keys():
         # This could be a valid condition if no file has been loaded - we therefore fail silently
-        switched = None
-        fpl_lock = None
+        point_state["switched"] = None
+        point_state["fpllock"] = None
+        point_state["locked"] = None
     elif str(point_id) not in layout_state["points"].keys():
         # We know a file is loaded - therefore this is a valid error to report
         logging.warning("Point "+str(point_id)+": Loaded file missing data for point - Default values will be set")
-        switched = None
-        fpl_lock = None
+        point_state["switched"] = None
+        point_state["fpllock"] = None
+        point_state["locked"] = None
     else:
         # We use exception handling in case the data elements are missing or corrupted (i.e. the wrong type)
         try:
-            switched = bool(layout_state["points"][str(point_id)]["switched"])
-            fpl_lock = bool(layout_state["points"][str(point_id)]["fpllock"])
+            point_state["switched"] = bool(layout_state["points"][str(point_id)]["switched"])
+            point_state["fpllock"] = bool(layout_state["points"][str(point_id)]["fpllock"])
+            point_state["locked"] = bool(layout_state["points"][str(point_id)]["locked"])
         except Exception as exception:
             logging.error("Point "+str(point_id)+": Loaded file data elements corrupted - Default values will be set")
             logging.error("Point "+str(point_id)+": Reported exception: "+str(exception))
-            switched = None
-            fpl_lock = None
+            point_state["switched"] = None
+            point_state["fpllock"] = None
+            point_state["locked"] = None
         else:
             logging.info("Point "+str(point_id)+": Successfully loaded initial state")
-    return(switched,fpl_lock)
+    return(point_state)
 
 #-------------------------------------------------------------------------------------------------
 # Function called on creation of a signal object to return the initial state from the loaded
@@ -286,35 +302,57 @@ def get_initial_point_state(point_id):
 
 def get_initial_signal_state(sig_id):
     global logging
+    signal_state={}
     if "signals" not in layout_state.keys():
         # This could be a valid condition if no file has been loaded - we therefore fail silently
-        sigclear = None
-        subclear = None
-        relonred = None
-        relonyel = None
+        signal_state["sigclear"] = None
+        signal_state["subclear"] = None
+        signal_state["override"] = None
+        signal_state["siglocked"] = None
+        signal_state["sublocked"] = None
+        signal_state["releaseonred"] = None
+        signal_state["releaseonyel"] = None
+        signal_state["theatretext"] = None
+        signal_state["routeset"] = None
     elif str(sig_id) not in layout_state["signals"].keys():
         # We know a file is loaded - therefore this is a valid error to report
         logging.warning("Signal "+str(sig_id)+": Loaded file missing data for signal - Default values will be set")
-        sigclear = None
-        subclear = None
-        relonred = None
-        relonyel = None
+        signal_state["sigclear"] = None
+        signal_state["subclear"] = None
+        signal_state["override"] = None
+        signal_state["siglocked"] = None
+        signal_state["sublocked"] = None
+        signal_state["releaseonred"] = None
+        signal_state["releaseonyel"] = None
+        signal_state["theatretext"] = None
+        signal_state["routeset"] = None
     else:
         # We use exception handling in case the data elements are missing or corrupted (i.e. the wrong type)
         try:
-            sigclear = bool(layout_state["signals"][str(sig_id)]["sigclear"])
-            subclear = bool(layout_state["signals"][str(sig_id)]["subclear"])
-            relonred = bool(layout_state["signals"][str(sig_id)]["releaseonred"])
-            relonyel = bool(layout_state["signals"][str(sig_id)]["releaseonyel"])
+            signal_state["sigclear"] = bool(layout_state["signals"][str(sig_id)]["sigclear"])
+            signal_state["subclear"] = bool(layout_state["signals"][str(sig_id)]["subclear"])
+            signal_state["override"] = bool(layout_state["signals"][str(sig_id)]["override"])
+            signal_state["siglocked"] = bool(layout_state["signals"][str(sig_id)]["siglocked"])
+            signal_state["sublocked"] = bool(layout_state["signals"][str(sig_id)]["sublocked"])
+            signal_state["releaseonred"] = bool(layout_state["signals"][str(sig_id)]["releaseonred"])
+            signal_state["releaseonyel"] = bool(layout_state["signals"][str(sig_id)]["releaseonyel"])
+            signal_state["theatretext"] = str(layout_state["signals"][str(sig_id)]["theatretext"])
+            # We load the 'values' of enumeration types - so need to convert them back to the enumerations
+            signal_state["routeset"] = signals_common.route_type(layout_state["signals"][str(sig_id)]["routeset"])
         except Exception as exception:
             logging.error("Signal "+str(sig_id)+": Loaded file data elements corrupted - Default values will be set")
             logging.error("Signal "+str(sig_id)+": Reported exception: "+str(exception))
-            sigclear = None
-            subclear = None
-            relonred = None
-            relonyel = None
+            signal_state["sigclear"] = None
+            signal_state["subclear"] = None
+            signal_state["override"] = None
+            signal_state["siglocked"] = None
+            signal_state["sublocked"] = None
+            signal_state["releaseonred"] = None
+            signal_state["releaseonyel"] = None
+            signal_state["theatretext"] = None
+            signal_state["routeset"] = None
         else:
             logging.info("Signal "+str(sig_id)+": Successfully loaded initial state ")
-    return(sigclear,subclear,relonred,relonyel)
+    return(signal_state)
 
 ############################################################################################################

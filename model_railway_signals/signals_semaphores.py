@@ -286,32 +286,39 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
-        # if nothing has been loaded then the default state (as created) will be applied
-        load_sigclear,load_subclear,load_relonred,load_relonyel = file_interface.get_initial_signal_state(sig_id)
-        # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
+        # Note that each element of 'loaded_state' will be 'None' if no data was loaded
+        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        # Set the signal override state if required
+        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
+        # Set the initial Approach control state for the signal
+        if loaded_state["releaseonred"]: signals_common.set_approach_control(sig_id,release_on_yellow=False)
+        if loaded_state["releaseonyel"]: signals_common.set_approach_control(sig_id,release_on_yellow=True)
+        # Toggle the signal state if SWITCHED - This will update the signal on the schematic and send
+        # out the associated DCC commands - Otherwise we have to 'Update' the signal to do this
         # If no signal state was loaded and the signal is fully automatic then we also need to toggle the
         # signal to display a CLEAR aspect (automatic signals are OFF for the default 'as created' state)
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
-        # If we're not toggling the signal then we need to update the signal to display the correct initial
-        # aspect and send out the DCC bus commands to change the aspect of the external DCC signal 
-        if load_sigclear:
+        if loaded_state["sigclear"]:
             signals_common.signals[str(sig_id)]["main_signal"] = False
             signals_common.toggle_signal(sig_id)
         elif fully_automatic:
             signals_common.signals[str(sig_id)]["main_signal"] = False
             signals_common.toggle_signal(sig_id)
         elif refresh_immediately: update_semaphore_signal(sig_id)
-        if load_relonred: signals_common.set_approach_control(sig_id,release_on_yellow=False)
+        # Lock the signal if required 
+        if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
         # Toggle the subsidary state if SWITCHED (loaded_state_subclear will be 'None' if no data was loaded)
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
         # We test to see if there is a subsidary arm first (ths signal may not have one for the main route)
-        if has_subsidary and load_subclear:
+        if has_subsidary and loaded_state["subclear"]:
             if signals_common.signals[str(sig_id)]["main_subsidary"] == True:
                 signals_common.signals[str(sig_id)]["main_subsidary"] = False
             signals_common.toggle_subsidary(sig_id)
         else: update_semaphore_subsidary_arms(sig_id)
+        # Lock the subsidary if required 
+        if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
         
     return ()
 
@@ -534,7 +541,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
                 update_semaphore_signal(associated_signal,updating_associated_signal=True)
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
-        signals_common.update_theatre_route_indication(sig_id)
+        signals_common.enable_disable_theatre_route_indication(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         mqtt_interface.publish_signal_state(sig_id)            

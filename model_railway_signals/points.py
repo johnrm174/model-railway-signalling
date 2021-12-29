@@ -340,15 +340,18 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         
         # Get the initial state for the point (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state_switched,loaded_state_fpl_active = file_interface.get_initial_point_state(point_id)
-        # Toggle the point state if SWITCHED (loaded_state_switched will be 'None' if no data was loaded)
-        # Note that Toggling the point will also send the DCC commands to set the initial state
-        if loaded_state_switched: toggle_point_state(point_id)
-        else: dcc_control.update_dcc_point(point_id,False)
-        # Toggle the FPL if FPL is ACTIVE (loaded_state_switched will be 'None' if no data was loaded)
+        loaded_state = file_interface.get_initial_point_state(point_id)
+        # Toggle the FPL if FPL is ACTIVE ("switched" will be 'None' if no data was loaded)
         # We toggle on False as points with FPLs are created with the FPL active by default
-        if fpl and loaded_state_fpl_active == False: toggle_fpl(point_id)
-        
+        if fpl and loaded_state["fpllock"] == False: toggle_fpl(point_id)
+        # Toggle the point state if SWITCHED ("switched" will be 'None' if no data was loaded)
+        # Note that Toggling the point will also send the DCC commands to set the initial state
+        # If we don't toggle the point we need to send out the DCC commands for the default state
+        if loaded_state["switched"]: toggle_point_state(point_id)
+        else: dcc_control.update_dcc_point(point_id,False)
+        # Externally lock the point if required
+        if loaded_state["locked"]: lock_point(point_id)
+
         # We'll also return a list of identifiers for the drawing objects
         # so we can change the colour of them later if required
         # [blade straight, blade switched, route straight, route switched]

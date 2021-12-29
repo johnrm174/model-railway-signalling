@@ -86,15 +86,17 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         signals_common.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
         
         # Get the initial state for the signal (if layout state has been successfully loaded)
-        # if nothing has been loaded then the default state (as created) will be applied
-        load_sigclear,load_subclear,load_relonred,load_relonyel = file_interface.get_initial_signal_state(sig_id)
-        # Toggle the signal state if SWITCHED (loaded_state_sigclear will be 'None' if no data was loaded)
-        # Note that toggling the signal will set the signal on the schematic to the correct initial aspect
-        # and send the appropriate DCC commands to set the aspect of the external signal accordingly.
-        # Otherwise we need to update the signal to set the initial aspect and send out the DCC commands
-        if load_sigclear: signals_common.toggle_signal(sig_id)
-        else: update_ground_position_signal (sig_id)
-       
+        # Note that each element of 'loaded_state' will be 'None' if no data was loaded
+        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        # Set the initial state from the "loaded" state - We only need to set the 'override' and
+        # 'sigclear' for ground signals - everything else gets set when the signal is updated
+        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
+        if loaded_state["sigclear"]: signals_common.toggle_signal(sig_id)
+        # Update the signal to show the initial aspect (and send out DCC commands)
+        update_ground_position_signal(sig_id)
+        # finally Lock the signal if required
+        if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
+
     return ()
 
 # -------------------------------------------------------------------------

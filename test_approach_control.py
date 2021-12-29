@@ -44,7 +44,7 @@ import threading
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG) 
 
 #----------------------------------------------------------------------
-# WINDOW 2 - Main Callback for 'Release on Yellow' Approach Control (Colour Light Signals)
+# WINDOW 1 - Main Callback for 'Release on Red' Approach Control (Semaphore Signals)
 #----------------------------------------------------------------------
 
 def window1_callback_function(item_id,callback_type):
@@ -338,7 +338,7 @@ create_section(canvas3,13,625,150,section_callback=window3_callback_function)
 create_section(canvas3,14,925,150,section_callback=window3_callback_function)
 create_section(canvas3,15,925,100,section_callback=window3_callback_function)
 
-print ("Window 2: Creating Signals")
+print ("Window 3: Creating Signals")
 create_colour_light_signal (canvas3,11,50,150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=window3_callback_function,
