@@ -30,7 +30,7 @@ import enum
 
 # -------------------------------------------------------------------------
 # Global variable to ensure we only start the tkinter scheduled tasks (to flash 
-# any approach control aspects) only once after the first signal has been created
+# any approach control aspects) only once (after the creation of the first signal)
 # -------------------------------------------------------------------------
 
 flash_aspects_started = False
@@ -48,12 +48,9 @@ class signal_sub_type(enum.Enum):
     four_aspect = 5
 
 # ---------------------------------------------------------------------------------
-# Externally called Function to create a Colour Light Signal 'object'. The Signal is
+# Public API Function to create a Colour Light Signal 'object'. The Signal is
 # normally set to "NOT CLEAR" = RED (or YELLOW if its a 2 aspect distant signal)
 # unless its fully automatic - when its set to "CLEAR" (with the appropriate aspect)
-# All attributes (that need to be tracked) are stored as a dictionary which is then
-# stored in the common dictionary of signals. Note that some elements in the dictionary
-# are MANDATORY across all signal types (to allow mixing and matching of signal types)
 # ---------------------------------------------------------------------------------
     
 def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
@@ -243,12 +240,9 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     return ()
 
 #-------------------------------------------------------------------
-# Internal Function to update the drawing objects to represent the
-# current state of the Subsidary signal (on/off). If a Subsidary was
-# not specified at creation time then the objects are hidden' and the
-# function will have no effect.
-# Note that we expect this function to only ever get called on a state 
-# change therefore we don't track the displayed aspect of the subsidary
+# Internal Function to update the current state of the Subsidary signal
+# (on/off). If a Subsidary was not specified at creation time then the
+# objects are hidden' and the function will have no effect.
 #------------------------------------------------------------------
     
 def update_colour_light_subsidary (sig_id:int):
@@ -269,10 +263,9 @@ def update_colour_light_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 # Function to Refresh the displayed signal aspect according the signal state
 # Also takes into account the state of the signal ahead if one is specified
-# to ensure the correct aspect is displayed for 3/4 aspect types and 2 aspect 
-# distant signals - e.g. for a 3/4 aspect signal - if the signal ahead is ON
+# to ensure the correct aspect is displayed (for 3/4 aspect types and 2 aspect 
+# distant signals). E.g. for a 3/4 aspect signal - if the signal ahead is ON
 # and this signal is OFF then we want to change it to YELLOW rather than GREEN
-# This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
 def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
@@ -404,11 +397,11 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
     return ()
 
 # -------------------------------------------------------------------------
-# Functions for cycling the flashing aspects. Rather  than using a Thread to
-# cycle the aspects we use the tkinter 'after' method to scedule the next
+# Internal Functions for cycling the flashing aspects. Rather than using a
+# Thread to do this, we use the tkinter 'after' method to scedule the next
 # update via the tkinter event queue. The first call to "flash_aspects_on"
-# is made after the first colour light signal has been successfully created
-# we do it like this so everything is running in the main tkinter thread as
+# is made after the first colour light signal has been successfully created.
+# We do it like this so everything is running in the main tkinter thread as
 # all the information out there concludes tkinter is not thread safe
 # -------------------------------------------------------------------------
 
@@ -486,7 +479,7 @@ def refresh_signal_aspects (sig_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Internal function to change the feather route indication
+# Function to change the feather route indication (on route change)
 # -------------------------------------------------------------------------
 
 def update_feather_route_indication (sig_id:int,route_to_set):

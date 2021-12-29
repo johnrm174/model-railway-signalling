@@ -1,19 +1,12 @@
 # ----------------------------------------------------------------------------------------------
-# This module is used for loading and saving layout 'State', enabling the main settings for
+# This module is used for loading and saving layout 'State', enabling the current settings for
 # signals, points and sections on the layout to be "preserved" until the next running session
-# Note that only the following state information is maintained:
-#     - Points - switched state of the point and Facing Point Lock
-#     - Signals - switched state of the signal and its subsidary
-#               - approach control state (for the main signals)
-#     - Sections - switched state of the section (clear/occupied)
-#                - current label for the section (train identifier)
 #
-# A single function is called to configure the load/save behavior:
-# 
 # load_layout_state - Loads the initial state for all 'points', 'signals' and 'sections' from file
 #                     and enables the save of the current layout state to file on application quit.
-#   Optional Parameters:
-#       file_name:str - to load/save - default = None (filename will be '<main-python-script>.sig')
+#                     If load is "cancelled" or "file not found" then the default state will be used
+#    Optional Parameters:
+#       file_name:str - to load/save - default = None (will default to '<main-python-script>.sig')
 #       load_file_dialog:bool - Opens a 'load file' dialog to select a file - default = False
 #       save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False
 #

@@ -110,9 +110,8 @@ def change_button_event (point_id:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Function to flip the state of the Point's Facing Point Lock - called when
-# the FPL button is pressed - Can also be called by the external programme
-# to enable automated route setting functions
+# Public API Function to flip the state of the Point's Facing Point Lock (to
+# enable route setting functions. Also called whenthe FPL button is pressed 
 # -------------------------------------------------------------------------
 
 def toggle_fpl (point_id:int):
@@ -145,7 +144,7 @@ def toggle_fpl (point_id:int):
 # Can also be called on point creation to set the initial (loaded) state
 # -------------------------------------------------------------------------
 
-def toggle_point_state(point_id:int, switched_by_another_point = False):
+def toggle_point_state (point_id:int, switched_by_another_point = False):
 
     global points
     global logging
@@ -173,9 +172,8 @@ def toggle_point_state(point_id:int, switched_by_another_point = False):
     return
 
 # -------------------------------------------------------------------------
-# External function to flip the route setting for the Point - called when the main
-# the main point button is pressed - Can also be called by an external programme
-# to enable automated route setting functions (i.e this is a public API function).
+# Public API Function to flip the route setting for the Point (to enable
+# route setting functions. Also called whenthe POINT button is pressed 
 # Will also recursivelly call itself to change any "also_switch" points
 # -------------------------------------------------------------------------
 
@@ -209,11 +207,9 @@ def toggle_point (point_id:int, switched_by_another_point = False):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to create a Point (drawing objects + state)
+# Public API function to create a Point (drawing objects + state)
 # By default the point is "NOT SWITCHED" (i.e. showing the default route)
 # If the point has a Facing Point Lock then this is set to locked
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of Points for later reference
 # Function returns a list of the lines that have been drawn (so an
 # external programme can change the colours if required)
 # -------------------------------------------------------------------------
@@ -360,9 +356,9 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     return(point_objects)
 
 # -------------------------------------------------------------------------
-# Externally called function to Lock one or more points. If the external
-# signal/point locking code has been correctly implemented it should only
-# be possible to lock a point that has the Facing point Lock activated
+# Public API function to Lock one or more points. The external signal/point
+# interlocking should be written to ensure it is only possible to lock a
+# point when the Facing point Lock is activated
 # -------------------------------------------------------------------------
 
 def lock_point (*point_ids:int):
@@ -387,7 +383,7 @@ def lock_point (*point_ids:int):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Unlock one or more points
+# Public API function to Unlock one or more points
 # -------------------------------------------------------------------------
 
 def unlock_point (*point_ids:int):
@@ -409,7 +405,7 @@ def unlock_point (*point_ids:int):
     return ()
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the point
+# Public API function to Return the current state of the point
 # -------------------------------------------------------------------------
 
 def point_switched (point_id:int):
@@ -423,7 +419,7 @@ def point_switched (point_id:int):
     return(switched)
 
 # -------------------------------------------------------------------------
-# Externally called function to query the current state of the FPL
+# Public API function to query the current state of the FPL
 # if the point does not have a FPL the return will always be TRUE
 # -------------------------------------------------------------------------
 

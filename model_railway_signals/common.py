@@ -38,7 +38,7 @@ def find_root_window (canvas):
     parent = canvas.master
     while parent.master:
         # if this is a subsidary window, we still want to bind the window
-        # close event to kill the applicatiion when the window is closed
+        # close event to kill the application when the window is closed
         try: parent.protocol("WM_DELETE_WINDOW",on_closing)
         except: pass
         parent = parent.master

@@ -42,7 +42,7 @@ class sig_callback_type(enum.Enum):
     sig_released = 5   # The signal has been "released" on the approach of a train
 
 # -------------------------------------------------------------------------
-# Global Classes used internally when creating/updating signals or 
+# Global Classes used internally/externally when creating/updating signals or 
 # processing button change events - Will apply to more that one signal type
 # -------------------------------------------------------------------------
 
@@ -198,6 +198,7 @@ def toggle_subsidary (sig_id:int):
 
 # -------------------------------------------------------------------------
 # Common function to Set the approach control mode for a signal
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
@@ -220,6 +221,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 
 #-------------------------------------------------------------------------
 # Common function to Clear the approach control mode for a signal
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
@@ -467,6 +469,7 @@ def create_theatre_route_elements (canvas,sig_id:int,
 
 # -------------------------------------------------------------------------
 # Common function to change the theatre route indication
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
 def update_theatre_route_indication (sig_id,theatre_text:str):
@@ -491,6 +494,7 @@ def update_theatre_route_indication (sig_id,theatre_text:str):
 # -------------------------------------------------------------------------
 # Common Function that gets called on a signal aspect change - will
 # Enable/disable the theatre route indicator on a change to/from DANGER 
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
 def enable_disable_theatre_route_indication (sig_id):

@@ -85,7 +85,7 @@ def section_exists(section_id:int):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------
-# Callback for processing Button presses (manual toggling of Track Sections
+# Callback for processing Button presses (manual toggling of Track Sections)
 # -------------------------------------------------------------------------
 
 def section_button_event (section_id:int):
@@ -95,13 +95,12 @@ def section_button_event (section_id:int):
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
     mqtt_interface.publish_section_state(section_id)
-    # Make the external callback (if one has been defined
+    # Make the external callback (if one has been defined)
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
 
 # -------------------------------------------------------------------------
-# Internal function to flip the state of the section. This Will SET/UNSET
-# the section and initiate an external callback if one is specified
+# Internal function to flip the state of the section
 # -------------------------------------------------------------------------
 
 def toggle_section (section_id:int):
@@ -166,7 +165,7 @@ def cancel_update(section_id):
     return()
 
 # -------------------------------------------------------------------------
-# Internal function to create an entry widget (when button right clicked)
+# Internal function to create an entry widget (on right mouse button click)
 # -------------------------------------------------------------------------
 
 def open_entry_box(section_id):
@@ -196,9 +195,7 @@ def open_entry_box(section_id):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to create a section (drawing objects + state)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of sections for later reference
+# Public API function to create a section (drawing objects + state)
 # -------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int,
@@ -241,7 +238,6 @@ def create_section (canvas, section_id:int, x:int, y:int,
         else:
             section_button.config(state="disabled")
         # Get the initial state for the section (if layout state has been successfully loaded)
-        # if nothing has been loaded then the default state (as created) will be applied
         loaded_state = file_interface.get_initial_section_state(section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
         if loaded_state["labeltext"]:
@@ -256,7 +252,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the section
+# Public API function to Return the current state of the section
 # -------------------------------------------------------------------------
 
 def section_occupied (section_id:Union[int,str]):
@@ -272,7 +268,7 @@ def section_occupied (section_id:Union[int,str]):
     return(occupied)
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the section
+# Public API function to Return the current label of the section (train identifier)
 # -------------------------------------------------------------------------
 
 def section_label (section_id:Union[int,str]):
@@ -286,7 +282,7 @@ def section_label (section_id:Union[int,str]):
     return(section_label)
 
 # -------------------------------------------------------------------------
-# Externally called functions to Set and Clear a section
+# Public API function to Set a section to OCCUPIED (and optionally update the label)
 # -------------------------------------------------------------------------
 
 def set_section_occupied (section_id:int,label:str=None):
@@ -312,6 +308,10 @@ def set_section_occupied (section_id:int,label:str=None):
             # be published if the MQTT interface has been configured for publishing updates for this track section
             mqtt_interface.publish_section_state(section_id)
     return()
+
+# -------------------------------------------------------------------------
+# Public API function to Set a section to CLEAR (returns the label)
+# -------------------------------------------------------------------------
 
 def clear_section_occupied (section_id:int):
     global logging

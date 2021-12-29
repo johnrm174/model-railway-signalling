@@ -24,10 +24,8 @@ from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Externally called function to create a Ground Position Signal (drawing objects
-# + state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of Signals for later reference
+# Public API function to create a Ground Position Signal (drawing objects and
+# internal state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
 # -------------------------------------------------------------------------
 
 def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
@@ -101,7 +99,6 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 
 # -------------------------------------------------------------------------
 # Internal function to Refresh the aspects of a ground position signal
-# Function assumes the Sig_ID has been validated by the calling module
 # Note that we expect this function to only ever get called on a state 
 # change therefore we don't track the displayed aspect of the signal
 # -------------------------------------------------------------------------
