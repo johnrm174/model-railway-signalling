@@ -104,6 +104,12 @@ window.title("Simple Networking Example - Box1 (Pi Sprog Node)")
 canvas = Canvas(window,height=450,width=750,bg="grey85")
 canvas.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. If file_name is 'None' then
+# the name of the main python script will be used with a '.sig' extension
+# For this example, the filename will be 'test_networking_1.sig'
+load_layout_state(file_name=None,load_file_dialog=False,save_file_dialog=False)
+
 print ("Initialising Pi Sprog")
 initialise_pi_sprog (dcc_debug_mode=False)
 request_dcc_power_on()
@@ -186,7 +192,16 @@ create_semaphore_signal (canvas, 12, 200, 300, orientation = 180,
                         sig_callback = lower_line_callback_function,
                         sig_passed_button = True)
 
+print ("Setting Initial Interlocking")
+# Set the initial interlocking conditions by running the main callback function
+upper_line_callback_function(None,None)
+lower_line_callback_function(None,None)
+
 print ("Entering Main Event Loop")
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window.focus_force()
+# Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
 
 #############################################################################################

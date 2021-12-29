@@ -288,38 +288,64 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_signal_state(sig_id)
-        # Set the signal override state if required
-        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
-        # Set the initial Approach control state for the signal
+        # Set the initial state from the "loaded" state
         if loaded_state["releaseonred"]: signals_common.set_approach_control(sig_id,release_on_yellow=False)
         if loaded_state["releaseonyel"]: signals_common.set_approach_control(sig_id,release_on_yellow=True)
-        # Toggle the signal state if SWITCHED - This will update the signal on the schematic and send
-        # out the associated DCC commands - Otherwise we have to 'Update' the signal to do this
-        # If no signal state was loaded and the signal is fully automatic then we also need to toggle the
-        # signal to display a CLEAR aspect (automatic signals are OFF for the default 'as created' state)
+        if loaded_state["theatretext"]: signals_common.update_theatre_route_indication(sig_id,loaded_state["theatretext"])
+        if loaded_state["routeset"]: signals_common.signals[str(sig_id)]["routeset"]=loaded_state["routeset"]
+        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
+        # If no state was loaded we still need to toggle fully automatic signals to OFF
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
-        if loaded_state["sigclear"]:
-            signals_common.signals[str(sig_id)]["main_signal"] = False
+        # We test to see if there is a arm for each route (as the signal may not have one for all the routes)
+        if loaded_state["sigclear"] or fully_automatic:
             signals_common.toggle_signal(sig_id)
-        elif fully_automatic:
-            signals_common.signals[str(sig_id)]["main_signal"] = False
-            signals_common.toggle_signal(sig_id)
-        elif refresh_immediately: update_semaphore_signal(sig_id)
-        # Lock the signal if required 
+            if signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN:
+                signals_common.signals[str(sig_id)]["main_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH1
+                   and signals_common.signals[str(sig_id)]["lh1_signal"]==True ):
+                signals_common.signals[str(sig_id)]["lh1_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH2
+                   and signals_common.signals[str(sig_id)]["lh2_signal"]==True ):
+                signals_common.signals[str(sig_id)]["lh2_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH1
+                   and signals_common.signals[str(sig_id)]["rh1_signal"]==True ):
+                signals_common.signals[str(sig_id)]["rh1_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
+                   and signals_common.signals[str(sig_id)]["rh2_signal"]==True ):
+                signals_common.signals[str(sig_id)]["rh2_signal"] = False
+        # Update the signal to show the initial aspect (and send out DCC commands)
+        # We only refresh the signal if it is set to refresh immediately
+        if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)
+        # finally Lock the signal if required
         if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
-        # Toggle the subsidary state if SWITCHED (loaded_state_subclear will be 'None' if no data was loaded)
+
+        # Set the initial state of the subsidary from the "loaded" state
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
-        # We test to see if there is a subsidary arm first (ths signal may not have one for the main route)
-        if has_subsidary and loaded_state["subclear"]:
-            if signals_common.signals[str(sig_id)]["main_subsidary"] == True:
-                signals_common.signals[str(sig_id)]["main_subsidary"] = False
-            signals_common.toggle_subsidary(sig_id)
-        else: update_semaphore_subsidary_arms(sig_id)
-        # Lock the subsidary if required 
-        if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
-        
+        # We test to see if there is a subsidary arm (as the signal may not have one for all the routes)
+        if has_subsidary:
+            if loaded_state["subclear"]:
+                signals_common.toggle_subsidary(sig_id)
+                if (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN
+                        and signals_common.signals[str(sig_id)]["main_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["main_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH1
+                       and signals_common.signals[str(sig_id)]["lh1_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["lh1_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH2
+                       and signals_common.signals[str(sig_id)]["lh2_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["lh2_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH1
+                       and signals_common.signals[str(sig_id)]["rh1_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["rh1_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
+                       and signals_common.signals[str(sig_id)]["rh2_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["rh2_subsidary"] = False            # Update the signal to show the initial aspect (and send out DCC commands)
+            update_semaphore_subsidary_arms(sig_id)
+            # finally Lock the subsidary if required 
+            if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
+            
     return ()
 
 #-------------------------------------------------------------------
@@ -492,36 +518,36 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
     if signals_common.signals[str(sig_id)]["distant"]:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = " (CAUTION - distant signal is ON)"
+            log_message = " (CAUTION) - signal is ON"
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = " (CAUTION - distant signal is OVERRIDDEN)"
+            log_message = " (CAUTION) - signal is OVERRIDDEN"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
+            log_message = (" (CAUTION) - signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         elif sig_ahead_id is not None and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
+            log_message = (" (CAUTION) - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER")
         else:
             new_aspect = signals_common.signal_state_type.PROCEED
-            log_message = (" (PROCEED - distant signal is OFF - route is set to " +
+            log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
     else:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is ON)"
+            log_message = " (DANGER) - signal is ON"
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is OVERRIDDEN)"
+            log_message = " (DANGER) - signal is OVERRIDDEN"
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
+            log_message = " (DANGER) - signal is subject to \'release on red\' approach control"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.CAUTION:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - home signal is OFF but associated distant signal "+str(associated_signal)+" is at CAUTION")
+            log_message = (" (CAUTION) - signal is OFF but associated distant "+str(associated_signal)+" is at CAUTION")
         else:
             new_aspect = signals_common.signal_state_type.PROCEED
-            log_message = (" (PROCEED - home signal is OFF - route is set to " +
+            log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
 
     current_aspect = signals_common.signals[str(sig_id)]["sigstate"]

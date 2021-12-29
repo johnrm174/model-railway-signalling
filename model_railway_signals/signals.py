@@ -502,13 +502,13 @@ def toggle_signal (sig_id:int):
         signals_common.toggle_signal(sig_id)
         # call the signal type-specific functions to update the signal (note that we only update
         # Semaphore and colour light signals if they are configured to update immediately)
-        if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-            if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            if signals_common.signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
             signals_ground_position.update_ground_position_signal (sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-            if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            if signals_common.signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
             signals_ground_disc.update_ground_disc_signal(sig_id)
     return()
 
@@ -534,9 +534,9 @@ def toggle_subsidary (sig_id:int):
             logging.warning ("Signal "+str(sig_id)+": toggle_subsidary - Subsidary signal is locked - Toggling anyway")
         signals_common.toggle_subsidary(sig_id)
         #  call the signal type-specific functions to update the signal
-        if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
+        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_subsidary(sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
+        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.update_semaphore_subsidary_arms(sig_id)
         else:
             logging.error ("Signal "+str(sig_id)+": toggle_subsidary - Function not supported by signal type")

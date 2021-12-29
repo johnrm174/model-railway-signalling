@@ -71,7 +71,7 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         if loaded_state["override"]: signals_common.set_signal_override(sig_id)
         if loaded_state["sigclear"]: signals_common.toggle_signal(sig_id)
         # Update the signal to show the initial aspect (and send out DCC commands)
-        update_ground_position_signal(sig_id)
+        update_ground_disc_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
         

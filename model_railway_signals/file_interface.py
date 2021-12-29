@@ -166,20 +166,36 @@ def save_state_and_quit():
                     path,name = os.path.split(filename)
                     filename = name            
                 logging.info("Saving Layout State Information as '"+filename+"'")
-                # Compile a dictionary of everything we want to save. Note that we only need to save the
-                # current user settings for the points, signals and sections. The application code should
-                # set the rest of the state information when it gets run for the first time on load
+                # Compile a dictionary of everything we want to save. We test each element
+                # before trying to add it to the dictionary to handle remote signals
                 signal_states = {}
                 for signal in signals_common.signals:
                     signal_states[signal] ={}
-                    signal_states[signal]["sigclear"] = signals_common.signals[signal]["sigclear"]
-                    signal_states[signal]["subclear"] = signals_common.signals[signal]["subclear"]
-                    signal_states[signal]["override"] = signals_common.signals[signal]["override"]
-                    signal_states[signal]["siglocked"] = signals_common.signals[signal]["siglocked"]
-                    signal_states[signal]["sublocked"] = signals_common.signals[signal]["sublocked"]
-                    # Use the 'value' for  Enumeration types as the enumerations can't be converted
-                    signal_states[signal]["routeset"] = signals_common.signals[signal]["routeset"].value
-                    # Release on Red/yellow and theatre indicators are only supported for certain signal types
+                    if "sigclear" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["sigclear"] = signals_common.signals[signal]["sigclear"]
+                    else: 
+                        signal_states[signal]["sigclear"] = None
+                    if "subclear" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["subclear"] = signals_common.signals[signal]["subclear"]
+                    else:
+                        signal_states[signal]["subclear"] = None
+                    if "override" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["override"] = signals_common.signals[signal]["override"]
+                    else:
+                        signal_states[signal]["override"] = None
+                    if "siglocked" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["siglocked"] = signals_common.signals[signal]["siglocked"]
+                    else:
+                        signal_states[signal]["siglocked"] = None
+                    if "sublocked" in signals_common.signals[signal].keys(): 
+                        signal_states[signal]["sublocked"] = signals_common.signals[signal]["sublocked"]
+                    else:
+                        signal_states[signal]["sublocked"] = None
+                    if "routeset" in signals_common.signals[signal].keys(): 
+                        # Use the 'value' for  Enumeration types as the enumerations can't be converted
+                        signal_states[signal]["routeset"] = signals_common.signals[signal]["routeset"].value
+                    else:
+                        signal_states[signal]["routeset"] = None
                     if "releaseonred" in signals_common.signals[signal].keys(): 
                         signal_states[signal]["releaseonred"] = signals_common.signals[signal]["releaseonred"]
                     else:

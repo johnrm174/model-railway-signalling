@@ -216,9 +216,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         if loaded_state["theatretext"]: signals_common.update_theatre_route_indication(sig_id,loaded_state["theatretext"])
         if loaded_state["routeset"]: update_feather_route_indication(sig_id,loaded_state["routeset"])
         if loaded_state["override"]: signals_common.set_signal_override(sig_id)
-        if loaded_state["sigclear"]: signals_common.toggle_signal(sig_id)
         # If no state was loaded we still need to toggle fully automatic signals to OFF
-        elif fully_automatic: signals_common.toggle_signal(sig_id)
+        if loaded_state["sigclear"] or fully_automatic: signals_common.toggle_signal(sig_id)
         # Update the signal to show the initial aspect (and send out DCC commands)
         # We only refresh the signal if it is set to refresh immediately
         if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal(sig_id)
