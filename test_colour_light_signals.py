@@ -270,58 +270,62 @@ root_window.title("Test Colour Light Signals")
 canvas = Canvas(root_window,height=900,width=1200,bg="grey85")
 canvas.pack()
 
-print ("Creating Buttons for the Test Functions")
+print ("Loading Layout State on startup")
+
+load_layout_state()
+
+print ("Creating Buttons")
 
 lock_signals_button = Button (canvas, text="Lock All Signals",
-        state="normal", relief="raised",command=lambda:lock_unlock_signals())
+        state="normal", relief="raised",command=lock_unlock_signals)
 canvas.create_window (10,10,window=lock_signals_button,anchor=NW)
 
 lock_subsidary_button = Button (canvas, text="Lock All Subsidary Signals",
-        state="normal", relief="raised",command=lambda:lock_unlock_subsidary())
+        state="normal", relief="raised",command=lock_unlock_subsidary)
 canvas.create_window (150,10,window=lock_subsidary_button,anchor=NW)
 
 set_signal_override_button = Button (canvas, text="Overide All Signals",
-        state="normal", relief="raised",command=lambda:set_clear_signal_overrides())
+        state="normal", relief="raised",command=set_clear_signal_overrides)
 canvas.create_window (360,10,window=set_signal_override_button,anchor=NW)
 
 button = Button (canvas, text="Print Signal State",
-        state="normal", relief="raised",command=lambda:print_signal_state())
+        state="normal", relief="raised",command=print_signal_state)
 canvas.create_window (520,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Print Subsidary State",
-        state="normal", relief="raised",command=lambda:print_subsidary_state())
+        state="normal", relief="raised",command=print_subsidary_state)
 canvas.create_window (670,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Toggle Signals",
-        state="normal", relief="raised",command=lambda:toggle_signals())
+        state="normal", relief="raised",command=toggle_signals)
 canvas.create_window (840,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Toggle Subsidaries",
-        state="normal", relief="raised",command=lambda:toggle_subsidaries())
+        state="normal", relief="raised",command=toggle_subsidaries)
 canvas.create_window (970,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Set App Cntl Red",
-        state="normal", relief="raised",command=lambda:set_all_approach_control_red())
+        state="normal", relief="raised",command=set_all_approach_control_red)
 canvas.create_window (20,850,window=button,anchor=NW)
 
 button = Button (canvas, text="Set App Cntl Yel",
-        state="normal", relief="raised",command=lambda:set_all_approach_control_yellow())
+        state="normal", relief="raised",command=set_all_approach_control_yellow)
 canvas.create_window (170,850,window=button,anchor=NW)
 
 button = Button (canvas, text="Clear App Cntl ",
-        state="normal", relief="raised",command=lambda:clear_all_approach_control())
+        state="normal", relief="raised",command=clear_all_approach_control)
 canvas.create_window (310,850,window=button,anchor=NW)
 
 button = Button (canvas, text="Set App cntl Red - 5,6,15,17",
-        state="normal", relief="raised",command=lambda:set_sigs_approach_control_red())
+        state="normal", relief="raised",command=set_sigs_approach_control_red)
 canvas.create_window (450,850,window=button,anchor=NW)
 
 button = Button (canvas, text="Set App cntl Yel - 5,6,14,17",
-        state="normal", relief="raised",command=lambda:set_sigs_approach_control_yellow())
+        state="normal", relief="raised",command=set_sigs_approach_control_yellow)
 canvas.create_window (680,850,window=button,anchor=NW)
 
 button = Button (canvas, text="Change Route Display",
-        state="normal", relief="raised",command=lambda:change_route_display())
+        state="normal", relief="raised",command=change_route_display)
 canvas.create_window (900,850,window=button,anchor=NW)
 
 print ("Drawing Tracks")
@@ -535,11 +539,6 @@ create_ground_position_signal (canvas,35,1000,650, sig_callback=signal_button,
 
 print (" ")
 print ("Negative tests for creating signals")
-create_ground_position_signal (canvas,0,500,500)
-create_ground_position_signal (canvas,1,500,500)
-create_ground_position_signal (canvas,90,500,500, orientation = 90)
-
-
 create_colour_light_signal (canvas,0,500,500)
 create_colour_light_signal (canvas,1,500,500)
 create_colour_light_signal (canvas,90,500,500, orientation = 90)
@@ -549,9 +548,16 @@ create_colour_light_signal (canvas,93,500,500, signal_subtype = signal_sub_type.
 create_colour_light_signal (canvas,94,500,500, signal_subtype = signal_sub_type.distant, approach_release_button = True)
 
 print (" ")
+print ("Negative tests for creating ground position signals")
+create_ground_position_signal (canvas,0,500,500)
+create_ground_position_signal (canvas,1,500,500)
+create_ground_position_signal (canvas,90,500,500, orientation = 90)
+
+print (" ")
 print ("Setting the initial aspects for all the signals (based on the signal ahead)")
 update_signals()
 
+print (" ")
 print ("Entering main event loop")
 root_window.mainloop()
 

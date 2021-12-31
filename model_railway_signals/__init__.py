@@ -66,6 +66,8 @@ from .mqtt_interface import set_sections_to_publish_state
 from .mqtt_interface import set_signals_to_publish_state
 from .mqtt_interface import set_signals_to_publish_passed_events
 
+from .file_interface import load_layout_state
+
 __all__ = [
       # Public point types
         'point_type',
@@ -137,5 +139,7 @@ __all__ = [
         'set_sections_to_publish_state',
         'set_signals_to_publish_state',
         'set_signals_to_publish_passed_events',
+      # Public File load/save functions
+        'load_layout_state'
            ]
 

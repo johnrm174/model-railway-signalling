@@ -23,9 +23,7 @@ def main_callback_function(item_id,callback_type):
 
     print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
-    #--------------------------------------------------------------
     # Update the route based on the point settings 
-    #--------------------------------------------------------------
     
     if point_switched(1):
         set_route(1,route=route_type.LH1)
@@ -36,26 +34,14 @@ def main_callback_function(item_id,callback_type):
         set_route(2,route=route_type.MAIN)
         set_route(12,route=route_type.MAIN)
 
-    #-------------------------------------------------------------- 
-    # Override the distant signals if the associated home signal is ON
-    # This bit is optional - omit for fully manual control
-    #--------------------------------------------------------------
-    
-    if not signal_clear(3): set_signal_override(12)
-    else: clear_signal_override(12)
-    if not signal_clear(2): set_signal_override(1)
-    else: clear_signal_override(1)
-    
-    #-------------------------------------------------------------- 
     # Process the signal/point interlocking
-    #--------------------------------------------------------------
-    
-    # Signal 12 (the distant signal associated with signal 2) is locked at danger if 
-    # the home signal ahead (signal 3) is at danger or if the route is set against it
-    if not signal_clear(12) and (not point_switched(1) or not fpl_active(1) or not signal_clear(3)):
-        lock_signal(12)
+
+    # Signal 1 (distant) is locked at CAUTION if the home signal ahead (signal 2) is at DANGER
+    # If Signal 1 is CLEAR then it we unlock it so it can be returned to danger at any time
+    if signal_clear(1) or signal_clear(2):
+        unlock_signal(1)
     else:
-        unlock_signal(12)
+        lock_signal(1)
 
     # Signal 2 is locked (at danger) if the point 1 facing point lock is not active
     # There is only a subsidary arm for the LH divergent route so we also need to
@@ -73,13 +59,20 @@ def main_callback_function(item_id,callback_type):
         if signal_clear(2): lock_subsidary(2)
         else: unlock_subsidary(2)
 
-    # If Signal 1 (distant) is clear then it we unlock it so it can be returned to danger at any time
-    # if it is at danger, we lock it if any of the home signals ahead are at DANGER.
-    if signal_clear(1) or signal_clear(2): unlock_signal(1)
-    else: lock_signal(1)
+    # Signal 12 (the distant signal 'associated with' signal 2) is locked at danger if 
+    # the home signal ahead (signal 3) is at danger or if the route is set against it
+    # If the signal is clear then it is unlocked (always able to return to ON)
+    if signal_clear(12) or ( point_switched(1) and fpl_active(1) and signal_clear(3) ):
+        unlock_signal(12)
+    else:
+        lock_signal(12)
+
     # Point 1 is locked if signal 1, signal 2 (or its subsidary) is set to clear
-    if signal_clear(1) or signal_clear(2) or subsidary_clear(2): lock_point(1)
-    else: unlock_point(1)
+    if signal_clear(1) or signal_clear(2) or subsidary_clear(2):
+        lock_point(1)
+    else:
+        unlock_point(1)
+    
         
     return()
 
@@ -91,7 +84,7 @@ def main_callback_function(item_id,callback_type):
 print ("Creating Window and Canvas")
 window = Tk()
 window.title("Example of using associated home/distant semaphore signals")
-canvas = Canvas(window,height=300,width=700,bg="grey85")
+canvas = Canvas(window,height=250,width=700,bg="grey85")
 canvas.pack()
 
 print ("Drawing Schematic and creating points")
@@ -126,12 +119,7 @@ create_semaphore_signal (canvas,3,600,100,
                          sig_passed_button = True)
 
 print ("Setting Initial Route and Interlocking")
-lock_signal(1)
-lock_signal(12)
-set_signal_override(1)
-set_signal_override(12)
-set_route (2,route_type.MAIN)
-set_route (12,route_type.MAIN)
+main_callback_function(None,None)
 
 print ("Entering Main Event Loop")
 window.mainloop()

@@ -143,6 +143,12 @@ window.title("Simple Interlocking Example")
 canvas = Canvas(window,height=300,width=1075,bg="grey85")
 canvas.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. If file_name is 'None' then
+# the name of the main python script will be used with a '.sig' extension
+# For this example, the filename will be 'test_simple_example.sig'
+load_layout_state(file_name=None,load_file_dialog=False,save_file_dialog=False)
+
 print ("Initialising Pi Sprog and creating DCC Mappings")
 # If not running on a Pi-SPROG this will generate an error, but the programme
 # will still run - it just won't attempt to send any DCC Commands to the Pi-SPROG
@@ -162,7 +168,7 @@ map_dcc_signal (sig_id = 2,
                 proceed = [[1,False],[2,True],[3,False],[4,False]],
                 caution = [[1,False],[2,False],[3,True],[4,False]],
                 prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                LH1 = [[5,True]], NONE = [[5,False]],
+                LH1 = [[5,True]], MAIN = [[5,False]], NONE = [[5,False]],
                 subsidary = 6)
 
 # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
@@ -279,5 +285,10 @@ print ("Setting Initial Interlocking")
 main_callback_function(None,None)
 
 print ("Entering Main Event Loop")
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window.focus_force()
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
+
+################################################################################

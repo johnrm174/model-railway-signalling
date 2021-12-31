@@ -180,6 +180,13 @@ window.title("Simple Interlocking Example - with Semaphores")
 canvas = Canvas(window,height=300,width=1075,bg="grey85")
 canvas.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. In this example, we're allowing
+# the user to select the file to load (and the file to save) via tkinter file dialogues.
+# As a filename of 'None' is specified then the default selection will be the name of
+# the main python script with a '.sig' extension (i.e. 'test_semaphore_example.sig')
+load_layout_state(file_name=None,load_file_dialog=True,save_file_dialog=True)
+
 print ("Initialising Pi Sprog and creating DCC Mappings")
 # If not running on a Pi-SPROG this will generate an error, but the programme
 # will still run - it just won't attempt to send any DCC Commands to the Pi-SPROG
@@ -190,7 +197,7 @@ request_dcc_power_on()
 
 # Semaphore signal mappings are simple mappings of each "arm" to a single DCC address
 map_semaphore_signal (sig_id = 1, main_signal = 1 , lh1_signal = 10 )
-map_semaphore_signal (sig_id = 2, main_signal = 2 , lh1_signal = 11 , lh1_subsidary = 12)
+map_semaphore_signal (sig_id = 2, main_signal = 2 , lh1_signal = 11, lh1_subsidary = 12)
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
 map_semaphore_signal (sig_id = 4, main_signal = 4 )
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
@@ -271,11 +278,16 @@ create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
 create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
 create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
 create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
+create_track_sensor (6, gpio_channel = 9, signal_passed = 6)
 
 print ("Setting Initial Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 main_callback_function(None,None)
 
-# Now enter the main event loop and wait for a button press (which will trigger a callback)
 print ("Entering Main Event Loop")
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window.focus_force()
+# Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
+

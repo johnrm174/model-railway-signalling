@@ -41,6 +41,7 @@
 
 from . import common
 from . import mqtt_interface
+from . import file_interface
 from tkinter import *
 from typing import Union
 import enum
@@ -84,7 +85,7 @@ def section_exists(section_id:int):
     return (str(section_id) in sections.keys() )
 
 # -------------------------------------------------------------------------
-# Callback for processing Button presses (manual toggling of Track Sections
+# Callback for processing Button presses (manual toggling of Track Sections)
 # -------------------------------------------------------------------------
 
 def section_button_event (section_id:int):
@@ -94,13 +95,12 @@ def section_button_event (section_id:int):
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
     mqtt_interface.publish_section_state(section_id)
-    # Make the external callback (if one has been defined
+    # Make the external callback (if one has been defined)
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
 
 # -------------------------------------------------------------------------
-# Internal function to flip the state of the section. This Will SET/UNSET
-# the section and initiate an external callback if one is specified
+# Internal function to flip the state of the section
 # -------------------------------------------------------------------------
 
 def toggle_section (section_id:int):
@@ -165,7 +165,7 @@ def cancel_update(section_id):
     return()
 
 # -------------------------------------------------------------------------
-# Internal function to create an entry widget (when button right clicked)
+# Internal function to create an entry widget (on right mouse button click)
 # -------------------------------------------------------------------------
 
 def open_entry_box(section_id):
@@ -195,9 +195,7 @@ def open_entry_box(section_id):
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to create a section (drawing objects + state)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of sections for later reference
+# Public API function to create a section (drawing objects + state)
 # -------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int,
@@ -220,7 +218,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         section_button = Button (canvas, text=label, state="normal", relief="raised",
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
-                    command = lambda:section_button_event(section_id))
+                    command = lambda:section_button_event(section_id), width = len(label))
         canvas.create_window (x,y,window=section_button)
         # Compile a dictionary of everything we need to track
         sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
@@ -231,21 +229,30 @@ def create_section (canvas, section_id:int, x:int, y:int,
                                      "positionx" : x,                     # Position of the button on the canvas
                                      "positiony" : y,                     # Position of the button on the canvas
                                      "occupied" : False }                 # Current state
-        # Fix the width of the button (if text is edited late this won't change)
-        section_button.config(width = sections[str(section_id)]["labellength"])
-        # Bind the Middle and Right Mouse clicks to the section button - to open the entry box
+        # Bind the Middle and Right Mouse buttons to the section_button if the
+        # Section is editable so that a "right click" will open the entry box 
+        # Disable the button(so the section cannot be toggled) if not editable
         if editable:
-            # Only bind the events if the Section is editable
             section_button.bind('<Button-2>', lambda event:open_entry_box(section_id))
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         else:
-            # Disable the button (to toggle the section) if not editable
             section_button.config(state="disabled")
+        # Get the initial state for the section (if layout state has been successfully loaded)
+        loaded_state = file_interface.get_initial_section_state(section_id)
+        # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
+        if loaded_state["labeltext"]:
+            sections[str(section_id)]["labeltext"] = loaded_state["labeltext"]
+            sections[str(section_id)]["button1"]["text"] = loaded_state["labeltext"]
+        # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
+        if loaded_state["occupied"]: toggle_section(section_id)
+        # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
+        # be published if the MQTT interface has been configured for publishing updates for this track section
+        mqtt_interface.publish_section_state(section_id) 
 
     return()
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the section
+# Public API function to Return the current state of the section
 # -------------------------------------------------------------------------
 
 def section_occupied (section_id:Union[int,str]):
@@ -261,7 +268,7 @@ def section_occupied (section_id:Union[int,str]):
     return(occupied)
 
 # -------------------------------------------------------------------------
-# Externally called function to Return the current state of the section
+# Public API function to Return the current label of the section (train identifier)
 # -------------------------------------------------------------------------
 
 def section_label (section_id:Union[int,str]):
@@ -275,7 +282,7 @@ def section_label (section_id:Union[int,str]):
     return(section_label)
 
 # -------------------------------------------------------------------------
-# Externally called functions to Set and Clear a section
+# Public API function to Set a section to OCCUPIED (and optionally update the label)
 # -------------------------------------------------------------------------
 
 def set_section_occupied (section_id:int,label:str=None):
@@ -301,6 +308,10 @@ def set_section_occupied (section_id:int,label:str=None):
             # be published if the MQTT interface has been configured for publishing updates for this track section
             mqtt_interface.publish_section_state(section_id)
     return()
+
+# -------------------------------------------------------------------------
+# Public API function to Set a section to CLEAR (returns the label)
+# -------------------------------------------------------------------------
 
 def clear_section_occupied (section_id:int):
     global logging

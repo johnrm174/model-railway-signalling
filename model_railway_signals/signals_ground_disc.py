@@ -13,16 +13,15 @@
 from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
+from . import file_interface
 from . import common
 
 from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------
-# Externally called function to create a Ground Disc Signal (drawing objects
-# + state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
-# All attributes (that need to be tracked) are stored as a dictionary
-# This is then added to a dictionary of Signals for later reference
+# Public API function to create a Ground Disc Signal (drawing objects and
+# internal state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
 # -------------------------------------------------------------------------
 
 def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
@@ -64,14 +63,22 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         signals_common.signals[str(sig_id)]["sigon"] = sigon           # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["sigoff"] = sigoff         # Type-specific - drawing object
 
-        # Refresh the signal drawing objects to reflect the initial state
-        update_ground_disc_signal (sig_id)
-       
+        # Get the initial state for the signal (if layout state has been successfully loaded)
+        # Note that each element of 'loaded_state' will be 'None' if no data was loaded
+        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        # Set the initial state from the "loaded" state - We only need to set the 'override' and
+        # 'sigclear' for ground signals - everything else gets set when the signal is updated
+        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
+        if loaded_state["sigclear"]: signals_common.toggle_signal(sig_id)
+        # Update the signal to show the initial aspect (and send out DCC commands)
+        update_ground_disc_signal(sig_id)
+        # finally Lock the signal if required
+        if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
+        
     return ()
 
 # -------------------------------------------------------------------------
 # Internal function to Refresh the aspects of a ground disc signal
-# Function assumes the Sig_ID has been validated by the calling module
 # Note that we expect this function to only ever get called on a state 
 # change therefore we don't track the displayed aspect of the signal
 # -------------------------------------------------------------------------

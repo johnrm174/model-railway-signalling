@@ -21,6 +21,7 @@ from . import common
 from . import signals_common
 from . import dcc_control
 from . import mqtt_interface
+from . import file_interface
 
 from typing import Union
 from tkinter import *
@@ -90,36 +91,23 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     elif associated_home == 0 and not main_signal:
         logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
     else:
-        
-        # We use a value of None to signify that a particular arm isn't to be created for the signal
-        # If it is to be created, we use True/False to represent the current state of the signal arm.
-        if main_signal == False: main_signal = None
-        if main_subsidary == False: main_subsidary = None
-        if lh1_subsidary == False: lh1_subsidary = None
-        if rh1_subsidary == False: rh1_subsidary = None
-        if lh2_subsidary == False: lh2_subsidary = None
-        if rh2_subsidary == False: rh2_subsidary = None
-        if lh1_signal == False: lh1_signal = None
-        if rh1_signal == False: rh1_signal = None
-        if lh2_signal == False: lh2_signal = None
-        if rh2_signal == False: rh2_signal = None
-        
+                
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
         # This to cater for the situation where not all home arms have an associated distant arm
         if associated_home > 0:
             postoffset = signals_common.signals[str(associated_home)]["postoffset"]
-        elif (rh2_signal is None and rh2_subsidary is None and rh1_signal is None and rh1_subsidary is None):
-            if lh2_signal is not None or lh2_subsidary is not None:
+        elif (not rh2_signal and not rh2_subsidary and not rh1_signal and not rh1_subsidary ):
+            if lh2_signal or lh2_subsidary:
                 postoffset = -8
-            elif lh1_signal is not None or lh1_subsidary is not None:
+            elif lh1_signal or lh1_subsidary:
                 postoffset = -15
             else:
                 postoffset = -20
-        elif rh2_signal is not None or rh2_subsidary is not None:
+        elif rh2_signal or rh2_subsidary:
             postoffset = -37
-        elif (rh2_signal is None and rh2_subsidary is None) and (lh2_signal is None and lh2_subsidary is None):
+        elif (not rh2_signal and not rh2_subsidary) and (not lh2_signal and not lh2_subsidary):
             postoffset = -22
         else:
             postoffset = -22
@@ -135,19 +123,19 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             canvas.create_line(common.rotate_line(x,y,0,0,0,postoffset,orientation),width=2,fill="white")
             canvas.create_line(common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation),width=3,fill="white")
             # Draw the rest of the gantry to support other arms as required
-            if lh2_signal is not None or lh2_subsidary is not None:
+            if lh2_signal or lh2_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation),width=2,fill="white")
                 if lh2_signal: canvas.create_line(common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation),width=2,fill="white")
-            if lh1_signal is not None or lh1_subsidary is not None:
+            if lh1_signal or lh1_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation),width=2,fill="white")
                 if lh1_signal: canvas.create_line(common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation),width=2,fill="white")
-            if rh2_signal is not None or rh2_subsidary is not None:
+            if rh2_signal or rh2_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation),width=2,fill="white")
                 if rh2_signal: canvas.create_line(common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation),width=2,fill="white")
-            if rh1_signal is not None or rh1_subsidary is not None:
+            if rh1_signal or rh1_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation),width=2,fill="white")
                 if rh1_signal: canvas.create_line(common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation),width=2,fill="white")
@@ -189,31 +177,35 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
 
         # Hide any otherdrawing objects we don't need for this particular signal
-        if main_signal is None: canvas.itemconfigure(mainsigon,state='hidden')
-        if main_subsidary is None: canvas.itemconfigure(mainsubon,state='hidden')
-        if lh1_subsidary is None: canvas.itemconfigure(lh1subon,state='hidden')
-        if rh1_subsidary is None: canvas.itemconfigure(rh1subon,state='hidden')
-        if lh2_subsidary is None: canvas.itemconfigure(lh2subon,state='hidden')
-        if rh2_subsidary is None: canvas.itemconfigure(rh2subon,state='hidden')
-        if lh1_signal is None: canvas.itemconfigure(lh1sigon,state='hidden')
-        if rh1_signal is None: canvas.itemconfigure(rh1sigon,state='hidden')
-        if lh2_signal is None: canvas.itemconfigure(lh2sigon,state='hidden')
-        if rh2_signal is None: canvas.itemconfigure(rh2sigon,state='hidden')
+        if not main_signal: canvas.itemconfigure(mainsigon,state='hidden')
+        if not main_subsidary: canvas.itemconfigure(mainsubon,state='hidden')
+        if not lh1_subsidary: canvas.itemconfigure(lh1subon,state='hidden')
+        if not rh1_subsidary: canvas.itemconfigure(rh1subon,state='hidden')
+        if not lh2_subsidary: canvas.itemconfigure(lh2subon,state='hidden')
+        if not rh2_subsidary: canvas.itemconfigure(rh2subon,state='hidden')
+        if not lh1_signal: canvas.itemconfigure(lh1sigon,state='hidden')
+        if not rh1_signal: canvas.itemconfigure(rh1sigon,state='hidden')
+        if not lh2_signal: canvas.itemconfigure(lh2sigon,state='hidden')
+        if not rh2_signal: canvas.itemconfigure(rh2sigon,state='hidden')
                              
-        # Set the initial state of the signal Arms if they have been created
-        # We set them in the "wrong" state initially, so that when the signal arms
-        # are first updated they get "changed" to the correct aspects and send out
-        # the DCC commands to put the layout signals into their corresponding state
-        if main_signal is not None: main_signal = not fully_automatic
-        if main_subsidary is not None: main_subsidary = True 
-        if lh1_subsidary is not None: lh1_subsidary = True
-        if rh1_subsidary is not None: rh1_subsidary = True
-        if lh2_subsidary is not None: lh2_subsidary = True
-        if rh2_subsidary is not None: rh2_subsidary = True
-        if lh1_signal is not None: lh1_signal = True
-        if rh1_signal is not None: rh1_signal = True
-        if lh2_signal is not None: lh2_signal = True
-        if rh2_signal is not None: rh2_signal = True
+        # Set the initial state of the signal Arms. We use True/False to represent the current
+        # state of the signal arm, or a value of 'None' if the arm doesn't exist. We set the
+        # arms that do exist in the "wrong" state initially, so that when they are first updated
+        # they get "changed" to the correct initial state (causing the appropriate DCC commands
+        # to be sent out to the external signal). So, bearing in mind that the parameters passed
+        # into this function were either True or False (with False representing no signal arm)
+        # Signal arm specified - corresponding arm will bee set to True (OFF) initially
+        # No signal arm specified - corresponding arm will be set to None
+        if not main_signal: main_signal = None
+        if not main_subsidary: main_subsidary = None 
+        if not lh1_subsidary: lh1_subsidary = None
+        if not rh1_subsidary: rh1_subsidary = None
+        if not lh2_subsidary: lh2_subsidary = None
+        if not rh2_subsidary: rh2_subsidary = None
+        if not lh1_signal: lh1_signal = None
+        if not rh1_signal: rh1_signal = None
+        if not lh2_signal: lh2_signal = None
+        if not rh2_signal: rh2_signal = None
 
         # If this is a distant signal associated with another home signal then we need to adjust the
         # position of the signal button to "deconflict" with the buttons of the home signal
@@ -283,17 +275,69 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         
         # if there is an associated signal then we also need to update that signal to refer back to this one
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
-        
-        # If the signal is fully automatic then toggle to OFF to display a "clear" aspect (this will refresh
-        # the signal to display the correct aspects and send the DCC commands to put all mapped signal arms
-        # into their correct states. If not automatic we still need to refresh the signal to display the
-        # correct aspects and send the DCC commands to put all mapped signal arms into their correct states
-        if fully_automatic: signals_common.toggle_signal(sig_id)
-        else: update_semaphore_signal(sig_id)
-        # Refresh the subsidary signal arms to display the initial aspects and send the DCC commands
-        # to put all mapped signal arms into their correct states
-        update_semaphore_subsidary_arms(sig_id)
 
+        # Get the initial state for the signal (if layout state has been successfully loaded)
+        # Note that each element of 'loaded_state' will be 'None' if no data was loaded
+        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        # Set the initial state from the "loaded" state
+        if loaded_state["releaseonred"]: signals_common.set_approach_control(sig_id,release_on_yellow=False)
+        if loaded_state["releaseonyel"]: signals_common.set_approach_control(sig_id,release_on_yellow=True)
+        if loaded_state["theatretext"]: signals_common.update_theatre_route_indication(sig_id,loaded_state["theatretext"])
+        if loaded_state["routeset"]: signals_common.signals[str(sig_id)]["routeset"]=loaded_state["routeset"]
+        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
+        # If no state was loaded we still need to toggle fully automatic signals to OFF
+        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
+        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
+        # We test to see if there is a arm for each route (as the signal may not have one for all the routes)
+        if loaded_state["sigclear"] or fully_automatic:
+            signals_common.toggle_signal(sig_id)
+            if signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN:
+                signals_common.signals[str(sig_id)]["main_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH1
+                   and signals_common.signals[str(sig_id)]["lh1_signal"]==True ):
+                signals_common.signals[str(sig_id)]["lh1_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH2
+                   and signals_common.signals[str(sig_id)]["lh2_signal"]==True ):
+                signals_common.signals[str(sig_id)]["lh2_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH1
+                   and signals_common.signals[str(sig_id)]["rh1_signal"]==True ):
+                signals_common.signals[str(sig_id)]["rh1_signal"] = False
+            elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
+                   and signals_common.signals[str(sig_id)]["rh2_signal"]==True ):
+                signals_common.signals[str(sig_id)]["rh2_signal"] = False
+        # Update the signal to show the initial aspect (and send out DCC commands)
+        # We only refresh the signal if it is set to refresh immediately
+        if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)
+        # finally Lock the signal if required
+        if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
+
+        # Set the initial state of the subsidary from the "loaded" state
+        # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
+        # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
+        # We test to see if there is a subsidary arm (as the signal may not have one for all the routes)
+        if has_subsidary:
+            if loaded_state["subclear"]:
+                signals_common.toggle_subsidary(sig_id)
+                if (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN
+                        and signals_common.signals[str(sig_id)]["main_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["main_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH1
+                       and signals_common.signals[str(sig_id)]["lh1_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["lh1_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH2
+                       and signals_common.signals[str(sig_id)]["lh2_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["lh2_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH1
+                       and signals_common.signals[str(sig_id)]["rh1_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["rh1_subsidary"] = False
+                elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
+                       and signals_common.signals[str(sig_id)]["rh2_subsidary"]==True ):
+                    signals_common.signals[str(sig_id)]["rh2_subsidary"] = False
+            # Update the signal to show the initial aspect (and send out DCC commands)
+            update_semaphore_subsidary_arms(sig_id)
+            # finally Lock the subsidary if required 
+            if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
+            
     return ()
 
 #-------------------------------------------------------------------
@@ -466,36 +510,36 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
     if signals_common.signals[str(sig_id)]["distant"]:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = " (CAUTION - distant signal is ON)"
+            log_message = " (CAUTION) - signal is ON"
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = " (CAUTION - distant signal is OVERRIDDEN)"
+            log_message = " (CAUTION) - signal is OVERRIDDEN"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - distant signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
+            log_message = (" (CAUTION) - signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
         elif sig_ahead_id is not None and signals_common.signals[str(sig_ahead_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER)")
+            log_message = (" (CAUTION) - distant signal is OFF but signal ahead "+str(sig_ahead_id)+" is at DANGER")
         else:
             new_aspect = signals_common.signal_state_type.PROCEED
-            log_message = (" (PROCEED - distant signal is OFF - route is set to " +
+            log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
     else:
         if not signals_common.signals[str(sig_id)]["sigclear"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is ON)"
+            log_message = " (DANGER) - signal is ON"
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is OVERRIDDEN)"
+            log_message = " (DANGER) - signal is OVERRIDDEN"
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
             new_aspect = signals_common.signal_state_type.DANGER
-            log_message = " (DANGER - home signal is subject to \'release on red\' approach control)"
+            log_message = " (DANGER) - signal is subject to \'release on red\' approach control"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.CAUTION:
             new_aspect = signals_common.signal_state_type.CAUTION
-            log_message = (" (CAUTION - home signal is OFF but associated distant signal "+str(associated_signal)+" is at CAUTION")
+            log_message = (" (CAUTION) - signal is OFF but associated distant "+str(associated_signal)+" is at CAUTION")
         else:
             new_aspect = signals_common.signal_state_type.PROCEED
-            log_message = (" (PROCEED - home signal is OFF - route is set to " +
+            log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
 
     current_aspect = signals_common.signals[str(sig_id)]["sigstate"]
@@ -515,7 +559,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
                 update_semaphore_signal(associated_signal,updating_associated_signal=True)
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
-        signals_common.update_theatre_route_indication(sig_id)
+        signals_common.enable_disable_theatre_route_indication(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
         mqtt_interface.publish_signal_state(sig_id)            

@@ -42,7 +42,7 @@ class sig_callback_type(enum.Enum):
     sig_released = 5   # The signal has been "released" on the approach of a train
 
 # -------------------------------------------------------------------------
-# Global Classes used internally when creating/updating signals or 
+# Global Classes used internally/externally when creating/updating signals or 
 # processing button change events - Will apply to more that one signal type
 # -------------------------------------------------------------------------
 
@@ -90,15 +90,16 @@ def null_callback (sig_id:int,callback_type):
     return (sig_id,callback_type)
 
 # -------------------------------------------------------------------------
-# Callbacks for processing button pushes - Will also make an external 
-# callback if one was specified when the signal was created. If not, 
-# then the null_callback function will be called to "do nothing"
+# Callbacks for processing button pushes
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
+    # toggle the signal state and refresh the signal
     toggle_signal(sig_id)
+    auto_refresh_signal(sig_id)
+    # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_switched)
     return ()
 
@@ -106,6 +107,12 @@ def subsidary_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
     toggle_subsidary(sig_id)
+    #  call the signal type-specific functions to update the signal
+    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
+        signals_colour_lights.update_colour_light_subsidary(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
+        signals_semaphores.update_semaphore_subsidary_arms(sig_id)
+    # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sub_switched)
     return ()
 
@@ -118,6 +125,7 @@ def sig_passed_button_event (sig_id:int):
     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
     # mqtt interface has been successfully configured and the signal has been set to publish passed events
     mqtt_interface.publish_signal_passed_event(sig_id)
+    # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
@@ -127,13 +135,32 @@ def approach_release_button_event (sig_id:int):
     # Pulse the approach release button to provide a visual indication
     signals[str(sig_id)]["releasebutton"].config(bg="red")
     common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+    # Clear the approach control and refresh the signal
     clear_approach_control(sig_id)
+    auto_refresh_signal(sig_id)
+    # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
-# Common function to flip the internal state of a signal the state of the
-# Signal button - Called on a Signal "Button Press" event
+# Common function to refreh a signal following a change in state
+# -------------------------------------------------------------------------
+
+def auto_refresh_signal(sig_id:int):
+    # call the signal type-specific functions to update the signal (note that we only update
+    # Semaphore and colour light signals if they are configured to update immediately)
+    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
+        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
+        signals_ground_position.update_ground_position_signal (sig_id)
+    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
+        if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
+        signals_ground_disc.update_ground_disc_signal(sig_id)
+    return()
+
+# -------------------------------------------------------------------------
+# Common function to flip the internal state of a signal
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
@@ -153,22 +180,10 @@ def toggle_signal (sig_id:int):
         if not signals[str(sig_id)]["automatic"]:
             signals[str(sig_id)]["sigbutton"].config(relief="sunken")
             signals[str(sig_id)]["sigbutton"].config(bg=common.bgsunken)
-    # call the signal type-specific functions to update the signal (note that we only update
-    # Semaphore and colour light signals if they are configured to update immediately)
-    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
-        signals_ground_position.update_ground_position_signal (sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-        if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
-        signals_ground_disc.update_ground_disc_signal(sig_id)
     return ()
 
 # -------------------------------------------------------------------------
 # Common function to flip the internal state of a subsidary signal
-# (associated with a main signal) and the state of the Signal button
-# Called on a Subsidary Signal "Button Press" event
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
@@ -184,36 +199,11 @@ def toggle_subsidary (sig_id:int):
         logging.info ("Signal "+str(sig_id)+": Toggling subsidary to OFF")
         signals[str(sig_id)]["subclear"] = True
         signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
-    #  call the signal type-specific functions to update the signal
-    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-        signals_colour_lights.update_colour_light_subsidary(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-        signals_semaphores.update_semaphore_subsidary_arms(sig_id)
     return ()
 
 # -------------------------------------------------------------------------
-# Shared function to Clear the approach control setting for a signal
-# -------------------------------------------------------------------------
-
-def clear_approach_control (sig_id:int):
-    global logging
-    global signals
-    # Only Clear approach control if it is currently set for the signal
-    if signals[str(sig_id)]["releaseonred"] or signals[str(sig_id)]["releaseonyel"]:
-        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
-        signals[str(sig_id)]["releaseonyel"] = False
-        signals[str(sig_id)]["releaseonred"] = False
-        signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
-        # call the signal type-specific functions to update the signal (note that we only update
-        # Semaphore and colour light signals if they are configured to update immediately)
-        if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-            if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-            if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-    return()
-
-# -------------------------------------------------------------------------
-# Common Functions to set and clear release control for a signal
+# Common function to Set the approach control mode for a signal
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
@@ -232,12 +222,121 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
             logging.info ("Signal "+str(sig_id)+": Setting approach control (release on red)")
             signals[str(sig_id)]["releaseonred"] = True
             signals[str(sig_id)]["releaseonyel"] = False
-        # call the signal type-specific functions to update the signal (note that we only update
-        # Semaphore and colour light signals if they are configured to update immediately)
-        if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-            if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-        elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-            if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
+    return()
+
+#-------------------------------------------------------------------------
+# Common function to Clear the approach control mode for a signal
+# (shared by Colour Light and semaphore signal types)
+# -------------------------------------------------------------------------
+
+def clear_approach_control (sig_id:int):
+    global logging
+    global signals
+    # Only Clear approach control if it is currently set for the signal
+    if signals[str(sig_id)]["releaseonred"] or signals[str(sig_id)]["releaseonyel"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing approach control")
+        signals[str(sig_id)]["releaseonyel"] = False
+        signals[str(sig_id)]["releaseonred"] = False
+        signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"normal"))
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to set a signal override
+# -------------------------------------------------------------------------
+
+def set_signal_override (sig_id:int):
+    global logging
+    global signals
+    # Only set the override if signal is not already overridden
+    if not signals[str(sig_id)]["override"]:
+        logging.info ("Signal "+str(sig_id)+": Setting override")
+        # Set the override state and change the button text to indicate override
+        signals[str(sig_id)]["override"] = True
+        signals[str(sig_id)]["sigbutton"].config(fg="red", disabledforeground="red")
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to clear a signal override
+# -------------------------------------------------------------------------
+
+def clear_signal_override (sig_id:int):
+    global logging
+    global signals
+    # Only set the override if signal is not already overridden
+    if signals[str(sig_id)]["override"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing override")
+        # Clear the override and change the button colour
+        signals[str(sig_id)]["override"] = False
+        signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to lock a signal (i.e. for point/signal interlocking)
+# -------------------------------------------------------------------------
+
+def lock_signal (sig_id:int):
+    global logging
+    global signals
+    # Only lock if it is currently unlocked
+    if not signals[str(sig_id)]["siglocked"]:
+        logging.info ("Signal "+str(sig_id)+": Locking signal")
+        # If signal/point locking has been correctly implemented it should
+        # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+        if signals[str(sig_id)]["sigclear"]:
+            logging.warning ("Signal "+str(sig_id)+": Signal to lock is OFF - Locking Anyway")            
+        # Disable the Signal button to lock it
+        signals[str(sig_id)]["sigbutton"].config(state="disabled")
+        signals[str(sig_id)]["siglocked"] = True
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to unlock a signal (i.e. for point/signal interlocking)
+# -------------------------------------------------------------------------
+
+def unlock_signal (sig_id:int):
+    global logging
+    global signals
+    # Only unlock if it is currently locked
+    if signals[str(sig_id)]["siglocked"]:
+        logging.info ("Signal "+str(sig_id)+": Unlocking signal")
+        # Enable the Signal button to unlock it (if its not a fully automatic signal)
+        if not signals[str(sig_id)]["automatic"]:
+            signals[str(sig_id)]["sigbutton"].config(state="normal")
+        signals[str(sig_id)]["siglocked"] = False
+    return() 
+
+# -------------------------------------------------------------------------
+# Common Function to lock a subsidary (i.e. for point/signal interlocking)
+# -------------------------------------------------------------------------
+
+def lock_subsidary (sig_id:int):
+    global logging
+    global signals
+    # Only lock if it is currently unlocked
+    if not signals[str(sig_id)]["sublocked"]:
+        logging.info ("Signal "+str(sig_id)+": Locking subsidary")
+        # If signal/point locking has been correctly implemented it should
+        # only be possible to lock a signal that is "ON" (i.e. at DANGER)
+        if signals[str(sig_id)]["subclear"]:
+            logging.warning ("Signal "+str(sig_id)+": Subsidary signal to lock is OFF - Locking anyway")            
+        # Disable the Button to lock the subsidary signal
+        signals[str(sig_id)]["subbutton"].config(state="disabled")        
+        signals[str(sig_id)]["sublocked"] = True
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to unlock a subsidary (i.e. for point/signal interlocking)
+# -------------------------------------------------------------------------
+
+def unlock_subsidary (sig_id:int):
+    global logging
+    global signals
+    # Only unlock if it is currently locked
+    if signals[str(sig_id)]["sublocked"]:
+        logging.info ("Signal "+str(sig_id)+": Unlocking subsidary")
+        # Re-enable the Button to unlock the subsidary signal
+        signals[str(sig_id)]["subbutton"].config(state="normal")
+        signals[str(sig_id)]["sublocked"] = False
     return()
 
 # -------------------------------------------------------------------------
@@ -372,17 +471,43 @@ def create_theatre_route_elements (canvas,sig_id:int,
     signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
     return()
 
+
 # -------------------------------------------------------------------------
-# Common Function to update a theatre route indicator either on signal
-# update or route change (shared by Colour Light and semaphore signal types)
+# Common function to change the theatre route indication
+# (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
-def update_theatre_route_indication (sig_id,theatre_text:str=None):
+def update_theatre_route_indication (sig_id,theatre_text:str):
     global logging
     global signals
     # Only update the Theatre route indication if one exists for the signal
     if signals[str(sig_id)]["hastheatre"]:
-        # First deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
+        # Deal with route changes (if a new route has been passed in) - but only if the theatre text has changed
+        if theatre_text != signals[str(sig_id)]["theatretext"]:
+            signals[str(sig_id)]["canvas"].itemconfig(signals[str(sig_id)]["theatreobject"],text=theatre_text)
+            signals[str(sig_id)]["theatretext"] = theatre_text
+            if signals[str(sig_id)]["theatreenabled"] == True:
+                logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'" + theatre_text + "\'")
+                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=False)
+            else:
+                logging.info ("Signal "+str(sig_id)+": Setting theatre route to \'" + theatre_text + "\'")
+                # We always call the function to update the DCC route indication on a change in route even if the signal
+                # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
+                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=True)
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function that gets called on a signal aspect change - will
+# Enable/disable the theatre route indicator on a change to/from DANGER 
+# (shared by Colour Light and semaphore signal types)
+# -------------------------------------------------------------------------
+
+def enable_disable_theatre_route_indication (sig_id):
+    global logging
+    global signals
+    # Only update the Theatre route indication if one exists for the signal
+    if signals[str(sig_id)]["hastheatre"]:
+        # Deal with the theatre route inhibit/enable cases (i.e. signal at DANGER or not at DANGER)
         # We test for Not True and Not False to support the initial state when the signal is created (state = None)
         if signals[str(sig_id)]["sigstate"] == signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != False:
             logging.info ("Signal "+str(sig_id)+": Disabling theatre route display (signal is at DANGER)")
@@ -396,18 +521,6 @@ def update_theatre_route_indication (sig_id,theatre_text:str=None):
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
             signals[str(sig_id)]["theatreenabled"] = True
             dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=True,sig_at_danger=False)
-        # Deal with route changes (if a new route has been passed in) - but only if the theatre text has changed
-        if theatre_text != None and theatre_text != signals[str(sig_id)]["theatretext"]:
-            signals[str(sig_id)]["canvas"].itemconfig(signals[str(sig_id)]["theatreobject"],text=theatre_text)
-            signals[str(sig_id)]["theatretext"] = theatre_text
-            if signals[str(sig_id)]["theatreenabled"] == True:
-                logging.info ("Signal "+str(sig_id)+": Changing theatre route display to \'" + theatre_text + "\'")
-                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=False)
-            else:
-                logging.info ("Signal "+str(sig_id)+": Setting theatre route to \'" + theatre_text + "\'")
-                # We always call the function to update the DCC route indication on a change in route even if the signal
-                # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
-                dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=True)
     return()
 
 #################################################################################################

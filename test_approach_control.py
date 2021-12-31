@@ -44,7 +44,7 @@ import threading
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG) 
 
 #----------------------------------------------------------------------
-# WINDOW 2 - Main Callback for 'Release on Yellow' Approach Control (Colour Light Signals)
+# WINDOW 1 - Callback for 'Release on Red' Approach Control (Semaphore Signals)
 #----------------------------------------------------------------------
 
 def window1_callback_function(item_id,callback_type):
@@ -125,7 +125,7 @@ def window1_callback_function(item_id,callback_type):
     return()
 
 #----------------------------------------------------------------------------------------------
-# WINDOW 2 - Main Callback for 'Release on Yellow' Approach Control (Colour Light Signals)
+# WINDOW 2 - Callback for 'Release on Yellow' Approach Control (Colour Light Signals)
 #----------------------------------------------------------------------------------------------
 
 def window2_callback_function(item_id,callback_type):
@@ -206,7 +206,7 @@ def window2_callback_function(item_id,callback_type):
     return()
 
 #----------------------------------------------------------------------------------------------
-# WINDOW 3 - Main Callback for 'Release on Red' Approach Control (Colour Light Signals)
+# WINDOW 3 - Callback for 'Release on Red' Approach Control (Colour Light Signals)
 #----------------------------------------------------------------------------------------------
 
 def window3_callback_function(item_id,callback_type):
@@ -309,6 +309,10 @@ window3.title("Window 3: An example of using 'Release on Red' Approach Control f
 canvas3 = Canvas(window3,height=300,width=1100,bg="grey85")
 canvas3.pack()
 
+print ("Loading Layout State on startup")
+# Configure the loading and saving of layout state. In this example, we're specifying the filename
+load_layout_state(file_name="approach_control_state.sig")
+
 print ("Initialising Pi Sprog")
 initialise_pi_sprog ()
 request_dcc_power_on()
@@ -334,7 +338,7 @@ create_section(canvas3,13,625,150,section_callback=window3_callback_function)
 create_section(canvas3,14,925,150,section_callback=window3_callback_function)
 create_section(canvas3,15,925,100,section_callback=window3_callback_function)
 
-print ("Window 2: Creating Signals")
+print ("Window 3: Creating Signals")
 create_colour_light_signal (canvas3,11,50,150,
                             signal_subtype = signal_sub_type.four_aspect,
                             sig_callback=window3_callback_function,
@@ -371,6 +375,14 @@ create_colour_light_signal (canvas3,16,1000,150,
                             fully_automatic=True,
                             sig_passed_button=True)
 
+print ("Window 3: Creating external Track Sensor Mappings")
+create_track_sensor (11, gpio_channel = 10, signal_passed = 11)
+create_track_sensor (12, gpio_channel = 11, signal_passed = 12)
+create_track_sensor (13, gpio_channel = 12, signal_passed = 13)
+create_track_sensor (14, gpio_channel = 13, signal_passed = 14)
+create_track_sensor (15, gpio_channel = 16, signal_passed = 15)
+create_track_sensor (16, gpio_channel = 17, signal_passed = 16)
+
 print ("Window 3: Setting Initial Route and Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 window3_callback_function(None, None)
@@ -383,7 +395,7 @@ print ("Window 2: Creating DCC Mappings")
 # Define the DCC mappings for the signals. In this instance, we're only going to generate mappings
 # for the signals that support flashing aspects (i.e. Traintech 4 aspects with flashing aspects)
 # Signal 2 (addresses 13,14,15,16) - uses the simplified Train_Tech signal mapping function
-map_traintech_signal (sig_id = 3, base_address = 13)
+map_traintech_signal (sig_id = 2, base_address = 13)
 # Signal 3 (addresses 17,18,19,20) - uses the simplified Train_Tech signal mapping function
 map_traintech_signal (sig_id = 3, base_address = 17)
 
@@ -441,6 +453,16 @@ create_colour_light_signal (canvas2,6,1000,150,
                             fully_automatic=True,
                             sig_passed_button=True)
 
+print ("Window 2: Creating external Track Sensor Mappings")
+# Map external track sensors for the signals - For simplicity, we'll give them the same ID as the signal
+# We'll also map them to the associated "signal passed" events rather than using their own callback
+create_track_sensor (1, gpio_channel = 4, signal_passed = 1)
+create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
+create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
+create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
+create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
+create_track_sensor (6, gpio_channel = 9, signal_passed = 6)
+
 print ("Window 2: Setting Initial Route and Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 window2_callback_function(None, None)
@@ -490,6 +512,14 @@ create_semaphore_signal (canvas1,26,1000,150,
                             sig_callback=window1_callback_function,
                             sig_passed_button=True)
 
+print ("Window 1: Creating external Track Sensor Mappings")
+create_track_sensor (21, gpio_channel = 18, signal_passed = 21)
+create_track_sensor (22, gpio_channel = 19, signal_passed = 22)
+create_track_sensor (23, gpio_channel = 20, signal_passed = 23)
+create_track_sensor (24, gpio_channel = 21, signal_passed = 24)
+create_track_sensor (25, gpio_channel = 22, signal_passed = 25)
+create_track_sensor (26, gpio_channel = 23, signal_passed = 26)
+
 print ("Window 1: Setting Initial Route and Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 window1_callback_function(None, None)
@@ -498,6 +528,9 @@ window1_callback_function(None, None)
 
 print("Entering Main Event Loop")
 print("Main Thread is: " + str(threading.get_ident()))
+# Before we enter the main loop we need to force focus on the main TKinter window.
+# I've had issues running the software on Windows platforms if you don't do this
+window1.focus_force()
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 window1.mainloop()
 

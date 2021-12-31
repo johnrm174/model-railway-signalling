@@ -37,10 +37,10 @@ def main_callback_function(item_id,callback_type):
     callback_thread = threading.get_ident()
     print ("Main Thread "+str(main_thread)+" and Callback Thread "+str(callback_thread)+" should be identical" )
 
-    if callback_type == section_callback_type.section_switched:
+    if callback_type == section_callback_type.section_updated:
         if item_id == 17: set_section_occupied(23)
         if item_id == 18: clear_section_occupied(23)
-        if item_id == 19: print ("Section 23 Occupied: "+str(section_occupied(23)))
+        if item_id == 19: print ("Section 23 Occupied: "+str(section_occupied(23))+" - '"+section_label(23)+"'")
         if item_id == 20: set_section_occupied(50)
         if item_id == 21: clear_section_occupied(50)
         if item_id == 22: print ("Section 50 Occupied: "+str(section_occupied(50)))
