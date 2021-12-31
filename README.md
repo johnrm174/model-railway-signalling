@@ -1,6 +1,8 @@
 # model-railway-signalling
 A model railway signalling library written in Python primarily intended for the Raspberry Pi, but will run on other platforms 
-(albeit without some of the external interfacing functions). For details of the "Public" API - scroll down the page
+(albeit without some of the external interfacing functions). 
+
+For details of the "Public" API - scroll down the page
 
 All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
@@ -570,7 +572,7 @@ load_layout_state - Loads the initial state for all 'points', 'signals' and 'sec
                     and enables the save of the current layout state to file on application quit.
                     If load is "cancelled" or "file not found" then the default state will be used
    Optional Parameters:
-      file_name:str - to load/save - default = None (will default to '<main-python-script>.sig')
+      file_name:str - to load/save - default = None (will default to 'main-python-script.sig')
       load_file_dialog:bool - Opens a 'load file' dialog to select a file - default = False
       save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False
 </pre>
