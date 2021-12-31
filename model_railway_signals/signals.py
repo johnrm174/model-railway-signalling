@@ -244,7 +244,6 @@ import logging
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -263,7 +262,6 @@ def signal_clear (sig_id:int):
 # -------------------------------------------------------------------------
 
 def signal_state (sig_id:Union[int,str]):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -281,7 +279,6 @@ def signal_state (sig_id:Union[int,str]):
 # -------------------------------------------------------------------------
 
 def signal_overridden (sig_id:int):
-    
     global logging
     # Validate the signal exists
     logging.warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
@@ -301,7 +298,6 @@ def signal_overridden (sig_id:int):
 # -------------------------------------------------------------------------
 
 def approach_control_set (sig_id:int):
-    
     global logging
     logging.warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
     # Validate the signal exists
@@ -325,7 +321,6 @@ def approach_control_set (sig_id:int):
 # -------------------------------------------------------------------------
 
 def subsidary_clear (sig_id:int):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -346,7 +341,6 @@ def subsidary_clear (sig_id:int):
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
@@ -364,7 +358,6 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
@@ -384,7 +377,6 @@ def unlock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def lock_subsidary (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
@@ -406,7 +398,6 @@ def lock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
@@ -429,26 +420,15 @@ def unlock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": set_signal_override - Signal does not exist")
         else:
+            # Set the override and refresh the signal following the change in state
             signals_common.set_signal_override(sig_id)
-            # call the signal type-specific functions to update the signal (note that we only update
-            # Semaphore and colour light signals if they are configured to update immediately)
-            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[str(sig_id)]["refresh"]:
-                    signals_colour_lights.update_colour_light_signal(sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-                if signals_common.signals[str(sig_id)]["refresh"]:
-                    signals_semaphores.update_semaphore_signal (sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
-                signals_ground_position.update_ground_position_signal (sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
-                signals_ground_disc.update_ground_disc_signal (sig_id)  
+            signals_common.auto_refresh_signal(sig_id)
         return()
 
 # -------------------------------------------------------------------------
@@ -460,26 +440,15 @@ def set_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
-    
     global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": clear_signal_override - Signal does not exist")
         else:
+            # Clear the override and refresh the signal following the change in state
             signals_common.clear_signal_override(sig_id)
-            # call the signal type-specific functions to update the signal (note that we only update
-            # Semaphore and colour light signals if they are configured to update immediately)
-            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-                if signals_common.signals[str(sig_id)]["refresh"]:
-                    signals_colour_lights.update_colour_light_signal(sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-                if signals_common.signals[str(sig_id)]["refresh"]:
-                    signals_semaphores.update_semaphore_signal (sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
-                signals_ground_position.update_ground_position_signal (sig_id)
-            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
-                signals_ground_disc.update_ground_disc_signal (sig_id)
+            signals_common.auto_refresh_signal(sig_id)
     return() 
 
 # -------------------------------------------------------------------------
@@ -491,7 +460,6 @@ def clear_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -499,17 +467,9 @@ def toggle_signal (sig_id:int):
     else:
         if signals_common.signals[str(sig_id)]["siglocked"]:
             logging.warning ("Signal "+str(sig_id)+": toggle_signal - Signal is locked - Toggling anyway")
+        # Toggle the signal and refresh the signal following the change in state
         signals_common.toggle_signal(sig_id)
-        # call the signal type-specific functions to update the signal (note that we only update
-        # Semaphore and colour light signals if they are configured to update immediately)
-        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            if signals_common.signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_position:
-            signals_ground_position.update_ground_position_signal (sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            if signals_common.signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.ground_disc:
-            signals_ground_disc.update_ground_disc_signal(sig_id)
+        signals_common.auto_refresh_signal(sig_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -522,7 +482,6 @@ def toggle_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -532,8 +491,8 @@ def toggle_subsidary (sig_id:int):
     else:
         if signals_common.signals[str(sig_id)]["sublocked"]:
             logging.warning ("Signal "+str(sig_id)+": toggle_subsidary - Subsidary signal is locked - Toggling anyway")
+        # Toggle the subsidary and refresh the signal following the change in state
         signals_common.toggle_subsidary(sig_id)
-        #  call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
             signals_colour_lights.update_colour_light_subsidary(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
@@ -551,7 +510,6 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -568,8 +526,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
             elif release_on_yellow and signals_common.signals[str(sig_id)]["subtype"]==signals_colour_lights.signal_sub_type.red_ylw:
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a 2 aspect red/yellow signal")
             else:
+                # Set approach control and refresh the signal following the change in state
                 signals_common.set_approach_control(sig_id,release_on_yellow)            
-                if signals_common.signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+                signals_common.auto_refresh_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             # Do some additional validation specific to this function for semaphore signals
             if signals_common.signals[str(sig_id)]["distant"]:
@@ -577,8 +536,9 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
             elif release_on_yellow:
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
             else:
+                # Set approach control and refresh the signal following the change in state
                 signals_common.set_approach_control(sig_id)
-                if signals_common.signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
+                signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error ("Signal "+str(sig_id)+": set_approach_control - Function not supported by signal type")
     return()
@@ -592,7 +552,6 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -601,11 +560,13 @@ def clear_approach_control (sig_id:int):
         # call the signal type-specific functions to update the signal (note that we only update
         # Semaphore and colour light signals if they are configured to update immediately)
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+            # Clear approach control and refresh the signal following the change in state
             signals_common.clear_approach_control (sig_id)
-            if signals_common.signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+            signals_common.auto_refresh_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+            # Clear approach control and refresh the signal following the change in state
             signals_common.clear_approach_control (sig_id)
-            if signals_common.signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
+            signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error ("Signal "+str(sig_id)+": clear_approach_control - Function not supported by signal type")
     return()
@@ -621,7 +582,6 @@ def clear_approach_control (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
-    
     global logging
     # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
@@ -649,7 +609,6 @@ def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
 # -------------------------------------------------------------------------
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -682,7 +641,6 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):

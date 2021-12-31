@@ -91,36 +91,23 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     elif associated_home == 0 and not main_signal:
         logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
     else:
-        
-        # We use a value of None to signify that a particular arm isn't to be created for the signal
-        # If it is to be created, we use True/False to represent the current state of the signal arm.
-        if main_signal == False: main_signal = None
-        if main_subsidary == False: main_subsidary = None
-        if lh1_subsidary == False: lh1_subsidary = None
-        if rh1_subsidary == False: rh1_subsidary = None
-        if lh2_subsidary == False: lh2_subsidary = None
-        if rh2_subsidary == False: rh2_subsidary = None
-        if lh1_signal == False: lh1_signal = None
-        if rh1_signal == False: rh1_signal = None
-        if lh2_signal == False: lh2_signal = None
-        if rh2_signal == False: rh2_signal = None
-        
+                
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
         # This to cater for the situation where not all home arms have an associated distant arm
         if associated_home > 0:
             postoffset = signals_common.signals[str(associated_home)]["postoffset"]
-        elif (rh2_signal is None and rh2_subsidary is None and rh1_signal is None and rh1_subsidary is None):
-            if lh2_signal is not None or lh2_subsidary is not None:
+        elif (not rh2_signal and not rh2_subsidary and not rh1_signal and not rh1_subsidary ):
+            if lh2_signal or lh2_subsidary:
                 postoffset = -8
-            elif lh1_signal is not None or lh1_subsidary is not None:
+            elif lh1_signal or lh1_subsidary:
                 postoffset = -15
             else:
                 postoffset = -20
-        elif rh2_signal is not None or rh2_subsidary is not None:
+        elif rh2_signal or rh2_subsidary:
             postoffset = -37
-        elif (rh2_signal is None and rh2_subsidary is None) and (lh2_signal is None and lh2_subsidary is None):
+        elif (not rh2_signal and not rh2_subsidary) and (not lh2_signal and not lh2_subsidary):
             postoffset = -22
         else:
             postoffset = -22
@@ -136,19 +123,19 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             canvas.create_line(common.rotate_line(x,y,0,0,0,postoffset,orientation),width=2,fill="white")
             canvas.create_line(common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation),width=3,fill="white")
             # Draw the rest of the gantry to support other arms as required
-            if lh2_signal is not None or lh2_subsidary is not None:
+            if lh2_signal or lh2_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation),width=2,fill="white")
                 if lh2_signal: canvas.create_line(common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation),width=2,fill="white")
-            if lh1_signal is not None or lh1_subsidary is not None:
+            if lh1_signal or lh1_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation),width=2,fill="white")
                 if lh1_signal: canvas.create_line(common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation),width=2,fill="white")
-            if rh2_signal is not None or rh2_subsidary is not None:
+            if rh2_signal or rh2_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation),width=2,fill="white")
                 if rh2_signal: canvas.create_line(common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation),width=2,fill="white")
-            if rh1_signal is not None or rh1_subsidary is not None:
+            if rh1_signal or rh1_subsidary:
                 canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation),width=2,fill="white")
                 canvas.create_line(common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation),width=2,fill="white")
                 if rh1_signal: canvas.create_line(common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation),width=2,fill="white")
@@ -190,31 +177,35 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
 
         # Hide any otherdrawing objects we don't need for this particular signal
-        if main_signal is None: canvas.itemconfigure(mainsigon,state='hidden')
-        if main_subsidary is None: canvas.itemconfigure(mainsubon,state='hidden')
-        if lh1_subsidary is None: canvas.itemconfigure(lh1subon,state='hidden')
-        if rh1_subsidary is None: canvas.itemconfigure(rh1subon,state='hidden')
-        if lh2_subsidary is None: canvas.itemconfigure(lh2subon,state='hidden')
-        if rh2_subsidary is None: canvas.itemconfigure(rh2subon,state='hidden')
-        if lh1_signal is None: canvas.itemconfigure(lh1sigon,state='hidden')
-        if rh1_signal is None: canvas.itemconfigure(rh1sigon,state='hidden')
-        if lh2_signal is None: canvas.itemconfigure(lh2sigon,state='hidden')
-        if rh2_signal is None: canvas.itemconfigure(rh2sigon,state='hidden')
+        if not main_signal: canvas.itemconfigure(mainsigon,state='hidden')
+        if not main_subsidary: canvas.itemconfigure(mainsubon,state='hidden')
+        if not lh1_subsidary: canvas.itemconfigure(lh1subon,state='hidden')
+        if not rh1_subsidary: canvas.itemconfigure(rh1subon,state='hidden')
+        if not lh2_subsidary: canvas.itemconfigure(lh2subon,state='hidden')
+        if not rh2_subsidary: canvas.itemconfigure(rh2subon,state='hidden')
+        if not lh1_signal: canvas.itemconfigure(lh1sigon,state='hidden')
+        if not rh1_signal: canvas.itemconfigure(rh1sigon,state='hidden')
+        if not lh2_signal: canvas.itemconfigure(lh2sigon,state='hidden')
+        if not rh2_signal: canvas.itemconfigure(rh2sigon,state='hidden')
                              
-        # Set the initial state of the signal Arms if they have been created
-        # We set them in the "wrong" state initially, so that when the signal arms
-        # are first updated they get "changed" to the correct aspects and send out
-        # the DCC commands to put the layout signals into their corresponding state
-        if main_signal is not None: main_signal = True
-        if main_subsidary is not None: main_subsidary = True 
-        if lh1_subsidary is not None: lh1_subsidary = True
-        if rh1_subsidary is not None: rh1_subsidary = True
-        if lh2_subsidary is not None: lh2_subsidary = True
-        if rh2_subsidary is not None: rh2_subsidary = True
-        if lh1_signal is not None: lh1_signal = True
-        if rh1_signal is not None: rh1_signal = True
-        if lh2_signal is not None: lh2_signal = True
-        if rh2_signal is not None: rh2_signal = True
+        # Set the initial state of the signal Arms. We use True/False to represent the current
+        # state of the signal arm, or a value of 'None' if the arm doesn't exist. We set the
+        # arms that do exist in the "wrong" state initially, so that when they are first updated
+        # they get "changed" to the correct initial state (causing the appropriate DCC commands
+        # to be sent out to the external signal). So, bearing in mind that the parameters passed
+        # into this function were either True or False (with False representing no signal arm)
+        # Signal arm specified - corresponding arm will bee set to True (OFF) initially
+        # No signal arm specified - corresponding arm will be set to None
+        if not main_signal: main_signal = None
+        if not main_subsidary: main_subsidary = None 
+        if not lh1_subsidary: lh1_subsidary = None
+        if not rh1_subsidary: rh1_subsidary = None
+        if not lh2_subsidary: lh2_subsidary = None
+        if not rh2_subsidary: rh2_subsidary = None
+        if not lh1_signal: lh1_signal = None
+        if not rh1_signal: rh1_signal = None
+        if not lh2_signal: lh2_signal = None
+        if not rh2_signal: rh2_signal = None
 
         # If this is a distant signal associated with another home signal then we need to adjust the
         # position of the signal button to "deconflict" with the buttons of the home signal
@@ -341,7 +332,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                     signals_common.signals[str(sig_id)]["rh1_subsidary"] = False
                 elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
                        and signals_common.signals[str(sig_id)]["rh2_subsidary"]==True ):
-                    signals_common.signals[str(sig_id)]["rh2_subsidary"] = False            # Update the signal to show the initial aspect (and send out DCC commands)
+                    signals_common.signals[str(sig_id)]["rh2_subsidary"] = False
+            # Update the signal to show the initial aspect (and send out DCC commands)
             update_semaphore_subsidary_arms(sig_id)
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)

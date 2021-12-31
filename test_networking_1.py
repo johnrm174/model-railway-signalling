@@ -128,7 +128,7 @@ map_semaphore_signal (sig_id = 12, main_signal = 103)
 print ("Initialising MQTT Client and connecting to external Broker")
 # Configure the MQTT Broker networking feature to allow this application node to act as a remote
 # DCC command station for other application nodes (i.e. forward received DCC commands to the Pi-Sprog) 
-configure_networking(broker_host ="mqtt.eclipseprojects.io", network_identifier="network1",
+configure_networking(broker_host ="broker.emqx.io", network_identifier="network1", broker_port=1883,
                      node_identifier= "Box1",publish_dcc_commands=False, mqtt_enhanced_debugging=mqtt_debug )
 # Configure the upper line events/updates we want to publish/subscribe to
 set_sections_to_publish_state(3)

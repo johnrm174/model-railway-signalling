@@ -168,7 +168,7 @@ map_dcc_signal (sig_id = 2,
                 proceed = [[1,False],[2,True],[3,False],[4,False]],
                 caution = [[1,False],[2,False],[3,True],[4,False]],
                 prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
-                LH1 = [[5,True]], NONE = [[5,False]],
+                LH1 = [[5,True]], MAIN = [[5,False]], NONE = [[5,False]],
                 subsidary = 6)
 
 # Signals 1,3,4 and 5 assume a TrainTech DCC 4 Aspect Signal - these are event driven
@@ -290,3 +290,5 @@ print ("Entering Main Event Loop")
 window.focus_force()
 # Now enter the main event loop and wait for a button press (which will trigger a callback)
 window.mainloop()
+
+################################################################################

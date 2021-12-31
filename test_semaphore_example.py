@@ -197,7 +197,7 @@ request_dcc_power_on()
 
 # Semaphore signal mappings are simple mappings of each "arm" to a single DCC address
 map_semaphore_signal (sig_id = 1, main_signal = 1 , lh1_signal = 10 )
-map_semaphore_signal (sig_id = 2, main_signal = 2 , lh1_signal = 11, rh1_signal = 13, lh1_subsidary = 12) ######################
+map_semaphore_signal (sig_id = 2, main_signal = 2 , lh1_signal = 11, lh1_subsidary = 12)
 map_semaphore_signal (sig_id = 3, main_signal = 3 )
 map_semaphore_signal (sig_id = 4, main_signal = 4 )
 map_semaphore_signal (sig_id = 5, main_signal = 5 )
@@ -253,7 +253,6 @@ create_semaphore_signal (canvas,2,300,200,
                          sig_callback=main_callback_function,
                          lh1_subsidary = True,
                          lh1_signal = True,
-                         rh1_signal = True,             #############################################
                          sig_passed_button = True)
 create_semaphore_signal (canvas,3,675,150,
                          sig_callback=main_callback_function,
@@ -279,6 +278,7 @@ create_track_sensor (2, gpio_channel = 5, signal_passed = 2)
 create_track_sensor (3, gpio_channel = 6, signal_passed = 3)
 create_track_sensor (4, gpio_channel = 7, signal_passed = 4)
 create_track_sensor (5, gpio_channel = 8, signal_passed = 5)
+create_track_sensor (6, gpio_channel = 9, signal_passed = 6)
 
 print ("Setting Initial Interlocking")
 # Set the initial interlocking conditions by running the main callback function

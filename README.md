@@ -2,15 +2,14 @@
 A model railway signalling library written in Python primarily intended for the Raspberry Pi, but will run on other platforms 
 (albeit without some of the external interfacing functions). For details of the "Public" API - scroll down the page
 
-An interface to the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. 
-A GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
-A MQTT interface enables multiple signalling applications to be networked together, sharing signal and track section states.
-
 All of the functions for creating and managing 'signals', 'points', 'sections' and 'sensors' have been developed as a Python Package 
 to promote re-use across other layouts. This includes functions to support the interlocking of signals and points to enable 
-fully prototypical signalling schemes to be developed. The signals and points opjects can be easily mapped to one or more DCC 
+fully prototypical signalling schemes to be developed. An interface to the Pi-SPROG-3 DCC Command station enables DCC control 
+of the signals and points out on the layout. The signals and points objects can be easily mapped to one or more DCC 
 addresses in a manner that should be compatible with the majority of DCC signal/points decoders currently on the market. 
-Track sensors can also be easily integrated to provide 'signal passed' events, enabling full automatic control.
+A GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be connected in via opto-isolators.
+These sensors can be configured to provide 'signal passed' events, enabling full automatic control of the layout signalling.
+A MQTT interface enables multiple signalling applications to be share signal and track section states and 'signal passed' events.
 
 Most types of colour light signals, semaphore signals, ground position light signals and ground disc signals are supported.
 
@@ -46,7 +45,7 @@ To use the "public" functions for developing your own layout signalling system:
 Some examples are included in the repository: https://github.com/johnrm174/model-railway-signalling:
 
 <pre>
-'test_simple_example.py' - a simple example of how to use the "signals" and "points" and "sections"
+'test_simple_example.py' - an example of how to use the "signals", "points", "sections" and "sensors"
            modules to create a basic track schematic with interlocked signals/points and semi-automation 
            of signals using external sensors to provide "signal passed" events as the train progresses 
            across the schematic. Also includes DCC Mapping examples (for both signals and points).
@@ -54,18 +53,18 @@ Some examples are included in the repository: https://github.com/johnrm174/model
 'test_semaphore_example.py' - effectively the same example as above, but using sempahore signals. 
            Includes DCC Mapping examples for the Semaphore signals (different to colour lights).
 
-'test_approach_control.py' - an example of using "approach control" for automation of junction signals. This 
-           is where a signal displays a more restrictive aspect (either red or yellow) when a lower-speed 
+'test_approach_control.py' - an example of using "approach control" for junction signals. Signals subject
+           to "approach control" display a more restrictive aspect (either red or yellow) when a lower-speed 
            divergent route is set, forcing the approaching train to slow down and be prepared to stop. As 
            the train approaches, the signal is "released", allowing the train to proceed past the signal 
            and onto the divergent route. For Colour light signals, examples of "Approach on Red" and 
            "Approach on Yellow" are provided (for "Approach on yellow", the signals behind will show the 
            correct flashing yellow aspects. For Semaphore signals, an example of using approach control
-           for semi-automating all the home signals within a block section is provided
+           for semi-automating all the home signals within a block section is provided.
 
 'test_networking_1/2.py' - an example of how to network multiple signalling applications (potentially hosted 
            on seperate computers) together via an external MQTT broker. This demonstrates how signal states,
-           "signal passed" events and track occupancy sections can be shared between applications
+           "signal passed" events and track occupancy information can be shared between applications.
 
 'test_harman-signalist_sc1.py'- developed primarily for testing using the Harmann Signallist SC1 decoder. 
            Enables the various modes to be selected (includes programming of CVs) and then tested. I used 
@@ -562,6 +561,20 @@ map_dcc_point
       state_reversed:bool - Set to True to reverse the DCC logic (default = false)
 </pre>
 
+## Loading and Saving Layout State
+
+This enables the current configuration of the signals, points and sections on the layout to be "saved" when the application 
+is closed and then "loaded" when the application is re-loaded (ready for the next running session)
+<pre>
+load_layout_state - Loads the initial state for all 'points', 'signals' and 'sections' from file
+                    and enables the save of the current layout state to file on application quit.
+                    If load is "cancelled" or "file not found" then the default state will be used
+   Optional Parameters:
+      file_name:str - to load/save - default = None (will default to '<main-python-script>.sig')
+      load_file_dialog:bool - Opens a 'load file' dialog to select a file - default = False
+      save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False
+</pre>
+
 ## Pi-Sprog Interface Functions
 
 This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi UART. It does not provide
@@ -673,5 +686,4 @@ set_signals_to_publish_passed_events - Enable the publication of signal passed e
                All subsequent events will be automatically published to remote subscribers
   Mandatory Parameters:
       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
-
 </pre>

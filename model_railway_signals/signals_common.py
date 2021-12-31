@@ -96,17 +96,9 @@ def null_callback (sig_id:int,callback_type):
 def signal_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
+    # toggle the signal state and refresh the signal
     toggle_signal(sig_id)
-    # call the signal type-specific functions to update the signal (note that we only update
-    # Semaphore and colour light signals if they are configured to update immediately)
-    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
-        signals_ground_position.update_ground_position_signal (sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-        if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
-        signals_ground_disc.update_ground_disc_signal(sig_id)
+    auto_refresh_signal(sig_id)
     # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_switched)
     return ()
@@ -143,16 +135,29 @@ def approach_release_button_event (sig_id:int):
     # Pulse the approach release button to provide a visual indication
     signals[str(sig_id)]["releasebutton"].config(bg="red")
     common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+    # Clear the approach control and refresh the signal
     clear_approach_control(sig_id)
+    auto_refresh_signal(sig_id)
+    # Make the external callback (if one was specified at signal creation time)
+    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
+    return ()
+
+# -------------------------------------------------------------------------
+# Common function to refreh a signal following a change in state
+# -------------------------------------------------------------------------
+
+def auto_refresh_signal(sig_id:int):
     # call the signal type-specific functions to update the signal (note that we only update
     # Semaphore and colour light signals if they are configured to update immediately)
     if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
         if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
+        signals_ground_position.update_ground_position_signal (sig_id)
     elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
         if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
-    return ()
+    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
+        signals_ground_disc.update_ground_disc_signal(sig_id)
+    return()
 
 # -------------------------------------------------------------------------
 # Common function to flip the internal state of a signal

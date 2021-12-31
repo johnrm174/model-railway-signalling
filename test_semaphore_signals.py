@@ -254,57 +254,61 @@ def clear_all_approach_control():
 # This is where the code begins
 #------------------------------------------------------------------------------------
 
-# Create the Window and canvas
 print ("Creating Window and Canvas")
+
 window = Tk()
 window.title("Test Semaphore Signals")
 canvas = Canvas(window,height=850,width=1200,bg="grey85")
 canvas.pack()
 
-print ("Creating Buttons for the Test Functions")
+print ("Loading Layout State on startup")
+
+load_layout_state()
+
+print ("Creating Buttons")
 
 lock_signals_button = Button (canvas, text="Lock All Signals",
-        state="normal", relief="raised",command=lambda:lock_unlock_signals())
+        state="normal", relief="raised",command=lock_unlock_signals)
 canvas.create_window (10,10,window=lock_signals_button,anchor=NW)
 
 lock_subsidary_button = Button (canvas, text="Lock All Subsidary Signals",
-        state="normal", relief="raised",command=lambda:lock_unlock_subsidary())
+        state="normal", relief="raised",command=lock_unlock_subsidary)
 canvas.create_window (150,10,window=lock_subsidary_button,anchor=NW)
 
 set_signal_override_button = Button (canvas, text="Overide All Signals",
-        state="normal", relief="raised",command=lambda:set_clear_signal_overrides())
+        state="normal", relief="raised",command=set_clear_signal_overrides)
 canvas.create_window (360,10,window=set_signal_override_button,anchor=NW)
 
 button = Button (canvas, text="Print Signal State",
-        state="normal", relief="raised",command=lambda:print_signal_state())
+        state="normal", relief="raised",command=print_signal_state)
 canvas.create_window (520,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Print Subsidary State",
-        state="normal", relief="raised",command=lambda:print_subsidary_state())
+        state="normal", relief="raised",command=print_subsidary_state)
 canvas.create_window (670,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Toggle Signals",
-        state="normal", relief="raised",command=lambda:toggle_signals())
+        state="normal", relief="raised",command=toggle_signals)
 canvas.create_window (840,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Toggle Subsidaries",
-        state="normal", relief="raised",command=lambda:toggle_subsidaries())
+        state="normal", relief="raised",command=toggle_subsidaries)
 canvas.create_window (970,10,window=button,anchor=NW)
 
 button = Button (canvas, text="Set Approach control Red",
-        state="normal", relief="raised",command=lambda:set_all_approach_control_red())
+        state="normal", relief="raised",command=set_all_approach_control_red)
 canvas.create_window (20,800,window=button,anchor=NW)
 
 button = Button (canvas, text="Set Approach control Yel",
-        state="normal", relief="raised",command=lambda:set_all_approach_control_yellow())
+        state="normal", relief="raised",command=set_all_approach_control_yellow)
 canvas.create_window (220,800,window=button,anchor=NW)
 
 button = Button (canvas, text="Clear Approach control ",
-        state="normal", relief="raised",command=lambda:clear_all_approach_control())
+        state="normal", relief="raised",command=clear_all_approach_control)
 canvas.create_window (420,800,window=button,anchor=NW)
 
 button = Button (canvas, text="Change Route Display",
-        state="normal", relief="raised",command=lambda:change_route_display())
+        state="normal", relief="raised",command=change_route_display)
 canvas.create_window (900,800,window=button,anchor=NW)
 
 canvas.create_text (250,170,text="Signal 50 is updated based on signal ahead 1")
@@ -603,14 +607,17 @@ create_semaphore_signal (canvas,96,500,500, distant=True, associated_home = 21)
 create_semaphore_signal (canvas,97,500,500, distant=True, associated_home = 13)
 create_semaphore_signal (canvas,98,500,500, distant=True, associated_home = 98)
 create_semaphore_signal (canvas,99,500,500, main_signal = False)
+
+print (" ")
+print ("Create Ground Disc Signals - Negative Tests")
 create_ground_disc_signal (canvas,0,500,500)
 create_ground_disc_signal (canvas,1,500,500)
 create_ground_disc_signal (canvas,90,500,500, orientation = 90)
-print (" ")
 
+print (" ")
 print ("Setting initial signal states")
 update_signals_based_on_signal_ahead()
 
-# Now enter the main event loop and wait for a button press (which will trigger a callback)
+print (" ")
 print ("Entering Main Event Loop")
 window.mainloop()
