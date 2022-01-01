@@ -6,19 +6,45 @@
 import math
 import queue
 import logging
+import time
 from . import mqtt_interface
 from . import file_interface
 
 #-------------------------------------------------------------------------
 # Function to catch the root window close event so we can perform an
 # orderly shutdown of the other threads running in the application
+# The shutdown_initiated flag is used to tell the flash aspects and timed
+# signals functions to stop scheduling further "after" commands and exit 
 #-------------------------------------------------------------------------
 
+shutdown_initiated = False
+
+def shutdown():
+    global logging
+    # Wait until all the tasks we have scheduled via the tkinter 'after' method
+    # have completed - we need to put a timeout around this to deal with any ongoing
+    # timed signal sequences (although user shouldn't shut down until these have finished)
+    timeout_start = time.time()
+    while time.time() < timeout_start + 10:
+        if root_window.tk.call('after','info') != "":
+            root_window.update()
+            time.sleep(0.001)
+        else:
+            logging.info ("Exiting Application")
+            break
+    if time.time() >= timeout_start + 10:
+        logging.warning ("Timeout waiting for scheduled events to be processed- Exiting anyway")
+    root_window.destroy()
+    return()
+
 def on_closing():
-    global root_window
+    global logging
+    global shutdown_initiated
     if file_interface.save_state_and_quit():
+        logging.info ("Initiating Shutdown")
+        shutdown_initiated = True
         mqtt_interface.mqtt_shutdown()
-        root_window.destroy()
+        root_window.after(10,lambda:shutdown())
     return()
 
 #-------------------------------------------------------------------------
@@ -66,6 +92,7 @@ def handle_callback_in_tkinter_thread(*args):
     return()
     
 def execute_function_in_tkinter_thread(callback_function):
+    global logging
     callback = event_queue.put(callback_function)
     if root_window is not None:
         root_window.event_generate("<<ExtCallback>>", when="tail")

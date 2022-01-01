@@ -29,13 +29,6 @@ import logging
 import enum
 
 # -------------------------------------------------------------------------
-# Global variable to ensure we only start the tkinter scheduled tasks (to flash 
-# any approach control aspects) only once (after the creation of the first signal)
-# -------------------------------------------------------------------------
-
-flash_aspects_started = False
-
-# -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
 # -------------------------------------------------------------------------
 
@@ -232,10 +225,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
 
-        # When we have created the first colour_light signal we're good to start the 
-        # scheduled functions to deal with any approach control flashing aspects
-        if not flash_aspects_started: flash_aspects_on()
-
     return ()
 
 #-------------------------------------------------------------------
@@ -398,34 +387,28 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
 # -------------------------------------------------------------------------
 # Internal Functions for cycling the flashing aspects. Rather than using a
 # Thread to do this, we use the tkinter 'after' method to scedule the next
-# update via the tkinter event queue. The first call to "flash_aspects_on"
-# is made after the first colour light signal has been successfully created.
-# We do it like this so everything is running in the main tkinter thread as
-# all the information out there concludes tkinter is not thread safe
+# update via the tkinter event queue (as Tkinter is not Threadsafe)
 # -------------------------------------------------------------------------
 
-def flash_aspects_off():
-    for signal in signals_common.signals:
-        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
-    common.root_window.after(250,lambda:flash_aspects_on())
+def flash_aspect_off(sig_id):
+    if not common.shutdown_initiated:
+        if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION
+            or signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION):
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+            common.root_window.after(250,lambda:flash_aspect_on(sig_id))
     return()
 
-def flash_aspects_on():
-    global flash_aspects_started
-    flash_aspects_started = True
-    for signal in signals_common.signals:
-        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
-    common.root_window.after(250,lambda:flash_aspects_off())
+def flash_aspect_on(sig_id):
+    if not common.shutdown_initiated:
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+            common.root_window.after(250,lambda:flash_aspect_off(sig_id))
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
+            common.root_window.after(250,lambda:flash_aspect_off(sig_id))
     return()
         
 # -------------------------------------------------------------------------
@@ -458,15 +441,16 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-        # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
+        # The flash_aspect_on function will start the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+        flash_aspect_on(sig_id)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-        # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
+        # The flash_aspect_on function will start the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
+        flash_aspect_on(sig_id)
 
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
         # Change the signal to display the Green aspect
