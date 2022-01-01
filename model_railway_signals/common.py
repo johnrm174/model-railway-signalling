@@ -19,32 +19,28 @@ from . import file_interface
 
 shutdown_initiated = False
 
-def shutdown():
-    global logging
-    # Wait until all the tasks we have scheduled via the tkinter 'after' method
-    # have completed - we need to put a timeout around this to deal with any ongoing
-    # timed signal sequences (although user shouldn't shut down until these have finished)
-    timeout_start = time.time()
-    while time.time() < timeout_start + 10:
-        if root_window.tk.call('after','info') != "":
-            root_window.update()
-            time.sleep(0.001)
-        else:
-            logging.info ("Exiting Application")
-            break
-    if time.time() >= timeout_start + 10:
-        logging.warning ("Timeout waiting for scheduled events to be processed- Exiting anyway")
-    root_window.destroy()
-    return()
-
 def on_closing():
     global logging
     global shutdown_initiated
     if file_interface.save_state_and_quit():
         logging.info ("Initiating Shutdown")
         shutdown_initiated = True
+        # Clear out any retained messages and disconnect from broker
         mqtt_interface.mqtt_shutdown()
-        root_window.after(10,lambda:shutdown())
+        # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
+        # We need to put a timeout around this to deal with any ongoing timed signal sequences
+        # (although its unlikely the user would initiate a shut down until these have finished)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 30:
+            if root_window.tk.call('after','info') != "":
+                root_window.update()
+                time.sleep(0.01)
+            else:
+                logging.info ("Exiting Application")
+                break
+        if time.time() >= timeout_start + 30:
+            logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+        root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------

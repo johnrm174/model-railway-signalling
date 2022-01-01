@@ -119,9 +119,10 @@ def subsidary_button_event (sig_id:int):
 def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    # Pulse the signal passed button to provide a visual indication
-    signals[str(sig_id)]["passedbutton"].config(bg="red")
-    common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+    # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
+    if not common.shutdown_initiated:
+        signals[str(sig_id)]["passedbutton"].config(bg="red")
+        common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
     # mqtt interface has been successfully configured and the signal has been set to publish passed events
     mqtt_interface.publish_signal_passed_event(sig_id)
@@ -133,8 +134,9 @@ def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
     # Pulse the approach release button to provide a visual indication
-    signals[str(sig_id)]["releasebutton"].config(bg="red")
-    common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+    if not common.shutdown_initiated:
+        signals[str(sig_id)]["releasebutton"].config(bg="red")
+        common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
     # Clear the approach control and refresh the signal
     clear_approach_control(sig_id)
     auto_refresh_signal(sig_id)

@@ -643,12 +643,16 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return()
 
-    # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
-    # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
-    if start_delay > 0:
-        common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+    # Don't initiate a timed signal sequence if a shutdown has already been initiated
+    if common.shutdown_initiated:
+        logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
     else:
-        timed_signal_sequence_start(start_delay, time_delay)
+        # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
+        # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
+        if start_delay > 0:
+            common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+        else:
+            timed_signal_sequence_start(start_delay, time_delay)
     return()
 
 
