@@ -482,13 +482,13 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", True, log_message)
     else:
-            # Its either a Home signal at DANGER or a Distant Signal at CAUTION
-            # In either case - all the main signal arms should be set to ON
-            update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
-            update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
-            update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
-            update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
-            update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
+        # Its either a Home signal at DANGER or a Distant Signal at CAUTION
+        # In either case - all the main signal arms should be set to ON
+        update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
+        update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
+        update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
+        update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
+        update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
     return()
 
 # -------------------------------------------------------------------------
