@@ -78,6 +78,17 @@
 #      Optional Parameters:
 #         state_reversed:bool - Set to True to reverse the DCC logic (default = false)
 #
+# The following functions are associated with the MQTT networking Feature:
+#
+# subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from other nodes on the network.
+#                         All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
+#   Mandatory Parameters:
+#       *nodes:str - The name of the node(s) publishing the DCC command feed (multiple nodes can be specified)
+#
+# set_node_to_publish_dcc_commands - Enable the publishing of all DCC commands to other MQTT network nodes
+#   Mandatory Parameters:
+#       publish_dcc_commands:bool - True to Publish / False to stop publishing (default=False)
+#
 #----------------------------------------------------------------------
 
 from . import signals_common
@@ -86,6 +97,10 @@ from . import mqtt_interface
 
 import enum
 import logging
+
+#-----------------------------------------------------------------------------------------
+# Global definitions
+#-----------------------------------------------------------------------------------------
 
 # Define the internal Type for the DCC Signal mappings
 class mapping_type(enum.Enum):
@@ -96,11 +111,20 @@ class mapping_type(enum.Enum):
 dcc_signal_mappings:dict = {}
 dcc_point_mappings:dict = {}
 
+# Define the Flag for whether DCC Commands are published to the MQTT Broker or not
+publish_dcc_commands_to_mqtt_broker:bool = False
+
+#-----------------------------------------------------------------------------------------
 # Internal function to test if a mapping exists for a signal
+#-----------------------------------------------------------------------------------------
+
 def sig_mapped(sig_id):
     return (str(sig_id) in dcc_signal_mappings.keys() )
 
+#-----------------------------------------------------------------------------------------
 # Internal function to test if a mapping exists for a point
+#-----------------------------------------------------------------------------------------
+
 def point_mapped(point_id):
     return (str(point_id) in dcc_point_mappings.keys() )
 
@@ -394,7 +418,7 @@ def update_dcc_signal_aspects(sig_id: int):
                     # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                     # Note that the commands will only be published if networking is configured and
                     # the node this software is running on is not configured as a "pi-sprog" node
-                    mqtt_interface.publish_accessory_short_event(entry[0],entry[1])        
+                    publish_accessory_short_event(entry[0],entry[1])        
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -424,7 +448,7 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
                 # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                 # Note that the commands will only be published if networking is configured and
                 # the node this software is running on is not configured as a "pi-sprog" node
-                mqtt_interface.publish_accessory_short_event(dcc_mapping[element],state)       
+                publish_accessory_short_event(dcc_mapping[element],state)       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -466,7 +490,7 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
                         # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                         # Note that the commands will only be published if networking is configured and
                         # the node this software is running on is not configured as a "pi-sprog" node
-                        mqtt_interface.publish_accessory_short_event(entry[0],entry[1])       
+                        publish_accessory_short_event(entry[0],entry[1])       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -507,7 +531,65 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
                             # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                             # Note that the commands will only be published if networking is configured and
                             # the node this software is running on is not configured as a "pi-sprog" node
-                            mqtt_interface.publish_accessory_short_event(command[0],command[1])       
+                            publish_accessory_short_event(command[0],command[1])       
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to the published DCC commands from another "Node"
+#-----------------------------------------------------------------------------------------------
+
+def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
+    global publish_dcc_commands_to_mqtt_broker
+    if publish_dcc_commands: logging.info("DCC Control - Configuring Application to publish DCC Commands to MQTT broker")
+    else: logging.info("DCC Control - Configuring Application NOT to publish DCC Commands to MQTT broker")
+    publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to the published DCC commands from another "Node"
+#-----------------------------------------------------------------------------------------------
+
+def subscribe_to_dcc_command_feed (*nodes:str):    
+    for node in nodes:
+        # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
+        # as each DCC address will appear on a different topic from the remote MQTT node 
+        mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events",node,0,
+                                    handle_mqtt_dcc_accessory_short_event,subtopics=True)
+    return() 
+
+#-----------------------------------------------------------------------------------------------
+# Callback for handling received MQTT messages from a remote DCC-command-producer Node
+#-----------------------------------------------------------------------------------------------
+
+def handle_mqtt_dcc_accessory_short_event (message):    
+    global logging
+    if "sourceidentifier" in message.keys() and "dccaddress" in message.keys() and "dccstate" in message.keys():
+        source_node = message["sourceidentifier"]
+        dcc_address = message["dccaddress"]
+        dcc_state = message["dccstate"]
+        if dcc_state: 
+            logging.debug ("DCC Control: Received ASON command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+        else:
+            logging.debug ("DCC Control: Received ASOF command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+        # Forward the received DCC command on to the Pi-Sprog Interface (for transmission on the DCC Bus)
+        pi_sprog_interface.send_accessory_short_event(dcc_address,dcc_state)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal function for building and sending MQTT messages - but only if this
+# particular node has been configured to publish DCC commands viathe mqtt broker
+# --------------------------------------------------------------------------------
+
+def publish_accessory_short_event(address:int,active:bool):
+    if publish_dcc_commands_to_mqtt_broker:
+        data = {}
+        data["dccaddress"] = address
+        data["dccstate"] = active
+        if active: log_message = "DCC Control: Publishing DCC command ASON with DCC address: "+str(address)+" to MQTT broker"
+        else: log_message = "DCC Control: Publishing DCC command ASOF with DCC address: "+str(address)+" to MQTT broker"
+        # Publish as "retained" messages so remote nodes that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("dcc_accessory_short_events",0,data=data,
+                            log_message=log_message,subtopic = str(address),retain=True)
     return()
 
 #######################################################################################

@@ -12,7 +12,6 @@
 
 from . import signals_common
 from . import dcc_control
-from . import mqtt_interface
 from . import file_interface
 from . import common
 
@@ -65,7 +64,7 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
-        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        loaded_state = file_interface.get_initial_item_state("signals",sig_id)
         # Set the initial state from the "loaded" state - We only need to set the 'override' and
         # 'sigclear' for ground signals - everything else gets set when the signal is updated
         if loaded_state["override"]: signals_common.set_signal_override(sig_id)
@@ -114,7 +113,7 @@ def update_ground_disc_signal (sig_id:int):
             
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        mqtt_interface.publish_signal_state(sig_id)            
+        signals_common.publish_signal_state(sig_id)            
         
     return ()
 

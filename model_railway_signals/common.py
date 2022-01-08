@@ -10,14 +10,32 @@ import time
 from . import mqtt_interface
 from . import file_interface
 
+# -------------------------------------------------------------------------
+# Global variables used within the Common Module
+# -------------------------------------------------------------------------
+
+# Global variables for how the signals/points/sections buttons appear
+# on the screen. This is to allow the appearance to be optimised for
+# particular window sizes/screen resolutions.
+fontsize = 9  # Used by the Signals, Points and sections modules
+xpadding = 4  # Used by the Signals, Points and sections modules
+ypadding = 3  # Used by the Signals, Points and sections modules
+bgraised = "grey85"   # Used by the Signals and Points modules
+bgsunken = "white"    # Used by the Signals and Points modules
+
+# Global Variable to hold a reference to the TkInter Root Window
+root_window = None
+# Event queue for passing "commands" back into the main tkinter thread
+event_queue = queue.Queue()
+# Global variable to signal (to other modules) that application is closing
+shutdown_initiated = False
+
 #-------------------------------------------------------------------------
 # Function to catch the root window close event so we can perform an
 # orderly shutdown of the other threads running in the application
 # The shutdown_initiated flag is used to tell the flash aspects and timed
 # signals functions to stop scheduling further "after" commands and exit 
 #-------------------------------------------------------------------------
-
-shutdown_initiated = False
 
 def on_closing():
     global logging
@@ -51,9 +69,6 @@ def on_closing():
 # tkinter isn't fully thread safe and so all manipulation of tkinter drawing
 # objects should be done from within the main tkinter thread.
 #-------------------------------------------------------------------------
-
-root_window = None
-event_queue = queue.Queue()
 
 def find_root_window (canvas):
     global root_window
@@ -95,18 +110,6 @@ def execute_function_in_tkinter_thread(callback_function):
     else:
         logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
     return()
-
-# -------------------------------------------------------------------------
-# Global variables for how the signals/points/sections buttons appear
-# on the screen. This is to allow the appearance to be optimised for
-# particular window sizes/screen resolutions.
-# -------------------------------------------------------------------------
-
-fontsize = 9  # Used by the Signals, Points and sections modules
-xpadding = 4  # Used by the Signals, Points and sections modules
-ypadding = 3  # Used by the Signals, Points and sections modules
-bgraised = "grey85"   # Used by the Signals and Points modules
-bgsunken = "white"    # Used by the Signals and Points modules
 
 # -------------------------------------------------------------------------
 # Common functions to rotate offset coordinates around an origin

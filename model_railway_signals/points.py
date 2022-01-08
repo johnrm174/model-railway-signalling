@@ -71,7 +71,6 @@ class point_callback_type(enum.Enum):
 # Points are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
 
-# Define an empty dictionary 
 points: dict = {}
 
 # -------------------------------------------------------------------------
@@ -336,7 +335,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         
         # Get the initial state for the point (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state = file_interface.get_initial_point_state(point_id)
+        loaded_state = file_interface.get_initial_item_state("points",point_id)
         # Toggle the FPL if FPL is ACTIVE ("switched" will be 'None' if no data was loaded)
         # We toggle on False as points with FPLs are created with the FPL active by default
         if fpl and loaded_state["fpllock"] == False: toggle_fpl(point_id)

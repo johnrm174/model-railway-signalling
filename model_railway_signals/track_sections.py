@@ -35,7 +35,22 @@
 #                      - also returns the current value of the Section Lable (as a string) to allow this
 #                        to be 'passed' to the next section (via the set_section_occupied function)
 #   Mandatory Parameters:
-#       section_id:int - The ID to be used for the section 
+#       section_id:int - The ID to be used for the section
+#
+# The following functions are associated with the MQTT networking Feature:
+#
+# subscribe_to_section_updates - Subscribe to section updates from another node on the MQTT network
+#   Mandatory Parameters:
+#       node:str - The name of the node publishing the track section update feed(s)
+#       sec_callback:name - Function to call when a section update is received from the remote node
+#                    The callback function returns (item_identifier, section_callback_type.section_updated),
+#                    where item_identifier is a string in the following format "<node>-<sec_id>"
+#       *sec_ids:int - The section(s) to subscribe to (multiple Section_IDs can be specified)
+#
+# set_sections_to_publish_state - Enable the publication of state updates for specified track sections.
+#                    All subsequent state changes will be automatically published to remote subscribers
+#   Mandatory Parameters:
+#       *sec_ids:int - The track section(s) to publish (multiple Signal_IDs can be specified)
 #
 # --------------------------------------------------------------------------------
 
@@ -48,10 +63,9 @@ import enum
 import logging
 
 # -------------------------------------------------------------------------
-# Classes used by external functions when calling the create_point function
+# Classes used by external functions when using track sections
 # -------------------------------------------------------------------------
     
-# Define the different callbacks types for the section
 class section_callback_type(enum.Enum):
     section_updated = 21   # The section has been updated by the user
     
@@ -62,11 +76,14 @@ class section_callback_type(enum.Enum):
 sections: dict = {}
 
 # -------------------------------------------------------------------------
-# Global references to the Entry box and the window we create it in
+# Global variables used by the Track Sections Module
 # -------------------------------------------------------------------------
 
+# Global references to the Tkinter Entry box and the associated window
 text_entry_box = None
 entry_box_window = None
+# Global list of track sections to publish to the MQTT Broker
+list_of_sections_to_publish=[]
 
 # -------------------------------------------------------------------------
 # The default "External" callback for the section buttons
@@ -90,11 +107,11 @@ def section_exists(section_id:int):
 
 def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Toggled ********************************************")
+    logging.info ("Section "+str(section_id)+": Track Section Toggled *******************************************")
     toggle_section(section_id)
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
-    mqtt_interface.publish_section_state(section_id)
+    send_mqtt_section_updated_event(section_id)
     # Make the external callback (if one has been defined)
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
@@ -144,7 +161,7 @@ def update_identifier(section_id):
         toggle_section(section_id)
     # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
-    mqtt_interface.publish_section_state(section_id)
+    send_mqtt_section_updated_event(section_id)
     # Make an external callback to indicate the section has been switched
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     # Clean up by destroying the entry box and the window we created it in
@@ -238,7 +255,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         else:
             section_button.config(state="disabled")
         # Get the initial state for the section (if layout state has been successfully loaded)
-        loaded_state = file_interface.get_initial_section_state(section_id)
+        loaded_state = file_interface.get_initial_item_state("sections",section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
         if loaded_state["labeltext"]:
             sections[str(section_id)]["labeltext"] = loaded_state["labeltext"]
@@ -247,7 +264,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         if loaded_state["occupied"]: toggle_section(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        mqtt_interface.publish_section_state(section_id) 
+        send_mqtt_section_updated_event(section_id) 
 
     return()
 
@@ -299,14 +316,14 @@ def set_section_occupied (section_id:int,label:str=None):
             toggle_section(section_id)
             # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            mqtt_interface.publish_section_state(section_id)
+            send_mqtt_section_updated_event(section_id)
         elif label is not None and sections[str(section_id)]["labeltext"] != label:
             # Section state remains unchanged but we need to update the Label
             sections[str(section_id)]["button1"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
             # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            mqtt_interface.publish_section_state(section_id)
+            send_mqtt_section_updated_event(section_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -323,11 +340,76 @@ def clear_section_occupied (section_id:int):
         toggle_section(section_id)
         # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        mqtt_interface.publish_section_state(section_id)
+        send_mqtt_section_updated_event(section_id)
         section_label = sections[str(section_id)]["labeltext"]
     else:
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to section updates published by remote MQTT "Node"
+#-----------------------------------------------------------------------------------------------
+
+def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
+    global sections
+    for sec_id in sec_ids:
+        mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node,sec_id,
+                                                  handle_mqtt_section_updated_event)
+        # Create a dummy section object to hold the state of the remote track occupancy section
+        # The Identifier for a remote Section is a string combining the the Node-ID and Section-ID
+        section_identifier = mqtt_interface.create_remote_item_identifier(sec_id,node)
+        if not section_exists(section_identifier):
+            sections[section_identifier] = {}
+            sections[section_identifier]["occupied"] = False
+            sections[section_identifier]["labeltext"] = "OCCUPIED"
+            sections[section_identifier]["extcallback"] = sec_callback
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to set configure a section to publish state changes to remote MQTT nodes
+#-----------------------------------------------------------------------------------------------
+
+def set_sections_to_publish_state(*sec_ids:int):    
+    global logging
+    global list_of_sections_to_publish
+    for sec_id in sec_ids:
+        logging.info("MQTT-Client: Configuring section "+str(sec_id)+" to publish state changes via MQTT broker")
+        if sec_id in list_of_sections_to_publish:
+            logging.warning("MQTT-Client: Section "+str(sec_id)+" - is already configured to publish state changes")
+        else:
+            list_of_sections_to_publish.append(sec_id)
+    return()
+
+# --------------------------------------------------------------------------------
+# Callback for handling received MQTT messages from a remote track section
+# --------------------------------------------------------------------------------
+
+def handle_mqtt_section_updated_event(message):
+    global logging
+    global sections
+    if "sourceidentifier" in message.keys() and "occupied" in message.keys() and "labeltext" in message.keys():
+        section_identifier = message["sourceidentifier"]
+        sections[section_identifier]["occupied"] = message["occupied"]
+        sections[section_identifier]["labeltext"] = message["labeltext"]
+        logging.info("Section "+section_identifier+": State update from remote section ***************************")
+        # Make the external callback (if one has been defined)
+        sections[section_identifier]["extcallback"] (section_identifier,section_callback_type.section_updated)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal function for building and sending MQTT messages - but only if the
+# section has been configured to publish updates via the mqtt broker
+# --------------------------------------------------------------------------------
+
+def send_mqtt_section_updated_event(section_id:int):
+    if section_id in list_of_sections_to_publish:
+        data = {}
+        data["occupied"] = sections[str(section_id)]["occupied"]
+        data["labeltext"] = sections[str(section_id)]["labeltext"]
+        log_message = "Section "+str(section_id)+": Publishing section state to MQTT Broker"
+        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("section_updated_event",section_id,data=data,log_message=log_message,retain=True)
+    return()
 
 ###############################################################################
 

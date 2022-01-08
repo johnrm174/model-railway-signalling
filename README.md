@@ -442,6 +442,45 @@ create_sensor - Creates a sensor object
 sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
 </pre>
 
+## Block Instruments
+
+<pre>
+block_callback_type (tells the calling program what has triggered the callback)
+    block_section_ahead_updated - The block section AHEAD of our block section has been updated
+                            (i.e. the block section state represented by the Repeater indicator)
+
+create_block_instrument - Creates a Block Section Instrument on the schematic
+  Mandatory Parameters:
+      Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
+      block_id:int - The local identifier to be used for the Block Instrument 
+      x:int, y:int - Position of the instrument on the canvas (in pixels)
+  Optional Parameters:
+      block_callback - The function to call if the section is manually toggled - default: null
+                       Note that the callback function returns (item_id, callback type)
+      single_line:bool -
+      bell_sound_file:str - The filename of the soundfile (in the local package resources
+                            folder to use for the bell sound (default "bell-ring-01.wav")
+      telegraph_sound_file:str - The filename of the soundfile (in the local package resources
+                     folder to use for the Telegraph key sound (default "telegraph-key-01.wav")
+      linked_to:int/str - the identifier for the "paired" block instrument - this can be specified
+                          either as an integer (representing the ID of a Block Instrument on the
+                          local schematic), or a string representing a Block Instrument running
+                          on a remote node - see MQTT networking (default = None)
+
+Note that the Block Signalling feature is primarily intended to provide a prototypical means of
+communication betewwn signalmen working their respective signal boxes. As such, MQTT networking
+is "built in" to the feature - If a remote instrument identifier is specified for the "linked_to"
+instrument amd networking has been configured when the block instrument was created then it will
+automatically be configured to publish its state and telegraph key clicks to the remote instrument
+and will also be subscribed to state updates and telegraph clicks from that instrument as well.
+
+block_section_ahead_clear(block_id:int) - Returns the state of the the ASSOCIATED block instrument
+              (i.e. the linked instrument controlling the state of the block section ahead of ours)
+              This can be used to implement full interlocking of the Starter signal in our section
+              (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
+              Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
+</pre>
+
 ## DCC Address Mapping Functions
 
 These functions provide the means to map the signals and points on the layout to the series of DCC 
@@ -642,8 +681,12 @@ configure_networking - Configures the local MQTT broker client and establishes a
       broker_port:int - The network port for the broker host (default = 1883)
       broker_username:str - the username to log into the MQTT Broker (default = None)
       broker_password:str - the password to log into the MQTT Broker (default = None)
-      publish_dcc_commands:bool - True to publish all DCC commands to the Broker (default = False)
+      publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands' function
       mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
+
+set_node_to_publish_dcc_commands - Enable the publishing of all DCC commands to other MQTT network nodes
+  Optional Parameters:
+      publish_dcc_commands:bool - True to Publish / False to stop publishing (default=False)
 
 subscribe_to_dcc_command_feed - Subcribes to the feed of DCC commands from another node on the network.
                     All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
