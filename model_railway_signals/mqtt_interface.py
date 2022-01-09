@@ -28,7 +28,7 @@
 #       broker_port:int - The network port for the broker host (default = 1883)
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
-#       publish_dcc_commands:bool - True to publish all DCC commands to the Broker (default = False)
+#       publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands' function instead
 #       mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
 #
 #-----------------------------------------------------------------------------------------------
@@ -91,10 +91,8 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 def on_disconnect(mqtt_client, userdata, rc):
     global logging
     global node_config
-    if rc==0:
-        logging.info("MQTT-Client: Broker connection terminated")
-    else:
-        logging.warning("MQTT-Client: Unexpected disconnection from broker")
+    if rc==0: logging.info("MQTT-Client: Broker connection terminated")
+    else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
     node_config["connected_to_broker"] = False
     return()
 
@@ -108,8 +106,8 @@ def on_connect(mqtt_client, userdata, flags, rc):
     if rc == 0:
         logging.info("MQTT-Client: Successfully connected to MQTT Broker")
         # As we set up our broker connection with 'cleansession=true' a disconnection will have removed
-        # all client connection information from the broked (including knowledge of the topics we have
-        # subscribed to - we therefore need to re-subscribe to all topics with this new connection
+        # all client connection information from the broker (including knowledge of the topics we have
+        # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
         # Note that this means we will immediately receive all retained messages for those topics
         if len(node_config["list_of_subscribed_topics"]) > 0:
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
@@ -131,7 +129,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
 # Internal function to process messages received from the MQTT Broker - unpacking the message and then
 # making the registered callback to pass the message back to the main application. Note that this function
 # is executed in the main tkinter thread (as long as we know the main root window) to make it threadsafe
-# If we don't know the main root window then the function is executed in the  current mqtt event thread.
+# If we don't know the main root window then the function is executed in the current mqtt event thread.
 #--------------------------------------------------------------------------------------------------------
 
 def process_message(msg):
@@ -140,15 +138,12 @@ def process_message(msg):
     try:
         unpacked_json = json.loads(msg.payload)
     except Exception as exception:
-        # Note - we will also get an exception when a remote node shuts down and publishes a 'None'
-        # message to the topic (to purge the broker queues of retained messages) - expected behavior
-        # So we only log the error message if the message payload is not empty (i.e. for other cases)
-        if msg.payload: logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
+        logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
         if node_config["enhanced_debugging"]:
             logging.debug("MQTT-Client: Successfully parsed message:"+str(unpacked_json))
         # Make the callback (that was registered when the calling programme subscribed to the feed)
-        # Note that e also need to test to see if the the topic is a partial match (to cover the
+        # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
         if msg.topic in node_config["callbacks"]:
             node_config["callbacks"][msg.topic] (unpacked_json)
@@ -167,10 +162,13 @@ def process_message(msg):
 def on_message(mqtt_client,obj,msg):
     global logging
     global node_config
-    if common.root_window is not None:
-        common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
-    else:
-        process_message(msg)
+    # Only process the message if there is a payload - If there is no payload then the message is
+    # a "null message" - sent to purge retained messages from the broker on application exit
+    if msg.payload:
+        if common.root_window is not None:
+            common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
+        else:
+            process_message(msg)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -256,9 +254,9 @@ def mqtt_shutdown():
 # Externally Called Function to subscribe to topics published by the MQTT broker. This function
 # takes in a string that defines the application-specific message type and converts this into
 # a fully qualified MQTT topic (using the Node and item ID). The registered callback will return
-# The content of the received messages. The optional subtopic parameter enables you to subscribe
-# to any specifc sub-topic from a particular item (or "+" to wildcard all sub-topics). This is
-# used in the Model Railway Signalling Package for subscribing to all DCC address messages(
+# the content of the received messages. The optional subtopic flag enables you to subscribe
+# to all sub-topics from a particular item. This is used in the Model Railway Signalling Package
+# for subscribing to all DCC address messages (where each DCC address is a seperate subtopic)
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callback,subtopics:bool=False):
