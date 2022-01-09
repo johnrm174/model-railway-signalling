@@ -3,13 +3,13 @@
 # "saved" when the application is closed and then "loaded" when the application is re-loaded
 # (ready for the next running session)
 # 
-# load_layout_state - Loads the initial state for all 'points', 'signals' and 'sections' from file
-#                     and enables the save of the current layout state to file on application quit.
+# load_layout_state - Loads the initial state for all 'points', 'signals', 'sections' and 'block
+#                     instruments' from file and enables layout state to be saved on application quit.
 #                     If load is "cancelled" or "file not found" then the default state will be used
 #    Optional Parameters:
 #       file_name:str - to load/save - default = None (will default to 'main-python-script.sig')
 #       load_file_dialog:bool - Opens a 'load file' dialog to select a file - default = False
-#       save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False#
+#       save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False
 #------------------------------------------------------------------------------------------------
 
 import os
@@ -151,7 +151,7 @@ def load_layout_state(file_name:str=None,
 #
 # If the filename is 'None' then 'load_layout_state' was never called (i.e. the signalling application
 # isn't using this feature). In this case we just provide the user with an option to quit or cancel.
-# If the filename is defined then we provide the user with an option to save (yes/no/cancel) and
+# If the filename is not 'None' then we provide the user with an option to save (yes/no/cancel) and
 # use the filename for the file that was loaded (or attempted) by the 'load_layout_state' function.
 # If 'save_as_option_enabled' is True, then we open a file dialogue to select a file.
 #
