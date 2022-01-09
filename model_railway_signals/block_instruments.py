@@ -13,28 +13,29 @@
 #       block_id:int - The local identifier to be used for the Block Instrument 
 #       x:int, y:int - Position of the instrument on the canvas (in pixels)
 #   Optional Parameters:
-#       block_callback - The function to call if the section is manually toggled - default: null
+#       block_callback - The function to call when the repeater indicator on our instrument has been
+#                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
-#       single_line:bool -
-#       bell_sound_file:str - The filename of the soundfile (in the local package resources
-#                             folder to use for the bell sound (default "bell-ring-01.wav")
-#       telegraph_sound_file:str - The filename of the soundfile (in the local package resources
-#                      folder to use for the Telegraph key sound (default "telegraph-key-01.wav")
+#       single_line:bool - for a single line instrument(created without a repeater) - default: False
+#       bell_sound_file:str - The filename of the soundfile (in the local package resources folder)
+#                             to use for the bell sound (default "bell-ring-01.wav")
+#       telegraph_sound_file:str - The  soundfile (in the local package resources folder) to use for
+#                                  the Telegraph key sound (default "telegraph-key-01.wav")
 #       linked_to:int/str - the identifier for the "paired" block instrument - this can be specified
-#                           either as an integer (representing the ID of a Block Instrument on the
-#                           local schematic), or a string representing a Block Instrument running
+#                           either as an integer representing the ID of a Block Instrument on the
+#                           local schematic, or a string representing a Block Instrument running
 #                           on a remote node - see MQTT networking (default = None)
 #
 # Note that the Block Signalling feature is primarily intended to provide a prototypical means of
 # communication betewwn signalmen working their respective signal boxes. As such, MQTT networking
 # is "built in" to the feature - If a remote instrument identifier is specified for the "linked_to"
-# instrument amd networking has been configured when the block instrument was created then it will
+# instrument and networking has been configured when the block instrument was created then it will
 # automatically be configured to publish its state and telegraph key clicks to the remote instrument
-# and will also be subscribed to state updates and telegraph clicks from that instrument as well.
+# and will subscribe itself to state updates and telegraph clicks from the linked instrument.
 #
 # block_section_ahead_clear(block_id:int) - Returns the state of the the ASSOCIATED block instrument
 #               (i.e. the linked instrument controlling the state of the block section ahead of ours)
-#               This can be used to implement full interlocking of the Starter signal in our section
+#               This can be used to implement full interlocking of the starter signal in our section
 #               (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
 #               Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
 #
@@ -132,7 +133,7 @@ def open_bell_code_hints():
 # Used in most externally-called functions to validate the Block instrument ID
 # --------------------------------------------------------------------------------
 
-def instrument_exists(block_id:Union[int,str]):
+def instrument_exists(block_id:int):
     return (str(block_id) in instruments.keys() )
 
 # --------------------------------------------------------------------------------
@@ -141,13 +142,13 @@ def instrument_exists(block_id:Union[int,str]):
 
 def occup_button_event (block_id:int):
     global logging
-    logging.info ("Block Instrument "+str(block_id)+": Occup button event *************************************")
+    logging.info ("Block Instrument "+str(block_id)+": Occup button event *****************************************")
     set_section_occupied(block_id)
     return()
 
 def clear_button_event (block_id:int):
     global logging
-    logging.info ("Block Instrument "+str(block_id)+": Clear button event *************************************")
+    logging.info ("Block Instrument "+str(block_id)+": Clear button event *****************************************")
     set_section_clear(block_id)
     return()
 
@@ -171,10 +172,9 @@ def telegraph_key_button (block_id:int):
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
-    repeater_instrument = instruments[str(block_id)]["linkedto"]
-    if repeater_instrument is not None:
-        if isinstance(repeater_instrument,str): send_mqtt_ring_section_bell_event(block_id)
-        else: ring_section_bell(repeater_instrument)
+    if instruments[str(block_id)]["linkedto"] is not None:
+        if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_ring_section_bell_event(block_id)
+        else: ring_section_bell(instruments[str(block_id)]["linkedto"])
     return()
 
 # --------------------------------------------------------------------------------
