@@ -25,6 +25,8 @@ Comments and suggestions welcome - but please be kind - the last time I coded an
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
 
+![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
+
 ## Installation
 For a first time installation use:
 <pre>
