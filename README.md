@@ -29,7 +29,7 @@ between running sessions.
 
 Comments and suggestions welcome - but please be kind - the last time I coded anything it was in Ada96 ;)
 
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
+![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
 ## Installation
 For a first time installation use:
@@ -159,7 +159,7 @@ Currently supported signal types:
           - With / without a "Signal Passed" Button
           - With / without a "Approach Release" Button
           - With / without control buttons (manual / fully automatic)
-	  - Home and Distant signals can be co-located
+      - Home and Distant signals can be co-located
     Ground Position Light Signals
           - normal ground position light or shunt ahead position light
           - either early or modern (post 1996) types
