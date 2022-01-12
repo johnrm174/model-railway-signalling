@@ -1,3 +1,9 @@
+#------------------------------------------------------------------------------------
+# This programme provides a simple example of creating and using paired block instruments
+# to communicate between signal bocxes on a layout. For a more representitive configuration
+# refer to the networked example ('test_networking_1.py' and 'test_networking_2.py')
+#------------------------------------------------------------------------------------
+
 from model_railway_signals import *
 from tkinter import *
 import logging
