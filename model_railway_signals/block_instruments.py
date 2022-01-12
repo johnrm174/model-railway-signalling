@@ -1,12 +1,14 @@
-# --------------------------------------------------------------------------------
-# This module is used for creating and managing Block instruments
-# Both single line (bi directional) and twin line instruments are supported
-# Sound files credited to https://www.soundjay.com/tos.html
+# -----------------------------------------------------------------------------------------------
+# This module is used for creating and managing Block instruments. Both single line (bi directional)
+# and twin line instruments are supported. Sound files credited to https://www.soundjay.com/tos.html
+# -----------------------------------------------------------------------------------------------
 #
+# Public types and functions: 
+# 
 # block_callback_type (tells the calling program what has triggered the callback)
 #     block_section_ahead_updated - The block section AHEAD of our block section has been updated
 #                             (i.e. the block section state represented by the Repeater indicator)
-#
+# 
 # create_block_instrument - Creates a Block Section Instrument on the schematic
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
@@ -17,29 +19,29 @@
 #                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
 #       single_line:bool - for a single line instrument(created without a repeater) - default: False
-#       bell_sound_file:str - The filename of the soundfile (in the local package resources folder)
-#                             to use for the bell sound (default "bell-ring-01.wav")
-#       telegraph_sound_file:str - The  soundfile (in the local package resources folder) to use for
-#                                  the Telegraph key sound (default "telegraph-key-01.wav")
-#       linked_to:int/str - the identifier for the "paired" block instrument - this can be specified
-#                           either as an integer representing the ID of a Block Instrument on the
-#                           local schematic, or a string representing a Block Instrument running
-#                           on a remote node - see MQTT networking (default = None)
+#       bell_sound_file:str - The filename of the soundfile (in the local package resources
+#                           folder) to use for the bell sound (default "bell-ring-01.wav")
+#       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
+#                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
+#       linked_to:int/str - the identifier for the "paired" block instrument - can be specified
+#                           either as an integer (representing the ID of a Block Instrument on the
+#                           the local schematic), or a string representing a Block Instrument 
+#                           running on a remote node - see MQTT networking (default = None)
+# 
+# Note that the Block Instruments feature is primarily intended to provide a prototypical means of
+# communication between signallers working their respective signal boxes. As such, MQTT networking
+# is "built in" - If a remote instrument identifier is specified for the "linked_to" instrument
+# and the MQTT network has been configured then this function will automatically configured the
+# block instrument to publish its state and telegraph key clicks to the remote instrument and
+# will also subscribe to state updates and telegraph clicks from the remote instrument.
+# 
+# block_section_ahead_clear(block_id:int) - Returns the state of the ASSOCIATED block instrument
+#           (i.e. the linked instrument controlling the state of the block section ahead of ours)
+#           This can be used to implement full interlocking of the Starter signal in our section
+#           (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
+#           Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
 #
-# Note that the Block Signalling feature is primarily intended to provide a prototypical means of
-# communication betewwn signalmen working their respective signal boxes. As such, MQTT networking
-# is "built in" to the feature - If a remote instrument identifier is specified for the "linked_to"
-# instrument and networking has been configured when the block instrument was created then it will
-# automatically be configured to publish its state and telegraph key clicks to the remote instrument
-# and will subscribe itself to state updates and telegraph clicks from the linked instrument.
-#
-# block_section_ahead_clear(block_id:int) - Returns the state of the the ASSOCIATED block instrument
-#               (i.e. the linked instrument controlling the state of the block section ahead of ours)
-#               This can be used to implement full interlocking of the starter signal in our section
-#               (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
-#               Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
-#
-# --------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------
 
 from . import common
 from . import mqtt_interface
@@ -370,7 +372,7 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
             # be published if the MQTT interface has been configured and we are connected to the broker
             if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
                 if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+                else: set_repeater_clear(instruments[str(block_id)]["linkedto"])
     return ()
 
 # --------------------------------------------------------------------------------
@@ -411,7 +413,7 @@ def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
             # be published if the MQTT interface has been configured and we are connected to the broker
             if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
                 if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+                else: set_repeater_occupied(instruments[str(block_id)]["linkedto"])
     return ()
 
 # --------------------------------------------------------------------------------
