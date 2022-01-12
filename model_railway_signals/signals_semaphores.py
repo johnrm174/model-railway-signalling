@@ -1,20 +1,5 @@
-
+# --------------------------------------------------------------------------------
 # This module is used for creating and managing semaphore signal types
-#
-# Currently supported sub types:
-#           - with or without a subsidary signal (on the main arm)
-#           - with or without junction signals (LH and/or RH diverging routes)
-#           - with or without subsidary signals (LH, RH and/or MAIN routes)
-#           - with or without a theatre type route indicator
-#           - with or without a manual control button
-#
-# Common features supported by Semaphore signals
-#           - set_route_indication (Route Type and theatre text)
-#           - lock_subsidary_signal / unlock_subsidary_signal
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
-#           - set_approach_control / clear_approch_control
-#           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
 from . import common

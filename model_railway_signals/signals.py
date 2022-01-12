@@ -1,29 +1,65 @@
-# --------------------------------------------------------------------------------
-# This module (and its dependent packages)is used for creating and managing signal objects
+# ------------------------------------------------------------------------------------------
+# This module (and its dependent packages) is used for creating and managing signal objects
+# ------------------------------------------------------------------------------------------
 #
-# Currently supported types:
-#    Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
-#           - with or without a position light subsidary signal
-#           - with or without route indication feathers (maximum of 5)
-#           - with or without a theatre type route indicator
-#           - With or without a "Signal Passed" Button
-#           - With or without a "Approach Release" Button
-#           - Main signal manual or fully automatic
-#    Semaphore Signals - Home or Distant
-#           - with or without junction arms (RH1, RH2, LH1, LH2 arms supported)
-#           - with or without subsidaries (Main, LH1, LH2, RH1, RH2 arms supported) - Home signals only
-#           - with or without a theatre type route indicator (for Home signals only)
-#           - With or without a "Signal Passed" Button
-#           - With or without a "Approach Release" Button
-#           - Main signal manual or fully automatic
+# Currently supported signal types:
+# 
+#     Colour Light Signals - 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
+#           - with / without a position light subsidary signal
+#           - with / without route indication feathers (maximum of 5)
+#           - with / without a theatre type route indicator
+#           - With / without a "Signal Passed" Button
+#           - With / without a "Approach Release" Button
+#           - With / without control buttons (manual / fully automatic)
+#     Semaphore Signals - Home or Distant
+#           - with / without junction arms (RH1, RH2, LH1, LH2)
+#           - with / without subsidary arms (Main, LH1, LH2, RH1, RH2) (Home signals only)
+#           - with / without a theatre type route indicator (Home signals only)
+#           - With / without a "Signal Passed" Button
+#           - With / without a "Approach Release" Button
+#           - With / without control buttons (manual / fully automatic)
+#       - Home and Distant signals can be co-located
 #     Ground Position Light Signals
-#           - normal groud position light or shunt ahead position light
+#           - normal ground position light or shunt ahead position light
 #           - either early or modern (post 1996) types
-#           - With or without a "Signal Passed" Button
 #     Ground Disc Signals
 #           - normal ground disc (red banner) or shunt ahead ground disc (yellow banner)
-#           - With or without a "Signal Passed" Button
-#
+# 
+# Summary of features supported by each signal type:
+# 
+#     Colour Light signals
+#            - set_route_indication (Route Type and theatre text)
+#            - update_signal (based on a signal Ahead) - not 2 Aspect Home or Red/Yellow
+#            - toggle_signal / toggle_subsidary
+#            - lock_subsidary / unlock_subsidary
+#            - lock_signal / unlock_signal
+#            - set_signal_override / clear_signal_override
+#            - set_approach_control (Release on Red or Yellow) / clear_approach_control
+#            - trigger_timed_signal
+#            - query signal state (signal_clear, signal_state, subsidary_clear)
+#     Semaphore signals:
+#            - set_route_indication (Route Type and theatre text)
+#            - update_signal (based on a signal Ahead) - (distant signals only)
+#            - toggle_signal / toggle_subsidary
+#            - lock_subsidary / unlock_subsidary
+#            - lock_signal / unlock_signal
+#            - set_signal_override / clear_signal_override
+#            - set_approach_control (Release on Red only) / clear_approach_control
+#            - trigger_timed_signal
+#            - query signal state (signal_clear, signal_state, subsidary_clear)
+#     Ground Position Colour Light signals:
+#            - toggle_signal
+#            - lock_signal / unlock_signal
+#            - set_signal_override / clear_signal_override
+#            - query signal state (signal_clear, signal_state)
+#     Ground Disc signals
+#            - toggle_signal
+#            - lock_signal / unlock_signal
+#            - set_signal_override / clear_signal_override
+#            - query signal state (signal_clear, signal_state)
+# 
+# Public types and functions:
+# 
 # signal_sub_type (use when creating colour light signals):
 #     signal_sub_type.home         (2 aspect - Red/Green)
 #     signal_sub_type.distant      (2 aspect - Yellow/Green
@@ -32,14 +68,14 @@
 #     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
 # route_type (use for specifying the route):
-#     route_type.NONE   (no route indication - i.e. not used)
+#     route_type.NONE   (no route indication)
 #     route_type.MAIN   (main route)
 #     route_type.LH1    (immediate left)
 #     route_type.LH2    (far left)
 #     route_type.RH1    (immediate right)
 #     route_type.RH2    (rar right)
-# These equate to the route feathers for colour light signals or the Sempahore junction "arm":
-#
+# These equate to the feathers for colour light signals or the Sempahore junction "arms"
+# 
 # signal_state_type(enum.Enum):
 #     DANGER               (colour light & semaphore signals)
 #     PROCEED              (colour light & semaphore signals)
@@ -48,73 +84,74 @@
 #     CAUTION_APP_CNTL     (colour light signals only - CAUTION but subject to RELEASE ON YELLOW)
 #     FLASH_CAUTION        (colour light signals only- when the signal ahead is CAUTION_APP_CNTL)
 #     FLASH_PRELIM_CAUTION (colour light signals only- when the signal ahead is FLASH_CAUTION)
-#
+# 
 # sig_callback_type (tells the calling program what has triggered the callback):
 #     sig_callback_type.sig_switched (signal has been switched)
 #     sig_callback_type.sub_switched (subsidary signal has been switched)
-#     sig_callback_type.sig_passed ("signal passed" button activated - or triggered by a Timed signal)
-#     sig_callback_type.sig_updated (signal aspect has been updated as part of a timed sequence)
-#     sig_callback_type.sig_released (signal "approach release" button has been activated)
-#
+#     sig_callback_type.sig_passed ("signal passed" event - or triggered by a Timed signal)
+#     sig_callback_type.sig_updated (signal aspect updated as part of a timed sequence)
+#     sig_callback_type.sig_released (signal "approach release" event)
+# 
 # create_colour_light_signal - Creates a colour light signal
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       signal_subtype:sig_sub_type - type of signal to create - Default is signal_sub_type.four_aspect
-#       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#       signal_subtype:sig_sub_type - type of signal to create - Default = four_aspect
+#       orientation:int- Orientation in degrees (0 or 180) - Default = zero
+#       sig_callback:name - Function to call when a signal event happens - Default = None
 #                         Note that the callback function returns (item_id, callback type)
-#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-#       approach_release_button:bool - Creates an "Approach Release" button - Default False
-#       position_light:bool - Creates a subsidary position light signal - Default False
-#       lhfeather45:bool - Creates a LH route indication feather at 45 degrees - Default False
-#       lhfeather90:bool - Creates a LH route indication feather at 90 degrees - Default False
-#       rhfeather45:bool - Creates a RH route indication feather at 45 degrees - Default False
-#       rhfeather90:bool - Creates a RH route indication feather at 90 degrees - Default False
-#       mainfeather:bool - Creates a MAIN route indication feather - Default False
-#       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-#       refresh_immediately:bool - When set to False the signal aspects will NOT be automaticall updated 
-#                 when the signal is changed and the external programme will need to call the seperate 
-#                 'update_signal' function use for 3/4 aspect signals - where the displayed aspect will
-#                 depend on the signal ahead - Default True 
-#       fully_automatic:bool - Creates a signal without any manual controls - Default False
-#
+#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
+#       approach_release_button:bool - Creates an "Approach Release" button - Default = False
+#       position_light:bool - Creates a subsidary position light signal - Default = False
+#       lhfeather45:bool - Creates a LH route feather at 45 degrees - Default = False
+#       lhfeather90:bool - Creates a LH route feather at 90 degrees - Default = False
+#       rhfeather45:bool - Creates a RH route feather at 45 degrees - Default = False
+#       rhfeather90:bool - Creates a RH route feather at 90 degrees - Default = False
+#       mainfeather:bool - Creates a MAIN route feather - Default = False
+#       theatre_route_indicator:bool -  Creates a Theatre route indicator - Default = False
+#       refresh_immediately:bool - When set to False the signal aspects will NOT be automatically
+#                 updated when the signal is changed and the external programme will need to call 
+#                 the seperate 'update_signal' function. Primarily intended for use with 3/4 
+#                 aspect signals, where the displayed aspect will depend on the displayed aspect 
+#                 of the signal ahead if the signal is clear - Default = True 
+#       fully_automatic:bool - Creates a signal without a manual controls - Default = False
+# 
 # create_semaphore_signal - Creates a Semaphore signal
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the signal on the canvas (in pixels) 
+#       x:int, y:int - Position of the point on the canvas (in pixels) 
 #   Optional Parameters:
-#       distant:bool - True to create a Distant signal - False to create a Home signal - default False
-#       associated_home:bool - Option only valid when creating distant signals - Set to True to associate
-#                              the distant signal with a previously created home signal - default False
-#                              (this option enables a distant signal to "share" the same post as the
-#                               home signal - specify the same x and y coordinates as the home signal) 
-#       orientation:int - Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#       distant:bool - True for a Distant signal - False for a Home signal - default = False
+#       associated_home:int - Option only valid when creating distant signals - Provide the ID of
+#                             a previously created home signal (and use the same x and y coords)
+#                             to create the distant signal on the same post as the home signal 
+#                             with appropriate "slotting" between the signal arms - Default = False  
+#       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_callback:name - Function to call when a signal event happens - Default = None
 #                           Note that the callback function returns (item_id, callback type)
-#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-#       approach_release_button:bool - Option only valid for home signals - Creates an "Approach Release"
-#                                      button in front of the signal - Default False
-#       main_signal:bool - To create a signal arm for the main route - default True
-#                       (Only set this to False for the case of creating a distant signal "associated 
-#                        with" a home signal where a distant arm for the main route is not required)
-#       lh1_signal:bool - To create a LH1 post with a main (junction) arm - default False
-#       lh2_signal:bool - To create a LH2 post with a main (junction) arm - default False
-#       rh1_signal:bool - To create a RH1 post with a main (junction) arm - default False
-#       rh2_signal:bool - To create a RH2 post with a main (junction) arm - default False
-#       main_subsidary:bool - To create a subsidary signal under the "main" signal - default False
-#       lh1_subsidary:bool - To create a LH1 post with a subsidary arm - default False
-#       lh2_subsidary:bool - To create a LH2 post with a subsidary arm - default False
-#       rh1_subsidary:bool - To create a RH1 post with a subsidary arm - default False
-#       rh2_subsidary:bool - To create a RH2 post with a subsidary arm - default False
-#       theatre_route_indicator:bool -  Creates a Theatre Type route indicator - Default False
-#       refresh_immediately:bool - When set to False the signal aspects will NOT be automatically updated 
-#                 when the signal is changed and the external programme will need to call the seperate 
-#                 'update_signal' function. Primarily intended for use with distant signals - Default True
-#       fully_automatic:bool - Creates a signal without any manual controls - Default False
+#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
+#       approach_release_button:bool - Creates an "Approach Release" button - Default = False
+#       main_signal:bool - To create a signal arm for the main route - default = True
+#                          (Only set this to False when creating an "associated" distant signal
+#                          for a situation where a distant arm for the main route is not required)
+#       lh1_signal:bool - create a LH1 post with a main (junction) arm - default = False
+#       lh2_signal:bool - create a LH2 post with a main (junction) arm - default = False
+#       rh1_signal:bool - create a RH1 post with a main (junction) arm - default = False
+#       rh2_signal:bool - create a RH2 post with a main (junction) arm - default = False
+#       main_subsidary:bool - create a subsidary signal under the "main" signal - default = False
+#       lh1_subsidary:bool - create a LH1 post with a subsidary arm - default = False
+#       lh2_subsidary:bool - create a LH2 post with a subsidary arm - default = False
+#       rh1_subsidary:bool - create a RH1 post with a subsidary arm - default = False
+#       rh2_subsidary:bool - create a RH2 post with a subsidary arm - default = False
+#       theatre_route_indicator:bool -  Creates a Theatre route indicator - Default = False
+#       refresh_immediately:bool - When set to False the signal aspects will NOT be automatically
+#                 updated when the signal is changed and the external programme will need to call 
+#                 the seperate 'update_signal' function. Primarily intended for fully automatic
+#                 distant signals to reflect the state of the home signal ahead - Default = True 
+#       fully_automatic:bool - Creates a signal without a manual control button - Default = False
 # 
 # create_ground_position_signal - create a ground position light signal
 #   Mandatory Parameters:
@@ -122,140 +159,147 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#       orientation:int- Orientation in degrees (0 or 180) - default is zero
+#       sig_callback:name - Function to call when a signal event happens - default = None
 #                         Note that the callback function returns (item_id, callback type)
-#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default False
-#       modern_type: bool - Specifies a modern type ground position signal (post 1996) - Default False
-#
-# create_ground_disc_signal - Creates a ground disc type shunting signal
+#       sig_passed_button:bool - Creates a "signal Passed" button - default =False
+#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default = False
+#       modern_type: bool - Specifies a modern type ground signal (post 1996) - default = False
+# 
+# create_ground_disc_signal - Creates a ground disc type signal
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #  Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       sig_callback:name - Function to call when a signal event happens - Default is no callback
+#       sig_callback:name - Function to call when a signal event happens - Default = none
 #                         Note that the callback function returns (item_id, callback type)
-#       sig_passed_button:bool - Creates a "signal Passed" button for automatic control - Default False
-#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default False (red banner)
-#
+#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
+#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default = False
+# 
 # set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default 'NONE'
-#       theatre_text:str  - The text to display in the theatre route indicator - default "NONE"
+#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
+#       theatre_text:str - The text to display in the theatre indicator - default = "NONE"
 # 
 # update_signal - update the signal aspect based on the aspect of a signal ahead - Primarily
-#                intended for 3/4 aspect colour light signals but can also be used to update 
-#                2-aspect distant signals (semaphore or colour light) on the home signal ahead
+#                 intended for 3/4 aspect colour light signals but can also be used to update 
+#                 2-aspect distant signals (semaphore or colour light) on the home signal ahead
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to update.
-#               Either an integer representing the ID of the signal created on our schematic,
-#               or a string representing the identifier of an signal on an external host/node
-#               (subscribed to via the MQTT Interface - refer to the section on MQTT interfacing)
-#               Default = "None" (no signal ahead to take into account when updating the signal)
-#
-# toggle_signal(sig_id) - to support route setting (use 'signal_clear' to find the switched state )
+#                Either an integer representing the ID of the signal created on our schematic,
+#                or a string representing the compound identifier of a remote signal on an 
+#                external MQTT node. Default = "None" (no signal ahead to take into account)
 # 
-# toggle_subsidary(sig_id) - to support route setting (use 'subsidary_clear' to find the switched state)
+# toggle_signal(sig_id:int) - for route setting (use 'signal_clear' to find the state)
 # 
-# lock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+# toggle_subsidary(sig_id:int) - forroute setting (use 'subsidary_clear' to find the state)
 # 
-# unlock_signal(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+# lock_signal(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
-# lock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+# unlock_signal(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
-# unlock_subsidary(*sig_id) - for point/signal interlocking (multiple Signal_IDs can be specified)
+# lock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
-# signal_clear(sig_id) - returns the SWITCHED state of the signal - i.e the state of the signal button
-#                        (True='OFF') - use for external point/signal interlocking functions
-#
-# subsidary_clear(sig_id) - returns the SWITCHED state of the subsidary - i.e the state of the subsidary
-#                         button (True='OFF') - use for external point/signal interlocking functions
+# unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
-# signal_state(sig_id) - returns the DISPLAYED state of the signal - This can be different to the SWITCHED
-#                        state of the signal if the signal is OVERRIDDEN or subject to APPROACH CONTROL
-#                        Use this function when you need to get the actual state (in terms of aspect)
-#                        that the signal is displaying - returns 'signal_state_type' (see above)
+# signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
+#                            signal manual control button (True='OFF', False = 'ON'). To enable
+#                            external point/signal interlocking functions
 # 
-# set_signal_override (sig_id*) - Overrides the signal to DANGER (can specify multiple sig_ids)
-#
-# clear_signal_override (sig_id*) - Reverts signal to the non-overridden state (can specify multiple sig_ids)
+# subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
+#                            signal manual control button (True='OFF', False = 'ON'). To enable
+#                            external point/signal interlocking functions
 # 
-# signal_overridden (sig_id) - returns the signal override state (True='overridden')
-#           Function DEPRECATED (will be removed from future releases) - use signal_state instead
+# signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal. This can be different 
+#                       to the SWITCHED state if the signal is OVERRIDDEN or subject to APPROACH
+#                       CONTROL. Use this function when you need to get the actual state (in terms
+#                       of aspect) that the signal is displaying - returns 'signal_state_type'.
+#                       - Note that for this function, the sig_id can be specified either as an 
+#                       integer (representing the ID of a signal on the local schematic), or a 
+#                       string (representing the identifier of an signal on an external MQTT node)
 # 
-# trigger_timed_signal - Sets the signal to DANGER and then cycles through the aspects back to PROCEED
-#                       - If a start delay > 0 is specified then a 'sig_passed' callback event is generated
-#                       - when the signal is changed to DANGER - For each subsequent aspect change (all the
-#                       - way back to PROCEED) a 'sig_updated' callback event will be generated
+# set_signal_override (sig_id*:int) - Overrides the signal to DANGER (can specify multiple sig_ids)
+# 
+# clear_signal_override (sig_id*:int) - Clears the siganl Override (can specify multiple sig_ids)
+# 
+# trigger_timed_signal - Sets the signal to DANGER and cycles through the aspects back to PROCEED.
+#                       If start delay > 0 then a 'sig_passed' callback event is generated when
+#                       the signal is changed to DANGER - For each subsequent aspect change 
+#                       (back to PROCEED) a 'sig_updated' callback event will be generated.
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       start_delay:int - Delay (in seconds) before changing to DANGER (default=5)
-#       time_delay:int - Delay (in seconds) for cycling through the aspects (default=5)
+#       start_delay:int - Delay (in seconds) before changing to DANGER (default = 5)
+#       time_delay:int - Delay (in seconds) for cycling through the aspects (default = 5)
 # 
-# set_approach_control - Used when a diverging route has a lower speed restriction to the main line
-#                        Puts the signal into "Approach Control" Mode where the signal will display a more 
-#                        restrictive aspect/state (either DANGER or CAUTION) to approaching trains. As the
-#                        Train approaches, the signal will then be "released" to display its "normal" aspect.
-#                        When a signal is in "approach control" mode the signals behind will display the 
-#                        appropriate aspects (when updated based on the signal ahead). These would be the
-#                        normal aspects for "Release on Red" but for "Release on Yellow", the signals behind  
-#                        would display flashing yellow and flashing double yellow (assuming 4 aspect signals)
+# set_approach_control - Normally used when a diverging route has a lower speed restriction.
+#             Puts the signal into "Approach Control" Mode where the signal will display a more 
+#             restrictive aspect/state (either DANGER or CAUTION) to approaching trains. As the
+#             Train approaches, the signal will then be "released" to display its "normal" aspect.
+#             When a signal is in "approach control" mode the signals behind will display the 
+#             appropriate aspects (when updated based on the signal ahead). These would be the
+#             normal aspects for "Release on Red" but for "Release on Yellow", the colour light 
+#             signals behind would show flashing yellow / double-yellow aspects as appropriate.
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
-#       release_on_yellow:Bool - True = Yellow Approach aspect, False = Red Approach aspect (default=False)
+#       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
 # 
-# clear_approach_control - This "releases" the signal to display the normal aspect and should be called when
-#                          a train is approaching the signal. Note that signals can also be released when the
-#                         "release button" (displayed just in front of the signal if specified when the signal
-#                          was created) is activated - manually or via an external sensor event#   Mandatory Parameters:
-#       sig_id:int - The ID for the signal
+# clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
+#             Signals are also automatically released when the"release button" (displayed just 
+#             in front of the signal if specified when the signal was created) is activated,
+#             either manually or via an external sensor event.
 # 
-# approach_control_set (sig_id) - returns if the signal is subject to approach control (True='active')
-#           Function DEPRECATED (will be removed from future releases) - use signal_state instead
+# signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
+#                                  Function DEPRECATED (will be removed from future releases)
+#                                  use "signal_state" function to get the state of the signal
+# 
+# approach_control_set (sig_id:int) - returns the signal approach control state (True='active')
+#                                  Function DEPRECATED (will be removed from future releases)
+#                                  use "signal_state" function to get the state of the signal
+#
+# ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
 # 
 # subscribe_to_signal_updates - Subscribe to signal updates from another node on the network 
 #   Mandatory Parameters:
-#       node:str - The name of the node publishing the signal state update feed(s)
-#       sig_callback:name - Function to call when a signal update is received from the remote node
-#                    The callback function returns (item_identifier, sig_callback_type.sig_updated),
-#                    where item_identifier is a string in the following format "<node>-<sig_id>"
-#       *sig_ids:int - The signal(s) to subscribe to (multiple Signal_IDs can be specified)
-#
-# subscribe_to_signal_passed_events  - Subscribe to a "signal passed" event feed for a specified node/signal 
+#       node:str - The name of the node publishing the signal state feed
+#       sig_callback:name - Function to call when an update is received from the remote node
+#                Callback returns (item_identifier, sig_callback_type.sig_updated)
+#                Item Identifier is a string in the following format "node_id-signal_id"
+#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+# 
+# subscribe_to_signal_passed_events  - Subscribe to signal passed events from another node  
 #   Mandatory Parameters:
-#       node:str - The name of the node publishing the signal passed event feed(s)
-#       sig_callback:name - Function to call when a signal passed event is received from the remote node
-#                    The callback function returns (item_identifier, sig_callback_type.sig_passed),
-#                    where Item Identifier is a string in the following format "<node>-<sig_id>"
-#       *sig_ids:int - The signal(s) to subscribe to (multiple Signal_IDs can be specified)
-#
-# set_signals_to_publish_state - Enable the publication of state updates for specified signals.
-#                All subsequent state changes will be automatically published to remote subscribers
+#       node:str - The name of the node publishing the signal passed event feed
+#       sig_callback:name - Function to call when a signal passed event is received
+#                Callback returns (item_identifier, sig_callback_type.sig_passed)
+#                Item Identifier is a string in the following format "node_id-signal_id"
+#       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
+#       
+# set_signals_to_publish_state - Enable the publication of state updates for signals.
+#                All subsequent changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sig_ids:int - The signal(s) to publish (multiple Signal_IDs can be specified)
-#
-# set_signals_to_publish_passed_events - Enable the publication of signal passed events for specified signals.
+#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+# 
+# set_signals_to_publish_passed_events - Enable the publication of signal passed events.
 #                All subsequent events will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sig_ids:int - The signal(s) to publish (multiple Signal_IDs can be specified)
-# -------------------------------------------------------------------------
+#       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+#
+# ------------------------------------------------------------------------------------------
    
 from . import signals_common
 from . import signals_colour_lights
 from . import signals_ground_position
 from . import signals_ground_disc
-from . import signals_semaphores
 from . import signals_semaphores
 from . import mqtt_interface
 

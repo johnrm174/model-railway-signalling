@@ -1,13 +1,5 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing Ground disc signal objects
-#
-# Currently supported sub-types :
-#       - Standard Ground Disc signal (red bar on white circle)  
-#       - Shunt Ahead Ground Disc (yellow bar on white circle)
-#
-# Common features supported by Ground Disc signals
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
 from . import signals_common

@@ -1,24 +1,28 @@
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------
 # This module is used for creating Track Sensor objects (Sensors) mapped to GPIO Pins
+# ------------------------------------------------------------------------------------------
 #
+# Public types and functions:
+# 
 # sensor_callback_type (tells the calling program what has triggered the callback):
-#     track_sensor_callback_type.sensor_triggered - The sensor has been externally triggered
+#     track_sensor_callback_type.sensor_triggered - The external sensor has been triggered
 # 
 # create_sensor - Creates a sensor object
 #   Mandatory Parameters:
 #       sensor_id:int - The ID to be used for the sensor 
-#       gpio_channel:int - The GPIO port number  to use for the sensor (not the physical pin number):
+#       gpio_channel:int - The GPIO port number for the sensor (not the physical pin number)
 #   Optional Parameters:
-#       sensor_timeout:float - The time period during which further triggers are ignored - default = 3.0 secs
-#       trigger_period:float - Duration that the sensor needs to remain active before triggering - default = 0.001 secs
-#       signal_passed:int    - Raise a "signal passed" event for the specified signal ID when triggered - default = None
-#       signal_approach:int  - Raise an "approach release" event for the specified signal ID when triggered - default = None
-#       sensor_callback      - The function to call when triggered (if signal events have not been specified) - default = None
-#                               Note that the callback function returns (item_id, callback type)
+#       sensor_timeout:float - Time period for ignoring further triggers - default = 3.0 secs
+#       trigger_period:float - Active duration for sensor before triggering - default = 0.001 secs
+#       signal_passed:int    - Raise a "signal passed" event for a signal ID - default = None
+#       signal_approach:int  - Raise an "approach release" event for a signal ID - default = None
+#       sensor_callback      - Function to call when a sensor has been triggered (if signal events 
+#                              have not been specified) - default = None
+#                              Note that the callback function returns (item_id, callback type)
 # 
-# sensor_active (sensor_id) - Returns the current state of the sensor (True/False)
-#
-# --------------------------------------------------------------------------------
+# sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
+# 
+# ------------------------------------------------------------------------------------------
 
 import enum
 import time

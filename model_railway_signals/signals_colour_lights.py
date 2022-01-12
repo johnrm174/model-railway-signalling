@@ -1,20 +1,5 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing colour light signal types
-#
-# Currently supported sub types: 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
-#           - with or without a position light subsidary signal
-#           - with or without feather route indicators (maximum of 5)
-#           - with or without a theatre type route indicator
-#           - with or without amanual control buttons
-#
-# Common features supported by Colour Light signals
-#           - set_route_indication (Route Type and theatre text)
-#           - update_signal (based on a specified signal Ahead)
-#           - lock_subsidary_signal / unlock_subsidary_signal
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
-#           - set_approach_control / clear_approch_control
-#           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
 from . import common

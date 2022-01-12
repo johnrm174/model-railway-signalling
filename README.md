@@ -1,5 +1,5 @@
 # model-railway-signalling
-A model railway signalling library written in Python. Primarily intended for the Raspberry Pi, but will alsorun on other platforms 
+A model railway signalling library written in Python. Primarily intended for the Raspberry Pi, but will also run on other platforms 
 (albeit without some of the Raspberry-Pi specific interfacing functions). 
 
 For details of the "Public" API - scroll down the page.
@@ -8,15 +8,16 @@ For details of the "Public" API - scroll down the page.
 
 All of the functions for creating and managing 'signals', 'points', 'sections', 'sensors' and 'block instruments' have 
 been developed as a Python Package to promote re-use across other layouts. This includes functions to support the interlocking 
-of signals, points and block instruments to enable fully prototypical signalling schemes to be developed. An interface to 
+of signals, points and block instruments to enable fully prototypical signalling schemes to be developed. 
+Most types of colour light signals, semaphore signals, ground position light signals and ground disc signals are supported.
+
+An interface to 
 the Pi-SPROG-3 DCC Command station enables DCC control of the signals and points out on the layout. The signals and points 
 objects can be mapped to one or more DCC addresses in a manner that should be compatible with the majority of DCC signal/points 
 decoders currently on the market. A GPIO interface allows external train detectors such as the BlockSignalling BOD2-NS to be 
 connected in via opto-isolators. These sensors can be configured to trigger 'signal approached' or 'signal passed' events, 
 enabling full automatic control of the layout signalling. A MQTT interface enables multiple signalling applications to be 
-networked together so that complex layouts can be split into different signalling sections/areas.
-
-Most types of colour light signals, semaphore signals, ground position light signals and ground disc signals are supported.
+networked together so that complex layouts can be split into different signalling sections/areas, with communication between them.
 
 Note that I have tried to make the package platform independent so you can use it to develop your own layout signalling schemes 
 without a Raspberry Pi or the associated Pi-SPROG-3 DCC Command station (track sensors can be manually 'triggered' via the
@@ -69,7 +70,7 @@ Some examples are included in the repository: https://github.com/johnrm174/model
            the train to proceed past the signal and onto the divergent route. For Colour light 
            signals, examples of "Approach on Red" and "Approach on Yellow" are provided (for 
            "Approach on yellow", the signals behind will show the correct flashing yellow 
-           aspects).For Semaphore signals, an example of using approach control for semi
+           aspects). For Semaphore signals, an example of using approach control for semi
            automating all the home signals within a block section is provided.
 
 'test_networking_1/2.py' - an example of how to network multiple signalling applications 
@@ -97,6 +98,8 @@ for my layout (still very much work in progress).
 
 ## Point Functions
 <pre>
+Public Types and Functions:
+
 point_type (use when creating points)
   point_type.RH
   point_type.LH
@@ -267,7 +270,6 @@ create_semaphore_signal - Creates a Semaphore signal
                             a previously created home signal (and use the same x and y coords)
                             to create the distant signal on the same post as the home signal 
                             with appropriate "slotting" between the signal arms - Default = False  
-
       orientation:int - Orientation in degrees (0 or 180) - Default = zero
       sig_callback:name - Function to call when a signal event happens - Default = None
                           Note that the callback function returns (item_id, callback type)
@@ -332,8 +334,8 @@ update_signal - update the signal aspect based on the aspect of a signal ahead -
   Optional Parameters:
       sig_ahead_id:int/str - The ID for the signal "ahead" of the one we want to update.
                Either an integer representing the ID of the signal created on our schematic,
-               or a string representing the identifier of an signal on an external MQTT node
-               Default = "None" (no signal ahead to take into account)
+               or a string representing the compound identifier of a remote signal on an 
+               external MQTT node. Default = "None" (no signal ahead to take into account)
 
 toggle_signal(sig_id:int) - for route setting (use 'signal_clear' to find the state)
 
@@ -383,30 +385,31 @@ set_approach_control - Normally used when a diverging route has a lower speed re
             Train approaches, the signal will then be "released" to display its "normal" aspect.
             When a signal is in "approach control" mode the signals behind will display the 
             appropriate aspects (when updated based on the signal ahead). These would be the
-            normal aspects for "Release on Red" but for "Release on Yellow", the signals behind
-            would show flashing yellow and flashing double-yellow aspects as appropriate.
+            normal aspects for "Release on Red" but for "Release on Yellow", the colour light 
+            signals behind would show flashing yellow / double-yellow aspects as appropriate.
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
 
-clear_approach_control - This "releases" the signal to display the normal aspect and should be 
-            called when a train is approaching the signal. Note that signals can also be released 
-            when the"release button" (displayed just in front of the signal if specified when the 
-            signal was created) is activated - either manually or via an external sensor event.
-      sig_id:int - The ID for the signal
+clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
+            Signals are also automatically released when the"release button" (displayed just 
+            in front of the signal if specified when the signal was created) is activated,
+            either manually or via an external sensor event.
 
 signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
                                  Function DEPRECATED (will be removed from future releases)
-		                 use "signal_state" function to get the state of the signal
+                                 use "signal_state" function to get the state of the signal
 
 approach_control_set (sig_id:int) - returns the signal approach control state (True='active')
                                  Function DEPRECATED (will be removed from future releases)
-		                 use "signal_state" function to get the state of the signal
+                                 use "signal_state" function to get the state of the signal
 </pre>
 
 ## Track Occupancy Functions
 <pre>
+Public types and functions:
+
 section_callback_type (tells the calling program what has triggered the callback):
      section_callback_type.section_updated - The section has been updated by the user
 
@@ -422,12 +425,14 @@ create_section - Creates a Track Occupancy section object
       label:str - The label to display on the section when occupied - default: "OCCUPIED"
 
 section_occupied (section_id:int/str)- Returns the section state (True=Occupied, False=Clear)
-               Either an integer representing the ID of the section created on our schematic,
-               or a string representing the identifier of an section on an external MQTT node
+               The Section ID can either be specified as an integer representing the ID of a 
+               section created on our schematic, or a string representing the compound 
+               identifier of a section on an remote MQTT network node.
 
 section_label (section_id:int/str)- Returns the 'label' of the section (as a string)
-               Either an integer representing the ID of the section created on our schematic,
-               or a string representing the identifier of an section on an external MQTT node
+               The Section ID can either be specified as an integer representing the ID of a 
+               section created on our schematic, or a string representing the compound 
+               identifier of a section on an remote MQTT network node.
 
 set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
   Mandatory Parameters:
@@ -438,15 +443,12 @@ set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' i
 clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
                   Returns the current value of the Section Lable (as a string) to allow this
                   to be 'passed' to the next section (via the set_section_occupied function)  
-Mandatory Parameters:
-      section_id:int - The ID to be used for the section 
-
-  Mandatory Parameters:
-      section_id:int - The ID to be used for the section 
 </pre>
 
 ## Track Sensor Functions
 <pre>
+Public types and functions:
+
 sensor_callback_type (tells the calling program what has triggered the callback):
     track_sensor_callback_type.sensor_triggered - The external sensor has been triggered
 
@@ -466,9 +468,11 @@ create_sensor - Creates a sensor object
 sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
 </pre>
 
-## Block Instruments
+## Block Instrument Functions
 
 <pre>
+Public types and functions: 
+
 block_callback_type (tells the calling program what has triggered the callback)
     block_section_ahead_updated - The block section AHEAD of our block section has been updated
                             (i.e. the block section state represented by the Repeater indicator)
@@ -479,20 +483,21 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
       block_id:int - The local identifier to be used for the Block Instrument 
       x:int, y:int - Position of the instrument on the canvas (in pixels)
   Optional Parameters:
-      block_callback - The function to call if the section is manually toggled - default: null
+      block_callback - The function to call when the repeater indicator on our instrument has been
+                       updated (i.e. the block changed on the linked instrument) - default: null
                        Note that the callback function returns (item_id, callback type)
-      single_line:bool -
+      single_line:bool - for a single line instrument(created without a repeater) - default: False
       bell_sound_file:str - The filename of the soundfile (in the local package resources
-                            folder to use for the bell sound (default "bell-ring-01.wav")
-      telegraph_sound_file:str - The filename of the soundfile (in the local package resources
-                     folder to use for the Telegraph key sound (default "telegraph-key-01.wav")
+                           folder) to use for the bell sound (default "bell-ring-01.wav")
+      telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
+                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
       linked_to:int/str - the identifier for the "paired" block instrument - can be specified
                           either as an integer (representing the ID of a Block Instrument on the
                           the local schematic), or a string representing a Block Instrument 
                           running on a remote node - see MQTT networking (default = None)
 
 Note that the Block Instruments feature is primarily intended to provide a prototypical means of
-communication betewwn signalmen working their respective signal boxes. As such, MQTT networking
+communication between signallers working their respective signal boxes. As such, MQTT networking
 is "built in" - If a remote instrument identifier is specified for the "linked_to" instrument
 and the MQTT network has been configured then this function will automatically configured the
 block instrument to publish its state and telegraph key clicks to the remote instrument and
@@ -522,11 +527,12 @@ This has been successfully tested with the Harman Signallist SC1 DCC Decoder in 
 by the signal (feathers or theatre). If the signal has a subsidary associated with it, this is 
 always mapped to a single DCC address.
 
-Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no  
-DCC mapping has been defined, then no DCC commands will be sent. This provides flexibility for 
-including signals on the schematic which are "off scene" or for progressively "working up" the 
-signalling scheme for a layout.
+Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no DCC mapping 
+has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
+schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
 <pre>
+Public types and functions:
+
 map_dcc_signal - Map a signal to one or more DCC Addresses
    Mandatory Parameters:
       sig_id:int - The ID for the signal to create a DCC mapping for
@@ -541,9 +547,9 @@ map_dcc_signal - Map a signal to one or more DCC Addresses
       RH1[[add:int,state:bool],] - DCC addresses/states for "RH45" (default = No Mapping)
       RH2[[add:int,state:bool],] - DCC addresses/states for "RH90" (default = No Mapping)
       MAIN[[add:int,state:bool],] - DCC addresses/states for "MAIN" (default = No Mapping)
-      NONE[[add:int,state:bool],] - DCC addresses/states to inhibit route (default = No Mapping)
-              the route indication when the signal is displaying DANGER - unless the DCC signal 
-              automatically inhibits route indications - see auto_route_inhibit flag (above)
+      NONE[[add:int,state:bool],] - DCC addresses/states to inhibit the route indication when 
+              the signal is displaying DANGER - unless the DCC signal automatically inhibits
+              route indications (see auto_route_inhibit flag above) - Default = None
       THEATRE[["char",[add:int,state:bool],],] - list of theatre states (default = No Mapping)
               Each entry comprises the "char" and the associated list of DCC addresses/states
               that need to be sent to get the theatre indicator to display that character.
@@ -638,6 +644,8 @@ This enables the current configuration of the signals, points and sections on th
 "saved" when the application is closed and then "loaded" when the application is re-loaded 
 (ready for the next running session)
 <pre>
+Public Types and Functions:
+
 load_layout_state - Loads the initial state for all 'points', 'signals' and 'sections' from file
                     and enables the save of the current layout state to file on application quit.
                     If load is "cancelled" or "file not found" then the default state will be used.
@@ -655,6 +663,8 @@ just the minimum set needed to support the driving of signals and points via a s
 DCC Accessory decoders. Basic CV Programming is also supported - primarily as an aid to testing. 
 For full decoder programming the recommendation is to use JRMI DecoderPro or similar.
 <pre>
+Public Types and Functions:
+
 initialise_pi_sprog - Open and configures the serial comms port to the Pi Sprog
    Optional Parameters:
       port_name:str - The serial port to use for the Pi-SPROG 3 - Default="/dev/serial0",
@@ -701,7 +711,7 @@ at the heart of the Block Instruments feature - allowing the different "signalli
 communicate prototypically via signalbox bell codes and block section status.
 
 To use these networking functions, you can either set up a local MQTT broker on one of the host 
-computerson your local network or alternatively use an 'open source' broker out there on the 
+computers on your local network or alternatively use an 'open source' broker out there on the 
 internet - I've been using a test broker at "mqtt.eclipseprojects.io" (note this has no security 
 or authentication).
 
@@ -710,6 +720,8 @@ appropriate level of security. This package does support basic username/password
 for connecting in to the broker but note that these are NOT ENCRYPTED when sending over the 
 internet unless you are also using a SSL connection.
 <pre>
+Public types and functions:
+
 configure_networking - Configures the local client and opens a connection to the MQTT broker
   Mandatory Parameters:
       broker_host:str - The name/IP address of the MQTT broker host to be used

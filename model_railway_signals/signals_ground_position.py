@@ -1,17 +1,5 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing Ground Position Light signal objects
-#
-# Currently supported sub-types :
-#       - Groud position light  
-#           - Early - red/white / white/white
-#           - Modern (post 1996) - red/red / white /white
-#       - Shunt Ahead position light
-#           - Early - yellow/white / white/white
-#           - Modern (post 1996) yellow/yellow / white /white
-#
-# Common features supported by Ground Position Colour Light signals
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
 from . import signals_common

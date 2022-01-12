@@ -1,35 +1,43 @@
 #-----------------------------------------------------------------------------------------------
-# These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, allowing
-# multiple signalling applications (running on different computers) to share a single Pi-Sprog DCC interface
-# and to share signal states and signal updated events across a MQTT broker network.
+# These functions provides a basic MQTT Client interface for the Model Railway Signalling Package, 
+# allowing multiple signalling applications (running on different computers) to share a single 
+# Pi-Sprog DCC interface and to share layout state and events across a MQTT broker network.
 #  
-# For example, you could run one signalling application on a computer without a Pi-Sprog (e.g. a Windows Laptop),
-# configure that node to "publish" its DCC command feed to the network and then configure another node (this time hosted
-# on a Raspberry Pi) to "subscribe" to the same DCC command feed and then forwarded to its local pi-Sprog DCC interface.
+# For example, you could run one signalling application on a computer without a Pi-Sprog (e.g. 
+# a Windows Laptop), configure that node to "publish" its DCC command feed to the network and 
+# then configure another node (this time hosted on a Raspberry Pi) to "subscribe" to the same 
+# DCC command feed and then forwarded to its local pi-Sprog DCC interface.
 # 
-# You can also use these features to split larger layouts into multiple signalling areas whilst still being able to 
-# implement a level of automation between them - primarily being aware of the "state" of remote signals (for updating
-# signals based on the one ahead) and "signal passed" events (for updating track occupancy sections) 
+# You can also use these features to split larger layouts into multiple signalling areas whilst 
+# still being able to implement a level of automation between them. Functions are provided to 
+# publishing and subscribing to the "state" of signals (for updating signals based on the one 
+# ahead), the "state" of track occupancy sections (for "passing" trains between signalling 
+# applications) and "signal passed" events (also for track occupancy). MQTT networking is also 
+# at the heart of the Block Instruments feature - allowing the different "signalling areas" to
+# communicate prototypically via signalbox bell codes and block section status.
 # 
-# To use these networking functions, you can either set up a local MQTT broker on one of the host computers
-# on your local network or alternatively use an 'open source' broker out there on the internet - I've been
-# using a test broker at "mqtt.eclipseprojects.io" (note this has no security or authentication).
+# To use these networking functions, you can either set up a local MQTT broker on one of the host 
+# computers on your local network or alternatively use an 'open source' broker out there on the 
+# internet - I've been using a test broker at "mqtt.eclipseprojects.io" (note this has no security 
+# or authentication).
 # 
-# If you do intend using an internet-based broker then it is important to configure it with an appropriate level
-# of security. This package does support basic username/password authentication for connecting in to the broker
-# but note that these are NOT ENCRYPTED when sending over the internet unless you are also using a SSL connection.
+# If you do intend using an internet-based broker then it is important to configure it with an 
+# appropriate level of security. This package does support basic username/password authentication 
+# for connecting in to the broker but note that these are NOT ENCRYPTED when sending over the 
+# internet unless you are also using a SSL connection.
+#-----------------------------------------------------------------------------------------------
 #
-# configure_networking - Configures the local MQTT broker client and establishes a connection to the broker
+# configure_networking - Configures the local client and opens a connection to the MQTT broker
 #   Mandatory Parameters:
-#       broker_host:str - The fully qualified name/IP address of the MQTT broker host
-#       network_identifier:str - The name to use for the signalling network (can be any string)
-#       node_identifier:str - The name to use for a particular node on the network (can be any string)
+#       broker_host:str - The name/IP address of the MQTT broker host to be used
+#       network_identifier:str - The name to use for this signalling network (any string)
+#       node_identifier:str - The name to use for this node on the network (can be any string)
 #   Optional Parameters:
 #       broker_port:int - The network port for the broker host (default = 1883)
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
-#       publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands' function instead
-#       mqtt_enhanced_debugging:bool - True to enable additional debug logging (default = False)
+#       publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands'
+#       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
 #
 #-----------------------------------------------------------------------------------------------
 

@@ -1,8 +1,11 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing Track Occupancy objects (sections)
+# --------------------------------------------------------------------------------
 #
+# Public types and functions:
+# 
 # section_callback_type (tells the calling program what has triggered the callback):
-#     section_callback_type.section_updated - The section has been updated by the user
+#      section_callback_type.section_updated - The section has been updated by the user
 # 
 # create_section - Creates a Track Occupancy section object
 #   Mandatory Parameters:
@@ -10,48 +13,48 @@
 #       section_id:int - The ID to be used for the section 
 #       x:int, y:int - Position of the section on the canvas (in pixels)
 #   Optional Parameters:
-#       section_callback - The function to call if the section is manually toggled - default: null
+#       section_callback - The function to call if the section is updated - default = None
 #                         Note that the callback function returns (item_id, callback type)
-#       editable:bool - Whether the section can be manually switched and/or edited (default = True)
+#       editable:bool - If the section can be manually toggled and/or edited (default = True)
 #       label:str - The label to display on the section when occupied - default: "OCCUPIED"
 # 
-# section_occupied (section_id:int/str)- Returns the state of the section (True=Occupied, False=Clear)
-#                   - Note that for this function, the section_id can be specified either as an integer 
-#                     (representing the ID of a signal on the local schematic), or a string (representing
-#                     the identifier of an signal on an external MQTT node)
+# section_occupied (section_id:int/str)- Returns the section state (True=Occupied, False=Clear)
+#                The Section ID can either be specified as an integer representing the ID of a 
+#                section created on our schematic, or a string representing the compound 
+#                identifier of a section on an remote MQTT network node.
 # 
 # section_label (section_id:int/str)- Returns the 'label' of the section (as a string)
-#                   - Note that for this function, the section_id can be specified either as an integer 
-#                     (representing the ID of a signal on the local schematic), or a string (representing
-#                     the identifier of an signal on an external MQTT node)
+#                The Section ID can either be specified as an integer representing the ID of a 
+#                section created on our schematic, or a string representing the compound 
+#                identifier of a section on an remote MQTT network node.
 # 
-# set_section_occupied - Sets the specified section to "OCCUPIED" (and updates the 'label' if required)
+# set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
 #   Mandatory Parameters:
 #       section_id:int - The ID to be used for the section 
 #   Optional Parameters:
-#       label:str - An updated label to display when occupied (if omitted the label will stay the same)
+#       label:str - An updated label to display when occupied (Default = No Change)
 # 
 # clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-#                      - also returns the current value of the Section Lable (as a string) to allow this
-#                        to be 'passed' to the next section (via the set_section_occupied function)
-#   Mandatory Parameters:
-#       section_id:int - The ID to be used for the section
+#                   Returns the current value of the Section Lable (as a string) to allow this
+#                   to be 'passed' to the next section (via the set_section_occupied function)  
+# 
+# ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
 #
-# subscribe_to_section_updates - Subscribe to section updates from another node on the MQTT network
+# subscribe_to_section_updates - Subscribe to section updates from another node on the network 
 #   Mandatory Parameters:
-#       node:str - The name of the node publishing the track section update feed(s)
-#       sec_callback:name - Function to call when a section update is received from the remote node
-#                    The callback function returns (item_identifier, section_callback_type.section_updated),
-#                    where item_identifier is a string in the following format "<node>-<sec_id>"
-#       *sec_ids:int - The section(s) to subscribe to (multiple Section_IDs can be specified)
-#
-# set_sections_to_publish_state - Enable the publication of state updates for specified track sections.
-#                    All subsequent state changes will be automatically published to remote subscribers
+#       node:str - The name of the node publishing the track section update feed
+#       sec_callback:name - Function to call when an update is received from the remote node
+#                Callback returns (item_identifier, section_callback_type.section_updated)
+#                item_identifier is a string in the following format "node_id-section_id"
+#       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
+#       
+# set_sections_to_publish_state - Enable the publication of state updates for track sections.
+#                All subsequent changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
-#       *sec_ids:int - The track section(s) to publish (multiple Signal_IDs can be specified)
-#
+#       *sec_ids:int - The track sections to publish (multiple Section_IDs can be specified)
+# 
 # --------------------------------------------------------------------------------
 
 from . import common
