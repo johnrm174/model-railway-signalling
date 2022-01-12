@@ -67,7 +67,7 @@ def window1_callback_function(item_id,callback_type):
             set_section_occupied(23)
         elif item_id == 24 and point_switched(21):
             set_section_occupied(25,clear_section_occupied(23))
-        elif item_id == 24 and not point_switched(1):
+        elif item_id == 24 and not point_switched(21):
             set_section_occupied(24,clear_section_occupied(23))
         elif item_id == 25:
             trigger_timed_signal (25,0,5)
