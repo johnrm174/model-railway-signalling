@@ -71,25 +71,10 @@ def main_callback_function(item_id,callback_type):
     # Override signals based on track occupancy - we could use signal passed events but
     # we also need to allow for manual setting/resetting of the track occupancy sections
     
-    # Distant signal 1 is overridden (to DANGER) if ANY home signals ahead are
-    # at Danger or the section immediately ahead of the signal is Occupied
-    if section_occupied(1):
-        set_signal_override(1)
-    elif point_switched(1):
-        if (signal_state(2) == signal_state_type.DANGER or
-            signal_state(3) == signal_state_type.DANGER or
-            signal_state(5) == signal_state_type.DANGER ):
-            set_signal_override(1)
-        else:
-            clear_signal_override(1)
-    else:
-        if (signal_state(2) == signal_state_type.DANGER or
-            signal_state(4) == signal_state_type.DANGER or
-            signal_state(5) == signal_state_type.DANGER ):
-            set_signal_override(1)
-        else:
-            clear_signal_override(1)
-    # Signal 2 is only overridden if the section ahead is occupied
+    # Distant signal 1 is overridden if the section ahead is Occupied
+    if section_occupied(1): set_signal_override(1)
+    else: clear_signal_override(1)
+    # Signal 2 is overridden if the section ahead is occupied
     # Where the section ahead is determined by the setting of Point 1
     if ((section_occupied(2) and point_switched(1)) or
             (section_occupied(3) and not point_switched(1))):
@@ -105,7 +90,6 @@ def main_callback_function(item_id,callback_type):
         clear_signal_override(4) 
 
     # Update the displayed route for signals 1 and 2 based on point 1 setting 
-    
     if point_switched(1):
         set_route(1,route=route_type.LH1)
         set_route(2,route=route_type.LH1)
@@ -116,6 +100,24 @@ def main_callback_function(item_id,callback_type):
     # Process the signal/point interlocking - Note that in this scheme we only allow
     # shunting from the loop line back into the siding (not back onto the main line
     
+    # Signal 1 is locked (at danger) if any of the home signals ahead are at DANGER
+    if point_switched(1):
+        if ((signal_state(2) == signal_state_type.DANGER or
+              signal_state(3) == signal_state_type.DANGER or
+              signal_state(5) == signal_state_type.DANGER ) 
+              and signal_clear(1)):
+            lock_signal(1)
+        else:
+            unlock_signal(1)
+    else:
+        if ((signal_state(2) == signal_state_type.DANGER or
+             signal_state(4) == signal_state_type.DANGER or
+             signal_state(5) == signal_state_type.DANGER )
+             and signal_clear(1)):
+            lock_signal(1)
+        else:
+            unlock_signal(1)
+
     # Signal 2 is locked (at danger) if point 1 FPL is not active
     # There is only a subsidary arm for the LH divergent route so we also need
     # to lock the subsidary signal if point 1 is set for the main route
