@@ -589,7 +589,7 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
 
 def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
     global publish_dcc_commands_to_mqtt_broker
-    if publish_dcc_commands: logging.info("DCC Control - Configuring Application to publish DCC Commands to MQTT broker")
+    if publish_dcc_commands: logging.info("MQTT-Client - Configuring Application to publish DCC Commands to MQTT broker")
     else: logging.info("DCC Control - Configuring Application NOT to publish DCC Commands to MQTT broker")
     publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
