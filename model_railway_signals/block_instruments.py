@@ -41,6 +41,12 @@
 #           (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
 #           Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
 #
+#
+# If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
+# then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
+# on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first)
+# If 'simpleaudio' is not installed then the software will still function correctly (just without sound)
+#
 # -----------------------------------------------------------------------------------------------
 
 from . import common
@@ -48,10 +54,25 @@ from . import mqtt_interface
 from . import file_interface
 from tkinter import *
 from typing import Union
+import enum
 import logging
 import importlib.resources
-import simpleaudio
-    
+
+# We can only use audio for the block instruments if 'simpleaudio' is installed
+# Although this package is supported across different platforms, for Windows
+# it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
+# haven't made audio a hard and fast dependency for the 'model_railway_signals'
+# pack age as a whole - its up to the user to install if required
+
+def is_simpleaudio_installed():
+    global simpleaudio
+    try:
+        import simpleaudio
+        return (True)
+    except Exception: pass
+    return (False)
+audio_enabled = is_simpleaudio_installed()
+
 # -------------------------------------------------------------------------
 # Classes used by external functions when calling the create_point function
 # -------------------------------------------------------------------------
@@ -445,6 +466,7 @@ def create_block_instrument (canvas,
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
     global instruments
+    global audio_enabled
     global logging
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
     # Find and store the root window (when the first block instrument is created)
@@ -489,20 +511,26 @@ def create_block_instrument (canvas,
         # If this is a double line indicator then create the repeater indicator
         if single_line: rep_ind_block, rep_ind_clear, rep_ind_occup = None, None, None
         else: rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator (canvas, x, y-55)
-        # Try to Load the specified audio files for the bell rings and telegraph key
-        # if these fail to load for any reason then no sounds will be produced on the above events
-        try:
-            with importlib.resources.path ('model_railway_signals.resource_files',bell_sound_file) as sound_file:
-                bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-        except:
-            logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
+        # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
+        # if these fail to load for any reason then no sounds will be produced on these events
+        if audio_enabled:
+            try:
+                with importlib.resources.path ('model_railway_signals.resource_files',bell_sound_file) as sound_file:
+                    bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
+            except:
+                logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
+                bell_audio = None
+            try:
+                with importlib.resources.path ('model_railway_signals.resource_files',telegraph_sound_file) as sound_file:
+                    telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
+            except:
+                logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")
+                telegraph_audio = None
+        else:
+            logging.warning ("Block Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
             bell_audio = None
-        try:
-            with importlib.resources.path ('model_railway_signals.resource_files',telegraph_sound_file) as sound_file:
-                telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-        except:
-            logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")
             telegraph_audio = None
+
         # Create the dictionary of elements that we need to track
         instruments[str(block_id)] = {}
         instruments[str(block_id)]["canvas"] = canvas                         # Tkinter drawing canvas
