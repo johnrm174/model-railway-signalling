@@ -40,9 +40,12 @@ To upgrade to the latest version use:
 <pre>
 $ python3 -m pip install --upgrade model-railway-signals 
 </pre>
-You may need to ensure you have the latest version of pip installed:
+If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
+then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
+on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first).
+If 'simpleaudio' is not installed then the software will still function correctly (just without sound).
 <pre>
-$ python3 -m pip install --upgrade pip
+$ python3 -m pip install simpleaudio
 </pre>
 
 ## Using the package
@@ -469,6 +472,11 @@ sensor_active (sensor_id:int) - Returns the current state of the sensor (True/Fa
 </pre>
 
 ## Block Instrument Functions
+
+If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
+then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
+on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first).
+If 'simpleaudio' is not installed then the software will still function correctly (just without sound).
 
 <pre>
 Public types and functions: 
