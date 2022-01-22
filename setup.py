@@ -25,6 +25,6 @@ setup(
     ],
     packages=["model_railway_signals"],
     include_package_data=True,
-    install_requires=["pyserial","paho-mqtt","simpleaudio"]
+    install_requires=["pyserial","paho-mqtt"]
 
 )
