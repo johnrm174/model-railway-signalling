@@ -94,7 +94,7 @@
 # 
 # create_colour_light_signal - Creates a colour light signal
 #   Mandatory Parameters:
-#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
@@ -120,9 +120,9 @@
 # 
 # create_semaphore_signal - Creates a Semaphore signal
 #   Mandatory Parameters:
-#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       x:int, y:int - Position of the point on the canvas (in pixels) 
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
 #       distant:bool - True for a Distant signal - False for a Home signal - default = False
 #       associated_home:int - Option only valid when creating distant signals - Provide the ID of
@@ -155,7 +155,7 @@
 # 
 # create_ground_position_signal - create a ground position light signal
 #   Mandatory Parameters:
-#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
@@ -168,7 +168,7 @@
 # 
 # create_ground_disc_signal - Creates a ground disc type signal
 #   Mandatory Parameters:
-#       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
+#       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #  Optional Parameters:
