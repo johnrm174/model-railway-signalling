@@ -496,9 +496,10 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
                        Note that the callback function returns (item_id, callback type)
       single_line:bool - for a single line instrument(created without a repeater) - default: False
       bell_sound_file:str - The filename of the soundfile (in the local package resources
-                           folder) to use for the bell sound (default "bell-ring-01.wav")
+                          folder) to use for the bell sound (default "bell-ring-01.wav" - other
+			  options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
-                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
+                          to use for the Telegraph key sound (default "telegraph-key-01.wav")
       linked_to:int/str - the identifier for the "paired" block instrument - can be specified
                           either as an integer (representing the ID of a Block Instrument on the
                           the local schematic), or a string representing a Block Instrument 
