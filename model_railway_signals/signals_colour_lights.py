@@ -1,39 +1,16 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing colour light signal types
-#
-# Currently supported sub types: 3 or 4 aspect or 2 aspect (home, distant or red/ylw)
-#           - with or without a position light subsidary signal
-#           - with or without feather route indicators (maximum of 5)
-#           - with or without a theatre type route indicator
-#           - with or without amanual control buttons
-#
-# Common features supported by Colour Light signals
-#           - set_route_indication (Route Type and theatre text)
-#           - update_signal (based on a specified signal Ahead)
-#           - lock_subsidary_signal / unlock_subsidary_signal
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
-#           - set_approach_control / clear_approch_control
-#           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
 from . import common
 from . import signals_common
 from . import dcc_control
-from . import mqtt_interface
 from . import file_interface
 
 from typing import Union
 from tkinter import *
 import logging
 import enum
-
-# -------------------------------------------------------------------------
-# Global variable to ensure we only start the tkinter scheduled tasks (to flash 
-# any approach control aspects) only once (after the creation of the first signal)
-# -------------------------------------------------------------------------
-
-flash_aspects_started = False
 
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating colour light signals 
@@ -209,7 +186,10 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
-        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        loaded_state = file_interface.get_initial_item_state("signals",sig_id)
+        # Note that for Enum types we load the value - need to turn this back into the Enum
+        if loaded_state["routeset"] is not None:
+            loaded_state["routeset"] = signals_common.route_type(loaded_state["routeset"])
         # Set the initial state from the "loaded" state
         if loaded_state["releaseonred"]: signals_common.set_approach_control(sig_id,release_on_yellow=False)
         if loaded_state["releaseonyel"]: signals_common.set_approach_control(sig_id,release_on_yellow=True)
@@ -231,10 +211,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             update_colour_light_subsidary(sig_id)
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
-
-        # When we have created the first colour_light signal we're good to start the 
-        # scheduled functions to deal with any approach control flashing aspects
-        if not flash_aspects_started: flash_aspects_on()
 
     return ()
 
@@ -391,41 +367,35 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
         dcc_control.update_dcc_signal_aspects(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        mqtt_interface.publish_signal_state(sig_id)            
+        signals_common.publish_signal_state(sig_id)            
 
     return ()
 
 # -------------------------------------------------------------------------
 # Internal Functions for cycling the flashing aspects. Rather than using a
 # Thread to do this, we use the tkinter 'after' method to scedule the next
-# update via the tkinter event queue. The first call to "flash_aspects_on"
-# is made after the first colour light signal has been successfully created.
-# We do it like this so everything is running in the main tkinter thread as
-# all the information out there concludes tkinter is not thread safe
+# update via the tkinter event queue (as Tkinter is not Threadsafe)
 # -------------------------------------------------------------------------
 
-def flash_aspects_off():
-    for signal in signals_common.signals:
-        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="grey")
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="grey")
-    common.root_window.after(250,lambda:flash_aspects_on())
+def flash_aspect_off(sig_id):
+    if not common.shutdown_initiated:
+        if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION
+            or signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION):
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="grey")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+            common.root_window.after(250,lambda:flash_aspect_on(sig_id))
     return()
 
-def flash_aspects_on():
-    global flash_aspects_started
-    flash_aspects_started = True
-    for signal in signals_common.signals:
-        if signals_common.signals[signal]["sigtype"] == signals_common.sig_type.colour_light:
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-            if signals_common.signals[signal]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel"],fill="yellow")
-                signals_common.signals[signal]["canvas"].itemconfig (signals_common.signals[signal]["yel2"],fill="yellow")
-    common.root_window.after(250,lambda:flash_aspects_off())
+def flash_aspect_on(sig_id):
+    if not common.shutdown_initiated:
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+            common.root_window.after(250,lambda:flash_aspect_off(sig_id))
+        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel"],fill="yellow")
+            signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
+            common.root_window.after(250,lambda:flash_aspect_off(sig_id))
     return()
         
 # -------------------------------------------------------------------------
@@ -458,15 +428,16 @@ def refresh_signal_aspects (sig_id:int):
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="yellow")
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_CAUTION:
-        # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
+        # The flash_aspect_on function will start the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
-        signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["yel2"],fill="grey")
+        flash_aspect_on(sig_id)
         
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-        # The flash_signal_aspects thread will take care of the flashing aspect so just turn off the other aspects  
+        # The flash_aspect_on function will start the flashing aspect so just turn off the other aspects  
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["red"],fill="grey")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["grn"],fill="grey")
+        flash_aspect_on(sig_id)
 
     elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
         # Change the signal to display the Green aspect
@@ -592,7 +563,7 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
             update_colour_light_signal(sig_id)
             # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
             # mqtt interface has been successfully configured and the signal has been set to publish passed events
-            mqtt_interface.publish_signal_passed_event(sig_id)
+            signals_common.publish_signal_passed_event(sig_id)
             signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         else:
             update_colour_light_signal(sig_id)
@@ -642,13 +613,16 @@ def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:i
         update_colour_light_signal(sig_id)
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return()
-
-    # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
-    # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
-    if start_delay > 0:
-        common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+    # Don't initiate a timed signal sequence if a shutdown has already been initiated
+    if common.shutdown_initiated:
+        logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
     else:
-        timed_signal_sequence_start(start_delay, time_delay)
+        # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
+        # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
+        if start_delay > 0:
+            common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+        else:
+            timed_signal_sequence_start(start_delay, time_delay)
     return()
 
 ###############################################################################

@@ -11,11 +11,13 @@ from .points import toggle_fpl
 from .signals_common import route_type
 from .signals_common import sig_callback_type
 from .signals_common import signal_state_type
+
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
 from .signals_ground_disc import create_ground_disc_signal
+
 from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
@@ -34,6 +36,10 @@ from .signals import clear_signal_override
 from .signals import set_approach_control
 from .signals import clear_approach_control
 from .signals import trigger_timed_signal
+from .signals import subscribe_to_signal_updates
+from .signals import subscribe_to_signal_passed_events
+from .signals import set_signals_to_publish_state
+from .signals import set_signals_to_publish_passed_events
 
 from .track_sections import section_callback_type
 from .track_sections import create_section
@@ -41,6 +47,8 @@ from .track_sections import section_occupied
 from .track_sections import section_label
 from .track_sections import set_section_occupied
 from .track_sections import clear_section_occupied
+from .track_sections import subscribe_to_section_updates
+from .track_sections import set_sections_to_publish_state
 
 from .track_sensors import track_sensor_callback_type
 from .track_sensors import create_track_sensor
@@ -56,17 +64,16 @@ from .dcc_control import map_semaphore_signal
 from .dcc_control import map_traintech_signal
 from .dcc_control import map_semaphore_signal
 from .dcc_control import map_dcc_point
+from .dcc_control import subscribe_to_dcc_command_feed
+from .dcc_control import set_node_to_publish_dcc_commands
 
 from .mqtt_interface import configure_networking
-from .mqtt_interface import subscribe_to_dcc_command_feed
-from .mqtt_interface import subscribe_to_section_updates
-from .mqtt_interface import subscribe_to_signal_updates
-from .mqtt_interface import subscribe_to_signal_passed_events
-from .mqtt_interface import set_sections_to_publish_state
-from .mqtt_interface import set_signals_to_publish_state
-from .mqtt_interface import set_signals_to_publish_passed_events
 
 from .file_interface import load_layout_state
+
+from .block_instruments import block_callback_type
+from .block_instruments import create_block_instrument
+from .block_instruments import block_section_ahead_clear
 
 __all__ = [
       # Public point types
@@ -108,6 +115,10 @@ __all__ = [
         'set_approach_control',
         'clear_approach_control',
         'trigger_timed_signal',
+        'subscribe_to_signal_updates',
+        'subscribe_to_signal_passed_events',
+        'set_signals_to_publish_state',
+        'set_signals_to_publish_passed_events',
       # Public track_section types
         'section_callback_type',
       # Public track_section functions
@@ -116,6 +127,8 @@ __all__ = [
         'section_label',
         'set_section_occupied',
         'clear_section_occupied',
+        'subscribe_to_section_updates',
+        'set_sections_to_publish_state',
       # public track_sensor types
         'track_sensor_callback_type',
       # public track_sensor functions
@@ -130,16 +143,16 @@ __all__ = [
         'map_traintech_signal',
         'map_semaphore_signal',
         'map_dcc_point',
+        'subscribe_to_dcc_command_feed',
+        'set_node_to_publish_dcc_commands',
       # Public networking functions
         'configure_networking',
-        'subscribe_to_dcc_command_feed',
-        'subscribe_to_section_updates',
-        'subscribe_to_signal_updates',
-        'subscribe_to_signal_passed_events',
-        'set_sections_to_publish_state',
-        'set_signals_to_publish_state',
-        'set_signals_to_publish_passed_events',
       # Public File load/save functions
-        'load_layout_state'
+        'load_layout_state',
+      # public block instrument types
+        'block_callback_type',
+      # Public block instrument functions
+        'create_block_instrument',
+        'block_section_ahead_clear'
            ]
 

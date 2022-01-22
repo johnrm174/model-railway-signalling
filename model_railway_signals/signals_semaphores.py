@@ -1,26 +1,10 @@
-
+# --------------------------------------------------------------------------------
 # This module is used for creating and managing semaphore signal types
-#
-# Currently supported sub types:
-#           - with or without a subsidary signal (on the main arm)
-#           - with or without junction signals (LH and/or RH diverging routes)
-#           - with or without subsidary signals (LH, RH and/or MAIN routes)
-#           - with or without a theatre type route indicator
-#           - with or without a manual control button
-#
-# Common features supported by Semaphore signals
-#           - set_route_indication (Route Type and theatre text)
-#           - lock_subsidary_signal / unlock_subsidary_signal
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
-#           - set_approach_control / clear_approch_control
-#           - trigger_timed_signal
 # --------------------------------------------------------------------------------
 
 from . import common
 from . import signals_common
 from . import dcc_control
-from . import mqtt_interface
 from . import file_interface
 
 from typing import Union
@@ -278,7 +262,10 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
-        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        loaded_state = file_interface.get_initial_item_state("signals",sig_id)
+        # Note that for Enum types we load the value - need to turn this back into the Enum
+        if loaded_state["routeset"] is not None:
+            loaded_state["routeset"] = signals_common.route_type(loaded_state["routeset"])
         # Set the initial state from the "loaded" state
         if loaded_state["releaseonred"]: signals_common.set_approach_control(sig_id,release_on_yellow=False)
         if loaded_state["releaseonyel"]: signals_common.set_approach_control(sig_id,release_on_yellow=True)
@@ -482,13 +469,13 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", True, log_message)
     else:
-            # Its either a Home signal at DANGER or a Distant Signal at CAUTION
-            # In either case - all the main signal arms should be set to ON
-            update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
-            update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
-            update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
-            update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
-            update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
+        # Its either a Home signal at DANGER or a Distant Signal at CAUTION
+        # In either case - all the main signal arms should be set to ON
+        update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
+        update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
+        update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
+        update_signal_arm (sig_id, "rh1_signal", "rh1sigoff", "rh1sigon", False, log_message)
+        update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
     return()
 
 # -------------------------------------------------------------------------
@@ -562,7 +549,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         signals_common.enable_disable_theatre_route_indication(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        mqtt_interface.publish_signal_state(sig_id)            
+        signals_common.publish_signal_state(sig_id)            
 
     return()
 
@@ -624,7 +611,7 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
             update_semaphore_signal(sig_id)
             # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
             # mqtt interface has been successfully configured and the signal has been set to publish passed events
-            mqtt_interface.publish_signal_passed_event(sig_id)
+            signals_common.publish_signal_passed_event(sig_id)
             signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
         else:
             update_semaphore_signal(sig_id)
@@ -643,13 +630,16 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
         return()
 
-    # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
-    # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
-    if start_delay > 0:
-        common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+    # Don't initiate a timed signal sequence if a shutdown has already been initiated
+    if common.shutdown_initiated:
+        logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
     else:
-        timed_signal_sequence_start(start_delay, time_delay)
+        # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
+        # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
+        if start_delay > 0:
+            common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+        else:
+            timed_signal_sequence_start(start_delay, time_delay)
     return()
-
 
 ###############################################################################

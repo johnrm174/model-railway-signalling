@@ -28,69 +28,72 @@ mqtt_debug = False
 # This is the main callback function for the upper line
 #----------------------------------------------------------------------
 
-def upper_line_callback_function(item_id,callback_type):
-
+def upper_line_callback(item_id,callback_type):
     print ("Callback for upper line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-
+    # We want the local Section 100 to mirror any changes made to Box2 Section 3
+    # So we get an indication of the "next Train" that is going to enter our section
+    if callback_type == section_callback_type.section_updated:
+        if item_id == "Box2-3":
+            if section_occupied ("Box2-3"): set_section_occupied(100,section_label("Box2-3"))
+            else: clear_section_occupied(100)
     # Deal with changes to the Track Occupancy (based on signal passed events)
     if callback_type == sig_callback_type.sig_passed:
-        if item_id == 1:
-            set_section_occupied(1,clear_section_occupied(100))
-        elif item_id == 2:
-            set_section_occupied(2,clear_section_occupied(1))
-        elif item_id == 3:
-            set_section_occupied(3,clear_section_occupied(2))
-        elif item_id == "Box2-1":
-            clear_section_occupied(3)
-
+        if item_id == 1: set_section_occupied(1,section_label("Box2-3"))
+        elif item_id == 2: set_section_occupied(2,clear_section_occupied(1))
+        elif item_id == 3: set_section_occupied(3,clear_section_occupied(2))
+        elif item_id == "Box2-1": clear_section_occupied(3)
     # Override signals based on track occupancy
-    # Upper Line
     if section_occupied(1): set_signal_override(1)
     else: clear_signal_override(1)
     if section_occupied(2): set_signal_override(2)
     else: clear_signal_override(2)
     if section_occupied(3): set_signal_override(3)
     else: clear_signal_override(3)
-
     # Refresh the signal aspects based on the route settings
     # The order is important - Need to work back along the route
     update_signal(3, sig_ahead_id = "Box2-1")
     update_signal(2, sig_ahead_id = 3)
     update_signal(1, sig_ahead_id = 2)
-        
+    return()
+
+#----------------------------------------------------------------------
+# This is the main callback function for the middle line
+#----------------------------------------------------------------------
+
+def middle_line_callback(item_id,callback_type):
+    print ("Callback for mifddle line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+    # Deal with changes to the Track Occupancy (based on signal events)
+    if callback_type == sig_callback_type.sig_passed:
+        if item_id == 7: set_section_occupied(7,section_label("Box2-9"))
+        elif item_id == 8: set_section_occupied(8,clear_section_occupied(7))
+        elif item_id == 9: set_section_occupied(9,clear_section_occupied(8))        
+        elif item_id == "Box2-7": clear_section_occupied(9)
+    # Interlock the starter signal with the State of the Block Instrument
+    if block_section_ahead_clear(2) or signal_clear(9): unlock_signal(9)
+    else: lock_signal(9)
+    # Do some simple interlocking for the distant signal
+    if (not signal_clear(9) or not signal_clear(8)) and not signal_clear(7):lock_signal(7)
+    else: unlock_signal(7)
     return()
 
 #----------------------------------------------------------------------
 # This is the main callback function for the lower line
 #----------------------------------------------------------------------
 
-def lower_line_callback_function(item_id,callback_type):
-
+def lower_line_callback(item_id,callback_type):
     print ("Callback for lower line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-
-    # We want the local Section 10 to mirror any changes made to Box2 Section 12
-    # So we get an indication of the "next Train" that is going to enter our section
-    if callback_type == section_callback_type.section_updated:
-        if item_id == "Box2-12":
-            if section_occupied ("Box2-12"):
-                set_section_occupied(10,section_label("Box2-12"))
-            else:
-                clear_section_occupied(10)
-
     # Deal with changes to the Track Occupancy (based on signal events)
     if callback_type == sig_callback_type.sig_passed:
-        if item_id == 11:
-            set_section_occupied(11,section_label("Box2-12"))
-        elif item_id == 12:
-            clear_section_occupied(11)
-            trigger_timed_signal(12,0,5)
-
-    # Override signals based on track occupancy
-    if section_occupied("Box2-12"): set_signal_override(10)
-    else: clear_signal_override(10)
-    if section_occupied(11): set_signal_override(11)
-    else: clear_signal_override(11)
-        
+        if item_id == 10: set_section_occupied(10,section_label("Box2-12"))
+        elif item_id == 11: set_section_occupied(11,clear_section_occupied(10))
+        elif item_id == 12: set_section_occupied(12,clear_section_occupied(11))        
+        elif item_id == "Box2-10": clear_section_occupied(12)
+    # Interlock the starter signal with the State of the Block Instrument
+    if block_section_ahead_clear(1) or signal_clear(12): unlock_signal(12)
+    else: lock_signal(12)
+    # Do some simple interlocking for the distant signal
+    if (not signal_clear(12) or not signal_clear(11)) and not signal_clear(10):lock_signal(10)
+    else: unlock_signal(10)
     return()
 
 #------------------------------------------------------------------------------------
@@ -101,14 +104,13 @@ def lower_line_callback_function(item_id,callback_type):
 print ("Creating Window and Canvas")
 window = Tk()
 window.title("Simple Networking Example - Box1 (Pi Sprog Node)")
-canvas = Canvas(window,height=450,width=750,bg="grey85")
+canvas = Canvas(window,height=700,width=750,bg="grey85")
 canvas.pack()
 
 print ("Loading Layout State on startup")
-# Configure the loading and saving of layout state. If file_name is 'None' then
-# the name of the main python script will be used with a '.sig' extension
+# Configure the loading and saving of layout state.
 # For this example, the filename will be 'test_networking_1.sig'
-load_layout_state(file_name=None,load_file_dialog=False,save_file_dialog=False)
+load_layout_state()
 
 print ("Initialising Pi Sprog")
 initialise_pi_sprog (dcc_debug_mode=False)
@@ -120,82 +122,118 @@ print ("Creating DCC Mappings for Signals")
 map_traintech_signal (sig_id = 1, base_address = 10)
 map_traintech_signal (sig_id = 2, base_address = 20)
 map_traintech_signal (sig_id = 3, base_address = 30)
-# Signals 10,11,12 assume a single address mapping for the semaphore arms
-map_semaphore_signal (sig_id = 10, main_signal = 101)
-map_semaphore_signal (sig_id = 11, main_signal = 102)
-map_semaphore_signal (sig_id = 12, main_signal = 103)
+# Signals 7-12 assume a single address mapping for the semaphore arms
+map_semaphore_signal (sig_id = 7, main_signal = 107)
+map_semaphore_signal (sig_id = 8, main_signal = 108)
+map_semaphore_signal (sig_id = 9, main_signal = 109)
+map_semaphore_signal (sig_id = 10, main_signal = 110)
+map_semaphore_signal (sig_id = 11, main_signal = 111)
+map_semaphore_signal (sig_id = 12, main_signal = 112)
 
 print ("Initialising MQTT Client and connecting to external Broker")
 # Configure the MQTT Broker networking feature to allow this application node to act as a remote
 # DCC command station for other application nodes (i.e. forward received DCC commands to the Pi-Sprog) 
 configure_networking(broker_host ="broker.emqx.io", network_identifier="network1", broker_port=1883,
-                     node_identifier= "Box1",publish_dcc_commands=False, mqtt_enhanced_debugging=mqtt_debug )
-# Configure the upper line events/updates we want to publish/subscribe to
-set_sections_to_publish_state(3)
-subscribe_to_signal_updates("Box2",upper_line_callback_function,1)
-subscribe_to_signal_passed_events("Box2",upper_line_callback_function,1)
-# Configure the lower line events/updates we want to publish/subscribe to
-subscribe_to_section_updates("Box2",lower_line_callback_function,12)
-set_signals_to_publish_state(10)
-set_signals_to_publish_passed_events(11)
-# Box 1 is the DCC Command station so we subscribe to DCC events from Box2
+                     node_identifier= "Box1", mqtt_enhanced_debugging=mqtt_debug )
+# Configure the events/updates we want to publish/subscribe to
+set_sections_to_publish_state(3,9,12)
+set_signals_to_publish_passed_events(1,7,10)
+set_signals_to_publish_state(1)
+subscribe_to_section_updates("Box2",upper_line_callback,3)
+subscribe_to_signal_passed_events("Box2",upper_line_callback,1)
+subscribe_to_signal_updates("Box2",upper_line_callback,1)
+subscribe_to_section_updates("Box2",middle_line_callback,9)
+subscribe_to_signal_passed_events("Box2",middle_line_callback,7)
+subscribe_to_section_updates("Box2",lower_line_callback,12)
+subscribe_to_signal_passed_events("Box2",lower_line_callback,10)
 subscribe_to_dcc_command_feed("Box2")
                      
 print ("Drawing Layout Schematic")
 canvas.create_line(0,150,750,150,fill="black",width=3) 
+canvas.create_line(0,210,750,210,fill="black",width=2,dash=(5,2))
 canvas.create_line(0,300,750,300,fill="black",width=3)
+canvas.create_line(0,350,750,350,fill="black",width=3)
 canvas.create_text (425,30,text="Section 3 is configured to publish state updates (to Box 2)")
 canvas.create_text (425,50,text="State Updates from Box 2 Signal 1 are used to update Signal 3 Aspect")
 canvas.create_text (425,70,text="Passed Events from Box 2 Signal 1 are used to update track occupancy")
-canvas.create_text (400,210,text="Signal 10 is configured to publish Signal State Updates (to Box2)")
-canvas.create_text (400,230,text="Signal 11 is configured to publish Signal Passed Events (to Box2)")
-canvas.create_text (350,375,text="Distant Signal 10 is mounted on the Home Starter (signal 12) of Box 2")
-canvas.create_text (680,400,text="Box 2 ===>>")
+
+canvas.create_text (375,500,text="The Block Instruments in the bottom example are linked\n"
+                                 "with the  instruments in the other networking programme\n"+
+                                 "to represent a 'continuous loop' arrangement. Right click\n"+
+                                 "on the TELEGRAPH button to bring up a list of bell codes" )
+canvas.create_text (650,430,text="Box 2 ===>>")
 
 print ("Creating track Occupancy Sections")
 # Upper Line Sections
-# Section 100 is an editable section to "set" the next approaching train
-canvas.create_text (75,20,text="Right Click to")
-canvas.create_text (75,40,text="Set Next Train")
-create_section (canvas,100,75,65,section_callback=upper_line_callback_function)
-create_section (canvas,1,175,150,section_callback=upper_line_callback_function)
-create_section (canvas,2,425,150,section_callback=upper_line_callback_function)
-create_section (canvas,3,675,150,section_callback=upper_line_callback_function)
+# Section 100 is an non editable section to show the next approaching train
+canvas.create_text (75,20,text="Next Train")
+canvas.create_text (75,40,text="From Box 2")
+create_section (canvas,100,75,65, editable=False)
+create_section (canvas,1,175,150,section_callback=upper_line_callback)
+create_section (canvas,2,425,150,section_callback=upper_line_callback)
+create_section (canvas,3,675,150,section_callback=upper_line_callback)
+# Middle Line Sections
+create_section (canvas,7,175,300,section_callback=middle_line_callback)
+create_section (canvas,8,425,300,section_callback=middle_line_callback)
+create_section (canvas,9,675,300,section_callback=middle_line_callback)
 # Lower Line Sections
-# Section 11 is a non editable section to "mirror" an external section
-create_section (canvas,10,575,300,editable=False)
-create_section (canvas,11,325,300,section_callback=lower_line_callback_function)
+create_section (canvas,10,575,350,section_callback=lower_line_callback)
+create_section (canvas,11,325,350,section_callback=lower_line_callback)
+create_section (canvas,12,75,350,section_callback=lower_line_callback)
 
 print ("Creating Signals")
 create_colour_light_signal (canvas, 1, 50, 150,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback = upper_line_callback_function,
+                            sig_callback = upper_line_callback,
                             sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas, 2, 300, 150,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback = upper_line_callback_function,
+                            sig_callback = upper_line_callback,
                             sig_passed_button = True,
                             refresh_immediately = False)
 create_colour_light_signal (canvas, 3, 550, 150,
                             signal_subtype = signal_sub_type.four_aspect,
-                            sig_callback = upper_line_callback_function,
+                            sig_callback = upper_line_callback,
                             sig_passed_button = True,
                             refresh_immediately = False)
-create_semaphore_signal (canvas, 10, 700, 300,
+
+create_semaphore_signal (canvas, 7, 50, 300,
+                        distant = True,
+                        sig_callback = middle_line_callback,
+                        sig_passed_button = True)
+create_semaphore_signal (canvas, 8, 300, 300,
+                        sig_callback = middle_line_callback,
+                        sig_passed_button = True)
+create_semaphore_signal (canvas, 9, 550, 300,
+                        sig_callback = middle_line_callback,
+                        sig_passed_button = True)
+
+create_semaphore_signal (canvas, 10, 700, 350,
                         distant = True, orientation = 180,
-                        sig_callback = lower_line_callback_function)
-create_semaphore_signal (canvas, 11, 450, 300, orientation = 180,
-                        sig_callback = lower_line_callback_function,
+                        sig_callback = lower_line_callback,
                         sig_passed_button = True)
-create_semaphore_signal (canvas, 12, 200, 300, orientation = 180,
-                        sig_callback = lower_line_callback_function,
+create_semaphore_signal (canvas, 11, 450, 350, orientation = 180,
+                        sig_callback = lower_line_callback,
                         sig_passed_button = True)
+create_semaphore_signal (canvas, 12, 200, 350, orientation = 180,
+                        sig_callback = lower_line_callback,
+                        sig_passed_button = True)
+
+print ("Creating Block Instruments")
+create_block_instrument(canvas, 1, 100, 525,
+                        block_callback=lower_line_callback,
+                        bell_sound_file='bell-ring-01.wav',
+                        linked_to = "Box2-2")
+create_block_instrument(canvas, 2, 650, 525,
+                        block_callback=middle_line_callback,
+                        bell_sound_file='bell-ring-02.wav',
+                        linked_to = "Box2-1")
 
 print ("Setting Initial Interlocking")
 # Set the initial interlocking conditions by running the main callback function
-upper_line_callback_function(None,None)
-lower_line_callback_function(None,None)
+upper_line_callback(None,None)
+lower_line_callback(None,None)
 
 print ("Entering Main Event Loop")
 # Before we enter the main loop we need to force focus on the main TKinter window.

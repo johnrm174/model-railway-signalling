@@ -69,8 +69,14 @@ class sig_type(enum.Enum):
 # Signals are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
 
-# Define an empty dictionary 
 signals:dict = {}
+
+# -------------------------------------------------------------------------
+# Global lists for Signals configured to publish events to the MQTT Broker
+# -------------------------------------------------------------------------
+
+list_of_signals_to_publish_passed_events=[]
+list_of_signals_to_publish_state_changes=[]
 
 # -------------------------------------------------------------------------
 # Common Function to check if a Signal exists in the dictionary of Signals
@@ -119,12 +125,13 @@ def subsidary_button_event (sig_id:int):
 def sig_passed_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    # Pulse the signal passed button to provide a visual indication
-    signals[str(sig_id)]["passedbutton"].config(bg="red")
-    common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+    # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
+    if not common.shutdown_initiated:
+        signals[str(sig_id)]["passedbutton"].config(bg="red")
+        common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
     # mqtt interface has been successfully configured and the signal has been set to publish passed events
-    mqtt_interface.publish_signal_passed_event(sig_id)
+    publish_signal_passed_event(sig_id)
     # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
@@ -133,8 +140,9 @@ def approach_release_button_event (sig_id:int):
     global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
     # Pulse the approach release button to provide a visual indication
-    signals[str(sig_id)]["releasebutton"].config(bg="red")
-    common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+    if not common.shutdown_initiated:
+        signals[str(sig_id)]["releasebutton"].config(bg="red")
+        common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
     # Clear the approach control and refresh the signal
     clear_approach_control(sig_id)
     auto_refresh_signal(sig_id)
@@ -471,7 +479,6 @@ def create_theatre_route_elements (canvas,sig_id:int,
     signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
     return()
 
-
 # -------------------------------------------------------------------------
 # Common function to change the theatre route indication
 # (shared by Colour Light and semaphore signal types)
@@ -522,5 +529,55 @@ def enable_disable_theatre_route_indication (sig_id):
             signals[str(sig_id)]["theatreenabled"] = True
             dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=True,sig_at_danger=False)
     return()
+
+# --------------------------------------------------------------------------------
+# Callbacks for handling MQTT messages received from a remote Signal
+# --------------------------------------------------------------------------------
+
+def handle_mqtt_signal_updated_event(message):
+    global logging
+    global signals
+    if "sourceidentifier" in message.keys() and "sigstate" in message.keys():
+        signal_identifier = message["sourceidentifier"]
+        # The sig state is an enumeration type - so its the VALUE that gets passed in the message
+        signals[signal_identifier]["sigstate"] = signal_state_type(message["sigstate"])
+        logging.info("Signal "+signal_identifier+": State update from remote signal *****************************")
+        logging.info ("Signal "+signal_identifier+": Aspect has changed to : "+
+                            str(signals[signal_identifier]["sigstate"]).rpartition('.')[-1])
+        # Make the external callback (if one has been defined)
+        signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_updated)
+    return()
+
+def handle_mqtt_signal_passed_event(message):
+    global logging
+    if "sourceidentifier" in message.keys():
+        signal_identifier = message["sourceidentifier"]
+        logging.info("Signal "+signal_identifier+": Remote Signal Passed Event ***********************************")
+        # Make the external callback (if one has been defined)
+        signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_passed)
+    return()
+
+# --------------------------------------------------------------------------------
+# Common functions for building and sending MQTT messages - but only if the
+# Signal has been configured to publish the specified updates via the mqtt broker
+# --------------------------------------------------------------------------------
+
+def publish_signal_state(sig_id:int):
+    if sig_id in list_of_signals_to_publish_state_changes:
+        data = {}
+        # The sig state is an enumeration type - so its the VALUE that gets passed in the message
+        data["sigstate"] = signals[str(sig_id)]["sigstate"].value
+        log_message = "Signal "+str(sig_id)+": Publishing signal state to MQTT Broker"
+        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
+        return()
+
+def publish_signal_passed_event(sig_id:int):
+    if sig_id in list_of_signals_to_publish_passed_events:
+        data = {}
+        log_message = "Signal "+str(sig_id)+": Publishing signal passed event to MQTT Broker"
+        # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
+        mqtt_interface.send_mqtt_message("signal_passed_event",sig_id,data=data,log_message=log_message,retain=False)
+        return()
 
 #################################################################################################

@@ -1,8 +1,11 @@
-# --------------------------------------------------------------------------------
-# This module is used for creating and managing point objects
-# Only basic left hand and right hand points are currently supported but
-# you should be able to mimic most formations with these basic types
+#---------------------------------------------------------------------------------------------------
+# This module is used for creating and managing point objects on the local schematic. Only basic left
+# hand and right hand points are currently supported but you should be able to mimic most layout
+# formations with these basic types
+#---------------------------------------------------------------------------------------------------
 #
+# Public Types and Functions:
+# 
 # point_type (use when creating points)
 #   point_type.RH
 #   point_type.LH
@@ -11,10 +14,10 @@
 #   point_callback_type.point_switched (point has been switched)
 #   point_callback_type.fpl_switched (facing point lock has been switched)
 # 
-# create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) that 
-#                make up the point (so calling programs can later update them if required (e.g. change 
-#                the colour of the lines to represent the route that has been set up)
-#                Returned list comprises: [straight blade, switched blade, straight route ,switched route]
+# create_point - Creates a point object and returns a list of the tkinter drawing objects (lines) 
+#                that make up the point so calling programs can later update them if required 
+#                (e.g. change the colour of the lines to represent the route that has been set up)
+#              - Returns: [straight blade, switched blade, straight route ,switched route]
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the point is to be displayed
 #       point_id:int - The ID for the point - also displayed on the point button
@@ -23,28 +26,27 @@
 #       colour:str - Any tkinter colour can be specified as a string
 #   Optional Parameters:
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
-#       point_callback - The function to call when a point button is pressed - default is no callback
-#                         Note that the callback function returns (item_id, callback type)
-#       reverse:bool - If the switching logic is to be reversed - Default is False
-#       fpl:bool - If the point is to have a Facing point lock (FPL) - Default is False (no FPL)
-#       also_switch:int - the Id of another point to automatically switch with this point - Default none
-#       auto:bool - If the point is to be fully automatic (e.g switched with another point) - Default False.
+#       point_callback - The function to call when the point is changed - default = no callback
+#                        Note that the callback function returns (item_id, callback type)
+#       reverse:bool - If the switching logic is to be reversed - Default = False
+#       fpl:bool - If the point is to have a Facing point lock - Default = False (no FPL)
+#       also_switch:int - the Id of another point to switch with this point - Default = None
+#       auto:bool - Point is fully automatic (i.e. no point control buttons) - Default = False.
 # 
-# lock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+# lock_point(*point_id:int) - use for point/signal interlocking (multiple IDs can be specified)
 # 
-# unlock_point(*point_id) - use for point/signal interlocking (multiple Point_IDs can be specified)
+# unlock_point(*point_id:int) - use for point/signal interlocking (multiple IDs can be specified)
 # 
-# toggle_point(point_id) - use for route setting (can use 'point_switched' to find the state first)
+# toggle_point(point_id:int) - use for route setting (use 'point_switched' to find state first)
 # 
-# toggle_fpl(point_id) - use for route setting (can use 'fpl_active' to find the state first)
+# toggle_fpl(point_id:int) - use for route setting (use 'fpl_active' to find state first)
 # 
-# point_switched (point_id) - returns the state of the point (True/False) - to support point/signal interlocking
+# point_switched (point_id:int) - returns the point state (True/False) - to support interlocking
 # 
-# fpl_active (point_id) - returns the state of the FPL (True/False) - to support point/signal interlocking
-#                       - Will always return True if the point does not have a Facing point Lock - to enable full 
-#                       - interlocking logic to be written for layouts but then inhibited for simplified control 
+# fpl_active (point_id:int) - returns the FPL state (True/False) - to support interlocking
+#                           - Will return True if the point does not have a Facing point Lock
 #
-# -------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 from . import dcc_control
 from . import common
@@ -71,7 +73,6 @@ class point_callback_type(enum.Enum):
 # Points are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
 
-# Define an empty dictionary 
 points: dict = {}
 
 # -------------------------------------------------------------------------
@@ -336,7 +337,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         
         # Get the initial state for the point (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
-        loaded_state = file_interface.get_initial_point_state(point_id)
+        loaded_state = file_interface.get_initial_item_state("points",point_id)
         # Toggle the FPL if FPL is ACTIVE ("switched" will be 'None' if no data was loaded)
         # We toggle on False as points with FPLs are created with the FPL active by default
         if fpl and loaded_state["fpllock"] == False: toggle_fpl(point_id)

@@ -1,22 +1,9 @@
 # --------------------------------------------------------------------------------
 # This module is used for creating and managing Ground Position Light signal objects
-#
-# Currently supported sub-types :
-#       - Groud position light  
-#           - Early - red/white / white/white
-#           - Modern (post 1996) - red/red / white /white
-#       - Shunt Ahead position light
-#           - Early - yellow/white / white/white
-#           - Modern (post 1996) yellow/yellow / white /white
-#
-# Common features supported by Ground Position Colour Light signals
-#           - lock_signal / unlock_signal
-#           - set_signal_override / clear_signal_override
 # --------------------------------------------------------------------------------
 
 from . import signals_common
 from . import dcc_control
-from . import mqtt_interface
 from . import file_interface
 from . import common
 
@@ -85,7 +72,7 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
-        loaded_state = file_interface.get_initial_signal_state(sig_id)
+        loaded_state = file_interface.get_initial_item_state("signals",sig_id)
         # Set the initial state from the "loaded" state - We only need to set the 'override' and
         # 'sigclear' for ground signals - everything else gets set when the signal is updated
         if loaded_state["override"]: signals_common.set_signal_override(sig_id)
@@ -141,7 +128,7 @@ def update_ground_position_signal (sig_id:int):
         
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        mqtt_interface.publish_signal_state(sig_id)            
+        signals_common.publish_signal_state(sig_id)            
         
     return ()
 

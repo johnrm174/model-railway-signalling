@@ -1,36 +1,44 @@
-#----------------------------------------------------------------------------------------
-# This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi UART. It does not provide
-# a fully-functional interface for All DCC command and control functions - just the minimum set needed to support the driving
-# of signals and points via a selection of common DCC Accessory decoders.Basic CV Programming is also supported - primarily 
-# as an aid to testing, but for full decoder programming the recommendation is to use JRMI DecoderPro.
+#--------------------------------------------------------------------------------------------------
+# This provides a basic CBUS interface fpor communicating with the Pi-SPROG3 via the Raspberry Pi 
+# UART. It does not provide a fully-functional interface for all DCC command and control functions,
+# just the minimum set needed to support the driving of signals and points via a selection of common
+# DCC Accessory decoders. Basic CV Programming is also supported - primarily as an aid to testing. 
+# For full decoder programming the recommendation is to use JRMI DecoderPro or similar.
+#--------------------------------------------------------------------------------------------------
 #
-#   initialise_pi_sprog (Open the comms port to the Pi Sprog)
-#      Optional Parameters:
-#         port_name:str - The Serial port to use for communicating with the Pi-SPROG 3 - Default="/dev/serial0",
-#         baud_rate:int - The baud rate to use for the serial port - Default = 115200,
-#         dcc_debug_mode:bool - Sets an additional level of logging for the CBUS commands being sent to the Pi-SPROG. 
-#                             - Will also Request and report the command station status (from the Pi-SPROG-3)
+# Public Types and Functions:
 # 
-#   service_mode_write_cv (programmes a CV in direct bit mode and waits for response)
-#              (events are only sent if we think the track power is currently switched on)
-#              (if acknowledgement isn't received within 5 seconds then the request times out)
-#      Mandatory Parameters:
-#         cv:int - The CV (Configuration Variable) to be programmed
-#         value:int - The value to programme
+# initialise_pi_sprog - Open and configures the serial comms port to the Pi Sprog
+#    Optional Parameters:
+#       port_name:str - The serial port to use for the Pi-SPROG 3 - Default="/dev/serial0",
+#       baud_rate:int - The baud rate to use for the serial port - Default = 115200,
+#       dcc_debug_mode:bool - Set to 'True' to log the CBUS commands being sent to the Pi-SPROG
+#                             If 'True' this initialisation function will also Request and report
+#                             the command station status from the Pi-SPROG-3 (default = False). 
 # 
-#   request_dcc_power_on (sends a request to switch on the track power and waits for acknowledgement)
-#          returns True if we have received acknowledgement that Track Power has been turned on
-#          returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
+# service_mode_write_cv - programmes a CV in direct bit mode and waits for response
+#                       (events are only sent if the track power is currently switched on)
+#                       (request times out after 5 secs if the request was unsuccessful)
+#    Mandatory Parameters:
+#       cv:int - The CV (Configuration Variable) to be programmed
+#       value:int - The value to programme
 # 
-#   request_dcc_power_off (sends a request to switch off the track power and waits for acknowledgement)
-#          returns True if we have received acknowledgement that Track Power has been turned off
-#          returns False if acknowledgement isn't received within 5 seconds (i.e. request timeout)
+# request_dcc_power_on - sends request to switch on the power and waits for acknowledgement
+#                  (requests only sent if the Comms Port has been successfully opened/configured)
+#        returns True - if we have  acknowledgement that Track Power has been turned on
+#        returns False - if the request times out (after 5 seconds)
+# 
+# request_dcc_power_off - sends request to switch off the power and waits for acknowledgement
+#                  (requests only sent if the Comms Port has been successfully opened/configured)
+#        returns True - if we have  acknowledgement that Track Power has been turned off
+#        returns False - if the request times out (after 5 seconds)
 # 
 # Functions are also included in the Code base for sending direct DCC accessory Packets
 # and Extended DCC Accessory Packets. However, I have as yet been unable to get these
 # Working with the Signallist SC1 Decoder - so these are unproven
 #
 # --------------------------------------------------------------------------------------------
+#
 # Note that the Pi-SPROG-3 needs the UART interfaces to be swapped so that
 # serial0 is routed to the GPIO connector instead of being used for BlueTooth.
 # The configuration procedure is documented below
@@ -49,6 +57,7 @@
 #        Remove ‘console=serial0,115200’
 #        Note that this file must contain only one line
 # 5) Reboot the Raspberry Pi
+#
 # --------------------------------------------------------------------------------------------
 
 import threading

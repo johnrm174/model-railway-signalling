@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # These functions provide the means to map the signals and points on the layout to the series of DCC 
 # commands needed to control them.
 # 
@@ -17,68 +17,128 @@
 # Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no DCC mapping 
 # has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
 # schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
-#
-#   map_dcc_signal - Map a signal to one or more DCC Addresses
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to create a DCC mapping for
-#      Optional Parameters:
-#         auto_route_inhibit:bool - If the signal inhibits route indications at DANGER (default=False)
-#         proceed[[add:int,state:bool],] - List of DCC addresses/states (default = no mapping)
-#         danger [[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-#         caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-#         prelim_caution[[add:int,state:bool],] - List of DCC addresses/states (default = No mapping)
-#         LH1[[add:int,state:bool],] - List of DCC addresses/states for "LH45" (default = No Mapping)
-#         LH2[[add:int,state:bool],] - List of DCC addresses/states for "LH90" (default = No Mapping)
-#         RH1[[add:int,state:bool],] - List of DCC addresses/states for "RH45" (default = No Mapping)
-#         RH2[[add:int,state:bool],] - List of DCC addresses/states for "RH90" (default = No Mapping)
-#         MAIN[[add:int,state:bool],] - List of DCC addresses/states for "MAIN" (default = No Mapping)
-#         NONE[[add:int,state:bool],] - List of DCC addresses/states to inhibit routes (default = No Mapping)
-#                 Note that you should ALWAYS provide mappings for NONE if you are using feather route indications
-#                 unless the DCC signal automatically inhibits route indications when displaying a DANGER aspect
-#         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
-#                 Each entry comprises the "character" and the associated list of DCC addresses/states
-#                 "#" is a special character - which means inhibit all indications (when signal is at danger)
-#                 Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
-#                 unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
-#         subsidary:int - Single DCC address for the "position light" indication (default = No Mapping)
+#----------------------------------------------------------------------------------------------------
 # 
-#   map_traintech_signal - Generate the mappings for a TrainTech signal
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to create a DCC mapping for
-#         base_address:int - The base address of the signal (the signal will take 4 consecutive addresses)
-#      Optional Parameters:
-#         route_address:int - The address for the route indicator (Feather or Theatre) - Default = 0 (no indicator)
-#         theatre_route:str - The character to be associated with the Theartre display - Default = "NONE" (no Text)
-#         feather_route:route_type - The route to be associated with the feather - Default = NONE (no route)
+# Public types and functions:
 # 
-#   map_semaphore_signal - Generate the mappings for a semaphore signal (DCC address mapped to each arm)
-#      Mandatory Parameters:
-#         sig_id:int - The ID for the signal to create a DCC mapping for
-#         main_signal:int     - single DCC address for the main signal arm  (default = No Mapping)
-#      Optional Parameters:
-#         main_subsidary:int  - single DCC address for the main subsidary arm (default = No Mapping)
-#         lh1_signal:int      - single DCC address for the LH1 signal arm (default = No Mapping)
-#         lh1_subsidary:int   - single DCC address for the LH1 subsidary arm (default = No Mapping)
-#         lh2_signal:int      - single DCC address for the LH2 signal arm (default = No Mapping)
-#         lh2_subsidary:int   - single DCC address for the LH2 subsidary arm (default = No Mapping)
-#         rh1_signal:int      - single DCC address for the RH1 signal arm  (default = No Mapping)
-#         rh1_subsidary:int   - single DCC address for the RH1 subsidary arm (default = No Mapping)
-#         rh2_signal:int      - single DCC address for the RH2 signal arm  (default = No Mapping)
-#         rh2_subsidary:int   - single DCC address for the RH2 subsidary arm (default = No Mapping)
-#         THEATRE[["character",[add:int,state:bool],],] - List of possible theatre indicator states (default = No Mapping)
-#                 Each entry comprises the "character" and the associated list of DCC addresses/states
-#                 "#" is a special character - which means inhibit all indications (when signal is at danger)
-#                 Note that you should ALWAYS provide mappings for '#' if you are using a theatre route indicator
-#                 unless the DCC signal itself inhibits route indications when displaying a DANGER aspect
+# map_dcc_signal - Map a signal to one or more DCC Addresses
+#    Mandatory Parameters:
+#       sig_id:int - The ID for the signal to create a DCC mapping for
+#    Optional Parameters:
+#       auto_route_inhibit:bool - If signal inhibits route indication at DANGER (default=False)
+#       proceed[[add:int,state:bool],] -  DCC addresses/states (default = no mapping)
+#       danger [[add:int,state:bool],] - DCC addresses/states (default = No mapping)
+#       caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
+#       prelim_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
+#       LH1[[add:int,state:bool],] - DCC addresses/states for "LH45" (default = No Mapping)
+#       LH2[[add:int,state:bool],] - DCC addresses/states for "LH90" (default = No Mapping)
+#       RH1[[add:int,state:bool],] - DCC addresses/states for "RH45" (default = No Mapping)
+#       RH2[[add:int,state:bool],] - DCC addresses/states for "RH90" (default = No Mapping)
+#       MAIN[[add:int,state:bool],] - DCC addresses/states for "MAIN" (default = No Mapping)
+#       NONE[[add:int,state:bool],] - DCC addresses/states to inhibit the route indication when 
+#               the signal is displaying DANGER - unless the DCC signal automatically inhibits
+#               route indications (see auto_route_inhibit flag above) - Default = None
+#       THEATRE[["char",[add:int,state:bool],],] - list of theatre states (default = No Mapping)
+#               Each entry comprises the "char" and the associated list of DCC addresses/states
+#               that need to be sent to get the theatre indicator to display that character.
+#               "#" is a special character - which means inhibit all indications (when signal 
+#               is at danger). You should ALWAYS provide mappings for '#' if you are using a 
+#               theatre indicator unless the signal automatically inhibits route indications.
+#       subsidary:int - Single DCC address for the "subsidary" signal (default = No Mapping)
+# 
+#     An example mapping for a  Signalist SC1 decoder with a base address of 1 (CV1=5) is included
+#     below. This assumes the decoder is configured in "8 individual output" Mode (CV38=8). In this
+#     example we are using outputs A,B,C,D to drive our signal with E & F each driving a feather 
+#     indication. The Signallist SC1 uses 8 consecutive addresses in total (which equate to DCC 
+#     addresses 1 to 8 for this example). The DCC addresses for each LED are: RED = 1, Green = 2, 
+#     YELLOW1 = 3, YELLOW2 = 4, Feather1 = 5, Feather2 = 6.
+# 
+#            map_dcc_signal (sig_id = 2,
+#                 danger = [[1,True],[2,False],[3,False],[4,False]],
+#                 proceed = [[1,False],[2,True],[3,False],[4,False]],
+#                 caution = [[1,False],[2,False],[3,True],[4,False]],
+#                 prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
+#                 LH1 = [[5,True],[6,False]], 
+#                 MAIN = [[6,True],[5,False]], 
+#                 NONE = [[5,False],[6,False]] )
+# 
+#      A second example DCC mapping, but this time with a Feather Route Indication, is shown below. 
+#      In this case, the main signal aspects are configured identically to the first example, the
+#      only difference being the THEATRE mapping - where a display of "1" is enabled by DCC Address
+#      5 and "2" by DCC Address 6. Note the special "#" character mapping - which defines the DCC 
+#      commands that need to be sent to inhibit the theatre display.
+# 
+#             map_dcc_signal (sig_id = 2,
+#                 danger = [[1,True],[2,False],[3,False],[4,False]],
+#                 proceed = [[1,False],[2,True],[3,False],[4,False]],
+#                 caution = [[1,False],[2,False],[3,True],[4,False]],
+#                 prelim_caution = [[1,False],[2,False],[3,True],[4,True]],
+#                 THEATRE = [ ["#",[[5,False],[6,False]]],
+#                             ["1",[[6,False],[5,True]]],
+#                             ["2",[[5,False],[6,True]]]  ] )
+# 
+# map_traintech_signal - Generate the mappings for a TrainTech signal
+#    Mandatory Parameters:
+#       sig_id:int - The ID for the signal to create a DCC mapping for
+#       base_address:int - Base address of signal (the signal will take 4 consecutive addresses)
+#    Optional Parameters:
+#       route_address:int - Address for the route indicator - Default = 0 (no indicator)
+#       theatre_route:str - Char to be associated with the Theartre - Default = "NONE" (no Text)
+#       feather_route:route_type - Route to be associated with feather - Default = NONE (no route)
+# 
+# map_semaphore_signal - Generate mappings for a semaphore signal (DCC address mapped to each arm)
+#    Mandatory Parameters:
+#       sig_id:int - The ID for the signal to create a DCC mapping for
+#       main_signal:int     - DCC address for the main signal arm (default = No Mapping)
+#    Optional Parameters:
+#       main_subsidary:int  - DCC address for main subsidary arm (default = No Mapping)
+#       lh1_signal:int      - DCC address for LH1 signal arm (default = No Mapping)
+#       lh1_subsidary:int   - DCC address for LH1 subsidary arm (default = No Mapping)
+#       lh2_signal:int      - DCC address for LH2 signal arm (default = No Mapping)
+#       lh2_subsidary:int   - DCC address for LH2 subsidary arm (default = No Mapping)
+#       rh1_signal:int      - DCC address for RH1 signal arm  (default = No Mapping)
+#       rh1_subsidary:int   - DCC address for RH1 subsidary arm (default = No Mapping)
+#       rh2_signal:int      - DCC address for RH2 signal arm  (default = No Mapping)
+#       rh2_subsidary:int   - DCC address for RH2 subsidary arm (default = No Mapping)
+#       THEATRE[["char",[add:int,state:bool],],] - list of theatre states (default = No Mapping)
+#               Each entry comprises the "char" and the associated list of DCC addresses/states
+#               that need to be sent to get the theatre indicator to display that character.
+#               "#" is a special character - which means inhibit all indications (when signal 
+#               is at danger). You should ALWAYS provide mappings for '#' if you are using a 
+#               theatre indicator unless the signal automatically inhibits route indications.
+# 
+#      Semaphore signal DCC mappings assume that each main/subsidary signal arm is mapped to a 
+#      seperate DCC address. In this example, we are mapping a signal with MAIN and LH signal 
+#      arms and a subsidary arm for the MAIN route. Note that if the semaphore signal had a
+#      theatre type route indication, then this would be mapped in exactly the same was as for
+#      the Colour Light Signal example (above).
+# 
+#            map_semaphore_signal (sig_id = 2, 
+#                                  main_signal = 1 , 
+#                                  lh1_signal = 2 , 
+#                                  main_subsidary = 3)
+# 
+# map_dcc_point
+#    Mandatory Parameters:
+#       point_id:int - The ID for the point to create a DCC mapping for
+#       address:int - the single DCC address to use for the point
+#    Optional Parameters:
+#       state_reversed:bool - Set to True to reverse the DCC logic (default = false)
 #
-#   map_dcc_point
-#      Mandatory Parameters:
-#         point_id:int - The ID for the point to create a DCC mapping for
-#         address:int - the single DCC address for the point
-#      Optional Parameters:
-#         state_reversed:bool - Set to True to reverse the DCC logic (default = false)
+#----------------------------------------------------------------------------------------------------
 #
-#----------------------------------------------------------------------
+# The following functions are associated with the MQTT networking Feature:
+#
+# set_node_to_publish_dcc_commands - Enables publishing of DCC commands to other network nodes
+#   Optional Parameters:
+#       publish_dcc_commands:bool - 'True' to Publish / 'False' to stop publishing (default=False)
+# 
+# subscribe_to_dcc_command_feed - Subcribes to DCC command feed from another node on the network.
+#           All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
+#   Mandatory Parameters:
+#       *nodes:str - The name of the node publishing the feed (multiple nodes can be specified)
+#
+#----------------------------------------------------------------------------------------------------
 
 from . import signals_common
 from . import pi_sprog_interface
@@ -86,6 +146,10 @@ from . import mqtt_interface
 
 import enum
 import logging
+
+#-----------------------------------------------------------------------------------------
+# Global definitions
+#-----------------------------------------------------------------------------------------
 
 # Define the internal Type for the DCC Signal mappings
 class mapping_type(enum.Enum):
@@ -96,11 +160,20 @@ class mapping_type(enum.Enum):
 dcc_signal_mappings:dict = {}
 dcc_point_mappings:dict = {}
 
+# Define the Flag for whether DCC Commands are published to the MQTT Broker or not
+publish_dcc_commands_to_mqtt_broker:bool = False
+
+#-----------------------------------------------------------------------------------------
 # Internal function to test if a mapping exists for a signal
+#-----------------------------------------------------------------------------------------
+
 def sig_mapped(sig_id):
     return (str(sig_id) in dcc_signal_mappings.keys() )
 
+#-----------------------------------------------------------------------------------------
 # Internal function to test if a mapping exists for a point
+#-----------------------------------------------------------------------------------------
+
 def point_mapped(point_id):
     return (str(point_id) in dcc_point_mappings.keys() )
 
@@ -394,7 +467,7 @@ def update_dcc_signal_aspects(sig_id: int):
                     # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                     # Note that the commands will only be published if networking is configured and
                     # the node this software is running on is not configured as a "pi-sprog" node
-                    mqtt_interface.publish_accessory_short_event(entry[0],entry[1])        
+                    publish_accessory_short_event(entry[0],entry[1])        
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -424,7 +497,7 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
                 # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                 # Note that the commands will only be published if networking is configured and
                 # the node this software is running on is not configured as a "pi-sprog" node
-                mqtt_interface.publish_accessory_short_event(dcc_mapping[element],state)       
+                publish_accessory_short_event(dcc_mapping[element],state)       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -466,7 +539,7 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
                         # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                         # Note that the commands will only be published if networking is configured and
                         # the node this software is running on is not configured as a "pi-sprog" node
-                        mqtt_interface.publish_accessory_short_event(entry[0],entry[1])       
+                        publish_accessory_short_event(entry[0],entry[1])       
     return()
 
 #-----------------------------------------------------------------------------------------
@@ -507,7 +580,65 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
                             # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
                             # Note that the commands will only be published if networking is configured and
                             # the node this software is running on is not configured as a "pi-sprog" node
-                            mqtt_interface.publish_accessory_short_event(command[0],command[1])       
+                            publish_accessory_short_event(command[0],command[1])       
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to the published DCC commands from another "Node"
+#-----------------------------------------------------------------------------------------------
+
+def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
+    global publish_dcc_commands_to_mqtt_broker
+    if publish_dcc_commands: logging.info("MQTT-Client - Configuring Application to publish DCC Commands to MQTT broker")
+    else: logging.info("DCC Control - Configuring Application NOT to publish DCC Commands to MQTT broker")
+    publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to the published DCC commands from another "Node"
+#-----------------------------------------------------------------------------------------------
+
+def subscribe_to_dcc_command_feed (*nodes:str):    
+    for node in nodes:
+        # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
+        # as each DCC address will appear on a different topic from the remote MQTT node 
+        mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events",node,0,
+                                    handle_mqtt_dcc_accessory_short_event,subtopics=True)
+    return() 
+
+#-----------------------------------------------------------------------------------------------
+# Callback for handling received MQTT messages from a remote DCC-command-producer Node
+#-----------------------------------------------------------------------------------------------
+
+def handle_mqtt_dcc_accessory_short_event (message):    
+    global logging
+    if "sourceidentifier" in message.keys() and "dccaddress" in message.keys() and "dccstate" in message.keys():
+        source_node = message["sourceidentifier"]
+        dcc_address = message["dccaddress"]
+        dcc_state = message["dccstate"]
+        if dcc_state: 
+            logging.debug ("DCC Control: Received ASON command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+        else:
+            logging.debug ("DCC Control: Received ASOF command from \'"+source_node+"\' for DCC address: "+str(dcc_address))
+        # Forward the received DCC command on to the Pi-Sprog Interface (for transmission on the DCC Bus)
+        pi_sprog_interface.send_accessory_short_event(dcc_address,dcc_state)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal function for building and sending MQTT messages - but only if this
+# particular node has been configured to publish DCC commands viathe mqtt broker
+# --------------------------------------------------------------------------------
+
+def publish_accessory_short_event(address:int,active:bool):
+    if publish_dcc_commands_to_mqtt_broker:
+        data = {}
+        data["dccaddress"] = address
+        data["dccstate"] = active
+        if active: log_message = "DCC Control: Publishing DCC command ASON with DCC address: "+str(address)+" to MQTT broker"
+        else: log_message = "DCC Control: Publishing DCC command ASOF with DCC address: "+str(address)+" to MQTT broker"
+        # Publish as "retained" messages so remote nodes that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("dcc_accessory_short_events",0,data=data,
+                            log_message=log_message,subtopic = str(address),retain=True)
     return()
 
 #######################################################################################
