@@ -361,7 +361,8 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0):
+                                   distant_button_offset:int=0,
+                                   drawing_objects:list=[]):
     global signals
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
@@ -389,26 +390,26 @@ def create_common_signal_elements (canvas,
     # accordingly so they always remain in the "right" position relative to the signal
     # Note that we have to cater for the special case of a semaphore distant signal being
     # created on the same post as a semaphore home signal. In this case (signified by a
-    # distant_button_offset), we apply the offset to deconflict with the home signal buttons
+    # distant_button_offset), we apply the offset to deconflict with the home signal buttons.
     if distant_button_offset != 0:
         button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
-        if not automatic: canvas.create_window(button_position,window=sig_button)
-        else:canvas.create_window(button_position,window=sig_button,state='hidden')
-        canvas.create_window(button_position,window=sub_button,state='hidden')
+        if not automatic: drawing_objects.append(canvas.create_window(button_position,window=sig_button))
+        else: drawing_objects.append(canvas.create_window(button_position,window=sig_button,state='hidden'))
+        drawing_objects.append(canvas.create_window(button_position,window=sub_button,state='hidden'))
     elif subsidary:
         if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
         else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
-        canvas.create_window(button_position,anchor=E,window=sig_button)
-        canvas.create_window(button_position,anchor=W,window=sub_button)            
+        drawing_objects.append(canvas.create_window(button_position,anchor=E,window=sig_button))
+        drawing_objects.append(canvas.create_window(button_position,anchor=W,window=sub_button))          
     else:
         button_position = common.rotate_point (x,y,-20,-25,orientation) 
-        canvas.create_window(button_position,window=sig_button)
-        canvas.create_window(button_position,window=sub_button,state='hidden')
+        drawing_objects.append(canvas.create_window(button_position,window=sig_button))
+        drawing_objects.append(canvas.create_window(button_position,window=sub_button,state='hidden'))
     # Signal passed button is created on the track at the base of the signal
     if sig_passed_button:
-        canvas.create_window(x,y,window=passed_button)
+        drawing_objects.append(canvas.create_window(x,y,window=passed_button))
     else:
-        canvas.create_window(x,y,window=passed_button,state='hidden')
+        drawing_objects.append(canvas.create_window(x,y,window=passed_button,state='hidden'))
     # Disable the main signal button if the signal is fully automatic
     if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
@@ -428,6 +429,7 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
+    signals[str(sig_id)]["drawingobjects"] = drawing_objects    # MANDATORY - the consolidated list of drawing objects
     return()
 
 # -------------------------------------------------------------------------
@@ -444,9 +446,11 @@ def create_approach_control_elements (canvas,sig_id:int,
     approach_release_button = Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                                         command=lambda:approach_release_button_event (sig_id))
     if approach_button:
-        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button)
+        window = canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button)
     else:
-        canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button,state="hidden")
+        window = canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button,state="hidden")
+    # Append the approach button window to the consolidated list of button windows
+    signals[str(sig_id)]["drawingobjects"].append(window)              
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
@@ -468,14 +472,18 @@ def create_theatre_route_elements (canvas,sig_id:int,
     # The text object is created anyway - but 'hidden' if not required for this particular signal
     text_coordinates = common.rotate_point(x,y,xoff,yoff,orientation)
     if has_theatre:
-        canvas.create_rectangle(common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation),fill="black")
-        theatreobject = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal')
+        theatre_object = canvas.create_rectangle(common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation),fill="black")
+        # Add the theatre background rectangle to the consolidated list of drawing objects
+        signals[str(sig_id)]["drawingobjects"].append(theatre_object)  
+        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal')
     else:
-        theatreobject = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden')
+        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden')
+    # Add the theatre text drawing object to the consolidated list of drawing objects
+    signals[str(sig_id)]["drawingobjects"].append(theatre_text)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
     signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
-    signals[str(sig_id)]["theatreobject"]  = theatreobject       # SHARED - Text drawing object
+    signals[str(sig_id)]["theatreobject"]  = theatre_text        # SHARED - Text drawing object
     signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
     return()
 
@@ -579,5 +587,28 @@ def publish_signal_passed_event(sig_id:int):
         # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
         mqtt_interface.send_mqtt_message("signal_passed_event",sig_id,data=data,log_message=log_message,retain=False)
         return()
+
+# ------------------------------------------------------------------------------------------
+# Common internal functions for deleting a signal object (including all the drawing objects)
+# This is used by the schematic editor for moving signals and changing signal types where we
+# delete the existing signal with all its data and then recreate it in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_signal(sig_id:int):
+    global signals
+    if sig_exists(sig_id):
+        # Delete all the tkinter canvas drawing objects created for the signal
+        for drawing_object in signals[str(sig_id)]["drawingobjects"]:
+            signals[str(sig_id)]["canvas"].delete(drawing_object)
+        # Delete all the tkinter button objects created for the signal
+        signals[str(sig_id)]["sigbutton"].destroy()
+        signals[str(sig_id)]["subbutton"].destroy()
+        signals[str(sig_id)]["passedbutton"].destroy()
+        # This buttons is only common to colour light and semaphore types
+        if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
+            signals[str(sig_id)]["releasebutton"].destroy()
+        # Finally, delete the signal entry from the dictionary of signals
+        del signals[str(sig_id)]
+    return()
 
 #################################################################################################

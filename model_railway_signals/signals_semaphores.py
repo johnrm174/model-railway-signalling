@@ -75,7 +75,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     elif associated_home == 0 and not main_signal:
         logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
     else:
-                
+        # Store all drawing objects we create in a list (to enable subsequent deletion)
+        drawing_objects = []                
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
@@ -104,25 +105,43 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # in which case the signal base & post will already have been drawn when the home signal was created
         # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
-            canvas.create_line(common.rotate_line(x,y,0,0,0,postoffset,orientation),width=2,fill="white")
-            canvas.create_line(common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation),width=3,fill="white")
+            line_coords = common.rotate_line(x,y,0,0,0,postoffset,orientation)
+            drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+            line_coords = common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation)
+            drawing_objects.append(canvas.create_line(line_coords,width=3,fill="white"))
             # Draw the rest of the gantry to support other arms as required
             if lh2_signal or lh2_subsidary:
-                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation),width=2,fill="white")
-                canvas.create_line(common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation),width=2,fill="white")
-                if lh2_signal: canvas.create_line(common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation),width=2,fill="white")
+                line_coords = common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                line_coords = common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                if lh2_signal:
+                    line_coords = common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation)
+                    drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
             if lh1_signal or lh1_subsidary:
-                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation),width=2,fill="white")
-                canvas.create_line(common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation),width=2,fill="white")
-                if lh1_signal: canvas.create_line(common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation),width=2,fill="white")
+                line_coords = common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                line_coords = common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                if lh1_signal:
+                    line_coords = common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation)
+                    drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
             if rh2_signal or rh2_subsidary:
-                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation),width=2,fill="white")
-                canvas.create_line(common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation),width=2,fill="white")
-                if rh2_signal: canvas.create_line(common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation),width=2,fill="white")
+                line_coords = common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                line_coords = common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                if rh2_signal:
+                    line_coords = common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation)
+                    drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
             if rh1_signal or rh1_subsidary:
-                canvas.create_line(common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation),width=2,fill="white")
-                canvas.create_line(common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation),width=2,fill="white")
-                if rh1_signal: canvas.create_line(common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation),width=2,fill="white")
+                line_coords = common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                line_coords = common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation)
+                drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
+                if rh1_signal:
+                    line_coords = common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation)
+                    drawing_objects.append(canvas.create_line(line_coords,width=2,fill="white"))
 
         # set the colour of the signal arm according to the signal type
         if distant: arm_colour="yellow"
@@ -134,32 +153,55 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         else: armoffset = 0
             
         # Draw the signal arm for the main route
-        mainsigon = canvas.create_line(common.rotate_line(x,y,65+armoffset,postoffset+3,65+armoffset,postoffset-8,orientation),fill=arm_colour,width=4)
-        mainsigoff = canvas.create_line(common.rotate_line(x,y,65+armoffset,postoffset+3,72+armoffset,postoffset-8,orientation),fill=arm_colour,width=4,state='hidden')
+        line_coords = common.rotate_line(x,y,65+armoffset,postoffset+3,65+armoffset,postoffset-8,orientation)
+        mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4)
+        line_coords = common.rotate_line(x,y,65+armoffset,postoffset+3,72+armoffset,postoffset-8,orientation)
+        mainsigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arm for the main route
-        mainsubon = canvas.create_line(common.rotate_line(x,y,+43,postoffset+3,+43,postoffset-6,orientation),fill=arm_colour,width=3)
-        mainsuboff = canvas.create_line(common.rotate_line(x,y,+43,postoffset+3,+48,postoffset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        line_coords = common.rotate_line(x,y,+43,postoffset+3,+43,postoffset-6,orientation)
+        mainsubon = canvas.create_line(line_coords,fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+43,postoffset+3,+48,postoffset-6,orientation)
+        mainsuboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden')
         # Draw the signal arms for the RH routes
-        rh1sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh1offset+2,60+armoffset,rh1offset-8,orientation),fill=arm_colour,width=4)
-        rh1sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh1offset+2,67+armoffset,rh1offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        rh2sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh2offset+2,60+armoffset,rh2offset-8,orientation),fill=arm_colour,width=4)
-        rh2sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,rh2offset+2,67+armoffset,rh2offset-8,orientation),fill=arm_colour,width=4,state='hidden')
+        line_coords = common.rotate_line(x,y,60+armoffset,rh1offset+2,60+armoffset,rh1offset-8,orientation)
+        rh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4)
+        line_coords = common.rotate_line(x,y,60+armoffset,rh1offset+2,67+armoffset,rh1offset-8,orientation)
+        rh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden')
+        line_coords = common.rotate_line(x,y,60+armoffset,rh2offset+2,60+armoffset,rh2offset-8,orientation)
+        rh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4)
+        line_coords = common.rotate_line(x,y,60+armoffset,rh2offset+2,67+armoffset,rh2offset-8,orientation)
+        rh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arms for the RH routes
-        rh1subon = canvas.create_line(common.rotate_line(x,y,+38,rh1offset+2,+38,rh1offset-6,orientation),fill=arm_colour,width=3)
-        rh1suboff = canvas.create_line(common.rotate_line(x,y,+38,rh1offset+2,+43,rh1offset-6,orientation),fill=arm_colour,width=3,state='hidden')
-        rh2subon = canvas.create_line(common.rotate_line(x,y,+38,rh2offset+2,+38,rh2offset-6,orientation),fill=arm_colour,width=3)
-        rh2suboff = canvas.create_line(common.rotate_line(x,y,+38,rh2offset+2,+43,rh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
+        line_coords = common.rotate_line(x,y,+38,rh1offset+2,+38,rh1offset-6,orientation)
+        rh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+38,rh1offset+2,+43,rh1offset-6,orientation)
+        rh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden')
+        line_coords = common.rotate_line(x,y,+38,rh2offset+2,+38,rh2offset-6,orientation)
+        rh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+38,rh2offset+2,+43,rh2offset-6,orientation)
+        rh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden')
         # Draw the signal arms for the LH routes
-        lh1sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh1offset+2,60+armoffset,lh1offset-8,orientation),fill=arm_colour,width=4)
-        lh1sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh1offset+2,67+armoffset,lh1offset-8,orientation),fill=arm_colour,width=4,state='hidden')
-        lh2sigon = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh2offset+2,60+armoffset,lh2offset-8,orientation),fill=arm_colour,width=4)
-        lh2sigoff = canvas.create_line(common.rotate_line(x,y,60+armoffset,lh2offset+2,67+armoffset,lh2offset-8,orientation),fill=arm_colour,width=4,state='hidden')
+        line_coords = common.rotate_line(x,y,60+armoffset,lh1offset+2,60+armoffset,lh1offset-8,orientation)
+        lh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4)
+        line_coords = common.rotate_line(x,y,60+armoffset,lh1offset+2,67+armoffset,lh1offset-8,orientation)
+        lh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden')
+        line_coords = common.rotate_line(x,y,60+armoffset,lh2offset+2,60+armoffset,lh2offset-8,orientation)
+        lh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4)
+        line_coords = common.rotate_line(x,y,60+armoffset,lh2offset+2,67+armoffset,lh2offset-8,orientation)
+        lh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden')
         # Draw the subsidary arms for the LH routes
-        lh1subon = canvas.create_line(common.rotate_line(x,y,+38,lh1offset+2,+38,lh1offset-6,orientation),fill=arm_colour,width=3)
-        lh1suboff = canvas.create_line(common.rotate_line(x,y,+38,lh1offset+2,+43,lh1offset-6,orientation),fill=arm_colour,width=3,state='hidden')
-        lh2subon = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+38,lh2offset-6,orientation),fill=arm_colour,width=3)
-        lh2suboff = canvas.create_line(common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation),fill=arm_colour,width=3,state='hidden')
-
+        line_coords = common.rotate_line(x,y,+38,lh1offset+2,+38,lh1offset-6,orientation)
+        lh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+38,lh1offset+2,+43,lh1offset-6,orientation)
+        lh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden')
+        line_coords = common.rotate_line(x,y,+38,lh2offset+2,+38,lh2offset-6,orientation)
+        lh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation)
+        lh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden')
+        # Store all the above drawing objects
+        drawing_objects.extend([mainsigon,mainsigoff,mainsubon,mainsuboff,rh1sigon,rh1sigoff])
+        drawing_objects.extend([rh1sigon,rh1sigoff,rh2sigon,rh2sigoff,lh1sigon,lh1sigoff,lh2sigon,lh2sigoff])
+        drawing_objects.extend([rh1subon,rh1suboff,rh2subon,rh2suboff,lh1subon,lh1suboff,lh2subon,lh2suboff])
         # Hide any otherdrawing objects we don't need for this particular signal
         if not main_signal: canvas.itemconfigure(mainsigon,state='hidden')
         if not main_subsidary: canvas.itemconfigure(mainsubon,state='hidden')
@@ -209,7 +251,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic,
-                                       distant_button_offset = button_offset)
+                                       distant_button_offset = button_offset,
+                                       drawing_objects = drawing_objects)
         
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,
