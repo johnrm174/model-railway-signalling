@@ -211,6 +211,10 @@ signal_sub_type (use when creating colour light signals):
     signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 
+semaphore_sub_type (use when creating semaphore signals):
+    semaphore_sub_type.home
+    semaphore_sub_type.distant
+                                  
 route_type (use for specifying the route):
     route_type.NONE   (no route indication)
     route_type.MAIN   (main route)
@@ -268,7 +272,8 @@ create_semaphore_signal - Creates a Semaphore signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
-      distant:bool - True for a Distant signal - False for a Home signal - default = False
+      signal_subtype - subtype of the signal to create - default = semaphore_sub_type.home
+      distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
       associated_home:int - Option only valid when creating distant signals - Provide the ID of
                             a previously created home signal (and use the same x and y coords)
                             to create the distant signal on the same post as the home signal 
@@ -497,7 +502,7 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
       single_line:bool - for a single line instrument(created without a repeater) - default: False
       bell_sound_file:str - The filename of the soundfile (in the local package resources
                           folder) to use for the bell sound (default "bell-ring-01.wav" - other
-			  options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
+              options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
       linked_to:int/str - the identifier for the "paired" block instrument - can be specified

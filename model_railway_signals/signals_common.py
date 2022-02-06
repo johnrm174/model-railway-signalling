@@ -361,11 +361,12 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0,
-                                   drawing_objects:list=[]):
+                                   distant_button_offset:int=0):
     global signals
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
+    # Define the "Tag" for all drawing objects for this signal instance
+    tag = "signal"+str(sig_id)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
     # Assign the button labels. if a distant_button_offset has been defined then this represents the 
@@ -393,23 +394,23 @@ def create_common_signal_elements (canvas,
     # distant_button_offset), we apply the offset to deconflict with the home signal buttons.
     if distant_button_offset != 0:
         button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
-        if not automatic: drawing_objects.append(canvas.create_window(button_position,window=sig_button))
-        else: drawing_objects.append(canvas.create_window(button_position,window=sig_button,state='hidden'))
-        drawing_objects.append(canvas.create_window(button_position,window=sub_button,state='hidden'))
+        if not automatic: canvas.create_window(button_position,window=sig_button,tags=tag)
+        else: canvas.create_window(button_position,window=sig_button,state='hidden',tags=tag)
+        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     elif subsidary:
         if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
         else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
-        drawing_objects.append(canvas.create_window(button_position,anchor=E,window=sig_button))
-        drawing_objects.append(canvas.create_window(button_position,anchor=W,window=sub_button))          
+        canvas.create_window(button_position,anchor=E,window=sig_button,tags=tag)
+        canvas.create_window(button_position,anchor=W,window=sub_button,tags=tag)          
     else:
         button_position = common.rotate_point (x,y,-20,-25,orientation) 
-        drawing_objects.append(canvas.create_window(button_position,window=sig_button))
-        drawing_objects.append(canvas.create_window(button_position,window=sub_button,state='hidden'))
+        canvas.create_window(button_position,window=sig_button,tags=tag)
+        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     # Signal passed button is created on the track at the base of the signal
     if sig_passed_button:
-        drawing_objects.append(canvas.create_window(x,y,window=passed_button))
+        canvas.create_window(x,y,window=passed_button,tags=tag)
     else:
-        drawing_objects.append(canvas.create_window(x,y,window=passed_button,state='hidden'))
+        canvas.create_window(x,y,window=passed_button,state='hidden',tags=tag)
     # Disable the main signal button if the signal is fully automatic
     if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
@@ -429,7 +430,6 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
-    signals[str(sig_id)]["drawingobjects"] = drawing_objects    # MANDATORY - the consolidated list of drawing objects
     return()
 
 # -------------------------------------------------------------------------
@@ -442,15 +442,16 @@ def create_approach_control_elements (canvas,sig_id:int,
                                       orientation:int,
                                       approach_button:bool):
     global signals
+    # Define the "Tag" for all drawing objects for this signal instance
+    tag = "signal"+str(sig_id)
     # Create the approach release button - We only want a small button - hence a small font size
     approach_release_button = Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                                         command=lambda:approach_release_button_event (sig_id))
+    button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button:
-        window = canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button)
+        window = canvas.create_window(button_position,window=approach_release_button,tags=tag)
     else:
-        window = canvas.create_window(common.rotate_point(x,y,-50,0,orientation),window=approach_release_button,state="hidden")
-    # Append the approach button window to the consolidated list of button windows
-    signals[str(sig_id)]["drawingobjects"].append(window)              
+        window = canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
@@ -468,18 +469,18 @@ def create_theatre_route_elements (canvas,sig_id:int,
                                    orientation:int,
                                    has_theatre:bool):
     global signals
+    # Define the "Tag" for all drawing objects for this signal instance
+    tag = "signal"+str(sig_id)
     # Draw the theatre route indicator box only if one is specified for this particular signal
     # The text object is created anyway - but 'hidden' if not required for this particular signal
     text_coordinates = common.rotate_point(x,y,xoff,yoff,orientation)
+    tag = "signal"+str(sig_id)
     if has_theatre:
-        theatre_object = canvas.create_rectangle(common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation),fill="black")
-        # Add the theatre background rectangle to the consolidated list of drawing objects
-        signals[str(sig_id)]["drawingobjects"].append(theatre_object)  
-        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal')
+        rectangle_coords = common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation)
+        theatre_object = canvas.create_rectangle(rectangle_coords,fill="black",tags=tag)
+        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal',tags=tag)
     else:
-        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden')
-    # Add the theatre text drawing object to the consolidated list of drawing objects
-    signals[str(sig_id)]["drawingobjects"].append(theatre_text)
+        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden',tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
     signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
@@ -598,8 +599,7 @@ def delete_signal(sig_id:int):
     global signals
     if sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
-        for drawing_object in signals[str(sig_id)]["drawingobjects"]:
-            signals[str(sig_id)]["canvas"].delete(drawing_object)
+        signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
         # Delete all the tkinter button objects created for the signal
         signals[str(sig_id)]["sigbutton"].destroy()
         signals[str(sig_id)]["subbutton"].destroy()

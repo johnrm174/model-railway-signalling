@@ -67,6 +67,10 @@
 #     signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
 #     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
+# semaphore_sub_type (use when creating semaphore signals):
+#     semaphore_sub_type.home
+#     semaphore_sub_type.distant
+#
 # route_type (use for specifying the route):
 #     route_type.NONE   (no route indication)
 #     route_type.MAIN   (main route)
@@ -124,7 +128,8 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       distant:bool - True for a Distant signal - False for a Home signal - default = False
+#       signal_subtype - subtype of the signal to create - default = semaphore_sub_type.home
+#       distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 #       associated_home:int - Option only valid when creating distant signals - Provide the ID of
 #                             a previously created home signal (and use the same x and y coords)
 #                             to create the distant signal on the same post as the home signal 
@@ -797,5 +802,61 @@ def set_signals_to_publish_passed_events(*sig_ids:int):
         else:
             signals_common.list_of_signals_to_publish_passed_events.append(sig_id)
     return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for deleting a signal object (including all the drawing objects)
+# This is used by the schematic editor for changing signal types where we delete the existing
+# signal with all its data and then recreate it (with the same sig_id) in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_signal(sig_id:int):
+    global signals
+    if signals_common.sig_exists(sig_id):
+        # Delete all the tkinter canvas drawing objects associated with the signal
+        signals_common.signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
+        # Delete all the tkinter button objects created for the signal
+        signals_common.signals[str(sig_id)]["sigbutton"].destroy()
+        signals_common.signals[str(sig_id)]["subbutton"].destroy()
+        signals_common.signals[str(sig_id)]["passedbutton"].destroy()
+        # This buttons is only common to colour light and semaphore types
+        if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
+                                                              signals_common.sig_type.semaphore):
+            signals_common.signals[str(sig_id)]["releasebutton"].destroy()
+        # Finally, delete the signal entry from the dictionary of signals
+        del signals_common.signals[str(sig_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for moving a signal object (i.e. all the associated drawing objects)
+# This is used by the schematic editor for moving signals around on the canvas. According to
+# all the info out there this is much more performant than deleting and then recreating
+# ------------------------------------------------------------------------------------------
+
+def move_signal(sig_id:int,xdiff:int,ydiff:int):
+    global signals
+    if signals_common.sig_exists(sig_id):
+        # Move all the tkinter canvas drawing objects associated with the signal
+        signals_common.signals[str(sig_id)]["canvas"].move("signal"+str(sig_id),xdiff,ydiff)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to "test" if the cursor is within the signal tkinter boundary box
+# ------------------------------------------------------------------------------------------
+
+def signal_highlighted (sig_id:int, xpos:int, ypos:int):
+    global signals
+    highlighted = False
+    if signals_common.sig_exists(sig_id):
+        bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
+        if bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos:
+            highlighted = True
+    return(highlighted)
+
+def get_boundary_box (sig_id:int):
+    global signals
+    bbox=[0,0,0,0]
+    if signals_common.sig_exists(sig_id):
+        bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
+    return(bbox)
 
 ##########################################################################################

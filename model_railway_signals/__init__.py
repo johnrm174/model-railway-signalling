@@ -14,6 +14,7 @@ from .signals_common import signal_state_type
 
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
+from .signals_semaphores import semaphore_sub_type
 from .signals_semaphores import create_semaphore_signal
 from .signals_ground_position import create_ground_position_signal
 from .signals_ground_disc import create_ground_disc_signal
