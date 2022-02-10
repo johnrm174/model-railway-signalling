@@ -3,11 +3,13 @@
 # ---------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
+#from model_railway_signals import *
 from model_railway_signals import signals
 from model_railway_signals import signals_common
 from model_railway_signals import signals_colour_lights
 from model_railway_signals import signals_semaphores
+from model_railway_signals import signals_ground_position
+from model_railway_signals import signals_ground_disc
 import logging
 import enum
 import uuid
@@ -36,9 +38,11 @@ class object_type(enum.Enum):
 selected_objects:dict = {}
 selected_objects["startx"] = 0
 selected_objects["starty"] = 0
-selected_objects["selectobject"] = False
+selected_objects["moveobjects"] = False
 selected_objects["selectarea"] = False
-selected_objects["objects"] =[]
+selected_objects["selectionbox"] = False
+selected_objects["selectedobjects"] =[]
+selected_objects["clipboard"] = {}
 
 #------------------------------------------------------------------------------------
 # All Objects we create (and their configuration) are stored in a global dictionary
@@ -56,7 +60,7 @@ def redraw_signal(signal):
     signals.delete_signal(signal["itemid"])
     # Create the signal (according to the signal type)
     if signal["itemtype"] == signals_common.sig_type.colour_light:
-        create_colour_light_signal (canvas,
+        signals_colour_lights.create_colour_light_signal (canvas,
                             sig_id = signal["itemid"],
                             x = signal["positionx"],
                             y = signal["positiony"],
@@ -74,8 +78,9 @@ def redraw_signal(signal):
                             theatre_route_indicator = signal["theatreroute"],
                             refresh_immediately = signal["immediaterefresh"],
                             fully_automatic = signal["fullyautomatic"])
+        
     elif signal["itemtype"] == signals_common.sig_type.semaphore:
-        create_semaphore_signal (canvas,
+        signals_semaphores.create_semaphore_signal (canvas,
                             sig_id = signal["itemid"],
                             x = signal["positionx"],
                             y = signal["positiony"],
@@ -98,31 +103,28 @@ def redraw_signal(signal):
                             theatre_route_indicator = signal["theatreroute"],
                             refresh_immediately = signal["immediaterefresh"],
                             fully_automatic = signal["fullyautomatic"])
-    elif signal["itemtype"] == signals_common.sig_type.ground_disc:
-        pass
+        
     elif signal["itemtype"] == signals_common.sig_type.ground_position:
-        pass
-    return()
+        signals_ground_position.create_ground_position_signal (canvas,
+                            sig_id = signal["itemid"],
+                            x = signal["positionx"],
+                            y = signal["positiony"],
+                            signal_subtype = signal["itemsubtype"],
+#                            sig_callback = schematic_callback,
+                            orientation = signal["orientation"],
+                            sig_passed_button = signal["passedbutton"])
 
-#------------------------------------------------------------------------------------
-# Internal function to update the configuration of a schematic on creation/change
-# by Calling the type-specific functions above depending on the object type
-#------------------------------------------------------------------------------------
-
-def update_object(object_id):
-    global schematic_objects
-    # Get the new/updated configuration details for the signal
-    schematic_object = schematic_objects[str(object_id)]
-    if schematic_object["item"] == object_type.signal:
-        update_signal(schematic_object)
-    elif schematic_object["item"] == object_type.point:
-        pass
-    elif schematic_object["item"] == object_type.section:
-        pass
-    elif schematic_object["item"] == object_type.sensor:
-        pass
-    elif schematic_object["item"] == object_type.instrument:
-        pass
+    elif signal["itemtype"] == signals_common.sig_type.ground_disc:
+        signals_ground_disc.create_ground_disc_signal (canvas,
+                            sig_id = signal["itemid"],
+                            x = signal["positionx"],
+                            y = signal["positiony"],
+                            signal_subtype = signal["itemsubtype"],
+#                            sig_callback = schematic_callback,
+                            orientation = signal["orientation"],
+                            sig_passed_button = signal["passedbutton"])
+    # Update the boundary box coordinates for the re-drawn signal
+    canvas.coords(signal["bbox"],signals.get_boundary_box(signal["itemid"]))
     return()
 
 #------------------------------------------------------------------------------------
@@ -165,30 +167,37 @@ def create_signal(item_type,item_subtype):
     signal["subroutelh2"] = False
     signal["subrouterh1"] = False
     signal["subrouterh2"] = False
+    # create the selection boundary box rectangle for the signal
+    signal["bbox"] = canvas.create_rectangle(signals.get_boundary_box(item_id),outline='black',state='hidden')
     # Create the Signal on the canvas
     redraw_signal(signal)
-    # Now create the selection boundary box rectangle for the signal
-    signal["bbox"] = canvas.create_rectangle(signals.get_boundary_box(item_id),outline='black',state='hidden')
     # Store the initial signal configuration
     schematic_objects[str(object_id)] = signal
 
     return()
 
+
 #------------------------------------------------------------------------------------
-# Internal function to Create a new Signal Object on the drawing canvas
+# Internal functions to Deselect all Objects
+#------------------------------------------------------------------------------------
+
+def deselect_all_objects():
+    global selected_objects
+    for object_id in selected_objects["selectedobjects"]:
+        canvas.itemconfigure(schematic_objects[object_id]["bbox"],state="hidden")
+    selected_objects["selectedobjects"]=[]
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to Move all selected objects on the canvas
 #------------------------------------------------------------------------------------
         
-def move_object(object_id:str,newposx:int,newposy:int):
+def move_selected_objects(xdiff:int,ydiff:int):
     global schematic_objects
-    global selected_objects
-    # Only bother re-drawing if the position has actually changed
-    if (schematic_objects[object_id]["positionx"] != newposx or
-        schematic_objects[object_id]["positiony"] != newposy):
-        # Move the schematic objects depending on type
+    for object_id in selected_objects["selectedobjects"]:
+        # Move the selected objects on the canvas depending on type
         if schematic_objects[object_id]["item"] == object_type.signal:
-            signals.move_signal(schematic_objects[object_id]["itemid"],
-                                newposx-schematic_objects[object_id]["positionx"],
-                                newposy-schematic_objects[object_id]["positiony"])
+            signals.move_signal(schematic_objects[object_id]["itemid"],xdiff,ydiff)
         elif schematic_objects[object_id]["item"] == object_type.point:
             pass
         elif schematic_objects[object_id]["item"] == object_type.section:
@@ -196,110 +205,241 @@ def move_object(object_id:str,newposx:int,newposy:int):
         elif schematic_objects[object_id]["item"] == object_type.instrument:
             pass
         # Move the boundary box rectangle associated with the object
-        canvas.move(schematic_objects[object_id]["bbox"],
-                    newposx-schematic_objects[object_id]["positionx"],
-                    newposy-schematic_objects[object_id]["positiony"])
+        canvas.move(schematic_objects[object_id]["bbox"],xdiff,ydiff)
         # Set the object position (and the "start" position) to the current cursor position
-        schematic_objects[object_id]["positionx"] = newposx
-        schematic_objects[object_id]["positiony"] = newposy
-        selected_objects["startx"] = newposx
-        selected_objects["starty"] = newposy
+        schematic_objects[object_id]["positionx"] += xdiff
+        schematic_objects[object_id]["positiony"] += ydiff
     return()
 
 #------------------------------------------------------------------------------------
-# Internal callback functions to Create a new Signal Object on the drawing canvas
+# Internal function to return the ID of the Object the cursor is over
 #------------------------------------------------------------------------------------
 
-def left_button_double_click(event):
-    global schematic_objects
+def find_highlighted_item(xpos:int,ypos:int):
     for object_id in schematic_objects:
-        if schematic_objects[str(object_id)]["item"] == object_type.signal:
-            if signals.signal_highlighted(schematic_objects[str(object_id)]["itemid"],event.x,event.y):
-                print ("Double Click on Signal " + str(schematic_objects[str(object_id)]["itemid"]) )
+        bbox = canvas.coords(schematic_objects[str(object_id)]["bbox"])
+        if bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos:
+            return(object_id)
+    return(None)
+
+#------------------------------------------------------------------------------------
+# Internal function to Delete all selected Objects
+# Called from the Tkinter Event binding to the delete and backspace keys
+#------------------------------------------------------------------------------------
+
+def delete_selected_objects(event=None):
+    global schematic_objects
+    global selected_objects
+    # Delete the item according to type
+    for object_id in selected_objects["selectedobjects"]:
+        schematic_object = schematic_objects[object_id]
+        if schematic_object["item"] == object_type.signal:
+            signals.delete_signal(schematic_object["itemid"])
+        elif schematic_object["item"] == object_type.point:
+            pass
+        elif schematic_object["item"] == object_type.section:
+            pass
+        elif schematic_object["item"] == object_type.sensor:
+            pass
+        elif schematic_object["item"] == object_type.instrument:
+            pass
+        # Delete the selection rectangle for the object and then the object
+        canvas.delete(schematic_objects[object_id]["bbox"])
+        del schematic_objects[object_id]
+    # Clear down the list of selected objects 
+    selected_objects["selectedobjects"]=[]
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to Rotate all selected Objects
+# Called from the Tkinter Event binding to the 'r' and 'R' keys
+#------------------------------------------------------------------------------------
+
+def rotate_selected_objects(event=None):
+    global schematic_objects
+    global selected_objects
+    # Delete the item according to type
+    for object_id in selected_objects["selectedobjects"]:
+        schematic_object = schematic_objects[object_id]
+        if schematic_object["orientation"] == 0:
+            schematic_object["orientation"] = 180
+        else:
+            schematic_object["orientation"] = 0
+        if schematic_object["item"] == object_type.signal:
+            redraw_signal(schematic_object)
+        elif schematic_object["item"] == object_type.point:
+            pass
+        elif schematic_object["item"] == object_type.section:
+            pass
+        elif schematic_object["item"] == object_type.sensor:
+            pass
+        elif schematic_object["item"] == object_type.instrument:
+            pass
+        # Update the selection boundary box rectangle for the signal
+        canvas.coords(schematic_object["bbox"],signals.get_boundary_box(schematic_object["itemid"]))
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal functions for Cut, Copy and Paste
+#------------------------------------------------------------------------------------
+        
+def copy_selected_objects(event=None):
+    global selected_objects
+    for object_id in selected_objects["selectedobjects"]:
+        selected_objects["clipboard"][object_id] = schematic_objects[object_id]
+    return()
+
+def cut_selected_objects(event=None):
+    global selected_objects
+    for object_id in selected_objects["selectedobjects"]:
+        selected_objects["clipboard"][object_id] = schematic_objects[object_id]
+        canvas.delete(schematic_objects[object_id]["bbox"])
+        delete_selected_objects()
+    return()
+        
+def paste_selected_objects(event=None):
+    global selected_objects
+    global schematic_objects
+    for object_to_paste in selected_objects["clipboard"]:
+        print ("qqqq",object_to_paste)
+        ############################################
+        # More work here
+        if object_to_paste in schematic_objects.keys():
+            # Create a new Object (with the existing configuration)
+            object_to_paste["itemid"] = 1
+            if object_to_paste["item"] == object_type.signal:
+                while True:
+                    if not signals_common.sig_exists(object_to_paste["itemid"]): break
+                else:
+                    object_to_paste["itemid"] = object_to_paste["itemid"] + 1
+                redraw_signal (object_to_paste)
+            elif object_to_paste["item"] == object_type.point:
+                pass
+            elif object_to_paste["item"] == object_type.section:
+                pass
+            elif object_to_paste["item"] == object_type.sensor:
+                pass
+            elif object_to_paste["item"] == object_type.instrument:
+                pass
+        else:
+            # Paste the existing items back onto the list
+            # Need to check whether a new object with the same ID has been created
+            # Between the cut and the paste - if so then the Paste will fail
+            schematic_objects.append(object_to_paste) 
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal callback functions for editing the schematic on the canvas
+#------------------------------------------------------------------------------------
+
+def left_double_click(event):
+    global schematic_objects
+    highlighted_object = find_highlighted_item(event.x,event.y)
+    if highlighted_object:
+        print ("Double Click on Object ",highlighted_object)
+    return()
+
+def right_button_click(event):
+    global schematic_objects
+    highlighted_object = find_highlighted_item(event.x,event.y)
+    if highlighted_object:
+        if highlighted_object not in selected_objects["selectedobjects"]:
+            # Deselect all objects and select the highlighted item
+            deselect_all_objects()
+            selected_objects["selectedobjects"].append(highlighted_object)
+            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="normal")
+        popup1.tk_popup(event.x_root, event.y_root)
+    else:
+        popup2.tk_popup(event.x_root, event.y_root)        
+
+    return()
+
+def left_button_click(event):
+    global selected_objects
+    # set keyboard focus for the canvas (so that any key bindings will work)
+    canvas.focus_set()
+    # Store the cursor position (for the start of the "move" or "area selection")
+    selected_objects["startx"] = event.x 
+    selected_objects["starty"] = event.y
+    # See if the Cursor is over the boundary box of an object
+    highlighted_object = find_highlighted_item(event.x,event.y)
+    if highlighted_object:
+        if highlighted_object not in selected_objects["selectedobjects"]:
+            # Deselect all objects and select the highlighted item
+            deselect_all_objects()
+            selected_objects["selectedobjects"].append(highlighted_object)
+            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="normal")
+        # Could also be the start of an object move
+        selected_objects["moveobjects"] = True
+    else:
+        # Cursor is not over any object - Could be the start of a new area selection or
+        # just clearing the current selection - In either case we deselect all objects
+        deselect_all_objects()
+        selected_objects["selectarea"] = True
+        if not selected_objects["selectionbox"]:
+            selected_objects["selectionbox"]=canvas.create_rectangle(0,0,0,0,outline="orange")
+        canvas.coords(selected_objects["selectionbox"],event.x,event.y,event.x,event.y)
+        canvas.itemconfigure(selected_objects["selectionbox"],state="normal")
+    return()
+
+def left_shift_click(event):
+    global selected_objects
+    # See if the Cursor is over the boundary box of an object
+    highlighted_object = find_highlighted_item(event.x,event.y)
+    if highlighted_object:
+        if highlighted_object in selected_objects["selectedobjects"]:
+            # Deselect just the highlighted object
+            selected_objects["selectedobjects"].remove(highlighted_object)
+            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="hidden")
+        else:
+            # Add the highlighted item to the list of selected objects
+            selected_objects["selectedobjects"].append(highlighted_object)
+            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="normal")
     return()
 
 def track_cursor(event):
     global selected_objects
-    # if one or more objects are selected then move them with the cursor
-    if selected_objects["selectobject"]:
+    # In "moveobjects" mode move all selected objects with the cursor
+    if selected_objects["moveobjects"]:
         # Work out how far we have moved from the last update)
         deltax = event.x-selected_objects["startx"]
         deltay = event.y-selected_objects["starty"]
-        # Now work through the selected objects and move them
-        for selected_object in selected_objects["objects"]:
-            # Work out the new position for the object
-            newposx = schematic_objects[selected_object]["positionx"] + deltax
-            newposy = schematic_objects[selected_object]["positiony"] + deltay
-            move_object(selected_object,newposx,newposy)
-    return()
-
-def left_button_click(event,shift_key):
-    global selected_objects
-    highlighted_object = None
-    selected_objects["startx"] = event.x 
-    selected_objects["starty"] = event.y
-    # See if the Cursor is over the boundary box of an object (to select)
-    for object_id in schematic_objects:
-        if schematic_objects[str(object_id)]["item"] == object_type.signal:
-            if signals.signal_highlighted(schematic_objects[str(object_id)]["itemid"],event.x,event.y):
-                boundarybox = signals.get_boundary_box(schematic_objects[str(object_id)]["itemid"])
-                highlighted_object = object_id
-                break
-    if highlighted_object:
-        # Could either be a new selection, change in selection or the start of an object move
-        selected_objects["selectobject"] = True
-        selected_objects["selectarea"] = False
-        if highlighted_object in selected_objects["objects"] and shift_key:
-            # Remove the highlighted item from the list of selected objects
-            selected_objects["objects"].remove(highlighted_object)
-            # make the selection box rectangle visible for the highlighted item
-            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="hidden") 
-        elif highlighted_object not in selected_objects["objects"]:
-            # make the selection box rectangle visible for the highlighted item
-            canvas.itemconfigure(schematic_objects[highlighted_object]["bbox"],state="normal") 
-            if shift_key:
-                # Add the highlighted item to the list of selected objects
-                selected_objects["objects"].append(highlighted_object)
-            else:
-                # Clear down all current selections and add the highlighted item
-                for obj_to_clear in selected_objects["objects"]:
-                    canvas.itemconfigure(schematic_objects[obj_to_clear]["bbox"],state="hidden")
-                selected_objects["objects"] = [highlighted_object]
-    else:
-        # Could be the start of an area selection or clearing the current selection
-        # Clear down all the selection box rectangles and set the list back to empty
-        for obj_to_clear in selected_objects["objects"]:
-            canvas.itemconfigure(schematic_objects[obj_to_clear]["bbox"],state="hidden")
-        selected_objects["objects"] = []
-        selected_objects["selectobject"] = False
-        selected_objects["selectarea"] = True
+        # Move all the objects that are selected
+        move_selected_objects(deltax,deltay)
+        # Reset the "start" position for the next move
+        selected_objects["startx"] = event.x
+        selected_objects["starty"] = event.y
+    elif selected_objects["selectarea"]:
+        canvas.coords(selected_objects["selectionbox"],selected_objects["startx"],selected_objects["starty"],event.x,event.y)
     return()
 
 def left_button_release(event):
     global selected_objects
-    if selected_objects["selectobject"]:
-        # Need to snap all schematic objects to the Grid
-        for obj_to_snap in selected_objects["objects"]:
-            finalposx = schematic_objects[obj_to_snap]["positionx"]
-            finalposy = schematic_objects[obj_to_snap]["positiony"]
-            remainderx = finalposx%canvas_grid
-            remaindery = finalposy%canvas_grid
-            if remainderx < canvas_grid/2: finalposx = finalposx - remainderx
-            else: finalposx = finalposx + (canvas_grid-remainderx)
-            if remaindery < canvas_grid/2: finalposy = finalposy - remaindery
-            else: finalposy = finalposy + (canvas_grid-remaindery)
-            move_object(obj_to_snap,finalposx,finalposy)
+    if selected_objects["moveobjects"]:
+        # Need to snap all schematic objects to the Grid - but we only need to work
+        # out the xdiff and xdiff for one of the selected objects to get the diff
+        obj_to_snap = selected_objects["selectedobjects"][0]
+        remainderx = schematic_objects[obj_to_snap]["positionx"]%canvas_grid
+        remaindery = schematic_objects[obj_to_snap]["positiony"]%canvas_grid
+        if remainderx < canvas_grid/2: remainderx = 0 - remainderx
+        else: remainderx = canvas_grid - remainderx
+        if remaindery < canvas_grid/2: remaindery = 0 - remaindery
+        else: remaindery = canvas_grid - remaindery
+        move_selected_objects(remainderx,remaindery)
         # Clear the "select object mode" - but leave all objects selected
-        selected_objects["selectobject"] = False
+        selected_objects["moveobjects"] = False
     elif selected_objects["selectarea"]:
-        # Clear the "select area mode"
+        # Clear the "select area mode" and select all objects within it
+        canvas.itemconfigure(selected_objects["selectionbox"],state="hidden")
         selected_objects["selectarea"] = False
-        # Clear down all the selection box rectangles and set the list back to empty
-        for obj_to_clear in selected_objects["objects"]:
-            canvas.itemconfigure(schematic_objects[obj_to_clear]["bbox"],state="hidden")
-        selected_objects["objects"] = []
         # Now select all objects inside the area box
-        # TBD TBD
+        abox = canvas.coords(selected_objects["selectionbox"])
+        for object_id in schematic_objects:
+            bbox = canvas.coords(schematic_objects[str(object_id)]["bbox"])
+            if bbox[0] > abox[0] and bbox[2] < abox[2] and bbox[1] > abox[1] and bbox[3] < abox[3]:
+                # Add the highlighted item to the list of selected objects
+                selected_objects["selectedobjects"].append(object_id)
+                canvas.itemconfigure(schematic_objects[object_id]["bbox"],state="normal")
     return()
 
 #------------------------------------------------------------------------------------
@@ -323,13 +463,21 @@ frame3=Frame(frame2, highlightthickness=1,highlightbackground="black")
 frame3.pack(side=LEFT,expand=False,fill=BOTH)
 label = Label(frame3,text="Click\nTo Add")
 label.pack(padx=5,pady=5)
-#button1_image = PhotoImage(file =r"colourlight.png")
-button=Button(frame3,text ="1",compound=TOP,command=lambda:create_signal
+colourlight = PhotoImage(file =r"colourlight.png")
+button=Button(frame3,image =colourlight,compound=TOP,command=lambda:create_signal
               (signals_common.sig_type.colour_light,signals_colour_lights.signal_sub_type.four_aspect))
 button.pack(padx=5,pady=5)
-#button2_image = PhotoImage(file =r"semaphore.png")
-button=Button(frame3,text ="2",compound=TOP,command=lambda:create_signal
+semaphore = PhotoImage(file =r"semaphore.png")
+button=Button(frame3,image =semaphore,compound=TOP,command=lambda:create_signal
               (signals_common.sig_type.semaphore,signals_semaphores.semaphore_sub_type.home))
+button.pack(padx=5,pady=5)
+#groundposition = PhotoImage(file =r"semaphore.png")
+button=Button(frame3,text="groundpos",compound=TOP,command=lambda:create_signal
+              (signals_common.sig_type.ground_position,signals_ground_position.ground_pos_sub_type.standard))
+button.pack(padx=5,pady=5)
+#grounddisc = PhotoImage(file =r"semaphore.png")
+button=Button(frame3,text ="grounddisc",compound=TOP,command=lambda:create_signal
+              (signals_common.sig_type.ground_disc,signals_ground_disc.ground_disc_sub_type.standard))
 button.pack(padx=5,pady=5)
 
 # Create frame4 inside frame2 to hold the canvas and scrollbars (right hand side)
@@ -348,18 +496,38 @@ canvas.config(width=canvas_width,height=canvas_height)
 canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
 canvas.pack(side=LEFT,expand=True,fill=BOTH)
 canvas_area = canvas.create_rectangle(0,0,canvas_width,canvas_height,outline="black",fill="grey85")
-# Bind the Canvas mouse events to the various callback functions
+# Bind the Canvas mouse and button events to the various callback functions
 canvas.bind("<Motion>", track_cursor)
-canvas.bind('<Button-1>', lambda event:left_button_click(event,False))
-canvas.bind('<Shift-Button-1>', lambda event:left_button_click(event,True))
+canvas.bind('<Button-1>', left_button_click)
+canvas.bind('<Button-2>', right_button_click)
+canvas.bind('<Button-3>', right_button_click)
+canvas.bind('<Shift-Button-1>', left_shift_click)
 canvas.bind('<ButtonRelease-1>', left_button_release)
-canvas.bind('<Double-Button-1>', left_button_double_click)
-canvas.bind('<Double-Button-1>', left_button_double_click)
+canvas.bind('<Double-Button-1>', left_double_click)
+canvas.bind('<BackSpace>', delete_selected_objects)
+canvas.bind('<Control-Key-c>', copy_selected_objects)
+canvas.bind('<Control-Key-x>', cut_selected_objects)
+canvas.bind('<Control-Key-v>', paste_selected_objects)
+canvas.bind('R', rotate_selected_objects)
+canvas.bind('r', rotate_selected_objects)
 # Draw the Grid on the Canvas
 for i in range(0,canvas_height,canvas_grid):
     canvas.create_line(0,i, canvas_width,i, fill='#999')
 for i in range(0,canvas_width,canvas_grid):
     canvas.create_line(i,0, i,canvas_height, fill='#999')
+# Define the Popup menu for Right Click (something selected)
+popup1 = Menu(tearoff=0)
+popup1.add_command(label="Cut")
+popup1.add_command(label="Copy")
+popup1.add_command(label="Edit")
+popup1.add_command(label="Rotate",command=rotate_selected_objects)
+popup1.add_command(label="Delete",command=delete_selected_objects)
+# Define the Popup menu for Right Click (nothing selected)
+popup2 = Menu(tearoff=0)
+popup2.add_command(label="Paste")
+popup2.add_command(label="Grid")
+
+
 
 print ("Entering Main Event Loop")
 root.mainloop()
