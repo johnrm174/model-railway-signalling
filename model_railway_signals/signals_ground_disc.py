@@ -9,6 +9,7 @@ from . import common
 
 from tkinter import *
 import logging
+import enum
 
 # -------------------------------------------------------------------------
 # Classes used externally when creating/updating Ground Disk signals 
