@@ -120,9 +120,10 @@ create_point - Creates a point object and returns a list of the tkinter drawing 
       point_id:int - The ID for the point - also displayed on the point button
       pointtype:point_type - either point_type.RH or point_type.LH
       x:int, y:int - Position of the point on the canvas (in pixels)
-      colour:str - Any tkinter colour can be specified as a string
+
   Optional Parameters:
-      orientation:int- Orientation in degrees (0 or 180) - Default is zero
+      colour:str - Any tkinter colour can be specified as a string - Default = "Black"
+      orientation:int- Orientation in degrees (0 or 180) - Default = zero
       point_callback - The function to call when the point is changed - default = no callback
                        Note that the callback function returns (item_id, callback type)
       reverse:bool - If the switching logic is to be reversed - Default = False
