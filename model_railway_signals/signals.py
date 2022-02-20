@@ -818,11 +818,10 @@ def set_signals_to_publish_passed_events(*sig_ids:int):
 # ------------------------------------------------------------------------------------------
 # Non public API function for deleting a signal object (including all the drawing objects)
 # This is used by the schematic editor for changing signal types where we delete the existing
-# signal with all its data and then recreate it (with the same sig_id) in its new configuration
+# signal with all its data and then recreate it (with the same ID) in its new configuration
 # ------------------------------------------------------------------------------------------
 
 def delete_signal(sig_id:int):
-    global signals
     if signals_common.sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects associated with the signal
         signals_common.signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
@@ -845,9 +844,7 @@ def delete_signal(sig_id:int):
 # ------------------------------------------------------------------------------------------
 
 def move_signal(sig_id:int,xdiff:int,ydiff:int):
-    global signals
     if signals_common.sig_exists(sig_id):
-        # Move all the tkinter canvas drawing objects associated with the signal
         signals_common.signals[str(sig_id)]["canvas"].move("signal"+str(sig_id),xdiff,ydiff)
     return()
 
@@ -855,8 +852,7 @@ def move_signal(sig_id:int,xdiff:int,ydiff:int):
 # Non public API function to "test" if the cursor is within the signal tkinter boundary box
 # ------------------------------------------------------------------------------------------
 
-def get_boundary_box (sig_id:int):
-    global signals
+def get_boundary_box(sig_id:int):
     if signals_common.sig_exists(sig_id):
         bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
     else:
