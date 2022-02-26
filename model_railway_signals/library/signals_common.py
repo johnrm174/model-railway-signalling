@@ -589,4 +589,26 @@ def publish_signal_passed_event(sig_id:int):
         mqtt_interface.send_mqtt_message("signal_passed_event",sig_id,data=data,log_message=log_message,retain=False)
         return()
 
+# ------------------------------------------------------------------------------------------
+# Common internal functions for deleting a signal object (including all the drawing objects)
+# This is used by the schematic editor for moving signals and changing signal types where we
+# delete the existing signal with all its data and then recreate it in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_signal(sig_id:int):
+    global signals
+    if sig_exists(sig_id):
+        # Delete all the tkinter canvas drawing objects created for the signal
+        signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
+        # Delete all the tkinter button objects created for the signal
+        signals[str(sig_id)]["sigbutton"].destroy()
+        signals[str(sig_id)]["subbutton"].destroy()
+        signals[str(sig_id)]["passedbutton"].destroy()
+        # This buttons is only common to colour light and semaphore types
+        if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
+            signals[str(sig_id)]["releasebutton"].destroy()
+        # Finally, delete the signal entry from the dictionary of signals
+        del signals[str(sig_id)]
+    return()
+
 #################################################################################################
