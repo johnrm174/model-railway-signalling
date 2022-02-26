@@ -441,16 +441,16 @@ def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
 # Internal function to create the Indicator component of a Block Instrument
 # --------------------------------------------------------------------------------
 
-def create_block_indicator(canvas:int, x:int, y:int):
-    canvas.create_rectangle (x-50, y-10, x+50, y+45, fill="gray90", outline='black', width=1)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='tomato', outline='black', start=-150, extent=40, width=0)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='yellow', outline='black', start=-110, extent=40, width=0)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='green yellow', outline='black', start=-70, extent=40, width=0)
-    canvas.create_arc(x-20, y-20, x+20, y+20, fill='gray90', outline="gray90", start=-155, extent=130, width=0)
-    canvas.create_oval(x-5, y-5, x+5, y+5, fill='black', outline="black", width=0)
-    block = canvas.create_line (x+0, y-5, x+0,  y + 35, fill='black', width = 3, state='normal')
-    clear = canvas.create_line (x-3, y-3, x+25, y + 25, fill='black', width = 3, state='hidden')
-    occup = canvas.create_line (x+3, y-3, x-25, y + 25, fill='black', width = 3 , state='hidden')
+def create_block_indicator(canvas:int, x:int, y:int, block_id_tag):
+    canvas.create_rectangle (x-50, y-10, x+50, y+45, fill="gray90", outline='black', width=1, tags=block_id_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='tomato', outline='black', start=-150, extent=40, width=0, tags=block_id_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='yellow', outline='black', start=-110, extent=40, width=0, tags=block_id_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='green yellow', outline='black', start=-70, extent=40, width=0, tags=block_id_tag)
+    canvas.create_arc(x-20, y-20, x+20, y+20, fill='gray90', outline="gray90", start=-155, extent=130, width=0, tags=block_id_tag)
+    canvas.create_oval(x-5, y-5, x+5, y+5, fill='black', outline="black", width=0, tags=block_id_tag)
+    block = canvas.create_line (x+0, y-5, x+0,  y + 35, fill='black', width = 3, state='normal', tags=block_id_tag)
+    clear = canvas.create_line (x-3, y-3, x+25, y + 25, fill='black', width = 3, state='hidden', tags=block_id_tag)
+    occup = canvas.create_line (x+3, y-3, x-25, y + 25, fill='black', width = 3 , state='hidden', tags=block_id_tag)
     return (block, clear, occup)
 
 # --------------------------------------------------------------------------------
@@ -481,9 +481,11 @@ def create_block_instrument (canvas,
     elif isinstance(linked_to,str) and mqtt_interface.split_remote_item_identifier(linked_to) is None:
         logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")   
     else:
+        # Define the "Tag" for all drawing objects for this instrument instance
+        block_id_tag = "instrument"+str(block_id)
         # Create the Instrument background - this will vary in size depending on single or double line
-        if single_line: canvas.create_rectangle (x-60, y-20, x+60, y+150, fill = "saddle brown")
-        else: canvas.create_rectangle (x-60, y-80, x+60, y+150, fill = "saddle brown")
+        if single_line: canvas.create_rectangle (x-60, y-20, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
+        else: canvas.create_rectangle (x-60, y-80, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
         # Create the button objects and their callbacks
         occup_button = Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
@@ -502,15 +504,15 @@ def create_block_instrument (canvas,
         bell_button.bind('<Button-2>', lambda event:open_bell_code_hints())
         bell_button.bind('<Button-3>', lambda event:open_bell_code_hints())
         # Create the windows (on the canvas) for the buttons
-        canvas.create_window(x, y+80, window=occup_button, anchor=SE)
-        canvas.create_window(x, y+80, window=clear_button, anchor=SW)
-        canvas.create_window(x, y+80, window=block_button, anchor=N)
-        canvas.create_window(x, y+115, window=bell_button, anchor=N)
+        canvas.create_window(x, y+80, window=occup_button, anchor=SE, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=clear_button, anchor=SW, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=block_button, anchor=N, tags=block_id_tag)
+        canvas.create_window(x, y+115, window=bell_button, anchor=N, tags=block_id_tag)
         # Create the main block section indicator for our instrument
-        my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y)
+        my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y, block_id_tag)
         # If this is a double line indicator then create the repeater indicator
         if single_line: rep_ind_block, rep_ind_clear, rep_ind_occup = None, None, None
-        else: rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator (canvas, x, y-55)
+        else: rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator (canvas, x, y-55, block_id_tag)
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
@@ -648,5 +650,45 @@ def send_mqtt_ring_section_bell_event(block_id:int):
     # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
     mqtt_interface.send_mqtt_message("instrument_telegraph_event",block_id,data=data,log_message=log_message,retain=False)
     return()
+# ------------------------------------------------------------------------------------------
+# Non public API function for deleting an instrument object (including all the drawing objects)
+# This is used by the schematic editor for changing instrument types where we delete the existing
+# instrument with all its data and then recreate it (with the same ID) in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_instrument(block_id:int):
+    if instrument_exists(block_id):
+        # Delete all the tkinter canvas drawing objects associated with the signal
+        instruments[str(block_id)]["canvas"].delete("instrument"+str(block_id))
+        # Delete all the tkinter button objects created for the signal
+        instruments[str(block_id)]["blockbutton"].destroy()
+        instruments[str(block_id)]["clearbutton"].destroy()
+        instruments[str(block_id)]["occupbutton"].destroy()
+        instruments[str(block_id)]["bellbutton"].destroy()
+        # Finally, delete the entry from the dictionary of instruments
+        del instruments[str(block_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for moving an instrument object (i.e. all the associated drawing objects)
+# This is used by the schematic editor for moving instruments around on the canvas. According to
+# all the info out there this is much more performant than deleting and then recreating
+# ------------------------------------------------------------------------------------------
+
+def move_instrument(block_id:int,xdiff:int,ydiff:int):
+    if instrument_exists(block_id):
+        instruments[str(block_id)]["canvas"].move("instrument"+str(block_id),xdiff,ydiff)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to "test" if the cursor is within the signal tkinter boundary box
+# ------------------------------------------------------------------------------------------
+
+def get_boundary_box(block_id:int):
+    if instrument_exists(block_id):
+        bbox=instruments[str(block_id)]["canvas"].bbox("instrument"+str(block_id))
+    else:
+        bbox=[0,0,0,0]
+    return(bbox)
 
 ###############################################################################

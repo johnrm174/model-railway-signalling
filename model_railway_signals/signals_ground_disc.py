@@ -9,18 +9,37 @@ from . import common
 
 from tkinter import *
 import logging
+import enum
 
+# -------------------------------------------------------------------------
+# Classes used externally when creating/updating Ground Disk signals 
+# -------------------------------------------------------------------------
+
+# Define the superset of signal sub types that can be created
+class ground_disc_sub_type(enum.Enum):
+    standard = 1            
+    shunt_ahead = 2           
+    
 # -------------------------------------------------------------------------
 # Public API function to create a Ground Disc Signal (drawing objects and
 # internal state). By default the Signal is "NOT CLEAR" (i.e. set to DANGER)
 # -------------------------------------------------------------------------
 
 def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
+                               signal_subtype=ground_disc_sub_type.standard,
                                sig_callback = None,
                                orientation:int = 0,
                                sig_passed_button: bool = False, 
-                               shunt_ahead: bool = False):
+                               shunt_ahead: bool = False):   ################ DEPRECATED #################
     global logging
+
+    ##########################################################################################################
+    # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
+    ##########################################################################################################
+    if shunt_ahead:
+        logging.warning ("Signal "+str(sig_id)+": 'shunt_ahead' flag is DEPRECATED - Use 'signal_subtype' instead")
+        signal_subtype = ground_disc_sub_type.shunt_ahead
+    ##########################################################################################################
 
     logging.info ("Signal "+str(sig_id)+": Creating Ground Disc Signal")
     # Do some basic validation on the parameters we have been given
@@ -31,17 +50,23 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")                  
     else:
-        
+        # Define the "Tag" for all drawing objects for this signal instance
+        sig_id_tag = "signal"+str(sig_id)
         # Draw the signal base
-        canvas.create_line (common.rotate_line (x,y,0,0,0,-11,orientation),width=2)
-        canvas.create_line (common.rotate_line (x,y,0,-11,5,-11,orientation),width=2)
+        line_coords = common.rotate_line (x,y,0,0,0,-11,orientation)
+        canvas.create_line (line_coords,width=2,tags=sig_id_tag)
+        line_coords = common.rotate_line (x,y,0,-11,5,-11,orientation)
+        canvas.create_line (line_coords,width=2,tags=sig_id_tag)
         # Draw the White disc of the signal
-        posroot = canvas.create_oval(common.rotate_line (x,y,+5,-21,+21,-5,orientation),fill="white",outline="black")
+        oval_coords = common.rotate_line (x,y,+5,-21,+21,-5,orientation)
+        posroot = canvas.create_oval(oval_coords,fill="white",outline="black",tags=sig_id_tag)
         # Draw the banner arms for the signal
-        if shunt_ahead: arm_colour="yellow3"
+        if signal_subtype == ground_disc_sub_type.shunt_ahead: arm_colour="yellow3"
         else: arm_colour = "red"
-        sigon = canvas.create_line(common.rotate_line(x,y,+13,-21,+13,-5,orientation),fill=arm_colour,width=3)
-        sigoff = canvas.create_line(common.rotate_line(x,y,+18,-19,+8,-7,orientation),fill=arm_colour,width=3)
+        line_coords = common.rotate_line(x,y,+13,-21,+13,-5,orientation)
+        sigon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,+18,-19,+8,-7,orientation)
+        sigoff = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
 
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,

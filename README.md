@@ -120,9 +120,10 @@ create_point - Creates a point object and returns a list of the tkinter drawing 
       point_id:int - The ID for the point - also displayed on the point button
       pointtype:point_type - either point_type.RH or point_type.LH
       x:int, y:int - Position of the point on the canvas (in pixels)
-      colour:str - Any tkinter colour can be specified as a string
+
   Optional Parameters:
-      orientation:int- Orientation in degrees (0 or 180) - Default is zero
+      colour:str - Any tkinter colour can be specified as a string - Default = "Black"
+      orientation:int- Orientation in degrees (0 or 180) - Default = zero
       point_callback - The function to call when the point is changed - default = no callback
                        Note that the callback function returns (item_id, callback type)
       reverse:bool - If the switching logic is to be reversed - Default = False
@@ -211,6 +212,20 @@ signal_sub_type (use when creating colour light signals):
     signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 
+semaphore_sub_type (use when creating semaphore signals):
+    semaphore_sub_type.home
+    semaphore_sub_type.distant
+                                  
+ground_pos_sub_type(enum.Enum):
+    ground_pos_sub_type.standard          (post 1996 type)
+    ground_pos_sub_type.shunt_ahead       (post 1996 type)
+    ground_pos_sub_type.early_standard           
+    ground_pos_sub_type.early_shunt_ahead
+
+ground_disc_sub_type(enum.Enum):
+    ground_disc_sub_type.standard
+    ground_disc_sub_type.shunt_ahead
+
 route_type (use for specifying the route):
     route_type.NONE   (no route indication)
     route_type.MAIN   (main route)
@@ -242,7 +257,7 @@ create_colour_light_signal - Creates a colour light signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
-      signal_subtype:sig_sub_type - type of signal to create - Default = four_aspect
+      signal_subtype:sig_sub_type - subtype of signal - Default = four_aspect
       orientation:int- Orientation in degrees (0 or 180) - Default = zero
       sig_callback:name - Function to call when a signal event happens - Default = None
                         Note that the callback function returns (item_id, callback type)
@@ -268,7 +283,8 @@ create_semaphore_signal - Creates a Semaphore signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
-      distant:bool - True for a Distant signal - False for a Home signal - default = False
+      signal_subtype - subtype of signal - default = semaphore_sub_type.home
+      distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
       associated_home:int - Option only valid when creating distant signals - Provide the ID of
                             a previously created home signal (and use the same x and y coords)
                             to create the distant signal on the same post as the home signal 
@@ -303,12 +319,13 @@ create_ground_position_signal - create a ground position light signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
+      signal_subtype - subtype of the signal - default = ground_pos_sub_type.early_standard
       orientation:int- Orientation in degrees (0 or 180) - default is zero
       sig_callback:name - Function to call when a signal event happens - default = None
                         Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button - default =False
-      shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default = False
-      modern_type: bool - Specifies a modern type ground signal (post 1996) - default = False
+      shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
+      modern_type: bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 
 create_ground_disc_signal - Creates a ground disc type signal
   Mandatory Parameters:
@@ -316,11 +333,12 @@ create_ground_disc_signal - Creates a ground disc type signal
       sig_id:int - The ID for the signal - also displayed on the signal button
       x:int, y:int - Position of the signal on the canvas (in pixels) 
  Optional Parameters:
+      signal_subtype - subtype of the signal - default = ground_disc_sub_type.standard
       orientation:int- Orientation in degrees (0 or 180) - Default is zero
       sig_callback:name - Function to call when a signal event happens - Default = none
                         Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
-      shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default = False
+      shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 
 set_route - Set (and change) the route indication (either feathers or theatre text)
   Mandatory Parameters:
@@ -497,7 +515,7 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
       single_line:bool - for a single line instrument(created without a repeater) - default: False
       bell_sound_file:str - The filename of the soundfile (in the local package resources
                           folder) to use for the bell sound (default "bell-ring-01.wav" - other
-			  options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
+              options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
       linked_to:int/str - the identifier for the "paired" block instrument - can be specified

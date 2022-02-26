@@ -23,9 +23,9 @@
 #       point_id:int - The ID for the point - also displayed on the point button
 #       pointtype:point_type - either point_type.RH or point_type.LH
 #       x:int, y:int - Position of the point on the canvas (in pixels)
-#       colour:str - Any tkinter colour can be specified as a string
 #   Optional Parameters:
-#       orientation:int- Orientation in degrees (0 or 180) - Default is zero
+#       colour:str - Any tkinter colour can be specified as a string - default = "Black"
+#       orientation:int- Orientation in degrees (0 or 180) - default = zero
 #       point_callback - The function to call when the point is changed - default = no callback
 #                        Note that the callback function returns (item_id, callback type)
 #       reverse:bool - If the switching logic is to be reversed - Default = False
@@ -216,7 +216,7 @@ def toggle_point (point_id:int, switched_by_another_point = False):
 # -------------------------------------------------------------------------
 
 def create_point (canvas, point_id:int, pointtype:point_type,
-                  x:int, y:int, colour:str, orientation:int = 0,
+                  x:int, y:int, colour:str="black", orientation:int = 0,
                   point_callback = null_callback, also_switch:int = 0,
                   reverse:bool=False,auto:bool=False,fpl:bool=False):
     
@@ -242,6 +242,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         logging.error ("Point "+str(point_id)+": Automatic point should be created without a facing point lock")
         point_objects = [0,0,0,0]
     else:
+        # Define the "Tag" for all drawing objects for this point instance
+        point_id_tag = "point"+str(point_id)
         # Create the button objects and their callbacks
         point_button = Button (canvas, text=str(point_id), state="normal", relief="raised",
                     font=('Courier',common.fontsize,"normal"),bg= "grey85",
@@ -257,56 +259,56 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         if pointtype==point_type.RH:
             # Draw the lines representing a Right Hand point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
-            blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
+            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #straignt blade
             line_coords = common.rotate_line (x,y,-25,0,-15,+10,orientation)
-            blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
+            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #switched blade
             line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
-            route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
+            route1 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #straight route
             line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
-            route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
+            route2 = canvas.create_line(line_coords,fill=colour,width=3,tags=point_id_tag) #switched route
             # Create the button windows in the correct relative positions for a Right Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
                 point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,window=point_button,state='hidden') 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden')
+                canvas.create_window (point_coords,window=point_button,state='hidden',tags=point_id_tag) 
+                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
                 point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,anchor=W,window=point_button) 
-                canvas.create_window (point_coords,anchor=E,window=fpl_button)
+                canvas.create_window (point_coords,anchor=W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
                 point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,window=point_button) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden')
+                canvas.create_window (point_coords,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
 
         else: 
             # Draw the lines representing a Left Hand point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
-            blade1 = canvas.create_line (line_coords,fill=colour,width=3) #straignt blade
+            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #straignt blade
             line_coords = common.rotate_line (x,y,-25,0,-15,-10,orientation)
-            blade2 = canvas.create_line (line_coords,fill=colour,width=3) #switched blade
+            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #switched blade
             line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
-            route1 = canvas.create_line (line_coords,fill=colour,width=3) #straight route
+            route1 = canvas.create_line (line_coords,fill=colour,width=3,tags=point_id_tag) #straight route
             line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
-            route2 = canvas.create_line(line_coords,fill=colour,width=3) #switched route
+            route2 = canvas.create_line(line_coords,fill=colour,width=3,tags=point_id_tag) #switched route
             # Create the button windows in the correct relative positions for a Left Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
                 point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,window=point_button,state='hidden') 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden')
+                canvas.create_window (point_coords,window=point_button,state='hidden',tags=point_id_tag) 
+                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
                 point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,anchor=W,window=point_button) 
-                canvas.create_window (point_coords,anchor=E,window=fpl_button)
+                canvas.create_window (point_coords,anchor=W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
                 point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,window=point_button) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden')
+                canvas.create_window (point_coords,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
                 
         # The "normal" state of the point is the straight through route by default
         # With reverse set to True, the divergent route becomes the "normal" state
@@ -436,6 +438,46 @@ def fpl_active(point_id:int):
     else:
         locked = points[str(point_id)]["fpllock"]
     return (locked)
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for deleting a point object (including all the drawing objects)
+# This is used by the schematic editor for changing point types where we delete the existing
+# point with all its data and then recreate it (with the same ID) in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_point(point_id:int):
+    global points
+    if point_exists(point_id):
+        # Delete all the tkinter canvas drawing objects associated with the point
+        points[str(point_id)]["canvas"].delete("point"+str(point_id))
+        # Delete all the tkinter button objects created for the point
+        points[str(point_id)]["changebutton"].destroy()
+        points[str(point_id)]["lockbutton"].destroy()
+        # Finally, delete the entry from the dictionary of points
+        del points[str(point_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for moving a point object (i.e. all the associated drawing objects)
+# This is used by the schematic editor for moving points around on the canvas. According to
+# all the info out there this is much more performant than deleting and then recreating
+# ------------------------------------------------------------------------------------------
+
+def move_point(point_id:int,xdiff:int,ydiff:int):
+    if point_exists(point_id):
+        points[str(point_id)]["canvas"].move("point"+str(point_id),xdiff,ydiff)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to "test" if the cursor is within the point tkinter boundary box
+# ------------------------------------------------------------------------------------------
+
+def get_boundary_box(point_id:int):
+    if point_exists(point_id):
+        bbox=points[str(point_id)]["canvas"].bbox("point"+str(point_id))
+    else:
+        bbox=[0,0,0,0]
+    return(bbox)
 
 ###############################################################################
 

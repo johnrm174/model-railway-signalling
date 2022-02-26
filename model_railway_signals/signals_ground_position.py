@@ -9,6 +9,18 @@ from . import common
 
 from tkinter import *
 import logging
+import enum
+
+# -------------------------------------------------------------------------
+# Classes used externally when creating/updating Ground Disk signals 
+# -------------------------------------------------------------------------
+
+# Define the superset of signal sub types that can be created
+class ground_pos_sub_type(enum.Enum):
+    standard = 1            
+    shunt_ahead = 2
+    early_standard = 3            
+    early_shunt_ahead = 4
 
 # -------------------------------------------------------------------------
 # Public API function to create a Ground Position Signal (drawing objects and
@@ -16,12 +28,25 @@ import logging
 # -------------------------------------------------------------------------
 
 def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
+                                    signal_subtype=ground_pos_sub_type.early_standard,
                                     sig_callback = None,
                                     orientation:int = 0,
                                     sig_passed_button: bool = False, 
-                                    shunt_ahead: bool = False,
-                                    modern_type: bool = False):
+                                    shunt_ahead: bool = False,    ################ DEPRECATED #################
+                                    modern_type: bool = False):   ################ DEPRECATED #################
     global logging
+    
+    ##########################################################################################################
+    # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
+    ##########################################################################################################
+    if shunt_ahead:
+        logging.warning ("Signal "+str(sig_id)+": 'shunt_ahead' flag is DEPRECATED - Use 'signal_subtype' instead")
+    elif modern_type:
+        logging.warning ("Signal "+str(sig_id)+": 'modern_type' flag is DEPRECATED - Use 'signal_subtype' instead")
+    if shunt_ahead and modern_type: signal_subtype = ground_pos_sub_type.shunt_ahead
+    elif shunt_ahead: signal_subtype = ground_pos_sub_type.early_shunt_ahead
+    elif modern_type: signal_subtype = ground_pos_sub_type.standard
+    ##########################################################################################################
 
     logging.info ("Signal "+str(sig_id)+": Creating Ground Position Signal")
     # Do some basic validation on the parameters we have been given
@@ -32,9 +57,11 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
     elif orientation != 0 and orientation != 180:
         logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")                  
     else:  
-        
+        # Define the "Tag" for all drawing objects for this signal instance
+        sig_id_tag = "signal"+str(sig_id)        
         # Draw the signal base
-        canvas.create_line (common.rotate_line (x,y,0,0,0,-25,orientation),width=2)
+        line_coords = common.rotate_line (x,y,0,0,0,-25,orientation)
+        canvas.create_line (line_coords,width=2,tags=sig_id_tag)
         # Draw the main body of signal
         point_coords1 = common.rotate_point (x,y,0,-5,orientation) 
         point_coords2 = common.rotate_point (x,y,0,-25,orientation) 
@@ -42,20 +69,30 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
         point_coords4 = common.rotate_point (x,y,+20,-20,orientation) 
         point_coords5 = common.rotate_point (x,y,+5,-5,orientation) 
         points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
-        canvas.create_polygon (points, outline="black")
+        canvas.create_polygon (points, outline="black",tags=sig_id_tag)
         # Create the position light "dark" aspects (i.e. when particular aspect is "not-lit")
         # We don't need to create a "dark" aspect for the "root" position light as this is always lit
-        canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="grey",outline="black")
-        canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill="grey",outline="black")
+        oval_coords = common.rotate_line (x,y,+9,-24,+16,-17,orientation)
+        canvas.create_oval (oval_coords,fill="grey",outline="black",tags=sig_id_tag)
+        oval_coords = common.rotate_line (x,y,+1,-24,+8,-17,orientation)
+        canvas.create_oval (oval_coords,fill="grey",outline="black",tags=sig_id_tag)
         # Draw the "DANGER" and "PROCEED" aspects (initially hidden)
-        if shunt_ahead: danger_colour = "gold"
-        else: danger_colour = "red"
-        if modern_type: root_colour = danger_colour
-        else: root_colour = "white"
-        sigoff1 = canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill="white",outline="black",state="hidden")
-        sigoff2 = canvas.create_oval (common.rotate_line (x,y,+9,-24,+16,-17,orientation),fill="white",outline="black",state="hidden")
-        sigon1 = canvas.create_oval (common.rotate_line (x,y,+1,-14,+8,-7,orientation),fill=root_colour,outline="black",state="hidden")
-        sigon2 = canvas.create_oval (common.rotate_line (x,y,+1,-24,+8,-17,orientation),fill=danger_colour,outline="black",state="hidden")
+        if signal_subtype in (ground_pos_sub_type.early_shunt_ahead,ground_pos_sub_type.shunt_ahead):
+            danger_colour = "gold"
+        else:
+            danger_colour = "red"
+        if signal_subtype in (ground_pos_sub_type.standard,ground_pos_sub_type.shunt_ahead):
+            root_colour = danger_colour
+        else:
+            root_colour = "white"
+        line_coords = common.rotate_line (x,y,+1,-14,+8,-7,orientation)
+        sigoff1 = canvas.create_oval (line_coords,fill="white",outline="black",state="hidden",tags=sig_id_tag)
+        line_coords = common.rotate_line (x,y,+9,-24,+16,-17,orientation)
+        sigoff2 = canvas.create_oval (line_coords,fill="white",outline="black",state="hidden",tags=sig_id_tag)
+        line_coords = common.rotate_line (x,y,+1,-14,+8,-7,orientation)
+        sigon1 = canvas.create_oval (line_coords,fill=root_colour,outline="black",state="hidden",tags=sig_id_tag)
+        line_coords = common.rotate_line (x,y,+1,-24,+8,-17,orientation)
+        sigon2 = canvas.create_oval (line_coords,fill=danger_colour,outline="black",state="hidden",tags=sig_id_tag)
 
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,

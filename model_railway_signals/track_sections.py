@@ -207,8 +207,9 @@ def open_entry_box(section_id):
     if sections[str(section_id)]["occupied"]:
         text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
     # Create a window on the canvas for the Entry box (overlaying the section button)
-    x =  sections[str(section_id)]["positionx"]
-    y =  sections[str(section_id)]["positiony"]
+    bbox = sections[str(section_id)]["canvas"].bbox("section"+str(section_id))
+    x = bbox[0] + (bbox[2]-bbox[0]) / 2
+    y = bbox[1] + (bbox[3]-bbox[1]) / 2
     entry_box_window = canvas.create_window (x,y,window=text_entry_box)
     # Force focus on the entry box so it will accept the keyboard entry immediately
     text_entry_box.focus()
@@ -239,7 +240,8 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id), width = len(label))
-        canvas.create_window (x,y,window=section_button)
+        # Note the "Tag" for the drawing objects for this track section (i.e. this window)
+        canvas.create_window (x,y,window=section_button,tags="section"+str(section_id))
         # Compile a dictionary of everything we need to track
         sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
                                      "button1" : section_button,          # drawing object
@@ -412,6 +414,55 @@ def send_mqtt_section_updated_event(section_id:int):
         log_message = "Section "+str(section_id)+": Publishing section state to MQTT Broker"
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("section_updated_event",section_id,data=data,log_message=log_message,retain=True)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for deleting a section object (including all the drawing objects)
+# This is used by the schematic editor for changing section types where we delete the existing
+# section with all its data and then recreate it (with the same ID) in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_section(section_id:int):
+    global sections
+    if section_exists(section_id):
+        # Delete all the tkinter canvas drawing objects associated with the section
+        sections[str(section_id)]["canvas"].delete("section"+str(section_id))
+        # Delete all the tkinter button objects created for the section
+        sections[str(section_id)]["button1"].destroy()
+        # Finally, delete the entry from the dictionary of sections
+        del sections[str(section_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for moving a section object (i.e. all the associated drawing objects)
+# This is used by the schematic editor for moving sections around on the canvas. According to
+# all the info out there this is much more performant than deleting and then recreating
+# ------------------------------------------------------------------------------------------
+
+def move_section(section_id:int,xdiff:int,ydiff:int):
+    if section_exists(section_id):
+        sections[str(section_id)]["canvas"].move("section"+str(section_id),xdiff,ydiff)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to "test" if the cursor is within the section tkinter boundary box
+# ------------------------------------------------------------------------------------------
+
+def get_boundary_box(section_id:int):
+    if section_exists(section_id):
+        bbox=sections[str(section_id)]["canvas"].bbox("section"+str(section_id))
+    else:
+        bbox=[0,0,0,0]
+    return(bbox)
+
+def bind_selection_events(section_id:int,object_id, callback):
+    sections[str(section_id)]["button1"].bind('<Motion>',lambda event:callback(event,object_id,event_id=0))
+    sections[str(section_id)]["button1"].bind('<Button-1>',lambda event:callback(event,object_id,event_id=1))
+    sections[str(section_id)]["button1"].bind('<Button-2>',lambda event:callback(event,object_id,event_id=2))
+    sections[str(section_id)]["button1"].bind('<Button-3>',lambda event:callback(event,object_id,event_id=2))
+    sections[str(section_id)]["button1"].bind('<Shift-Button-1>',lambda event:callback(event,object_id,event_id=3))
+    sections[str(section_id)]["button1"].bind('<ButtonRelease-1>',lambda event:callback(event,object_id,event_id=4))
+    sections[str(section_id)]["button1"].bind('<Double-Button-1>',lambda event:callback(event,object_id,event_id=5))
     return()
 
 ###############################################################################

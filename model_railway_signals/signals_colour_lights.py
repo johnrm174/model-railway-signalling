@@ -63,12 +63,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
     elif approach_release_button and signal_subtype == signal_sub_type.distant:
         logging.error ("Signal "+str(sig_id)+": 2 Aspect distant signals should not have Approach Release Control")
     else:
-        
+        # Define the "Tag" for all drawing objects for this signal instance
+        sig_id_tag = "signal"+str(sig_id)
         # Draw the signal base line & signal post   
         line_coords = common.rotate_line (x,y,0,0,0,-20,orientation) 
-        canvas.create_line (line_coords,width=2)
+        canvas.create_line (line_coords,width=2,tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,0,-20,+30,-20,orientation) 
-        canvas.create_line (line_coords,width=3)
+        canvas.create_line (line_coords,width=3,tags=sig_id_tag)
         
         # Draw the body of the position light - only if a position light has been specified
         if position_light:
@@ -78,13 +79,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
             point_coords4 = common.rotate_point (x,y,+26,-24,orientation) 
             point_coords5 = common.rotate_point (x,y,+19,-12,orientation) 
             points = point_coords1, point_coords2, point_coords3, point_coords4, point_coords5
-            canvas.create_polygon (points, outline="black", fill="black")
+            canvas.create_polygon (points, outline="black", fill="black",tags=sig_id_tag)
         
         # Draw the position light aspects (but hide then if the signal doesn't have a subsidary)
         line_coords = common.rotate_line (x,y,+18,-27,+24,-21,orientation) 
-        poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black")
+        poslight1 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,+14,-14,+20,-20,orientation) 
-        poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black")
+        poslight2 = canvas.create_oval (line_coords,fill="grey",outline="black",tags=sig_id_tag)
         if not position_light:
             canvas.itemconfigure(poslight1,state='hidden')
             canvas.itemconfigure(poslight2,state='hidden')
@@ -92,14 +93,13 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         # Draw all aspects for a 4-aspect  signal (running from bottom to top)
         # Unused spects (if its a 2 or 3 aspect signal) get 'hidden' later
         line_coords = common.rotate_line (x,y,+40,-25,+30,-15,orientation) 
-        red = canvas.create_oval (line_coords,fill="grey")
+        red = canvas.create_oval (line_coords,fill="grey",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,+50,-25,+40,-15,orientation) 
-        yel = canvas.create_oval (line_coords,fill="grey")
+        yel = canvas.create_oval (line_coords,fill="grey",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,+60,-25,+50,-15,orientation) 
-        grn = canvas.create_oval (line_coords,fill="grey") 
+        grn = canvas.create_oval (line_coords,fill="grey",tags=sig_id_tag) 
         line_coords = common.rotate_line (x,y,+70,-25,+60,-15,orientation) 
-        yel2 = canvas.create_oval (line_coords,fill="grey")
-        
+        yel2 = canvas.create_oval (line_coords,fill="grey",tags=sig_id_tag)
         # Hide the aspects we don't need and define the 'offset' for the route indications based on
         # the signal type - so that the feathers and theatre route indicator sit on top of the signal
         # If its a 2 aspect signal we need to hide the green and the 2nd yellow aspect
@@ -122,15 +122,15 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 
         # Now draw the feathers (x has been adjusted for the no of aspects)            
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+85,-20,orientation) 
-        main = canvas.create_line (line_coords,width=3,fill="black")
+        main = canvas.create_line (line_coords,width=3,fill="black",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-10,orientation) 
-        rhf45 = canvas.create_line (line_coords,width=3,fill="black")
+        rhf45 = canvas.create_line (line_coords,width=3,fill="black",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-5,orientation) 
-        rhf90 = canvas.create_line (line_coords,width=3,fill="black")
+        rhf90 = canvas.create_line (line_coords,width=3,fill="black",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+81,-30,orientation) 
-        lhf45 = canvas.create_line (line_coords,width=3,fill="black")
+        lhf45 = canvas.create_line (line_coords,width=3,fill="black",tags=sig_id_tag)
         line_coords = common.rotate_line (x,y,offset+71,-20,offset+71,-35,orientation) 
-        lhf90 = canvas.create_line (line_coords,width=3,fill="black")
+        lhf90 = canvas.create_line (line_coords,width=3,fill="black",tags=sig_id_tag)
         # Hide any feather drawing objects we don't need for this particular signal
         if not mainfeather: canvas.itemconfigure(main,state='hidden')
         if not lhfeather45: canvas.itemconfigure(lhf45,state='hidden')

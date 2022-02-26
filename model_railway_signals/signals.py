@@ -67,6 +67,20 @@
 #     signal_sub_type.three_aspect (3 aspect - Red/Yellow/Green)
 #     signal_sub_type.four_aspect  (4 aspect - Red/Yellow/Double-Yellow/Green)
 # 
+# semaphore_sub_type (use when creating semaphore signals):
+#     semaphore_sub_type.home
+#     semaphore_sub_type.distant
+#
+# ground_pos_sub_type(enum.Enum):
+#     ground_pos_sub_type.standard          (post 1996 type)
+#     ground_pos_sub_type.shunt_ahead       (post 1996 type)
+#     ground_pos_sub_type.early_standard           
+#     ground_pos_sub_type.early_shunt_ahead
+#
+# ground_disc_sub_type(enum.Enum):
+#     ground_disc_sub_type.standard
+#     ground_disc_sub_type.shunt_ahead
+#
 # route_type (use for specifying the route):
 #     route_type.NONE   (no route indication)
 #     route_type.MAIN   (main route)
@@ -98,7 +112,7 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       signal_subtype:sig_sub_type - type of signal to create - Default = four_aspect
+#       signal_subtype:sig_sub_type - subtype of signal - Default = four_aspect
 #       orientation:int- Orientation in degrees (0 or 180) - Default = zero
 #       sig_callback:name - Function to call when a signal event happens - Default = None
 #                         Note that the callback function returns (item_id, callback type)
@@ -124,7 +138,8 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
-#       distant:bool - True for a Distant signal - False for a Home signal - default = False
+#       signal_subtype - subtype of the signal - default = semaphore_sub_type.home
+#       distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 #       associated_home:int - Option only valid when creating distant signals - Provide the ID of
 #                             a previously created home signal (and use the same x and y coords)
 #                             to create the distant signal on the same post as the home signal 
@@ -159,12 +174,13 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
+#       signal_subtype - subtype of the signal - default = ground_pos_sub_type.early_standard
 #       orientation:int- Orientation in degrees (0 or 180) - default is zero
 #       sig_callback:name - Function to call when a signal event happens - default = None
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - default =False
-#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow/white aspect) - default = False
-#       modern_type: bool - Specifies a modern type ground signal (post 1996) - default = False
+#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
+#       modern_type: bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # create_ground_disc_signal - Creates a ground disc type signal
 #   Mandatory Parameters:
@@ -172,11 +188,12 @@
 #       sig_id:int - The ID for the signal - also displayed on the signal button
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #  Optional Parameters:
+#       signal_subtype - subtype of the signal - default = ground_disc_sub_type.standard
 #       orientation:int- Orientation in degrees (0 or 180) - Default is zero
 #       sig_callback:name - Function to call when a signal event happens - Default = none
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
-#       shunt_ahead:bool - Specifies a shunt ahead signal (yellow banner) - default = False
+#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
@@ -797,5 +814,49 @@ def set_signals_to_publish_passed_events(*sig_ids:int):
         else:
             signals_common.list_of_signals_to_publish_passed_events.append(sig_id)
     return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for deleting a signal object (including all the drawing objects)
+# This is used by the schematic editor for changing signal types where we delete the existing
+# signal with all its data and then recreate it (with the same ID) in its new configuration
+# ------------------------------------------------------------------------------------------
+
+def delete_signal(sig_id:int):
+    if signals_common.sig_exists(sig_id):
+        # Delete all the tkinter canvas drawing objects associated with the signal
+        signals_common.signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
+        # Delete all the tkinter button objects created for the signal
+        signals_common.signals[str(sig_id)]["sigbutton"].destroy()
+        signals_common.signals[str(sig_id)]["subbutton"].destroy()
+        signals_common.signals[str(sig_id)]["passedbutton"].destroy()
+        # This buttons is only common to colour light and semaphore types
+        if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
+                                                              signals_common.sig_type.semaphore):
+            signals_common.signals[str(sig_id)]["releasebutton"].destroy()
+        # Finally, delete the signal entry from the dictionary of signals
+        del signals_common.signals[str(sig_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for moving a signal object (i.e. all the associated drawing objects)
+# This is used by the schematic editor for moving signals around on the canvas. According to
+# all the info out there this is much more performant than deleting and then recreating
+# ------------------------------------------------------------------------------------------
+
+def move_signal(sig_id:int,xdiff:int,ydiff:int):
+    if signals_common.sig_exists(sig_id):
+        signals_common.signals[str(sig_id)]["canvas"].move("signal"+str(sig_id),xdiff,ydiff)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to "test" if the cursor is within the signal tkinter boundary box
+# ------------------------------------------------------------------------------------------
+
+def get_boundary_box(sig_id:int):
+    if signals_common.sig_exists(sig_id):
+        bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
+    else:
+        bbox=[0,0,0,0]
+    return(bbox)
 
 ##########################################################################################
