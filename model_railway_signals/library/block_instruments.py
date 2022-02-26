@@ -517,13 +517,13 @@ def create_block_instrument (canvas,
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
             try:
-                with importlib.resources.path ('model_railway_signals.resource_files',bell_sound_file) as sound_file:
+                with importlib.resources.path ('model_railway_signals.library.resources',bell_sound_file) as sound_file:
                     bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
             except:
                 logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
                 bell_audio = None
             try:
-                with importlib.resources.path ('model_railway_signals.resource_files',telegraph_sound_file) as sound_file:
+                with importlib.resources.path ('model_railway_signals.library.resources',telegraph_sound_file) as sound_file:
                     telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
             except:
                 logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")
