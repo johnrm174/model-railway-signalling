@@ -1,1 +1,1 @@
-recursive-include model_railway_signals/resource_files *.wav
+recursive-include model_railway_signals/library/resources *.wav
