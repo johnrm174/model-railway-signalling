@@ -2,8 +2,6 @@ import pathlib
 from setuptools import setup
 from setuptools import find_packages
 
-print (find_packages())
-
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
 
@@ -13,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="model-railway-signals",
-    version="2.6.2",
+    version="2.6.3",
     packages=find_packages(),
     include_package_data=True,
     description="Create your own DCC model railway signalling scheme",
