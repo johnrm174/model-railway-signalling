@@ -39,9 +39,9 @@ schematic_objects:dict={}
 # The Root Window and Canvas are "global" - assigned when created by the main programme
 #------------------------------------------------------------------------------------
 
-def initialise(root_object,canvas_object,grid_size):
-    global root, canvas, canvas_grid
-    root, canvas, canvas_grid = root_object, canvas_object, grid_size
+def initialise(root_object,canvas_object):
+    global root, canvas
+    root, canvas = root_object, canvas_object
     return()
 
 #------------------------------------------------------------------------------------
@@ -282,6 +282,7 @@ def create_default_object(item:object_type):
                  schematic_objects[object_id]["posx"] == x):
                 posfree = False
         if posfree: break
+        canvas_grid = canvas.getvar(name="gridsize")
         x, y = x + canvas_grid*2, y + canvas_grid*2
     # We use a UUID to use as a unique reference for this schematic object
     object_id = uuid.uuid4()
@@ -323,6 +324,11 @@ def create_default_signal_object(item_type,item_subtype):
     schematic_objects[object_id]["subroutelh2"] = False
     schematic_objects[object_id]["subrouterh1"] = False
     schematic_objects[object_id]["subrouterh2"] = False
+    schematic_objects[object_id]["distroutemain"] = False
+    schematic_objects[object_id]["distroutelh1"] = False
+    schematic_objects[object_id]["distroutelh2"] = False
+    schematic_objects[object_id]["distrouterh1"] = False
+    schematic_objects[object_id]["distrouterh2"] = False
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)
     return()

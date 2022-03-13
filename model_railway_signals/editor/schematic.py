@@ -42,11 +42,11 @@ schematic_state["clipboardobjects"] = []
 # The Root Window and Canvas are "global" - assigned when created by the main programme
 #------------------------------------------------------------------------------------
 
-def initialise(root_object,canvas_object,grid_size):
-    global root, canvas, canvas_grid
+def initialise(root_object,canvas_object):
+    global root, canvas
     global popup1,popup2
     # Set the global root window and canvas references
-    root, canvas, canvas_grid = root_object, canvas_object, grid_size
+    root, canvas = root_object, canvas_object
     # Define the Object Popup menu for Right Click (something selected)
     popup1 = Menu(tearoff=0)
     popup1.add_command(label="Copy",command=copy_selected_objects)
@@ -65,10 +65,12 @@ def initialise(root_object,canvas_object,grid_size):
 #------------------------------------------------------------------------------------
 
 def draw_grid():
-    width, height = root.getvar(name="canvasx"), root.getvar(name="canvasy")
+    width = canvas.getvar(name="canvasx")
+    height = canvas.getvar(name="canvasx")
+    canvas_grid = canvas.getvar(name="gridsize")
     canvas.delete("grid")
     if root.getvar(name="mode") == "Edit": state = "normal"
-    else: state = "hidden"
+    else: state = "hidden" 
     canvas.create_rectangle(0,0,width,height,outline="black",fill="grey85",tags="grid")
     for i in range(0, height, canvas_grid):
         canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=state)
@@ -275,12 +277,12 @@ def paste_clipboard_objects(event=None):
         # The new objects are "pasted" at a slightly offset position on the canvas
         new_object_id = uuid.uuid4()
         objects.schematic_objects[new_object_id] = copy.deepcopy(objects.schematic_objects[object_id])
-        objects.schematic_objects[new_object_id]["posx"] += canvas_grid
-        objects.schematic_objects[new_object_id]["posy"] += canvas_grid
+        objects.schematic_objects[new_object_id]["posx"] += canvas.getvar(name="gridsize")
+        objects.schematic_objects[new_object_id]["posy"] += canvas.getvar(name="gridsize")
         # Create the new drawing objects depending on object type
         if objects.schematic_objects[new_object_id]["item"] == objects.object_type.line:
-            objects.schematic_objects[new_object_id]["endx"] += canvas_grid
-            objects.schematic_objects[new_object_id]["endy"] += canvas_grid
+            objects.schematic_objects[new_object_id]["endx"] += canvas.getvar(name="gridsize")
+            objects.schematic_objects[new_object_id]["endy"] += canvas.getvar(name="gridsize")
             # Set the drawing objects to None so they will be created
             objects.schematic_objects[new_object_id]["line"] = None
             objects.schematic_objects[new_object_id]["end1"] = None
@@ -360,7 +362,7 @@ def find_highlighted_line_end(xpos:int,ypos:int):
 #------------------------------------------------------------------------------------
 
 def snap_to_grid(xpos:int,ypos:int):
-    grid_size = canvas_grid
+    grid_size = canvas.getvar(name="gridsize")
     remainderx = xpos%grid_size
     remaindery = ypos%grid_size
     if remainderx < grid_size/2: remainderx = 0 - remainderx

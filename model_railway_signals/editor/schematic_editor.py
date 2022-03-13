@@ -67,10 +67,6 @@ def mode_selection(new_mode:str):
 # This is where the code begins
 #------------------------------------------------------------------------------------
     
-canvas_width = 1000
-canvas_height = 500
-canvas_grid = 25
-
 # Create the Main Root Window 
 root = Tk()
 root.title("Schematic Editor")
@@ -78,11 +74,6 @@ root.title("Schematic Editor")
 # Configure the Tkinter variables:
 mode = StringVar(root, name ="mode")
 root.setvar(name ="mode", value ="Edit")
-canvasx = IntVar(root, name ="canvasx")
-root.setvar(name ="canvasx", value = canvas_width)
-canvasy = IntVar(root, name ="canvasy")
-root.setvar(name ="canvasy", value = canvas_height)
-
 # Create the menu bar
 mainmenubar = Menu(root)
 root.configure(menu=mainmenubar)    
@@ -104,7 +95,7 @@ mode_menu.add_command(label = " Play", command=lambda x="Play":mode_selection(x)
 mainmenubar.add_cascade(label = mode_label, menu = mode_menu)
 # Create the various menubar items for the Settings Dropdown
 settings_menu = Menu(mainmenubar,tearoff=False)
-settings_menu.add_command(label =" Canvas...", command = menubar.canvas_settings)
+settings_menu.add_command(label =" Canvas...", command = lambda:menubar.edit_canvas_settings(root,canvas))
 settings_menu.add_command(label =" MQTT...")
 settings_menu.add_command(label =" SPROG...")
 settings_menu.add_command(label =" Files...")
@@ -176,6 +167,9 @@ frame4=Frame(frame2, borderwidth = 1)
 frame4.pack(side=LEFT,expand=True,fill=BOTH)
 
 # Create the canvas and scrollbars inside frame4
+canvas_width = 1000
+canvas_height = 500
+canvas_grid = 25
 canvas=Canvas(frame4,bg="grey85",scrollregion=(0,0,canvas_width,canvas_height))
 hbar=Scrollbar(frame4,orient=HORIZONTAL)
 hbar.pack(side=BOTTOM,fill=X)
@@ -186,7 +180,13 @@ vbar.config(command=canvas.yview)
 canvas.config(width=canvas_width,height=canvas_height)
 canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
 canvas.pack(side=LEFT,expand=True,fill=BOTH)
-
+# configure the Tkinter Intvars for the width and height
+canvasx = IntVar(canvas, name ="canvasx")
+canvas.setvar(name ="canvasx", value = canvas_width)
+canvasy = IntVar(canvas, name ="canvasy") 
+canvas.setvar(name ="canvasy", value = canvas_height)
+canvasgrid = IntVar(canvas, name ="gridsize")
+canvas.setvar(name ="gridsize", value = canvas_grid)
 # Bind the Canvas mouse and button events to the various callback functions
 canvas.bind("<Motion>", schematic.track_cursor)
 canvas.bind('<Button-1>', schematic.left_button_click)
@@ -203,9 +203,8 @@ canvas.bind('<Control-Key-c>', schematic.copy_selected_objects)
 canvas.bind('<Control-Key-v>', schematic.paste_clipboard_objects)
 canvas.bind('r', schematic.rotate_selected_objects)
 
-objects.initialise (root, canvas, canvas_grid)
-schematic.initialise (root, canvas, canvas_grid)
-menubar.initialise (root, canvas)
+objects.initialise (root, canvas)
+schematic.initialise (root, canvas)
 configure.initialise (root, canvas)
 
 root.mainloop()

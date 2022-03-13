@@ -6,74 +6,97 @@ from tkinter import *
 from . import schematic
 
 #------------------------------------------------------------------------------------
-# The Root Window and Canvas are "global" - assigned when created by the main programme
+# Function to validate a Canvas width/height size entry
 #------------------------------------------------------------------------------------
 
-def initialise(root_object,canvas_object):
-    global root, canvas
-    root, canvas = root_object, canvas_object
-    return()
-
-#------------------------------------------------------------------------------------
-# Dialogue and callbacks for resizing the canvas
-#------------------------------------------------------------------------------------
-
-def canvas_settings():
-
-    def resize_canvas(event=None):
-        try:
-            # Get the values for the new canvas width and height
-            width, height = int(entry1.get()), int(entry2.get())
-        except:
-            # If its not an integer then we catch the exception here
-            return()
+def validate_entry(EB,entry,minvalue,maxvalue):
+    try:
+        width = int(entry.get())
+    except:
+        error_msg = "Entry is invalid"
+    else:
+        if width < minvalue or width > maxvalue:
+            error_msg = "Entry is out of range"
         else:
-            # Do some additional validation on the values before applying
-            if width < 400 or height < 200 or width > 4000 or height > 2000:
-                return()
-            else:
-                root.setvar(name ="canvasx", value = width)
-                root.setvar(name ="canvasy", value = height)
-                canvas.config (width = width, height = height, scrollregion=(0,0,width,height))
-                schematic.draw_grid()
-                canvas.pack()
-                dialog_window.destroy()
+            EB.config(fg='black')
+            return(True,"")
+    EB.config(fg='red')
+    return(False,error_msg)
+                
+#------------------------------------------------------------------------------------
+# Class for Changing (and applying) the canvas settings
+#------------------------------------------------------------------------------------
+
+class canvas_dimension_element:
+    def __init__(self,parent,label1,label2,initialvalue,minvalue,maxvalue):
+        self.min = minvalue
+        self.max = maxvalue
+        self.frame = Frame(parent)
+        self.frame.pack()
+        self.label1 = Label(self.frame,text=label1)
+        self.label1.pack(padx=5,pady=5,side=LEFT)
+        self.entry = StringVar(parent,str(initialvalue))        
+        self.value = StringVar(parent,str(initialvalue))
+        self.EB = Entry(self.frame,width=5,textvariable=self.entry)
+        self.EB.pack(padx=5,pady=5,side=LEFT)
+        self.label2 = Label(self.frame,text=label2)
+        self.label2.pack(padx=5, pady=5, side=LEFT)
+        self.EB.bind('<Return>',self.entry_box_updated)
+        self.EB.bind('<Escape>',self.entry_box_cancel)
+        self.EB.bind('<FocusOut>',self.entry_box_updated)
+    def entry_box_updated(self,event):
+        valid, error_msg = validate_entry(self.EB,self.entry,self.min,self.max)
+        if valid:
+            self.value.set(self.entry.get())
+            if event.keysym == 'Return': self.frame.focus()
+        else:
+            print (error_msg)               
+        return()
+    def entry_box_cancel(self,event):
+        self.entry.set(self.value.get())
+        self.frame.focus()
         return()
     
-    def cancel_resize(event=None):
-        dialog_window.destroy()
+class edit_canvas_settings:
+    def __init__(self,root,canvas):
+        # Creatre the canvas settings window
+        self.canvas = canvas
+        winx = root.winfo_rootx() + 150
+        winy = root.winfo_rooty() + 50
+        self.window = Toplevel(root)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("Canvas Settings")
+        self.window.attributes('-topmost',True)
+        # Create the labels and entry boxes for the width and height
+        self.width = canvas_dimension_element(self.window,"Canvas width:","(pixels 400-4000)",
+                        initialvalue=self.canvas.getvar(name ="canvasx"),minvalue=400,maxvalue=4000)
+        self.height = canvas_dimension_element(self.window,"Canvas height:","(pixels 200-2000)",
+                        initialvalue=self.canvas.getvar(name ="canvasy"),minvalue=200,maxvalue=2000)
+        # Create the buttons for applying the changes
+        frame = Frame(self.window)
+        frame.pack()
+        button1 = Button (frame, text = "Apply", command = lambda:self.resize_canvas(False))
+        button1.pack(padx=5, pady=5, side=LEFT)
+        button2 = Button (frame, text = "Ok", command = lambda:self.resize_canvas(True))
+        button2.pack(padx=5, pady=5, side=LEFT)
+        button3 = Button (frame, text = "Cancel", command = self.cancel_resize)
+        button3.pack(padx=5, pady=5, side=LEFT)
+    def resize_canvas(self,close_window:bool):
+        valid1, error_msg = validate_entry(self.width.EB,self.width.entry,400,4000)
+        if valid1: self.width.value.set(self.width.entry.get())
+        valid2, error_msg = validate_entry(self.height.EB,self.height.entry,200,2000)
+        if valid2: self.height.value.set(self.height.entry.get())
+        if valid1 and valid2:
+            width, height = self.width.value.get(), self.height.value.get()
+            self.canvas.setvar(name ="canvasx", value = int(width))
+            self.canvas.setvar(name ="canvasy", value = int(height))
+            self.canvas.config (width = width, height = height, scrollregion=(0,0,width,height))
+            schematic.draw_grid()
+            self.canvas.pack()
+            if close_window: self.window.destroy()
         return()
-
-    # Creatre the basic window
-    win_x = root.winfo_rootx() + 300
-    win_y = root.winfo_rooty() + 100
-    dialog_window=Toplevel(root)
-    dialog_window.geometry(f'+{win_x}+{win_y}')
-    dialog_window.title("Canvas")
-    dialog_window.attributes('-topmost',True)
-    # Now add the specific contents we need
-    label1 = Label(dialog_window,text = "Canvas width:")
-    label1.grid(row=0, column=0, padx=5, pady=5)
-    entry1 = Entry(dialog_window,width=5)
-    entry1.grid(row=0, column=1, padx=5, pady=5)
-    entry1.insert(0,root.getvar(name="canvasx"))
-    label2 = Label(dialog_window,text = "(pixels 400-4000)")
-    label2.grid(row=0, column=2, padx=5, pady=5)
-    label3 = Label(dialog_window,text = "Canvas height:")
-    label3.grid(row=1, column=0, padx=5, pady=5)
-    entry2 = Entry(dialog_window,width=5)
-    entry2.grid(row=1, column=1, padx=5, pady=5)
-    entry2.insert(0,root.getvar(name="canvasy"))
-    label4 = Label(dialog_window,text = "(pixels 200-2000)")
-    label4.grid(row=1, column=2, padx=5, pady=5)
-    # Finally the buttons for applying the changes
-    button1 = Button (dialog_window, text = "Ok", command = resize_canvas)
-    button1.grid(row=2, column=1, padx=5, pady=5)
-    button2 = Button (dialog_window, text = "Cancel", command = cancel_resize)
-    button2.grid(row=2, column=2, padx=5, pady=5)
-    dialog_window.bind('<Return>',resize_canvas)
-    dialog_window.bind('<Escape>',cancel_resize)
-    return()
-
-
+    def cancel_resize(self,event=None):
+        self.window.destroy()
+        return()
+    
 #############################################################################################
