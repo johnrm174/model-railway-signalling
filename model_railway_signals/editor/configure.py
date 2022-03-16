@@ -37,21 +37,21 @@ def load_initial_state(signal):
     signal.sigid.existing.set(str(objects.schematic_objects[object_id]["itemid"]))
     signal.sigtype.var.set(objects.schematic_objects[object_id]["itemtype"].value)
     signal.subtype.var.set(objects.schematic_objects[object_id]["itemsubtype"].value)
-    signal.routes.sig.main.sel.set(objects.schematic_objects[object_id]["sigroutemain"])
-    signal.routes.sig.lh1.sel.set(objects.schematic_objects[object_id]["sigroutelh1"])
-    signal.routes.sig.lh2.sel.set(objects.schematic_objects[object_id]["sigroutelh2"])
-    signal.routes.sig.rh1.sel.set(objects.schematic_objects[object_id]["sigrouterh1"])
-    signal.routes.sig.rh2.sel.set(objects.schematic_objects[object_id]["sigrouterh2"])
-    signal.routes.sub.main.sel.set(objects.schematic_objects[object_id]["subroutemain"])
-    signal.routes.sub.lh1.sel.set(objects.schematic_objects[object_id]["subroutelh1"])
-    signal.routes.sub.lh2.sel.set(objects.schematic_objects[object_id]["subroutelh2"])
-    signal.routes.sub.rh1.sel.set(objects.schematic_objects[object_id]["subrouterh1"])
-    signal.routes.sub.rh2.sel.set(objects.schematic_objects[object_id]["subrouterh2"])
-    signal.routes.sub.main.sel.set(objects.schematic_objects[object_id]["distroutemain"])
-    signal.routes.sub.lh1.sel.set(objects.schematic_objects[object_id]["distroutelh1"])
-    signal.routes.sub.lh2.sel.set(objects.schematic_objects[object_id]["distroutelh2"])
-    signal.routes.sub.rh1.sel.set(objects.schematic_objects[object_id]["distrouterh1"])
-    signal.routes.sub.rh2.sel.set(objects.schematic_objects[object_id]["distrouterh2"])
+    signal.routes1.sig.main.sel.set(objects.schematic_objects[object_id]["sigroutemain"])
+    signal.routes1.sig.lh1.sel.set(objects.schematic_objects[object_id]["sigroutelh1"])
+    signal.routes1.sig.lh2.sel.set(objects.schematic_objects[object_id]["sigroutelh2"])
+    signal.routes1.sig.rh1.sel.set(objects.schematic_objects[object_id]["sigrouterh1"])
+    signal.routes1.sig.rh2.sel.set(objects.schematic_objects[object_id]["sigrouterh2"])
+    signal.routes1.sub.main.sel.set(objects.schematic_objects[object_id]["subroutemain"])
+    signal.routes1.sub.lh1.sel.set(objects.schematic_objects[object_id]["subroutelh1"])
+    signal.routes1.sub.lh2.sel.set(objects.schematic_objects[object_id]["subroutelh2"])
+    signal.routes1.sub.rh1.sel.set(objects.schematic_objects[object_id]["subrouterh1"])
+    signal.routes1.sub.rh2.sel.set(objects.schematic_objects[object_id]["subrouterh2"])
+    signal.routes1.sub.main.sel.set(objects.schematic_objects[object_id]["distroutemain"])
+    signal.routes1.sub.lh1.sel.set(objects.schematic_objects[object_id]["distroutelh1"])
+    signal.routes1.sub.lh2.sel.set(objects.schematic_objects[object_id]["distroutelh2"])
+    signal.routes1.sub.rh1.sel.set(objects.schematic_objects[object_id]["distrouterh1"])
+    signal.routes1.sub.rh2.sel.set(objects.schematic_objects[object_id]["distrouterh2"])
     # Set the initial UI selections
     update_route_selections(signal)
     update_signal_subtype_selections(signal)
@@ -80,21 +80,21 @@ def save_signal_state(signal,close_window:bool):
     objects.schematic_objects[object_id]["itemid"] = int(signal.sigid.sigid.get())
     objects.schematic_objects[object_id]["itemtype"] = signal_type
     objects.schematic_objects[object_id]["itemsubtype"] = signal_subtype
-    objects.schematic_objects[object_id]["sigroutemain"] = signal.routes.sig.main.sel.get()
-    objects.schematic_objects[object_id]["sigroutelh1"] = signal.routes.sig.lh1.sel.get()
-    objects.schematic_objects[object_id]["sigroutelh2"] = signal.routes.sig.lh2.sel.get()
-    objects.schematic_objects[object_id]["sigrouterh1"] = signal.routes.sig.rh1.sel.get()
-    objects.schematic_objects[object_id]["sigrouterh2"] = signal.routes.sig.rh2.sel.get()
-    objects.schematic_objects[object_id]["subroutemain"] = signal.routes.sub.main.sel.get()
-    objects.schematic_objects[object_id]["subroutelh1"] = signal.routes.sub.lh1.sel.get()
-    objects.schematic_objects[object_id]["subroutelh2"] = signal.routes.sub.lh2.sel.get()
-    objects.schematic_objects[object_id]["subrouterh1"] = signal.routes.sub.rh1.sel.get()
-    objects.schematic_objects[object_id]["subrouterh2"] = signal.routes.sub.rh2.sel.get()
-    objects.schematic_objects[object_id]["distroutemain"] = signal.routes.sub.main.sel.get()
-    objects.schematic_objects[object_id]["distroutelh1"] = signal.routes.sub.lh1.sel.get()
-    objects.schematic_objects[object_id]["distroutelh2"] = signal.routes.sub.lh2.sel.get()
-    objects.schematic_objects[object_id]["distrouterh1"] = signal.routes.sub.rh1.sel.get()
-    objects.schematic_objects[object_id]["distrouterh2"] = signal.routes.sub.rh2.sel.get()
+    objects.schematic_objects[object_id]["sigroutemain"] = signal.routes1.sig.main.sel.get()
+    objects.schematic_objects[object_id]["sigroutelh1"] = signal.routes1.sig.lh1.sel.get()
+    objects.schematic_objects[object_id]["sigroutelh2"] = signal.routes1.sig.lh2.sel.get()
+    objects.schematic_objects[object_id]["sigrouterh1"] = signal.routes1.sig.rh1.sel.get()
+    objects.schematic_objects[object_id]["sigrouterh2"] = signal.routes1.sig.rh2.sel.get()
+    objects.schematic_objects[object_id]["subroutemain"] = signal.routes1.sub.main.sel.get()
+    objects.schematic_objects[object_id]["subroutelh1"] = signal.routes1.sub.lh1.sel.get()
+    objects.schematic_objects[object_id]["subroutelh2"] = signal.routes1.sub.lh2.sel.get()
+    objects.schematic_objects[object_id]["subrouterh1"] = signal.routes1.sub.rh1.sel.get()
+    objects.schematic_objects[object_id]["subrouterh2"] = signal.routes1.sub.rh2.sel.get()
+    objects.schematic_objects[object_id]["distroutemain"] = signal.routes1.sub.main.sel.get()
+    objects.schematic_objects[object_id]["distroutelh1"] = signal.routes1.sub.lh1.sel.get()
+    objects.schematic_objects[object_id]["distroutelh2"] = signal.routes1.sub.lh2.sel.get()
+    objects.schematic_objects[object_id]["distrouterh1"] = signal.routes1.sub.rh1.sel.get()
+    objects.schematic_objects[object_id]["distrouterh2"] = signal.routes1.sub.rh2.sel.get()
     # Update the "existing" sigid element on "Apply" - to ensure validation works
     signal.sigid.existing.set(str(objects.schematic_objects[object_id]["itemid"]))
     # Finally update the signal (recreate in its new configuration)
@@ -192,8 +192,8 @@ def update_signal_subtype_selections(signal):
         signal.subtype.B1.configure(text="2 Aspect G/R")
         signal.subtype.B2.configure(text="2 Aspect G/Y")
         signal.subtype.B3.configure(text="2 Aspect Y/R")
-        signal.subtype.B4.configure(text="3 Aspect")
-        signal.subtype.B5.configure(text="4 Aspect")
+        signal.subtype.B4.configure(text="3 Aspect    ")
+        signal.subtype.B5.configure(text="4 Aspect    ")
         signal.subtype.B3.pack(side=LEFT)
         signal.subtype.B4.pack(side=LEFT)
         signal.subtype.B5.pack(side=LEFT)
@@ -220,8 +220,56 @@ def update_signal_subtype_selections(signal):
     return()
 
 #------------------------------------------------------------------------------------
-# Sub Functions of "update_route_selections" to enable/disable individual route 
-# selection boxes (and their entry boxes) and "groups" of route selection boxes
+#update the signal subtype selections based on the signal type
+#------------------------------------------------------------------------------------
+
+def configure_aspect_setting(aspect,supported):
+    aspect.sel.set(supported)
+    aspect.CB.config(state="disabled")
+    aspect.checkbox_updated()
+    return()
+
+def update_signal_aspect_selections(signal):
+    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
+        if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.home.value:
+            configure_aspect_setting(signal.aspects.danger,True)
+            configure_aspect_setting(signal.aspects.proceed,True)
+            configure_aspect_setting(signal.aspects.caution,False)
+            configure_aspect_setting(signal.aspects.prelimcaution,False)
+            configure_aspect_setting(signal.aspects.flashcaution,False)
+            configure_aspect_setting(signal.aspects.flashprelimcaution,False)
+        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
+            configure_aspect_setting(signal.aspects.danger,False)
+            configure_aspect_setting(signal.aspects.proceed,True)
+            configure_aspect_setting(signal.aspects.caution,True)
+            configure_aspect_setting(signal.aspects.prelimcaution,False)
+            configure_aspect_setting(signal.aspects.flashcaution,False)
+            configure_aspect_setting(signal.aspects.flashprelimcaution,False)
+        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.red_ylw.value:
+            configure_aspect_setting(signal.aspects.danger,True)
+            configure_aspect_setting(signal.aspects.proceed,False)
+            configure_aspect_setting(signal.aspects.caution,True)
+            configure_aspect_setting(signal.aspects.prelimcaution,False)
+            configure_aspect_setting(signal.aspects.flashcaution,False)
+            configure_aspect_setting(signal.aspects.flashprelimcaution,False)
+        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.three_aspect.value:
+            configure_aspect_setting(signal.aspects.danger,True)
+            configure_aspect_setting(signal.aspects.proceed,True)
+            configure_aspect_setting(signal.aspects.caution,True)
+            configure_aspect_setting(signal.aspects.prelimcaution,False)
+            configure_aspect_setting(signal.aspects.flashcaution,False)
+            configure_aspect_setting(signal.aspects.flashprelimcaution,False)
+        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.four_aspect.value:
+            configure_aspect_setting(signal.aspects.danger,True)
+            configure_aspect_setting(signal.aspects.proceed,True)
+            configure_aspect_setting(signal.aspects.caution,True)
+            configure_aspect_setting(signal.aspects.prelimcaution,True)
+            configure_aspect_setting(signal.aspects.flashcaution,False)
+            configure_aspect_setting(signal.aspects.flashprelimcaution,False)
+    return()
+
+#------------------------------------------------------------------------------------
+# Update Signal Aspect Selections
 #------------------------------------------------------------------------------------
 
 def enable_route_selection(route_box):
@@ -260,57 +308,90 @@ def enable_route_selections(route_group):
 def update_route_selections(signal):
     # Update the available route selections
     if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
-        # Available selections are: Route Feathers (ALL Routes) and subsidary
-        signal.routes.sig.frame.configure(text="Feathers")
-        signal.routes.sub.frame.configure(text="Subsidary")
-        signal.routes.dist.frame.configure(text="Not Used")
+        # Re configure the UI for the type-specific entry boxes
+        signal.routes1.frame.pack_forget()
+        signal.aspects.frame.pack()
+        signal.routes2.frame.pack()
+        signal.frame2.pack_forget()
+        signal.frame2.pack()
         # Disable ALL SUBSIDARY and DISTANT route selections
-        disable_route_selections(signal.routes.sub)
-        disable_route_selections(signal.routes.dist)
+        disable_route_selections(signal.routes1.sub)
+        disable_route_selections(signal.routes1.dist)
         if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
             # Disable ALL Feather route Indications
-            disable_route_selections(signal.routes.sig)
+            disable_route_selections(signal.routes1.sig)
         else:
             # Enable ALL Feather route Indications
-            enable_route_selections(signal.routes.sig)
+            enable_route_selections(signal.routes1.sig)
             # Enable the MAIN subsidary indication
-            enable_route_selection(signal.routes.sub.main)
+            enable_route_selection(signal.routes1.sub.main)
 
     elif signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+        # Re configure the UI for the type-specific entry boxes
+        signal.aspects.frame.pack_forget()
+        signal.routes2.frame.pack_forget()
+        signal.routes1.frame.pack()
+        signal.frame2.pack_forget()
+        signal.frame2.pack()
         # Available selections: ALL Signal arms, Subsidary arms and Distant Arms
-        signal.routes.sig.frame.configure(text="Signal Arms")
-        signal.routes.sub.frame.configure(text="Subsidary Arms")
-        signal.routes.dist.frame.configure(text="Distant Arms")
+        signal.routes1.sig.frame.configure(text="Signal Arms")
+        signal.routes1.sub.frame.configure(text="Subsidary Arms")
+        signal.routes1.dist.frame.configure(text="Distant Arms")
         # Semaphores support arms for ALL route selections
-        enable_route_selections(signal.routes.sig)
+        enable_route_selections(signal.routes1.sig)
         # Enable (and fix) the MAIN route indication
-        signal.routes.sig.main.sel.set(True)
-        signal.routes.sig.main.CB.configure(state="disabled")
-        signal.routes.sig.main.EB.configure(state="normal")
+        signal.routes1.sig.main.sel.set(True)
+        signal.routes1.sig.main.CB.configure(state="disabled")
+        signal.routes1.sig.main.EB.configure(state="normal")
         if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
             # Disable ALL SUBSIDARY and DISTANT route selections
-            disable_route_selections(signal.routes.sub)
-            disable_route_selections(signal.routes.dist)
+            disable_route_selections(signal.routes1.sub)
+            disable_route_selections(signal.routes1.dist)
         else:
             # Enable ALL SUBSIDARY and DISTANT route selections
-            enable_route_selections(signal.routes.sub)
-            enable_route_selections(signal.routes.dist)
+            enable_route_selections(signal.routes1.sub)
+            enable_route_selections(signal.routes1.dist)
         
-    elif (signal.sigtype.var.get() == signals_common.sig_type.ground_position.value or
-             signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value):
+    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+        # Re configure the UI for the type-specific entry boxes
+        signal.routes1.frame.pack_forget()
+        signal.aspects.frame.pack()
+        signal.routes2.frame.pack()
+        signal.frame2.pack_forget()
+        signal.frame2.pack()
         # Ground Signals ONLY support a single route indication
-        signal.routes.sig.frame.configure(text="Ground Signal")
-        signal.routes.sub.frame.configure(text="Not Used")
-        signal.routes.dist.frame.configure(text="Not Used")
+        signal.routes1.sig.frame.configure(text="Ground Signal")
+        signal.routes1.sub.frame.configure(text="Not Used")
+        signal.routes1.dist.frame.configure(text="Not Used")
         # Enable (and fix) ONLY the MAIN route indication
-        disable_route_selections(signal.routes.sig)
-        signal.routes.sig.main.sel.set(True)
-        signal.routes.sig.main.CB.configure(state="disabled")
-        signal.routes.sig.main.EB.configure(state="normal")
+        disable_route_selections(signal.routes1.sig)
+        signal.routes1.sig.main.sel.set(True)
+        signal.routes1.sig.main.CB.configure(state="disabled")
+        signal.routes1.sig.main.EB.configure(state="normal")
         # Disable ALL SUBSIDARY and DISTANT route selections
-        disable_route_selections(signal.routes.sub)
-        disable_route_selections(signal.routes.dist)
+        disable_route_selections(signal.routes1.sub)
+        disable_route_selections(signal.routes1.dist)
         
+    elif signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value:
+        # Re configure the UI for the type-specific entry boxes
+        signal.aspects.frame.pack_forget()
+        signal.routes2.frame.pack_forget()
+        signal.routes1.frame.pack()
+        signal.frame2.pack_forget()
+        signal.frame2.pack()
+        # Ground Signals ONLY support a single route indication
+        signal.routes1.sig.frame.configure(text="Ground Signal")
+        signal.routes1.sub.frame.configure(text="Not Used")
+        signal.routes1.dist.frame.configure(text="Not Used")
+        # Enable (and fix) ONLY the MAIN route indication
+        disable_route_selections(signal.routes1.sig)
+        signal.routes1.sig.main.sel.set(True)
+        signal.routes1.sig.main.CB.configure(state="disabled")
+        signal.routes1.sig.main.EB.configure(state="normal")
+        # Disable ALL SUBSIDARY and DISTANT route selections
+        disable_route_selections(signal.routes1.sub)
+        disable_route_selections(signal.routes1.dist)
+
     return()
     
 #------------------------------------------------------------------------------------
@@ -320,26 +401,26 @@ def update_route_selections(signal):
 
 def update_distant_selections(signal):
     if signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
-        if not signal.routes.sig.main.sel.get():
-            disable_route_selection(signal.routes.dist.main)
+        if not signal.routes1.sig.main.sel.get():
+            disable_route_selection(signal.routes1.dist.main)
         else:
-            enable_route_selection(signal.routes.dist.main)
-        if not signal.routes.sig.lh1.sel.get():
-            disable_route_selection(signal.routes.dist.lh1)
+            enable_route_selection(signal.routes1.dist.main)
+        if not signal.routes1.sig.lh1.sel.get():
+            disable_route_selection(signal.routes1.dist.lh1)
         else:
-            enable_route_selection(signal.routes.dist.lh1)
-        if not signal.routes.sig.lh2.sel.get():
-            disable_route_selection(signal.routes.dist.lh2)
+            enable_route_selection(signal.routes1.dist.lh1)
+        if not signal.routes1.sig.lh2.sel.get():
+            disable_route_selection(signal.routes1.dist.lh2)
         else:
-            enable_route_selection(signal.routes.dist.lh2)
-        if not signal.routes.sig.rh1.sel.get():
-            disable_route_selection(signal.routes.dist.rh1)
+            enable_route_selection(signal.routes1.dist.lh2)
+        if not signal.routes1.sig.rh1.sel.get():
+            disable_route_selection(signal.routes1.dist.rh1)
         else:
-            enable_route_selection(signal.routes.dist.rh1)
-        if not signal.routes.sig.rh2.sel.get():
-            disable_route_selection(signal.routes.dist.rh2)
+            enable_route_selection(signal.routes1.dist.rh1)
+        if not signal.routes1.sig.rh2.sel.get():
+            disable_route_selection(signal.routes1.dist.rh2)
         else:
-            enable_route_selection(signal.routes.dist.rh2)
+            enable_route_selection(signal.routes1.dist.rh2)
     return()
 
 #------------------------------------------------------------------------------------
@@ -348,8 +429,8 @@ def update_distant_selections(signal):
 #------------------------------------------------------------------------------------
 
 class sig_id_selection:
-    def __init__(self,parent):
-        self.frame = LabelFrame(parent,text = "Signal ID")
+    def __init__(self,parent,text):
+        self.frame = LabelFrame(parent,text = text)
         self.frame.pack(side=LEFT, padx=5, pady=5)
         self.entry = StringVar(parent,"")
         self.sigid = StringVar(parent,"")
@@ -444,29 +525,28 @@ class general_settings_frame:
 
 class selection_button_frame:
     def __init__(self, parent, name, callback, width, b1, b2, b3, b4, b5):
-        self.frame = LabelFrame(parent, text = name, width = 800, height= 60)
+        self.frame = LabelFrame(parent, text = name)
         self.frame.pack(padx=5, pady=5)
-#        self.frame.pack_propagate(0)
         self.var = IntVar(parent,0)
         if b1 != "":
-            self.B1 = Radiobutton(self.frame, text=b1, width=width,
-                anchor='w', command=callback, variable=self.var, value=1)
+            self.B1 = Radiobutton(self.frame, text=b1, anchor='w',
+                command=callback, variable=self.var, value=1)
             self.B1.pack(padx=3, pady=3, side=LEFT)
         if b2 != "":
-            self.B2 = Radiobutton(self.frame, text=b2, width=width,
-                anchor='w', command=callback, variable=self.var, value=2)
+            self.B2 = Radiobutton(self.frame, text=b2, anchor='w',
+                command=callback, variable=self.var, value=2)
             self.B2.pack(padx=3, pady=3, side=LEFT)
         if b3 != "":
-            self.B3 = Radiobutton(self.frame, text=b3, width=width,
-                anchor='w', command=callback, variable=self.var, value=3)
+            self.B3 = Radiobutton(self.frame, text=b3, anchor='w',
+                command=callback, variable=self.var, value=3)
             self.B3.pack(padx=3, pady=3, side=LEFT)
         if b4 != "":
-            self.B4 = Radiobutton(self.frame, text=b4, width=width,
-                anchor='w', command=callback, variable=self.var, value=4)
+            self.B4 = Radiobutton(self.frame, text=b4, anchor='w',
+                command=callback, variable=self.var, value=4)
             self.B4.pack(padx=3, pady=3, side=LEFT)
         if b5 != "":
-            self.B5 = Radiobutton(self.frame, text=b5, width=width,
-                anchor='w', command=callback, variable=self.var, value=5)
+            self.B5 = Radiobutton(self.frame, text=b5, anchor='w', 
+                command=callback, variable=self.var, value=5)
             self.B5.pack(padx=3, pady=3, side=LEFT)
 
 #------------------------------------------------------------------------------------
@@ -498,7 +578,6 @@ class semaphore_route_element:
             # Otherwise the event was "focus out" onto something else
             if event.keysym == 'Return': self.frame.focus()
         else:
-            self.EB.focus()
             print (error_msg)               
         return()
     def entry_box_cancel(self,event):
@@ -532,19 +611,20 @@ class semaphore_route_group:
         
 class semaphore_route_frame:
     def __init__(self,parent,callback):
-        self.frame = LabelFrame(parent,text="Signal Routes and DCC Addresses",
+        self.frame = LabelFrame(parent,text="Semaphore Signal Arms and DCC Addresses",
                             width=800,height=180)
         self.frame.pack(padx=5, pady=5)
 #        self.frame.pack_propagate(0)
-        self.sig = semaphore_route_group(self.frame,callback,"Main Signal Arms")
+        self.frame1 = Frame(self.frame)
+        self.frame1.pack()
+        self.sig = semaphore_route_group(self.frame1,callback,"Main Signal Arms")
         self.sig.frame.pack(side=LEFT)
-        self.sub = semaphore_route_group(self.frame,callback,"Subsidary Arms")
+        self.sub = semaphore_route_group(self.frame1,callback,"Subsidary Arms")
         self.sub.frame.pack(side=LEFT)
-        self.dist = semaphore_route_group(self.frame,callback,"Distant Arms")
+        self.dist = semaphore_route_group(self.frame1,callback,"Distant Arms")
         self.dist.frame.pack(side=LEFT)
-
-
-
+        self.label = Label(self.frame,text="DCC Addresses must be in the range 1-2047")
+        self.label.pack()
 
 #------------------------------------------------------------------------------------
 # Classes for the Colour Light Route selection checkboxes and DCC address entry boxes
@@ -646,22 +726,12 @@ class colour_light_indication_group:
     def __init__(self,parent,name):
         self.frame = LabelFrame(parent, text=name)
         self.frame.pack(padx=5, pady=5)
-        self.proceed = colour_light_route_element(self.frame,"Proceed",width=15)
-        self.danger = colour_light_route_element(self.frame,"Danger",width=15)
-        self.caution = colour_light_route_element(self.frame,"Caution",width=15)
-        self.prelimcaution = colour_light_route_element(self.frame,"Prelim Caution",width=15)
-        self.flashcaution = colour_light_route_element(self.frame,"Flash Caution",width=15)
-        self.flashprelimcaution = colour_light_route_element(self.frame,"Flash Prelim Caut",width=15)
-
-class colour_light_route_frame:
-    def __init__(self,parent):
-        self.frame = LabelFrame(parent,text="Signal Routes and DCC Addresses",
-                            width=800,height=180)
-        self.frame.pack(padx=5, pady=5)
-#        self.frame.pack_propagate(0)
-        self.sig = colour_light_route_group(self.frame,"Route Feathers")
-        self.sig.frame.pack(side=LEFT)
-        self.sub = colour_light_indication_group(self.frame,"Signal Aspects")
+        self.proceed = colour_light_route_element(self.frame,"Proceed",width=12)
+        self.danger = colour_light_route_element(self.frame,"Danger",width=12)
+        self.caution = colour_light_route_element(self.frame,"Caution",width=12)
+        self.prelimcaution = colour_light_route_element(self.frame,"Prelim Caution",width=12)
+        self.flashcaution = colour_light_route_element(self.frame,"Flash Caution",width=12)
+        self.flashprelimcaution = colour_light_route_element(self.frame,"Flash Prelim",width=12)
 
 #------------------------------------------------------------------------------------
 # Class for the Edit Signal Window
@@ -677,31 +747,36 @@ class edit_signal:
         self.window.title("Configure Signal")
         self.window.attributes('-topmost',True)
         # Create a Frame to hold the Sig ID and Signal Type Selections
-        self.frame = Frame(self.window)
-        self.frame.pack()
+        self.frame1 = Frame(self.window)
+        self.frame1.pack()
         # Create the entry box for the signal ID
-        self.sigid = sig_id_selection(self.frame) 
+        self.sigid = sig_id_selection(self.frame1,"Signal ID") 
         # Create the Selection buttons for Signal Type
-        self.sigtype = selection_button_frame(self.frame,"Signal Type",
+        self.sigtype = selection_button_frame(self.frame1,"Signal Type",
                     self.sig_type_updated,13,"Colour Light","Ground Position",
                                               "Semaphore","Ground Disc","")
         # Create the Selection buttons for Signal Subtype
         self.subtype = selection_button_frame(self.window,"Signal Subtype",
                     self.sig_subtype_updated,13,"-","-","-","-","-")
-        # Create the Checkboxes and Entry Boxes for the Route Indications
-        self.routes = semaphore_route_frame(self.window,self.route_selections_updated)
-        # Create the Checkboxes and Entry Boxes for the Sensor Events
-        self.routes2 = colour_light_route_frame(self.window)
         
+        # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
+        self.aspects = colour_light_indication_group(self.window,"Signal Aspects and DCC Addresses")
+        self.routes2 = colour_light_route_group(self.window,"Route Feathers and DCC Aspects")
+        
+        # Create the Checkboxes and Entry Boxes for the Semaphore Route Indications
+        self.routes1 = semaphore_route_frame(self.window,self.route_selections_updated)
+
+
+
         self.gen = general_settings_frame(self.window)
         # Create the buttons for applying/cancelling configuration changes
-        frame = Frame(self.window)
-        frame.pack(padx=10, pady=5)
-        B1 = Button (frame, text = "Apply",command=lambda:save_signal_state(self,False))
+        self.frame2 = Frame(self.window)
+        self.frame2.pack(padx=10, pady=10)
+        B1 = Button (self.frame2, text = "Apply",command=lambda:save_signal_state(self,False))
         B1.pack(side=LEFT, padx=5)
-        B2 = Button (frame, text = "Ok",command=lambda:save_signal_state(self,True))
+        B2 = Button (self.frame2, text = "Ok",command=lambda:save_signal_state(self,True))
         B2.pack(side=LEFT, padx=5)
-        B3 = Button (frame, text = "Cancel",command=lambda:load_initial_state(self))
+        B3 = Button (self.frame2, text = "Cancel",command=lambda:load_initial_state(self))
         B3.pack(side=LEFT, padx=5)
         # load the initial UI state
         load_initial_state(self)
@@ -709,10 +784,13 @@ class edit_signal:
     def sig_type_updated(self):
         self.subtype.var.set(1)
         update_signal_subtype_selections(self)
+        update_signal_aspect_selections(self)
         update_route_selections(self)
+        update_distant_selections(self)
         return()
     
     def sig_subtype_updated(self):
+        update_signal_aspect_selections(self)
         update_route_selections(self)
         return()
     
