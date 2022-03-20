@@ -5,6 +5,7 @@
 from tkinter import *
 
 from . import objects
+from . import common
 from ..library import signals
 from ..library import signals_common
 from ..library import signals_colour_lights
@@ -26,15 +27,15 @@ def initialise(root_object,canvas_object):
 # Function to load the initial UI state when the Edit window is created
 #------------------------------------------------------------------------------------
  
-def load_initial_state(signal):
+def load_state(signal):
     object_id = signal.object_id
     # Set the Tkinter variables from the current object settings
-    signal.sigid.sigid.set(str(objects.schematic_objects[object_id]["itemid"]))
-    # For the SigID, we also set the Entry box initial value
-    signal.sigid.entry.set(str(objects.schematic_objects[object_id]["itemid"]))
+    signal.sigid.id.set(str(objects.schematic_objects[object_id]["itemid"]))
+    # For the ID, we also set the "Entry" box initial value and the "current" element
     # The "existing" sigid element is used to supress "sig exists" validation
     # in the case of a sig ID being changed and then changed back before "apply"
-    signal.sigid.existing.set(str(objects.schematic_objects[object_id]["itemid"]))
+    signal.sigid.entry.set(str(objects.schematic_objects[object_id]["itemid"]))
+    signal.sigid.current.set(str(objects.schematic_objects[object_id]["itemid"]))
     signal.sigtype.var.set(objects.schematic_objects[object_id]["itemtype"].value)
     signal.subtype.var.set(objects.schematic_objects[object_id]["itemsubtype"].value)
     signal.routes1.sig.main.sel.set(objects.schematic_objects[object_id]["sigroutemain"])
@@ -62,7 +63,7 @@ def load_initial_state(signal):
 # Function to commit all configuration changes (Apply/OK Button)
 #------------------------------------------------------------------------------------
  
-def save_signal_state(signal,close_window:bool):
+def save_state(signal):
     object_id = signal.object_id
     # Get the Signal Subtype (will depend on the signal Type)
     signal_type = signals_common.sig_type(signal.sigtype.var.get())
@@ -77,7 +78,7 @@ def save_signal_state(signal,close_window:bool):
     # Delete the existing signal object (the signal will be re-created)
     signals.delete_signal(objects.schematic_objects[object_id]["itemid"])
     # Set the Tkinter variables from the current object settings
-    objects.schematic_objects[object_id]["itemid"] = int(signal.sigid.sigid.get())
+    objects.schematic_objects[object_id]["itemid"] = int(signal.sigid.id.get())
     objects.schematic_objects[object_id]["itemtype"] = signal_type
     objects.schematic_objects[object_id]["itemsubtype"] = signal_subtype
     objects.schematic_objects[object_id]["sigroutemain"] = signal.routes1.sig.main.sel.get()
@@ -96,62 +97,10 @@ def save_signal_state(signal,close_window:bool):
     objects.schematic_objects[object_id]["distrouterh1"] = signal.routes1.sub.rh1.sel.get()
     objects.schematic_objects[object_id]["distrouterh2"] = signal.routes1.sub.rh2.sel.get()
     # Update the "existing" sigid element on "Apply" - to ensure validation works
-    signal.sigid.existing.set(str(objects.schematic_objects[object_id]["itemid"]))
+    signal.sigid.current.set(str(objects.schematic_objects[object_id]["itemid"]))
     # Finally update the signal (recreate in its new configuration)
     objects.update_signal_object(object_id)
-    # Close the window if required (i.e. OK Button was pressed)
-    if close_window: signal.window.destroy()
     return()
-
-#------------------------------------------------------------------------------------
-# Function to validate a Sig ID Entry (ensure its a valid integer and within
-# the Sig ID range, given the Entry Box Object and associated StringVar
-# The function also checks the signal ID is not already used by another signal
-# The "existing" sigid element is used to supress "sig exists" validation
-# in the case of a sig ID being changed and then changed back before "apply"
-#------------------------------------------------------------------------------------
-
-def validate_sig_id(EB,entry,existing):
-    if entry.get() == "":
-        error_msg = "Signal ID is empty"
-    else:
-        try:
-            new_sig_id = int(entry.get())
-        except:
-            error_msg = "Signal ID is invalid"
-        else:
-            old_sig_id = int(existing.get())
-            if new_sig_id < 1 or new_sig_id > 99:
-                error_msg = "Signal ID is out of range"
-            elif signals_common.sig_exists(new_sig_id) and new_sig_id != old_sig_id:
-                error_msg = "Signal ID is already assigned"
-            else:
-                EB.config(fg='black')
-                return(True,"")
-    EB.config(fg='red')
-    return(False,error_msg)
-
-#------------------------------------------------------------------------------------
-# Function to validate a DCC Address Entry (ensure its a valid integer and within
-# the DCC address range, given the Entry Box Object and associated StringVar
-#------------------------------------------------------------------------------------
-
-def validate_dcc_address(EB,entry):
-    if entry.get() == "":
-        return(True,"")
-    else:
-        try:
-            dcc_address = int(entry.get())
-        except:
-            error_msg = "DCC Address is invalid"
-        else:
-            if dcc_address < 1 or dcc_address > 2047:
-                error_msg = "DCC Address is out of range"
-            else:
-                EB.config(fg='black')
-                return(True,"")
-    EB.config(fg='red')
-    return(False,error_msg)
 
 #------------------------------------------------------------------------------------
 # Function to Validate the GPIO Channel setting (for external sensors),
@@ -520,36 +469,6 @@ class general_settings_frame:
         # Also - Update based on signal ahead
 
 #------------------------------------------------------------------------------------
-# Class for the signal type / subtype selection radio buttons
-#------------------------------------------------------------------------------------
-
-class selection_button_frame:
-    def __init__(self, parent, name, callback, width, b1, b2, b3, b4, b5):
-        self.frame = LabelFrame(parent, text = name)
-        self.frame.pack(padx=5, pady=5)
-        self.var = IntVar(parent,0)
-        if b1 != "":
-            self.B1 = Radiobutton(self.frame, text=b1, anchor='w',
-                command=callback, variable=self.var, value=1)
-            self.B1.pack(padx=3, pady=3, side=LEFT)
-        if b2 != "":
-            self.B2 = Radiobutton(self.frame, text=b2, anchor='w',
-                command=callback, variable=self.var, value=2)
-            self.B2.pack(padx=3, pady=3, side=LEFT)
-        if b3 != "":
-            self.B3 = Radiobutton(self.frame, text=b3, anchor='w',
-                command=callback, variable=self.var, value=3)
-            self.B3.pack(padx=3, pady=3, side=LEFT)
-        if b4 != "":
-            self.B4 = Radiobutton(self.frame, text=b4, anchor='w',
-                command=callback, variable=self.var, value=4)
-            self.B4.pack(padx=3, pady=3, side=LEFT)
-        if b5 != "":
-            self.B5 = Radiobutton(self.frame, text=b5, anchor='w', 
-                command=callback, variable=self.var, value=5)
-            self.B5.pack(padx=3, pady=3, side=LEFT)
-
-#------------------------------------------------------------------------------------
 # Classes for the Semaphore Route selection checkboxes and DCC address entry boxes
 #------------------------------------------------------------------------------------
 
@@ -571,7 +490,7 @@ class semaphore_route_element:
         self.EB.bind('<Escape>',self.entry_box_cancel)
         self.EB.bind('<FocusOut>',self.entry_box_updated)
     def entry_box_updated(self,event):
-        valid, error_msg = validate_dcc_address(self.EB,self.entry)
+        valid, error_msg = common.validate_dcc_address(self.EB,self.entry)
         if valid:
             self.dcc.set(self.entry.get())
             # if the event was "return" then focus away from the entry box
@@ -630,59 +549,6 @@ class semaphore_route_frame:
 # Classes for the Colour Light Route selection checkboxes and DCC address entry boxes
 #------------------------------------------------------------------------------------
 
-class dcc_address_entry_box:
-    def __init__(self,parent):
-        self.state = BooleanVar(parent,False)
-        self.parent = parent
-        self.address = StringVar(parent,"")
-        self.entry = StringVar(parent,"")
-        self.EB = Entry(parent,width=4,textvariable=self.entry,state="disabled")
-        self.EB.pack(side=LEFT)
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
-        self.CB = Checkbutton(parent, width=3, indicatoron = False, state="disabled", 
-                        variable=self.state, command=self.update_dcc_state)
-        self.CB.pack(side=LEFT)
-        self.defaultbg = self.CB.cget("background")
-    def update_dcc_state(self):
-        if self.state.get(): self.CB.configure(text="ON")
-        else: self.CB.configure(text="OFF")
-        return()
-    def entry_box_updated(self,event):
-        valid, error_msg = validate_dcc_address(self.EB,self.entry)
-        if valid:
-            self.address.set(self.entry.get())
-            if event.keysym == 'Return': self.parent.focus()
-            if self.address.get() == "": 
-                self.CB.config(state="disabled", text="")
-                self.CB.configure(text="",bg=self.defaultbg)
-            else:
-                self.CB.config(state="normal")
-                self.CB.configure(bg="white")
-                self.update_dcc_state()
-        else:
-            print (error_msg)               
-        return()
-    def entry_box_cancel(self,event):
-        self.EB.config(fg='black')
-        self.entry.set(self.address.get())
-        self.parent.focus()
-        return()
-    def entry_box_enable(self):
-        self.EB.config(state="normal")
-        self.entry.set(self.address.get())
-        if self.entry.get() == "" : 
-            self.CB.config(state="disabled",bg=self.defaultbg)
-        else:
-            self.CB.config(state="normal",bg="white")
-        return()
-    def entry_box_disable(self):
-        self.EB.config(state="disabled")
-        self.entry.set("")
-        self.CB.config(state="disabled", text="",bg=self.defaultbg)
-        return()
-
 class colour_light_route_element:
     # The basic element comprising checkbox and DCC address entry boxes
     def __init__(self,parent,name,width):
@@ -692,11 +558,11 @@ class colour_light_route_element:
         self.CB = Checkbutton(self.frame, width=width, text=name, variable=self.sel,
                               anchor='w', command=self.checkbox_updated)
         self.CB.pack(side=LEFT)
-        self.dcc1 = dcc_address_entry_box(self.frame)
-        self.dcc2 = dcc_address_entry_box(self.frame)
-        self.dcc3 = dcc_address_entry_box(self.frame)
-        self.dcc4 = dcc_address_entry_box(self.frame)
-        self.dcc5 = dcc_address_entry_box(self.frame)
+        self.dcc1 = common.dcc_address_entry_box(self.frame,True)
+        self.dcc2 = common.dcc_address_entry_box(self.frame,True)
+        self.dcc3 = common.dcc_address_entry_box(self.frame,True)
+        self.dcc4 = common.dcc_address_entry_box(self.frame,True)
+        self.dcc5 = common.dcc_address_entry_box(self.frame,True)
     def checkbox_updated(self):
         if self.sel.get():
             self.dcc1.entry_box_enable()
@@ -750,14 +616,15 @@ class edit_signal:
         self.frame1 = Frame(self.window)
         self.frame1.pack()
         # Create the entry box for the signal ID
-        self.sigid = sig_id_selection(self.frame1,"Signal ID") 
+        self.sigid = common.object_id_selection(self.frame1,"Signal ID",
+                        signals_common.sig_exists) 
         # Create the Selection buttons for Signal Type
-        self.sigtype = selection_button_frame(self.frame1,"Signal Type",
-                    self.sig_type_updated,13,"Colour Light","Ground Position",
+        self.sigtype = common.selection_button_frame(self.frame1,"Signal Type",
+                    self.sig_type_updated,"Colour Light","Ground Position",
                                               "Semaphore","Ground Disc","")
         # Create the Selection buttons for Signal Subtype
-        self.subtype = selection_button_frame(self.window,"Signal Subtype",
-                    self.sig_subtype_updated,13,"-","-","-","-","-")
+        self.subtype = common.selection_button_frame(self.window,"Signal Subtype",
+                    self.sig_subtype_updated,"-","-","-","-","-")
         
         # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
         self.aspects = colour_light_indication_group(self.window,"Signal Aspects and DCC Addresses")
@@ -766,20 +633,13 @@ class edit_signal:
         # Create the Checkboxes and Entry Boxes for the Semaphore Route Indications
         self.routes1 = semaphore_route_frame(self.window,self.route_selections_updated)
 
-
-
         self.gen = general_settings_frame(self.window)
-        # Create the buttons for applying/cancelling configuration changes
-        self.frame2 = Frame(self.window)
-        self.frame2.pack(padx=10, pady=10)
-        B1 = Button (self.frame2, text = "Apply",command=lambda:save_signal_state(self,False))
-        B1.pack(side=LEFT, padx=5)
-        B2 = Button (self.frame2, text = "Ok",command=lambda:save_signal_state(self,True))
-        B2.pack(side=LEFT, padx=5)
-        B3 = Button (self.frame2, text = "Cancel",command=lambda:load_initial_state(self))
-        B3.pack(side=LEFT, padx=5)
+        
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        common.window_control_buttons(self.window, self, load_state, save_state)
+        
         # load the initial UI state
-        load_initial_state(self)
+        load_state(self)
 
     def sig_type_updated(self):
         self.subtype.var.set(1)
@@ -798,21 +658,6 @@ class edit_signal:
         update_distant_selections(self)
         return()
 
-#------------------------------------------------------------------------------------
-# Main entry point for editing an object configuration
-#------------------------------------------------------------------------------------
 
-def edit_object(object_id):
-    if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        pass;
-    elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        edit_signal(object_id)
-    elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-        pass;
-    elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-        pass;
-    elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-        pass;
-    return()
 
 #############################################################################################

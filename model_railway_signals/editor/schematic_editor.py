@@ -14,7 +14,8 @@ from ..library import signals_ground_disc
 from . import objects
 from . import schematic
 from . import menubar
-from . import configure
+from . import configure_signal
+from . import configure_point
 
 #------------------------------------------------------------------------------------
 # Internal Callback function up for Track Occupancy Sections events - we need to use
@@ -205,7 +206,7 @@ canvas.bind('r', schematic.rotate_selected_objects)
 
 objects.initialise (root, canvas)
 schematic.initialise (root, canvas)
-configure.initialise (root, canvas)
+configure_signal.initialise (root, canvas)
 
 root.mainloop()
 

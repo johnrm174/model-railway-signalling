@@ -350,6 +350,9 @@ def create_default_point_object(item_type):
     schematic_objects[object_id]["reverse"] = False
     schematic_objects[object_id]["automatic"] = False
     schematic_objects[object_id]["hasfpl"] = False
+    # These are the DCC address parameters
+    schematic_objects[object_id]["dccaddress"] = 0
+    schematic_objects[object_id]["dccreversed"] = False
     # Draw the Point on the canvas (and assign the ID)
     update_point_object(object_id)
     return()

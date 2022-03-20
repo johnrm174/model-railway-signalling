@@ -16,7 +16,8 @@ from ..library import track_sections
 from ..library import points
 
 from . import objects
-from . import configure
+from . import configure_signal
+from . import configure_point
 
 import enum
 import uuid
@@ -138,7 +139,17 @@ def deselect_all_objects(event=None):
 #------------------------------------------------------------------------------------
 
 def edit_selected_object():
-    configure.edit_object(schematic_state["selectedobjects"][0])
+    object_id = schematic_state["selectedobjects"][0]
+    if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+        pass;
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
+        configure_signal.edit_signal(object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
+        configure_point.edit_point(root, object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
+        pass;
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
+        pass;
     return()
 
 #------------------------------------------------------------------------------------
