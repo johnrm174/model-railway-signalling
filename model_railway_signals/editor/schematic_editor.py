@@ -206,7 +206,6 @@ canvas.bind('r', schematic.rotate_selected_objects)
 
 objects.initialise (root, canvas)
 schematic.initialise (root, canvas)
-configure_signal.initialise (root, canvas)
 
 root.mainloop()
 

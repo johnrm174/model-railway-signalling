@@ -143,7 +143,7 @@ def edit_selected_object():
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
         pass;
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        configure_signal.edit_signal(object_id)
+        configure_signal.edit_signal(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
         configure_point.edit_point(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
@@ -230,6 +230,18 @@ def delete_selected_objects(event=None):
             signals.delete_signal(objects.schematic_objects[object_id]["itemid"])
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
             points.delete_point(objects.schematic_objects[object_id]["itemid"])
+            # Cycle through all the other objects to remove any references to the point
+            for obj in objects.schematic_objects:
+                if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
+                     objects.schematic_objects[obj]["alsoswitch"] ==
+                           objects.schematic_objects[object_id]["itemid"] ):
+                    # Update the other point object (to remove the "auto switch" value")
+                    objects.schematic_objects[obj]["alsoswitch"] = 0
+                    points.delete_point(objects.schematic_objects[obj]["itemid"])
+                    objects.update_point_object(obj)
+            ##################################################################
+            # TODO - remove any signal interlocking references (when supported)
+            ###################################################################     
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
             track_sections.delete_section(objects.schematic_objects[object_id]["itemid"])
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:

@@ -641,4 +641,26 @@ def publish_accessory_short_event(address:int,active:bool):
                             log_message=log_message,subtopic = str(address),retain=True)
     return()
 
+# --------------------------------------------------------------------------------
+# Non public API function for deleting a point mapping - This is used by the
+# schematic editor for deleting existing DCC mappings (before creating new ones)
+# --------------------------------------------------------------------------------
+
+def delete_point_mapping(point_id:int):
+    global points
+    if point_mapped(point_id):
+        del dcc_point_mappings[str(point_id)]
+    return()
+
+# --------------------------------------------------------------------------------
+# Non public API function for deleting a signal mapping - This is used by the
+# schematic editor for deleting existing DCC mappings (before creating new ones)
+# --------------------------------------------------------------------------------
+
+def delete_signal_mapping(sig_id:int):
+    global points
+    if sig_mapped(sig_id):
+        del dcc_signal_mappings[str(sig_id)]
+    return()
+
 #######################################################################################

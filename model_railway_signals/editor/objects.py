@@ -13,6 +13,7 @@ from ..library import signals_ground_disc
 from ..library import block_instruments
 from ..library import track_sections
 from ..library import points
+from ..library import dcc_control
 
 import enum
 import uuid
@@ -89,34 +90,52 @@ def update_line_object(object_id):
 def update_signal_object(object_id):
     global schematic_objects
     # If the signal already exists then delete it (and re-create with the same ID)
+    # Note that we also delete any associated DCC address mapping for the point
     if schematic_objects[object_id]["itemid"]:
         signals.delete_signal(schematic_objects[object_id]["itemid"])
+        dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
     else:
         # Find the next available Signal_ID (if not updating an existing signal object)
         schematic_objects[object_id]["itemid"] = 1
         while True:
             if not signals_common.sig_exists(schematic_objects[object_id]["itemid"]): break
             else: schematic_objects[object_id]["itemid"] += 1
+            
+    if (schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light or
+          schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_position):
+        # Create the new DCC Mapping for the Colour Light Signal
+        dcc_control.map_dcc_signal (schematic_objects[object_id]["itemid"],
+                    danger = schematic_objects[object_id]["dccaspects"][0],
+                    proceed = schematic_objects[object_id]["dccaspects"][1],
+                    caution = schematic_objects[object_id]["dccaspects"][2],
+                    prelim_caution = schematic_objects[object_id]["dccaspects"][3],
+                    flash_caution = schematic_objects[object_id]["dccaspects"][4],
+                    flash_prelim_caution = schematic_objects[object_id]["dccaspects"][5])
+    else:
+        # Create the new DCC Mapping for the Semaphore Signal
+        pass
+
     # Create the new signal object (according to the signal type)
     if schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light:
         signals_colour_lights.create_colour_light_signal (canvas,
-                            sig_id = schematic_objects[object_id]["itemid"],
-                            x = schematic_objects[object_id]["posx"],
-                            y = schematic_objects[object_id]["posy"],
-                            signal_subtype = schematic_objects[object_id]["itemsubtype"],
-#                            sig_callback = schematic_callback,
-                            orientation = schematic_objects[object_id]["orientation"],
-                            sig_passed_button = schematic_objects[object_id]["passedbutton"],
-                            approach_release_button = schematic_objects[object_id]["releasebutton"],
-                            position_light = schematic_objects[object_id]["subroutemain"],
-                            mainfeather = schematic_objects[object_id]["sigroutemain"],
-                            lhfeather45 = schematic_objects[object_id]["sigroutelh1"],
-                            lhfeather90 = schematic_objects[object_id]["sigroutelh2"],
-                            rhfeather45 = schematic_objects[object_id]["sigrouterh1"],
-                            rhfeather90 = schematic_objects[object_id]["sigrouterh2"],
-                            theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
-                            refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
-                            fully_automatic = schematic_objects[object_id]["fullyautomatic"])
+                    sig_id = schematic_objects[object_id]["itemid"],
+                    x = schematic_objects[object_id]["posx"],
+                    y = schematic_objects[object_id]["posy"],
+                    signal_subtype = schematic_objects[object_id]["itemsubtype"],
+#                   sig_callback = schematic_callback,
+                    orientation = schematic_objects[object_id]["orientation"],
+                    sig_passed_button = schematic_objects[object_id]["passedbutton"],
+                    approach_release_button = schematic_objects[object_id]["releasebutton"],
+                    position_light = schematic_objects[object_id]["subroutemain"],
+                    mainfeather = schematic_objects[object_id]["sigroutemain"],
+                    lhfeather45 = schematic_objects[object_id]["sigroutelh1"],
+                    lhfeather90 = schematic_objects[object_id]["sigroutelh2"],
+                    rhfeather45 = schematic_objects[object_id]["sigrouterh1"],
+                    rhfeather90 = schematic_objects[object_id]["sigrouterh2"],
+                    theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
+                    refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
+                    fully_automatic = schematic_objects[object_id]["fullyautomatic"])
+        
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore:
         signals_semaphores.create_semaphore_signal (canvas,
                             sig_id = schematic_objects[object_id]["itemid"],
@@ -141,6 +160,7 @@ def update_signal_object(object_id):
                             theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
                             refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
                             fully_automatic = schematic_objects[object_id]["fullyautomatic"])
+        
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_position:
         signals_ground_position.create_ground_position_signal (canvas,
                             sig_id = schematic_objects[object_id]["itemid"],
@@ -150,6 +170,7 @@ def update_signal_object(object_id):
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
                             sig_passed_button = schematic_objects[object_id]["passedbutton"])
+        
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_disc:
         signals_ground_disc.create_ground_disc_signal (canvas,
                             sig_id = schematic_objects[object_id]["itemid"],
@@ -159,6 +180,7 @@ def update_signal_object(object_id):
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
                             sig_passed_button = schematic_objects[object_id]["passedbutton"])
+        
     # Create/update the selection rectangle for the signal (based on the boundary box)
     set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
     return()
@@ -170,14 +192,21 @@ def update_signal_object(object_id):
 def update_point_object(object_id):
     global schematic_objects
     # If the point already exists then delete it (and re-create with the same ID)
+    # Note that we also delete any associated DCC address mapping for the point
     if schematic_objects[object_id]["itemid"]:
         points.delete_point(schematic_objects[object_id]["itemid"])
+        dcc_control.delete_point_mapping(schematic_objects[object_id]["itemid"])
     else:
         # Find the next available ID (if not updating an existing point object)
         schematic_objects[object_id]["itemid"] = 1
         while True:
             if not points.point_exists(schematic_objects[object_id]["itemid"]): break
             else: schematic_objects[object_id]["itemid"] += 1
+    # Create the new DCC Mapping for the point
+    if schematic_objects[object_id]["dccaddress"] > 0:
+        dcc_control.map_dcc_point (schematic_objects[object_id]["itemid"],
+                                   schematic_objects[object_id]["dccaddress"],
+                                   schematic_objects[object_id]["dccreversed"])
     # Create the new point object
     points.create_point (canvas,
                 point_id = schematic_objects[object_id]["itemid"],
@@ -329,6 +358,15 @@ def create_default_signal_object(item_type,item_subtype):
     schematic_objects[object_id]["distroutelh2"] = False
     schematic_objects[object_id]["distrouterh1"] = False
     schematic_objects[object_id]["distrouterh2"] = False
+    # These are the DCC address parameters
+    schematic_objects[object_id]["dccaspects"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+                                                    
+
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)
     return()
