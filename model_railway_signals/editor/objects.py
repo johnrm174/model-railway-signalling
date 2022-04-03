@@ -5,6 +5,7 @@
 
 from tkinter import *
 from ..library import signals
+from ..library import track_sensors
 from ..library import signals_common
 from ..library import signals_colour_lights
 from ..library import signals_semaphores
@@ -89,28 +90,51 @@ def update_line_object(object_id):
 
 def update_signal_object(object_id):
     global schematic_objects
+    
     # If the signal already exists then delete it (and re-create with the same ID)
-    # Note that we also delete any associated DCC address mapping for the point
+    # Note that we also delete any associated DCC address and GPIO sensor mappings
     if schematic_objects[object_id]["itemid"]:
         signals.delete_signal(schematic_objects[object_id]["itemid"])
         dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
+        track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10)
+        track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10+1)
     else:
-        # Find the next available Signal_ID (if not updating an existing signal object)
+        # It must be a newly created signal - Find the next available Signal_ID
         schematic_objects[object_id]["itemid"] = 1
         while True:
             if not signals_common.sig_exists(schematic_objects[object_id]["itemid"]): break
             else: schematic_objects[object_id]["itemid"] += 1
             
+    # Create the sensor mappings for the signal (if any have been specified)
+    if schematic_objects[object_id]["passedsensor"][1] > 0:     
+        track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10,
+                        gpio_channel = schematic_objects[object_id]["passedsensor"][1],
+#                     sensor_callback = schematic_callback,
+                        signal_passed = schematic_objects[object_id]["itemid"] )
+    if schematic_objects[object_id]["approachsensor"][1] > 0:  
+        track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10+1,
+                        gpio_channel = schematic_objects[object_id]["approachsensor"][1],
+#                     sensor_callback = schematic_callback,
+                        signal_passed = schematic_objects[object_id]["itemid"] )
+
+    # Create the DCC Mappings for the signal (depending on signal type
     if (schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light or
           schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_position):
         # Create the new DCC Mapping for the Colour Light Signal
         dcc_control.map_dcc_signal (schematic_objects[object_id]["itemid"],
-                    danger = schematic_objects[object_id]["dccaspects"][0],
-                    proceed = schematic_objects[object_id]["dccaspects"][1],
+                    proceed = schematic_objects[object_id]["dccaspects"][0],
+                    danger = schematic_objects[object_id]["dccaspects"][1],
                     caution = schematic_objects[object_id]["dccaspects"][2],
                     prelim_caution = schematic_objects[object_id]["dccaspects"][3],
                     flash_caution = schematic_objects[object_id]["dccaspects"][4],
-                    flash_prelim_caution = schematic_objects[object_id]["dccaspects"][5])
+                    flash_prelim_caution = schematic_objects[object_id]["dccaspects"][5],
+                    NONE = schematic_objects[object_id]["dccfeathers"][0],
+                    MAIN = schematic_objects[object_id]["dccfeathers"][1],
+                    LH1 = schematic_objects[object_id]["dccfeathers"][2],
+                    LH2 = schematic_objects[object_id]["dccfeathers"][3],
+                    RH1 = schematic_objects[object_id]["dccfeathers"][4],
+                    RH2 = schematic_objects[object_id]["dccfeathers"][5],
+                    subsidary = schematic_objects[object_id]["dccsubsidary"])
     else:
         # Create the new DCC Mapping for the Semaphore Signal
         pass
@@ -124,14 +148,14 @@ def update_signal_object(object_id):
                     signal_subtype = schematic_objects[object_id]["itemsubtype"],
 #                   sig_callback = schematic_callback,
                     orientation = schematic_objects[object_id]["orientation"],
-                    sig_passed_button = schematic_objects[object_id]["passedbutton"],
-                    approach_release_button = schematic_objects[object_id]["releasebutton"],
-                    position_light = schematic_objects[object_id]["subroutemain"],
-                    mainfeather = schematic_objects[object_id]["sigroutemain"],
-                    lhfeather45 = schematic_objects[object_id]["sigroutelh1"],
-                    lhfeather90 = schematic_objects[object_id]["sigroutelh2"],
-                    rhfeather45 = schematic_objects[object_id]["sigrouterh1"],
-                    rhfeather90 = schematic_objects[object_id]["sigrouterh2"],
+                    sig_passed_button = schematic_objects[object_id]["passedsensor"][0],
+                    approach_release_button = schematic_objects[object_id]["approachsensor"][0],
+                    position_light = schematic_objects[object_id]["subsidary"],
+                    mainfeather = schematic_objects[object_id]["feathers"][0],
+                    lhfeather45 = schematic_objects[object_id]["feathers"][1],
+                    lhfeather90 = schematic_objects[object_id]["feathers"][2],
+                    rhfeather45 = schematic_objects[object_id]["feathers"][3],
+                    rhfeather90 = schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
                     refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
                     fully_automatic = schematic_objects[object_id]["fullyautomatic"])
@@ -145,18 +169,18 @@ def update_signal_object(object_id):
                             associated_home = schematic_objects[object_id]["associatedsignal"],
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
-                            sig_passed_button = schematic_objects[object_id]["passedbutton"],
-                            approach_release_button = schematic_objects[object_id]["releasebutton"],
-                            main_signal = schematic_objects[object_id]["sigroutemain"],
-                            lh1_signal = schematic_objects[object_id]["sigroutelh1"],
-                            lh2_signal = schematic_objects[object_id]["sigroutelh2"],
-                            rh1_signal = schematic_objects[object_id]["sigrouterh1"],
-                            rh2_signal = schematic_objects[object_id]["sigrouterh1"],
-                            main_subsidary = schematic_objects[object_id]["subroutemain"],
-                            lh1_subsidary = schematic_objects[object_id]["subroutelh1"],
-                            lh2_subsidary = schematic_objects[object_id]["subroutelh2"],
-                            rh1_subsidary = schematic_objects[object_id]["subrouterh1"],
-                            rh2_subsidary = schematic_objects[object_id]["subrouterh2"],
+                            sig_passed_button = schematic_objects[object_id]["passedsensor"][0],
+                            approach_release_button = schematic_objects[object_id]["approachsensor"][0],
+                            main_signal = schematic_objects[object_id]["sigarms"][0],
+                            lh1_signal = schematic_objects[object_id]["sigarms"][1],
+                            lh2_signal = schematic_objects[object_id]["sigarms"][2],
+                            rh1_signal = schematic_objects[object_id]["sigarms"][3],
+                            rh2_signal = schematic_objects[object_id]["sigarms"][4],
+                            main_subsidary = schematic_objects[object_id]["subarms"][0],
+                            lh1_subsidary = schematic_objects[object_id]["subarms"][1],
+                            lh2_subsidary = schematic_objects[object_id]["subarms"][2],
+                            rh1_subsidary = schematic_objects[object_id]["subarms"][3],
+                            rh2_subsidary = schematic_objects[object_id]["subarms"][4],
                             theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
                             refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
                             fully_automatic = schematic_objects[object_id]["fullyautomatic"])
@@ -169,7 +193,7 @@ def update_signal_object(object_id):
                             signal_subtype = schematic_objects[object_id]["itemsubtype"],
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
-                            sig_passed_button = schematic_objects[object_id]["passedbutton"])
+                            sig_passed_button = schematic_objects[object_id]["passedsensor"][0])
         
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_disc:
         signals_ground_disc.create_ground_disc_signal (canvas,
@@ -179,7 +203,7 @@ def update_signal_object(object_id):
                             signal_subtype = schematic_objects[object_id]["itemsubtype"],
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
-                            sig_passed_button = schematic_objects[object_id]["passedbutton"])
+                            sig_passed_button = schematic_objects[object_id]["passedsensor"][0])
         
     # Create/update the selection rectangle for the signal (based on the boundary box)
     set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
@@ -327,7 +351,7 @@ def create_default_object(item:object_type):
 #------------------------------------------------------------------------------------
 # Internal function to Create a new default Signal Object
 #------------------------------------------------------------------------------------
-        
+
 def create_default_signal_object(item_type,item_subtype):
     global schematic_objects
     # Create the generic dictionary elements and set the creation position
@@ -337,39 +361,43 @@ def create_default_signal_object(item_type,item_subtype):
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["itemsubtype"] = item_subtype
     schematic_objects[object_id]["orientation"] = 0
-    schematic_objects[object_id]["passedbutton"] = True
-    schematic_objects[object_id]["releasebutton"] = False
+    schematic_objects[object_id]["passedsensor"] = [False,0]
+    schematic_objects[object_id]["approachsensor"] = [False,0]
     schematic_objects[object_id]["fullyautomatic"] = False
     schematic_objects[object_id]["immediaterefresh"] = True
     schematic_objects[object_id]["associatedsignal"] = 0
+    schematic_objects[object_id]["subsidary"] = False
     schematic_objects[object_id]["theatreroute"] = False
-    schematic_objects[object_id]["sigroutemain"] = (item_type==signals_common.sig_type.semaphore)
-    schematic_objects[object_id]["sigroutelh1"] = False
-    schematic_objects[object_id]["sigroutelh2"] = False
-    schematic_objects[object_id]["sigrouterh1"] = False
-    schematic_objects[object_id]["sigrouterh2"] = False
-    schematic_objects[object_id]["subroutemain"] = False
-    schematic_objects[object_id]["subroutelh1"] = False
-    schematic_objects[object_id]["subroutelh2"] = False
-    schematic_objects[object_id]["subrouterh1"] = False
-    schematic_objects[object_id]["subrouterh2"] = False
-    schematic_objects[object_id]["distroutemain"] = False
-    schematic_objects[object_id]["distroutelh1"] = False
-    schematic_objects[object_id]["distroutelh2"] = False
-    schematic_objects[object_id]["distrouterh1"] = False
-    schematic_objects[object_id]["distrouterh2"] = False
-    # These are the DCC address parameters
+    schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
+    schematic_objects[object_id]["sigarms"] = [False,False,False,False,False]
+    schematic_objects[object_id]["subarms"] = [False,False,False,False,False]
+    schematic_objects[object_id]["distarms"] = [False,False,False,False,False]
+    # These are the DCC address parameters for the colour light signal aspects
+    schematic_objects[object_id]["dccsubsidary"] = 0
     schematic_objects[object_id]["dccaspects"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
-                                                    
+    # These are the DCC address parameters for the colour light feathers                                                    
+    schematic_objects[object_id]["dccfeathers"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+    # These are the DCC address parameters for the Theatre route indicator    
+    schematic_objects[object_id]["dcctheatre"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]],
+                                                   [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
 
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)
-    return()
+    return() 
 
 #------------------------------------------------------------------------------------
 # Internal function to Create a new default Point Object

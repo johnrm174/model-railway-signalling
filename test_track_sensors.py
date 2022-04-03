@@ -5,7 +5,7 @@
 
 from tkinter import *
 from model_railway_signals import *
-from model_railway_signals import common
+from model_railway_signals.library import common
 
 import logging
 import time

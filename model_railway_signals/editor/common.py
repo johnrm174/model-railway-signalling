@@ -72,12 +72,17 @@ class CreateToolTip():
 
 class object_id_selection:
     def __init__(self, parent_window, frame_label, exists_function):
+        # Create a Label frame for the UI element
         self.frame = LabelFrame(parent_window, text=frame_label)
         self.frame.pack(side=LEFT, padx=2, pady=2)
+        # Create the tkinter vars for the entry box - 'current' is the original value, 'entry'
+        # is the "raw" EB value (before validation) and 'var' is the last validated value
         self.entry = StringVar(parent_window, "")
         self.current = StringVar(parent_window, "")
         self.var = StringVar(parent_window, "")
+        # This is the function to call to see if the object already exists
         self.exists_function = exists_function
+        # Create the entry box and associated default tooltip
         self.EB = Entry(self.frame, width=3, textvariable=self.entry)
         self.EB.pack(padx=2, pady=2) 
         self.EB.bind('<Return>', self.entry_box_updated)
@@ -92,14 +97,14 @@ class object_id_selection:
         if event.keysym == 'Return': self.frame.focus()
         
     def entry_box_cancel(self, event):
-        self.EB.config(fg='black')
         self.entry.set(self.var.get())
+        self.validate()
         self.frame.focus()
         
     def validate(self):
         valid = False
         if self.entry.get() == "":
-            self.TT.text = "ID is empty"
+            self.TT.text = "Value is empty"
         else:
             try:
                 new_id = int(self.entry.get())
@@ -110,7 +115,7 @@ class object_id_selection:
                 if new_id < 1 or new_id > 99:
                     self.TT.text = "Out of range (1-99)"
                 elif self.exists_function(new_id) and new_id != current_id:
-                    self.TT.text = "ID is already assigned"
+                    self.TT.text = "ID already assigned"
                 else:
                     self.TT.text = ("Enter new ID (1-99) " +
                         "(this will also update any references to " +
@@ -127,8 +132,8 @@ class object_id_selection:
         self.var.set(str(value))
         self.current.set(str(value))
         self.entry.set(str(value))
-        self.EB.config(fg='black')
-        
+        self.validate()
+
     def get_value(self):
         return(int(self.var.get()))
         
@@ -146,19 +151,28 @@ class object_id_selection:
 
 class dcc_address_entry_box:
     def __init__(self, parent_window, dcc_state_checkbox=False):
+        # Need the reference to the parent window for focusing away from the EB
         self.parent = parent_window
+        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
+        # (before validation) and 'var' is the last validated value
         self.var = StringVar(parent_window,"")
         self.entry = StringVar(parent_window,"")
+        # Create the tkinter vars for the DCC state CB - 'selection' is the actual CB state
+        # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
+        # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_window,False)
+        self.selection = BooleanVar(parent_window,False)
+        # Create the entry box and associated tooltip
         self.EB = Entry(parent_window, width=4, textvariable=self.entry)
         self.EB.pack(side=LEFT, padx=2, pady=2)
         self.EB.bind('<Return>',self.entry_box_updated)
         self.EB.bind('<Escape>',self.entry_box_cancel)
         self.EB.bind('<FocusOut>',self.entry_box_updated)
         self.EBTT = CreateToolTip(self.EB, "Enter a DCC address (1-2047)")
+        # Create the optional checkbox and associated tool tip
         if dcc_state_checkbox:
             self.CB = Checkbutton(parent_window, width=3, indicatoron = False, 
-                        variable=self.state, command=self.update_dcc_state, state="disabled")
+                variable=self.selection, command=self.update_dcc_state, state="disabled")
             self.CB.pack(side=LEFT, padx=2, pady=2)
             self.defaultbg = self.CB.cget("background")
             self.CBTT = CreateToolTip(self.CB, "Set the DCC Logic")
@@ -166,6 +180,7 @@ class dcc_address_entry_box:
             self.CB = None
             
     def update_dcc_state(self):
+        self.state.set(self.selection.get())
         if self.state.get(): self.CB.configure(text="ON")
         else: self.CB.configure(text="OFF")
         
@@ -174,6 +189,7 @@ class dcc_address_entry_box:
         if self.entry.get() == "":
             if self.CB is not None:
                 self.CB.config(state="disabled", text="", bg=self.defaultbg)
+                self.selection.set(False)
             valid = True
         else:
             try:
@@ -187,6 +203,7 @@ class dcc_address_entry_box:
                     self.EBTT.text = "Enter a DCC address (1-2047)"
                     if self.CB is not None:
                         self.CB.config(state="normal", bg="white")
+                        self.selection.set(self.state.get())
                         self.update_dcc_state()
                     valid = True
         if valid:
@@ -201,36 +218,44 @@ class dcc_address_entry_box:
         if event.keysym == 'Return': self.parent.focus()
         
     def entry_box_cancel(self,event):
-        self.EB.config(fg='black')
         self.entry.set(self.var.get())
+        self.validate()
         self.parent.focus()
         
     def enable(self):
         self.EB.config(state="normal")
         self.entry.set(self.var.get())
+        self.validate()
         if self.CB is not None:
             if self.entry.get() == "" : 
-                self.CB.config(state="disabled",bg=self.defaultbg)
+                self.CB.config(state="disabled", text="", bg=self.defaultbg)
+                self.state.set(False)
             else:
-                self.CB.config(state="normal",bg="white")
-                
+                self.CB.config(state="normal", bg="white")
+                self.selection.set(self.state.get())
+                self.update_dcc_state()
+              
     def disable(self):
         self.EB.config(state="disabled")
         self.entry.set("")
         if self.CB is not None:
-            self.CB.config(state="disabled", text="",bg=self.defaultbg)
-            
-    def set_value(self, command=[0,False]):
-        if command[0] == 0:
+            self.CB.config(state="disabled", text="", bg=self.defaultbg)
+            self.selection.set(False)
+
+    def set_value(self, dcc_command):
+        # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
+        if dcc_command[0] == 0:
             self.var.set("")
             self.entry.set("")
         else:
-            self.var.set(str(command[0]))
-            self.entry.set(str(command[0]))
-        self.state.set(command[1])
+            self.var.set(str(dcc_command[0]))
+            self.entry.set(str(dcc_command[0]))
+        self.state.set(dcc_command[1])
+        self.selection.set(dcc_command[1])
         self.validate()
         
     def get_value(self):
+        # Returns a 2 element list of [DCC_Address, DCC_State]
         if self.var.get() == "": return([0, False])
         else: return([int(self.var.get()), self.state.get()])          
     
@@ -244,10 +269,13 @@ class dcc_address_entry_box:
 class selection_buttons:
     def __init__(self, parent_window, frame_label, tool_tip = "",
             callback=None,b1=None, b2=None, b3=None, b4=None, b5=None):
+        # Create a labelframe to hold the buttons
         self.frame = LabelFrame(parent_window, text = frame_label)
         self.frame.pack(padx=2, pady=2)
         self.var = IntVar(parent_window,0)
+        # This is the external callback to make when a selection is made
         self.callback = callback
+        # Only create as many buttons as we need
         if b1 is not None:
             self.B1 = Radiobutton(self.frame, text=b1, anchor='w',
                 command=self.updated, variable=self.var, value=1)
