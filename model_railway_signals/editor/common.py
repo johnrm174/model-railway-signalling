@@ -75,16 +75,16 @@ class object_id_selection:
         # Create a Label frame for the UI element
         self.frame = LabelFrame(parent_window, text=frame_label)
         self.frame.pack(side=LEFT, padx=2, pady=2)
-        # Create the tkinter vars for the entry box - 'current' is the original value, 'entry'
-        # is the "raw" EB value (before validation) and 'var' is the last validated value
+        # Create the tkinter vars for the entry box - 'initial_value' is the original value, 
+        # 'entry' is the "raw" EB value (before validation) and 'value' is the validated value
         self.entry = StringVar(parent_window, "")
-        self.current = StringVar(parent_window, "")
-        self.var = StringVar(parent_window, "")
+        self.initial_value = StringVar(parent_window, "")
+        self.value = StringVar(parent_window, "")
         # This is the function to call to see if the object already exists
         self.exists_function = exists_function
-        # Create the entry box and associated default tooltip
+        # Create the entry box, event bindings and associated default tooltip
         self.EB = Entry(self.frame, width=3, textvariable=self.entry)
-        self.EB.pack(padx=2, pady=2) 
+        self.EB.pack(padx=2, pady=2)
         self.EB.bind('<Return>', self.entry_box_updated)
         self.EB.bind('<Escape>', self.entry_box_cancel)
         self.EB.bind('<FocusOut>', self.entry_box_updated)
@@ -97,7 +97,7 @@ class object_id_selection:
         if event.keysym == 'Return': self.frame.focus()
         
     def entry_box_cancel(self, event):
-        self.entry.set(self.var.get())
+        self.entry.set(self.value.get())
         self.validate()
         self.frame.focus()
         
@@ -111,7 +111,7 @@ class object_id_selection:
             except:
                 self.TT.text = "Not a valid integer"
             else:
-                current_id = int(self.current.get())
+                current_id = int(self.initial_value.get())
                 if new_id < 1 or new_id > 99:
                     self.TT.text = "Out of range (1-99)"
                 elif self.exists_function(new_id) and new_id != current_id:
@@ -123,20 +123,20 @@ class object_id_selection:
                     valid = True
         if valid:
             self.EB.config(fg='black')
-            self.var.set(self.entry.get())
+            self.value.set(self.entry.get())
         else:               
             self.EB.config(fg='red')
         return(valid)
     
     def set_value(self, value:int):
-        self.var.set(str(value))
-        self.current.set(str(value))
+        self.value.set(str(value))
+        self.initial_value.set(str(value))
         self.entry.set(str(value))
         self.validate()
 
     def get_value(self):
-        return(int(self.var.get()))
-        
+        return(int(self.value.get()))
+
 #------------------------------------------------------------------------------------
 # Common class for a DCC address entry box UI element
 # Can be created with or without a checkbox representing the "state"
@@ -146,7 +146,7 @@ class object_id_selection:
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value (address, state)
 #    "get_value" - will return the last "valid" value (address,state)
-# Validation = Address must be a valid integer, must be between 1-2047
+# Validation = Address must be a valid integer (or blank) and between 1-2047
 #------------------------------------------------------------------------------------
 
 class dcc_address_entry_box:
@@ -154,15 +154,15 @@ class dcc_address_entry_box:
         # Need the reference to the parent window for focusing away from the EB
         self.parent = parent_window
         # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
-        # (before validation) and 'var' is the last validated value
-        self.var = StringVar(parent_window,"")
+        # (before validation) and 'value' is the last validated value
+        self.value = StringVar(parent_window,"")
         self.entry = StringVar(parent_window,"")
         # Create the tkinter vars for the DCC state CB - 'selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_window,False)
         self.selection = BooleanVar(parent_window,False)
-        # Create the entry box and associated tooltip
+        # Create the entry box, event bindings and associated tooltip
         self.EB = Entry(parent_window, width=4, textvariable=self.entry)
         self.EB.pack(side=LEFT, padx=2, pady=2)
         self.EB.bind('<Return>',self.entry_box_updated)
@@ -208,23 +208,23 @@ class dcc_address_entry_box:
                     valid = True
         if valid:
             self.EB.config(fg='black')
-            self.var.set(self.entry.get())
+            self.value.set(self.entry.get())
         else:
             self.EB.config(fg='red')
         return(valid)
 
-    def entry_box_updated(self,event):
+    def entry_box_updated(self, event):
         self.validate()
         if event.keysym == 'Return': self.parent.focus()
         
-    def entry_box_cancel(self,event):
-        self.entry.set(self.var.get())
+    def entry_box_cancel(self, event):
+        self.entry.set(self.value.get())
         self.validate()
         self.parent.focus()
         
     def enable(self):
         self.EB.config(state="normal")
-        self.entry.set(self.var.get())
+        self.entry.set(self.value.get())
         self.validate()
         if self.CB is not None:
             if self.entry.get() == "" : 
@@ -242,13 +242,13 @@ class dcc_address_entry_box:
             self.CB.config(state="disabled", text="", bg=self.defaultbg)
             self.selection.set(False)
 
-    def set_value(self, dcc_command):
+    def set_value(self, dcc_command:[int,bool]):
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
         if dcc_command[0] == 0:
-            self.var.set("")
+            self.value.set("")
             self.entry.set("")
         else:
-            self.var.set(str(dcc_command[0]))
+            self.value.set(str(dcc_command[0]))
             self.entry.set(str(dcc_command[0]))
         self.state.set(dcc_command[1])
         self.selection.set(dcc_command[1])
@@ -256,14 +256,16 @@ class dcc_address_entry_box:
         
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
-        if self.var.get() == "": return([0, False])
-        else: return([int(self.var.get()), self.state.get()])          
+        if self.value.get() == "": return([0, False])
+        else: return([int(self.value.get()), self.state.get()])          
     
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
 # Class instance elements to use externally are:
-#     "var" - the current value of the Radio Button Group
 #     "B1" to "B5 - to access the button widgets themselves (i.e. for reconfiguration)
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (address, state)
+#    "get_value" - will return the last "valid" value (address,state)
 #------------------------------------------------------------------------------------
 
 class selection_buttons:
@@ -272,42 +274,48 @@ class selection_buttons:
         # Create a labelframe to hold the buttons
         self.frame = LabelFrame(parent_window, text = frame_label)
         self.frame.pack(padx=2, pady=2)
-        self.var = IntVar(parent_window,0)
+        self.value = IntVar(parent_window,0)
         # This is the external callback to make when a selection is made
         self.callback = callback
         # Only create as many buttons as we need
         if b1 is not None:
             self.B1 = Radiobutton(self.frame, text=b1, anchor='w',
-                command=self.updated, variable=self.var, value=1)
+                command=self.updated, variable=self.value, value=1)
             self.B1.pack(side=LEFT, padx=2, pady=2)
             self.B1.TT = CreateToolTip(self.B1, tool_tip)
         if b2 is not None:
             self.B2 = Radiobutton(self.frame, text=b2, anchor='w',
-                command=self.updated, variable=self.var, value=2)
+                command=self.updated, variable=self.value, value=2)
             self.B2.pack(side=LEFT, padx=2, pady=2)
             self.B2.TT = CreateToolTip(self.B2, tool_tip)
         if b3 is not None:
             self.B3 = Radiobutton(self.frame, text=b3, anchor='w',
-                command=self.updated, variable=self.var, value=3)
+                command=self.updated, variable=self.value, value=3)
             self.B3.pack(side=LEFT, padx=2, pady=2)
             self.B3.TT = CreateToolTip(self.B3, tool_tip)
         if b4 is not None:
             self.B4 = Radiobutton(self.frame, text=b4, anchor='w',
-                command=self.updated, variable=self.var, value=4)
+                command=self.updated, variable=self.value, value=4)
             self.B4.pack(side=LEFT, padx=2, pady=2)
             self.B4.TT = CreateToolTip(self.B4, tool_tip)
         if b5 is not None:
             self.B5 = Radiobutton(self.frame, text=b5, anchor='w', 
-                command=self.updated, variable=self.var, value=5)
+                command=self.updated, variable=self.value, value=5)
             self.B5.pack(side=LEFT, padx=2, pady=2)
             self.B5.TT = CreateToolTip(self.B5, tool_tip)
             
     def updated(self):
         if self.callback is not None: self.callback()
 
+    def set_value(self, value:int):
+        self.value.set(value)
+
+    def get_value(self):
+        return(self.value.get())
+
 #------------------------------------------------------------------------------------
 # Class for the common Apply/OK/Reset/Cancel Buttons - will make external callbacks
-# to the specified "load" and "save" functions as appropriate 
+# to the specified "load_callback" and "save_callback" functions as appropriate 
 #------------------------------------------------------------------------------------
 
 class window_controls:

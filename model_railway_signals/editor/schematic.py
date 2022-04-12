@@ -141,15 +141,15 @@ def deselect_all_objects(event=None):
 def edit_selected_object():
     object_id = schematic_state["selectedobjects"][0]
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        pass;
+        pass; #################### TODO #############################
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
         configure_signal.edit_signal(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
         configure_point.edit_point(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-        pass;
+        pass; #################### TODO #############################
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-        pass;
+        pass; #################### TODO #############################
     return()
 
 #------------------------------------------------------------------------------------
@@ -221,34 +221,36 @@ def move_selected_objects(xdiff:int,ydiff:int):
 def delete_selected_objects(event=None):
     global schematic_state
     for object_id in schematic_state["selectedobjects"]:
-        # Delete the selected object depending on type
+        # Delete the selected object depending on type - first we use a "soft delete"
+        # to delete the drawing objects and any associated DCC/Sensor mappings etc
         if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
             canvas.delete(objects.schematic_objects[object_id]["line"])
             canvas.delete(objects.schematic_objects[object_id]["end1"])
             canvas.delete(objects.schematic_objects[object_id]["end2"])
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            signals.delete_signal(objects.schematic_objects[object_id]["itemid"])
+            objects.soft_delete_signal(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            points.delete_point(objects.schematic_objects[object_id]["itemid"])
+            objects.soft_delete_point(object_id)
             # Cycle through all the other objects to remove any references to the point
             for obj in objects.schematic_objects:
+                # First we update any other point objects that refer to the deleted point
                 if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
                      objects.schematic_objects[obj]["alsoswitch"] ==
                            objects.schematic_objects[object_id]["itemid"] ):
                     # Update the other point object (to remove the "auto switch" value")
+                    objects.soft_delete_point(obj)
                     objects.schematic_objects[obj]["alsoswitch"] = 0
-                    points.delete_point(objects.schematic_objects[obj]["itemid"])
                     objects.update_point_object(obj)
-            ##################################################################
-            # TODO - remove any signal interlocking references (when supported)
-            ###################################################################     
+                ##################################################################
+                # TODO - remove any signal interlocking references (when supported)
+                ###################################################################     
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            track_sections.delete_section(objects.schematic_objects[object_id]["itemid"])
+            objects.soft_delete_section(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-            block_instruments.delete_instrument(objects.schematic_objects[object_id]["itemid"])
-        # Delete the associated selection rectangle drawing object
+             objects.soft_delete_instrument(object_id)
+        # Now we "Hard Delete" the selected object - deleting the boundary box rectangle
+        # and deleting the object entry from the dictionary of schematic objects
         canvas.delete(objects.schematic_objects[object_id]["bbox"])
-        # Delete the associated object entry from the dictionary of schematic objects
         del objects.schematic_objects[object_id]
         # if the deleted object is on the clipboard then remove from the clipboard
         if object_id in schematic_state["clipboardobjects"]:
@@ -258,12 +260,13 @@ def delete_selected_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Rotate all selected Objects ('R' key and popup menu)
+# Internal function to Rotate all selected Objects ('r' key and popup menu)
 #------------------------------------------------------------------------------------
 
 def rotate_selected_objects(event=None):
     for object_id in schematic_state["selectedobjects"]:
         # Rotate the selected object depending on type (and update the selection rectangle)
+        # Only Points and Signals can be rotated - all other objects are unchanged
         if (objects.schematic_objects[object_id]["item"] in
                 (objects.object_type.signal,objects.object_type.point)):
             # Work out the orientation change based on the current orientation
@@ -271,15 +274,19 @@ def rotate_selected_objects(event=None):
                 objects.schematic_objects[object_id]["orientation"] = 180
             else:
                 objects.schematic_objects[object_id]["orientation"] = 0
-            # Update the item according to the object type
+            # Update the item according to the object type - first we use a "soft delete"
+            # to delete the drawing objects and any associated DCC/Sensor mappings etc
+            # Then we "update" the object to re-create it (and the associated mappings)
             if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
+                objects.soft_delete_signal(object_id)
                 objects.update_signal_object(object_id)
             elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
+                objects.soft_delete_point(object_id)
                 objects.update_point_object(object_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Copy selected objects to the clipboard (Cntl-C and popup menu)
+# Internal function to Copy selected objects to the clipboard (Cntl-c and popup menu)
 #------------------------------------------------------------------------------------
         
 def copy_selected_objects(event=None):
@@ -313,17 +320,21 @@ def paste_clipboard_objects(event=None):
             objects.schematic_objects[new_object_id]["bbox"] = None
             objects.update_line_object(new_object_id)
         else:
-            # Set 'itemid' abd 'bbox' to None so they will be assigned/created
+            # Set the 'bbox' to None so it will be created for the new object
             objects.schematic_objects[new_object_id]["itemid"] = None
             objects.schematic_objects[new_object_id]["bbox"] = None
-            # Draw the newly created items according to object type
+            # Assign new IDs and Draw the newly created items according to object type
             if objects.schematic_objects[new_object_id]["item"] == objects.object_type.signal:
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_signal_id()
                 objects.update_signal_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.point:
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_point_id()
                 objects.update_point_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.section:
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_section_id()
                 objects.update_section_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.instrument:
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_instrument_id()
                 objects.update_instrument_object(new_object_id)
         # Add the new object to the list of selected objects
         select_object(new_object_id)

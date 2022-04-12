@@ -47,7 +47,7 @@ def initialise(root_object,canvas_object):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to create/update the boiundary box rectangle for an object
+# Internal function to create/update the boundary box rectangle for an object
 # Note that we create the boundary box slightly bigger than the object itself
 # This is primarily to cater for horizontal and vertical lines
 #------------------------------------------------------------------------------------
@@ -57,13 +57,75 @@ def set_bbox(object_id:str,bbox:list):
     x1, y1 = bbox[0] - 5, bbox[1] - 5
     x2, y2 = bbox[2] + 5, bbox[3] + 5
     if schematic_objects[object_id]["bbox"]:
+        # Note that we leave it in its current state (hidden/visable) if we
+        # are updating it - so selected objects remain visibly selected
         canvas.coords(schematic_objects[object_id]["bbox"],x1,y1,x2,y2)
     else:
+        # If we are creating it for the first time - we hide it (object unselected)
         schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')        
     return()
 
 #------------------------------------------------------------------------------------
+# Internal functions to "soft delete" items (i.e. drawing objects, dcc mappings etc)
+# These functions are called when an object is changed (delete before re-creation) 
+#------------------------------------------------------------------------------------
+
+def soft_delete_signal(object_id):
+    signals.delete_signal(schematic_objects[object_id]["itemid"])
+    dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
+    track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10)
+    track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10+1)
+    return()
+
+def soft_delete_point(object_id):
+    points.delete_point(schematic_objects[object_id]["itemid"])
+    dcc_control.delete_point_mapping(schematic_objects[object_id]["itemid"])
+    return()
+
+def soft_delete_section(object_id):
+    track_sections.delete_section(schematic_objects[object_id]["itemid"])
+    return()
+
+def soft_delete_instrument(object_id):
+    block_instruments.delete_instrument(schematic_objects[object_id]["itemid"])
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to assign a unique type-specific id for a newly created object
+# (these functions are called on object creation or object copy/paste)
+#------------------------------------------------------------------------------------
+
+def new_signal_id():
+    sig_id = 1
+    while True:
+        if not signals_common.sig_exists(sig_id): break
+        else: sig_id += 1
+    return(sig_id)
+
+def new_point_id():
+    point_id = 1
+    while True:
+        if not points.point_exists(point_id): break
+        else: point_id += 1
+    return(point_id)
+
+def new_section_id():
+    section_id = 1
+    while True:
+        if not track_sections.section_exists(section_id): break
+        else: section_id += 1
+    return(section_id)
+
+def new_instrument_id():
+    instrument_id = 1
+    while True:
+        if not block_instruments.instrument_exists(instrument_id): break
+        else: instrument_id += 1
+    return(instrument_id)
+
+#------------------------------------------------------------------------------------
 # Internal function to to draw (or re-draw) a line object on the drawing canvas
+# Either on initial creation or after the object has been edited/saved
 #------------------------------------------------------------------------------------
         
 def update_line_object(object_id):
@@ -86,25 +148,12 @@ def update_line_object(object_id):
 
 #------------------------------------------------------------------------------------
 # Internal function to draw (or re-draw) a signal object based on its configuration
+# Either on initial creation or after the object has been edited/saved
 #------------------------------------------------------------------------------------
 
 def update_signal_object(object_id):
     global schematic_objects
     
-    # If the signal already exists then delete it (and re-create with the same ID)
-    # Note that we also delete any associated DCC address and GPIO sensor mappings
-    if schematic_objects[object_id]["itemid"]:
-        signals.delete_signal(schematic_objects[object_id]["itemid"])
-        dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
-        track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10)
-        track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10+1)
-    else:
-        # It must be a newly created signal - Find the next available Signal_ID
-        schematic_objects[object_id]["itemid"] = 1
-        while True:
-            if not signals_common.sig_exists(schematic_objects[object_id]["itemid"]): break
-            else: schematic_objects[object_id]["itemid"] += 1
-            
     # Create the sensor mappings for the signal (if any have been specified)
     if schematic_objects[object_id]["passedsensor"][1] > 0:     
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10,
@@ -211,26 +260,18 @@ def update_signal_object(object_id):
 
 #------------------------------------------------------------------------------------
 # Internal function to to draw (or re-draw) a point object on the drawing canvas
+# Either on initial creation or after the object has been edited/saved
 #------------------------------------------------------------------------------------
 
 def update_point_object(object_id):
     global schematic_objects
-    # If the point already exists then delete it (and re-create with the same ID)
-    # Note that we also delete any associated DCC address mapping for the point
-    if schematic_objects[object_id]["itemid"]:
-        points.delete_point(schematic_objects[object_id]["itemid"])
-        dcc_control.delete_point_mapping(schematic_objects[object_id]["itemid"])
-    else:
-        # Find the next available ID (if not updating an existing point object)
-        schematic_objects[object_id]["itemid"] = 1
-        while True:
-            if not points.point_exists(schematic_objects[object_id]["itemid"]): break
-            else: schematic_objects[object_id]["itemid"] += 1
+    
     # Create the new DCC Mapping for the point
     if schematic_objects[object_id]["dccaddress"] > 0:
         dcc_control.map_dcc_point (schematic_objects[object_id]["itemid"],
                                    schematic_objects[object_id]["dccaddress"],
                                    schematic_objects[object_id]["dccreversed"])
+        
     # Create the new point object
     points.create_point (canvas,
                 point_id = schematic_objects[object_id]["itemid"],
@@ -244,25 +285,19 @@ def update_point_object(object_id):
                 reverse = schematic_objects[object_id]["reverse"],
                 auto = schematic_objects[object_id]["automatic"],
                 fpl = schematic_objects[object_id]["hasfpl"])
+    
     # Create/update the selection rectangle for the point (based on the boundary box)
     set_bbox (object_id, points.get_boundary_box(schematic_objects[object_id]["itemid"]))
     return()
 
 #------------------------------------------------------------------------------------
 # Internal function to to draw (or re-draw) a "Section" object on the drawing canvas
+# Either on initial creation or after the object has been edited/saved
 #------------------------------------------------------------------------------------
 
 def update_section_object(object_id):
     global schematic_objects
-    # If the section already exists then delete it (and re-create with the same ID)
-    if schematic_objects[object_id]["itemid"]:
-        track_sections.delete_section(schematic_objects[object_id]["itemid"])
-    else:
-        # Find the next available ID (if not updating an existing track section object)
-        schematic_objects[object_id]["itemid"] = 1
-        while True:
-            if not track_sections.section_exists(schematic_objects[object_id]["itemid"]): break
-            else: schematic_objects[object_id]["itemid"] += 1
+    
     # If we are in edit mode then we need to make the section non-editable so we
     # can use the mouse events for selecting and moving the section object
     mode = root.getvar(name="mode")
@@ -272,6 +307,7 @@ def update_section_object(object_id):
     else:
         section_enabled = schematic_objects[object_id]["editable"]
         section_label = schematic_objects[object_id]["label"]
+        
     # Create the new track section object
     track_sections.create_section (canvas,
                 section_id = schematic_objects[object_id]["itemid"],
@@ -279,11 +315,12 @@ def update_section_object(object_id):
                 y = schematic_objects[object_id]["posy"],
 #                section_callback = schematic_callback,
                 label = section_label,
-                editable = section_enabled)                 
+                editable = section_enabled)
+    
     # Create/update the selection rectangle for the track section (based on the boundary box)
     set_bbox (object_id, track_sections.get_boundary_box(schematic_objects[object_id]["itemid"]))
-    # Set up a callback for mouse clicks and movement on the track occupancy button - otherwise 
-    # Otherwise we'll end up just toggling the button and never getting a canvas mouse event
+    # Set up a callback for mouse clicks / movement on the button - otherwise we'll
+    # end up just toggling the button and never getting a canvas mouse event
     callback = schematic_objects[object_id]["callback"]
     item_id = schematic_objects[object_id]["itemid"]
     # Only bind the mouse events if we are in edit mode
@@ -292,19 +329,12 @@ def update_section_object(object_id):
 
 #------------------------------------------------------------------------------------
 # Internal function to to draw (or re-draw) a Block Instrument object on the canvas
+# Either on initial creation or after the object has been edited/saved
 #------------------------------------------------------------------------------------
 
 def update_instrument_object(object_id):
     global schematic_objects
-    # If the instrument already exists then delete it (and re-create with the same ID)
-    if schematic_objects[object_id]["itemid"]:
-        block_instruments.delete_instrument(schematic_objects[object_id]["itemid"])
-    else:
-        # Find the next available ID (if not updating an existing instrument object)
-        schematic_objects[object_id]["itemid"] = 1
-        while True:
-            if not block_instruments.instrument_exists(schematic_objects[object_id]["itemid"]): break
-            else: schematic_objects[object_id]["itemid"] += 1
+    
     # Create the new Block Instrument object
     block_instruments.create_block_instrument (canvas,
                 block_id = schematic_objects[object_id]["itemid"],
@@ -315,6 +345,7 @@ def update_instrument_object(object_id):
                 bell_sound_file = schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = schematic_objects[object_id]["keysound"],
                 linked_to = schematic_objects[object_id]["linkedto"])
+    
     # Create/update the selection rectangle for the instrument (based on the boundary box)
     set_bbox (object_id, block_instruments.get_boundary_box(schematic_objects[object_id]["itemid"]))
     return()
@@ -345,6 +376,7 @@ def create_default_object(item:object_type):
     schematic_objects[object_id]["item"] = item
     schematic_objects[object_id]["posx"] = x
     schematic_objects[object_id]["posy"] = y
+    schematic_objects[object_id]["itemid"] = None
     schematic_objects[object_id]["bbox"] = None
     return(object_id)
 
@@ -357,7 +389,7 @@ def create_default_signal_object(item_type,item_subtype):
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.signal)
     # The following dictionary elements are specific to signals
-    schematic_objects[object_id]["itemid"] = None
+    schematic_objects[object_id]["itemid"] = new_signal_id()
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["itemsubtype"] = item_subtype
     schematic_objects[object_id]["orientation"] = 0
@@ -408,7 +440,7 @@ def create_default_point_object(item_type):
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.point)
     # the following dictionary elements are specific to points
-    schematic_objects[object_id]["itemid"] = None
+    schematic_objects[object_id]["itemid"] = new_point_id()
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["orientation"] = 0
     schematic_objects[object_id]["colour"] = "black"
@@ -432,7 +464,7 @@ def create_default_section_object(callback):
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.section)
     # the following dictionary elements are specific to Track sections
-    schematic_objects[object_id]["itemid"] = None
+    schematic_objects[object_id]["itemid"] = new_section_id()
     schematic_objects[object_id]["label"] = "Occupied"
     schematic_objects[object_id]["editable"] = True
     schematic_objects[object_id]["callback"] = callback
@@ -449,7 +481,7 @@ def create_default_instrument_object():
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.instrument)
     # the following dictionary elements are specific to block instruments
-    schematic_objects[object_id]["itemid"] = None
+    schematic_objects[object_id]["itemid"] = new_instrument_id()
     schematic_objects[object_id]["singleline"] = False
     schematic_objects[object_id]["bellsound"] = "bell-ring-01.wav"
     schematic_objects[object_id]["keysound"] = "telegraph-key-01.wav"

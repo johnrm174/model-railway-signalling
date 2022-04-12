@@ -22,8 +22,8 @@ def load_state(signal):
     object_id = signal.object_id
     # Set the Tkinter variables from the current object settings
     signal.sigid.set_value(objects.schematic_objects[object_id]["itemid"])
-    signal.sigtype.var.set(objects.schematic_objects[object_id]["itemtype"].value)
-    signal.subtype.var.set(objects.schematic_objects[object_id]["itemsubtype"].value)
+    signal.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
+    signal.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"].value)
     signal.aspects.has_subsidary.set(objects.schematic_objects[object_id]["subsidary"])
     signal.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
     signal.sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"])
@@ -53,16 +53,16 @@ def load_state(signal):
     feathers = objects.schematic_objects[object_id]["feathers"]
     if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light:
         if objects.schematic_objects[object_id]["theatreroute"]:
-            signal.routetype.var.set(3)
+            signal.routetype.set_value(3)
         elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
-            signal.routetype.var.set(2)
+            signal.routetype.set_value(2)
         else:
-            signal.routetype.var.set(1)      
+            signal.routetype.set_value(1)      
     elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore:
         ########################## To Do #########################
-        signal.routetype.var.set(0)      
+        signal.routetype.set_value(0)      
     else:
-        signal.routetype.var.set(0)      
+        signal.routetype.set_value(0)      
     # Set the initial UI selections
     update_signal_subtype_selections(signal)
     update_signal_selection_elements(signal)
@@ -74,24 +74,28 @@ def load_state(signal):
 #------------------------------------------------------------------------------------
  
 def save_state(signal,close_window):
+    object_id = signal.object_id
+    # Check the signal we are editing still exists (hasn't been deleted from the schematic)
+    # If it no longer exists then we just destroy the window and exit without saving
+    if not signals_common.sig_exists(objects.schematic_objects[object_id]["itemid"]):
+        signal.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    if ( signal.sigid.validate() and signal.sensors.validate() and signal.aspects.validate() and
+    elif ( signal.sigid.validate() and signal.sensors.validate() and signal.aspects.validate() and
          signal.theatre.validate() and signal.feathers.validate() ):
          ########################### TODO 
-        object_id = signal.object_id
         # Delete the existing signal object (the signal will be re-created)
-        signals.delete_signal(objects.schematic_objects[object_id]["itemid"])
+        objects.soft_delete_signal(object_id)
         # Get the Signal Subtype (will depend on the signal Type)
-        signal_type = signals_common.sig_type(signal.sigtype.var.get())
+        signal_type = signals_common.sig_type(signal.sigtype.get_value())
         if signal_type == signals_common.sig_type.colour_light:
-            signal_subtype = signals_colour_lights.signal_sub_type(signal.subtype.var.get())
+            signal_subtype = signals_colour_lights.signal_sub_type(signal.subtype.get_value())
         elif signal_type == signals_common.sig_type.semaphore:
-            signal_subtype = signals_semaphores.semaphore_sub_type(signal.subtype.var.get())
+            signal_subtype = signals_semaphores.semaphore_sub_type(signal.subtype.get_value())
         elif signal_type == signals_common.sig_type.ground_position:
-            signal_subtype = signals_ground_position.ground_pos_sub_type(signal.subtype.var.get())
+            signal_subtype = signals_ground_position.ground_pos_sub_type(signal.subtype.get_value())
         elif signal_type == signals_common.sig_type.ground_disc:
-            signal_subtype = signals_ground_disc.ground_disc_sub_type(signal.subtype.var.get())
+            signal_subtype = signals_ground_disc.ground_disc_sub_type(signal.subtype.get_value())
         # Update all object configuration settings from the Tkinter variables
         objects.schematic_objects[object_id]["itemid"] = signal.sigid.get_value()
         objects.schematic_objects[object_id]["itemtype"] = signal_type
@@ -121,7 +125,7 @@ def save_state(signal,close_window):
         objects.schematic_objects[object_id]["dccfeathers"] = signal.feathers.get_addresses()
         objects.schematic_objects[object_id]["dcctheatre"] = signal.theatre.get_addresses()
         # Set the Theatre route indicator flag if that particular radio button is selected
-        if signal.routetype.var.get() == 3:
+        if signal.routetype.get_value() == 3:
             objects.schematic_objects[object_id]["theatreroute"] = True
             objects.schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
         else:
@@ -146,53 +150,53 @@ def update_signal_selection_elements(signal):
     signal.theatre.frame.pack_forget()
     signal.controls.frame.pack_forget()
     # Only pack those elements relevant to the signal type and route type
-    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         signal.sensors.approach.enable()
         signal.aspects.frame.pack()
         signal.routetype.frame.pack()
-        if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
-            signal.routetype.var.set(1)
+        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
+            signal.routetype.set_value(1)
             signal.routetype.B2.configure(state="disabled")
             signal.routetype.B3.configure(state="disabled")
             signal.routetype.B4.configure(state="disabled")
         else:
-            if signal.routetype.var.get() == 4: signal.routetype.var.set(1)
+            if signal.routetype.get_value() == 4: signal.routetype.set_value(1)
             signal.routetype.B2.configure(state="normal")
             signal.routetype.B3.configure(state="normal")
             signal.routetype.B4.configure(state="disabled")
-            if signal.routetype.var.get() == 2:
+            if signal.routetype.get_value() == 2:
                 signal.feathers.frame.pack()
                 signal.feathers.enable()
                 signal.theatre.disable()
-            elif signal.routetype.var.get() == 3:
+            elif signal.routetype.get_value() == 3:
                 signal.theatre.frame.pack()
                 signal.theatre.enable()
                 signal.feathers.disable()
         signal.controls.frame.pack()
         
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         signal.sensors.approach.disable()
         signal.aspects.frame.pack()
         
-    elif signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         signal.sensors.approach.enable()
         signal.routetype.frame.pack()
-        if signal.subtype.var.get() == signals_semaphores.semaphore_sub_type.distant.value:
-            signal.routetype.var.set(1)
+        if signal.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
+            signal.routetype.set_value(1)
             signal.routetype.B2.configure(state="disabled")
             signal.routetype.B3.configure(state="disabled")
             signal.routetype.B4.configure(state="disabled")
         else:
-            if signal.routetype.var.get() == 2: signal.routetype.var.set(1)
+            if signal.routetype.get_value() == 2: signal.routetype.set_value(1)
             signal.routetype.B2.configure(state="disabled")
             signal.routetype.B3.configure(state="normal")
             signal.routetype.B4.configure(state="normal")
-            if signal.routetype.var.get() == 3:
+            if signal.routetype.get_value() == 3:
                 signal.theatre.frame.pack()
                 signal.theatre.enable()
                 signal.feathers.disable()
                 
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         signal.sensors.approach.disable()
     
     # Finally re-pack the general control buttons at the bottom of the window
@@ -205,11 +209,11 @@ def update_signal_selection_elements(signal):
 #------------------------------------------------------------------------------------
 
 def update_signal_route_selections(signal):
-    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         signal.routetype.B4.configure(state="disabled")
-    elif signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         signal.routetype.B4.configure(state="disabled")
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         signal.subtype.B1.configure(text="Norm (post'96) ")
         signal.subtype.B2.configure(text="Shunt (post'96)")
         signal.subtype.B3.configure(text="Norm (early)   ")
@@ -217,7 +221,7 @@ def update_signal_route_selections(signal):
         signal.subtype.B3.pack(side=LEFT)
         signal.subtype.B4.pack(side=LEFT)
         signal.subtype.B5.pack_forget()
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         signal.subtype.B1.configure(text="Standard       ")
         signal.subtype.B2.configure(text="Shunt Ahead    ")
         signal.subtype.B3.pack_forget()
@@ -230,7 +234,7 @@ def update_signal_route_selections(signal):
 #------------------------------------------------------------------------------------
 
 def update_signal_subtype_selections(signal):
-    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         signal.subtype.B1.configure(text="2 Aspect G/R  ")
         signal.subtype.B2.configure(text="2 Aspect G/Y  ")
         signal.subtype.B3.configure(text="2 Aspect Y/R  ")
@@ -239,13 +243,13 @@ def update_signal_subtype_selections(signal):
         signal.subtype.B3.pack(side=LEFT)
         signal.subtype.B4.pack(side=LEFT)
         signal.subtype.B5.pack(side=LEFT)
-    elif signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         signal.subtype.B1.configure(text="Home          ")
         signal.subtype.B2.configure(text="Distant       ")
         signal.subtype.B3.pack_forget()
         signal.subtype.B4.pack_forget()
         signal.subtype.B5.pack_forget()
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         signal.subtype.B1.configure(text="Norm (post'96) ")
         signal.subtype.B2.configure(text="Shunt (post'96)")
         signal.subtype.B3.configure(text="Norm (early)   ")
@@ -253,7 +257,7 @@ def update_signal_subtype_selections(signal):
         signal.subtype.B3.pack(side=LEFT)
         signal.subtype.B4.pack(side=LEFT)
         signal.subtype.B5.pack_forget()
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         signal.subtype.B1.configure(text="Standard       ")
         signal.subtype.B2.configure(text="Shunt Ahead    ")
         signal.subtype.B3.pack_forget()
@@ -266,36 +270,36 @@ def update_signal_subtype_selections(signal):
 #------------------------------------------------------------------------------------
 
 def update_signal_aspect_selections(signal):
-    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
-        if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.home.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value:
             signal.aspects.red.enable_addresses()
             signal.aspects.grn.enable_addresses()
             signal.aspects.ylw.disable_addresses()
             signal.aspects.dylw.disable_addresses()
             signal.aspects.fylw.disable_addresses()
             signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
+        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
             signal.aspects.red.disable_addresses()
             signal.aspects.grn.enable_addresses()
             signal.aspects.ylw.enable_addresses()
             signal.aspects.dylw.disable_addresses()
             signal.aspects.fylw.enable_addresses()
             signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.red_ylw.value:
+        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.red_ylw.value:
             signal.aspects.red.enable_addresses()
             signal.aspects.grn.disable_addresses()
             signal.aspects.ylw.enable_addresses()
             signal.aspects.dylw.disable_addresses()
             signal.aspects.fylw.disable_addresses()
             signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.three_aspect.value:
+        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.three_aspect.value:
             signal.aspects.red.enable_addresses()
             signal.aspects.grn.enable_addresses()
             signal.aspects.ylw.enable_addresses()
             signal.aspects.dylw.disable_addresses()
             signal.aspects.fylw.enable_addresses()
             signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.var.get() == signals_colour_lights.signal_sub_type.four_aspect.value:
+        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.four_aspect.value:
             signal.aspects.red.enable_addresses()
             signal.aspects.grn.enable_addresses()
             signal.aspects.ylw.enable_addresses()
@@ -304,7 +308,7 @@ def update_signal_aspect_selections(signal):
             signal.aspects.fdylw.enable_addresses()
         # Include the subsidary signal selection frame 
         signal.aspects.subframe.pack()
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         signal.aspects.red.enable_addresses()
         signal.aspects.grn.enable_addresses()
         signal.aspects.ylw.disable_addresses()
@@ -330,10 +334,10 @@ class signal_sensor:
         # Create the class instance variables
         self.parent_window = parent_window
         self.selected = BooleanVar(parent_window,False)
-        self.original = BooleanVar(parent_window,False)
-        self.var = StringVar(parent_window,"")
+        self.initial_value = BooleanVar(parent_window,False)
+        self.value = StringVar(parent_window,"")
         self.entry = StringVar(parent_window,"")
-        self.current = StringVar(parent_window,"")
+        self.initial_value = StringVar(parent_window,"")
         # Create the checkbutton
         self.CB = Checkbutton(parent_window, text=text,
                     variable=self.selected, command=self.selection_updated)
@@ -356,7 +360,7 @@ class signal_sensor:
         return()
     
     def entry_box_cancel(self,event):
-        self.entry.set(self.var.get())
+        self.entry.set(self.value.get())
         self.validate()
         self.parent.focus()
         return()
@@ -364,7 +368,7 @@ class signal_sensor:
     def selection_updated(self):
         if self.selected.get():
             self.EB.config(state="normal")
-            self.entry.set(self.var.get())
+            self.entry.set(self.value.get())
         else:
             self.EB.config(state='disabled')
             self.entry.set("")
@@ -383,10 +387,11 @@ class signal_sensor:
                 # Perform the remaining validation (setting the tooltip accordingly)           
                 if new_channel < 4 or new_channel > 26 or new_channel == 14 or new_channel == 15:
                     self.EBTT.text = ("GPIO Channel must be in the range of 4-13 or 16-26")
+                    valid = False
                 else:
                     # Test to see if the gpio channel is already assigned to another signal
-                    if self.current.get() == "": current_channel = 0
-                    else: current_channel = int(self.current.get())
+                    if self.initial_value.get() == "": current_channel = 0
+                    else: current_channel = int(self.initial_value.get())
                     for obj in objects.schematic_objects:
                         if ( objects.schematic_objects[obj]["item"] == objects.object_type.signal and
                              ( objects.schematic_objects[obj]["passedsensor"][1] == new_channel or
@@ -397,7 +402,7 @@ class signal_sensor:
                             valid = False                    
         if valid:
             # Update the internal value
-            self.var.set(self.entry.get())
+            self.value.set(self.entry.get())
             self.EB.config(fg='black')
             # Reset the tooltip to the default message
             self.EBTT.text = ("Specify a GPIO channel in the range of 4-13 or 16-26")
@@ -409,8 +414,8 @@ class signal_sensor:
     def enable(self):
         self.CB.config(state="normal")
         self.EB.config(state="normal")
-        self.entry.set(self.var.get())
-        self.selected.set(self.original.get())
+        self.entry.set(self.value.get())
+        self.selected.set(self.initial_value.get())
         self.selection_updated()
         self.validate()
               
@@ -423,22 +428,22 @@ class signal_sensor:
     def set_value(self, signal_sensor):
         # A GPIO Selection comprises [Selected, GPIO_Port]
         if signal_sensor[1] == 0:
-            self.var.set("")
+            self.value.set("")
             self.entry.set("")
-            self.current.set("")
+            self.initial_value.set("")
         else:
-            self.var.set(str(signal_sensor[1]))
-            self.current.set(str(signal_sensor[1]))
+            self.value.set(str(signal_sensor[1]))
+            self.initial_value.set(str(signal_sensor[1]))
             self.entry.set(str(signal_sensor[1]))
-        self.original.set(signal_sensor[0])
+        self.initial_value.set(signal_sensor[0])
         self.selected.set(signal_sensor[0])
         self.selection_updated()
         self.validate()
         
     def get_value(self):
         # Returns a 2 element list of [selected, GPIO_Port]
-        if self.var.get() == "": return( [ self.selected.get(),0 ] )
-        else: return( [ self.selected.get(), int(self.var.get()) ] )
+        if self.value.get() == "": return( [ self.selected.get(),0 ] )
+        else: return( [ self.selected.get(), int(self.value.get()) ] )
     
 #------------------------------------------------------------------------------------
 # Classe for the Signal Passed and Signal Approach events / Sensors
@@ -459,9 +464,9 @@ class signal_sensors:
         # Create a label frame for both GPIO entry elements
         self.frame = LabelFrame(parent_window, text="Signal events and associated GPIO sensors")
         self.frame.pack(padx=5, pady=5)
-        self.passed = signal_sensor(self.frame, "Signal passed", "select to add a "+
+        self.passed = signal_sensor(self.frame, "Signal passed button", "select to add a "+
                 "'signal passed' sensor (for signal automation)")
-        self.approach = signal_sensor(self.frame, "Signal release", "select to add a "+
+        self.approach = signal_sensor(self.frame, "Signal release button", "select to add a "+
                 "'signal released' sensor (for approach control automation)")
         
     def validate(self):
@@ -509,7 +514,7 @@ def enable_route_selections(route_group):
     
 def update_route_selections(signal):
     # Update the available route selections
-    if signal.sigtype.var.get() == signals_common.sig_type.colour_light.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         # Re configure the UI for the type-specific entry boxes
         signal.routes1.frame.pack_forget()
         signal.aspects.frame.pack()
@@ -517,7 +522,7 @@ def update_route_selections(signal):
         # Disable ALL SUBSIDARY and DISTANT route selections
         disable_route_selections(signal.routes1.sub)
         disable_route_selections(signal.routes1.dist)
-        if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
+        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
             # Disable ALL Feather route Indications
             disable_route_selections(signal.routes1.sig)
         else:
@@ -526,7 +531,7 @@ def update_route_selections(signal):
             # Enable the MAIN subsidary indication
             enable_route_selection(signal.routes1.sub.main)
 
-    elif signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         # Re configure the UI for the type-specific entry boxes
         signal.aspects.frame.pack_forget()
         signal.routes2.frame.pack_forget()
@@ -541,7 +546,7 @@ def update_route_selections(signal):
         signal.routes1.sig.main.sel.set(True)
         signal.routes1.sig.main.CB.configure(state="disabled")
         signal.routes1.sig.main.EB.configure(state="normal")
-        if signal.subtype.var.get() == signals_colour_lights.signal_sub_type.distant.value:
+        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
             # Disable ALL SUBSIDARY and DISTANT route selections
             disable_route_selections(signal.routes1.sub)
             disable_route_selections(signal.routes1.dist)
@@ -550,7 +555,7 @@ def update_route_selections(signal):
             enable_route_selections(signal.routes1.sub)
             enable_route_selections(signal.routes1.dist)
         
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_position.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         # Re configure the UI for the type-specific entry boxes
         signal.routes1.frame.pack_forget()
         signal.aspects.frame.pack()
@@ -568,7 +573,7 @@ def update_route_selections(signal):
         disable_route_selections(signal.routes1.sub)
         disable_route_selections(signal.routes1.dist)
         
-    elif signal.sigtype.var.get() == signals_common.sig_type.ground_disc.value:
+    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         # Re configure the UI for the type-specific entry boxes
         signal.aspects.frame.pack_forget()
         signal.routes2.frame.pack_forget()
@@ -590,7 +595,7 @@ def update_route_selections(signal):
     
 
 def update_distant_selections(signal):
-    if signal.sigtype.var.get() == signals_common.sig_type.semaphore.value:
+    if signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         if not signal.routes1.sig.main.sel.get():
             disable_route_selection(signal.routes1.dist.main)
         else:
@@ -1137,7 +1142,7 @@ class edit_signal:
         load_state(self)
 
     def sig_type_updated(self):
-        self.subtype.var.set(1)
+        self.subtype.set_value(1)
         update_signal_subtype_selections(self)
         update_signal_selection_elements(self)
         update_signal_aspect_selections(self)
