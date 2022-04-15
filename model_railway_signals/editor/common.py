@@ -66,6 +66,7 @@ class CreateToolTip():
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value of the entry box
 #    "get_value" - will return the last "valid" value of the entry box
+#    "get_initial_value" - will return the initial value of the entry box
 # Validation = Object ID must be a valid integer, must be between 1-99
 # and must not be already assigned to another object of the same type
 #------------------------------------------------------------------------------------
@@ -137,6 +138,9 @@ class object_id_selection:
     def get_value(self):
         return(int(self.value.get()))
 
+    def get_initial_value(self):
+        return(int(self.initial_value.get()))
+
 #------------------------------------------------------------------------------------
 # Common class for a DCC address entry box UI element
 # Can be created with or without a checkbox representing the "state"
@@ -162,9 +166,10 @@ class dcc_address_entry_box:
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_window,False)
         self.selection = BooleanVar(parent_window,False)
+        self.enabled = BooleanVar(parent_window,True)
         # Create the entry box, event bindings and associated tooltip
         self.EB = Entry(parent_window, width=4, textvariable=self.entry)
-        self.EB.pack(side=LEFT, padx=2, pady=2)
+        self.EB.pack(side=LEFT)
         self.EB.bind('<Return>',self.entry_box_updated)
         self.EB.bind('<Escape>',self.entry_box_cancel)
         self.EB.bind('<FocusOut>',self.entry_box_updated)
@@ -173,7 +178,7 @@ class dcc_address_entry_box:
         if dcc_state_checkbox:
             self.CB = Checkbutton(parent_window, width=3, indicatoron = False, 
                 variable=self.selection, command=self.update_dcc_state, state="disabled")
-            self.CB.pack(side=LEFT, padx=2, pady=2)
+            self.CB.pack(side=LEFT)
             self.defaultbg = self.CB.cget("background")
             self.CBTT = CreateToolTip(self.CB, "Set the DCC Logic")
         else:
@@ -186,7 +191,8 @@ class dcc_address_entry_box:
         
     def validate(self):
         valid = False
-        if self.entry.get() == "":
+        # If the entry is disabled then validation will always pass
+        if not self.enabled.get() or self.entry.get() == "":
             if self.CB is not None:
                 self.CB.config(state="disabled", text="", bg=self.defaultbg)
                 self.selection.set(False)
@@ -234,13 +240,15 @@ class dcc_address_entry_box:
                 self.CB.config(state="normal", bg="white")
                 self.selection.set(self.state.get())
                 self.update_dcc_state()
-              
+        self.enabled.set(True)
+        
     def disable(self):
         self.EB.config(state="disabled")
         self.entry.set("")
         if self.CB is not None:
             self.CB.config(state="disabled", text="", bg=self.defaultbg)
             self.selection.set(False)
+        self.enabled.set(False)
 
     def set_value(self, dcc_command:[int,bool]):
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
@@ -256,7 +264,8 @@ class dcc_address_entry_box:
         
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
-        if self.value.get() == "": return([0, False])
+        # If the element is disabled will always return [0,False]
+        if not self.enabled.get() or self.value.get() == "": return([0, False])
         else: return([int(self.value.get()), self.state.get()])          
     
 #------------------------------------------------------------------------------------
@@ -320,21 +329,26 @@ class selection_buttons:
 
 class window_controls:
     def __init__(self, parent_window, parent_object, load_callback, save_callback):
-        # Create the buttons for applying/cancelling configuration changes
+        # Create the class instance variables
         self.window = parent_window
         self.save_callback = save_callback
         self.load_callback = load_callback
         self.parent_object = parent_object
         self.frame = Frame(self.window)
         self.frame.pack(padx=2, pady=2)
+        # Create the buttons and tooltips
         self.B1 = Button (self.frame, text = "Apply",command=self.apply)
         self.B1.pack(side=LEFT, padx=2, pady=2)
+        self.TT1 = CreateToolTip(self.B1, "Apply selections")
         self.B2 = Button (self.frame, text = "Ok",command=self.ok)
         self.B2.pack(side=LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.B2, "Apply selections and close window")
         self.B3 = Button (self.frame, text = "Reset",command=self.reset)
         self.B3.pack(side=LEFT, padx=2, pady=2)
-        self.B3 = Button (self.frame, text = "Cancel",command=self.cancel)
-        self.B3.pack(side=LEFT, padx=2, pady=2)
+        self.TT3 = CreateToolTip(self.B3, "Abandon edit and reload original configuration")
+        self.B4 = Button (self.frame, text = "Cancel",command=self.cancel)
+        self.B4.pack(side=LEFT, padx=2, pady=2)
+        self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
         
     def apply(self):
         self.save_callback(self.parent_object,False)

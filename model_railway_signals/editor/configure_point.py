@@ -261,18 +261,15 @@ class general_settings:
             # Ensure the point isn't configured to "auto switch" with another point
             for obj in objects.schematic_objects:
                 if (objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                    objects.schematic_objects[obj]["alsoswitch"] == self.parent_object.pointid.get_value()):
+                    objects.schematic_objects[obj]["alsoswitch"] == self.parent_object.pointid.get_initial_value()):
+                    self.CB4TT.text = ("Point is configured to be 'also switched' by point " +
+                        str(objects.schematic_objects[obj]["itemid"]) + " so must remain 'fully automatic'")
+                    self.CB4.config(fg="red")
                     valid = False
-                    break
         if valid:
             self.CB4TT.text = ("Select to enable this point to be " +
                                 "'also switched' by another point")
             self.CB4.config(fg="black")
-        else:
-            self.CB4TT.text = ("Point is configured to be 'also switched' by point " +
-                               str(objects.schematic_objects[object_id]["itemid"]) +
-                               " so must remain 'fully automatic'")
-            self.CB4.config(fg="red")
         return(valid)
     
     def set_values(self, rot:bool, rev:bool, auto:bool, fpl:bool):
@@ -305,7 +302,7 @@ class dcc_address_settings:
         # Create a DCC Address element and checkbox for the "reversed" selection
         self.dcc = common.dcc_address_entry_box(self.frame, dcc_state_checkbox=False)
         self.CB = Checkbutton(self.frame, text="Reverse DCC logic", variable=self.dccreversed)
-        self.CB.pack(side=LEFT)
+        self.CB.pack(side=LEFT, padx=2, pady=2)
         self.CBTT = common.CreateToolTip(self.CB, "Select to reverse the DCC command logic")
         
     def validate(self):
