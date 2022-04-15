@@ -235,7 +235,7 @@ def track_sensor_active (sensor_id:int):
 def delete_sensor_mapping(sensor_id:int):
     global channels
     channel = sensor_mapped(sensor_id)
-    if channel is not None:
+    if raspberry_pi and channel is not None:
         GPIO.remove_event_detect(channel)
         del channels[str(channel)]
     return()
