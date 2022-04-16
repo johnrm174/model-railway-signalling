@@ -188,7 +188,18 @@ def update_signal_object(object_id):
                     THEATRE = schematic_objects[object_id]["dcctheatre"] )
     else:
         # Create the new DCC Mapping for the Semaphore Signal
-        pass
+        dcc_control.map_semaphore_signal (schematic_objects[object_id]["itemid"],
+                    main_signal = schematic_objects[object_id]["sigarms"][0][0][1],
+                    lh1_signal = schematic_objects[object_id]["sigarms"][1][0][1],
+                    lh2_signal = schematic_objects[object_id]["sigarms"][2][0][1],
+                    rh1_signal = schematic_objects[object_id]["sigarms"][3][0][1],
+                    rh2_signal = schematic_objects[object_id]["sigarms"][4][0][1],
+                    main_subsidary = schematic_objects[object_id]["sigarms"][0][1][1],
+                    lh1_subsidary = schematic_objects[object_id]["sigarms"][1][1][1],
+                    lh2_subsidary = schematic_objects[object_id]["sigarms"][2][1][1],
+                    rh1_subsidary = schematic_objects[object_id]["sigarms"][3][1][1],
+                    rh2_subsidary = schematic_objects[object_id]["sigarms"][4][1][1],
+                    THEATRE = schematic_objects[object_id]["dcctheatre"] )
 
     # Create the new signal object (according to the signal type)
     if schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light:
@@ -226,20 +237,20 @@ def update_signal_object(object_id):
                             orientation = schematic_objects[object_id]["orientation"],
                             sig_passed_button = schematic_objects[object_id]["passedsensor"][0],
                             approach_release_button = schematic_objects[object_id]["approachsensor"][0],
-                            main_signal = schematic_objects[object_id]["sigarms"][0],
-                            lh1_signal = schematic_objects[object_id]["sigarms"][1],
-                            lh2_signal = schematic_objects[object_id]["sigarms"][2],
-                            rh1_signal = schematic_objects[object_id]["sigarms"][3],
-                            rh2_signal = schematic_objects[object_id]["sigarms"][4],
-                            main_subsidary = schematic_objects[object_id]["subarms"][0],
-                            lh1_subsidary = schematic_objects[object_id]["subarms"][1],
-                            lh2_subsidary = schematic_objects[object_id]["subarms"][2],
-                            rh1_subsidary = schematic_objects[object_id]["subarms"][3],
-                            rh2_subsidary = schematic_objects[object_id]["subarms"][4],
+                            main_signal = schematic_objects[object_id]["sigarms"][0][0][0],
+                            lh1_signal = schematic_objects[object_id]["sigarms"][1][0][0],
+                            lh2_signal = schematic_objects[object_id]["sigarms"][2][0][0],
+                            rh1_signal = schematic_objects[object_id]["sigarms"][3][0][0],
+                            rh2_signal = schematic_objects[object_id]["sigarms"][4][0][0],
+                            main_subsidary = schematic_objects[object_id]["sigarms"][0][1][0],
+                            lh1_subsidary = schematic_objects[object_id]["sigarms"][1][1][0],
+                            lh2_subsidary = schematic_objects[object_id]["sigarms"][2][1][0],
+                            rh1_subsidary = schematic_objects[object_id]["sigarms"][3][1][0],
+                            rh2_subsidary = schematic_objects[object_id]["sigarms"][4][1][0],
                             theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
                             refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
                             fully_automatic = schematic_objects[object_id]["fullyautomatic"])
-        
+
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_position:
         signals_ground_position.create_ground_position_signal (canvas,
                             sig_id = schematic_objects[object_id]["itemid"],
@@ -398,34 +409,47 @@ def create_default_signal_object(item_type,item_subtype):
     schematic_objects[object_id]["itemid"] = new_signal_id()
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["itemsubtype"] = item_subtype
-    schematic_objects[object_id]["orientation"] = 0 ###########################
+    schematic_objects[object_id]["orientation"] = 0 
     schematic_objects[object_id]["passedsensor"] = [False,0]    # [button,gpio_port]
     schematic_objects[object_id]["approachsensor"] = [False,0]  # [button,gpio_port]
     schematic_objects[object_id]["subsidary"] = [False,0]       # [has_subsidary,dcc_address]
     schematic_objects[object_id]["theatreroute"] = False
     schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
-    schematic_objects[object_id]["sigarms"] = [False,False,False,False,False] #######################
-    schematic_objects[object_id]["subarms"] = [False,False,False,False,False] ########################
-    schematic_objects[object_id]["distarms"] = [False,False,False,False,False] ###########################
-    schematic_objects[object_id]["fullyautomatic"] = False #################
-    schematic_objects[object_id]["immediaterefresh"] = True ##############
-    schematic_objects[object_id]["associatedsignal"] = 0 ######################
-    # These are the DCC address parameters for the colour light signal aspects
     schematic_objects[object_id]["dccautoinhibit"] = False
+    schematic_objects[object_id]["fullyautomatic"] = False
+    schematic_objects[object_id]["immediaterefresh"] = True #######################
+    schematic_objects[object_id]["associatedsignal"] = 0 ###########################
+    schematic_objects[object_id]["distantbutton"] = False
+    # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+    # Each Route element comprises: [signal, subsidary, distant]
+    # Each signal element comprises [enabled/disabled, address]
+    schematic_objects[object_id]["sigarms"] = [ [ [True,0],[False,0],[False,0] ],
+                                                [ [False,0],[False,0],[False,0] ],
+                                                [ [False,0],[False,0],[False,0] ],
+                                                [ [False,0],[False,0],[False,0] ],
+                                                [ [False,0],[False,0],[False,0] ] ]
+    # Colour Light Aspects list comprises: [grn, red, ylw, dylw, fylw, fdylw]
+    # Each aspect element comprises [add1, add2, add3, add4, add5]
+    # Each address element comprises: [address,state]
     schematic_objects[object_id]["dccaspects"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                    [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
-    # These are the DCC address parameters for the colour light feathers                                                    
+    # Feather Route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+    # Each route element comprises: [add1, add2, add3, add4, add5]
+    # Each address element comprises: [address,state]
     schematic_objects[object_id]["dccfeathers"] = [ [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                     [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                     [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                     [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                     [[0,False],[0,False],[0,False],[0,False],[0,False]],
                                                     [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
-    # These are the DCC address parameters for the Theatre route indicator    
+    # Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+    # Each route element comprises: [character, address-sequence]
+    # Each address-sequence comprises: [add1, add2, add3, add4, add5]
+    # Each address element comprises: [address,state]
     schematic_objects[object_id]["dcctheatre"] = [ ["#", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                                                    ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                                                    ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
