@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------------
 
 from tkinter import *
+from tkinter import ttk
 
 from . import objects
 from . import common
@@ -16,21 +17,21 @@ from ..library import points
 def load_state(point):
     object_id = point.object_id
     # Set the Initial UI state from the current object settings
-    point.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
-    point.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
+    point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
+    point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
     # The Point type is an enumeration type so we have to set the value
-    point.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
+    point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
     # These are the general settings for the point
     auto = objects.schematic_objects[object_id]["automatic"]
     rev = objects.schematic_objects[object_id]["reverse"]
     fpl = objects.schematic_objects[object_id]["hasfpl"]
     if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
     else:rot = False
-    point.settings.set_values(rot, rev, auto, fpl)
+    point.config.settings.set_values(rot, rev, auto, fpl)
     # Set the initial DCC address values
     add = objects.schematic_objects[object_id]["dccaddress"]
     rev = objects.schematic_objects[object_id]["dccreversed"]
-    point.dccsettings.set_values (add, rev)
+    point.config.dccsettings.set_values (add, rev)
     return()
     
 #------------------------------------------------------------------------------------
@@ -41,17 +42,18 @@ def save_state(point, close_window:bool):
     object_id = point.object_id
     # Check the point we are editing still exists (hasn't been deleted from the schematic)
     # If it no longer exists then we just destroy the window and exit without saving
-    if not points.point_exists(objects.schematic_objects[object_id]["itemid"]):
+    if object_id not in objects.schematic_objects.keys():
         point.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    elif point.pointid.validate() and point.alsoswitch.validate() and point.settings.validate():
+    elif (point.config.pointid.validate() and point.config.alsoswitch.validate()
+                        and point.config.settings.validate() ):
         # Soft Delete the existing point object (the point will be re-created on "update")
         # We do this here before updating the object in case the pint ID has been changed
         objects.soft_delete_point(object_id)
         # If the ID has been updated then update all references from other layout objects
         old_id = objects.schematic_objects[object_id]["itemid"]
-        new_id = point.pointid.get_value()
+        new_id = point.config.pointid.get_value()
         if old_id != new_id:
             for obj in objects.schematic_objects:
                 # First we update any other point objects that refer to the current point
@@ -66,10 +68,10 @@ def save_state(point, close_window:bool):
         # Update the point coniguration from the current user selections
         objects.schematic_objects[object_id]["itemid"] = new_id
         # We need to convert the point type back into the appropriate enumeration value 
-        objects.schematic_objects[object_id]["itemtype"] = points.point_type(point.pointtype.get_value())
-        objects.schematic_objects[object_id]["alsoswitch"] = point.alsoswitch.get_value()
+        objects.schematic_objects[object_id]["itemtype"] = points.point_type(point.config.pointtype.get_value())
+        objects.schematic_objects[object_id]["alsoswitch"] = point.config.alsoswitch.get_value()
         # These are the general settings
-        rot, rev, auto, fpl = point.settings.get_values()
+        rot, rev, auto, fpl = point.config.settings.get_values()
         objects.schematic_objects[object_id]["reverse"] = rev
         objects.schematic_objects[object_id]["automatic"] = auto
         objects.schematic_objects[object_id]["hasfpl"] = fpl
@@ -77,7 +79,7 @@ def save_state(point, close_window:bool):
         else: objects.schematic_objects[object_id]["orientation"] = 0
         # Get the  DCC address - note that dcc.get_value returns [address,state]
         # in this instance we only need the DCC address element(element [0])
-        add, rev = point.dccsettings.get_values ()
+        add, rev = point.config.dccsettings.get_values ()
         objects.schematic_objects[object_id]["dccaddress"] = add
         objects.schematic_objects[object_id]["dccreversed"] = rev
         # Update the point (recreate in its new configuration)
@@ -105,7 +107,11 @@ def save_state(point, close_window:bool):
         if close_window: point.window.destroy()
         else: load_state(point)
     return()
-            
+
+#####################################################################################
+# Classes for the Point "Configuration" Tab
+#####################################################################################
+
 #------------------------------------------------------------------------------------
 # Common Class for the "Also Switch" Entry Box UI Element
 # Class instance methods to use externally are:
@@ -123,7 +129,7 @@ class also_switch_selection:
         self.parent_object = parent_object
         # Create the Label Frame for the "also switch" entry box
         self.frame = LabelFrame(parent_window, text="ID of point to 'Also Switch'")
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the tkinter variables to hold the state
         self.entry = StringVar(parent_window,"")
         self.value = StringVar(parent_window, "")
@@ -211,10 +217,12 @@ class also_switch_selection:
 
 class general_settings:
     def __init__(self, parent_window, parent_object):
+        # We need the reference to the parent object so we can call the sibling
+        # class method to get the current value of the Point ID for validation
         self.parent_object = parent_object
         # Create a Label frame to hold the general settings
         self.frame = LabelFrame(parent_window,text="General configuration")
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the Tkinter Boolean vars to hold the values
         self.rotated = BooleanVar(self.frame,False)
         self.reversed = BooleanVar(self.frame,False)
@@ -295,13 +303,16 @@ class general_settings:
 class dcc_address_settings:
     def __init__(self, parent_window):
         # Create a Label frame to hold the DCC Address settings
-        self.frame = LabelFrame(parent_window,text="DCC Address")
-        self.frame.pack(padx=2, pady=2)
+        self.frame = LabelFrame(parent_window,text="DCC Address and command logic")
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the Tkinter Boolean vars to hold the DCC reversed selection
         self.dccreversed = BooleanVar(self.frame,False)
         # Create a DCC Address element and checkbox for the "reversed" selection
-        self.dcc = common.dcc_address_entry_box(self.frame, dcc_state_checkbox=False)
-        self.CB = Checkbutton(self.frame, text="Reverse DCC logic", variable=self.dccreversed)
+        # We create this in a subframe so the elements are centered
+        self.subframe = Frame(self.frame)
+        self.subframe.pack(padx=2, pady=2)
+        self.dcc = common.dcc_address_entry_box(self.subframe, dcc_state_checkbox=False)
+        self.CB = Checkbutton(self.subframe, text="Reversed", variable=self.dccreversed)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.CBTT = common.CreateToolTip(self.CB, "Select to reverse the DCC command logic")
         
@@ -317,33 +328,64 @@ class dcc_address_settings:
         return (self.dcc.get_value()[0],self.dccreversed.get())
     
 #------------------------------------------------------------------------------------
-# Class for the Edit Signal Window
+# Top level Class for the Point Configuration Tab
 #------------------------------------------------------------------------------------
 
-class edit_point:
-    def __init__(self, root_window, object_id):
-        # This is the UUID for the signal being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Toplevel(root_window)
-        self.window.title("Point")
-        self.window.attributes('-topmost',True)
+class point_configuration_tab:
+    def __init__(self, parent_window):
         # Create a Frame to hold the Sig ID and Signal Type Selections
-        self.frame = Frame(self.window)
-        self.frame.pack(padx=2, pady=2)
+        self.frame = Frame(parent_window)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
+        # Note the need to pass in the type-specific "point_exists" function
         self.pointid = common.object_id_selection(self.frame, "Point ID", points.point_exists) 
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
                                       "Select Point Type", None, "RH", "LH")
         # Create the UI element for the general settings
         # Note that the class needs the parent object (to reference siblings)
-        self.settings = general_settings(self.window, self)
+        self.settings = general_settings(parent_window, self)
         # Create the UI element for the "Also Switch" entry 
         # Note that the class needs the parent object (to reference siblings)
-        self.alsoswitch = also_switch_selection(self.window, self)
+        self.alsoswitch = also_switch_selection(parent_window, self)
         # Create the UI element for the DCC Settings 
-        self.dccsettings = dcc_address_settings(self.window)
+        self.dccsettings = dcc_address_settings(parent_window)
+
+#####################################################################################
+# Classes for the Point "Interlocking" Tab
+#####################################################################################
+
+#------------------------------------------------------------------------------------
+# Top level Class for the Point Interlocking Tab
+#------------------------------------------------------------------------------------
+
+class point_interlocking_tab:
+    def __init__(self, parent_window):
+        label = Label(parent_window,text="Work in Progress")
+        label.pack()
+
+
+#####################################################################################
+# Top level Class for the Edit Point window
+#####################################################################################
+
+class edit_point:
+    def __init__(self, parent_window, object_id):
+        # This is the UUID for the object being edited
+        self.object_id = object_id
+        # Creatre the basic Top Level window
+        self.window = Toplevel(parent_window)
+        self.window.title("Point")
+        self.window.attributes('-topmost',True)
+        # Create the Window tabs
+        self.tabs = ttk.Notebook(self.window)
+        self.tab1 = Frame(self.tabs)
+        self.tabs.add(self.tab1, text="Configration")
+        self.tab2 = Frame(self.tabs)
+        self.tabs.add(self.tab2, text="Interlocking")
+        self.tabs.pack()
+        self.config = point_configuration_tab(self.tab1)
+        self.locking = point_interlocking_tab(self.tab2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         common.window_controls(self.window, self, load_state, save_state)
         # load the initial UI state

@@ -3,9 +3,11 @@
 #------------------------------------------------------------------------------------
 
 from tkinter import *
+from tkinter import ttk
 
 from . import objects
 from . import common
+from ..library import points
 from ..library import signals
 from ..library import track_sensors
 from ..library import signals_common
@@ -21,50 +23,50 @@ from ..library import signals_ground_disc
 def load_state(signal):
     object_id = signal.object_id
     # Set the Initial UI state from the current object settings
-    signal.sigid.set_value(objects.schematic_objects[object_id]["itemid"])
+    signal.config.sigid.set_value(objects.schematic_objects[object_id]["itemid"])
     # The Signal type/subtype are enumeration types so we have to set the value
-    signal.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
-    signal.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"].value)
-    signal.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
-    signal.sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"])
-    signal.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
-    signal.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
-    signal.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
-    signal.feathers.set_addresses(objects.schematic_objects[object_id]["dccfeathers"])
-    signal.theatre.set_theatre(objects.schematic_objects[object_id]["dcctheatre"])
-    signal.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-    signal.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-    signal.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
+    signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
+    signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"].value)
+    signal.config.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
+    signal.config.sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"])
+    signal.config.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
+    signal.config.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
+    signal.config.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
+    signal.config.feathers.set_addresses(objects.schematic_objects[object_id]["dccfeathers"])
+    signal.config.theatre.set_theatre(objects.schematic_objects[object_id]["dcctheatre"])
+    signal.config.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
+    signal.config.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
+    signal.config.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
     # These are the general settings for the signal
     sig_button = not objects.schematic_objects[object_id]["fullyautomatic"]
-    dist_button = objects.schematic_objects[object_id]["distantbutton"]
+    dist_button = not objects.schematic_objects[object_id]["distautomatic"]
     if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
     else:rot = False
-    signal.settings.set_values(rot, sig_button, dist_button)
+    signal.config.settings.set_values(rot, sig_button, dist_button)
     
 #    objects.schematic_objects[object_id]["immediaterefresh"])
-#    objects.schematic_objects[object_id]["associatedsignal"])
     
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
     if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light:
         if objects.schematic_objects[object_id]["theatreroute"]:
-            signal.routetype.set_value(3)
+            signal.config.routetype.set_value(3)
         elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
-            signal.routetype.set_value(2)
+            signal.config.routetype.set_value(2)
         else:
-            signal.routetype.set_value(1)      
+            signal.config.routetype.set_value(1)      
     elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore:
         if objects.schematic_objects[object_id]["theatreroute"]:
-            signal.routetype.set_value(3)
+            signal.config.routetype.set_value(3)
         else: 
-            signal.routetype.set_value(4)      
+            signal.config.routetype.set_value(4)      
     else:
-        signal.routetype.set_value(1)      
+        signal.config.routetype.set_value(1)      
     # Set the initial UI selections
-    update_signal_subtype_selections(signal)
-    update_signal_selection_elements(signal)
-    update_signal_aspect_selections(signal)
+    update_signal_subtype_selections(signal.config)
+    update_signal_selection_elements(signal.config)
+    update_signal_aspect_selections(signal.config)
+    update_signal_button_selections(signal.config)
     return()
     
 #------------------------------------------------------------------------------------
@@ -73,56 +75,58 @@ def load_state(signal):
  
 def save_state(signal,close_window):
     object_id = signal.object_id
-    # Check the signal we are editing still exists (hasn't been deleted from the schematic)
+    # Check the object we are editing still exists (hasn't been deleted from the schematic)
     # If it no longer exists then we just destroy the window and exit without saving
-    if not signals_common.sig_exists(objects.schematic_objects[object_id]["itemid"]):
+    if object_id not in objects.schematic_objects.keys():
         signal.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    elif ( signal.sigid.validate() and signal.sensors.validate() and signal.aspects.validate() and
-         signal.theatre.validate() and signal.feathers.validate() and signal.semaphores.validate() ):
-         ########################### TODO - Validation of other UI elements #######################
+    elif ( signal.config.sigid.validate() and signal.config.sensors.validate() and
+           signal.config.aspects.validate() and signal.config.theatre.validate() and
+           signal.config.feathers.validate() and signal.config.semaphores.validate() ):
+        ##########################################################################################
+        ############# TODO - Validation of Interlocking & Automation UI elements #################
+        ##########################################################################################
         # Delete the existing signal object (the signal will be re-created)
         objects.soft_delete_signal(object_id)
         # Get the Signal Subtype (will depend on the signal Type)
-        signal_type = signals_common.sig_type(signal.sigtype.get_value())
+        signal_type = signals_common.sig_type(signal.config.sigtype.get_value())
         if signal_type == signals_common.sig_type.colour_light:
-            signal_subtype = signals_colour_lights.signal_sub_type(signal.subtype.get_value())
+            signal_subtype = signals_colour_lights.signal_sub_type(signal.config.subtype.get_value())
         elif signal_type == signals_common.sig_type.semaphore:
-            signal_subtype = signals_semaphores.semaphore_sub_type(signal.subtype.get_value())
+            signal_subtype = signals_semaphores.semaphore_sub_type(signal.config.subtype.get_value())
         elif signal_type == signals_common.sig_type.ground_position:
-            signal_subtype = signals_ground_position.ground_pos_sub_type(signal.subtype.get_value())
+            signal_subtype = signals_ground_position.ground_pos_sub_type(signal.config.subtype.get_value())
         elif signal_type == signals_common.sig_type.ground_disc:
-            signal_subtype = signals_ground_disc.ground_disc_sub_type(signal.subtype.get_value())
+            signal_subtype = signals_ground_disc.ground_disc_sub_type(signal.config.subtype.get_value())
         # Update all object configuration settings from the Tkinter variables
-        objects.schematic_objects[object_id]["itemid"] = signal.sigid.get_value()
+        objects.schematic_objects[object_id]["itemid"] = signal.config.sigid.get_value()
         objects.schematic_objects[object_id]["itemtype"] = signal_type
         objects.schematic_objects[object_id]["itemsubtype"] = signal_subtype
-        objects.schematic_objects[object_id]["passedsensor"] = signal.sensors.passed.get_value()
-        objects.schematic_objects[object_id]["approachsensor"] = signal.sensors.approach.get_value()
-        objects.schematic_objects[object_id]["subsidary"] = signal.aspects.get_subsidary()
-        objects.schematic_objects[object_id]["feathers"] = signal.feathers.get_feathers()
-        objects.schematic_objects[object_id]["dccaspects"] = signal.aspects.get_addresses()
-        objects.schematic_objects[object_id]["dccfeathers"] = signal.feathers.get_addresses()
-        objects.schematic_objects[object_id]["dcctheatre"] = signal.theatre.get_theatre()
-        objects.schematic_objects[object_id]["sigarms"] = signal.semaphores.get_arms()
+        objects.schematic_objects[object_id]["passedsensor"] = signal.config.sensors.passed.get_value()
+        objects.schematic_objects[object_id]["approachsensor"] = signal.config.sensors.approach.get_value()
+        objects.schematic_objects[object_id]["subsidary"] = signal.config.aspects.get_subsidary()
+        objects.schematic_objects[object_id]["feathers"] = signal.config.feathers.get_feathers()
+        objects.schematic_objects[object_id]["dccaspects"] = signal.config.aspects.get_addresses()
+        objects.schematic_objects[object_id]["dccfeathers"] = signal.config.feathers.get_addresses()
+        objects.schematic_objects[object_id]["dcctheatre"] = signal.config.theatre.get_theatre()
+        objects.schematic_objects[object_id]["sigarms"] = signal.config.semaphores.get_arms()
         # These are the general settings for the signal
-        rot, sig_button, dist_button = signal.settings.get_values()
+        rot, sig_button, dist_button = signal.config.settings.get_values()
         objects.schematic_objects[object_id]["fullyautomatic"] = not sig_button
-        objects.schematic_objects[object_id]["distantbutton"] = dist_button
+        objects.schematic_objects[object_id]["distautomatic"] = not dist_button
         if rot: objects.schematic_objects[object_id]["orientation"] = 180
         else: objects.schematic_objects[object_id]["orientation"] = 0
         
 #        objects.schematic_objects[object_id]["immediaterefresh"] = 
-#        objects.schematic_objects[object_id]["associatedsignal"] = 
 
         # Set the Theatre route indicator flag if that particular radio button is selected
-        if signal.routetype.get_value() == 3:
+        if signal.config.routetype.get_value() == 3:
             objects.schematic_objects[object_id]["theatreroute"] = True
             objects.schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
-            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.theatre.get_auto_inhibit()
+            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.theatre.get_auto_inhibit()
         else:
-            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.feathers.get_auto_inhibit()
+            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
             objects.schematic_objects[object_id]["theatreroute"] = False
         # Update the signal (recreate in its new configuration)
         objects.update_signal_object(object_id)
@@ -131,116 +135,129 @@ def save_state(signal,close_window):
         else: load_state(signal)
     return()
 
+#####################################################################################
+# Functions and Classes for the Point "Configuration" Tab
+#####################################################################################
+
+#------------------------------------------------------------------------------------
+# Enable/disable the distant button selection depending on other selections
+#------------------------------------------------------------------------------------
+
+def update_signal_button_selections(parent_object):
+    # Only enable the distant button selection if the signal is a semaphore
+    # and one or more distant arms have been selected
+    if ( parent_object.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+             ( parent_object.semaphores.main.dist.get_element()[0] or
+               parent_object.semaphores.lh1.dist.get_element()[0] or
+               parent_object.semaphores.lh2.dist.get_element()[0] or
+               parent_object.semaphores.rh1.dist.get_element()[0] or
+               parent_object.semaphores.rh2.dist.get_element()[0] ) ):
+        parent_object.settings.enable_dist_button()
+    else:
+        parent_object.settings.disable_dist_button()
+    return()
+
 #------------------------------------------------------------------------------------
 # Hide/show the various route indication UI elements depending on what is selected
 # Also update the available route selections depending on signal type / syb-type
 #------------------------------------------------------------------------------------
 
-def update_signal_selection_elements(signal):
+def update_signal_selection_elements(parent_object):
     # Pack_forget everything first - then we pack everything in the right order
     # Signal Type, Subtype, gen settings and and Signal events always remain packed
-    signal.routetype.frame.pack_forget()
-    signal.aspects.frame.pack_forget()
-    signal.semaphores.frame.pack_forget()
-    signal.feathers.frame.pack_forget()
-    signal.theatre.frame.pack_forget()
-    signal.controls.frame.pack_forget()
+    parent_object.routetype.frame.pack_forget()
+    parent_object.aspects.frame.pack_forget()
+    parent_object.semaphores.frame.pack_forget()
+    parent_object.feathers.frame.pack_forget()
+    parent_object.theatre.frame.pack_forget()
     # Only pack those elements relevant to the signal type and route type
-    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    if parent_object.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         # Enable the Approach control element (supported by Colour Light signals)
-        signal.sensors.approach.enable()
+        parent_object.sensors.approach.enable()
         # Main UI elements to pack are the Aspects (DCC addresses) and Route Type selections
-        signal.aspects.frame.pack()
-        signal.routetype.frame.pack()
+        parent_object.aspects.frame.pack(padx=2, pady=2, fill='x')
+        parent_object.routetype.frame.pack(padx=2, pady=2, fill='x')
         # Enable the available route type selections for colour light signals
-        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
+        if parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
             # 2 aspect distant colour light signals do not support route indications
-            signal.routetype.set_value(1)
-            signal.routetype.B2.configure(state="disabled")
-            signal.routetype.B3.configure(state="disabled")
-            signal.routetype.B4.configure(state="disabled")
-            signal.feathers.disable()
-            signal.theatre.disable()
+            parent_object.routetype.set_value(1)
+            parent_object.routetype.B2.configure(state="disabled")
+            parent_object.routetype.B3.configure(state="disabled")
+            parent_object.routetype.B4.configure(state="disabled")
+            parent_object.feathers.disable()
+            parent_object.theatre.disable()
         else:
             # If Route Arms are currently selected we change this to Feathers
-            if signal.routetype.get_value() == 4: signal.routetype.set_value(2)
+            if parent_object.routetype.get_value() == 4: parent_object.routetype.set_value(2)
             # Available selections are None, Feathers, theatre (not route Arms)
-            signal.routetype.B2.configure(state="normal")
-            signal.routetype.B3.configure(state="normal")
-            signal.routetype.B4.configure(state="disabled")
+            parent_object.routetype.B2.configure(state="normal")
+            parent_object.routetype.B3.configure(state="normal")
+            parent_object.routetype.B4.configure(state="disabled")
             # Pack the selected route selection UI elements
-            if signal.routetype.get_value() == 1:
-                signal.feathers.disable()
-                signal.theatre.disable()
-            elif signal.routetype.get_value() == 2:
-                signal.feathers.frame.pack()
-                signal.feathers.enable()
-                signal.theatre.disable()
-            elif signal.routetype.get_value() == 3:
-                signal.theatre.frame.pack()
-                signal.theatre.enable()
-                signal.feathers.disable()
-        # Colour light signals do not support a seperate distant signal button
-        signal.settings.disable_dist_button()
+            if parent_object.routetype.get_value() == 1:
+                parent_object.feathers.disable()
+                parent_object.theatre.disable()
+            elif parent_object.routetype.get_value() == 2:
+                parent_object.feathers.frame.pack(padx=2, pady=2, fill='x')
+                parent_object.feathers.enable()
+                parent_object.theatre.disable()
+            elif parent_object.routetype.get_value() == 3:
+                parent_object.theatre.frame.pack(padx=2, pady=2, fill='x')
+                parent_object.theatre.enable()
+                parent_object.feathers.disable()
         
-    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
-        # Ground Pos signals do not support Approach control or seperate distant buttons
-        signal.sensors.approach.disable()
-        signal.settings.disable_dist_button()
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+        # Ground Pos signals do not support Approach control
+        parent_object.sensors.approach.disable()
         # Main UI element to pack is the Aspects (DCC addresses)
-        signal.aspects.frame.pack()
+        parent_object.aspects.frame.pack(padx=2, pady=2, fill='x')
         
-    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         # Enable the Approach control element (supported by Semaphore signals)
-        signal.sensors.approach.enable()
+        parent_object.sensors.approach.enable()
         # Main UI elements to pack are the Route Type selections and semaphore arm selections
-        signal.routetype.frame.pack()
-        signal.semaphores.frame.pack()
+        parent_object.routetype.frame.pack(padx=2, pady=2, fill='x')
+        parent_object.semaphores.frame.pack(padx=2, pady=2, fill='x')
         # Enable the available route type selections for Semaphore signals
-        if signal.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
+        if parent_object.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
+            # Distant signals use the main signal button
+            parent_object.settings.enable_dist_button()
             # distant semaphore signals do not support route indications
-            signal.routetype.set_value(1)
-            signal.routetype.B2.configure(state="disabled")
-            signal.routetype.B3.configure(state="disabled")
-            signal.routetype.B4.configure(state="disabled")
-            signal.semaphores.disable_subsidaries()
-            signal.semaphores.disable_distants()
+            parent_object.routetype.set_value(1)
+            parent_object.routetype.B2.configure(state="disabled")
+            parent_object.routetype.B3.configure(state="disabled")
+            parent_object.routetype.B4.configure(state="disabled")
+            parent_object.semaphores.disable_subsidaries()
+            parent_object.semaphores.disable_distants()
         else:
-            signal.semaphores.enable_subsidaries()
-            signal.semaphores.enable_distants()
+            parent_object.semaphores.enable_subsidaries()
+            parent_object.semaphores.enable_distants()
             # If Feathers are selected then change selection to Route Arms
-            if signal.routetype.get_value() == 2: signal.routetype.set_value(4)
+            if parent_object.routetype.get_value() == 2: signal.routetype.set_value(4)
             # Available selections are none, Route Arms, theatre (not Feathers)
-            signal.routetype.B2.configure(state="disabled")
-            signal.routetype.B3.configure(state="normal")
-            signal.routetype.B4.configure(state="normal")
+            parent_object.routetype.B2.configure(state="disabled")
+            parent_object.routetype.B3.configure(state="normal")
+            parent_object.routetype.B4.configure(state="normal")
             # Pack the selected route selection UI elements
-            if signal.routetype.get_value() == 1:
-                signal.semaphores.disable_routes()
-            elif signal.routetype.get_value() == 3:
-                signal.theatre.frame.pack()
-                signal.theatre.enable()
-                signal.semaphores.disable_routes()
-            elif signal.routetype.get_value() == 4:
-                signal.theatre.disable()
-                signal.semaphores.enable_routes()
-        #################################################################
-        # To Do - only enable if one or more distant arms are selected
-        signal.settings.enable_dist_button()
-        ##################################################################               
-    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
-        # Ground Disc signals do not support Approach control or seperate distant buttons
-        signal.sensors.approach.disable()
-        signal.settings.disable_dist_button()
+            if parent_object.routetype.get_value() == 1:
+                parent_object.semaphores.disable_routes()
+            elif parent_object.routetype.get_value() == 3:
+                parent_object.theatre.frame.pack(padx=2, pady=2, fill='x')
+                parent_object.theatre.enable()
+                parent_object.semaphores.disable_routes()
+            elif parent_object.routetype.get_value() == 4:
+                parent_object.theatre.disable()
+                parent_object.semaphores.enable_routes()
+                
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+        # Ground Disc signals do not support Approach control
+        parent_object.sensors.approach.disable()
         # Main UI element to pack is the Semaphore Arms (DCC addresses)
-        signal.semaphores.frame.pack()
+        parent_object.semaphores.frame.pack(padx=2, pady=2, fill='x')
         # Only the main signal arm is supported for ground discs
-        signal.semaphores.disable_routes()
-        signal.semaphores.disable_subsidaries()
-        signal.semaphores.disable_distants()
-    
-    # Finally re-pack the general control buttons at the bottom of the window
-    signal.controls.frame.pack()
+        parent_object.semaphores.disable_routes()
+        parent_object.semaphores.disable_subsidaries()
+        parent_object.semaphores.disable_distants()
     
     return()
 
@@ -248,90 +265,90 @@ def update_signal_selection_elements(signal):
 # Update the available signal subtype selections based on the signal type
 #------------------------------------------------------------------------------------
 
-def update_signal_subtype_selections(signal):
-    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        signal.subtype.B1.configure(text="2 Aspect G/R  ")
-        signal.subtype.B2.configure(text="2 Aspect G/Y  ")
-        signal.subtype.B3.configure(text="2 Aspect Y/R  ")
-        signal.subtype.B4.configure(text="3 Aspect      ")
-        signal.subtype.B5.configure(text="4 Aspect      ")
-        signal.subtype.B3.pack(side=LEFT)
-        signal.subtype.B4.pack(side=LEFT)
-        signal.subtype.B5.pack(side=LEFT)
-    elif signal.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        signal.subtype.B1.configure(text="Home          ")
-        signal.subtype.B2.configure(text="Distant       ")
-        signal.subtype.B3.pack_forget()
-        signal.subtype.B4.pack_forget()
-        signal.subtype.B5.pack_forget()
-    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
-        signal.subtype.B1.configure(text="Norm (post'96) ")
-        signal.subtype.B2.configure(text="Shunt (post'96)")
-        signal.subtype.B3.configure(text="Norm (early)   ")
-        signal.subtype.B4.configure(text="Shunt (early)  ")
-        signal.subtype.B3.pack(side=LEFT)
-        signal.subtype.B4.pack(side=LEFT)
-        signal.subtype.B5.pack_forget()
-    elif signal.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
-        signal.subtype.B1.configure(text="Standard       ")
-        signal.subtype.B2.configure(text="Shunt Ahead    ")
-        signal.subtype.B3.pack_forget()
-        signal.subtype.B4.pack_forget()
-        signal.subtype.B5.pack_forget()
+def update_signal_subtype_selections(parent_object):
+    if parent_object.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+        parent_object.subtype.B1.configure(text="2 Asp G/R ")
+        parent_object.subtype.B2.configure(text="2 Asp G/Y ")
+        parent_object.subtype.B3.configure(text="2 Asp Y/R ")
+        parent_object.subtype.B4.configure(text="3 Aspect  ")
+        parent_object.subtype.B5.configure(text="4 Aspect  ")
+        parent_object.subtype.B3.pack(side=LEFT)
+        parent_object.subtype.B4.pack(side=LEFT)
+        parent_object.subtype.B5.pack(side=LEFT)
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+        parent_object.subtype.B1.configure(text="Home    ")
+        parent_object.subtype.B2.configure(text="Distant ")
+        parent_object.subtype.B3.pack_forget()
+        parent_object.subtype.B4.pack_forget()
+        parent_object.subtype.B5.pack_forget()
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+        parent_object.subtype.B1.configure(text="Norm (post'96)")
+        parent_object.subtype.B2.configure(text="Shunt (post'96)")
+        parent_object.subtype.B3.configure(text="Norm (early)")
+        parent_object.subtype.B4.configure(text="Shunt (early)")
+        parent_object.subtype.B3.pack(side=LEFT)
+        parent_object.subtype.B4.pack(side=LEFT)
+        parent_object.subtype.B5.pack_forget()
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+        parent_object.subtype.B1.configure(text="Normal")
+        parent_object.subtype.B2.configure(text="Shunt Ahead")
+        parent_object.subtype.B3.pack_forget()
+        parent_object.subtype.B4.pack_forget()
+        parent_object.subtype.B5.pack_forget()
     return()
 
 #------------------------------------------------------------------------------------
 # Update the available aspect selections based on signal type and subtype 
 #------------------------------------------------------------------------------------
 
-def update_signal_aspect_selections(signal):
-    if signal.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        if signal.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value:
-            signal.aspects.red.enable_addresses()
-            signal.aspects.grn.enable_addresses()
-            signal.aspects.ylw.disable_addresses()
-            signal.aspects.dylw.disable_addresses()
-            signal.aspects.fylw.disable_addresses()
-            signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
-            signal.aspects.red.disable_addresses()
-            signal.aspects.grn.enable_addresses()
-            signal.aspects.ylw.enable_addresses()
-            signal.aspects.dylw.disable_addresses()
-            signal.aspects.fylw.enable_addresses()
-            signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.red_ylw.value:
-            signal.aspects.red.enable_addresses()
-            signal.aspects.grn.disable_addresses()
-            signal.aspects.ylw.enable_addresses()
-            signal.aspects.dylw.disable_addresses()
-            signal.aspects.fylw.disable_addresses()
-            signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.three_aspect.value:
-            signal.aspects.red.enable_addresses()
-            signal.aspects.grn.enable_addresses()
-            signal.aspects.ylw.enable_addresses()
-            signal.aspects.dylw.disable_addresses()
-            signal.aspects.fylw.enable_addresses()
-            signal.aspects.fdylw.disable_addresses()
-        elif signal.subtype.get_value() == signals_colour_lights.signal_sub_type.four_aspect.value:
-            signal.aspects.red.enable_addresses()
-            signal.aspects.grn.enable_addresses()
-            signal.aspects.ylw.enable_addresses()
-            signal.aspects.dylw.enable_addresses()
-            signal.aspects.fylw.enable_addresses()
-            signal.aspects.fdylw.enable_addresses()
+def update_signal_aspect_selections(parent_object):
+    if parent_object.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+        if parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value:
+            parent_object.aspects.red.enable_addresses()
+            parent_object.aspects.grn.enable_addresses()
+            parent_object.aspects.ylw.disable_addresses()
+            parent_object.aspects.dylw.disable_addresses()
+            parent_object.aspects.fylw.disable_addresses()
+            parent_object.aspects.fdylw.disable_addresses()
+        elif parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
+            parent_object.aspects.red.disable_addresses()
+            parent_object.aspects.grn.enable_addresses()
+            parent_object.aspects.ylw.enable_addresses()
+            parent_object.aspects.dylw.disable_addresses()
+            parent_object.aspects.fylw.enable_addresses()
+            parent_object.aspects.fdylw.disable_addresses()
+        elif parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.red_ylw.value:
+            parent_object.aspects.red.enable_addresses()
+            parent_object.aspects.grn.disable_addresses()
+            parent_object.aspects.ylw.enable_addresses()
+            parent_object.aspects.dylw.disable_addresses()
+            parent_object.aspects.fylw.disable_addresses()
+            parent_object.aspects.fdylw.disable_addresses()
+        elif parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.three_aspect.value:
+            parent_object.aspects.red.enable_addresses()
+            parent_object.aspects.grn.enable_addresses()
+            parent_object.aspects.ylw.enable_addresses()
+            parent_object.aspects.dylw.disable_addresses()
+            parent_object.aspects.fylw.enable_addresses()
+            parent_object.aspects.fdylw.disable_addresses()
+        elif parent_object.subtype.get_value() == signals_colour_lights.signal_sub_type.four_aspect.value:
+            parent_object.aspects.red.enable_addresses()
+            parent_object.aspects.grn.enable_addresses()
+            parent_object.aspects.ylw.enable_addresses()
+            parent_object.aspects.dylw.enable_addresses()
+            parent_object.aspects.fylw.enable_addresses()
+            parent_object.aspects.fdylw.enable_addresses()
         # Include the subsidary signal selection frame 
-        signal.aspects.subframe.pack()
-    elif signal.sigtype.get_value() == signals_common.sig_type.ground_position.value:
-        signal.aspects.red.enable_addresses()
-        signal.aspects.grn.enable_addresses()
-        signal.aspects.ylw.disable_addresses()
-        signal.aspects.dylw.disable_addresses()
-        signal.aspects.fylw.disable_addresses()
-        signal.aspects.fdylw.disable_addresses()
+        parent_object.aspects.subframe.pack()
+    elif parent_object.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+        parent_object.aspects.red.enable_addresses()
+        parent_object.aspects.grn.enable_addresses()
+        parent_object.aspects.ylw.disable_addresses()
+        parent_object.aspects.dylw.disable_addresses()
+        parent_object.aspects.fylw.disable_addresses()
+        parent_object.aspects.fdylw.disable_addresses()
         # Hide the subsidary signal selection frame
-        signal.aspects.subframe.pack_forget()
+        parent_object.aspects.subframe.pack_forget()
     return()
 
 #------------------------------------------------------------------------------------
@@ -407,9 +424,6 @@ class signal_sensor:
                     valid = False
                 else:
                     # Test to see if the gpio channel is already assigned to another signal
-                    #######################################################################
-                    # TODO - change validation to use initial sig id value
-                    #######################################################################
                     if self.initial_value.get() == "": current_channel = 0
                     else: current_channel = int(self.initial_value.get())
                     for obj in objects.schematic_objects:
@@ -481,10 +495,13 @@ class signal_sensors:
         # The child class instances need the reference to the parent object so they can call
         # the sibling class method to get the current value of the Signal ID for validation
         self.frame = LabelFrame(parent_window, text="Signal sensors and associated GPIO ports")
-        self.frame.pack(padx=5, pady=5)
-        self.passed = signal_sensor(self.frame, parent_object, self.validate, "Signal passed button", 
+        self.frame.pack(padx=5, pady=5, fill='x')
+        # Create the elements in a subframe so they are centered
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
+        self.passed = signal_sensor(self.subframe, parent_object, self.validate, "Signal passed button", 
                     "Select to add a 'signal passed' button (and optionally linked GPIO sensor)")
-        self.approach = signal_sensor(self.frame, parent_object, self.validate, "Signal release button",
+        self.approach = signal_sensor(self.subframe, parent_object, self.validate, "Signal release button",
                     "Select to add a 'signal released' button (and optionally linked GPIO sensor)")
         
     def validate(self):
@@ -562,7 +579,7 @@ class semaphore_route_element:
 # Uses the base semaphore_route_element class from above
 # Class instance functions to use externally are:
 #    "validate" - validate the current entry box values and return True/false
-#    "distant_enable" - enables/loads the dist CB and EB (if the sig arm is enabled)
+#    "update_dist_selections" - enables/loads the dist CB and EB (if the sig arm is enabled)
 #    "route_disable" - disables/blanks all checkboxes and entry boxes
 #    "route_enable" - enables/loads all checkboxes and entry boxes
 #    "set_group" - will set the element [enabled/disabled, address]
@@ -570,26 +587,28 @@ class semaphore_route_element:
 #------------------------------------------------------------------------------------
 
 class semaphore_route_group: 
-    def __init__(self, parent_frame, label):
+    def __init__(self, parent_frame, callback, label):
+        self.callback = callback
         # Create a frame for this UI element
         self.frame = Frame(parent_frame)
         self.frame.pack()
         # Create the lable and tooltip for the route group
         self.label = Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = LEFT)
-        self.sig = semaphore_route_element(self.frame, self.distant_enable, "Main signal",
+        self.sig = semaphore_route_element(self.frame, self.update_dist_selections, "Main signal",
                         "Select to add a main signal arm for this route")
-        self.sub = semaphore_route_element(self.frame, self.distant_enable, "Subsidary arm",
+        self.sub = semaphore_route_element(self.frame, self.update_dist_selections, "Subsidary arm",
                         "Select to add a subsidary signal arm for this route")
-        self.dist = semaphore_route_element(self.frame, self.distant_enable, "Distant arm",
+        self.dist = semaphore_route_element(self.frame, self.update_dist_selections, "Distant arm",
                         "Select to add a distant signal arm for this route")
         
-    def distant_enable(self):
+    def update_dist_selections(self):
         # Distant route arms can only be associated with a main signal
         if self.sig.get_element()[0]:
             self.dist.enable()
         else:
             self.dist.disable()
+        self.callback()
 
     def validate(self):
         return(self.sig.validate() and self.sub.validate() and self.dist.validate())
@@ -597,7 +616,7 @@ class semaphore_route_group:
     def route_enable(self):
         self.sig.enable()
         self.sub.enable()
-        self.distant_enable()
+        self.update_dist_selections()
     
     def route_disable(self):
         self.sig.disable()
@@ -633,17 +652,19 @@ class semaphore_route_group:
 #------------------------------------------------------------------------------------
 
 class semaphore_route_frame:
-    def __init__(self, parent_window):
+    def __init__(self, parent_window, callback):
+        # Create a frame for this UI element
         self.frame = LabelFrame(parent_window, text="Semaphore Signal Arms and DCC Addresses")
-        self.frame.pack(padx=2, pady=2)
-        self.main = semaphore_route_group(self.frame, "Main")
-        self.lh1 = semaphore_route_group(self.frame, "LH1")
-        self.lh2 = semaphore_route_group(self.frame, "LH2")
-        self.rh1 = semaphore_route_group(self.frame, "RH1")
-        self.rh2 = semaphore_route_group(self.frame, "RH2")
+        self.frame.pack(padx=2, pady=2, fill='x')
+        # Create the individual UI elements for each route (sign, sub, dist)
+        self.main = semaphore_route_group(self.frame, callback, "Main")
+        self.lh1 = semaphore_route_group(self.frame, callback, "LH1")
+        self.lh2 = semaphore_route_group(self.frame, callback, "LH2")
+        self.rh1 = semaphore_route_group(self.frame, callback, "RH1")
+        self.rh2 = semaphore_route_group(self.frame, callback, "RH2")
         # The signal arm for the main route cannot be deselected
         self.main.sig.disable()
-        
+             
     def validate(self):
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate()
                     and self.rh1.validate() and self.rh2.validate())
@@ -663,11 +684,11 @@ class semaphore_route_frame:
         self.rh2.route_disable()
 
     def enable_distants(self):
-        self.main.distant_enable()
-        self.lh1.distant_enable()
-        self.lh2.distant_enable()
-        self.rh1.distant_enable()
-        self.rh2.distant_enable()
+        self.main.update_dist_selections()
+        self.lh1.update_dist_selections()
+        self.lh2.update_dist_selections()
+        self.rh1.update_dist_selections()
+        self.rh2.update_dist_selections()
     
     def disable_distants(self):
         self.main.dist.disable()
@@ -724,8 +745,6 @@ class semaphore_route_frame:
 
 class dcc_entry_boxes:
     def __init__(self, parent_window):
-#        self.label = Label(parent_window, text="DCC commands:")
-#        self.label.pack(side=LEFT, padx=2, pady=2)
         self.dcc1 = common.dcc_address_entry_box(parent_window,True)
         self.dcc2 = common.dcc_address_entry_box(parent_window,True)
         self.dcc3 = common.dcc_address_entry_box(parent_window,True)
@@ -903,7 +922,7 @@ class colour_light_aspects:
         # Create a label frame for this UI element
         self.frame = LabelFrame(parent_window,
                 text="DCC commands for Colour Light signal aspects")
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the DCC Entry Elements for the main signal Aspects
         self.red = dcc_entry_element(self.frame, 15, "Danger")
         self.grn = dcc_entry_element(self.frame, 15, "Proceed")
@@ -920,8 +939,6 @@ class colour_light_aspects:
                               text="Subsidary signal", command=self.sub_update)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.CBTT = common.CreateToolTip(self.CB, "Select for a subsidary signal")
-#        self.label = Label(self.subframe,text="DCC address:")
-#        self.label.pack(side=LEFT, padx=2, pady=2)
         self.subsidary = common.dcc_address_entry_box(self.subframe,False)
 
     def sub_update(self):
@@ -990,7 +1007,7 @@ class route_indications:
     def __init__(self, parent_window, frame_label:str, feathers:bool=False, theatre:bool=False):
         # Create a label frame for the route selections
         self.frame = LabelFrame(parent_window, text=frame_label)
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the individual route selection elements
         self.dark = dcc_entry_element(self.frame, 5, "(Dark)", theatre=theatre, feathers=feathers)
         self.main = dcc_entry_element(self.frame, 5, "MAIN", theatre=theatre, feathers=feathers)
@@ -1125,24 +1142,27 @@ class general_settings:
     def __init__(self, parent_window):
         # Create a Label frame to hold the general settings
         self.frame = LabelFrame(parent_window,text="General configuration")
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the Tkinter Boolean vars to hold the values
         self.rotated = BooleanVar(self.frame,False)
         self.sigbutton = BooleanVar(self.frame,False)
         self.distbutton = BooleanVar(self.frame,False)
         self.initial_distbutton = BooleanVar(self.frame,False)
-        self.CB1 = Checkbutton(self.frame, text="Rotated ", variable=self.rotated)
+        # Create the checkbuttons in a subframe (so they are centered)
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
+        self.CB1 = Checkbutton(self.subframe, text="Rotated ", variable=self.rotated)
         self.CB1.pack(side=LEFT, padx=2, pady=2)
         self.CB1TT = common.CreateToolTip(self.CB1,"Select to rotate by 180 degrees")
-        self.CB2 = Checkbutton(self.frame, text="Signal button", variable=self.sigbutton)
+        self.CB2 = Checkbutton(self.subframe, text="Signal button", variable=self.sigbutton)
         self.CB2.pack(side=LEFT, padx=2, pady=2)
-        self.CB2TT = common.CreateToolTip(self.CB2,"Select to create a manual control button "+
-                            "for the signal (deselect if the signal is to be switched automatically)")
-        self.CB3 = Checkbutton(self.frame, text="Distant button", variable=self.distbutton)
+        self.CB2TT = common.CreateToolTip(self.CB2,"Select to create a control button "+
+                "for the main signal (deselect if the signal is to be switched automatically)")
+        self.CB3 = Checkbutton(self.subframe, text="Distant button", variable=self.distbutton)
         self.CB3.pack(side=LEFT, padx=2, pady=2)
         self.CB3TT = common.CreateToolTip(self.CB3,"For semaphore signals, select to create a "+
-                        "manual control button for the distant signal (deselect if the distant"+
-                        "arms are to be automatically switched with another signal on the layout)")
+                "control button for the distant signal arms (deselect if the distant arms "+
+                " re to configured to 'mirror' another distant signal on the schematic)")
         
     def enable_dist_button(self):
         self.CB3.config(state="normal")
@@ -1165,68 +1185,364 @@ class general_settings:
 # Class for the Edit Signal Window
 #------------------------------------------------------------------------------------
 
-class edit_signal:
-    def __init__(self, root_window, object_id):
-        # This is the UUID for the signal being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Toplevel(root_window)
-        self.window.title("Signal")
-        self.window.attributes('-topmost',True)
+class signal_configuration_tab:
+    def __init__(self, parent_window):
         # Create a Frame to hold the Sig ID and Signal Type Selections
-        self.frame1 = Frame(self.window)
-        self.frame1.pack(padx=2, pady=2)
+        self.frame = Frame(parent_window)
+        self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
-        self.sigid = common.object_id_selection(self.frame1,"Signal ID",
+        self.sigid = common.object_id_selection(self.frame,"Signal ID",
                         signals_common.sig_exists)
         # Create the UI Element for Signal Type selection
-        self.sigtype = common.selection_buttons(self.frame1,"Signal Type",
+        self.sigtype = common.selection_buttons(self.frame,"Signal Type",
                     "Select signal type",self.sig_type_updated,"Colour Light",
-                        "Ground Position","Semaphore","Ground Disc")
+                        "Ground Pos","Semaphore","Ground Disc")
         # Create the UI Element for Signal subtype selection
-        self.subtype = common.selection_buttons(self.window,"Signal Subtype",
+        self.subtype = common.selection_buttons(parent_window,"Signal Subtype",
                     "Select signal subtype",self.sig_subtype_updated,"-","-","-","-","-")
         # Create the UI Element for the signal general settings
-        self.settings = general_settings(self.window)
+        self.settings = general_settings(parent_window)
         # Create the UI Element for the signal aproach/passed sensors
         # Note that the class needs the parent object (to reference siblings)
-        self.sensors = signal_sensors(self.window, self)
+        self.sensors = signal_sensors(parent_window, self)
         # Create the Selection buttons for changing the type of the route indication
         # Available selections are configured according to signal type on load
-        self.routetype = common.selection_buttons(self.window, "Route Indications",
+        self.routetype = common.selection_buttons(parent_window, "Route Indications",
                     "Select the route indications for the signal", self.route_selections_updated,
                     "None", "Route feathers", "Theatre indicator", "Route arms")
         # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
-        self.aspects = colour_light_aspects(self.window)
-        self.theatre = route_indications(self.window, "Theatre route indications and"+
+        self.aspects = colour_light_aspects(parent_window)
+        self.theatre = route_indications(parent_window, "Theatre route indications and"+
                                              " associated DCC commands", theatre=True)
-        self.feathers = route_indications(self.window, "Feather route indications and"+
+        self.feathers = route_indications(parent_window, "Feather route indications and"+
                                              " associated DCC commands", feathers=True)
-#
         # Create the Checkboxes and Entry Boxes for the Semaphore Route Indications
-        self.semaphores = semaphore_route_frame(self.window)
-
-        
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
-        
-        # load the initial UI state
-        load_state(self)
+        # Note the callback to update whether a "distant button" can be selected
+        self.semaphores = semaphore_route_frame(parent_window, self.distant_arms_updated)
 
     def sig_type_updated(self):
         self.subtype.set_value(1)
         update_signal_subtype_selections(self)
         update_signal_selection_elements(self)
         update_signal_aspect_selections(self)
-        return()
+        update_signal_button_selections(self)
     
     def sig_subtype_updated(self):
         update_signal_aspect_selections(self)
         update_signal_selection_elements(self)
-        return()
+        update_signal_button_selections(self)
     
     def route_selections_updated(self):
         update_signal_selection_elements(self)
-        return()
+        update_signal_button_selections(self)
+
+    def distant_arms_updated(self):
+        update_signal_button_selections(self)
+
+#####################################################################################
+# Classes for the Signal "Interlocking" Tab
+#####################################################################################
+
+#------------------------------------------------------------------------------------
+# Class for an point entry box (comprising "point ID" entry Box and state box)
+# Class instance functions to use externally are:
+#    "validate" - validate the current entry box values and return True/false
+#    "set_value" - will set the element [point_id, point_state]
+#    "get_value" - returns the last "valid" value [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+class point_entry_box:
+    def __init__(self, parent_window):
+        # Need the reference to the parent window for focusing away from the EB
+        self.parent = parent_window
+        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
+        # (before validation) and 'value' is the last validated value
+        self.value = StringVar(parent_window,"")
+        self.entry = StringVar(parent_window,"")
+        # Create the tkinter vars for the Point state CB - 'selection' is the actual CB state
+        # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
+        # last entered state (used to "load" the actual CB state once the EB is valid)        
+        self.state = BooleanVar(parent_window,False)
+        self.selection = BooleanVar(parent_window,False)
+        # Create the entry box, event bindings and associated tooltip
+        self.EB = Entry(parent_window, width=3, textvariable=self.entry)
+        self.EB.pack(side=LEFT)
+        self.EB.bind('<Return>',self.entry_box_updated)
+        self.EB.bind('<Escape>',self.entry_box_cancel)
+        self.EB.bind('<FocusOut>',self.entry_box_updated)
+        self.EBTT = common.CreateToolTip(self.EB, "Specify the points along the "+
+                                      "specified route towards the next signal")
+        # Create the checkbox and associated tool tip
+        self.CB = Checkbutton(parent_window, width=2, indicatoron = False, 
+            variable=self.selection, command=self.update_state, state="disabled")
+        self.CB.pack(side=LEFT)
+        self.defaultbg = self.CB.cget("background")
+        self.CBTT = common.CreateToolTip(self.CB, "Select the required state for the point")
+            
+    def update_state(self):
+        self.state.set(self.selection.get())
+        if self.state.get(): self.CB.configure(text=u"\u2191")
+        else: self.CB.configure(text=u"\u2192")
+        
+    def validate(self):
+        valid = False
+        if self.entry.get() == "":
+            self.CB.config(state="disabled", text="", bg=self.defaultbg)
+            self.selection.set(False)
+            valid = True
+        else:
+            try:
+                point_id = int(self.entry.get())
+            except:
+                self.EBTT.text = "Not a valid integer"
+            else:
+                if not points.point_exists(point_id):
+                    self.EBTT.text = "Point does not exist"
+                else:
+                    self.EBTT.text = ("Specify the points along the specified "+
+                                      "route towards the next signal")
+                    self.CB.config(state="normal", bg="white")
+                    self.selection.set(self.state.get())
+                    self.update_state()
+                    valid = True
+        if valid:
+            self.EB.config(fg='black')
+            self.value.set(self.entry.get())
+        else:
+            self.EB.config(fg='red')
+        return(valid)
+
+    def entry_box_updated(self, event):
+        self.validate()
+        if event.keysym == 'Return': self.parent.focus()
+        
+    def entry_box_cancel(self, event):
+        self.entry.set(self.value.get())
+        self.validate()
+        self.parent.focus()
+
+    def set_value(self, point:[int,bool]):
+        # A Point comprises a 2 element list of [Point_id, Point_state]
+        if point[0] == 0:
+            self.value.set("")
+            self.entry.set("")
+        else:
+            self.value.set(str(point[0]))
+            self.entry.set(str(point[0]))
+        self.state.set(point[1])
+        self.selection.set(point[1])
+        self.validate()
+        
+    def get_value(self):
+        # Returns a 2 element list of [Point_id, Point_state]
+        if self.value.get() == "": return([0, False])
+        else: return([int(self.value.get()), self.state.get()]) 
+
+#------------------------------------------------------------------------------------
+# Class for an signal entry box (comprising "signal ID" entry Box)
+# Class instance functions to use externally are:
+#    "validate" - validate the current entry box values and return True/false
+#    "set_value" - will set the element [point_id, point_state]
+#    "get_value" - returns the last "valid" value [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+class signal_entry_box:
+    def __init__(self, parent_window):
+        # Need the reference to the parent window for focusing away from the EB
+        self.parent = parent_window
+        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
+        # (before validation) and 'value' is the last validated value
+        self.value = StringVar(parent_window,"")
+        self.entry = StringVar(parent_window,"")
+        # Create the entry box, event bindings and associated tooltip
+        self.EB = Entry(parent_window, width=3, textvariable=self.entry)
+        self.EB.pack(side=LEFT)
+        self.EB.bind('<Return>',self.entry_box_updated)
+        self.EB.bind('<Escape>',self.entry_box_cancel)
+        self.EB.bind('<FocusOut>',self.entry_box_updated)
+        self.EBTT = common.CreateToolTip(self.EB, "Enter the ID of the next signal "+
+                                  "ahead along the specified route (optional)")
+            
+    def validate(self):
+        valid = False
+        if self.entry.get() == "":
+            valid = True
+        else:
+            try:
+                sig_id = int(self.entry.get())
+            except:
+                self.EBTT.text = "Not a valid integer"
+            else:
+                if not signals_common.sig_exists(sig_id):
+                    self.EBTT.text = "Signal does not exist"
+                else:
+                    self.EBTT.text = ("Enter the ID of the next signal "+
+                                  "ahead along the specified route (optional)")
+                    valid = True
+        if valid:
+            self.EB.config(fg='black')
+            self.value.set(self.entry.get())
+        else:
+            self.EB.config(fg='red')
+        return(valid)
+
+    def entry_box_updated(self, event):
+        self.validate()
+        if event.keysym == 'Return': self.parent.focus()
+        
+    def entry_box_cancel(self, event):
+        self.entry.set(self.value.get())
+        self.validate()
+        self.parent.focus()
+
+    def set_value(self, signal:int):
+        if signal == 0:
+            self.value.set("")
+            self.entry.set("")
+        else:
+            self.value.set(str(signal))
+            self.entry.set(str(signal))
+        self.validate()
+        
+    def get_value(self):
+        if self.value.get() == "": return(0)
+        else: return(int(self.value.get()))
+        
+#------------------------------------------------------------------------------------
+# Class for a route interlocking group (comprising 7 points and a signal)
+# Uses the base point_entry_box class from above
+# Class instance functions to use externally are:
+#    "validate" - validate the current entry box values and return True/false
+#    "set_route" - will set theroute elements (points & signal)
+#    "get_route" - returns the last "valid" values (points & signal)
+#------------------------------------------------------------------------------------
+
+class interlocking_route_group: 
+    def __init__(self, parent_frame, label):
+        # Create a frame for this UI element
+        self.frame = Frame(parent_frame)
+        self.frame.pack()
+        # Create the lable and tooltip for the route group
+        self.label = Label(self.frame, anchor='w', width=5, text=label)
+        self.label.pack(side = LEFT)
+        self.p1 = point_entry_box(self.frame)
+        self.p2 = point_entry_box(self.frame)
+        self.p3 = point_entry_box(self.frame)
+        self.p4 = point_entry_box(self.frame)
+        self.p5 = point_entry_box(self.frame)
+        self.p6 = point_entry_box(self.frame)
+        self.p7 = point_entry_box(self.frame)
+        self.label = Label(self.frame, text=" Sig ahead:")
+        self.label.pack(side = LEFT)
+        self.sig = signal_entry_box(self.frame)
+    
+    def validate(self):
+        return(self.p1.validate() and self.p2.validate() and self.p3.validate() and
+               self.p4.validate() and self.p5.validate() and self.p6.validate() and
+               self.p7.validate() and self.sig.validate())
+        
+    def set_route(self, interlocking_route):
+        # A route comprises: [p1, p2, p3, p4, p5, p6, p7, signal]
+        # Each point element comprises [point_id, point_state]
+        self.p1.set_value(interlocking_route[0])
+        self.p2.set_value(interlocking_route[1])
+        self.p3.set_value(interlocking_route[2])
+        self.p4.set_value(interlocking_route[3])
+        self.p5.set_value(interlocking_route[4])
+        self.p6.set_value(interlocking_route[5])
+        self.p7.set_value(interlocking_route[6])
+        self.sig.set_value(interlocking_route[7])
+        
+    def get_route(self):
+        # A route comprises: [p1, p2, p3, p4, p5, p6, p7, signal]
+        # Each point element comprises [point_id, point_state]
+        return ( [ self.p1.get_value(),
+                   self.p2.get_value(),
+                   self.p3.get_value(),
+                   self.p4.get_value(),
+                   self.p5.get_value(),
+                   self.p6.get_value(),
+                   self.p7.get_value(),
+                   self.sig.get_value() ] )
+
+#------------------------------------------------------------------------------------
+# Class for a route interlocking frame 
+# Uses the base interlocking_route_group class from above
+#    "validate" - validate the current entry box values and return True/false
+#    "set_routes" - will set all ui elements (enabled/disabled, addresses)
+#    "get_routes" - returns the last "valid" values (enabled/disabled, addresses)
+#------------------------------------------------------------------------------------
+
+class interlocking_route_frame:
+    def __init__(self, parent_window):
+        # Create a frame for this UI element
+        self.frame = LabelFrame(parent_window, text="Supported signal routes and interlocking")
+        self.frame.pack(padx=2, pady=2, fill='x')
+        # Create the individual UI elements for each route (sign, sub, dist)
+        self.main = interlocking_route_group(self.frame, "Main")
+        self.lh1 = interlocking_route_group(self.frame, "LH1")
+        self.lh2 = interlocking_route_group(self.frame, "LH2")
+        self.rh1 = interlocking_route_group(self.frame, "RH1")
+        self.rh2 = interlocking_route_group(self.frame, "RH2")
+
+    def validate(self):
+        return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
+               self.rh1.validate() and self.rh2.validate())
+        
+    def set_routes(self, interlocking_routes):
+        # Routes comprises: [main,lh1, lh2, rh1, rh2]
+        # Each route comprises: [p1, p2, p3, p4, p5, p6, p7, signal]
+        # Each point element comprises [point_id, point_state]
+        self.main.set_route(interlocking_routes[0])
+        self.lh1.set_route(interlocking_routes[1])
+        self.lh2.set_route(interlocking_routes[2])
+        self.rh1.set_route(interlocking_routes[3])
+        self.rh2.set_route(interlocking_routes[4])
+        
+    def get_routes(self):
+        # Routes comprises: [main,lh1, lh2, rh1, rh2]
+        # Each route comprises: [p1, p2, p3, p4, p5, p6, p7, signal]
+        # Each point element comprises [point_id, point_state]
+        return ( [ self.main.get_route(),
+                   self.lh1.get_route(),
+                   self.lh2.get_route(),
+                   self.rh1.get_route(),
+                   self.rh2.get_route() ] )
+    
+#------------------------------------------------------------------------------------
+# Top level Class for the Signal Interlocking Tab
+#------------------------------------------------------------------------------------
+
+class signal_interlocking_tab:
+    def __init__(self, parent_window):
+        route = interlocking_route_frame(parent_window)
+        label = Label(parent_window,text="Work in Progress")
+        label.pack()
+
+#####################################################################################
+# Top level Class for the Edit Signal window
+#####################################################################################
+
+class edit_signal:
+    def __init__(self, parent_window, object_id):
+        # This is the UUID for the object being edited
+        self.object_id = object_id
+        # Creatre the basic Top Level window
+        self.window = Toplevel(parent_window)
+        self.window.title("Signal")
+        self.window.attributes('-topmost',True)
+        # Create the Window tabs
+        self.tabs = ttk.Notebook(self.window)
+        self.tab1 = Frame(self.tabs)
+        self.tabs.add(self.tab1, text="Configration")
+        self.tab2 = Frame(self.tabs)
+        self.tabs.add(self.tab2, text="Interlocking")
+        self.tabs.pack()
+        self.config = signal_configuration_tab(self.tab1)
+        self.locking = signal_interlocking_tab(self.tab2)
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        common.window_controls(self.window, self, load_state, save_state)
+        # load the initial UI state
+        load_state(self)
 
 #############################################################################################

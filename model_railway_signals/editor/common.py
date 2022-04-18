@@ -282,7 +282,7 @@ class selection_buttons:
             callback=None,b1=None, b2=None, b3=None, b4=None, b5=None):
         # Create a labelframe to hold the buttons
         self.frame = LabelFrame(parent_window, text = frame_label)
-        self.frame.pack(padx=2, pady=2)
+        self.frame.pack(padx=2, pady=2, fill='x')
         self.value = IntVar(parent_window,0)
         # This is the external callback to make when a selection is made
         self.callback = callback

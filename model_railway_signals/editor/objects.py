@@ -73,8 +73,12 @@ def set_bbox(object_id:str,bbox:list):
 def soft_delete_signal(object_id):
     signals.delete_signal(schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
+    # Delete the track sensor mappings for the signal (if any)
     track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10)
     track_sensors.delete_sensor_mapping(schematic_objects[object_id]["itemid"]*10+1)
+    # Delete the associated distant signal (if there is one)
+    signals.delete_signal(schematic_objects[object_id]["itemid"]+100)
+    dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"]+100)
     return()
 
 def soft_delete_point(object_id):
@@ -200,6 +204,18 @@ def update_signal_object(object_id):
                     rh1_subsidary = schematic_objects[object_id]["sigarms"][3][1][1],
                     rh2_subsidary = schematic_objects[object_id]["sigarms"][4][1][1],
                     THEATRE = schematic_objects[object_id]["dcctheatre"] )
+        # Create the new DCC Mapping for the associated distant Signal
+        if ( schematic_objects[object_id]["sigarms"][0][2][0] or
+             schematic_objects[object_id]["sigarms"][1][2][0] or
+             schematic_objects[object_id]["sigarms"][2][2][0] or
+             schematic_objects[object_id]["sigarms"][3][2][0] or
+             schematic_objects[object_id]["sigarms"][4][2][0] ):
+            dcc_control.map_semaphore_signal (schematic_objects[object_id]["itemid"]+100,
+                    main_signal = schematic_objects[object_id]["sigarms"][0][2][1],
+                    lh1_signal = schematic_objects[object_id]["sigarms"][1][2][1],
+                    lh2_signal = schematic_objects[object_id]["sigarms"][2][2][1],
+                    rh1_signal = schematic_objects[object_id]["sigarms"][3][2][1],
+                    rh2_signal = schematic_objects[object_id]["sigarms"][4][2][1] )
 
     # Create the new signal object (according to the signal type)
     if schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light:
@@ -232,7 +248,6 @@ def update_signal_object(object_id):
                             x = schematic_objects[object_id]["posx"],
                             y = schematic_objects[object_id]["posy"],
                             signal_subtype = schematic_objects[object_id]["itemsubtype"],
-                            associated_home = schematic_objects[object_id]["associatedsignal"],
 #                            sig_callback = schematic_callback,
                             orientation = schematic_objects[object_id]["orientation"],
                             sig_passed_button = schematic_objects[object_id]["passedsensor"][0],
@@ -248,8 +263,27 @@ def update_signal_object(object_id):
                             rh1_subsidary = schematic_objects[object_id]["sigarms"][3][1][0],
                             rh2_subsidary = schematic_objects[object_id]["sigarms"][4][1][0],
                             theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
-                            refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
                             fully_automatic = schematic_objects[object_id]["fullyautomatic"])
+        # Create the associated distant signal (signal_id = home_signal_id + 100)
+        if ( schematic_objects[object_id]["sigarms"][0][2][0] or
+             schematic_objects[object_id]["sigarms"][1][2][0] or
+             schematic_objects[object_id]["sigarms"][2][2][0] or
+             schematic_objects[object_id]["sigarms"][3][2][0] or
+             schematic_objects[object_id]["sigarms"][4][2][0] ):
+            signals_semaphores.create_semaphore_signal (canvas,
+                            sig_id = schematic_objects[object_id]["itemid"]+100,
+                            x = schematic_objects[object_id]["posx"],
+                            y = schematic_objects[object_id]["posy"],
+                            signal_subtype = signals_semaphores.semaphore_sub_type.distant,
+                            associated_home = schematic_objects[object_id]["itemid"],
+#                            sig_callback = schematic_callback,
+                            orientation = schematic_objects[object_id]["orientation"],
+                            main_signal = schematic_objects[object_id]["sigarms"][0][2][0],
+                            lh1_signal = schematic_objects[object_id]["sigarms"][1][2][0],
+                            lh2_signal = schematic_objects[object_id]["sigarms"][2][2][0],
+                            rh1_signal = schematic_objects[object_id]["sigarms"][3][2][0],
+                            rh2_signal = schematic_objects[object_id]["sigarms"][4][2][0],
+                            fully_automatic = schematic_objects[object_id]["distautomatic"])
 
     elif schematic_objects[object_id]["itemtype"] == signals_common.sig_type.ground_position:
         signals_ground_position.create_ground_position_signal (canvas,
@@ -417,9 +451,8 @@ def create_default_signal_object(item_type,item_subtype):
     schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
     schematic_objects[object_id]["dccautoinhibit"] = False
     schematic_objects[object_id]["fullyautomatic"] = False
-    schematic_objects[object_id]["immediaterefresh"] = True #######################
-    schematic_objects[object_id]["associatedsignal"] = 0 ###########################
-    schematic_objects[object_id]["distantbutton"] = False
+    schematic_objects[object_id]["immediaterefresh"] = True ####################################
+    schematic_objects[object_id]["distautomatic"] = True
     # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
     # Each Route element comprises: [signal, subsidary, distant]
     # Each signal element comprises [enabled/disabled, address]
