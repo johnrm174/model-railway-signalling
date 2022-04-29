@@ -19,8 +19,7 @@ def load_state(point):
     # Set the Initial UI state from the current object settings
     point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
     point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
-    # The Point type is an enumeration type so we have to set the value
-    point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"].value)
+    point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     # These are the general settings for the point
     auto = objects.schematic_objects[object_id]["automatic"]
     rev = objects.schematic_objects[object_id]["reverse"]
@@ -67,8 +66,7 @@ def save_state(point, close_window:bool):
                 ###################################################################
         # Update the point coniguration from the current user selections
         objects.schematic_objects[object_id]["itemid"] = new_id
-        # We need to convert the point type back into the appropriate enumeration value 
-        objects.schematic_objects[object_id]["itemtype"] = points.point_type(point.config.pointtype.get_value())
+        objects.schematic_objects[object_id]["itemtype"] = point.config.pointtype.get_value()
         objects.schematic_objects[object_id]["alsoswitch"] = point.config.alsoswitch.get_value()
         # These are the general settings
         rot, rev, auto, fpl = point.config.settings.get_values()

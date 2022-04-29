@@ -19,6 +19,8 @@ from . import objects
 from . import configure_signal
 from . import configure_point
 
+import importlib.resources
+import logging
 import enum
 import uuid
 import copy
@@ -36,59 +38,43 @@ schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
 schematic_state["selectarea"] = False
 schematic_state["selectbox"] = False
-schematic_state["selectedobjects"] =[]
+schematic_state["selectedobjects"] = []
 schematic_state["clipboardobjects"] = []
+schematic_state["editingenabled"] = True
+
+# The Tkinter root window and canvas object references
+canvas = None
+root = None
+# The two tkinter popup menu objects
+popup1 = None
+popup2 = None
+# The tkinter IntVars for the canvas settings
+canvasx = None
+canvasy = None
+canvasgrid = None
+# The tkinter Frame object holding the "add object" buttons
+button_frame = None
+canvas_border = None
+# The Tkinter PhotoImage labels for the buttons
+button_images = {}
 
 #------------------------------------------------------------------------------------
-# The Root Window and Canvas are "global" - assigned when created by the main programme
-#------------------------------------------------------------------------------------
-
-def initialise(root_object,canvas_object):
-    global root, canvas
-    global popup1,popup2
-    # Set the global root window and canvas references
-    root, canvas = root_object, canvas_object
-    # Define the Object Popup menu for Right Click (something selected)
-    popup1 = Menu(tearoff=0)
-    popup1.add_command(label="Copy",command=copy_selected_objects)
-    popup1.add_command(label="Edit",command=edit_selected_object)
-    popup1.add_command(label="Rotate",command=rotate_selected_objects)
-    popup1.add_command(label="Delete",command=delete_selected_objects)
-    # Define the Canvas Popup menu for Right Click (nothing selected)
-    popup2 = Menu(tearoff=0)
-    popup2.add_command(label="Paste",command=paste_clipboard_objects)
-    # Now draw the initial grid
-    draw_grid()
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to draw (or redraw) the grid on the screen
+# Internal Function to draw (or redraw) the grid on the screen (after re-sizing)
 #------------------------------------------------------------------------------------
 
 def draw_grid():
-    width = canvas.getvar(name="canvasx")
-    height = canvas.getvar(name="canvasx")
-    canvas_grid = canvas.getvar(name="gridsize")
+    width = canvasx.get()
+    height = canvasy.get()
+    canvas_grid = canvasgrid.get()
     canvas.delete("grid")
-    if root.getvar(name="mode") == "Edit": state = "normal"
-    else: state = "hidden" 
-    canvas.create_rectangle(0,0,width,height,outline="black",fill="grey85",tags="grid")
+    if schematic_state["editingenabled"]: state = "normal"
+    else: state = "hidden"
+    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid")
     for i in range(0, height, canvas_grid):
         canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=state)
     for i in range(0, width, canvas_grid):
         canvas.create_line(i,0,i,height,fill='#999',tags="grid",state=state)
-    return()
-
-#------------------------------------------------------------------------------------
-# Functions to toggle the grid on/off (set depending on the mode)
-#------------------------------------------------------------------------------------
-
-def display_grid():
-    canvas.itemconfig("grid",state="normal")
-    return()
-
-def hide_grid():
-    canvas.itemconfig("grid",state="hidden")
+    canvas.tag_lower("grid")
     return()
 
 #------------------------------------------------------------------------------------
@@ -303,16 +289,16 @@ def paste_clipboard_objects(event=None):
     # Clear down any object selections prior to the "paste"
     deselect_all_objects()
     for object_id in schematic_state["clipboardobjects"]:
-        # Create a new Object (with a new UUID) with the copied configuration
-        # The new objects are "pasted" at a slightly offset position on the canvas
+        # Create a deep copy of the new Object (with a new UUID)
         new_object_id = uuid.uuid4()
         objects.schematic_objects[new_object_id] = copy.deepcopy(objects.schematic_objects[object_id])
-        objects.schematic_objects[new_object_id]["posx"] += canvas.getvar(name="gridsize")
-        objects.schematic_objects[new_object_id]["posy"] += canvas.getvar(name="gridsize")
+        # The new objects are "pasted" at a slightly offset position on the canvas
+        objects.schematic_objects[new_object_id]["posx"] += canvasgrid.get()
+        objects.schematic_objects[new_object_id]["posy"] += canvasgrid.get()
         # Create the new drawing objects depending on object type
         if objects.schematic_objects[new_object_id]["item"] == objects.object_type.line:
-            objects.schematic_objects[new_object_id]["endx"] += canvas.getvar(name="gridsize")
-            objects.schematic_objects[new_object_id]["endy"] += canvas.getvar(name="gridsize")
+            objects.schematic_objects[new_object_id]["endx"] += canvasgrid.get()
+            objects.schematic_objects[new_object_id]["endy"] += canvasgrid.get()
             # Set the drawing objects to None so they will be created
             objects.schematic_objects[new_object_id]["line"] = None
             objects.schematic_objects[new_object_id]["end1"] = None
@@ -325,16 +311,16 @@ def paste_clipboard_objects(event=None):
             objects.schematic_objects[new_object_id]["bbox"] = None
             # Assign new IDs and Draw the newly created items according to object type
             if objects.schematic_objects[new_object_id]["item"] == objects.object_type.signal:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_signal_id()
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(signals_common.sig_exists)
                 objects.update_signal_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.point:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_point_id()
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(points.point_exists)
                 objects.update_point_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.section:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_section_id()
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(track_sections.section_exists)
                 objects.update_section_object(new_object_id)
             elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.instrument:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_instrument_id()
+                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(block_instruments.instrument_exists)
                 objects.update_instrument_object(new_object_id)
         # Add the new object to the list of selected objects
         select_object(new_object_id)
@@ -396,7 +382,7 @@ def find_highlighted_line_end(xpos:int,ypos:int):
 #------------------------------------------------------------------------------------
 
 def snap_to_grid(xpos:int,ypos:int):
-    grid_size = canvas.getvar(name="gridsize")
+    grid_size = canvasgrid.get()
     remainderx = xpos%grid_size
     remaindery = ypos%grid_size
     if remainderx < grid_size/2: remainderx = 0 - remainderx
@@ -412,7 +398,7 @@ def snap_to_grid(xpos:int,ypos:int):
 def right_button_click(event,highlighted_object=None):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         # If its an object event then use the ID we've been given for the section button
         # Otherwise find the object at the current cursor position (if there is one)
         if not highlighted_object: highlighted_object = find_highlighted_object(event.x,event.y)
@@ -437,7 +423,7 @@ def left_button_click(event,highlighted_object=None):
     # set keyboard focus for the canvas (so that any key bindings will work)
     canvas.focus_set()
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         if highlighted_object:
             # If its an object event (section button) then find the canvas coordinates
             # relative to the button event coordinates and set "moveobjects"
@@ -490,7 +476,7 @@ def left_button_click(event,highlighted_object=None):
 def left_shift_click(event,highlighted_object=None):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         # If its an object event (section button) then use the object ID we've been given.
         # Otherwise find the object at the current cursor position (if there is one)
         if not highlighted_object:
@@ -511,7 +497,7 @@ def left_shift_click(event,highlighted_object=None):
 def left_double_click(event,highlighted_object=None):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         # If its an object event (section button) then use the object ID we've been given.
         # Otherwise find the object at the current cursor position (if there is one)
         if not highlighted_object:
@@ -531,7 +517,7 @@ def left_double_click(event,highlighted_object=None):
 def track_cursor(event,object_id=None):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         if schematic_state["moveobjects"]:
             # If its an object event (section button) then use the event coordinates
             # associated with the button event - else use the normal canvas coordinates
@@ -570,7 +556,7 @@ def track_cursor(event,object_id=None):
 def left_button_release(event):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
-    if root.getvar(name="mode") == "Edit":
+    if schematic_state["editingenabled"]:
         if schematic_state["moveobjects"]:
             # Finish the move by snapping all objects to the grid - we only need to work
             # out the xdiff and xdiff for one of the selected objects to get the diff
@@ -605,5 +591,187 @@ def left_button_release(event):
             canvas.itemconfigure(schematic_state["selectbox"],state="hidden")
             schematic_state["selectarea"] = False
     return()
+
+#------------------------------------------------------------------------------------
+# Externally called Function to resize the canvas (called from menubar module)
+#------------------------------------------------------------------------------------
+
+def resize_canvas(width:int, height:int):
+    canvasx.set(width)
+    canvasy.set(height)
+    canvas.config (width=width, height=height, scrollregion=(0,0,width,height))
+    canvas.pack()
+    draw_grid()
+    return()
+
+#------------------------------------------------------------------------------------
+# Externally called Function to get the current canvas size (called from menubar module)
+#------------------------------------------------------------------------------------
+
+def get_canvas_size():
+    width = canvasx.get()
+    height = canvasy.get()
+    return (canvasx.get(), canvasy.get())
+
+#------------------------------------------------------------------------------------
+# Externally called Functions to enable/disable schematic editing (Menubar Mode selection)
+#------------------------------------------------------------------------------------
+
+def enable_editing():
+    global schematic_state
+    schematic_state["editingenabled"] = True
+    canvas.itemconfig("grid",state="normal")
+    for object_id in objects.schematic_objects:
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
+            objects.soft_delete_section(object_id)
+            objects.update_section_object(object_id, edit_mode=True)
+    # Re-pack the subframe containing the "add object" buttons to display it        
+    button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
+    return()
+
+def disable_editing():
+    global schematic_state
+    schematic_state["editingenabled"] = False
+    canvas.itemconfig("grid",state="hidden")
+    deselect_all_objects()
+    # Refresh all the Section objects to make them editable/non-editable depending on the mode
+    for object_id in objects.schematic_objects:
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
+            objects.soft_delete_section(object_id)
+            objects.update_section_object(object_id, edit_mode=False)
+    # Forget the subframe containing the "add object" buttons to hide it
+    button_frame.forget()
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal Callback function up for Track Occupancy Sections events - we need to use
+# this in place of the canvas callbacks as the Section Objects are Button Objects
+#------------------------------------------------------------------------------------
+
+def section_event_callback(event, object_id, event_id):
+    if event_id == 0: track_cursor(event,object_id)
+    elif event_id == 1: left_button_click(event,object_id)
+    elif event_id == 2: right_button_click(event,object_id)
+    elif event_id == 3: left_shift_click(event,object_id)
+    elif event_id == 4: left_button_release(event) # Note Obj ID not needed here
+    elif event_id == 5: left_double_click(event,object_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Externally Called Initialisation function for the Canvas object (returns canvas)
+#------------------------------------------------------------------------------------
+
+def create_canvas (root_window):
+    global root, canvas, popup1, popup2
+    global canvasx, canvasy, canvasgrid
+    global button_frame, canvas_border
+    global button_images
+    root = root_window
+    # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
+    frame = Frame(root_window)
+    frame.pack (expand=True, fill=BOTH)    
+    # Create a subframe to hold the canvas and scrollbars
+    canvas_frame = Frame(frame, borderwidth=1)
+    canvas_frame.pack(side=RIGHT, expand=True, fill=BOTH)
+    # Create a subframe to hold the "add" buttons
+    button_frame = Frame(frame, borderwidth=1)
+    button_frame.pack(side=RIGHT, expand=True, fill=BOTH)
+    # Default values for the canvas
+    canvas_width = 1000
+    canvas_height = 500
+    canvas_grid = 25
+    # Create the canvas and scrollbars inside the parentframe
+    canvas = Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
+    hbar = Scrollbar(canvas_frame, orient=HORIZONTAL)
+    hbar.pack(side=BOTTOM, fill=X)
+    hbar.config(command=canvas.xview)
+    vbar = Scrollbar(canvas_frame, orient=VERTICAL)
+    vbar.pack(side=RIGHT, fill=Y)
+    vbar.config(command=canvas.yview)
+    canvas.config(width=canvas_width, height=canvas_height)
+    canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+    canvas.pack(side=LEFT, expand=True, fill=BOTH)
+    # configure the Tkinter Intvars for width, height and grid size
+    canvasx = IntVar(canvas, value = canvas_width, name="canvasx")
+    canvasy = IntVar(canvas, value = canvas_height, name="canvasy") 
+    canvasgrid = IntVar(canvas, value = canvas_grid, name="canvasgrid")
+    # Bind the Canvas mouse and button events to the various callback functions
+    canvas.bind("<Motion>", track_cursor)
+    canvas.bind('<Button-1>', left_button_click)
+    canvas.bind('<Button-2>', right_button_click)
+    canvas.bind('<Button-3>', right_button_click)
+    canvas.bind('<Shift-Button-1>', left_shift_click)
+    canvas.bind('<ButtonRelease-1>', left_button_release)
+    canvas.bind('<Double-Button-1>', left_double_click)
+    # Bind the canvas keypresses to the associated functions
+    canvas.bind('<BackSpace>', delete_selected_objects)
+    canvas.bind('<Delete>', delete_selected_objects)
+    canvas.bind('<Escape>', deselect_all_objects)
+    canvas.bind('<Control-Key-c>', copy_selected_objects)
+    canvas.bind('<Control-Key-v>', paste_clipboard_objects)
+    canvas.bind('r', rotate_selected_objects)
+    # Define the Object Popup menu for Right Click (something selected)
+    popup1 = Menu(tearoff=0)
+    popup1.add_command(label="Copy", command=copy_selected_objects)
+    popup1.add_command(label="Edit", command=edit_selected_object)
+    popup1.add_command(label="Rotate", command=rotate_selected_objects)
+    popup1.add_command(label="Delete", command=delete_selected_objects)
+    # Define the Canvas Popup menu for Right Click (nothing selected)
+    popup2 = Menu(tearoff=0)
+    popup2.add_command(label="Paste", command=paste_clipboard_objects)
+    # Now draw the initial grid
+    draw_grid()
+    # Load the images for the for the "add object" buttons
+    resource_folder = 'model_railway_signals.editor.resources'
+    file_names = ['line','colour_light','semaphore','ground_position','ground_disc',
+                'left_hand_point','right_hand_point','track_section','block_instrument']
+    for file_name in file_names:
+        try:
+            with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
+                button_images[file_name] = PhotoImage(file=file_path)
+        except:
+            logging.error ("Schematic_Editor - Error loading image file '"+file_name+".png'")
+            button_images[file_name]=None
+    # Add The Buttons for creating new objects and adding to the schematic
+    # Note that for enumeration types we pass the "value"
+    button1 = Button (button_frame, image=button_images['line'],
+                      command=lambda:objects.create_default_line_object())
+    button1.pack (padx=2 ,pady=2)
+    button2 = Button (button_frame, image=button_images['colour_light'],
+                      command=lambda:objects.create_default_signal_object
+                          (signals_common.sig_type.colour_light.value,
+                           signals_colour_lights.signal_sub_type.four_aspect.value) )
+    button2.pack (padx=2, pady=2)
+    button3 = Button (button_frame, image=button_images['semaphore'],
+                      command=lambda:objects.create_default_signal_object
+                          (signals_common.sig_type.semaphore.value,
+                           signals_semaphores.semaphore_sub_type.home.value))
+    button3.pack (padx=2, pady=2)
+    button4 = Button (button_frame, image=button_images['ground_position'],
+                      command=lambda:objects.create_default_signal_object
+                          (signals_common.sig_type.ground_position.value,
+                           signals_ground_position.ground_pos_sub_type.standard.value))
+    button4.pack (padx=2, pady=2)
+    button5 = Button (button_frame, image=button_images['ground_disc'],
+                      command=lambda:objects.create_default_signal_object
+                          (signals_common.sig_type.ground_disc.value,
+                           signals_ground_disc.ground_disc_sub_type.standard.value))
+    button5.pack (padx=2, pady=2)
+    button6 = Button (button_frame, image=button_images['left_hand_point'],
+                      command=lambda:objects.create_default_point_object
+                          (points.point_type.LH.value))
+    button6.pack (padx=2, pady=2)
+    button7 = Button (button_frame, image=button_images['right_hand_point'],
+                      command=lambda:objects.create_default_point_object
+                          (points.point_type.RH.value))
+    button7.pack (padx=2, pady=2)
+    button8 = Button (button_frame, image=button_images['track_section'],
+                      command=lambda:objects.create_default_section_object
+                          (section_event_callback))
+    button8.pack (padx=2, pady=2)
+    button9 = Button (button_frame, image=button_images['block_instrument'], compound=TOP,
+                      command=lambda:objects.create_default_instrument_object())
+    button9.pack (padx=2, pady=2)
+    return(canvas)
 
 ####################################################################################

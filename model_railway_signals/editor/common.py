@@ -166,6 +166,7 @@ class dcc_address_entry_box:
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_window,False)
         self.selection = BooleanVar(parent_window,False)
+        # Flag to track whether entry box is enabled/disabled
         self.enabled = BooleanVar(parent_window,True)
         # Create the entry box, event bindings and associated tooltip
         self.EB = Entry(parent_window, width=4, textvariable=self.entry)
@@ -286,29 +287,32 @@ class selection_buttons:
         self.value = IntVar(parent_window,0)
         # This is the external callback to make when a selection is made
         self.callback = callback
+        # Create a subframe (so the buttons are centered)
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
         # Only create as many buttons as we need
         if b1 is not None:
-            self.B1 = Radiobutton(self.frame, text=b1, anchor='w',
+            self.B1 = Radiobutton(self.subframe, text=b1, anchor='w',
                 command=self.updated, variable=self.value, value=1)
             self.B1.pack(side=LEFT, padx=2, pady=2)
             self.B1.TT = CreateToolTip(self.B1, tool_tip)
         if b2 is not None:
-            self.B2 = Radiobutton(self.frame, text=b2, anchor='w',
+            self.B2 = Radiobutton(self.subframe, text=b2, anchor='w',
                 command=self.updated, variable=self.value, value=2)
             self.B2.pack(side=LEFT, padx=2, pady=2)
             self.B2.TT = CreateToolTip(self.B2, tool_tip)
         if b3 is not None:
-            self.B3 = Radiobutton(self.frame, text=b3, anchor='w',
+            self.B3 = Radiobutton(self.subframe, text=b3, anchor='w',
                 command=self.updated, variable=self.value, value=3)
             self.B3.pack(side=LEFT, padx=2, pady=2)
             self.B3.TT = CreateToolTip(self.B3, tool_tip)
         if b4 is not None:
-            self.B4 = Radiobutton(self.frame, text=b4, anchor='w',
+            self.B4 = Radiobutton(self.subframe, text=b4, anchor='w',
                 command=self.updated, variable=self.value, value=4)
             self.B4.pack(side=LEFT, padx=2, pady=2)
             self.B4.TT = CreateToolTip(self.B4, tool_tip)
         if b5 is not None:
-            self.B5 = Radiobutton(self.frame, text=b5, anchor='w', 
+            self.B5 = Radiobutton(self.subframe, text=b5, anchor='w', 
                 command=self.updated, variable=self.value, value=5)
             self.B5.pack(side=LEFT, padx=2, pady=2)
             self.B5.TT = CreateToolTip(self.B5, tool_tip)
