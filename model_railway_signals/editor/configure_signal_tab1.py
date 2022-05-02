@@ -28,9 +28,9 @@ from ..library import signals_ground_disc
 #------------------------------------------------------------------------------------
 
 class general_settings:
-    def __init__(self, parent_window):
+    def __init__(self, parent_frame):
         # Create a Label frame to hold the general settings
-        self.frame = LabelFrame(parent_window,text="General configuration")
+        self.frame = LabelFrame(parent_frame,text="General configuration")
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the Tkinter Boolean vars to hold the values
         self.rotated = BooleanVar(self.frame,False)
@@ -82,177 +82,149 @@ class general_settings:
 
 #------------------------------------------------------------------------------------
 # Classes for a Signal Sensor Entry Box UI Element
-# Class instance functions to use externally are:
+# Class instance objects inherited from the parent class are:
+#    "EB_EB" - the tkinter entry box (to enable/disable it)
+#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
+# Class instance methods which override the parent class method are:
 #    "enable" - disables/blanks the checkbox and entry box 
 #    "disable"  enables/loads the entry box and entry box
 #    "validate" - validate the current entry box value and return True/false
-#    "set_value" - will set the current value [selected, gpio-port]
-#    "get_value" - will return the last "valid" value [selected, gpio-port]
+#    "set_value" - will set the current value [selected:bool, gpio-port:int]
+#    "get_value" - will return the last "valid" value [selected:bool, gpio-port:int]
 #------------------------------------------------------------------------------------
 
-class signal_sensor:
-    def __init__(self, parent_window, parent_object, callback, text, tooltip):
+class signal_sensor (common.entry_box):
+    def __init__(self, parent_frame, parent_object, callback, text, tooltip):
         # We need the reference to the parent object so we can call the sibling
         # class method to get the current value of the Signal ID for validation
         self.parent_object = parent_object
         self.callback = callback
-        self.parent_window = parent_window
-        self.state = BooleanVar(parent_window,False)
-        self.initial_state = BooleanVar(parent_window,False)
-        self.value = StringVar(parent_window,"")
-        self.entry = StringVar(parent_window,"")
-        self.initial_value = StringVar(parent_window,"")
+        # Create the tkinter vars for the checkbutton
+        self.state = BooleanVar(parent_frame, False)
+        self.initial_state = BooleanVar(parent_frame, False)
         # Create the checkbutton and tooltip
-        self.CB = Checkbutton(parent_window, text=text,
-                    variable=self.state, command=self.selection_updated)
+        self.CB = Checkbutton(parent_frame, text=text, variable=self.state, 
+                               command=self.selection_updated)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.CBTT = common.CreateToolTip(self.CB, tooltip)
-        # Create the GPIO Port entry box and tooltip
-        self.EB = Entry(parent_window, width = 4, textvariable = self.entry)
-        self.EB.pack(side=LEFT, padx=2, pady=2) 
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
-        self.EBTT = common.CreateToolTip(self.EB, "Specify a GPIO channel "+
-                                            "in the range of 4-13 or 16-26")
-        
-    def entry_box_updated(self,event):
-        self.validate()
-        if event.keysym == 'Return': self.parent_window.focus()
-        self.callback()
-        return()
-    
-    def entry_box_cancel(self,event):
-        self.entry.set(self.value.get())
-        self.validate()
-        self.parent_window.focus()
-        self.callback()
-        return()
-
+        # Call the common base class init function to create the EB
+        super().__init__(frame, width=3)        
+                
     def selection_updated(self):
-        if self.state.get():
-            self.EB.config(state="normal")
-            self.entry.set(self.value.get())
-        else:
-            self.EB.config(state='disabled')
-            self.entry.set("")
+        if self.state.get(): super().enable()
+        else: super().disable()
             
     def validate(self):
         valid = True
-        if self.entry.get() != "":
+        if self.eb_entry.get() != "":
             try:
-                new_channel = int(self.entry.get())
+                new_channel = int(self.eb_entry.get())
             except:
-                self.EBTT.text = "Not a valid integer"
+                self.EB_TT.text = "Not a valid integer"
                 valid = False
             else:
                 if new_channel < 4 or new_channel > 26 or new_channel == 14 or new_channel == 15:
-                    self.EBTT.text = ("GPIO Channel must be in the range of 4-13 or 16-26")
+                    self.EB_TT.text = ("GPIO Channel must be in the range of 4-13 or 16-26")
                     valid = False
                 else:
                     # Test to see if the gpio channel is already assigned to another signal
-                    if self.initial_value.get() == "": current_channel = 0
-                    else: current_channel = int(self.initial_value.get())
+                    if self.eb_initial_value.get() == "": current_channel = 0
+                    else: current_channel = int(self.eb_initial_value.get())
                     for obj in objects.schematic_objects:
                         if ( objects.schematic_objects[obj]["item"] == objects.object_type.signal and
-                             objects.schematic_objects[obj]["itemid"] != self.parent_object.sigid.get_initial_value() and
+                             objects.schematic_objects[obj]["itemid"] != int(self.parent_object.sigid.get_initial_value()) and
                              ( objects.schematic_objects[obj]["passedsensor"][1] == new_channel or
                                objects.schematic_objects[obj]["approachsensor"][1] == new_channel ) ):
-                            self.EBTT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
+                            self.EB_TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
                                             +str(objects.schematic_objects[obj]["itemid"]))
                             valid = False                    
         if valid:
-            self.value.set(self.entry.get())
-            self.EB.config(fg='black')
-            self.EBTT.text = ("Specify a GPIO channel in the range of 4-13 or 16-26")
-        else:
-            self.EB.config(fg='red')
-        return(valid)
+            self.eb_value.set(self.eb_entry.get())
+            unique = self.callback()
+        if valid and unique:
+            self.EB_TT.text = ("Specify a GPIO channel in the range of 4-13 or 16-26")
+        return(valid and unique)
 
     def enable(self):
         self.CB.config(state="normal")
-        self.EB.config(state="normal")
-        self.entry.set(self.value.get())
         self.state.set(self.initial_state.get())
         self.selection_updated()
-        self.validate()
               
     def disable(self):
         self.CB.config(state="disabled")
-        self.EB.config(state="disabled")
-        self.entry.set("")
         self.state.set(False)
+        super().disable()
         
     def set_value(self, signal_sensor:[bool,int]):
         # A GPIO Selection comprises [Selected, GPIO_Port]
-        if signal_sensor[1] == 0:
-            self.value.set("")
-            self.entry.set("")
-            self.initial_value.set("")
-        else:
-            self.value.set(str(signal_sensor[1]))
-            self.initial_value.set(str(signal_sensor[1]))
-            self.entry.set(str(signal_sensor[1]))
+        if signal_sensor[1] == 0: super().set_value("")
+        else: super().set_value(str(signal_sensor[1]))
         self.state.set(signal_sensor[0])
         self.initial_state.set(signal_sensor[0])
         self.selection_updated()
-        self.validate()
         
     def get_value(self):
         # Returns a 2 element list of [selected, GPIO_Port]
-        if self.value.get() == "": return( [ self.state.get(), 0 ] )
-        else: return( [ self.state.get(), int(self.value.get()) ] )
+        if  super().get_value() == "": return( [self.state.get(), 0] )
+        else: return( [self.state.get(), int(super().get_value())] )
     
 #------------------------------------------------------------------------------------
 # Class for the Signal Passed and Signal Approach events / Sensors
 # Uses multiple instances of the signal_sensor class above
-#    "validate" - validate the current entry box values and return True/false
 #    "passed.enable" - disables/blanks the checkbox and entry box 
 #    "passed.disable"  enables/loads the entry box and entry box
-#    "passed.set_value" - will set the current value (selection, gpio-port)
-#    "passed.get_value" - will return the last "valid" value (selection, gpio-port)
+#    "passed.set_value" - will set the current value [enabled:bool, gpio-port:int]
+#    "passed.get_value" - will return the last "valid" value [enabled:bool, gpio-port:int]
 #    "approach.enable" - disables/blanks the checkbox and entry box 
 #    "approach.disable" - enables/loads the checkbox and entry box
-#    "approach.set_value" - will set the current value [enabled/disabled, gpio-port]
-#    "approach.get_value" - returns the last "valid" value [enabled/disabled, gpio-port]
+#    "approach.set_value" - will set the current value [enabled:bool, gpio-port:int]
+#    "approach.get_value" - returns the last "valid" value [enabled:bool, gpio-port:int]
+# Class instance methods which override the parent class method are:
+#    "validate" - validate both entry box values and return True/false
 #------------------------------------------------------------------------------------
 
 class signal_sensors:
-    def __init__(self, parent_window, parent_object):
+    def __init__(self, parent_frame, parent_object):
         # The child class instances need the reference to the parent object so they can call
         # the sibling class method to get the current value of the Signal ID for validation
-        self.frame = LabelFrame(parent_window, text="Signal sensors and associated GPIO ports")
+        self.frame = LabelFrame(parent_frame, text="Signal sensors and associated GPIO ports")
         self.frame.pack(padx=5, pady=5, fill='x')
         # Create the elements in a subframe so they are centered
         self.subframe = Frame(self.frame)
         self.subframe.pack()
-        self.passed = signal_sensor(self.subframe, parent_object, self.validate, "Signal passed button", 
+        self.passed = signal_sensor(self.subframe, parent_object, self.check_unique, "Signal passed button", 
                     "Select to add a 'signal passed' button (and optionally linked GPIO sensor)")
-        self.approach = signal_sensor(self.subframe, parent_object, self.validate, "Signal release button",
+        self.approach = signal_sensor(self.subframe, parent_object, self.check_unique, "Signal release button",
                     "Select to add a 'signal released' button (and optionally linked GPIO sensor)")
         
-    def validate(self):
-        valid = self.passed.validate() and self.approach.validate()
-        if self.passed.get_value()[1] > 0 and self.passed.get_value()[1] == self.approach.get_value()[1]:
-            self.passed.EB.config(fg='red')
-            self.passed.EBTT.text = "GPIO channels for signal passed and signal release must be different"
-            self.approach.EB.config(fg='red')
-            self.approach.EBTT.text = "GPIO channels for signal passed and signal release must be different"
+    def check_unique(self):
+        if self.passed.eb_entry.get() != "" and self.passed.eb_entry.get() == self.approach.eb_entry.get():
+            self.passed.EB_EB.config(fg='red')
+            self.passed.EB_TT.text = "GPIO channels for signal passed and signal release must be different"
+            self.approach.EB_EB.config(fg='red')
+            self.approach.EB_TT.text = "GPIO channels for signal passed and signal release must be different"
             valid = False
+        else:
+            self.passed.EB_EB.config(fg='black')
+            valid = True
         return(valid)
+
+    def validate(self):
+        return(self.passed.validate() and self.approach.validate())
     
 #------------------------------------------------------------------------------------
 # Class for a semaphore route arm element (comprising checkbox and DCC entry Box)
 # Uses the base dcc_address_entry_box class from common.py
-# Class instance functions to use externally are:
-#    "validate" - validate the current entry box values and return True/false
+# Class instance methods inherited from the parent class are:
+#    "validate" - validate the current DCC entry box value and return True/false
+# Class instance methods which override the parent class method are:
 #    "enable" - disables/blanks the checkbox and entry box
 #    "disable" - enables/loads the checkbox and entry box
 #    "set_element" - will set the element [enabled/disabled, address]
 #    "get_element" - returns the last "valid" value [enabled/disabled, address]
 #------------------------------------------------------------------------------------
 
-class semaphore_route_element:
+class semaphore_route_element (common.dcc_address_entry_box):
     # The basic element comprising checkbox and DCC address entry box
     def __init__(self, parent_frame, callback, name, tooltip):
         self.callback = callback
@@ -260,25 +232,22 @@ class semaphore_route_element:
         # Used for validation - if disabled then the entries are always valid
         self.selection_enabled = True
         # Create the tkinter variables for the check box
-        self.state = BooleanVar(parent_frame, False)
-        self.initial_state = BooleanVar(parent_frame, False)
+        self.selection = BooleanVar(parent_frame, False)
+        self.initial_selection = BooleanVar(parent_frame, False)
         # Create the checkbox and tooltip
-        self.CB = Checkbutton(parent_frame, text=name, variable=self.state,
+        self.CB = Checkbutton(parent_frame, text=name, variable=self.selection,
                                    command=self.selection_updated)
         self.CB.pack(side=LEFT)
-        self.CBTT = common.CreateToolTip(self.CB, tooltip)
-        # Create an instance of the DCC entry box class (without the state button)
-        self.dcc = common.dcc_address_entry_box(parent_frame, False)
+        self.CB_TT = common.CreateToolTip(self.CB, tooltip)
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame)
         
     def selection_updated(self, make_callback=True):
-        if self.state.get(): self.dcc.enable()
-        else: self.dcc.disable()
+        if self.selection.get(): super().enable()
+        else: super().disable()
         if make_callback: self.callback()
         return()
-    
-    def validate(self):
-        return(self.dcc.validate())
-    
+        
     def enable(self):
         self.CB.config(state="normal")
         self.selection_enabled = True
@@ -286,20 +255,20 @@ class semaphore_route_element:
     
     def disable(self):
         self.CB.config(state="disabled")
-        self.state.set(False)
+        self.selection.set(False)
         self.selection_enabled = False
         self.selection_updated(make_callback=False)
         
-    def set_element(self, signal_arm):
+    def set_element(self, signal_arm:[bool,int]):
         # Each signal element comprises [enabled/disabled, address]
-        self.state.set(signal_arm[0])
-        self.initial_state.set(signal_arm[0])
-        self.dcc.set_value([signal_arm[1], False])
+        self.selection.set(signal_arm[0])
+        self.initial_selection.set(signal_arm[0])
+        super().set_value([signal_arm[1], False])
         self.selection_updated(make_callback=False)
         
     def get_element(self):
         # Each signal element comprises [enabled/disabled, address]
-        return( [self.state.get(), self.dcc.get_value()[0] ] )
+        return( [self.selection.get(), super().get_value()[0]] )
     
 #------------------------------------------------------------------------------------
 # Class for a semaphore route arm group (comprising main, subsidary, and distant arms)
@@ -331,10 +300,8 @@ class semaphore_route_group:
         
     def update_dist_selections(self):
         # Distant route arms can only be associated with a main home signal arm
-        if self.sig.get_element()[0]:
-            self.dist.enable()
-        else:
-            self.dist.disable()
+        if self.sig.get_element()[0]: self.dist.enable()
+        else: self.dist.disable()
         self.callback()
 
     def validate(self):
@@ -350,7 +317,7 @@ class semaphore_route_group:
         self.sub.disable()
         self.dist.disable()
         
-    def set_group(self, signal_elements):
+    def set_group(self, signal_elements:[[bool,int],]):
         # Signal Group comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
         self.sig.set_element(signal_elements[0])
@@ -379,10 +346,10 @@ class semaphore_route_group:
 #------------------------------------------------------------------------------------
 
 class semaphore_route_frame:
-    def __init__(self, parent_window, callback):
+    def __init__(self, parent_frame, callback):
         # Create a frame for this UI element. We don't pack this element
         # as the frame gets packed/unpacked depending on UI selections
-        self.frame = LabelFrame(parent_window, text="Semaphore Signal Arms and DCC Addresses")
+        self.frame = LabelFrame(parent_frame, text="Semaphore Signal Arms and DCC Addresses")
         # Create the individual UI elements for each route (sign, sub, dist)
         self.main = semaphore_route_group(self.frame, callback, "Main")
         self.lh1 = semaphore_route_group(self.frame, callback, "LH1")
@@ -390,7 +357,7 @@ class semaphore_route_frame:
         self.rh1 = semaphore_route_group(self.frame, callback, "RH1")
         self.rh2 = semaphore_route_group(self.frame, callback, "RH2")
         # The signal arm for the main route cannot be deselected
-        self.main.sig.disable()
+        self.main.sig.CB.config(state="disabled")
              
     def validate(self):
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate()
@@ -438,7 +405,7 @@ class semaphore_route_frame:
         self.rh1.sub.disable()
         self.rh2.sub.disable()
 
-    def set_arms(self, signal_arms):
+    def set_arms(self, signal_arms:[[[bool,int],],]):
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
@@ -471,12 +438,13 @@ class semaphore_route_frame:
 #------------------------------------------------------------------------------------
 
 class dcc_entry_boxes:
-    def __init__(self, parent_window):
-        self.dcc1 = common.dcc_address_entry_box(parent_window,True)
-        self.dcc2 = common.dcc_address_entry_box(parent_window,True)
-        self.dcc3 = common.dcc_address_entry_box(parent_window,True)
-        self.dcc4 = common.dcc_address_entry_box(parent_window,True)
-        self.dcc5 = common.dcc_address_entry_box(parent_window,True)
+    def __init__(self, parent_frame):
+        self.dcc1 = common.dcc_address_entry_box(parent_frame,True)
+        self.dcc2 = common.dcc_address_entry_box(parent_frame,True)
+        self.dcc3 = common.dcc_address_entry_box(parent_frame,True)
+        self.dcc4 = common.dcc_address_entry_box(parent_frame,True)
+        self.dcc5 = common.dcc_address_entry_box(parent_frame,True)
+        
     def validate_addresses(self):
         return ( self.dcc1.validate() and
                  self.dcc2.validate() and
@@ -534,7 +502,7 @@ class dcc_entry_boxes:
 #------------------------------------------------------------------------------------
 
 class dcc_entry_element(dcc_entry_boxes):
-    def __init__(self, parent_window, callback, width, label, feathers=False,
+    def __init__(self, parent_frame, callback, width, label, feathers=False,
                          theatre=False, enable_addresses_on_selection=False):
         self.callback = callback
         # If being used for a route, the MAIN and DARK entry elements will always have
@@ -542,7 +510,7 @@ class dcc_entry_element(dcc_entry_boxes):
         # Other DCC address entries will only be enabled if the CB/EB is selected
         self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create a label frame for this UI element
-        self.frame = Frame(parent_window)
+        self.frame = Frame(parent_frame)
         self.frame.pack()
         # This flag tracks whether the Theatre character is enabled/disabled
         # Used for validation - if disabled then the entries are always valid
@@ -551,39 +519,30 @@ class dcc_entry_element(dcc_entry_boxes):
         self.label = Label(self.frame, width=width, text=label, anchor='w')
         self.label.pack(side=LEFT)
         # Create the tkinter variables for the entry box and check box
-        self.state = BooleanVar(parent_window,False)
-        self.value = StringVar(parent_window,"")
-        self.entry = StringVar(parent_window,"")
+        self.selection = BooleanVar(self.frame,False)
+        self.state = BooleanVar(self.frame,False)
+        self.value = StringVar(self.frame,"")
+        self.entry = StringVar(self.frame,"")
         # Create the optional elements - Checkbox or Entry Box
-        if feathers:
-            self.CB = Checkbutton(self.frame, variable=self.state, command=self.selection_updated)
-            self.CB.pack(side=LEFT)
-            self.CBTT = common.CreateToolTip(self.CB, "Select to create a " +
-                                             " feather indication for this route")
-        else: 
-            self.CB = None
-        if theatre:
-            self.EB = Entry(self.frame, width=2, textvariable=self.entry)
-            self.EB.pack(side=LEFT)
-            self.EB.bind('<Return>',self.entry_box_updated)
-            self.EB.bind('<Escape>',self.entry_box_cancel)
-            self.EB.bind('<FocusOut>',self.entry_box_updated)
-            self.EBTT = common.CreateToolTip(self.EB, "Specify the character " +
-                                             "to be displayed for this route")
-        else:
-            self.EB = None
+        self.CB = Checkbutton(self.frame, variable=self.state, command=self.selection_updated)
+        self.CBTT = common.CreateToolTip(self.CB, "Select to create a " +
+                                        " feather indication for this route")
+        if feathers: self.CB.pack(side=LEFT)
+        self.EB = Entry(self.frame, width=2, textvariable=self.entry)
+        self.EB.bind('<Return>',self.entry_box_updated)
+        self.EB.bind('<Escape>',self.entry_box_cancel)
+        self.EB.bind('<FocusOut>',self.entry_box_updated)
+        self.EBTT = common.CreateToolTip(self.EB, "Specify the character " +
+                                        "to be displayed for this route")
+        if theatre: self.EB.pack(side=LEFT)
         # Call the init function of the class we are inheriting from
-        dcc_entry_boxes.__init__(self, self.frame)
+        super().__init__(self.frame)
         
     def selection_updated(self):
         # Enable/disable the DCC entry boxes if enabled for this DCC entry element
         if self.enable_addresses_on_selection:
-            if self.CB is not None:
-                if self.state.get(): self.enable_addresses() 
-                else: self.disable_addresses()
-            elif self.EB is not None:
-                if self.entry.get() == "": self.disable_addresses() 
-                else: self.enable_addresses()
+            if self.state.get() or self.entry.get() != "": self.enable_addresses() 
+            else: self.disable_addresses()
         if self.callback is not None: self.callback()
        
     def entry_box_updated(self,event):
@@ -601,7 +560,7 @@ class dcc_entry_element(dcc_entry_boxes):
     def validate(self):
         # If the Elements are disabled (hidden) then they are not applicable to
         # the selected signal type / subtype and configuration - therefore valid
-        if not self.selection_enabled or self.EB is None:
+        if not self.selection_enabled:
             sel_valid = True
         elif len(self.entry.get()) > 1:
             self.EBTT.text = "More than one character has been entered"
@@ -637,15 +596,15 @@ class dcc_entry_element(dcc_entry_boxes):
         return([self.value.get(),self.get_addresses()])
 
     def enable_selection(self):
-        if self.CB is not None: self.CB.config(state="normal")
-        if self.EB is not None: self.EB.config(state="normal")
+        self.CB.config(state="normal")
+        self.EB.config(state="normal")
         self.entry.set(self.value.get())
         self.selection_enabled = True
         self.selection_updated()
         
     def disable_selection(self):
-        if self.CB is not None: self.CB.config(state="disabled")
-        if self.EB is not None: self.EB.config(state="disabled")
+        self.CB.config(state="disabled")
+        self.EB.config(state="disabled")
         self.disable_addresses()
         self.selection_enabled = False
         
@@ -660,10 +619,10 @@ class dcc_entry_element(dcc_entry_boxes):
 #------------------------------------------------------------------------------------
 
 class colour_light_aspects:
-    def __init__(self,parent_window):
+    def __init__(self, parent_frame):
         # Create a label frame for this UI element. We don't pack this element
         # as the frame gets packed/unpacked depending on UI selections
-        self.frame = LabelFrame(parent_window,
+        self.frame = LabelFrame(parent_frame,
                 text="DCC commands for Colour Light signal aspects")
         # Create the DCC Entry Elements for the main signal Aspects
         self.red = dcc_entry_element(self.frame, None, 15, "Danger")
@@ -676,7 +635,7 @@ class colour_light_aspects:
         self.subframe = Frame(self.frame)
         self.subframe.pack()
         # Add the selection for a subsidary signal
-        self.has_subsidary = BooleanVar(parent_window,False)
+        self.has_subsidary = BooleanVar(self.frame,False)
         self.CB = Checkbutton(self.subframe, variable=self.has_subsidary,
                               text="Subsidary signal", command=self.sub_update)
         self.CB.pack(side=LEFT, padx=2, pady=2)
@@ -746,10 +705,10 @@ class colour_light_aspects:
 #------------------------------------------------------------------------------------
 
 class route_indications:
-    def __init__(self, parent_window, callback, frame_label:str, feathers:bool=False, theatre:bool=False):
+    def __init__(self, parent_frame, callback, frame_label:str, feathers:bool=False, theatre:bool=False):
         # Create a label frame for the route selections. We don't pack this element
         # as the frame gets packed/unpacked depending on UI selections
-        self.frame = LabelFrame(parent_window, text=frame_label)
+        self.frame = LabelFrame(parent_frame, text=frame_label)
         # Create the individual route selection elements
         self.dark = dcc_entry_element(self.frame, callback, 5, "(Dark)", feathers, theatre, False)
         self.main = dcc_entry_element(self.frame, callback , 5, "MAIN", feathers, theatre, False)
@@ -760,7 +719,7 @@ class route_indications:
         # Inhibit the Selection box / entry box for the "Dark" aspect - always deselected
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit
-        self.auto_inhibit = BooleanVar(parent_window,False)
+        self.auto_inhibit = BooleanVar(self.frame,False)
         self.CB = Checkbutton(self.frame, variable=self.auto_inhibit, command=self.auto_inhibit_update,
                                 text="Auto inhibit route indications on DANGER")
         self.CB.pack(padx=2, pady=2)
@@ -878,15 +837,15 @@ class route_indications:
 #------------------------------------------------------------------------------------
 
 class signal_configuration_tab:
-    def __init__(self, parent_window, sig_type_updated, sub_type_updated,
+    def __init__(self, parent_frame, sig_type_updated, sub_type_updated,
                 route_type_updated, route_selections_updated, distants_updated):
         # Create a Frame to hold the Sig ID and Signal Type Selections
-        self.frame = Frame(parent_window)
+        self.frame = Frame(parent_frame)
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
         self.sigid = common.object_id_selection(self.frame,"Signal ID",
                         signals_common.sig_exists)
-        # Create the UI Element for Signal Type selection
+        # Create the UI Element for Signal Type selection 
         self.sigtype = common.selection_buttons(self.frame,"Signal Type",
                     "Select signal type",sig_type_updated,"Colour Light",
                         "Ground Pos","Semaphore","Ground Disc")

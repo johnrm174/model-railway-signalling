@@ -8,9 +8,17 @@ from . import common
                 
 #------------------------------------------------------------------------------------
 # Class for a canvas Configuration UI element (width and height)
+# Class instance methods inherited from the parent class are:
+#    "set_value" - set the initial value of the entry box (string) 
+#    "get_value" - get the last "validated" value of the entry box (string) 
+# Class instance variables inherited from the parent class are:
+#    "EB_EB" - the tkinter entry box (to enable/disable it)
+#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
+# Class instance methods which override the parent class method are:
+#    "validate" - validate the current entry box value and return True/false
 #------------------------------------------------------------------------------------
 
-class edit_canvas_element:
+class edit_canvas_element (common.entry_box):
     def __init__(self, parent_window, label, tooltip, minvalue, maxvalue):
         # The default tooltip for the entry box
         self.tooltip = tooltip
@@ -23,40 +31,24 @@ class edit_canvas_element:
         # Element comprises of Label and Entry Box (with tooltip)
         self.label = Label(self.frame, text=label)
         self.label.pack(padx=2,pady=2, side=LEFT)
-        self.entry = StringVar(self.frame)        
-        self.value = StringVar(self.frame)
-        self.EB = Entry(self.frame, width=5, textvariable=self.entry)
-        self.EB.pack(padx=2, pady=2, side=LEFT)
-        self.TT = common.CreateToolTip(self.EB, tooltip)
-        # Bind the Events associated with the Entry Box
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
+        # Call the common base class init function to create the EB
+        super().__init__(self.frame, width=5)
         
     def validate(self):
+        valid = False
         try:
-            width = int(self.entry.get())
+            dimention = int(self.eb_entry.get())
         except:
-            self.TT.text = "Not a valid integer"
+            self.EB_TT.text = "Not a valid integer"
         else:
-            if width < self.min or width > self.max:
-                self.TT.text = ("Out of range - value must be "+
+            if dimention < self.min or dimention > self.max:
+                self.EB_TT.text = ("Out of range - value must be "+
                         "between "+str(self.min)+" and "+str(self.max))
             else:
-                self.EB.config(fg='black')
-                self.TT.text = self.tooltip
-                self.value.set(self.entry.get())
-                return(True)
-        self.EB.config(fg='red')
-        return(False)
-
-    def entry_box_updated(self,event):
-        valid = self.validate()
-        if event.keysym == 'Return': self.frame.focus()
-    
-    def entry_box_cancel(self,event):
-        self.entry.set(self.value.get())
-        self.frame.focus()
+                self.EB_TT.text = self.tooltip
+                self.eb_value.set(self.eb_entry.get())
+                valid = True
+        return(valid)
 
 #------------------------------------------------------------------------------------
 # Class for the Canvas configuration toolbar window
@@ -84,18 +76,14 @@ class edit_canvas_settings:
 
     def load_state(self, parent_object=None):
         width, height = schematic.get_canvas_size()
-        self.width.entry.set(width)
-        self.width.value.set(width)
-        self.height.entry.set(height)
-        self.height.value.set(height)
-        self.width.validate()
-        self.height.validate()
+        self.width.set_value(str(width))
+        self.height.set_value(str(height))
         
     def save_state(self, parent_object, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
         if self.width.validate() and self.height.validate():
-            width, height = self.width.value.get(), self.height.value.get()
-            schematic.resize_canvas(int(width),int(height))
+            width, height = int(self.width.get_value()), int(self.height.get_value())
+            schematic.resize_canvas(width,height)
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
         

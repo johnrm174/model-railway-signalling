@@ -19,39 +19,31 @@ from ..library import block_instruments
 
 #------------------------------------------------------------------------------------
 # Class for an point entry box (comprising "point ID" entry Box and state box)
-# Class instance functions to use externally are:
+# Class instance methods inherited from the parent class are:
+# Class instance variables inherited from the parent class are:
+#    "EB_EB" - the tkinter entry box (to enable/disable it)
+#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
+# Class instance methods which override the parent class method are:
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
 #    "validate" - validate the current entry box values and return True/false
 #    "set_value" - will set the element [point_id, point_state]
 #    "get_value" - returns the last "valid" value [point_id, point_state]
-#    "enable" - enables/loads the entry box
-#    "disable" - disables/clears the enrty box
 #------------------------------------------------------------------------------------
 
-class point_entry_box:
-    def __init__(self, parent_window):
-        # Need the reference to the parent window for focusing away from the EB
-        self.parent = parent_window
-        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
-        # (before validation) and 'value' is the last validated value
-        self.value = StringVar(parent_window,"")
-        self.entry = StringVar(parent_window,"")
+class point_entry_box(common.entry_box):
+    def __init__(self, parent_frame):
+        # Need the reference to the parent fame for focusing away from the EB
+        self.frame = parent_frame
         # Create the tkinter vars for the Point state CB - 'selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_window,False)
         self.selection = BooleanVar(parent_window,False)
-        # Flag to track whether entry box is enabled/disabled
-        self.enabled = BooleanVar(parent_window,True)
-        # Create the entry box, event bindings and associated tooltip
-        self.EB = Entry(parent_window, width=3, textvariable=self.entry)
-        self.EB.pack(side=LEFT)
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
-        self.EBTT = common.CreateToolTip(self.EB, "Specify the points that need "+
-            "to be set and locked before the signal can be cleared for the route")
+        # Call the common base class init function to create the EB
+        super().__init__(frame, width=4)
         # Create the checkbox and associated tool tip
-        self.CB = Checkbutton(parent_window, width=2, indicatoron = False, 
+        self.CB = Checkbutton(self.frame, width=2, indicatoron = False, 
             variable=self.selection, command=self.update_state, state="disabled")
         self.CB.pack(side=LEFT)
         self.defaultbg = self.CB.cget("background")
@@ -65,70 +57,48 @@ class point_entry_box:
         
     def validate(self):
         valid = False
-        if self.entry.get() == "":
+        if self.eb_entry.get() == "":
             self.CB.config(state="disabled", text="", bg=self.defaultbg)
             self.selection.set(False)
             valid = True
         else:
             try:
-                point_id = int(self.entry.get())
+                point_id = int(self.eb_entry.get())
             except:
-                self.EBTT.text = "Not a valid integer"
+                self.EB_TT.text = "Not a valid integer"
             else:
                 if not points.point_exists(point_id):
-                    self.EBTT.text = "Point does not exist"
+                    self.EB_TT.text = "Point does not exist"
                 else:
-                    self.EBTT = common.CreateToolTip(self.EB, "Specify the points that need "+
-                        "to be set and locked before the signal can be cleared for the route")
                     self.CB.config(state="normal", bg="white")
                     self.selection.set(self.state.get())
                     self.update_state()
                     valid = True
         if valid:
-            self.EB.config(fg='black')
-            self.value.set(self.entry.get())
-        else:
-            self.EB.config(fg='red')
+            self.EB_TT.text = ("Specify the points that need to be set and "+
+                            "locked before the signal can be cleared for the route")
+            self.eb_value.set(self.eb_entry.get())
         return(valid)
 
-    def entry_box_updated(self, event):
-        self.validate()
-        if event.keysym == 'Return': self.parent.focus()
-        
-    def entry_box_cancel(self, event):
-        self.entry.set(self.value.get())
-        self.validate()
-        self.parent.focus()
-
     def enable(self):
-        self.EB.config(state="normal")
-        self.entry.set(self.value.get())
-        self.validate()
-        self.state.set(self.selection.get())
-        self.enabled.set(True)
+        self.update_state()        
+        super().enable()
         
     def disable(self):
-        self.EB.config(state="disabled")
-        self.entry.set("")
         self.state.set(False)
-        self.enabled.set(False)
+        super().disable()
         
     def set_value(self, point:[int,bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
-        if point[0] == 0:
-            self.value.set("")
-            self.entry.set("")
-        else:
-            self.value.set(str(point[0]))
-            self.entry.set(str(point[0]))
         self.state.set(point[1])
         self.selection.set(point[1])
-        self.validate()
+        if point[0] == 0: super().set_value("")
+        else: super().set_value(str(point[0]))
         
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
-        if not self.enabled.get() or self.value.get() == "": return([0, False])
-        else: return([int(self.value.get()), self.state.get()]) 
+        if super().get_value() == "": return([0, False])          
+        else: return([int(super().get_value()), self.state.get()])          
 
 #------------------------------------------------------------------------------------
 # Class for an signal entry box (comprising "signal ID" entry Box)

@@ -26,7 +26,7 @@ from ..library import signals_ground_disc
 def load_state(signal):
     object_id = signal.object_id
     # Set the Initial UI state from the current object settings
-    signal.config.sigid.set_value(objects.schematic_objects[object_id]["itemid"])
+    signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
     signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"])
     signal.config.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
@@ -98,7 +98,7 @@ def save_state(signal,close_window):
         # Delete the existing signal object (the signal will be re-created)
         objects.soft_delete_signal(object_id)
         # Update all object configuration settings from the Tkinter variables
-        objects.schematic_objects[object_id]["itemid"] = signal.config.sigid.get_value()
+        objects.schematic_objects[object_id]["itemid"] = int(signal.config.sigid.get_value())
         objects.schematic_objects[object_id]["itemtype"] = signal.config.sigtype.get_value()
         objects.schematic_objects[object_id]["itemsubtype"] = signal.config.subtype.get_value()
         objects.schematic_objects[object_id]["passedsensor"] = signal.config.sensors.passed.get_value()
@@ -375,7 +375,7 @@ def update_tab2_signal_selection_elements(signal):
     # Only pack those elements relevant to the signal type and route type
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and not
          signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value):
-        signal.interlocking.sub.frame.pack(padx=2, pady=2, fill='x')
+        signal.locking.sub.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub.enable()
     elif ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and not
            signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value):
