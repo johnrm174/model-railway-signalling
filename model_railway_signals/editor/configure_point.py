@@ -111,19 +111,14 @@ def save_state(point, close_window:bool):
 #####################################################################################
 
 #------------------------------------------------------------------------------------
-# Common Class for the "Also Switch" Entry Box UI Element
-# Class instance methods inherited from the parent class are:
+# Common Class for the "Also Switch" Entry Box - builds on the Integer Entry Box class
+# Public class instance methods inherited from the parent class(es) are:
 #    "disable" - disables/blanks the entry box (and associated state button)
 #    "enable"  enables/loads the entry box (and associated state button)
-# Class instance variables inherited from the parent class are:
-#    "EB_EB" - the tkinter entry box (to enable/disable it)
-#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
-# Class instance methods which override the parent class method are:
-#    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
-# Validation = The "also switch" point ID must either be not specified or, it
-# must exist, must be different to the Point ID and must be "fully automatic"
+# Public class instance methods overridden by this class are
+#    "validate" - validate the current entry box value and return True/false
 #------------------------------------------------------------------------------------
 
 class also_switch_selection(common.integer_entry_box):
@@ -171,14 +166,6 @@ class also_switch_selection(common.integer_entry_box):
                         valid = False       
         self.set_validation_status(valid)
         return(valid)
-
-    def set_value(self,value:int):
-        if value == 0: super().set_value("")
-        else: super().set_value(value)
-   
-    def get_value(self):
-        if super().get_value() == "": return(0)
-        else: return(super().get_value())          
 
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element
@@ -267,7 +254,7 @@ class general_settings:
                 self.automatic.get(), self.hasfpl.get())
 
 #------------------------------------------------------------------------------------
-# Class for the DCC Address Settings UI Element
+# Class for the DCC Address Settings - builds on the DCC Entry Box class
 # Class instance methods inherited from the parent class are:
 #    "disable" - disables/blanks the entry box (and associated state button)
 #    "enable"  enables/loads the entry box (and associated state button)

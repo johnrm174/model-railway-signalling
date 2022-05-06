@@ -188,11 +188,11 @@ class integer_entry_box(entry_box):
         else: super().set_value(str(value))
 
     def get_value(self):
-        if super().get_value() == "": return("")
+        if super().get_value() == "": return(0)
         else: return(int(super().get_value()))
 
     def get_initial_value(self):
-        if super().get_initial_value() == "": return("")
+        if super().get_initial_value() == "": return(0)
         else: return(int(super().get_initial_value()))
     
 #------------------------------------------------------------------------------------
