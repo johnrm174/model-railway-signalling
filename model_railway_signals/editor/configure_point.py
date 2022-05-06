@@ -17,7 +17,7 @@ from ..library import points
 def load_state(point):
     object_id = point.object_id
     # Set the Initial UI state from the current object settings
-    point.config.pointid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
+    point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
     point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
     point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     # These are the general settings for the point
@@ -45,14 +45,14 @@ def save_state(point, close_window:bool):
         point.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    elif (point.config.pointid.validate() and point.config.alsoswitch.validate()
-                        and point.config.settings.validate() ):
+    elif (point.config.pointid.validate() and point.config.alsoswitch.validate() and
+             point.config.settings.validate() and point.config.dccsettings.validate()):
         # Soft Delete the existing point object (the point will be re-created on "update")
         # We do this here before updating the object in case the pint ID has been changed
         objects.soft_delete_point(object_id)
         # If the ID has been updated then update all references from other layout objects
         old_id = objects.schematic_objects[object_id]["itemid"]
-        new_id = int(point.config.pointid.get_value())
+        new_id = point.config.pointid.get_value()
         if old_id != new_id:
             for obj in objects.schematic_objects:
                 # First we update any other point objects that refer to the current point
@@ -126,7 +126,7 @@ def save_state(point, close_window:bool):
 # must exist, must be different to the Point ID and must be "fully automatic"
 #------------------------------------------------------------------------------------
 
-class also_switch_selection(common.entry_box):
+class also_switch_selection(common.integer_entry_box):
     def __init__(self, parent_frame, parent_object):
         # We need the reference to the parent object so we can call the sibling
         # class method to get the current value of the Point ID for validation
@@ -134,54 +134,51 @@ class also_switch_selection(common.entry_box):
         # Create the Label Frame for the "also switch" entry box
         self.frame = LabelFrame(parent_frame, text="ID of point to 'Also Switch'")
         self.frame.pack(padx=2, pady=2, fill='x')
-        # create a subframe for the DCC entry box (so it is centered)
+        # create a subframe for the entry box (so it is centered)
         self.subframe = Frame(self.frame)
         self.subframe.pack()
         # Call the common base class init function to create the EB
-        super().__init__(self.subframe, width=3)
+        super().__init__(self.subframe, width=3, min_value=1, max_value=99,
+                         tool_tip = "Enter the ID of an existing fully " +
+                         "automatic point to be switched with this point")
         
     def validate(self):
-        valid = True
-        if self.eb_entry.get() != "":
-            try:
-                autoswitch = int(self.eb_entry.get())
-            except:
-                self.EB_TT.text = "Not a valid integer"
+        # Do the basic integer validation first (integer, in range)
+        valid = super().validate(update_validation_status=False)
+        if valid and self.eb_entry.get() != "":
+            autoswitch = int(self.eb_entry.get())
+            # Validate the other point exists, is different to the current
+            # point and that the other pointt is a fully automatic point
+            if not points.point_exists(autoswitch):
+                self.EB_TT.text = "Point does not exist"
+                valid = False
+            elif autoswitch == self.parent_object.pointid.get_value():
+                self.EB_TT.text = "Specified ID is the same ID as the current point"
+                valid = False
+            elif not points.automatic(autoswitch):
+                self.EB_TT.text = "Point "+str(autoswitch)+" is not 'fully automatic'"
                 valid = False
             else:
-                if not points.point_exists(autoswitch):
-                    self.EB_TT.text = "Point does not exist"
-                    valid = False
-                elif autoswitch == int(self.parent_object.pointid.get_value()):
-                    self.EB_TT.text = "Specified point is the same as the current Point ID "
-                    valid = False
-                elif not points.automatic(autoswitch):
-                    self.EB_TT.text = "Point "+str(autoswitch)+" is not 'fully automatic'"
-                    valid = False
-                else:
-                    # Test to see if the entered point is already being autoswitched by another point
-                    if self.eb_initial_value.get() == "": initial_autoswitch = 0
-                    else: initial_autoswitch = int(self.eb_initial_value.get())
-                    for obj in objects.schematic_objects:
-                        if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                             objects.schematic_objects[obj]["alsoswitch"] == autoswitch and
-                             autoswitch != initial_autoswitch ):
-                            self.EB_TT.text = ("Point "+str(autoswitch)+" is already configured to 'also " +
-                                "switch' with point "+str(objects.schematic_objects[obj]["itemid"]))
-                            valid = False
-        if valid:
-            self.EB_TT.text = ("Enter the ID of an existing fully " +
-                        "automatic point to be switched with this point")
-            self.eb_value.set(self.eb_entry.get())
+                # Test to see if the entered point is already being autoswitched by another point
+                if self.eb_initial_value.get() == "": initial_autoswitch = 0
+                else: initial_autoswitch = int(self.eb_initial_value.get())
+                for obj in objects.schematic_objects:
+                    if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
+                         objects.schematic_objects[obj]["alsoswitch"] == autoswitch and
+                         autoswitch != initial_autoswitch ):
+                        self.EB_TT.text = ("Point "+str(autoswitch)+" is already configured to 'also " +
+                            "switch' with point "+str(objects.schematic_objects[obj]["itemid"]))
+                        valid = False       
+        self.set_validation_status(valid)
         return(valid)
 
     def set_value(self,value:int):
         if value == 0: super().set_value("")
-        else: super().set_value(str(value))
+        else: super().set_value(value)
    
     def get_value(self):
         if super().get_value() == "": return(0)
-        else: return(int(super().get_value()))          
+        else: return(super().get_value())          
 
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element
@@ -247,7 +244,7 @@ class general_settings:
             # Ensure the point isn't configured to "auto switch" with another point
             for obj in objects.schematic_objects:
                 if (objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                    objects.schematic_objects[obj]["alsoswitch"] == int(self.parent_object.pointid.get_initial_value())):
+                    objects.schematic_objects[obj]["alsoswitch"] == self.parent_object.pointid.get_initial_value()):
                     self.CB4TT.text = ("Point is configured to be 'also switched' by point " +
                         str(objects.schematic_objects[obj]["itemid"]) + " so must remain 'fully automatic'")
                     self.CB4.config(fg="red")

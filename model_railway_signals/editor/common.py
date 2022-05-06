@@ -7,12 +7,12 @@ from tkinter import *
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
 # https://stackoverflow.com/questions/3221956/how-do-i-display-tooltips-in-tkinter
-# Class instance elements to use externally are:
+# Class instance elements intended for external use are:
 #     "text" - to change the tooltip text (e.g. to show error messages)
 #------------------------------------------------------------------------------------
 
 class CreateToolTip():
-    def __init__(self, widget, text='widget info'):
+    def __init__(self, widget, text:str='widget info'):
         self.waittime = 500     #miliseconds
         self.wraplength = 180   #pixels
         self.widget = widget
@@ -62,49 +62,50 @@ class CreateToolTip():
 
 #------------------------------------------------------------------------------------
 # Common Base Class for an "Entry box" UI Element
-# Class instance methods to use externally are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
+# Public class methods intended for external use:
+#    "disable" - disables/blanks the entry box
+#    "enable"  enables/loads the entry box
 #    "validate" - This gets overridden by the child class function
 #    "set_value" - set the initial value of the entry box (string) 
 #    "get_value" - get the last "validated" value of the entry box (string) 
-#    "get_initial_value" - get the initial value of the entry box (string) 
-# Class objects to access externally are:
-#    "EB_EB" - the tkinter entry box (to enable/disable it)
+#    "get_initial_value" - get the initial value of the entry box (string)
+# Private class methods/objects intended for use by child classes that inherit
+#    "set_validation_status" - Updates the status of the EB
 #    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
+#    "eb_entry" - is the current entry box (may or may not be valid)
+#    "eb_value" - is the validated value of the entry box
+#    "eb_initial_value" - the value first loaded into the entry box
 #------------------------------------------------------------------------------------
 
 class entry_box:
-    def __init__(self, parent_frame, width):
-        # Need the reference to the frame for focusing away from the EB
-        self.frame = parent_frame
-        # Create the tkinter vars for the entry box - 'initial_value' is the original value, 
-        # 'entry' is the "raw" EB value (before validation) and 'value' is the validated value
-        self.eb_entry = StringVar(self.frame, "")
-        self.eb_initial_value = StringVar(self.frame, "")
-        self.eb_value = StringVar(self.frame, "")
+    def __init__(self, parent_frame, width:int, tool_tip:str="", callback=None):
+        self.tool_tip = tool_tip
+        self.eb_callback = callback
+        # Need the frame  reference for when focusing away from the EB
+        self.eb_frame = parent_frame
+        # Create the tkinter vars for the entry box
+        self.eb_entry = StringVar(self.eb_frame, "")
+        self.eb_initial_value = StringVar(self.eb_frame, "")
+        self.eb_value = StringVar(self.eb_frame, "")
         # Flag to track whether entry box is enabled/disabled
-        self.eb_enabled = BooleanVar(self.frame, True)
+        self.eb_enabled = BooleanVar(self.eb_frame, True)
         # Create the entry box, event bindings and associated default tooltip
-        self.EB_EB = Entry(self.frame, width=width, textvariable=self.eb_entry)
+        self.EB_EB = Entry(self.eb_frame, width=width, textvariable=self.eb_entry)
         self.EB_EB.pack(side=LEFT)
         self.EB_EB.bind('<Return>', self.entry_box_updated)
         self.EB_EB.bind('<Escape>', self.entry_box_cancel)
         self.EB_EB.bind('<FocusOut>', self.entry_box_updated)
-        self.EB_TT = CreateToolTip(self.EB_EB)
+        self.EB_TT = CreateToolTip(self.EB_EB, self.tool_tip)
         
-    def entry_box_updated(self, event=None):
-        if self.validate():
-            self.EB_EB.config(fg='black')
-        else:
-            self.EB_EB.config(fg='red')
-        if event is not None and event.keysym == 'Return':
-            self.frame.focus()
+    def entry_box_updated(self, event):
+        self.validate()
+        if event.keysym == 'Return': self.eb_frame.focus()
+        if self.eb_callback is not None: self.eb_callback()
         
     def entry_box_cancel(self, event):
         self.eb_entry.set(self.eb_value.get())
         self.EB_EB.config(fg='black')
-        self.frame.focus()
+        self.eb_frame.focus()
         
     def enable(self):
         self.EB_EB.config(state="normal")
@@ -115,17 +116,25 @@ class entry_box:
     def disable(self):
         self.EB_EB.config(state="disabled")
         self.eb_entry.set("")
-        self.entry_box_updated()
         self.eb_enabled.set(False)
         
     def validate(self):
+        self.set_validation_status(True)
         return(True)
     
+    def set_validation_status(self, valid:bool):
+        if valid:
+            self.EB_EB.config(fg='black')
+            self.EB_TT.text = self.tool_tip
+            self.eb_value.set(self.eb_entry.get())
+        else:
+            self.EB_EB.config(fg='red')
+
     def set_value(self, value:str):
         self.eb_value.set(value)
         self.eb_initial_value.set(value)
         self.eb_entry.set(value)
-        self.entry_box_updated()
+        self.validate()
 
     def get_value(self):
         if not self.eb_enabled.get(): return("")
@@ -135,23 +144,70 @@ class entry_box:
         return(self.eb_initial_value.get())
 
 #------------------------------------------------------------------------------------
-# Common Class for the "Object ID" Entry Box UI Element
-# Class instance methods inherited from the parent class are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
-#    "set_value" - set the initial value of the entry box (string) 
-#    "get_value" - get the last "validated" value of the entry box (string) 
-#    "get_initial_value" - get the initial value of the entry box (string) 
-# Class instance variables inherited from the parent class are:
-#    "EB_EB" - the tkinter entry box (to enable/disable it)
-#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
-# Class instance methods which override the parent class method are:
-#    "validate" - validate the current entry box value and return True/false
-# Validation = Object ID must be a valid integer, must be between 1-99
-# and must not be already assigned to another object of the same type
+# Common Class for an "Integer Entry box" - builds on the base Entry Box class
+# Public class instance methods inherited from the base Entry Box class are:
+#    "disable" - disables/blanks the entry box 
+#    "enable"  enables/loads the entry box 
+# Public class instance methods overridden by this class are
+#    "set_value" - set the initial value of the entry box (int) 
+#    "get_value" - get the last "validated" value of the entry box (int) 
+#    "get_initial_value" - get the initial value of the entry box (int) 
+#    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
-class object_id_selection(entry_box):
+class integer_entry_box(entry_box):
+    def __init__(self, parent_frame, width:int, min_value:int, max_value:int,
+                   tool_tip:str="", callback=None, allow_empty:bool=True):
+        self.eb_allow_empty = allow_empty
+        self.eb_max = max_value
+        self.eb_min = min_value
+        super().__init__(parent_frame, width, tool_tip, callback)
+                
+    def validate(self, update_validation_status=True):
+        valid = False
+        if self.eb_entry.get() == "":
+            # If empty and not allowed then we just reload the last valid value
+            if not self.eb_allow_empty: self.eb_entry.set(self.eb_value.get())
+            valid = True
+        else:
+            try:
+                value = int(self.eb_entry.get())
+            except:
+                self.EB_TT.text = "Not a valid integer"
+            else:
+                if value < self.eb_min or value > self.eb_max:
+                    self.EB_TT.text = ("Value out of range  - enter a value between "+
+                                       str(self.eb_min)+ " and "+str(self.eb_max) )
+                else:
+                    valid = True
+        if update_validation_status: self.set_validation_status(valid)
+        return(valid)
+    
+    def set_value(self, value:int):
+        if value ==0: super().set_value("")
+        else: super().set_value(str(value))
+
+    def get_value(self):
+        if super().get_value() == "": return("")
+        else: return(int(super().get_value()))
+
+    def get_initial_value(self):
+        if super().get_initial_value() == "": return("")
+        else: return(int(super().get_initial_value()))
+    
+#------------------------------------------------------------------------------------
+# Common Class for an "Object ID" Entry Box - builds on the Integer Entry Box class
+# Public class instance methods inherited from the parent class(es) are:
+#    "disable" - disables/blanks the entry box
+#    "enable"  enables/loads the entry box
+#    "set_value" - set the initial value of the entry box (int) 
+#    "get_value" - get the last "validated" value of the entry box (int) 
+#    "get_initial_value" - get the initial value of the entry box (int) 
+# Public class instance methods overridden by this class are
+#    "validate" - Checks whether the entry is a valid Item Id 
+#------------------------------------------------------------------------------------
+
+class object_id_selection(integer_entry_box):
     def __init__(self, parent_frame, label, exists_function):
         # This is the function to call to see if the object already exists
         self.exists_function = exists_function
@@ -159,57 +215,45 @@ class object_id_selection(entry_box):
         self.frame = LabelFrame(parent_frame, text=label)
         self.frame.pack(side=LEFT, padx=2, pady=2)
         # Call the common base class init function to create the EB
-        super().__init__(self.frame, width=3)
-                
+        tool_tip = ("Enter new ID (1-99) \n" + "Once saved/applied any references"+
+                    "to this layout object will be updated in other layout objects")
+        super().__init__(self.frame, 3, 1,99, tool_tip=tool_tip, allow_empty=False)
+        
     def validate(self):
-        valid = False
-        if self.eb_entry.get() == "":
-            self.eb_entry.set("0")
-            self.EB_TT.text = "Out of range (1-99)"
-        else:
-            try:
-                new_id = int(self.eb_entry.get())
-            except:
-                self.EB_TT.text = "Not a valid integer"
-            else:
-                current_id = int(self.eb_initial_value.get())
-                if new_id < 1 or new_id > 99:
-                    self.EB_TT.text = "Out of range (1-99)"
-                elif self.exists_function(new_id) and new_id != current_id:
-                    self.EB_TT.text = "ID already assigned"
-                else:
-                    self.EB_TT.text = ("Enter new ID (1-99) \n" +
-                        "Once saved/applied any references to this layout " +
-                        "object will be updated in other layout objects")
-                    self.eb_value.set(self.eb_entry.get())
-                    valid = True
+        # Do the basic integer validation first (integer, in range, not empty)
+        valid = super().validate(update_validation_status=False)
+        if valid:
+            # Validate that the entered ID is not assigned to another item
+            current_id = int(self.eb_initial_value.get())
+            new_id = int(self.eb_entry.get())
+            if self.exists_function(new_id) and new_id != current_id:
+                self.EB_TT.text = "ID already assigned"
+                valid = False
+        self.set_validation_status(valid)
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Common class for a DCC address entry box UI element
+# Common class for a DCC address entry box - builds on the Integer Entry Box class
 # Can be created with or without a checkbox representing the "state"
-# Class instance methods inherited from the parent class are:
+# Public class instance methods inherited from the parent class(es) are:
 #    "disable" - disables/blanks the entry box (and associated state button)
 #    "enable"  enables/loads the entry box (and associated state button)
-# Class instance variables inherited from the parent class are:
-#    "EB_EB" - the tkinter entry box (to enable/disable it)
-#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
-# Class instance methods which override the parent class method are:
+#    "validate" - validate the current entry box value and return True/false
+# Public class instance methods overridden by this class are
 #    "set_value" - will set the current value [address:int, state:bool]
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
-#    "validate" - validate the current entry box value and return True/false
-# Validation = Address must be a valid integer (or blank) and between 1-2047
 #------------------------------------------------------------------------------------
 
-class dcc_address_entry_box (entry_box):
+class dcc_address_entry_box (integer_entry_box):
     def __init__(self, parent_frame, dcc_state_checkbox=False):
-        # Create the tkinter vars for the DCC state CB - 'dccselection' is the actual CB state
+        # Create the tkinter vars for the DCC state CB - 'dcc_selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'dccstate' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.dcc_state = BooleanVar(parent_frame, False)
         self.dcc_selection = BooleanVar(parent_frame, False)
         # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=5)
+        super().__init__(parent_frame, width=5 , min_value=1, max_value=2047,
+                         tool_tip="Enter a DCC address (1-2047) or leave blank")
         # Create the checkbox and associated tool tip
         self.DCC_CB = Checkbutton(parent_frame, width=3, indicatoron = False, state="disabled",
                              variable=self.dcc_selection, command=self.update_dcc_state)
@@ -232,30 +276,16 @@ class dcc_address_entry_box (entry_box):
             else: self.DCC_CB.configure(text="OFF")
         
     def validate(self):
-        valid = False
-        # If the entry box is empty or disabled then validation will always pass
-        if not self.eb_enabled.get() or self.eb_entry.get() == "":
-            self.EB_TT.text = "Enter a DCC address (1-2047) or leave blank"
-            valid = True
-        else:
-            try:
-                address = int(self.eb_entry.get())
-            except:
-                self.EB_TT.text = "Not a valid integer"
-            else:
-                if address < 1 or address > 2047:
-                    self.EB_TT.text = "DCC Address is out of range (1-2047)"
-                else:
-                    self.EB_TT.text = "Enter a DCC address (1-2047) or leave blank"
-                    self.eb_value.set(self.eb_entry.get())
-                    valid = True
-            self.update_dcc_state()
+        # Do the basic integer validation first (integer, in range)
+        valid = super().validate(update_validation_status=False)
+        self.update_dcc_state()
+        self.set_validation_status(valid)
         return(valid)
         
     def set_value(self, dcc_command:[int, bool]):
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
         if dcc_command[0] == 0: super().set_value("")
-        else: super().set_value(str(dcc_command[0]))
+        else: super().set_value(dcc_command[0])
         self.dcc_state.set(dcc_command[1])
         self.dcc_selection.set(dcc_command[1])
         
@@ -263,7 +293,7 @@ class dcc_address_entry_box (entry_box):
         # Returns a 2 element list of [DCC_Address, DCC_State]
         # If the element is disabled will always return [0,False]
         if super().get_value() == "": return([0, False])          
-        else: return([int(super().get_value()), self.dcc_state.get()])          
+        else: return([super().get_value(), self.dcc_state.get()])          
     
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
