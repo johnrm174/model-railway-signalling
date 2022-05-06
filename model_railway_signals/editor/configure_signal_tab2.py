@@ -38,10 +38,10 @@ class point_entry_box(common.entry_box):
         # Create the tkinter vars for the Point state CB - 'selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
-        self.state = BooleanVar(parent_window,False)
-        self.selection = BooleanVar(parent_window,False)
+        self.state = BooleanVar(parent_frame,False)
+        self.selection = BooleanVar(parent_frame,False)
         # Call the common base class init function to create the EB
-        super().__init__(frame, width=4)
+        super().__init__(parent_frame, width=4)
         # Create the checkbox and associated tool tip
         self.CB = Checkbutton(self.frame, width=2, indicatoron = False, 
             variable=self.selection, command=self.update_state, state="disabled")

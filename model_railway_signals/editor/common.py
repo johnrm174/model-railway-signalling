@@ -110,7 +110,7 @@ class entry_box:
     def enable(self):
         self.EB_EB.config(state="normal")
         self.eb_entry.set(self.eb_value.get())
-        self.entry_box_updated()
+        self.validate()
         self.eb_enabled.set(True)
         
     def disable(self):

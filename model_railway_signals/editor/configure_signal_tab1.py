@@ -108,7 +108,7 @@ class signal_sensor (common.entry_box):
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.CBTT = common.CreateToolTip(self.CB, tooltip)
         # Call the common base class init function to create the EB
-        super().__init__(frame, width=3)        
+        super().__init__(parent_frame, width=3)        
                 
     def selection_updated(self):
         if self.state.get(): super().enable()
@@ -837,10 +837,10 @@ class route_indications:
 #------------------------------------------------------------------------------------
 
 class signal_configuration_tab:
-    def __init__(self, parent_frame, sig_type_updated, sub_type_updated,
+    def __init__(self, parent_tab, sig_type_updated, sub_type_updated,
                 route_type_updated, route_selections_updated, distants_updated):
         # Create a Frame to hold the Sig ID and Signal Type Selections
-        self.frame = Frame(parent_frame)
+        self.frame = Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
         self.sigid = common.object_id_selection(self.frame,"Signal ID",
@@ -850,26 +850,26 @@ class signal_configuration_tab:
                     "Select signal type",sig_type_updated,"Colour Light",
                         "Ground Pos","Semaphore","Ground Disc")
         # Create the UI Element for Signal subtype selection
-        self.subtype = common.selection_buttons(parent_window,"Signal Subtype",
+        self.subtype = common.selection_buttons(parent_tab,"Signal Subtype",
                     "Select signal subtype",sub_type_updated,"-","-","-","-","-")
         # Create the UI Element for the signal general settings
-        self.settings = general_settings(parent_window)
+        self.settings = general_settings(parent_tab)
         # Create the UI Element for the signal aproach/passed sensors
         # Note that the class needs the parent object (to reference siblings)
-        self.sensors = signal_sensors(parent_window, self)
+        self.sensors = signal_sensors(parent_tab, self)
         # Create the Selection buttons for changing the type of the route indication
         # Available selections are configured according to signal type on load
-        self.routetype = common.selection_buttons(parent_window, "Route Indications",
+        self.routetype = common.selection_buttons(parent_tab, "Route Indications",
                     "Select the route indications for the signal", route_type_updated,
                     "None", "Route feathers", "Theatre indicator", "Route arms")
         # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
-        self.aspects = colour_light_aspects(parent_window)
-        self.theatre = route_indications(parent_window, route_selections_updated,
+        self.aspects = colour_light_aspects(parent_tab)
+        self.theatre = route_indications(parent_tab, route_selections_updated,
                 "Theatre route indications and associated DCC commands", theatre=True)
-        self.feathers = route_indications(parent_window, route_selections_updated,
+        self.feathers = route_indications(parent_tab, route_selections_updated,
                 "Feather route indications and associated DCC commands", feathers=True)
         # Create the Checkboxes and Entry Boxes for the Semaphore Route Indications
         # Note the callback to update whether a "distant button" can be selected
-        self.semaphores = semaphore_route_frame(parent_window, distants_updated)
+        self.semaphores = semaphore_route_frame(parent_tab, distants_updated)
         
 #############################################################################################
