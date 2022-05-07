@@ -48,7 +48,7 @@ def save_state(point, close_window:bool):
     elif (point.config.pointid.validate() and point.config.alsoswitch.validate() and
              point.config.settings.validate() and point.config.dccsettings.validate()):
         # Soft Delete the existing point object (the point will be re-created on "update")
-        # We do this here before updating the object in case the pint ID has been changed
+        # We do this here before updating the object in case the pont ID has been changed
         objects.soft_delete_point(object_id)
         # If the ID has been updated then update all references from other layout objects
         old_id = objects.schematic_objects[object_id]["itemid"]
@@ -333,11 +333,11 @@ class point_interlocking_tab:
 #####################################################################################
 
 class edit_point:
-    def __init__(self, parent_window, object_id):
+    def __init__(self, root, object_id):
         # This is the UUID for the object being edited
         self.object_id = object_id
         # Creatre the basic Top Level window
-        self.window = Toplevel(parent_window)
+        self.window = Toplevel(root)
         self.window.title("Point")
         self.window.attributes('-topmost',True)
         # Create the Window tabs

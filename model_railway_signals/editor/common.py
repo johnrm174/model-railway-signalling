@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# These are common classes used across multiple "Object Configuration" UIs
+# These are common classes used across multiple UI Elements
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -236,12 +236,12 @@ class object_id_selection(integer_entry_box):
 # Common class for a DCC address entry box - builds on the Integer Entry Box class
 # Can be created with or without a checkbox representing the "state"
 # Public class instance methods inherited from the parent class(es) are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
 #    "validate" - validate the current entry box value and return True/false
 # Public class instance methods overridden by this class are
 #    "set_value" - will set the current value [address:int, state:bool]
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
 #------------------------------------------------------------------------------------
 
 class dcc_address_entry_box (integer_entry_box):
@@ -275,6 +275,14 @@ class dcc_address_entry_box (integer_entry_box):
             if self.dcc_state.get(): self.DCC_CB.configure(text="ON")
             else: self.DCC_CB.configure(text="OFF")
         
+    def enable(self):
+        super().enable()
+        self.update_dcc_state()
+        
+    def disable(self):
+        super().disable()
+        self.update_dcc_state()
+
     def validate(self):
         # Do the basic integer validation first (integer, in range)
         valid = super().validate(update_validation_status=False)
@@ -284,16 +292,14 @@ class dcc_address_entry_box (integer_entry_box):
         
     def set_value(self, dcc_command:[int, bool]):
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
-        if dcc_command[0] == 0: super().set_value("")
-        else: super().set_value(dcc_command[0])
+        super().set_value(dcc_command[0])
         self.dcc_state.set(dcc_command[1])
         self.dcc_selection.set(dcc_command[1])
         
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
         # If the element is disabled will always return [0,False]
-        if super().get_value() == "": return([0, False])          
-        else: return([super().get_value(), self.dcc_state.get()])          
+        return([super().get_value(), self.dcc_state.get()])          
     
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons

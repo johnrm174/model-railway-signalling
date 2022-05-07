@@ -18,37 +18,34 @@ from ..library import signals_ground_disc
 from ..library import block_instruments
 
 #------------------------------------------------------------------------------------
-# Class for an point entry box (comprising "point ID" entry Box and state box)
-# Class instance methods inherited from the parent class are:
-# Class instance variables inherited from the parent class are:
-#    "EB_EB" - the tkinter entry box (to enable/disable it)
-#    "EB_TT" - The tooltip for the entry box (to change the tooltip text)
-# Class instance methods which override the parent class method are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
-#    "validate" - validate the current entry box values and return True/false
-#    "set_value" - will set the element [point_id, point_state]
-#    "get_value" - returns the last "valid" value [point_id, point_state]
+# Class for an point entry box - Builds on the base Integer Entry Box class
+# Public class instance methods overridden by this class are
+#    "disable" - disables/blanks the entry box 
+#    "enable"  enables/loads the entry box 
+#    "set_value" - set the initial value of the entry box
+#    "get_value" - get the last "validated" value of the entry box
+#    "get_initial_value" - get the initial value of the entry box 
+#    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
-class point_entry_box(common.entry_box):
+class point_entry_box(common.integer_entry_box):
     def __init__(self, parent_frame):
-        # Need the reference to the parent fame for focusing away from the EB
-        self.frame = parent_frame
         # Create the tkinter vars for the Point state CB - 'selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_frame,False)
         self.selection = BooleanVar(parent_frame,False)
         # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=4)
+        super().__init__(parent_frame, width=3, min_value=1, max_value=99,
+                         tool_tip = "Specify the points that need to be set and"+
+                         " locked before the signal can be cleared for the route")
         # Create the checkbox and associated tool tip
-        self.CB = Checkbutton(self.frame, width=2, indicatoron = False, 
+        self.CB = Checkbutton(parent_frame, width=2, indicatoron = False, 
             variable=self.selection, command=self.update_state, state="disabled")
         self.CB.pack(side=LEFT)
         self.defaultbg = self.CB.cget("background")
         self.CBTT = common.CreateToolTip(self.CB, "Select the required state for "+
-                                         "the point (normal/switched)")
+                                         "the point (normal or switched)")
             
     def update_state(self):
         self.state.set(self.selection.get())
@@ -56,28 +53,21 @@ class point_entry_box(common.entry_box):
         else: self.CB.configure(text=u"\u2192")
         
     def validate(self):
-        valid = False
-        if self.eb_entry.get() == "":
+        # Do the basic integer validation first (integer, in range, not empty)
+        valid = super().validate(update_validation_status=False)
+        if valid and self.eb_entry.get() != "":
+            if not points.point_exists(int(self.eb_entry.get())):
+                self.EB_TT.text = "Point does not exist"
+                valid = False
+            # Enable/disable the point selections depending on the state of the EB
+        if not valid or self.eb_entry.get() == "":
             self.CB.config(state="disabled", text="", bg=self.defaultbg)
             self.selection.set(False)
-            valid = True
         else:
-            try:
-                point_id = int(self.eb_entry.get())
-            except:
-                self.EB_TT.text = "Not a valid integer"
-            else:
-                if not points.point_exists(point_id):
-                    self.EB_TT.text = "Point does not exist"
-                else:
-                    self.CB.config(state="normal", bg="white")
-                    self.selection.set(self.state.get())
-                    self.update_state()
-                    valid = True
-        if valid:
-            self.EB_TT.text = ("Specify the points that need to be set and "+
-                            "locked before the signal can be cleared for the route")
-            self.eb_value.set(self.eb_entry.get())
+            self.CB.config(state="normal", bg="white")
+            self.selection.set(self.state.get())
+            self.update_state()
+        self.set_validation_status(valid)
         return(valid)
 
     def enable(self):
@@ -92,174 +82,75 @@ class point_entry_box(common.entry_box):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.state.set(point[1])
         self.selection.set(point[1])
-        if point[0] == 0: super().set_value("")
-        else: super().set_value(str(point[0]))
+        super().set_value(point[0])
         
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
-        if super().get_value() == "": return([0, False])          
-        else: return([int(super().get_value()), self.state.get()])          
+        return([super().get_value(), self.state.get()])          
 
 #------------------------------------------------------------------------------------
-# Class for an signal entry box (comprising "signal ID" entry Box)
-# Class instance functions to use externally are:
-#    "validate" - validate the current entry box values and return True/false
-#    "enable" - enables/loads the entry box
-#    "disable" - disables/clears the enrty box
-#    "set_value" - will set the element [point_id, point_state]
-#    "get_value" - returns the last "valid" value [point_id, point_state]
+# Class for an signal ID entry box - Builds on the base Entry Box class
+# Note that we use the base string EB class to support remote sig IDs
+# Public class instance methods inherited from the parent class are:
+#    "disable" - disables/blanks the entry box 
+#    "enable"  enables/loads the entry box 
+#    "set_value" - set the initial value of the entry box
+#    "get_value" - get the last "validated" value of the entry box
+#    "get_initial_value" - get the initial value of the entry box 
+# Public class instance methods overridden by this class are
+#    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
-class signal_entry_box:
-    def __init__(self, parent_window, parent_object):
+class signal_entry_box(common.entry_box):
+    def __init__(self, parent_frame, parent_object):
         # We need the parent object for accessing the current sig ID entry
         self.parent_object = parent_object
-        # Need the reference to the parent window for focusing away from the EB
-        self.parent = parent_window
-        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
-        # (before validation) and 'value' is the last validated value
-        self.value = StringVar(parent_window,"")
-        self.entry = StringVar(parent_window,"")
-        # Flag to track whether entry box is enabled/disabled
-        self.enabled = BooleanVar(parent_window,True)
-        # Create the entry box, event bindings and associated tooltip
-        self.EB = Entry(parent_window, width=8, textvariable=self.entry)
-        self.EB.pack(side=LEFT)
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
-        self.EBTT = common.CreateToolTip(self.EB, "Enter the ID of the next signal "+
-                "on the specified route - This can be a local signal ID or a "+
-                "remote signal ID (subscribed to via MQTT networking)")
-            
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame, width=6, tool_tip = "Enter the ID of the "+
+                "next signal along the specified route - This can be a local signal "+
+                "or a remote signal (subscribed to via MQTT networking)")
+        
     def validate(self):
         valid = False
-        if self.entry.get() == str(self.parent_object.config.sigid.get_value()):
-            self.EBTT.text = ("Entered signal ID is the same as the current signal ID")
-            self.EB.config(fg='red')
-        elif self.entry.get() == "" or signals_common.sig_exists(self.entry.get()):
+        if self.eb_entry.get() == str(self.parent_object.config.sigid.get_value()):
+            self.EB_TT.text = ("Entered signal ID is the same as the current signal ID")
+        elif self.eb_entry.get() == "" or signals_common.sig_exists(self.eb_entry.get()):
             valid = True
-            self.EBTT = common.CreateToolTip(self.EB, "Enter the ID of the next signal "+
-                    "on the specified route - This can be a local signal ID or a "+
-                    "remote signal ID (subscribed to via MQTT networking)")
-            self.EB.config(fg='black')
-            self.value.set(self.entry.get())
         else:
-            self.EBTT.text = ("Local signal does not exist or "+
-                        "remote signal has not been subscribed to")
-            self.EB.config(fg='red')
+            self.EB_TT.text = ("Local signal does not exist or "+
+                           "remote signal has not been subscribed to")
+        self.set_validation_status(valid)
         return(valid)
 
-    def entry_box_updated(self, event):
-        self.validate()
-        if event.keysym == 'Return': self.parent.focus()
-        
-    def entry_box_cancel(self, event):
-        self.entry.set(self.value.get())
-        self.validate()
-        self.parent.focus()
-
-    def enable(self):
-        self.EB.config(state="normal")
-        self.entry.set(self.value.get())
-        self.validate()
-        self.enabled.set(True)
-        
-    def disable(self):
-        self.EB.config(state="disabled")
-        self.entry.set("")
-        self.validate()
-        self.enabled.set(False)
-        
-    def set_value(self, signal:int):
-        if signal == 0:
-            self.value.set("")
-            self.entry.set("")
-        else:
-            self.value.set(str(signal))
-            self.entry.set(str(signal))
-        self.validate()
-        
-    def get_value(self):
-        if not self.enabled.get() or self.value.get() == "": return(0)
-        else: return(int(self.value.get()))
-
 #------------------------------------------------------------------------------------
-# Class for an signal entry box (comprising "signal ID" entry Box)
-# Class instance functions to use externally are:
-#    "validate" - validate the current entry box values and return True/false
-#    "enable" - enables/loads the entry box
-#    "disable" - disables/clears the enrty box
-#    "set_value" - will set the element [point_id, point_state]
-#    "get_value" - returns the last "valid" value [point_id, point_state]
+# Class for an Instrument entry box - Builds on the base Entry Box class
+# Public class instance methods inherited from the parent class are:
+#    "disable" - disables/blanks the entry box 
+#    "enable"  enables/loads the entry box 
+#    "set_value" - set the initial value of the entry box
+#    "get_value" - get the last "validated" value of the entry box
+#    "get_initial_value" - get the initial value of the entry box 
+# Public class instance methods overridden by this class are
+#    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
-class instrument_entry_box:
-    def __init__(self, parent_window):
-        # Need the reference to the parent window for focusing away from the EB
-        self.parent = parent_window
-        # Create the tkinter vars for the entry box - 'entry' is the "raw" EB value
-        # (before validation) and 'value' is the last validated value
-        self.value = StringVar(parent_window,"")
-        self.entry = StringVar(parent_window,"")
-        # Flag to track whether entry box is enabled/disabled
-        self.enabled = BooleanVar(parent_window,True)
-        # Create the entry box, event bindings and associated tooltip
-        self.EB = Entry(parent_window, width=3, textvariable=self.entry)
-        self.EB.pack(side=LEFT)
-        self.EB.bind('<Return>',self.entry_box_updated)
-        self.EB.bind('<Escape>',self.entry_box_cancel)
-        self.EB.bind('<FocusOut>',self.entry_box_updated)
-        self.EBTT = common.CreateToolTip(self.EB, "Enter the ID of the Block"+
-                                         "Instrument associated with the route")
+class instrument_entry_box(common.integer_entry_box):
+    def __init__(self, parent_frame):
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame, width=3,  min_value=1, max_value=99,
+             tool_tip = "Enter the ID of the block instrument associated with "+
+                       " the next block section along the specified route") 
             
     def validate(self):
-        if self.entry.get() == "" or block_instruments.instrument_exists(self.entry.get()):
-            valid = True
-            self.EBTT = common.CreateToolTip(self.EB, "Enter the ID of the Block"+
-                                         "Instrument associated with the route")
-            self.EB.config(fg='black')
-            self.value.set(self.entry.get())
-        else:
-            valid = False
-            self.EBTT.text = ("Block Instrument doesn't exist")
-            self.EB.config(fg='red')
+        # Do the basic integer validation first (integer, in range, not empty)
+        valid = super().validate(update_validation_status=False)
+        if valid and not self.eb_entry.get() == "":
+            if not block_instruments.instrument_exists(int(self.eb_entry.get())):
+                valid = False
+                self.EB_TT.text = ("Block Instrument doesn't exist")
+        self.set_validation_status(valid)
         return(valid)
-
-    def entry_box_updated(self, event):
-        self.validate()
-        if event.keysym == 'Return': self.parent.focus()
-        
-    def entry_box_cancel(self, event):
-        self.entry.set(self.value.get())
-        self.validate()
-        self.parent.focus()
-
-    def enable(self):
-        self.EB.config(state="normal")
-        self.entry.set(self.value.get())
-        self.validate()
-        self.enabled.set(True)
-        
-    def disable(self):
-        self.EB.config(state="disabled")
-        self.entry.set("")
-        self.validate()
-        self.enabled.set(False)
-        
-    def set_value(self, signal:int):
-        if signal == 0:
-            self.value.set("")
-            self.entry.set("")
-        else:
-            self.value.set(str(signal))
-            self.entry.set(str(signal))
-        self.validate()
-        
-    def get_value(self):
-        if not self.enabled.get() or self.value.get() == "": return(0)
-        else: return(int(self.value.get()))
-        
+                
 #------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 7 points and a signal)
 # Uses the base point_entry_box class from above
@@ -271,6 +162,7 @@ class instrument_entry_box:
 
 class interlocking_route_group: 
     def __init__(self, parent_frame, parent_object, label, subsidary):
+        self.parent_object = parent_object
         self.subsidary = subsidary
         # Create a frame for this UI element
         self.frame = Frame(parent_frame)
@@ -285,19 +177,24 @@ class interlocking_route_group:
         self.p5 = point_entry_box(self.frame)
         self.p6 = point_entry_box(self.frame)
         self.p7 = point_entry_box(self.frame)
-        if not self.subsidary:
-            self.label = Label(self.frame, text=" Sig:")
-            self.label.pack(side = LEFT)
-            self.sig = signal_entry_box(self.frame, parent_object)            
-        self.label = Label(self.frame, text=" Blk:")
-        self.label.pack(side = LEFT)
-        self.block = instrument_entry_box(self.frame)            
+        # Create the optional elements
+        self.label1 = Label(self.frame, text=" Sig:")
+        self.label1.pack(side = LEFT)
+        self.sig = signal_entry_box(self.frame, parent_object)            
+        self.label2 = Label(self.frame, text=" Blk:")
+        self.label2.pack(side = LEFT)
+        self.block = instrument_entry_box(self.frame)
+        # Hide the Signal and Instriment elements if not required
+        if self.subsidary:
+            self.label1.pack_forget()
+            self.label2.pack_forget()
+            self.sig.EB_EB.pack_forget()
+            self.block.EB_EB.pack_forget()
     
     def validate(self):
         valid = (self.p1.validate() and self.p2.validate() and self.p3.validate() and
                  self.p4.validate() and self.p5.validate() and self.p6.validate() and
-                 self.p7.validate() and self.block.validate())
-        if not self.subsidary: valid = valid and self.sig.validate()
+                 self.p7.validate() and self.sig.validate() and self.block.validate())
         return(valid)
     
     def enable(self):
@@ -308,9 +205,15 @@ class interlocking_route_group:
         self.p5.enable()
         self.p6.enable()
         self.p7.enable()
-        self.block.enable()
-        if not self.subsidary: self.sig.enable()
-        
+        # Only enable the sigID and InstID EBs for Semaphores and Colour Lights
+        if (self.parent_object.config.sigtype.get_value() == 1 or
+              self.parent_object.config.sigtype.get_value() == 3 ):
+            self.sig.enable()
+            self.block.enable()
+        else:
+            self.sig.disable()
+            self.block.disable()
+
     def disable(self):
         self.p1.disable()
         self.p2.disable()
@@ -319,9 +222,9 @@ class interlocking_route_group:
         self.p5.disable()
         self.p6.disable()
         self.p7.disable()
+        self.sig.disable()
         self.block.disable()
-        if not self.subsidary: self.sig.disable()
-        
+                
     def set_route(self, interlocking_route):
         # A route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
         # Each point element comprises [point_id, point_state]
@@ -332,7 +235,7 @@ class interlocking_route_group:
         self.p5.set_value(interlocking_route[4])
         self.p6.set_value(interlocking_route[5])
         self.p7.set_value(interlocking_route[6])
-        if not self.subsidary: self.sig.set_value(interlocking_route[7])
+        self.sig.set_value(interlocking_route[7])
         self.block.set_value(interlocking_route[8])
         
     def get_route(self):
@@ -344,10 +247,9 @@ class interlocking_route_group:
                    self.p4.get_value(),
                    self.p5.get_value(),
                    self.p6.get_value(),
-                   self.p7.get_value() ]
-        if not self.subsidary: route.append(self.sig.get_value())
-        else: route.append("")
-        route.append(self.block.get_value())
+                   self.p7.get_value(),
+                   self.sig.get_value(),
+                   self.block.get_value() ]
         return (route)
 
 #------------------------------------------------------------------------------------

@@ -212,13 +212,15 @@ def update_signal_object(object_id):
                     rhfeather45 = schematic_objects[object_id]["feathers"][3],
                     rhfeather90 = schematic_objects[object_id]["feathers"][4],
                     theatre_route_indicator = schematic_objects[object_id]["theatreroute"],
-                    refresh_immediately = schematic_objects[object_id]["immediaterefresh"],
+                    refresh_immediately = False,
                     fully_automatic = schematic_objects[object_id]["fullyautomatic"])
         # set the initial theatre route indication (for MAIN)for the signal if appropriate
         if schematic_objects[object_id]["theatreroute"]:
             signals.set_route(sig_id = schematic_objects[object_id]["itemid"],
                     theatre_text = schematic_objects[object_id]["dcctheatre"][1][0])
-        
+        # update the signal to show the initial aspect
+        signals.update_signal(schematic_objects[object_id]["itemid"])
+
     elif sig_type == signals_common.sig_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals_semaphores.semaphore_sub_type(schematic_objects[object_id]["itemsubtype"])
@@ -444,7 +446,6 @@ def create_default_signal_object(item_type, item_subtype):
     schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
     schematic_objects[object_id]["dccautoinhibit"] = False
     schematic_objects[object_id]["fullyautomatic"] = False
-    schematic_objects[object_id]["immediaterefresh"] = True ####################################
     schematic_objects[object_id]["distautomatic"] = True
     # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
     # Each Route element comprises: [signal, subsidary, distant]
