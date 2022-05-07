@@ -226,30 +226,30 @@ class interlocking_route_group:
         self.block.disable()
                 
     def set_route(self, interlocking_route):
-        # A route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
         # Each point element comprises [point_id, point_state]
-        self.p1.set_value(interlocking_route[0])
-        self.p2.set_value(interlocking_route[1])
-        self.p3.set_value(interlocking_route[2])
-        self.p4.set_value(interlocking_route[3])
-        self.p5.set_value(interlocking_route[4])
-        self.p6.set_value(interlocking_route[5])
-        self.p7.set_value(interlocking_route[6])
-        self.sig.set_value(interlocking_route[7])
-        self.block.set_value(interlocking_route[8])
+        self.p1.set_value(interlocking_route[0][0])
+        self.p2.set_value(interlocking_route[0][1])
+        self.p3.set_value(interlocking_route[0][2])
+        self.p4.set_value(interlocking_route[0][3])
+        self.p5.set_value(interlocking_route[0][4])
+        self.p6.set_value(interlocking_route[0][5])
+        self.p7.set_value(interlocking_route[0][6])
+        self.sig.set_value(interlocking_route[1])
+        self.block.set_value(interlocking_route[2])
         
     def get_route(self):
-        # A route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
         # Each point element comprises [point_id, point_state]
-        route =  [ self.p1.get_value(),
-                   self.p2.get_value(),
-                   self.p3.get_value(),
-                   self.p4.get_value(),
-                   self.p5.get_value(),
-                   self.p6.get_value(),
-                   self.p7.get_value(),
-                   self.sig.get_value(),
-                   self.block.get_value() ]
+        route =  [ [ self.p1.get_value(),
+                     self.p2.get_value(),
+                     self.p3.get_value(),
+                     self.p4.get_value(),
+                     self.p5.get_value(),
+                     self.p6.get_value(),
+                     self.p7.get_value() ],
+                     self.sig.get_value(),
+                     self.block.get_value() ]
         return (route)
 
 #------------------------------------------------------------------------------------
@@ -292,7 +292,7 @@ class interlocking_route_frame:
 
     def set_routes(self, interlocking_routes):
         # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
         # Each point element comprises [point_id, point_state]
         self.main.set_route(interlocking_routes[0])
         self.lh1.set_route(interlocking_routes[1])
@@ -302,7 +302,7 @@ class interlocking_route_frame:
         
     def get_routes(self):
         # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
         # Each point element comprises [point_id, point_state]
         return ( [ self.main.get_route(),
                    self.lh1.get_route(),

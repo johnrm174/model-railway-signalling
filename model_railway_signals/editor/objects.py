@@ -489,15 +489,15 @@ def create_default_signal_object(item_type, item_subtype):
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
     
     # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-    # Each route comprises: [p1, p2, p3, p4, p5, p6, p7, signal, block_inst]
+    # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
     # Each point element comprises [point_id, point_state]
     # Note that Sig ID in this case is a string
     schematic_objects[object_id]["siglocking"] = [
-             [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],"",0],
-             [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],"",0],
-             [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],"",0],
-             [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],"",0],
-             [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],"",0] ]
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
     
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)

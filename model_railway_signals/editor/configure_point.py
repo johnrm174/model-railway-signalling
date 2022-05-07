@@ -101,6 +101,8 @@ def save_state(point, close_window:bool):
                points.point_switched(new_id) ) ):
             # Use the non-public-api call to bypass validation (can't toggle "auto" points)
             points.toggle_point_state(objects.schematic_objects[object_id]["alsoswitch"],True)
+        # "Process" the changes by running the layout interlocking
+        run_layout.initialise_layout()
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)

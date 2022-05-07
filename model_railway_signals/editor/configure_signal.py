@@ -7,6 +7,7 @@ from tkinter import ttk
 
 from . import objects
 from . import common
+from . import run_layout
 from . import configure_signal_tab1 
 from . import configure_signal_tab2
 
@@ -47,7 +48,7 @@ def load_state(signal):
     signal.config.settings.set_values(rot, sig_button, dist_button)
     # These elements are for the signal intelocking tab
     signal.locking.sig.set_routes(objects.schematic_objects[object_id]["siglocking"])
-    
+    ########################## Work in Progress #############################################    
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
     if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -121,12 +122,13 @@ def save_state(signal, close_window):
         else:
             objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
             objects.schematic_objects[object_id]["theatreroute"] = False
-            
         # These elements are for the signal intelocking tab
         objects.schematic_objects[object_id]["siglocking"] = signal.locking.sig.get_routes()
-            
+        ########################## Work in Progress #############################################
         # Update the signal (recreate in its new configuration)
         objects.update_signal_object(object_id)
+        # "Process" the changes by running the layout interlocking
+        run_layout.initialise_layout()
         # Close window on "OK" or re-load UI for "apply"
         if close_window: signal.window.destroy()
         else: load_state(signal)
