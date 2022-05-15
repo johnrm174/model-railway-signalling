@@ -215,7 +215,7 @@ class object_id_selection(integer_entry_box):
         self.frame = LabelFrame(parent_frame, text=label)
         self.frame.pack(side=LEFT, padx=2, pady=2)
         # Call the common base class init function to create the EB
-        tool_tip = ("Enter new ID (1-99) \n" + "Once saved/applied any references"+
+        tool_tip = ("Enter new ID (1-99) \n" + "Once saved/applied any references "+
                     "to this layout object will be updated in other layout objects")
         super().__init__(self.frame, 3, 1,99, tool_tip=tool_tip, allow_empty=False)
         

@@ -136,8 +136,8 @@ class also_switch_selection(common.integer_entry_box):
         self.subframe.pack()
         # Call the common base class init function to create the EB
         super().__init__(self.subframe, width=3, min_value=1, max_value=99,
-                         tool_tip = "Enter the ID of an existing fully " +
-                         "automatic point to be switched with this point")
+                         tool_tip = "Enter the ID of an existing fully automatic " +
+                         "point to be switched with this point (or leave blank)")
         
     def validate(self):
         # Do the basic integer validation first (integer, in range)
@@ -198,7 +198,7 @@ class general_settings:
         self.subframe1.pack()
         self.CB1 = Checkbutton(self.subframe1, text="Rotated ", variable=self.rotated)
         self.CB1.pack(side=LEFT, padx=2, pady=2)
-        self.CB1TT = common.CreateToolTip(self.CB1,"Select to rotate by 180 degrees")
+        self.CB1TT = common.CreateToolTip(self.CB1,"Select to rotate point by 180 degrees")
         self.CB2 = Checkbutton(self.subframe1, text="Facing point lock", variable=self.hasfpl)
         self.CB2.pack(side=LEFT, padx=2, pady=2)
         self.CB2TT = common.CreateToolTip(self.CB2,"Select for a Facing Point Lock (not fully automatic points)")

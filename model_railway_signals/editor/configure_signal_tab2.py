@@ -18,6 +18,77 @@ from ..library import signals_ground_disc
 from ..library import block_instruments
 
 #------------------------------------------------------------------------------------
+# Class for the signal route selections UI Elements
+#------------------------------------------------------------------------------------
+
+class route_selection():
+    def __init__(self, parent_frame, label, tool_tip, callback=None):
+        self.tooltip = tool_tip
+        self.callback = callback
+        # Create the tkinter var for the route selection CB       
+        self.state = BooleanVar(parent_frame,False)
+        # Create the checkbox and associated tool tip
+        self.CB = Checkbutton(parent_frame, text=label, variable=self.state,
+                                 command=self.selection_changed, state="normal")
+        self.CB.pack(side=LEFT)
+        self.CBTT = common.CreateToolTip(self.CB, self.tooltip)
+    def enable(self):
+        self.CB.configure(state="normal")
+        self.CBTT.text = self.tooltip
+    def disable(self):
+        self.CB.configure(state="disabled")
+        self.CBTT.text = "These reflect the route selections set on the 'configuration' tab"
+    def selection_changed(self):
+        if self.callback is not None: self.callback()
+        
+class route_selections():
+    def __init__(self, parent_frame, label, tool_tip, callback=None):
+        # Create a label frame for the selections
+        self.frame = LabelFrame(parent_frame, text=label)
+        self.frame.pack(padx=2, pady=2, fill='x')
+        # We use a subframe to center the selections boxes
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
+        # Create the required selection elements
+        self.main = route_selection(self.subframe,"MAIN", tool_tip, callback)
+        self.lh1 = route_selection(self.subframe,"LH1", tool_tip, callback)
+        self.lh2 = route_selection(self.subframe,"LH2", tool_tip, callback)
+        self.rh1 = route_selection(self.subframe,"RH1", tool_tip, callback)
+        self.rh2 = route_selection(self.subframe,"RH2", tool_tip, callback)        
+
+    def enable(self):
+        self.main.enable()
+        self.lh1.enable()
+        self.lh2.enable()
+        self.rh1.enable()
+        self.rh2.enable()
+        
+    def disable(self):
+        self.main.disable()
+        self.lh1.disable()
+        self.lh2.disable()
+        self.rh1.disable()
+        self.rh2.disable()
+
+    def set_values(self, routes):
+        # Route list comprises: [main, lh1, lh2, rh1, rh2]
+        # Each  element comprises a single boolean value
+        self.main.state.set(routes[0])
+        self.lh1.state.set(routes[1])
+        self.lh2.state.set(routes[2])
+        self.rh1.state.set(routes[3])
+        self.rh2.state.set(routes[4])
+
+    def get_values(self):
+        # Route list comprises: [main, lh1, lh2, rh1, rh2]
+        # Each  element comprises a single boolean value
+        return ([ self.main.state.get(),
+                  self.lh1.state.get(),
+                  self.lh2.state.get(),
+                  self.rh1.state.get(),
+                  self.rh2.state.get() ] )
+
+#------------------------------------------------------------------------------------
 # Class for an point entry box - Builds on the base Integer Entry Box class
 # Public class instance methods overridden by this class are
 #    "disable" - disables/blanks the entry box 
@@ -315,11 +386,14 @@ class interlocking_route_frame:
 #------------------------------------------------------------------------------------
 
 class signal_interlocking_tab:
-    def __init__(self, parent_window, parent_object):
+    def __init__(self, parent_window, parent_object, routes_updated):
+        tool_tip = "Select the routes that the main signal aspect controls"
+        self.sig_routes = route_selections(parent_window, "Routes supported by the main signal aspect",
+                            "Select the routes to be supported by the main signal")
+        tool_tip = "Select the routes that the subsidary signal aspect controls"
+        self.sub_routes = route_selections(parent_window, "Routes supported by the subsidary signal aspect",
+                            "Select the routes to be supported by the subsidary signal")
         # These UI elements need the parent object so the current sig_id can be accessed for validation
-        self.sig = interlocking_route_frame(parent_window, parent_object, "Main signal routes and interlocking", False)
-        self.sub = interlocking_route_frame(parent_window, parent_object, "Subsidary signal routes and interlocking", True)
-        label = Label(parent_window,text="Work in Progress")
-        label.pack()
+        self.interlocking = interlocking_route_frame(parent_window, parent_object, "Routes and interlocking", False)
         
 #############################################################################################

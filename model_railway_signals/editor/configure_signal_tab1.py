@@ -43,16 +43,16 @@ class general_settings:
         self.subframe.pack()
         self.CB1 = Checkbutton(self.subframe, text="Rotated ", variable=self.rotated)
         self.CB1.pack(side=LEFT, padx=2, pady=2)
-        self.CB1TT = common.CreateToolTip(self.CB1,"Select to rotate by 180 degrees")
+        self.CB1TT = common.CreateToolTip(self.CB1,"Select to rotate signal by 180 degrees")
         self.CB2 = Checkbutton(self.subframe, text="Signal button", variable=self.sigbutton)
         self.CB2.pack(side=LEFT, padx=2, pady=2)
         self.CB2TT = common.CreateToolTip(self.CB2,"Select to create a control button "+
                 "for the main signal (deselect if the signal is to be switched automatically)")
         self.CB3 = Checkbutton(self.subframe, text="Distant button", variable=self.distbutton)
         self.CB3.pack(side=LEFT, padx=2, pady=2)
-        self.CB3TT = common.CreateToolTip(self.CB3,"For semaphore signals, select to create a "+
-                "control button for the distant signal arms (deselect if the distant arms "+
-                " re to configured to 'mirror' another distant signal on the schematic)")
+        self.CB3TT = common.CreateToolTip(self.CB3,"For semaphore home signals with distant "+
+                "arms - select to create a seperate control button for the distant signal "+
+                "arms (deselect if the distant arms are to be switched automatically)")
         
     def enable_dist_button(self):
         self.CB3.config(state="normal")
@@ -82,10 +82,9 @@ class general_settings:
 
 #------------------------------------------------------------------------------------
 # Class for a Signal Sensor Entry Box - builds on the Integer Entry Box class
-# Public class instance methods inherited from the parent class(es) are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
 # Public class instance methods overridden by this class are
+#    "disable" - disables/blanks the checkbox (and entry box)
+#    "enable"  enables/loads the checkbox (and entry box)
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
 #    "validate" - validate the current entry box value and return True/false
@@ -110,9 +109,9 @@ class signal_sensor (common.integer_entry_box):
                          " (or leave blank)", callback=callback, allow_empty=True)
                         
     def selection_updated(self):
-        if self.state.get(): self.enable()
-        else: self.disable()
-            
+        if self.state.get(): super().enable()
+        else: super().disable()
+
     def validate(self):
         # Do the basic integer validation first (integer, in range)
         valid = super().validate(update_validation_status=False)
@@ -145,6 +144,16 @@ class signal_sensor (common.integer_entry_box):
     def get_value(self):
         # Returns a 2 element list of [selected, GPIO_Port]
         return( [self.state.get(), super().get_value()] )
+    
+    def enable(self):
+        self.state.set(self.initial_state.get())
+        self.CB.config(state="normal")
+        self.selection_updated()
+        
+    def disable(self):
+        self.state.set(False)
+        self.CB.config(state="disabled")
+        self.selection_updated()                
     
 #------------------------------------------------------------------------------------
 # Class for the Signal Passed and Signal Approach buttons and sensors

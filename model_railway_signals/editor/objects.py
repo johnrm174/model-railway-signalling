@@ -444,6 +444,8 @@ def create_default_signal_object(item_type, item_subtype):
     schematic_objects[object_id]["subsidary"] = [False,0]       # [has_subsidary,dcc_address]
     schematic_objects[object_id]["theatreroute"] = False
     schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
+    schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False] #########################
+    schematic_objects[object_id]["subroutes"] = [False,False,False,False,False] #########################
     schematic_objects[object_id]["dccautoinhibit"] = False
     schematic_objects[object_id]["fullyautomatic"] = False
     schematic_objects[object_id]["distautomatic"] = True

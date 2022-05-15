@@ -16,6 +16,7 @@ def process_interlocking():
             # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
             # Each point element comprises [point_id, point_state]
             signal_unlocked = False
+            subsidary_unlocked = False
             for index, route in enumerate(objects.schematic_objects[object_id]["siglocking"]):
                 route_clear = True
                 route_active = False
@@ -27,12 +28,17 @@ def process_interlocking():
                             route_clear = False
                             break
                 if route_active and route_clear:
+                    print(objects.schematic_objects[object_id]["sigroutes"])
                     signals.set_route(sig_id, route = signals_common.route_type(index+1))
-                    signals.unlock_signal(sig_id)
-                    signal_unlocked = True
+                    if objects.schematic_objects[object_id]["sigroutes"][index]:
+                        signals.unlock_signal(sig_id)
+                        signal_unlocked = True
+                    if objects.schematic_objects[object_id]["subroutes"][index]:
+                        signals.unlock_subsidary(sig_id)
+                        subsidary_unlocked = True
                     break
-            if not signal_unlocked:
-                signals.lock_signal(sig_id)
+            if not signal_unlocked: signals.lock_signal(sig_id)
+            if not subsidary_unlocked: signals.lock_subsidary(sig_id)
     return()
     
 #------------------------------------------------------------------------------------
