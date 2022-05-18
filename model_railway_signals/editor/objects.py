@@ -439,13 +439,11 @@ def create_default_signal_object(item_type, item_subtype):
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["itemsubtype"] = item_subtype
     schematic_objects[object_id]["orientation"] = 0 
-    schematic_objects[object_id]["passedsensor"] = [True,0]    # [button,gpio_port]
+    schematic_objects[object_id]["passedsensor"] = [True,0]     # [button,gpio_port]
     schematic_objects[object_id]["approachsensor"] = [False,0]  # [button,gpio_port]
     schematic_objects[object_id]["subsidary"] = [False,0]       # [has_subsidary,dcc_address]
     schematic_objects[object_id]["theatreroute"] = False
     schematic_objects[object_id]["feathers"] = [False,False,False,False,False]
-    schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False] #########################
-    schematic_objects[object_id]["subroutes"] = [False,False,False,False,False] #########################
     schematic_objects[object_id]["dccautoinhibit"] = False
     schematic_objects[object_id]["fullyautomatic"] = False
     schematic_objects[object_id]["distautomatic"] = True
@@ -489,7 +487,6 @@ def create_default_signal_object(item_type, item_subtype):
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
-    
     # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
     # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
     # Each point element comprises [point_id, point_state]
@@ -500,7 +497,9 @@ def create_default_signal_object(item_type, item_subtype):
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
-    
+    # Defines the interlocking routes enabled for the signal/subsidary [MAIN, LH1, LH2, RH1, RH2]
+    schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False]
+    schematic_objects[object_id]["subroutes"] = [True,False,False,False,False]
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)
     return() 

@@ -48,7 +48,7 @@ class route_selections():
         self.frame.pack(padx=2, pady=2, fill='x')
         # We use a subframe to center the selections boxes
         self.subframe = Frame(self.frame)
-        self.subframe.pack()
+        self.subframe.pack(padx=2, pady=2)
         # Create the required selection elements
         self.main = route_selection(self.subframe,"MAIN", tool_tip, callback)
         self.lh1 = route_selection(self.subframe,"LH1", tool_tip, callback)
@@ -387,13 +387,14 @@ class interlocking_route_frame:
 
 class signal_interlocking_tab:
     def __init__(self, parent_window, parent_object, routes_updated):
-        tool_tip = "Select the routes that the main signal aspect controls"
-        self.sig_routes = route_selections(parent_window, "Routes supported by the main signal aspect",
-                            "Select the routes to be supported by the main signal")
-        tool_tip = "Select the routes that the subsidary signal aspect controls"
-        self.sub_routes = route_selections(parent_window, "Routes supported by the subsidary signal aspect",
-                            "Select the routes to be supported by the subsidary signal")
         # These UI elements need the parent object so the current sig_id can be accessed for validation
-        self.interlocking = interlocking_route_frame(parent_window, parent_object, "Routes and interlocking", False)
+        self.interlocking = interlocking_route_frame(parent_window, parent_object,
+                                "Define supported routes and interlocking", False)
+        self.sig_routes = route_selections(parent_window, "Enable route interlocking for the main signal",
+                            "Route must be selected to enable the signal to be cleared for the route - "+
+                            "the route display will be dependent on the signal configuration tab selections")
+        self.sub_routes = route_selections(parent_window, "Enable route interlocking for the subsidary signal",
+                            "Route must be selected to enable the subsidary to be cleared for the route - "+
+                            "the route display will be dependent on the signal configuration tab selections")
         
 #############################################################################################

@@ -366,74 +366,94 @@ def update_tab1_signal_aspect_selections(signal):
     return()
 
 #------------------------------------------------------------------------------------
-# Enable/disable the various route elements depending on what is selected
+# Enable/disable the various route selection elements depending on what is selected
+# I've kept it simple and not coupled it too tightly to the signal configuration tab
 #------------------------------------------------------------------------------------
 
 def update_tab2_available_signal_routes(signal):
-    # Hide the UI elements we might need to re-arrange (base on the selections)
-    signal.locking.sub_routes.frame.pack_forget()
-    signal.locking.interlocking.frame.pack_forget()
-    
-    # Configure the main signal route selection elements based on signal type 
-    if (signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value or
-         signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value):
-        # Main signal routes are set via the configuration tab so disable selection
-        signal.locking.sig_routes.disable()
-        # Set UI checkbox values according to the selected route type
-        if signal.config.routetype.get_value() == 2:
-            # Route Feathers - Main route is always enabled
-            signal.locking.sig_routes.set_values( [ True,
-                signal.config.feathers.lh1.get_feather(),
-                signal.config.feathers.lh2.get_feather(),
-                signal.config.feathers.rh1.get_feather(),
-                signal.config.feathers.rh2.get_feather() ] )
-        elif signal.config.routetype.get_value() == 3:
-            # Theatre Indicator - Main route is always enabled
-            signal.locking.sig_routes.set_values( [ True,
-                   signal.config.theatre.lh1.get_theatre()[0] != "",
-                   signal.config.theatre.lh2.get_theatre()[0] != "",
-                   signal.config.theatre.rh1.get_theatre()[0] != "",
-                   signal.config.theatre.rh2.get_theatre()[0] != "" ] )
-        elif signal.config.routetype.get_value() == 4:
-            # Semaphore Arms - Main route is always enabled
-            signal.locking.sig_routes.set_values( [ True,
-                  signal.config.semaphores.lh1.sig.selection.get(),
-                  signal.config.semaphores.lh2.sig.selection.get(),
-                  signal.config.semaphores.rh1.sig.selection.get(),
-                  signal.config.semaphores.rh2.sig.selection.get() ] )
-        else:
-            # No Route indications selected - Main route only
-            signal.locking.sig_routes.set_values([True, False, False, False, False])
-    elif (signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value or
-         signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value):
-        # A single ground position/disc signal can indicate multiple routes
-        signal.locking.sig_routes.enable()
-        
-    # Configure the subsidary signal route selection elements based on signal type 
-    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        ################### To Do - Check signal has subsidary #######################
-        # Display the subsidary route selection box - all routes are available
+    # Only display the subsidary route selection if the signal is configured with a subsidary 
+    if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+           signal.config.aspects.get_subsidary()[0] ):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub_routes.enable()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        ################### To Do - Check signal has subsidary #######################
-        # Display the subsidary route selection and disable it
+    elif ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+           ( signal.config.semaphores.main.sub.selection.get() or
+             signal.config.semaphores.lh1.sub.selection.get() or
+             signal.config.semaphores.lh2.sub.selection.get() or
+             signal.config.semaphores.rh1.sub.selection.get() or
+             signal.config.semaphores.rh2.sub.selection.get() ) ):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-        signal.locking.sub_routes.disable()
-        # Semaphore Arms - routes set according to signal configuration
-        signal.locking.sub_routes.set_values( [
-                signal.config.semaphores.main.sub.selection.get(),
-                signal.config.semaphores.lh1.sub.selection.get(),
-                signal.config.semaphores.lh2.sub.selection.get(),
-                signal.config.semaphores.rh1.sub.selection.get(),
-                signal.config.semaphores.rh2.sub.selection.get() ])
+        signal.locking.sub_routes.enable()
     else:
+        signal.locking.sub_routes.frame.pack_forget()
         signal.locking.sub_routes.disable()
-
-    # Pack the Main interlocking selection Frame
-    signal.locking.interlocking.frame.pack(padx=2, pady=2, fill='x')
-    
     return()
+
+# def update_tab2_available_signal_routes(signal):
+#     # Hide the UI elements we might need to re-arrange (base on the selections)
+#     signal.locking.sub_routes.frame.pack_forget()
+#     signal.locking.interlocking.frame.pack_forget()
+#     
+#     # Configure the main signal route selection elements based on signal type 
+#     if (signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value or
+#          signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value):
+#         # Main signal routes are set via the configuration tab so disable selection
+#         signal.locking.sig_routes.disable()
+#         # Set UI checkbox values according to the selected route type
+#         if signal.config.routetype.get_value() == 2:
+#             # Route Feathers - Main route is always enabled
+#             signal.locking.sig_routes.set_values( [ True,
+#                 signal.config.feathers.lh1.get_feather(),
+#                 signal.config.feathers.lh2.get_feather(),
+#                 signal.config.feathers.rh1.get_feather(),
+#                 signal.config.feathers.rh2.get_feather() ] )
+#         elif signal.config.routetype.get_value() == 3:
+#             # Theatre Indicator - Main route is always enabled
+#             signal.locking.sig_routes.set_values( [ True,
+#                    signal.config.theatre.lh1.get_theatre()[0] != "",
+#                    signal.config.theatre.lh2.get_theatre()[0] != "",
+#                    signal.config.theatre.rh1.get_theatre()[0] != "",
+#                    signal.config.theatre.rh2.get_theatre()[0] != "" ] )
+#         elif signal.config.routetype.get_value() == 4:
+#             # Semaphore Arms - Main route is always enabled
+#             signal.locking.sig_routes.set_values( [ True,
+#                   signal.config.semaphores.lh1.sig.selection.get(),
+#                   signal.config.semaphores.lh2.sig.selection.get(),
+#                   signal.config.semaphores.rh1.sig.selection.get(),
+#                   signal.config.semaphores.rh2.sig.selection.get() ] )
+#         else:
+#             # No Route indications selected - Main route only
+#             signal.locking.sig_routes.set_values([True, False, False, False, False])
+#     elif (signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value or
+#          signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value):
+#         # A single ground position/disc signal can indicate multiple routes
+#         signal.locking.sig_routes.enable()
+#         
+#     # Configure the subsidary signal route selection elements based on signal type 
+#     if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+#         ################### To Do - Check signal has subsidary #######################
+#         # Display the subsidary route selection box - all routes are available
+#         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+#         signal.locking.sub_routes.enable()
+#     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+#         ################### To Do - Check signal has subsidary #######################
+#         # Display the subsidary route selection and disable it
+#         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+#         signal.locking.sub_routes.disable()
+#         # Semaphore Arms - routes set according to signal configuration
+#         signal.locking.sub_routes.set_values( [
+#                 signal.config.semaphores.main.sub.selection.get(),
+#                 signal.config.semaphores.lh1.sub.selection.get(),
+#                 signal.config.semaphores.lh2.sub.selection.get(),
+#                 signal.config.semaphores.rh1.sub.selection.get(),
+#                 signal.config.semaphores.rh2.sub.selection.get() ])
+#     else:
+#         signal.locking.sub_routes.disable()
+# 
+#     # Pack the Main interlocking selection Frame
+#     signal.locking.interlocking.frame.pack(padx=2, pady=2, fill='x')
+#     
+#     return()
 
 #------------------------------------------------------------------------------------
 # Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 
