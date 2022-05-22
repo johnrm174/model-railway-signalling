@@ -377,11 +377,11 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub_routes.enable()
     elif ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           ( signal.config.semaphores.main.sub.selection.get() or
-             signal.config.semaphores.lh1.sub.selection.get() or
-             signal.config.semaphores.lh2.sub.selection.get() or
-             signal.config.semaphores.rh1.sub.selection.get() or
-             signal.config.semaphores.rh2.sub.selection.get() ) ):
+           ( signal.config.semaphores.main.sub.selection.get_element()[0] or
+             signal.config.semaphores.lh1.sub.selection.get_element()[0] or
+             signal.config.semaphores.lh2.sub.selection.get_element()[0] or
+             signal.config.semaphores.rh1.sub.selection.get_element()[0] or
+             signal.config.semaphores.rh2.sub.selection.get_element()[0] ) ):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub_routes.enable()
     else:

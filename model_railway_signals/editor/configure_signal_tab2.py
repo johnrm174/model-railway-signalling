@@ -37,7 +37,7 @@ class route_selection():
         self.CBTT.text = self.tooltip
     def disable(self):
         self.CB.configure(state="disabled")
-        self.CBTT.text = "These reflect the route selections set on the 'configuration' tab"
+        self.CBTT.text = "Disabled to reflect selections on 'configuration' tab"
     def selection_changed(self):
         if self.callback is not None: self.callback()
         
@@ -268,33 +268,33 @@ class interlocking_route_group:
                  self.p7.validate() and self.sig.validate() and self.block.validate())
         return(valid)
     
-    def enable(self):
-        self.p1.enable()
-        self.p2.enable()
-        self.p3.enable()
-        self.p4.enable()
-        self.p5.enable()
-        self.p6.enable()
-        self.p7.enable()
-        # Only enable the sigID and InstID EBs for Semaphores and Colour Lights
-        if (self.parent_object.config.sigtype.get_value() == 1 or
-              self.parent_object.config.sigtype.get_value() == 3 ):
-            self.sig.enable()
-            self.block.enable()
-        else:
-            self.sig.disable()
-            self.block.disable()
-
-    def disable(self):
-        self.p1.disable()
-        self.p2.disable()
-        self.p3.disable()
-        self.p4.disable()
-        self.p5.disable()
-        self.p6.disable()
-        self.p7.disable()
-        self.sig.disable()
-        self.block.disable()
+##    def enable(self):
+##        self.p1.enable()
+##        self.p2.enable()
+##        self.p3.enable()
+##        self.p4.enable()
+##        self.p5.enable()
+##        self.p6.enable()
+##        self.p7.enable()
+##        # Only enable the sigID and InstID EBs for Semaphores and Colour Lights
+##        if (self.parent_object.config.sigtype.get_value() == 1 or
+##              self.parent_object.config.sigtype.get_value() == 3 ):
+##            self.sig.enable()
+##            self.block.enable()
+##        else:
+##            self.sig.disable()
+##            self.block.disable()
+##
+##    def disable(self):
+##        self.p1.disable()
+##        self.p2.disable()
+##        self.p3.disable()
+##        self.p4.disable()
+##        self.p5.disable()
+##        self.p6.disable()
+##        self.p7.disable()
+##        self.sig.disable()
+##        self.block.disable()
                 
     def set_route(self, interlocking_route):
         # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
@@ -347,19 +347,19 @@ class interlocking_route_frame:
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
                self.rh1.validate() and self.rh2.validate())
     
-    def enable(self):
-        self.main.enable()
-        self.lh1.enable()
-        self.lh2.enable()
-        self.rh1.enable()
-        self.rh2.enable()
-
-    def disable(self):
-        self.main.disable()
-        self.lh1.disable()
-        self.lh2.disable()
-        self.rh1.disable()
-        self.rh2.disable()
+##    def enable(self):
+##        self.main.enable()
+##        self.lh1.enable()
+##        self.lh2.enable()
+##        self.rh1.enable()
+##        self.rh2.enable()
+##
+##    def disable(self):
+##        self.main.disable()
+##        self.lh1.disable()
+##        self.lh2.disable()
+##        self.rh1.disable()
+##        self.rh2.disable()
 
     def set_routes(self, interlocking_routes):
         # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
