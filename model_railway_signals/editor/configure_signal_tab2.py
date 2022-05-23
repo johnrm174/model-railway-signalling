@@ -382,6 +382,27 @@ class interlocking_route_frame:
                    self.rh2.get_route() ] )
 
 #------------------------------------------------------------------------------------
+# Class for a signal route interlocking frame
+# uses multiple instances of the signal_route_selection_element
+# Public class instance methods provided by this class are:
+#    "set_values" - Populates the list of interlocked signals and their routes 
+#------------------------------------------------------------------------------------
+
+class signal_route_interlocking_frame():
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the Signal Interlocking List 
+        self.frame = LabelFrame(parent_frame, text="MAIN route - conflicting signals")
+        self.frame.pack(padx=2, pady=2, fill='x')
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
+        self.subframe1 = Frame(self.subframe)
+        self.subframe1.pack(side=LEFT, padx=20)
+        self.element1 = common.signal_route_selection_element(self.subframe1, read_only=False)
+        self.subframe2 = Frame(self.subframe)
+        self.subframe2.pack(side=LEFT, padx=20)
+        self.element2 = common.signal_route_selection_element(self.subframe2, read_only=False)
+
+#------------------------------------------------------------------------------------
 # Top level Class for the Signal Interlocking Tab
 #------------------------------------------------------------------------------------
 
@@ -396,5 +417,7 @@ class signal_interlocking_tab:
         self.sub_routes = route_selections(parent_window, "Enable route interlocking for the subsidary signal",
                             "Route must be selected to enable the subsidary to be cleared for the route - "+
                             "the route display will be dependent on the signal configuration tab selections")
+        
+        self.conflicting_sigs = signal_route_interlocking_frame(parent_window)
         
 #############################################################################################

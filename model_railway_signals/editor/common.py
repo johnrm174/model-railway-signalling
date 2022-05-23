@@ -4,6 +4,8 @@
 
 from tkinter import *
 
+from ..library import signals_common
+
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
 # https://stackoverflow.com/questions/3221956/how-do-i-display-tooltips-in-tkinter
@@ -299,8 +301,74 @@ class dcc_address_entry_box (integer_entry_box):
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
         # If the element is disabled will always return [0,False]
-        return([super().get_value(), self.dcc_state.get()])          
+        return([super().get_value(), self.dcc_state.get()])
+
+#------------------------------------------------------------------------------------
+# Base class for a generic signal route selection Checkbox
+# Public class instance methods provided are
+#    "set_value" - Sets the CB value
+#------------------------------------------------------------------------------------
+
+class route_selection_checkbox():
+    def __init__(self, parent_frame, label, read_only=False):
+        # Create the tkinter var for the Point state CB - 'selection' is the actual CB state
+        self.selection = BooleanVar(parent_frame,False)
+        # Create the checkbox and associated tool tip
+        self.CB = Checkbutton(parent_frame, indicatoron = False, variable=self.selection, text=label)
+        self.CB.pack(side=LEFT)
+        if read_only:
+            tool_tip = "Edit the associated signal to configure the interlocking"
+            self.CB.configure(state="disabled")
+        else:
+            tool_tip = "Select the conflicting signal routes"
+        self.CBTT = CreateToolTip(self.CB, tool_tip)
+        
+    def set_value(self, new_value:bool):
+        self.selection.set(new_value)
+            
+#------------------------------------------------------------------------------------
+# Class for a signal route selection element - builds on the Integer Entry Box class
+# Public class instance methods inherited from the parent class(es) are:
+#    "disable" - disables/blanks the entry box
+#    "enable"  enables/loads the entry box
+# Public class instance methods overridden by this class are
+#    "validate" - Checks whether the entry is a valid Item Id 
+#    "set_values" - Sets the EB value and all route selection CBs 
+#------------------------------------------------------------------------------------
+
+class signal_route_selection_element(integer_entry_box):
+    def __init__(self, parent_frame, read_only=False):
+        # Call the common base class init function to create the EB
+        if read_only: tool_tip = "Edit the associated signal to configure the interlocking"
+        else: tool_tip = "Specify the ID of the conflicting signal"
+        super().__init__(parent_frame, width=3, min_value=1, max_value=99, tool_tip=tool_tip)
+        if read_only: self.EB_EB.config(state="disabled")
+        # Now create the UI Elements for each of the possible route selections
+        self.main = route_selection_checkbox(parent_frame, label="MAIN", read_only = read_only)
+        self.lh1 = route_selection_checkbox(parent_frame, label="LH1", read_only = read_only)
+        self.lh2 = route_selection_checkbox(parent_frame, label="LH2", read_only = read_only)
+        self.rh1 = route_selection_checkbox(parent_frame, label="RH1", read_only = read_only)
+        self.rh2 = route_selection_checkbox(parent_frame, label="RH2", read_only = read_only)
+
+    def validate(self):
+        # Do the basic integer validation first (integer, in range, not empty)
+        valid = super().validate(update_validation_status=False)
+        if not signals_common.sig_exists(self.get_value()):
+            self.EB_TT.text = "Signal does not exist"
+            valid = False
+        self.set_validation_status(valid)
+        return(valid)
     
+    def set_values(self,sig_interlocking_routes:[int,[bool,bool,bool,bool,bool]]):
+        # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        super().set_value(sig_interlocking_routes[0])
+        self.main.set_value(sig_interlocking_routes[1][0])
+        self.lh1.set_value(sig_interlocking_routes[1][1])
+        self.lh2.set_value(sig_interlocking_routes[1][2])
+        self.rh1.set_value(sig_interlocking_routes[1][3])
+        self.rh2.set_value(sig_interlocking_routes[1][4])
+
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
 # Class instance elements to use externally are:
