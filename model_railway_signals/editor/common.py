@@ -236,10 +236,9 @@ class object_id_selection(integer_entry_box):
 
 #------------------------------------------------------------------------------------
 # Common class for a DCC address entry box - builds on the Integer Entry Box class
-# Can be created with or without a checkbox representing the "state"
-# Public class instance methods inherited from the parent class(es) are:
-#    "validate" - validate the current entry box value and return True/false
+# Can be created with or without a checkbox (representing the DCC logic)
 # Public class instance methods overridden by this class are
+#    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value [address:int, state:bool]
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
 #    "disable" - disables/blanks the entry box (and associated state button)
@@ -249,7 +248,7 @@ class object_id_selection(integer_entry_box):
 class dcc_address_entry_box (integer_entry_box):
     def __init__(self, parent_frame, dcc_state_checkbox=False):
         # Create the tkinter vars for the DCC state CB - 'dcc_selection' is the actual CB state
-        # which will be 'unchecked' if the EB value is empty or not valid and 'dccstate' is the
+        # which will be 'unchecked' if the EB value is empty or not valid and 'dcc_state' is the
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.dcc_state = BooleanVar(parent_frame, False)
         self.dcc_selection = BooleanVar(parent_frame, False)
@@ -265,10 +264,9 @@ class dcc_address_entry_box (integer_entry_box):
         # Only display the checkbox if required (otherwise don't pack it)
         if dcc_state_checkbox: self.DCC_CB.pack(side=LEFT)
             
-    def update_dcc_state(self):
-        self.dcc_state.set(self.dcc_selection.get())
-        # If the entry box value is empty or disabled then state selection is disabled
-        if not self.eb_enabled.get() or self.eb_value.get() == "":
+    def update_dcc_state(self,valid = True):
+        # If the entry box is empty or disabled then state selection is disabled
+        if not self.eb_enabled.get() or self.eb_entry.get() == "" or not valid:
             self.DCC_CB.config(state="disabled", text="", bg=self.defaultbg)
             self.dcc_selection.set(False)
         else:
@@ -279,6 +277,7 @@ class dcc_address_entry_box (integer_entry_box):
         
     def enable(self):
         super().enable()
+        self.dcc_selection.set(self.dcc_state.get())
         self.update_dcc_state()
         
     def disable(self):
@@ -286,9 +285,9 @@ class dcc_address_entry_box (integer_entry_box):
         self.update_dcc_state()
 
     def validate(self):
-        # Do the basic integer validation first (integer, in range)
+        # Do the basic integer validation (is an integer and in range)
         valid = super().validate(update_validation_status=False)
-        self.update_dcc_state()
+        self.update_dcc_state(valid)
         self.set_validation_status(valid)
         return(valid)
         
@@ -300,75 +299,129 @@ class dcc_address_entry_box (integer_entry_box):
         
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
-        # If the element is disabled will always return [0,False]
-        return([super().get_value(), self.dcc_state.get()])
+        # When disabled (or empty) will always return [0,False]
+        # When invalid will return [last valid value, last valid state]
+        return([super().get_value(), self.dcc_selection.get()])
 
 #------------------------------------------------------------------------------------
 # Base class for a generic signal route selection Checkbox
 # Public class instance methods provided are
-#    "set_value" - Sets the CB value
+#    "set_value" - will set the CB state (bool)
+#    "get_value" - will return the current state (bool)
+#    "disable" - disables/blanks the CB 
+#    "enable"  enables/loads the CB
 #------------------------------------------------------------------------------------
 
 class route_selection_checkbox():
     def __init__(self, parent_frame, label, read_only=False):
-        # Create the tkinter var for the Point state CB - 'selection' is the actual CB state
-        self.selection = BooleanVar(parent_frame,False)
+        self.label = label
+        # Create the tkinter vars for the state CB - 'selection' is the actual CB state
+        # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
+        # last entered state (used to "load" the actual CB state once the EB is valid)        
+        self.state = BooleanVar(parent_frame, False)
+        self.selection = BooleanVar(parent_frame, False)
         # Create the checkbox and associated tool tip
-        self.CB = Checkbutton(parent_frame, indicatoron = False, variable=self.selection, text=label)
+        self.CB = Checkbutton(parent_frame, indicatoron = False, variable=self.selection,
+                              width = 5, text=label, command = self.cb_updated)
         self.CB.pack(side=LEFT)
         if read_only:
-            tool_tip = "Edit the associated signal to configure the interlocking"
+            tool_tip = "Edit the associated signal to configure (signal interlocking tab)"
             self.CB.configure(state="disabled")
         else:
-            tool_tip = "Select the conflicting signal routes"
+            tool_tip = "Select all conflicting signal routes"
         self.CBTT = CreateToolTip(self.CB, tool_tip)
+        
+    def cb_updated(self):
+        self.state.set(self.selection.get())
+
+    def enable(self):
+        self.selection.set(self.state.get())
+        self.CB.config(state="normal", text=self.label)
+        self.cb_updated()
+
+    def disable(self):
+        self.selection.set(False)
+        self.CB.config(state="disabled", text="")
         
     def set_value(self, new_value:bool):
         self.selection.set(new_value)
+        self.state.set(new_value)
+        self.cb_updated()
+        
+    def get_value(self,):
+        # Will always return False if disabled
+        return (self.selection.get())
             
 #------------------------------------------------------------------------------------
 # Class for a signal route selection element - builds on the Integer Entry Box class
-# Public class instance methods inherited from the parent class(es) are:
-#    "disable" - disables/blanks the entry box
-#    "enable"  enables/loads the entry box
 # Public class instance methods overridden by this class are
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
+#    "get_values" - Gets the EB value and all route selection CBs 
 #------------------------------------------------------------------------------------
 
 class signal_route_selection_element(integer_entry_box):
     def __init__(self, parent_frame, read_only=False):
+        self.read_only = read_only
+        # Create a frame to hold all the elements - but we leave packing to the child
+        # class so we can arrange elements in lists/colulms as appropriate to the UI
+        self.frame = Frame(parent_frame)
         # Call the common base class init function to create the EB
-        if read_only: tool_tip = "Edit the associated signal to configure the interlocking"
-        else: tool_tip = "Specify the ID of the conflicting signal"
-        super().__init__(parent_frame, width=3, min_value=1, max_value=99, tool_tip=tool_tip)
-        if read_only: self.EB_EB.config(state="disabled")
+        if self.read_only: tool_tip = "Edit the associated signal to configure (signal interlocking tab)"
+        else: tool_tip = "Specify any signals which (when cleared) would conflict with this signal route"
+        super().__init__(self.frame, width=3, min_value=1, max_value=99, tool_tip=tool_tip)
+        # Disable the EB (we don't use the disable method as we wantto display the value_
+        if self.read_only: self.EB_EB.config(state="disabled")
         # Now create the UI Elements for each of the possible route selections
-        self.main = route_selection_checkbox(parent_frame, label="MAIN", read_only = read_only)
-        self.lh1 = route_selection_checkbox(parent_frame, label="LH1", read_only = read_only)
-        self.lh2 = route_selection_checkbox(parent_frame, label="LH2", read_only = read_only)
-        self.rh1 = route_selection_checkbox(parent_frame, label="RH1", read_only = read_only)
-        self.rh2 = route_selection_checkbox(parent_frame, label="RH2", read_only = read_only)
+        self.main = route_selection_checkbox(self.frame, label="MAIN", read_only = read_only)
+        self.lh1 = route_selection_checkbox(self.frame, label="LH1", read_only = read_only)
+        self.lh2 = route_selection_checkbox(self.frame, label="LH2", read_only = read_only)
+        self.rh1 = route_selection_checkbox(self.frame, label="RH1", read_only = read_only)
+        self.rh2 = route_selection_checkbox(self.frame, label="RH2", read_only = read_only)
 
     def validate(self):
-        # Do the basic integer validation first (integer, in range, not empty)
+        # Do the basic integer validation (integer, in range)
         valid = super().validate(update_validation_status=False)
-        if not signals_common.sig_exists(self.get_value()):
+        if self.eb_entry.get() != "" and not signals_common.sig_exists(self.eb_entry.get()):
             self.EB_TT.text = "Signal does not exist"
             valid = False
         self.set_validation_status(valid)
+        # Enable/disable the checkboxes depending on the EB state
+        if not self.read_only:
+            if self.eb_entry.get() == "" or not valid:
+                self.main.disable()
+                self.lh1.disable()
+                self.lh2.disable()
+                self.rh1.disable()
+                self.rh2.disable()
+            else:
+                self.main.enable()
+                self.lh1.enable()
+                self.lh2.enable()
+                self.rh1.enable()
+                self.rh2.enable()
         return(valid)
     
-    def set_values(self,sig_interlocking_routes:[int,[bool,bool,bool,bool,bool]]):
-        # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+    def set_values(self, signal:[int,[bool,bool,bool,bool,bool]]):
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
-        super().set_value(sig_interlocking_routes[0])
-        self.main.set_value(sig_interlocking_routes[1][0])
-        self.lh1.set_value(sig_interlocking_routes[1][1])
-        self.lh2.set_value(sig_interlocking_routes[1][2])
-        self.rh1.set_value(sig_interlocking_routes[1][3])
-        self.rh2.set_value(sig_interlocking_routes[1][4])
+        super().set_value(signal[0])
+        self.main.set_value(signal[1][0])
+        self.lh1.set_value(signal[1][1])
+        self.lh2.set_value(signal[1][2])
+        self.rh1.set_value(signal[1][3])
+        self.rh2.set_value(signal[1][4])
 
+    def get_values(self):
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        return ( [ super().get_value(),
+                   [ self.main.get_value(),
+                     self.lh1.get_value(),
+                     self.lh2.get_value(),
+                     self.rh1.get_value(),
+                     self.rh2.get_value() ] ])
+   
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
 # Class instance elements to use externally are:

@@ -500,6 +500,32 @@ def create_default_signal_object(item_type, item_subtype):
     # Defines the interlocking routes enabled for the signal/subsidary [MAIN, LH1, LH2, RH1, RH2]
     schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False]
     schematic_objects[object_id]["subroutes"] = [True,False,False,False,False]
+    # conflicting signal routes comprises [main,lh1,lh2,rh1,rh2]
+    # each sig_route comprises [sig1, sig2, sig3, sig4]
+    # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+    # Where each route element is a boolean value (True or False)
+    schematic_objects[object_id]["conflictsigs"] = [
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ] ]
+
     # Draw the Signal on the canvas (and assign the ID)
     update_signal_object(object_id)
     return() 

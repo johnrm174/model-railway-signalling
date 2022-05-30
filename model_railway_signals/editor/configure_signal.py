@@ -50,6 +50,7 @@ def load_state(signal):
     signal.locking.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
     signal.locking.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
     signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["siglocking"])
+    signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["conflictsigs"])
     ########################## Work in Progress #############################################    
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
@@ -91,7 +92,7 @@ def save_state(signal, close_window):
     elif ( signal.config.sigid.validate() and signal.config.sensors.validate() and
            signal.config.aspects.validate() and signal.config.theatre.validate() and
            signal.config.feathers.validate() and signal.config.semaphores.validate() and
-           signal.locking.interlocking.validate() ):
+           signal.locking.interlocking.validate() and signal.locking.conflicting_sigs.validate() ):
         ##########################################################################################
         ############# TODO - Validation of Interlocking & Automation UI elements #################
         ##########################################################################################
@@ -115,7 +116,6 @@ def save_state(signal, close_window):
         objects.schematic_objects[object_id]["distautomatic"] = not dist_button
         if rot: objects.schematic_objects[object_id]["orientation"] = 180
         else: objects.schematic_objects[object_id]["orientation"] = 0
-        
         # Set the Theatre route indicator flag if that particular radio button is selected
         if signal.config.routetype.get_value() == 3:
             objects.schematic_objects[object_id]["theatreroute"] = True
@@ -127,6 +127,7 @@ def save_state(signal, close_window):
         objects.schematic_objects[object_id]["sigroutes"] = signal.locking.sig_routes.get_values()
         objects.schematic_objects[object_id]["subroutes"] = signal.locking.sub_routes.get_values()
         objects.schematic_objects[object_id]["siglocking"] = signal.locking.interlocking.get_routes()
+        objects.schematic_objects[object_id]["conflictsigs"] = signal.locking.conflicting_sigs.get_values()
         ########################## Work in Progress #############################################
         # Update the signal (recreate in its new configuration)
         objects.update_signal_object(object_id)
@@ -377,11 +378,11 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub_routes.enable()
     elif ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           ( signal.config.semaphores.main.sub.selection.get_element()[0] or
-             signal.config.semaphores.lh1.sub.selection.get_element()[0] or
-             signal.config.semaphores.lh2.sub.selection.get_element()[0] or
-             signal.config.semaphores.rh1.sub.selection.get_element()[0] or
-             signal.config.semaphores.rh2.sub.selection.get_element()[0] ) ):
+           ( signal.config.semaphores.main.sub.get_element()[0] or
+             signal.config.semaphores.lh1.sub.get_element()[0] or
+             signal.config.semaphores.lh2.sub.get_element()[0] or
+             signal.config.semaphores.rh1.sub.get_element()[0] or
+             signal.config.semaphores.rh2.sub.get_element()[0] ) ):
         signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.sub_routes.enable()
     else:

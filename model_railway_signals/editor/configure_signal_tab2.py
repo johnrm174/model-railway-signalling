@@ -382,25 +382,100 @@ class interlocking_route_frame:
                    self.rh2.get_route() ] )
 
 #------------------------------------------------------------------------------------
-# Class for a signal route interlocking frame
-# uses multiple instances of the signal_route_selection_element
+# Class for a conflicting signal UI Element (for interlocking)
+# uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes 
+#    "get_values" - Populates the list of interlocked signals and their routes 
 #------------------------------------------------------------------------------------
 
-class signal_route_interlocking_frame():
-    def __init__(self, parent_frame):
+class conflicting_signals_element():
+    def __init__(self, parent_frame, route):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = LabelFrame(parent_frame, text="MAIN route - conflicting signals")
+        self.frame = LabelFrame(parent_frame, text=route+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')
-        self.subframe = Frame(self.frame)
-        self.subframe.pack()
-        self.subframe1 = Frame(self.subframe)
-        self.subframe1.pack(side=LEFT, padx=20)
-        self.element1 = common.signal_route_selection_element(self.subframe1, read_only=False)
-        self.subframe2 = Frame(self.subframe)
-        self.subframe2.pack(side=LEFT, padx=20)
-        self.element2 = common.signal_route_selection_element(self.subframe2, read_only=False)
+        self.frame.grid_columnconfigure(0, weight=1)
+        self.frame.grid_columnconfigure(1, weight=1)
+        self.sig1 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig1.frame.grid(row=0, column=0)
+        self.sig2 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig2.frame.grid(row=0, column=1)
+        self.sig3 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig3.frame.grid(row=1, column=0)
+        self.sig4 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig4.frame.grid(row=1, column=1)
+
+    def validate(self):
+        return ( self.sig1.validate and
+                 self.sig2.validate and
+                 self.sig3.validate and
+                 self.sig4.validate )
+    
+    def set_values(self, sig_route:[[int,[bool,bool,bool,bool,bool]],]):
+        # each sig_route comprises [sig1, sig2, sig3, sig4]
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        self.sig1.set_values(sig_route[0])
+        self.sig2.set_values(sig_route[1])
+        self.sig3.set_values(sig_route[2])
+        self.sig4.set_values(sig_route[3])
+
+    def get_values(self):
+        # each sig_route comprises [sig1, sig2, sig3, sig4]
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        return ( [self.sig1.get_values(),
+                  self.sig2.get_values(),
+                  self.sig3.get_values(),
+                  self.sig4.get_values()] )
+
+#------------------------------------------------------------------------------------
+# Class for a conflicting signal frame UI Element (for interlocking)
+# uses multiple instances of the common signal_route_selection_element
+# Public class instance methods provided by this class are:
+#    "set_values" - Populates the list of interlocked signals and their routes 
+#    "get_values" - Populates the list of interlocked signals and their routes 
+#    "validate" - Validates the Entry boxvalue (valid, existing, signal ID) 
+#------------------------------------------------------------------------------------
+
+class conflicting_signals_frame():
+    def __init__(self, parent_frame):
+        self.frame = Frame(parent_frame)
+        self.frame.pack(fill='x')
+        self.main = conflicting_signals_element(self.frame,"MAIN Route")
+        self.lh1 = conflicting_signals_element(self.frame,"LH1 Route")
+        self.lh2 = conflicting_signals_element(self.frame,"LH2 Route")
+        self.rh1 = conflicting_signals_element(self.frame,"RH1 Route")
+        self.rh2 = conflicting_signals_element(self.frame,"RH2 Route")
+        
+    def validate(self):
+        return ( self.main.validate and
+                 self.lh1.validate and
+                 self.lh2.validate and
+                 self.rh1.validate and
+                 self.rh2.validate )
+
+    def set_values(self, sig_routes_element:[[[int,[bool,bool,bool,bool,bool]],],]):
+        # sig_interlocking_routes comprises [main,lh1,lh2,rh1,rh2]
+        # each sig_route comprises [sig1, sig2, sig3, sig4]
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        self.main.set_values(sig_routes_element[0])
+        self.lh1.set_values(sig_routes_element[1])
+        self.lh2.set_values(sig_routes_element[2])
+        self.rh1.set_values(sig_routes_element[3])
+        self.rh2.set_values(sig_routes_element[4])
+
+    def get_values(self):
+        # sig_interlocking_routes comprises [main,lh1,lh2,rh1,rh2]
+        # each sig_route comprises [sig1, sig2, sig3, sig4]
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        return ( [self.main.get_values(),
+                  self.lh1.get_values(),
+                  self.lh2.get_values(),
+                  self.rh1.get_values(),
+                  self.rh2.get_values() ] )
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Signal Interlocking Tab
@@ -410,7 +485,7 @@ class signal_interlocking_tab:
     def __init__(self, parent_window, parent_object, routes_updated):
         # These UI elements need the parent object so the current sig_id can be accessed for validation
         self.interlocking = interlocking_route_frame(parent_window, parent_object,
-                                "Define supported routes and interlocking", False)
+                                "Signal routes and point interlocking", False)
         self.sig_routes = route_selections(parent_window, "Enable route interlocking for the main signal",
                             "Route must be selected to enable the signal to be cleared for the route - "+
                             "the route display will be dependent on the signal configuration tab selections")
@@ -418,6 +493,6 @@ class signal_interlocking_tab:
                             "Route must be selected to enable the subsidary to be cleared for the route - "+
                             "the route display will be dependent on the signal configuration tab selections")
         
-        self.conflicting_sigs = signal_route_interlocking_frame(parent_window)
+        self.conflicting_sigs = conflicting_signals_frame(parent_window)
         
 #############################################################################################
