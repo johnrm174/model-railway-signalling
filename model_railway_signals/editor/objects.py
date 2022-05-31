@@ -3,12 +3,14 @@
 # ie create default objects and update following a configuration change
 # ---------------------------------------------------------------------
 
+from tkinter import *
+from typing import Union
 import enum
 import uuid
-from tkinter import *
+import copy
 
+from ..library import points
 from ..library import signals
-from ..library import track_sensors
 from ..library import signals_common
 from ..library import signals_colour_lights
 from ..library import signals_semaphores
@@ -16,8 +18,8 @@ from ..library import signals_ground_position
 from ..library import signals_ground_disc
 from ..library import block_instruments
 from ..library import track_sections
-from ..library import points
 from ..library import dcc_control
+from ..library import track_sensors
 
 from . import run_layout
 
@@ -38,6 +40,24 @@ class object_type(enum.Enum):
 #------------------------------------------------------------------------------------
 
 schematic_objects:dict={}
+
+# We also maintain seperate indexes for each of the complex object types
+signal_index:dict={}
+point_index:dict={}
+instrument_index:dict={}
+section_index:dict={}
+
+# Simple functions to get the main dictionary index
+def signal(ID:Union[int,str]): return (signal_index[str(ID)])
+def point(ID:int): return (point_index[str(ID)])
+def instrument(ID:int): return (instrument_index[str(ID)])
+def section(ID:int): return (section_index[str(ID)])
+
+# simple functions to test if a particular object ID already exists
+def signal_exists(ID:Union[int,str]): return (str(ID) in signal_index.keys())
+def point_exists(ID:int): return (str(ID) in point_index.keys())
+def instrument_exists(ID:int): return (str(ID) in instrument_index.keys())
+def section_exists(ID:int): return (str(ID) in section_index.keys())
 
 #------------------------------------------------------------------------------------
 # Global variables used to track the Canvas Object
@@ -70,11 +90,12 @@ def set_bbox(object_id:str,bbox:list):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal functions to "soft delete" items (i.e. drawing objects, dcc mappings etc)
-# These functions are called when an object is changed (delete before re-creation) 
+# Internal functions to delete the library drawing objects - either on hard deletion
+# of the object (from the canvas) or on an update when we need to delete and re-create
 #------------------------------------------------------------------------------------
 
-def soft_delete_signal(object_id):
+def delete_signal_object(object_id):
+    # Delete the signal drawing objects and associated DCC mapping
     signals.delete_signal(schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
@@ -85,52 +106,166 @@ def soft_delete_signal(object_id):
     dcc_control.delete_signal_mapping(schematic_objects[object_id]["itemid"]+100)
     return()
 
-def soft_delete_point(object_id):
+def delete_point_object(object_id):
+    # Delete the point drawing objects and associated DCC mapping
     points.delete_point(schematic_objects[object_id]["itemid"])
     dcc_control.delete_point_mapping(schematic_objects[object_id]["itemid"])
     return()
 
-def soft_delete_section(object_id):
+def delete_section_object(object_id):
+    # Delete the section drawing objects
     track_sections.delete_section(schematic_objects[object_id]["itemid"])
     return()
 
-def soft_delete_instrument(object_id):
+def delete_instrument_object(object_id):
+    # Delete the instrument drawing objects
     block_instruments.delete_instrument(schematic_objects[object_id]["itemid"])
     return()
 
+def delete_line_object(object_id):
+    # Delete the line drawing objects    
+    canvas.delete(schematic_objects[object_id]["line"])
+    canvas.delete(schematic_objects[object_id]["end1"])
+    canvas.delete(schematic_objects[object_id]["end2"])
+    return()
+
 #------------------------------------------------------------------------------------
-# Internal function to to draw (or re-draw) a line object on the drawing canvas
-# Either on initial creation or after the object has been edited/saved
+# Function to hard delete a point (main object, drawing objects DCC mappings, sensor
+# mappings etc). This function called when an object is deleted from the schematic
+#------------------------------------------------------------------------------------
+
+def delete_signal(object_id):
+    # Delete the library object
+    delete_signal_object(object_id)
+    # Delete any signal interlocking entries from affected points
+    for point_id in point_index:
+        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
+        for index, interlocked_signal in enumerate(list_of_interlocked_signals):
+            if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[point(point_id)]["siginterlock"].pop(index)
+    # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
+    # the object from the dictionary of schematic objects (and associated dictionary keys)
+    canvas.delete(schematic_objects[object_id]["bbox"])
+    del signal_index[str(schematic_objects[object_id]["itemid"])]
+    del schematic_objects[object_id]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to hard delete a point (main object, drawing objects & DCC mappings)
+# This function called when an object is deleted from the schematic
+#------------------------------------------------------------------------------------
+
+def delete_point(object_id):
+    # Delete the library object
+    delete_point_object(object_id)
+    # Cycle through all the other objects to remove any references to the point
+    # Update any other point objects that "auto switch" the deleted point
+    for item_id in point_index:
+        if schematic_objects[point(item_id)]["alsoswitch"] == schematic_objects[object_id]["itemid"]:
+            schematic_objects[obj]["alsoswitch"] = 0
+    # Remove any references to the point from the signal interlocking
+    for item in signal_index:
+        ##################################################################
+        # TODO - remove any signal interlocking references (when supported)
+        ###################################################################
+        pass
+    # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
+    # the object from the dictionary of schematic objects (and associated dictionary keys)
+    canvas.delete(schematic_objects[object_id]["bbox"])
+    del point_index[str(schematic_objects[object_id]["itemid"])]
+    del schematic_objects[object_id]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to hard delete a Track Section (main object & drawing objects)
+# This function called when an object is deleted from the schematic
+#------------------------------------------------------------------------------------
+    
+def delete_section(object_id):
+    # Delete the library object
+    delete_section_object(object_id)
+    # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
+    # the object from the dictionary of schematic objects (and associated dictionary keys)
+    canvas.delete(schematic_objects[object_id]["bbox"])
+    del section_index[str(schematic_objects[object_id]["itemid"])]
+    del schematic_objects[object_id]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to hard delete a Block Instrument (main object & drawing objects)
+# This function called when an object is deleted from the schematic
+#------------------------------------------------------------------------------------
+
+def delete_instrument(object_id):
+    # Delete the library object
+    delete_instrument_object(object_id)
+    # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
+    # the object from the dictionary of schematic objects (and associated dictionary keys)
+    canvas.delete(schematic_objects[object_id]["bbox"])
+    del instrument_index[str(schematic_objects[object_id]["itemid"])]
+    del schematic_objects[object_id]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to hard delete a Line (i.e. main object & drawing objects)
+# This function called when an object is deleted from the schematic
+#------------------------------------------------------------------------------------
+
+def delete_line(object_id):
+    # Delete the line drawing objects
+    delete_line_object(object_id)
+    # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
+    # the object from the dictionary of schematic objects (and associated dictionary keys)
+    canvas.delete(schematic_objects[object_id]["bbox"])
+    del schematic_objects[object_id]
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to to create (or re-create) a Line object on the canvas
+# Either on initial creation or after the object attributes have been updated
 #------------------------------------------------------------------------------------
         
-def update_line_object(object_id):
+def update_line(object_id):
     global schematic_objects
-    # Retrieve the coordinates for the line
+    # Delete the existing line drawing objects
+    delete_line_object(object_id)
+    # Create new drawing objects
     x1 = schematic_objects[object_id]["posx"]
     y1 = schematic_objects[object_id]["posy"]
     x2 = schematic_objects[object_id]["endx"]
     y2 = schematic_objects[object_id]["endy"]
-    # Create/update the drawing objects based on the coordinates
-    if schematic_objects[object_id]["line"]: canvas.coords(schematic_objects[object_id]["line"],x1,y1,x2,y2)
-    else: schematic_objects[object_id]["line"] = canvas.create_line(x1,y1,x2,y2,fill="black",width=3)
-    if schematic_objects[object_id]["end1"]: canvas.coords(schematic_objects[object_id]["end1"],x1-5,y1-5,x1+5,y1+5)
-    else: schematic_objects[object_id]["end1"] = canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden')
-    if schematic_objects[object_id]["end2"]: canvas.coords(schematic_objects[object_id]["end2"],x2-5,y2-5,x2+5,y2+5)
-    else: schematic_objects[object_id]["end2"] = canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden')
+    schematic_objects[object_id]["line"] = canvas.create_line(x1,y1,x2,y2,fill="black",width=3)
+    schematic_objects[object_id]["end1"] = canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden')
+    schematic_objects[object_id]["end2"] = canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden')
     # Create/update the selection rectangle for the line (based on the boundary box)
     set_bbox (object_id, canvas.bbox(schematic_objects[object_id]["line"]))
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to draw (or re-draw) a signal object based on its configuration
-# Either on initial creation or after the object has been edited/saved
+# Function to to create (or re-create) a Signal object on the canvas
+# Either on initial creation or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def update_signal_object(object_id):
+def update_signal(object_id, item_id=None):
     global schematic_objects
+    
+    # Delete the library object (this gets re-created in the new configuration)
+    delete_signal_object(object_id)
+    
+    # Check to see if the Type-specific ID has been changed
+    old_item_id = schematic_objects[object_id]["itemid"]
+    if item_id is not None and old_item_id != item_id:
+        # Update the Item Id and the type-specific index
+        schematic_objects[object_id]["itemid"] = item_id
+        del signal_index[str(old_item_id)]
+        signal_index[str(item_id)] = object_id
+        ##################################################################
+        # TODO - Update point interlocking to reference new signal ID 
+        ###################################################################
 
     # Turn the signal type value back into the required enumeration type
     sig_type = signals_common.sig_type(schematic_objects[object_id]["itemtype"])
+    
     # Create the sensor mappings for the signal (if any have been specified)
     if schematic_objects[object_id]["passedsensor"][1] > 0:     
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10,
@@ -296,22 +431,70 @@ def update_signal_object(object_id):
         
     # Create/update the selection rectangle for the signal (based on the boundary box)
     set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
+
+    # Update any point interlocking tables that are affected by the change
+    # Delete any current entries to the Signal from the affected points
+    for point_id in point_index:
+        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
+        for index, interlocked_signal in enumerate(list_of_interlocked_signals):
+            if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[point(point_id)]["siginterlock"].pop(index)
+    # Find and add any interlocked routes to the affected points 
+    for point_id in point_index:
+        point_interlocked_by_signal = False
+        interlocked_routes = [False, False, False, False, False]
+        list_of_routes_to_test = schematic_objects[object_id]["pointinterlock"]
+        for route_index, route_to_test in enumerate(list_of_routes_to_test):
+            list_of_points_to_test = route_to_test[0]
+            for point_to_test in list_of_points_to_test:
+                if point_to_test[0] == int(point_id):
+                    interlocked_routes[route_index] = True
+                    point_interlocked_by_signal = True
+        if point_interlocked_by_signal:
+            interlocked_signal = [schematic_objects[object_id]["itemid"], interlocked_routes]
+            schematic_objects[point(point_id)]["siginterlock"].append(interlocked_signal)
+
+    # "Process" the changes by running the layout interlocking
+    run_layout.initialise_layout()
+
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to to draw (or re-draw) a point object on the drawing canvas
-# Either on initial creation or after the object has been edited/saved
+# Function to to create (or re-create) a Point object on the canvas
+# Either on initial creation or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def update_point_object(object_id):
+def update_point(object_id, item_id = None):
     global schematic_objects
+    
+    # Delete the library object (this gets re-created in the new configuration)
+    delete_point_object(object_id)
+    
+    # Check to see if the Type-specific ID has been changed
+    old_item_id = schematic_objects[object_id]["itemid"]
+    if item_id is not None and old_item_id != item_id:
+        # Update the Item Id and the type-specific index
+        schematic_objects[object_id]["itemid"] = item_id
+        del point_index[str(old_item_id)]
+        point_index[str(item_id)] = object_id
+        # Update any other point objects that "also switch" the current point
+        for point_id in point_index:
+            if schematic_objects[point(point_id)]["alsoswitch"] == old_item_id:
+                schematic_objects[point(point_id)]["alsoswitch"] = item_id
+                update_point(point(point_id))
+        ##################################################################
+        # TODO - Update signal interlocking to reference new point ID 
+        ###################################################################
+
     # Create the new DCC Mapping for the point
     if schematic_objects[object_id]["dccaddress"] > 0:
         dcc_control.map_dcc_point (schematic_objects[object_id]["itemid"],
                                    schematic_objects[object_id]["dccaddress"],
                                    schematic_objects[object_id]["dccreversed"])
+        
     # Turn the point type value back into the required enumeration type
     point_type = points.point_type(schematic_objects[object_id]["itemtype"])
+    
     # Create the new point object
     points.create_point (canvas,
                 point_id = schematic_objects[object_id]["itemid"],
@@ -325,17 +508,53 @@ def update_point_object(object_id):
                 reverse = schematic_objects[object_id]["reverse"],
                 auto = schematic_objects[object_id]["automatic"],
                 fpl = schematic_objects[object_id]["hasfpl"])
+    
     # Create/update the selection rectangle for the point (based on the boundary box)
     set_bbox (object_id, points.get_boundary_box(schematic_objects[object_id]["itemid"]))
+
+    # Finally, we need to ensure that all points in an 'auto switch' chain are set
+    # to the same switched/not-switched state so they switch together correctly
+    # First, test to see if the current point is configured to "auto switch" with 
+    # another point and, if so, toggle the current point to the same setting
+    current_point_id = schematic_objects[object_id]["itemid"]
+    also_switch_id = schematic_objects[object_id]["alsoswitch"]
+    for point_id in point_index:
+        if schematic_objects[point(point_id)]["alsoswitch"] == current_point_id:
+            if points.point_switched(point_id):
+                # Use the non-public-api call to bypass the validation for "toggle_point"
+                points.toggle_point_state(current_point_id,True)
+    # Next, test to see if the current point is configured to "auto switch" another
+    # point and, if so, toggle that point to the same setting (this will also toggle
+    # any other points downstream in the "auto-switch" chain)
+    if  also_switch_id > 0:
+        if points.point_switched(also_switch_id) != points.point_switched(current_point_id):
+            # Use the non-public-api call to bypass validation (can't toggle "auto" points)
+            points.toggle_point_state(also_switch_id,True)
+            
+    # "Process" the changes by running the layout interlocking
+    run_layout.initialise_layout()
+    
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to to draw (or re-draw) a "Section" object on the drawing canvas
-# Either on initial creation or after the object has been edited/saved
+# Function to to create (or re-create) a Track Section object on the canvas
+# Either on initial creation or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def update_section_object(object_id, edit_mode=True):
+def update_section(object_id, edit_mode=True, item_id = None):
     global schematic_objects
+    
+    # Delete the library object (this gets re-created in the new configuration)
+    delete_section_object(object_id)
+
+    # Check to see if the Type-specific ID has been changed
+    old_item_id = schematic_objects[object_id]["itemid"]
+    if item_id is not None and old_item_id != item_id:
+        # Update the Item Id and the type-specific index
+        schematic_objects[object_id]["itemid"] = item_id
+        del section_index[str(old_item_id)]
+        section_index[str(item_id)] = object_id
+
     # If we are in edit mode then we need to make the section non-editable so we
     # can use the mouse events for selecting and moving the section object
     if edit_mode:
@@ -344,6 +563,7 @@ def update_section_object(object_id, edit_mode=True):
     else:
         section_enabled = schematic_objects[object_id]["editable"]
         section_label = schematic_objects[object_id]["label"]
+        
     # Create the new track section object
     track_sections.create_section (canvas,
                 section_id = schematic_objects[object_id]["itemid"],
@@ -352,23 +572,41 @@ def update_section_object(object_id, edit_mode=True):
                 section_callback = run_layout.schematic_callback,
                 label = section_label,
                 editable = section_enabled)
+    
     # Create/update the selection rectangle for the track section (based on the boundary box)
     set_bbox (object_id, track_sections.get_boundary_box(schematic_objects[object_id]["itemid"]))
+    
     # Set up a callback for mouse clicks / movement on the button - otherwise we'll
     # end up just toggling the button and never getting a canvas mouse event
     callback = schematic_objects[object_id]["callback"]
     item_id = schematic_objects[object_id]["itemid"]
     # Only bind the mouse events if we are in edit mode
     if edit_mode: track_sections.bind_selection_events(item_id,object_id,callback)
+    
+    # "Process" the changes by running the layout interlocking
+    run_layout.initialise_layout()
+
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to to draw (or re-draw) a Block Instrument object on the canvas
-# Either on initial creation or after the object has been edited/saved
+# Function to to create (or re-create) a Block Instrument object on the canvas
+# Either on initial creation or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def update_instrument_object(object_id):
+def update_instrument(object_id, item_id = None):
     global schematic_objects
+    
+    # Delete the library object (this gets re-created in the new configuration)
+    delete_instrument_object(object_id)
+
+    # Check to see if the Type-specific ID has been changed
+    old_item_id = schematic_objects[object_id]["itemid"]
+    if item_id is not None and old_item_id != item_id:
+        # Update the Item Id and the type-specific index
+        schematic_objects[object_id]["itemid"] = item_id
+        del instrument_index[str(old_item_id)]
+        instrument_index[str(item_id)] = object_id
+        
     # Create the new Block Instrument object
     block_instruments.create_block_instrument (canvas,
                 block_id = schematic_objects[object_id]["itemid"],
@@ -379,8 +617,13 @@ def update_instrument_object(object_id):
                 bell_sound_file = schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = schematic_objects[object_id]["keysound"],
                 linked_to = schematic_objects[object_id]["linkedto"])
+    
     # Create/update the selection rectangle for the instrument (based on the boundary box)
     set_bbox (object_id, block_instruments.get_boundary_box(schematic_objects[object_id]["itemid"]))
+
+    # "Process" the changes by running the layout interlocking
+    run_layout.initialise_layout()
+    
     return()
 
 #------------------------------------------------------------------------------------
@@ -427,15 +670,19 @@ def new_item_id(exists_function):
     return(item_id)
 
 #------------------------------------------------------------------------------------
-# Internal function to Create a new default Signal Object
+# Function to Create a new default signal (and draw it on the canvas)
 #------------------------------------------------------------------------------------
 
-def create_default_signal_object(item_type, item_subtype):
+def create_default_signal(item_type, item_subtype):
     global schematic_objects
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.signal)
+    # Assign a new Item ID (that doesn't conflict with an existing object)
+    item_id = new_item_id(exists_function = signal_exists)
+    # Add the index to the signal
+    signal_index[str(item_id)] = object_id 
     # The following dictionary elements are specific to signals
-    schematic_objects[object_id]["itemid"] = new_item_id(signals_common.sig_exists)
+    schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["itemsubtype"] = item_subtype
     schematic_objects[object_id]["orientation"] = 0 
@@ -491,7 +738,7 @@ def create_default_signal_object(item_type, item_subtype):
     # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
     # Each point element comprises [point_id, point_state]
     # Note that Sig ID in this case is a string
-    schematic_objects[object_id]["siglocking"] = [
+    schematic_objects[object_id]["pointinterlock"] = [
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
              [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
@@ -504,7 +751,7 @@ def create_default_signal_object(item_type, item_subtype):
     # each sig_route comprises [sig1, sig2, sig3, sig4]
     # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
     # Where each route element is a boolean value (True or False)
-    schematic_objects[object_id]["conflictsigs"] = [
+    schematic_objects[object_id]["siginterlock"] = [
              [ [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]], 
@@ -527,19 +774,23 @@ def create_default_signal_object(item_type, item_subtype):
                [0, [False, False, False, False, False]] ] ]
 
     # Draw the Signal on the canvas (and assign the ID)
-    update_signal_object(object_id)
+    update_signal(object_id)
     return() 
 
 #------------------------------------------------------------------------------------
-# Internal function to Create a new default Point Object
+# Function to Create a new default Point (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_point_object(item_type):
+def create_default_point(item_type):
     global schematic_objects
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.point)
+    # Assign a new Item ID (that doesn't conflict with an existing object)
+    item_id = new_item_id(exists_function = point_exists)
+    # Add the index to the signal
+    point_index[str(item_id)] = object_id 
     # the following dictionary elements are specific to points
-    schematic_objects[object_id]["itemid"] = new_item_id(points.point_exists)
+    schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["orientation"] = 0
     schematic_objects[object_id]["colour"] = "black"
@@ -550,50 +801,60 @@ def create_default_point_object(item_type):
     # These are the DCC address parameters
     schematic_objects[object_id]["dccaddress"] = 0
     schematic_objects[object_id]["dccreversed"] = False
+    # This is the (variable length) signal interlocking table
+    schematic_objects[object_id]["siginterlock"] =[]
     # Draw the Point on the canvas (and assign the ID)
-    update_point_object(object_id)
+    update_point(object_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Create a new default Section Object
+# Function to Create a new default Track Section (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_section_object(callback):
+def create_default_section(callback):
     global schematic_objects
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.section)
+    # Assign a new Item ID (that doesn't conflict with an existing object)
+    item_id = new_item_id(exists_function = section_exists)
+    # Add the index to the signal
+    section_index[str(item_id)] = object_id 
     # the following dictionary elements are specific to Track sections
-    schematic_objects[object_id]["itemid"] = new_item_id(track_sections.section_exists)
+    schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["label"] = "Occupied"
     schematic_objects[object_id]["editable"] = True
     schematic_objects[object_id]["callback"] = callback
     # Draw the track section on the canvas
-    update_section_object(object_id)
+    update_section(object_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Create a new default Block Instrument Object
+# Function to Create a new default Block Instrument (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_instrument_object():
+def create_default_instrument():
     global schematic_objects
     # Create the generic dictionary elements and set the creation position
     object_id = create_default_object(object_type.instrument)
+    # Assign a new Item ID (that doesn't conflict with an existing object)
+    item_id = new_item_id(exists_function = instrument_exists)
+    # Add the index to the signal
+    instrument_index[str(item_id)] = object_id 
     # the following dictionary elements are specific to block instruments
-    schematic_objects[object_id]["itemid"] = new_item_id(block_instruments.instrument_exists)
+    schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["singleline"] = False
     schematic_objects[object_id]["bellsound"] = "bell-ring-01.wav"
     schematic_objects[object_id]["keysound"] = "telegraph-key-01.wav"
     schematic_objects[object_id]["linkedto"] = None
     # Draw the block instrument on the canvas
-    update_instrument_object(object_id)
+    update_instrument(object_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Create a new default Line Object
+# Function to Create a new default Line (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_line_object():
+def create_default_line():
     global schematic_objects
     object_id = create_default_object(object_type.line)
     # the following dictionary elements are specific to lines
@@ -603,7 +864,103 @@ def create_default_line_object():
     schematic_objects[object_id]["end1"] = None
     schematic_objects[object_id]["end2"] = None
     # Draw the Line on the canvas
-    update_line_object(object_id)
+    update_line(object_id)
     return()
+
+#------------------------------------------------------------------------------------
+# Internal Function to Create a deep copy of an existing object (with a new UUID)
+#------------------------------------------------------------------------------------
+
+def copy_core_object(object_id):
+    # Create a deep copy of the new Object (with a new UUID)
+    new_object_id = uuid.uuid4()
+    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    # The new objects are "pasted" at a slightly offset position on the canvas
+    position_offset = canvas.getvar(name="canvasgrid")
+    schematic_objects[new_object_id]["posx"] += position_offset
+    schematic_objects[new_object_id]["posy"] += position_offset
+    # Set the 'bbox' to None so it will be created for the new object
+    schematic_objects[new_object_id]["bbox"] = None
+    return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Functions to Create a copy of an existing line - returns the new Object ID
+#------------------------------------------------------------------------------------
+
+def copy_line(object_id):
+    # Create a deep copy of the object
+    new_object_id = copy_core_object(object_id)
+    # The other end of the line also needs to be shifted
+    position_offset = canvas.getvar(name="canvasgrid")
+    schematic_objects[new_object_id]["endx"] += position_offset
+    schematic_objects[new_object_id]["endy"] += position_offset
+    # Set the drawing objects to None so they will be created
+    schematic_objects[new_object_id]["line"] = None
+    schematic_objects[new_object_id]["end1"] = None
+    schematic_objects[new_object_id]["end2"] = None
+    schematic_objects[new_object_id]["bbox"] = None
+    # Draw the new object
+    update_line(new_object_id)
+    return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Functions to Create a copy of an existing signal - returns the new Object ID
+#------------------------------------------------------------------------------------
+
+def copy_signal(object_id):
+    # Create a deep copy of the object
+    new_object_id = copy_core_object(object_id)
+    # Assign a new type-specific ID for the object and add to the index
+    new_id = new_item_id(exists_function = signal_exists)
+    schematic_objects[new_object_id]["itemid"] = new_id
+    signal_index[str(new_id)] = new_object_id
+    # Draw the new object
+    update_signal(new_object_id)
+    return(new_object_id)            
+
+#------------------------------------------------------------------------------------
+# Functions to Create a copy of an existing point - returns the new Object ID
+#------------------------------------------------------------------------------------
+
+def copy_point(object_id):
+    # Create a deep copy of the object
+    new_object_id = copy_core_object(object_id)
+    # Assign a new type-specific ID for the object and add to the index
+    new_id = new_item_id(exists_function = point_exists)
+    schematic_objects[new_object_id]["itemid"] = new_id
+    point_index[str(new_id)] = new_object_id
+    # Draw the new object
+    update_point(new_object_id)
+    return(new_object_id)            
+
+#------------------------------------------------------------------------------------
+# Functions to Create a copy of an existing Track Section - returns the new Object ID
+#------------------------------------------------------------------------------------
+
+def copy_section(object_id):
+    # Create a deep copy of the object
+    new_object_id = copy_core_object(object_id)
+    # Assign a new type-specific ID for the object and add to the index
+    new_id = new_item_id(exists_function = section_exists)
+    schematic_objects[new_object_id]["itemid"] = new_id
+    section_index[str(new_id)] = new_object_id
+    # Draw the new object
+    update_section(new_object_id)
+    return(new_object_id)
+
+#------------------------------------------------------------------------------------
+# Functions to Create a copy of an existing Block Instrument  - returns the new Object ID
+#------------------------------------------------------------------------------------
+
+def copy_instrument(object_id):
+    # Create a deep copy of the object
+    new_object_id = copy_core_object(object_id)
+    # Assign a new type-specific ID for the object and add to the index
+    new_id = new_item_id(exists_function = instrument_exists)
+    schematic_objects[new_object_id]["itemid"] = new_id
+    instrument_index[str(new_id)] = new_object_id
+    # Draw the new object
+    update_instrument(new_object_id)
+    return(new_object_id)            
 
 ####################################################################################

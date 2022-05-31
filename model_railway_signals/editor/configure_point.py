@@ -7,8 +7,6 @@ from tkinter import ttk
 
 from . import objects
 from . import common
-from . import run_layout
-from ..library import points
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -32,6 +30,8 @@ def load_state(point):
     add = objects.schematic_objects[object_id]["dccaddress"]
     rev = objects.schematic_objects[object_id]["dccreversed"]
     point.config.dccsettings.set_values (add, rev)
+    # Set the read only list of Interlocked signals
+    point.locking.signals.set_values(objects.schematic_objects[object_id]["siginterlock"])
     return()
     
 #------------------------------------------------------------------------------------
@@ -48,25 +48,10 @@ def save_state(point, close_window:bool):
     # been validated on entry, but changes to other objects may have been made since then
     elif (point.config.pointid.validate() and point.config.alsoswitch.validate() and
              point.config.settings.validate() and point.config.dccsettings.validate()):
-        # Soft Delete the existing point object (the point will be re-created on "update")
-        # We do this here before updating the object in case the pont ID has been changed
-        objects.soft_delete_point(object_id)
-        # If the ID has been updated then update all references from other layout objects
-        old_id = objects.schematic_objects[object_id]["itemid"]
+        # Get the Point ID (this may or may not have changed) - Note that we don't save  
+        # the value to the dictionary - instead we pass to the update point function
         new_id = point.config.pointid.get_value()
-        if old_id != new_id:
-            for obj in objects.schematic_objects:
-                # First we update any other point objects that refer to the current point
-                if (objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                        objects.schematic_objects[obj]["alsoswitch"] == old_id):
-                    objects.schematic_objects[obj]["alsoswitch"] = new_id
-                    objects.soft_delete_point(obj)
-                    objects.update_point_object(obj)
-                ##################################################################
-                # TODO - update any signal interlocking details (when supported)
-                ###################################################################
         # Update the point coniguration from the current user selections
-        objects.schematic_objects[object_id]["itemid"] = new_id
         objects.schematic_objects[object_id]["itemtype"] = point.config.pointtype.get_value()
         objects.schematic_objects[object_id]["alsoswitch"] = point.config.alsoswitch.get_value()
         # These are the general settings
@@ -82,28 +67,7 @@ def save_state(point, close_window:bool):
         objects.schematic_objects[object_id]["dccaddress"] = add
         objects.schematic_objects[object_id]["dccreversed"] = rev
         # Update the point (recreate in its new configuration)
-        objects.update_point_object(object_id)
-        # Finally, we need to ensure that all points in an 'auto switch' chain are set
-        # to the same switched/not-switched state so they switch together correctly
-        # First, test to see if the current point is configured to "auto switch" with 
-        # another point and, if so, toggle the current point to the same setting
-        for obj in objects.schematic_objects:
-            if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                    objects.schematic_objects[obj]["alsoswitch"] == new_id and
-                  ( points.point_switched(objects.schematic_objects[obj]["itemid"]) !=
-                    points.point_switched(new_id) ) ):
-                # Use the non-public-api call to bypass the validation
-                points.toggle_point_state(objects.schematic_objects[object_id]["itemid"],True)
-        # Next, test to see if the current point is configured to "auto switch" another
-        # point and, if so, toggle that point to the same setting (this will also toggle
-        # any other points downstream in the "auto-switch" chain
-        if ( objects.schematic_objects[object_id]["alsoswitch"] > 0 and
-             ( points.point_switched(objects.schematic_objects[object_id]["alsoswitch"]) !=
-               points.point_switched(new_id) ) ):
-            # Use the non-public-api call to bypass validation (can't toggle "auto" points)
-            points.toggle_point_state(objects.schematic_objects[object_id]["alsoswitch"],True)
-        # "Process" the changes by running the layout interlocking
-        run_layout.initialise_layout()
+        objects.update_point(object_id, item_id = new_id)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)
@@ -115,9 +79,7 @@ def save_state(point, close_window:bool):
 
 #------------------------------------------------------------------------------------
 # Common Class for the "Also Switch" Entry Box - builds on the Integer Entry Box class
-# Public class instance methods inherited from the parent class(es) are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
+# Public class instance methods inherited/used from the parent class(es) are:
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
 # Public class instance methods overridden by this class are
@@ -147,25 +109,24 @@ class also_switch_selection(common.integer_entry_box):
             autoswitch = int(self.eb_entry.get())
             # Validate the other point exists, is different to the current
             # point and that the other pointt is a fully automatic point
-            if not points.point_exists(autoswitch):
+            if not objects.point_exists(autoswitch):
                 self.EB_TT.text = "Point does not exist"
                 valid = False
             elif autoswitch == self.parent_object.pointid.get_value():
                 self.EB_TT.text = "Specified ID is the same ID as the current point"
                 valid = False
-            elif not points.automatic(autoswitch):
+            elif not objects.schematic_objects[objects.point(autoswitch)]["automatic"]:
                 self.EB_TT.text = "Point "+str(autoswitch)+" is not 'fully automatic'"
                 valid = False
             else:
                 # Test to see if the entered point is already being autoswitched by another point
                 if self.eb_initial_value.get() == "": initial_autoswitch = 0
                 else: initial_autoswitch = int(self.eb_initial_value.get())
-                for obj in objects.schematic_objects:
-                    if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                         objects.schematic_objects[obj]["alsoswitch"] == autoswitch and
-                         autoswitch != initial_autoswitch ):
-                        self.EB_TT.text = ("Point "+str(autoswitch)+" is already configured to 'also " +
-                            "switch' with point "+str(objects.schematic_objects[obj]["itemid"]))
+                for point_id in objects.point_index:
+                    other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
+                    if other_autoswitch == autoswitch and autoswitch != initial_autoswitch:
+                        self.EB_TT.text = ("Point "+str(autoswitch)+" is already configured "+
+                                              "to 'also switch' with point "+point_id)
                         valid = False       
         self.set_validation_status(valid)
         return(valid)
@@ -232,11 +193,11 @@ class general_settings:
         valid = True
         if not self.automatic.get():
             # Ensure the point isn't configured to "auto switch" with another point
-            for obj in objects.schematic_objects:
-                if (objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                    objects.schematic_objects[obj]["alsoswitch"] == self.parent_object.pointid.get_initial_value()):
+            for point_id in objects.point_index:
+                autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
+                if autoswitch == self.parent_object.pointid.get_initial_value():
                     self.CB4TT.text = ("Point is configured to be 'also switched' by point " +
-                        str(objects.schematic_objects[obj]["itemid"]) + " so must remain 'fully automatic'")
+                                           point_id + " so must remain 'fully automatic'")
                     self.CB4.config(fg="red")
                     valid = False
         if valid:
@@ -258,9 +219,7 @@ class general_settings:
 
 #------------------------------------------------------------------------------------
 # Class for the DCC Address Settings - builds on the DCC Entry Box class
-# Class instance methods inherited from the parent class are:
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
+# Class instance methods inherited/used from the parent class are:
 #    "validate" - validate the current DCC entry box value and return True/false
 # Class instance methods which override the parent class method are:
 #    "set_values" - will set the entry/checkbox states [address:int, reversed:bool]
@@ -304,7 +263,8 @@ class point_configuration_tab:
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
         # Note the need to pass in the type-specific "point_exists" function
-        self.pointid = common.object_id_selection(self.frame, "Point ID", points.point_exists) 
+        self.pointid = common.object_id_selection(self.frame, "Point ID",
+                                exists_function = objects.point_exists) 
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
                                       "Select Point Type", None, "RH", "LH")
@@ -358,16 +318,7 @@ class signal_route_interlocking_frame():
 
 class point_interlocking_tab:
     def __init__(self, parent_tab):
-        self.interlocking = signal_route_interlocking_frame(parent_tab)
-        dummy_data = [ [1,[True, True, True, True, True]],
-                       [1,[True, False, True, False, True]],
-                       [1,[False, True, False, True, True]],
-                       [1,[False, True, False, True, True]],
-                       [1,[False, True, False, True, True]],
-                       [1,[False, True, False, True, True]],
-                       [1,[True, True, True, True, False]],
-                       [1,[False, False, False, False, False]] ]
-        self.interlocking.set_values(dummy_data)
+        self.signals = signal_route_interlocking_frame(parent_tab)
 
 #####################################################################################
 # Top level Class for the Edit Point window

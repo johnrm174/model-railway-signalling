@@ -21,10 +21,8 @@ from . import configure_point
 
 import importlib.resources
 import logging
-import enum
-import uuid
-import copy
 import math
+import copy
 
 #------------------------------------------------------------------------------------
 # Global variables used to track the current selections/state of the Schematic Editor
@@ -207,41 +205,21 @@ def move_selected_objects(xdiff:int,ydiff:int):
 def delete_selected_objects(event=None):
     global schematic_state
     for object_id in schematic_state["selectedobjects"]:
-        # Delete the selected object depending on type - first we use a "soft delete"
-        # to delete the drawing objects and any associated DCC/Sensor mappings etc
+        # Delete the selected object depending on type
         if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-            canvas.delete(objects.schematic_objects[object_id]["line"])
-            canvas.delete(objects.schematic_objects[object_id]["end1"])
-            canvas.delete(objects.schematic_objects[object_id]["end2"])
+            objects.delete_line(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            objects.soft_delete_signal(object_id)
+            objects.delete_signal(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            objects.soft_delete_point(object_id)
-            # Cycle through all the other objects to remove any references to the point
-            for obj in objects.schematic_objects:
-                # First we update any other point objects that refer to the deleted point
-                if ( objects.schematic_objects[obj]["item"] == objects.object_type.point and
-                     objects.schematic_objects[obj]["alsoswitch"] ==
-                           objects.schematic_objects[object_id]["itemid"] ):
-                    # Update the other point object (to remove the "auto switch" value")
-                    objects.soft_delete_point(obj)
-                    objects.schematic_objects[obj]["alsoswitch"] = 0
-                    objects.update_point_object(obj)
-                ##################################################################
-                # TODO - remove any signal interlocking references (when supported)
-                ###################################################################     
+            objects.delete_point(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.soft_delete_section(object_id)
+            objects.delete_section(object_id)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-             objects.soft_delete_instrument(object_id)
-        # Now we "Hard Delete" the selected object - deleting the boundary box rectangle
-        # and deleting the object entry from the dictionary of schematic objects
-        canvas.delete(objects.schematic_objects[object_id]["bbox"])
-        del objects.schematic_objects[object_id]
+             objects.delete_instrument(object_id)
         # if the deleted object is on the clipboard then remove from the clipboard
         if object_id in schematic_state["clipboardobjects"]:
             schematic_state["clipboardobjects"].remove(object_id)
-    # Remove the object from the list of selected objects
+    # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     return()
 
@@ -260,15 +238,11 @@ def rotate_selected_objects(event=None):
                 objects.schematic_objects[object_id]["orientation"] = 180
             else:
                 objects.schematic_objects[object_id]["orientation"] = 0
-            # Update the item according to the object type - first we use a "soft delete"
-            # to delete the drawing objects and any associated DCC/Sensor mappings etc
-            # Then we "update" the object to re-create it (and the associated mappings)
+            # Update the object to re-create it (and the associated mappings)
             if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-                objects.soft_delete_signal(object_id)
-                objects.update_signal_object(object_id)
+                objects.update_signal(object_id)
             elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-                objects.soft_delete_point(object_id)
-                objects.update_point_object(object_id)
+                objects.update_point(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -289,39 +263,17 @@ def paste_clipboard_objects(event=None):
     # Clear down any object selections prior to the "paste"
     deselect_all_objects()
     for object_id in schematic_state["clipboardobjects"]:
-        # Create a deep copy of the new Object (with a new UUID)
-        new_object_id = uuid.uuid4()
-        objects.schematic_objects[new_object_id] = copy.deepcopy(objects.schematic_objects[object_id])
-        # The new objects are "pasted" at a slightly offset position on the canvas
-        objects.schematic_objects[new_object_id]["posx"] += canvasgrid.get()
-        objects.schematic_objects[new_object_id]["posy"] += canvasgrid.get()
-        # Create the new drawing objects depending on object type
-        if objects.schematic_objects[new_object_id]["item"] == objects.object_type.line:
-            objects.schematic_objects[new_object_id]["endx"] += canvasgrid.get()
-            objects.schematic_objects[new_object_id]["endy"] += canvasgrid.get()
-            # Set the drawing objects to None so they will be created
-            objects.schematic_objects[new_object_id]["line"] = None
-            objects.schematic_objects[new_object_id]["end1"] = None
-            objects.schematic_objects[new_object_id]["end2"] = None
-            objects.schematic_objects[new_object_id]["bbox"] = None
-            objects.update_line_object(new_object_id)
-        else:
-            # Set the 'bbox' to None so it will be created for the new object
-            objects.schematic_objects[new_object_id]["itemid"] = None
-            objects.schematic_objects[new_object_id]["bbox"] = None
-            # Assign new IDs and Draw the newly created items according to object type
-            if objects.schematic_objects[new_object_id]["item"] == objects.object_type.signal:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(signals_common.sig_exists)
-                objects.update_signal_object(new_object_id)
-            elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.point:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(points.point_exists)
-                objects.update_point_object(new_object_id)
-            elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.section:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(track_sections.section_exists)
-                objects.update_section_object(new_object_id)
-            elif objects.schematic_objects[new_object_id]["item"] == objects.object_type.instrument:
-                objects.schematic_objects[new_object_id]["itemid"] = objects.new_item_id(block_instruments.instrument_exists)
-                objects.update_instrument_object(new_object_id)
+        # Create a new Copy the object (depending on type)
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+            new_object_id = objects.copy_line(object_id)
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
+            new_object_id = objects.copy_signal(object_id)
+        elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
+            new_object_id = objects.copy_point(object_id)
+        elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
+            new_object_id = objects.copy_section(object_id)
+        elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
+            new_object_id = objects.copy_instrument(object_id)
         # Add the new object to the list of selected objects
         select_object(new_object_id)
     # Make the list of "Copied" Objects reflect what we have just pasted
@@ -623,7 +575,6 @@ def enable_editing():
     canvas.itemconfig("grid",state="normal")
     for object_id in objects.schematic_objects:
         if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.soft_delete_section(object_id)
             objects.update_section_object(object_id, edit_mode=True)
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
@@ -637,7 +588,6 @@ def disable_editing():
     # Refresh all the Section objects to make them editable/non-editable depending on the mode
     for object_id in objects.schematic_objects:
         if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.soft_delete_section(object_id)
             objects.update_section_object(object_id, edit_mode=False)
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
@@ -735,42 +685,42 @@ def create_canvas (root_window):
     # Add The Buttons for creating new objects and adding to the schematic
     # Note that for enumeration types we pass the "value"
     button1 = Button (button_frame, image=button_images['line'],
-                      command=lambda:objects.create_default_line_object())
+                      command=lambda:objects.create_default_line())
     button1.pack (padx=2 ,pady=2)
     button2 = Button (button_frame, image=button_images['colour_light'],
-                      command=lambda:objects.create_default_signal_object
+                      command=lambda:objects.create_default_signal
                           (signals_common.sig_type.colour_light.value,
                            signals_colour_lights.signal_sub_type.four_aspect.value) )
     button2.pack (padx=2, pady=2)
     button3 = Button (button_frame, image=button_images['semaphore'],
-                      command=lambda:objects.create_default_signal_object
+                      command=lambda:objects.create_default_signal
                           (signals_common.sig_type.semaphore.value,
                            signals_semaphores.semaphore_sub_type.home.value))
     button3.pack (padx=2, pady=2)
     button4 = Button (button_frame, image=button_images['ground_position'],
-                      command=lambda:objects.create_default_signal_object
+                      command=lambda:objects.create_default_signal
                           (signals_common.sig_type.ground_position.value,
                            signals_ground_position.ground_pos_sub_type.standard.value))
     button4.pack (padx=2, pady=2)
     button5 = Button (button_frame, image=button_images['ground_disc'],
-                      command=lambda:objects.create_default_signal_object
+                      command=lambda:objects.create_default_signal
                           (signals_common.sig_type.ground_disc.value,
                            signals_ground_disc.ground_disc_sub_type.standard.value))
     button5.pack (padx=2, pady=2)
     button6 = Button (button_frame, image=button_images['left_hand_point'],
-                      command=lambda:objects.create_default_point_object
+                      command=lambda:objects.create_default_point
                           (points.point_type.LH.value))
     button6.pack (padx=2, pady=2)
     button7 = Button (button_frame, image=button_images['right_hand_point'],
-                      command=lambda:objects.create_default_point_object
+                      command=lambda:objects.create_default_point
                           (points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
     button8 = Button (button_frame, image=button_images['track_section'],
-                      command=lambda:objects.create_default_section_object
-                          (section_event_callback))
+                      command=lambda:objects.create_default_section
+                        (section_event_callback))
     button8.pack (padx=2, pady=2)
-    button9 = Button (button_frame, image=button_images['block_instrument'], compound=TOP,
-                      command=lambda:objects.create_default_instrument_object())
+    button9 = Button (button_frame, image=button_images['block_instrument'],
+                      compound=TOP, command=lambda:objects.create_default_instrument())
     button9.pack (padx=2, pady=2)
     return(canvas)
 

@@ -7,18 +7,12 @@ from tkinter import ttk
 
 from . import objects
 from . import common
-from . import run_layout
 from . import configure_signal_tab1 
 from . import configure_signal_tab2
 
-from ..library import points
-from ..library import signals
-from ..library import track_sensors
 from ..library import signals_common
 from ..library import signals_colour_lights
 from ..library import signals_semaphores
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -49,8 +43,8 @@ def load_state(signal):
     # These elements are for the signal intelocking tab
     signal.locking.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
     signal.locking.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
-    signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["siglocking"])
-    signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["conflictsigs"])
+    signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
+    signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
     ########################## Work in Progress #############################################    
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
@@ -96,10 +90,10 @@ def save_state(signal, close_window):
         ##########################################################################################
         ############# TODO - Validation of Interlocking & Automation UI elements #################
         ##########################################################################################
-        # Delete the existing signal object (the signal will be re-created)
-        objects.soft_delete_signal(object_id)
+        # Get the Signal ID (this may or may not have changed) - Note that we don't save  
+        # the value to the dictionary - instead we pass to the update signal function
+        new_id = signal.config.sigid.get_value()
         # Update all object configuration settings from the Tkinter variables
-        objects.schematic_objects[object_id]["itemid"] = int(signal.config.sigid.get_value())
         objects.schematic_objects[object_id]["itemtype"] = signal.config.sigtype.get_value()
         objects.schematic_objects[object_id]["itemsubtype"] = signal.config.subtype.get_value()
         objects.schematic_objects[object_id]["passedsensor"] = signal.config.sensors.passed.get_value()
@@ -126,13 +120,11 @@ def save_state(signal, close_window):
         # These elements are for the signal intelocking tab
         objects.schematic_objects[object_id]["sigroutes"] = signal.locking.sig_routes.get_values()
         objects.schematic_objects[object_id]["subroutes"] = signal.locking.sub_routes.get_values()
-        objects.schematic_objects[object_id]["siglocking"] = signal.locking.interlocking.get_routes()
-        objects.schematic_objects[object_id]["conflictsigs"] = signal.locking.conflicting_sigs.get_values()
+        objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
+        objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
         ########################## Work in Progress #############################################
         # Update the signal (recreate in its new configuration)
-        objects.update_signal_object(object_id)
-        # "Process" the changes by running the layout interlocking
-        run_layout.initialise_layout()
+        objects.update_signal(object_id, item_id = new_id)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: signal.window.destroy()
         else: load_state(signal)

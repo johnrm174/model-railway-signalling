@@ -7,14 +7,6 @@ from tkinter import ttk
 
 from . import objects
 from . import common
-from ..library import points
-from ..library import signals
-from ..library import track_sensors
-from ..library import signals_common
-from ..library import signals_colour_lights
-from ..library import signals_semaphores
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
 
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element
@@ -836,7 +828,7 @@ class signal_configuration_tab:
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Object-ID
         self.sigid = common.object_id_selection(self.frame,"Signal ID",
-                        signals_common.sig_exists)
+                                exists_function = objects.signal_exists)
         # Create the UI Element for Signal Type selection 
         self.sigtype = common.selection_buttons(self.frame,"Signal Type",
                     "Select signal type",sig_type_updated,"Colour Light",
