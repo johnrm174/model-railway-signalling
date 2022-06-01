@@ -458,7 +458,7 @@ class edit_signal:
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
-        self.window.title("Signal")
+        self.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
         self.window.attributes('-topmost',True)
         # Create the Window tabs
         self.tabs = ttk.Notebook(self.window)

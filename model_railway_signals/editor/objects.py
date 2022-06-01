@@ -91,7 +91,7 @@ def set_bbox(object_id:str,bbox:list):
 
 #------------------------------------------------------------------------------------
 # Internal functions to delete the library drawing objects - either on hard deletion
-# of the object (from the canvas) or on an update when we need to delete and re-create
+# of the object (from the schematic) or on an update when we need to delete and re-create
 #------------------------------------------------------------------------------------
 
 def delete_signal_object(object_id):
@@ -137,12 +137,15 @@ def delete_line_object(object_id):
 def delete_signal(object_id):
     # Delete the library object
     delete_signal_object(object_id)
-    # Delete any signal interlocking entries from affected points
+    # Find and delete any signal interlocking entries from affected points
     for point_id in point_index:
         list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
         for index, interlocked_signal in enumerate(list_of_interlocked_signals):
             if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
                 schematic_objects[point(point_id)]["siginterlock"].pop(index)
+    ########################################################################
+    # TODO - remove any opposing signal interlocking references to signal
+    #########################################################################
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     canvas.delete(schematic_objects[object_id]["bbox"])
@@ -163,12 +166,15 @@ def delete_point(object_id):
     for item_id in point_index:
         if schematic_objects[point(item_id)]["alsoswitch"] == schematic_objects[object_id]["itemid"]:
             schematic_objects[obj]["alsoswitch"] = 0
-    # Remove any references to the point from the signal interlocking
-    for item in signal_index:
-        ##################################################################
-        # TODO - remove any signal interlocking references (when supported)
-        ###################################################################
-        pass
+    # Remove any references to the point from signal interlocking tables
+    for signal_id in signal_index:
+        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
+        for index1, interlocked_route in enumerate(list_of_interlocked_routes):
+            list_of_interlocked_points = interlocked_route[0]
+            for index2, interlocked_point in enumerate(list_of_interlocked_points):
+                if interlocked_point[0] == schematic_objects[object_id]["itemid"]:
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].pop(index2)
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].append([0,False])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     canvas.delete(schematic_objects[object_id]["bbox"])
@@ -199,6 +205,9 @@ def delete_section(object_id):
 def delete_instrument(object_id):
     # Delete the library object
     delete_instrument_object(object_id)
+    ########################################################################
+    # TODO - remove any Signal interlocking references to Block Instrument
+    #########################################################################
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     canvas.delete(schematic_objects[object_id]["bbox"])
@@ -252,16 +261,22 @@ def update_signal(object_id, item_id=None):
     # Delete the library object (this gets re-created in the new configuration)
     delete_signal_object(object_id)
     
+    # Delete any interlocking entries to the Signal from the affected points
+    # We do this here so we handle any changes to the Signal ID (the signal
+    # gets added to the interlocking lists of any affected points later on)
+    for point_id in point_index:
+        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
+        for index, interlocked_signal in enumerate(list_of_interlocked_signals):
+            if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[point(point_id)]["siginterlock"].pop(index)
+                
     # Check to see if the Type-specific ID has been changed
-    old_item_id = schematic_objects[object_id]["itemid"]
+    old_item_id = schematic_objects[object_id]["itemid"]                
     if item_id is not None and old_item_id != item_id:
         # Update the Item Id and the type-specific index
         schematic_objects[object_id]["itemid"] = item_id
         del signal_index[str(old_item_id)]
         signal_index[str(item_id)] = object_id
-        ##################################################################
-        # TODO - Update point interlocking to reference new signal ID 
-        ###################################################################
 
     # Turn the signal type value back into the required enumeration type
     sig_type = signals_common.sig_type(schematic_objects[object_id]["itemtype"])
@@ -432,14 +447,8 @@ def update_signal(object_id, item_id=None):
     # Create/update the selection rectangle for the signal (based on the boundary box)
     set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
 
-    # Update any point interlocking tables that are affected by the change
-    # Delete any current entries to the Signal from the affected points
-    for point_id in point_index:
-        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
-        for index, interlocked_signal in enumerate(list_of_interlocked_signals):
-            if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[point(point_id)]["siginterlock"].pop(index)
-    # Find and add any interlocked routes to the affected points 
+    # Find and add any interlocked routes to the locking tables of affected points
+    # Any existing entries for the signal in these tables were removed earlier in the code
     for point_id in point_index:
         point_interlocked_by_signal = False
         interlocked_routes = [False, False, False, False, False]
@@ -670,6 +679,53 @@ def new_item_id(exists_function):
     return(item_id)
 
 #------------------------------------------------------------------------------------
+# Internal function to set the default interlocking tables (to empty structures)
+# Function is called at object creation time to set the initial values - also when
+# an object is copied (as the copied object will not inherit interlocking settings)
+#------------------------------------------------------------------------------------
+
+def set_default_signal_interlocking(object_id):
+    # Defines the interlocking routes enabled for the signal/subsidary [MAIN, LH1, LH2, RH1, RH2]
+    schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False]
+    schematic_objects[object_id]["subroutes"] = [True,False,False,False,False]
+    # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
+    # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
+    # Each point element comprises [point_id, point_state]
+    # Note that Sig ID in this case is a string
+    schematic_objects[object_id]["pointinterlock"] = [
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
+             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
+    # conflicting signal routes comprises [main,lh1,lh2,rh1,rh2]
+    # each sig_route comprises [sig1, sig2, sig3, sig4]
+    # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+    # Where each route element is a boolean value (True or False)
+    schematic_objects[object_id]["siginterlock"] = [
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ] ]
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to Create a new default signal (and draw it on the canvas)
 #------------------------------------------------------------------------------------
 
@@ -734,48 +790,24 @@ def create_default_signal(item_type, item_subtype):
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
                ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
-    # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-    # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
-    # Each point element comprises [point_id, point_state]
-    # Note that Sig ID in this case is a string
-    schematic_objects[object_id]["pointinterlock"] = [
-             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
-             [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
-    # Defines the interlocking routes enabled for the signal/subsidary [MAIN, LH1, LH2, RH1, RH2]
-    schematic_objects[object_id]["sigroutes"] = [True,False,False,False,False]
-    schematic_objects[object_id]["subroutes"] = [True,False,False,False,False]
-    # conflicting signal routes comprises [main,lh1,lh2,rh1,rh2]
-    # each sig_route comprises [sig1, sig2, sig3, sig4]
-    # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-    # Where each route element is a boolean value (True or False)
-    schematic_objects[object_id]["siginterlock"] = [
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ] ]
+
+    # Set the default interlocking tables for the signal
+    set_default_signal_interlocking(object_id)
 
     # Draw the Signal on the canvas (and assign the ID)
     update_signal(object_id)
-    return() 
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to set the default interlocking tables (to empty structures)
+# Function is called at object creation time to set the initial values - also when
+# an object is copied (as the copied object will not inherit interlocking settings)
+#------------------------------------------------------------------------------------
+
+def set_default_point_interlocking(object_id):
+    # This is the (variable length) signal interlocking table
+    schematic_objects[object_id]["siginterlock"] =[]
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new default Point (and draw it on the canvas)
@@ -801,8 +833,8 @@ def create_default_point(item_type):
     # These are the DCC address parameters
     schematic_objects[object_id]["dccaddress"] = 0
     schematic_objects[object_id]["dccreversed"] = False
-    # This is the (variable length) signal interlocking table
-    schematic_objects[object_id]["siginterlock"] =[]
+    # Set the default interlocking table for the point
+    set_default_point_interlocking(object_id)
     # Draw the Point on the canvas (and assign the ID)
     update_point(object_id)
     return()
@@ -914,6 +946,8 @@ def copy_signal(object_id):
     new_id = new_item_id(exists_function = signal_exists)
     schematic_objects[new_object_id]["itemid"] = new_id
     signal_index[str(new_id)] = new_object_id
+    # Reset the interlocking tables for the signal (not copied)
+    set_default_signal_interlocking(new_object_id)
     # Draw the new object
     update_signal(new_object_id)
     return(new_object_id)            
@@ -929,6 +963,8 @@ def copy_point(object_id):
     new_id = new_item_id(exists_function = point_exists)
     schematic_objects[new_object_id]["itemid"] = new_id
     point_index[str(new_id)] = new_object_id
+    # Reset the interlocking tables for the point (not copied)
+    set_default_point_interlocking(new_object_id)
     # Draw the new object
     update_point(new_object_id)
     return(new_object_id)            

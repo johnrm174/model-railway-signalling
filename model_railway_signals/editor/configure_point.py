@@ -291,7 +291,7 @@ class point_configuration_tab:
 class signal_route_interlocking_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = LabelFrame(parent_frame, text="Interlocking with signal routes")
+        self.frame = LabelFrame(parent_frame, text="Interlocking with signals")
         self.frame.pack(padx=2, pady=2, fill='x')
         # These are the lists that hold the references to the subframes and subclasses
         self.sigelements = []
@@ -305,12 +305,16 @@ class signal_route_interlocking_frame():
         self.subframe.pack()
         self.sigelements = []
         # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
-        for sig_interlocking_routes in sig_interlocking_frame:
-            # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-            # Where each route element is a boolean value (True or False)            
-            self.sigelements.append(common.signal_route_selection_element(self.subframe, read_only=True))
-            self.sigelements[-1].frame.pack()
-            self.sigelements[-1].set_values (sig_interlocking_routes)
+        if sig_interlocking_frame:
+            for sig_interlocking_routes in sig_interlocking_frame:
+                # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+                # Where each route element is a boolean value (True or False)            
+                self.sigelements.append(common.signal_route_selection_element(self.subframe, read_only=True))
+                self.sigelements[-1].frame.pack()
+                self.sigelements[-1].set_values (sig_interlocking_routes)
+        else:
+            self.label = Label(self.subframe, text= "None")
+            self.label.pack()
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Point Interlocking Tab
@@ -330,7 +334,7 @@ class edit_point:
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
-        self.window.title("Point")
+        self.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
         self.window.attributes('-topmost',True)
         # Create the Window tabs
         self.tabs = ttk.Notebook(self.window)
