@@ -30,6 +30,8 @@
 #       danger [[add:int,state:bool],] - DCC addresses/states (default = No mapping)
 #       caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
 #       prelim_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
+#       flash_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
+#       flash_prelim_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
 #       LH1[[add:int,state:bool],] - DCC addresses/states for "LH45" (default = No Mapping)
 #       LH2[[add:int,state:bool],] - DCC addresses/states for "LH90" (default = No Mapping)
 #       RH1[[add:int,state:bool],] - DCC addresses/states for "RH45" (default = No Mapping)
