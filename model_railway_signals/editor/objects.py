@@ -474,8 +474,8 @@ def update_signal(object_id, item_id=None):
     # Create/update the selection rectangle for the signal (based on the boundary box)
     set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
 
-    # "Process" the changes by running the layout interlocking
-    run_layout.initialise_layout()
+    # Re-initialise the layout to "Process" the changes (interlocking, update signals etc)
+    run_layout.initialise_layout(signal_id = schematic_objects[object_id]["itemid"])
 
     return()
 
@@ -828,7 +828,9 @@ def create_default_signal(item_type, item_subtype):
 #------------------------------------------------------------------------------------
 
 def set_default_point_interlocking(object_id):
-    # This is the (variable length) signal interlocking table
+    # siginterlock comprises a variable length list of interlocked signals
+    # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+    # Each route element is a boolean value (True or False)            
     schematic_objects[object_id]["siginterlock"] =[]
     return()
 

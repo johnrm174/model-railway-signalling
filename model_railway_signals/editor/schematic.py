@@ -616,6 +616,7 @@ def create_canvas (root_window):
     global canvasx, canvasy, canvasgrid
     global button_frame, canvas_border
     global button_images
+    global logging
     root = root_window
     # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
     frame = Frame(root_window)

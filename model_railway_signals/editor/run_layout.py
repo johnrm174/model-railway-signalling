@@ -2,6 +2,7 @@
 # This module contains all the functions to "run" the layout
 #------------------------------------------------------------------------------------
 
+import logging
 from typing import Union
 
 from ..library import signals
@@ -43,11 +44,12 @@ def find_signal_route(signal_object):
     return (signal_route)
 
 #------------------------------------------------------------------------------------
-# Function to update the Signal / Point interlocking. Called on sig/sub_switched,
-# point_switched or block_section_ahead_updated events
+# Function to update the Signal / Point / Block Instruments interlocking. Called on
+# sig/sub_switched, point_switched fpl_switched or block_section_ahead_updated events
 #------------------------------------------------------------------------------------
 
 def process_interlocking():
+    # Process the Signal Interlocking
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         # We only interlock local signals (Sig ID = int). Remote signals (subscribed to
@@ -83,11 +85,21 @@ def process_interlocking():
             if has_subsidary:
                 if subsidary_can_be_unlocked: signals.unlock_subsidary(signal_id)
                 else: signals.lock_subsidary(signal_id)
-                
-        ####################################################################################
-        # TODO - Interlock the points
-        ####################################################################################
-                
+    # Process the Point Interlocking
+    for point_id in objects.point_index:
+        point_object = objects.schematic_objects[objects.point(point_id)]
+        # siginterlock comprises a variable length list of interlocked signals
+        # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Each route element is a boolean value (True or False)
+        point_locked = False
+        for interlocked_signal in point_object["siginterlock"]:
+            for index, interlocked_route in enumerate(interlocked_signal[1]):
+                if interlocked_route:
+                    if signals.signal_clear(interlocked_signal[0], signals_common.route_type(index+1)):
+                        point_locked = True
+                        break
+        if point_locked: points.lock_point(point_id)
+        else: points.unlock_point(point_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -131,6 +143,7 @@ def update_signal_behind(signal_id:Union[int,str]):
 #------------------------------------------------------------------------------------
 
 def process_signal_updates(signal_id:Union[int,str]):
+    global logging
     # The Signal that has changed could either be a local signal (sig ID is an integer)
     # or a remote signal (Signal ID is a string)
     signal_object = objects.schematic_objects[objects.signal(signal_id)]
@@ -170,7 +183,9 @@ def process_signal_updates(signal_id:Union[int,str]):
 def schematic_callback(item_id,callback_type):
     print ("Callback into main program - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
-    # Process the signal updates (update signals based on signal ahead)    
+    # Process the signal updates (update signals based on signal ahead)
+    # This is primarily for coour light signals where the displayed aspect
+    # if clear will depend on the displayed aspect of the signal aheaf
     if callback_type == signals_common.sig_callback_type.sig_switched:
         process_signal_updates(item_id)
 
@@ -186,10 +201,14 @@ def schematic_callback(item_id,callback_type):
 
 #------------------------------------------------------------------------------------
 # Function to "initialise" the layout following a layout configuration change
+# This effectively keeps all layout objects "in step" by ensuring that all
+# signals "behind" a signal are updated to reflect the new (as updated) aspect
+# and that the interlocking of signals/points/instruments is initialised
 #------------------------------------------------------------------------------------
 
-def initialise_layout():
-    schematic_callback(0,"initialise")
+def initialise_layout(signal_id=None):
+    if signal_id is not None: process_signal_updates(signal_id)
+    process_interlocking()
     return()
 
 ########################################################################################
