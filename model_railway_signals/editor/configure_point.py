@@ -15,6 +15,8 @@ from . import common
  
 def load_state(point):
     object_id = point.object_id
+    # Label the edit window with the Point ID
+    point.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
     # Set the Initial UI state from the current object settings
     point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
     point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
@@ -71,6 +73,11 @@ def save_state(point, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)
+        # Hide the validation error message
+        point.validation_error.pack_forget()
+    else:
+        # Display the validation error message
+        point.validation_error.pack()
     return()
 
 #####################################################################################
@@ -194,8 +201,8 @@ class general_settings:
         if not self.automatic.get():
             # Ensure the point isn't configured to "auto switch" with another point
             for point_id in objects.point_index:
-                autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
-                if autoswitch == self.parent_object.pointid.get_initial_value():
+                other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
+                if other_autoswitch == self.parent_object.pointid.get_initial_value():
                     self.CB4TT.text = ("Point is configured to be 'also switched' by point " +
                                            point_id + " so must remain 'fully automatic'")
                     self.CB4.config(fg="red")
@@ -313,7 +320,7 @@ class signal_route_interlocking_frame():
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text= "None")
+            self.label = Label(self.subframe, text= "Edit the appropriate signals\nto configure interlocking")
             self.label.pack()
 
 #------------------------------------------------------------------------------------
@@ -334,7 +341,6 @@ class edit_point:
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
-        self.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
         self.window.attributes('-topmost',True)
         # Create the Window tabs
         self.tabs = ttk.Notebook(self.window)
@@ -346,7 +352,9 @@ class edit_point:
         self.config = point_configuration_tab(self.tab1)
         self.locking = point_interlocking_tab(self.tab2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        # Create the Validation error message (this gets packed/unpacked on apply/save)
+        self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 

@@ -313,7 +313,7 @@ class dcc_address_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class route_selection_checkbox():
-    def __init__(self, parent_frame, label, read_only=False):
+    def __init__(self, parent_frame, label, width = 5, read_only=False):
         self.label = label
         # Create the tkinter vars for the state CB - 'selection' is the actual CB state
         # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
@@ -322,7 +322,7 @@ class route_selection_checkbox():
         self.selection = BooleanVar(parent_frame, False)
         # Create the checkbox and associated tool tip
         self.CB = Checkbutton(parent_frame, indicatoron = False, variable=self.selection,
-                              width = 5, text=label, command = self.cb_updated)
+                              width = width, text=label, command = self.cb_updated)
         self.CB.pack(side=LEFT)
         if read_only:
             tool_tip = "Edit the associated signal to configure (signal interlocking tab)"
@@ -373,11 +373,11 @@ class signal_route_selection_element(integer_entry_box):
         # Disable the EB (we don't use the disable method as we wantto display the value_
         if self.read_only: self.EB_EB.config(state="disabled")
         # Now create the UI Elements for each of the possible route selections
-        self.main = route_selection_checkbox(self.frame, label="MAIN", read_only = read_only)
-        self.lh1 = route_selection_checkbox(self.frame, label="LH1", read_only = read_only)
-        self.lh2 = route_selection_checkbox(self.frame, label="LH2", read_only = read_only)
-        self.rh1 = route_selection_checkbox(self.frame, label="RH1", read_only = read_only)
-        self.rh2 = route_selection_checkbox(self.frame, label="RH2", read_only = read_only)
+        self.main = route_selection_checkbox(self.frame, label="MAIN", width = 5, read_only = read_only)
+        self.lh1 = route_selection_checkbox(self.frame, label="LH1", width = 4, read_only = read_only)
+        self.lh2 = route_selection_checkbox(self.frame, label="LH2", width = 4, read_only = read_only)
+        self.rh1 = route_selection_checkbox(self.frame, label="RH1", width = 4, read_only = read_only)
+        self.rh2 = route_selection_checkbox(self.frame, label="RH2", width = 4, read_only = read_only)
 
     def validate(self):
         # Do the basic integer validation (integer, in range)

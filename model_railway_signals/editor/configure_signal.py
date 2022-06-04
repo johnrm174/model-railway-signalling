@@ -20,6 +20,8 @@ from ..library import signals_semaphores
  
 def load_state(signal):
     object_id = signal.object_id
+    # Label the edit window with the Signal ID
+    signal.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
     # Set the Initial UI state from the current object settings
     signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
     signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
@@ -45,7 +47,9 @@ def load_state(signal):
     signal.locking.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
     signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
     signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
-    ########################## Work in Progress #############################################    
+    ##########################################################################################
+    ################################ TODO - Automation UI elements ###########################
+    ##########################################################################################
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
     if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -88,7 +92,7 @@ def save_state(signal, close_window):
            signal.config.feathers.validate() and signal.config.semaphores.validate() and
            signal.locking.interlocking.validate() and signal.locking.conflicting_sigs.validate() ):
         ##########################################################################################
-        ############# TODO - Validation of Interlocking & Automation UI elements #################
+        ####################### TODO - Validation of Automation UI elements ######################
         ##########################################################################################
         # Get the Signal ID (this may or may not have changed) - Note that we don't save  
         # the value to the dictionary - instead we pass to the update signal function
@@ -122,12 +126,19 @@ def save_state(signal, close_window):
         objects.schematic_objects[object_id]["subroutes"] = signal.locking.sub_routes.get_values()
         objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
         objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
-        ########################## Work in Progress #############################################
+        ##########################################################################################
+        ################################ TODO - Automation UI elements ###########################
+        ##########################################################################################
         # Update the signal (recreate in its new configuration)
         objects.update_signal(object_id, item_id = new_id)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: signal.window.destroy()
         else: load_state(signal)
+        # Hide the validation error message
+        signal.validation_error.pack_forget()
+    else:
+        # Display the validation error message
+        signal.validation_error.pack()
     return()
 
 #------------------------------------------------------------------------------------
@@ -458,7 +469,6 @@ class edit_signal:
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
-        self.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
         self.window.attributes('-topmost',True)
         # Create the Window tabs
         self.tabs = ttk.Notebook(self.window)
@@ -474,7 +484,9 @@ class edit_signal:
         self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self,
                 self.route_selections_updated)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        # Create the Validation error message (this gets packed/unpacked on apply/save)
+        self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
         
