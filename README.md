@@ -371,12 +371,20 @@ lock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be speci
 unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 
 signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
-                           signal manual control button (True='OFF', False = 'ON'). To enable
-                           external point/signal interlocking functions
+                           signal manual control button (True='OFF', False = 'ON'). If a route
+                           is specified then the function also tests against the specified route
+  Mandatory Parameters:
+      sig_id:int - The ID for the signal
+  Optional Parameters:
+      route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 
 subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
-                           signal manual control button (True='OFF', False = 'ON'). To enable
-                           external point/signal interlocking functions
+                           signal manual control button (True='OFF', False = 'ON'). If a route
+                           is specified then the function also tests against the specified route
+  Mandatory Parameters:
+      sig_id:int - The ID for the signal
+  Optional Parameters:
+      route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 
 signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal. This can be different 
                       to the SWITCHED state if the signal is OVERRIDDEN or subject to APPROACH
