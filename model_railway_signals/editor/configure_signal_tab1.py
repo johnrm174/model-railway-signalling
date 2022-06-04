@@ -115,14 +115,14 @@ class signal_sensor (common.integer_entry_box):
             else:
                 # Test to see if the gpio channel is already assigned to another signal
                 current_channel = self.eb_initial_value.get()
-                for obj in objects.schematic_objects:
-                    if ( objects.schematic_objects[obj]["item"] == objects.object_type.signal and
-                         objects.schematic_objects[obj]["itemid"] != int(self.parent_object.sigid.get_initial_value()) and
-                         ( objects.schematic_objects[obj]["passedsensor"][1] == new_channel or
-                           objects.schematic_objects[obj]["approachsensor"][1] == new_channel ) ):
+                for signal_id in objects.signal_index:
+                    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+                    if ( signal_object["itemid"] != int(self.parent_object.sigid.get_initial_value()) and
+                         ( signal_object["passedsensor"][1] == new_channel or
+                              signal_object["approachsensor"][1] == new_channel ) ):
                         self.EB_TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
-                                        +str(objects.schematic_objects[obj]["itemid"]))
-                        valid = False                    
+                                        +str(signal_object["itemid"]))
+                        valid = False
         self.set_validation_status(valid)
         return(valid)
         

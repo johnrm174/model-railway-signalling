@@ -2,6 +2,8 @@
 # This module contains all the functions to "run" the layout
 #------------------------------------------------------------------------------------
 
+from typing import Union
+
 from ..library import signals
 from ..library import points
 from ..library import block_instruments
@@ -10,31 +12,33 @@ from ..library import signals_common
 from . import objects
 
 #------------------------------------------------------------------------------------
-# Internal common Function to find the first set/cleared route for a signal object)
+# Internal common Function to find the first set/cleared route for a signal object
+# Note the function is only called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def find_signal_route(object_id):
+def find_signal_route(signal_object):
     signal_route = None
     # Iterate through all possible routes supported by the signal
-    for index, route in enumerate(objects.schematic_objects[object_id]["siglocking"]):
+    # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
+    # Each point element comprises [point_id, point_state]
+    for index, interlocked_route in enumerate(signal_object["pointinterlock"]):
         route_set_and_locked = True
         route_has_points = False
         # Iterate through the route to see ifthe points are set correctly 
-        for point in route[0]:
-            if point[0] > 0:
+        for interlocked_point in interlocked_route[0]:
+            if interlocked_point[0] > 0:
                 route_has_points = True
-                if (not points.fpl_active(point[0]) or not
-                      points.point_switched(point[0]) == point[1] ):
+                if (not points.fpl_active(interlocked_point[0]) or not
+                      points.point_switched(interlocked_point[0]) == interlocked_point[1] ):
                     # If the point is not set/locked correctly then break straight away
                     route_set_and_locked = False
                     break
         # Valid route if all points on the route are set and locked correctly
-        # Or if no points have been specified for the main route
+        # Or if the route is MAIN and no points have been specified for the route
         if (index == 0 and not route_has_points) or (route_has_points and route_set_and_locked):
             # Set the Route indication for the signal
             signal_route = signals_common.route_type(index+1)
-            sig_id = objects.schematic_objects[object_id]["itemid"]
-            signals.set_route(sig_id, route = signal_route)
+            signals.set_route(signal_object["itemid"], route = signal_route)
             break
     return (signal_route)
 
@@ -44,47 +48,45 @@ def find_signal_route(object_id):
 #------------------------------------------------------------------------------------
 
 def process_interlocking():
-    for object_id in objects.schematic_objects:
-        # Signal Interlocking (based on points ahead,conflicting signals and block instruments)
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            sig_id = objects.schematic_objects[object_id]["itemid"]
-            has_subsidary = (objects.schematic_objects[object_id]["subsidary"][0] or
-                             objects.schematic_objects[object_id]["sigarms"][0][1][0] or
-                             objects.schematic_objects[object_id]["sigarms"][1][1][0] or
-                             objects.schematic_objects[object_id]["sigarms"][2][1][0] or
-                             objects.schematic_objects[object_id]["sigarms"][3][1][0] or
-                             objects.schematic_objects[object_id]["sigarms"][4][1][0] ) 
-            # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-            # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
-            # Each point element comprises [point_id, point_state]
+    for signal_id in objects.signal_index:
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
+        # We only interlock local signals (Sig ID = int). Remote signals (subscribed to
+        # via MQTT networking) are only used for setting route on the route ahead
+        if type(signal_object["itemid"]) == int:
+            has_subsidary = (signal_object["subsidary"][0] or
+                             signal_object["sigarms"][0][1][0] or
+                             signal_object["sigarms"][1][1][0] or
+                             signal_object["sigarms"][2][1][0] or
+                             signal_object["sigarms"][3][1][0] or
+                             signal_object["sigarms"][4][1][0] ) 
             signal_can_be_unlocked = False
             subsidary_can_be_unlocked = False
             # Find the route (where points are set/cleared)
-            signal_route = find_signal_route(object_id)
+            signal_route = find_signal_route(signal_object)
+            # If there is a set/locked route then the signal/subsidary can be unlocked
             if signal_route is not None:
-                if objects.schematic_objects[object_id]["sigroutes"][signal_route.value-1]:
+                if signal_object["sigroutes"][signal_route.value-1]:
                     signal_can_be_unlocked = True
-                if objects.schematic_objects[object_id]["subroutes"][signal_route.value-1]:
+                if signal_object["subroutes"][signal_route.value-1]:
                     subsidary_can_be_unlocked = True
             ####################################################################################
-            # TODO - Interlock with Opposing signals (UI element yet to be defined)
-            # Also on the block instrument controlling access to the next block section
+            # TODO - Interlock with Opposing signals and block instruments
             ####################################################################################
             # Interlock the main signal with the subsidary
-            if signals.signal_clear(sig_id): subsidary_can_be_unlocked = False
+            if signals.signal_clear(signal_id): subsidary_can_be_unlocked = False
             if has_subsidary:
-                if signals.subsidary_clear(sig_id): signal_can_be_unlocked = False
+                if signals.subsidary_clear(signal_id): signal_can_be_unlocked = False
             # Lock/unlock the signal as required
-            if signal_can_be_unlocked: signals.unlock_signal(sig_id)
-            else: signals.lock_signal(sig_id)
+            if signal_can_be_unlocked: signals.unlock_signal(signal_id)
+            else: signals.lock_signal(signal_id)
             # Lock/unlock the subsidary as required
             if has_subsidary:
-                if subsidary_can_be_unlocked: signals.unlock_subsidary(sig_id)
-                else: signals.lock_subsidary(sig_id)
+                if subsidary_can_be_unlocked: signals.unlock_subsidary(signal_id)
+                else: signals.lock_subsidary(signal_id)
                 
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            pass
-            ####################### TODO ###################################
+        ####################################################################################
+        # TODO - Interlock the points
+        ####################################################################################
                 
     return()
 
@@ -95,25 +97,31 @@ def process_interlocking():
 # no further aspect changes (that need propugating back down the line)
 #------------------------------------------------------------------------------------
 
-def update_signal_behind(sig_ahead_id):
-    for object_id in objects.schematic_objects:
-        if ( objects.schematic_objects[object_id]["item"] == objects.object_type.signal and
-             objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value):
-            # Find the signal route (where points are set/cleared)
-            sig_route = find_signal_route(object_id)
-            if sig_route is not None:
-                # Test to see if the signal is "behind" the signal we called with
-                sig_ahead = objects.schematic_objects[object_id]["siglocking"][sig_route.value-1][1]
-                sig_id = objects.schematic_objects[object_id]["itemid"]
-                if sig_ahead == str(sig_ahead_id):
-                    # Fnd the displayed aspect of the signal
-                    initial_signal_aspect = signals.signal_state(sig_id)
-                    # Update the signal based on the signal ahead
-                    signals.update_signal(sig_id, sig_ahead)
-                    # If the aspect has changed then also need to update the 
-                    # signal behindby calling the same function recursively
-                    if signals.signal_state(sig_id) != initial_signal_aspect:
-                        update_signal_behind(sig_id)
+def update_signal_behind(signal_id:Union[int,str]):
+    # The Signal that has changed could either be a local signal (sig ID is an integer)
+    # or a remote signal (Signal ID is a string) - In either case, we need to work back
+    # back along the route to update any local signals behind.
+    for signal_to_test_id in objects.signal_index:
+        signal_object_to_test = objects.schematic_objects[objects.signal(signal_to_test_id)]
+        # We only need to "update on signal ahead" if it is a local signal (integer)
+        # As these may be defined with one or more routes (and therefore signals) ahead
+        if type(signal_object_to_test["itemid"]) == int:
+            if signal_object_to_test["itemtype"] == signals_common.sig_type.colour_light.value:
+                # Find the signal route (where points are set/cleared)
+                signal_route = find_signal_route(signal_object_to_test)
+                if signal_route is not None:
+                    # Test if the signal is "behind" the signal we called into the function with
+                    # Note that the signal Ahead is a string (for local or remote signals)
+                    signal_ahead_id = signal_object_to_test["pointinterlock"][signal_route.value-1][1]
+                    if signal_ahead_id == str(signal_id):
+                        # Fnd the displayed aspect of the signal (before any changes)
+                        initial_signal_aspect = signals.signal_state(signal_to_test_id)
+                        # Update the signal behind based on the signal we called into the function with
+                        signals.update_signal(signal_to_test_id, signal_id)
+                        # If the aspect has changed then also need to update the 
+                        # signal behindby calling the same function recursively
+                        if signals.signal_state(signal_to_test_id) != initial_signal_aspect:
+                            update_signal_behind(signal_to_test_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -122,27 +130,37 @@ def update_signal_behind(sig_ahead_id):
 # Called on Called on sig_switched event - for colour light signals only
 #------------------------------------------------------------------------------------
 
-def process_signal_updates(sig_id:int):
-    # Find the signal that has changed 
-    for object_id in objects.schematic_objects:
-        if (objects.schematic_objects[object_id]["item"] == objects.object_type.signal
-                  and objects.schematic_objects[object_id]["itemid"] == sig_id):
-            if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
-                # Fnd the current state of the signal
-                initial_signal_aspect = signals.signal_state(sig_id)
-                # Find the route (where points are set/cleared)
-                sig_route = find_signal_route(object_id)
-                if sig_route is not None:
-                    sig_ahead = objects.schematic_objects[object_id]["siglocking"][sig_route.value-1][1]
-                    if sig_ahead != "": signals.update_signal(sig_id, sig_ahead)
-                    else: signals.update_signal(sig_id)
-                    # If the state of the signal has changed, we need to work back along the route
-                    if signals.signal_state(sig_id) != initial_signal_aspect:
-                        update_signal_behind(sig_id)
-                else:
-                    print ("run_layout- process_signal_updates - This should never happen")
-                    signals.update_signal(sig_id)
-            break
+def process_signal_updates(signal_id:Union[int,str]):
+    # The Signal that has changed could either be a local signal (sig ID is an integer)
+    # or a remote signal (Signal ID is a string)
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    # We only need to "update on signal ahead" if it is a local signal (integer)
+    # As these may be defined with one or more routes (and therefore signals) ahead
+    if type(signal_id)== int:
+        if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
+            # Find the route set for the signal (where points are set and locked)
+            signal_route = find_signal_route(signal_object)
+            if signal_route is not None:
+                # Find the current signal aspect (this call takes an integer or a string)
+                initial_signal_aspect = signals.signal_state(signal_id)
+                # If a signal ahead has been defined then we can update on the signal ahead
+                # Otherwise we just update the signal based on its current state
+                # Note that the signal Ahead is a string (for local or remote signals)
+                signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
+                if signal_ahead_id != "": signals.update_signal(signal_id, signal_ahead_id)
+                else: signals.update_signal(signal_id)
+                # If the state of the signal has changed, we need to work back along the route
+                if signals.signal_state(signal_id) != initial_signal_aspect:
+                    update_signal_behind(signal_id)
+            else:
+                # There should always be a valid route for the signal to be unlocked (and changeable)
+                # so this bit of code should never execute - left here as a catch-all
+                logging.error("RUN LAYOUT - Signal "+str(signal_id)+" - Signal has been changed without a valid route")
+                signals.update_signal(signal_id)
+        else:
+            # Signal ID must be a string (and hence a remote signal) - We therefore don't need to
+            # update the signal (its on another layout) but we do need to update any "signals behind"
+            update_signal_behind(signal_id)
     return()
 
 #------------------------------------------------------------------------------------

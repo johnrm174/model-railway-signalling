@@ -7,15 +7,6 @@ from tkinter import ttk
 
 from . import objects
 from . import common
-from ..library import points
-from ..library import signals
-from ..library import track_sensors
-from ..library import signals_common
-from ..library import signals_colour_lights
-from ..library import signals_semaphores
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
-from ..library import block_instruments
 
 #------------------------------------------------------------------------------------
 # Class for the signal route selections UI Elements
@@ -127,7 +118,7 @@ class point_entry_box(common.integer_entry_box):
         # Do the basic integer validation first (integer, in range, not empty)
         valid = super().validate(update_validation_status=False)
         if valid and self.eb_entry.get() != "":
-            if not points.point_exists(int(self.eb_entry.get())):
+            if not objects.point_exists(int(self.eb_entry.get())):
                 self.EB_TT.text = "Point does not exist"
                 valid = False
             # Enable/disable the point selections depending on the state of the EB
@@ -185,7 +176,7 @@ class signal_entry_box(common.entry_box):
         valid = False
         if self.eb_entry.get() == str(self.parent_object.config.sigid.get_value()):
             self.EB_TT.text = ("Entered signal ID is the same as the current signal ID")
-        elif self.eb_entry.get() == "" or signals_common.sig_exists(self.eb_entry.get()):
+        elif self.eb_entry.get() == "" or objects.signal_exists(self.eb_entry.get()):
             valid = True
         else:
             self.EB_TT.text = ("Local signal does not exist or "+
@@ -216,7 +207,7 @@ class instrument_entry_box(common.integer_entry_box):
         # Do the basic integer validation first (integer, in range, not empty)
         valid = super().validate(update_validation_status=False)
         if valid and not self.eb_entry.get() == "":
-            if not block_instruments.instrument_exists(int(self.eb_entry.get())):
+            if not objects.instrument_exists(int(self.eb_entry.get())):
                 valid = False
                 self.EB_TT.text = ("Block Instrument doesn't exist")
         self.set_validation_status(valid)

@@ -145,6 +145,7 @@ def delete_signal(object_id):
                 schematic_objects[point(point_id)]["siginterlock"].pop(index)
     ########################################################################
     # TODO - remove any opposing signal interlocking references to signal
+    # TODO - remove any "signal Ahead" references to signal
     #########################################################################
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
@@ -298,6 +299,7 @@ def update_signal(object_id, item_id=None):
             schematic_objects[point(point_id)]["siginterlock"].append(interlocked_signal)
 
     #####################################################################################
+    # TODO - update any "signal Ahead" references when signal ID is changed
     # TODO - Manage any references to the signal from the Instrument interlocking tables
     # TODO - Manage any references to the signal from the Track Section automation tables
     # All still TBD at the moment on the assumption I'll handle them similar to points
