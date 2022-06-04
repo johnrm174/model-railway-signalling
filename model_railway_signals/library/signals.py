@@ -226,12 +226,20 @@
 # unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
 # signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). To enable
-#                            external point/signal interlocking functions
+#                            signal manual control button (True='OFF', False = 'ON'). If a route
+#                            is specified then the function also tests against the specified route
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
+#   Optional Parameters:
+#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 # 
 # subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). To enable
-#                            external point/signal interlocking functions
+#                            signal manual control button (True='OFF', False = 'ON'). If a route
+#                            is specified then the function also tests against the specified route
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
+#   Optional Parameters:
+#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 # 
 # signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal. This can be different 
 #                       to the SWITCHED state if the signal is OVERRIDDEN or subject to APPROACH
@@ -333,14 +341,18 @@ import logging
 # Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def signal_clear (sig_id:int):
+def signal_clear (sig_id:int,route:signals_common.route_type = None):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
         sig_clear = False
     else:
-        sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
+        if route is None:
+            sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
+        else:
+            sig_clear = (signals_common.signals[str(sig_id)]["sigclear"] and
+                    signals_common.signals[str(sig_id)]["routeset"] == route)
     return (sig_clear)
 
 # -------------------------------------------------------------------------
@@ -410,7 +422,7 @@ def approach_control_set (sig_id:int):
 # Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def subsidary_clear (sig_id:int):
+def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -420,7 +432,11 @@ def subsidary_clear (sig_id:int):
         logging.error ("Signal "+str(sig_id)+": subsidary_clear - Signal does not have a subsidary")
         sig_clear = False
     else:
-        sig_clear = signals_common.signals[str(sig_id)]["subclear"]
+        if route is None:
+            sig_clear = signals_common.signals[str(sig_id)]["subclear"]
+        else:
+            sig_clear = (signals_common.signals[str(sig_id)]["sigclear"] and
+                    signals_common.signals[str(sig_id)]["routeset"] == route)
     return (sig_clear)
 
 # -------------------------------------------------------------------------
