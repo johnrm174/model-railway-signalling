@@ -256,25 +256,29 @@ class dcc_address_entry_box (integer_entry_box):
         super().__init__(parent_frame, width=5 , min_value=1, max_value=2047,
                          tool_tip="Enter a DCC address (1-2047) or leave blank")
         # Create the checkbox and associated tool tip
-        self.DCC_CB = Checkbutton(parent_frame, width=3, indicatoron = False, state="disabled",
-                             variable=self.dcc_selection, command=self.update_dcc_state)
+        self.DCC_CB = Checkbutton(parent_frame, width=3, indicatoron = False,
+                        variable=self.dcc_selection, command=self.dcc_state_change)
         self.DCC_TT = CreateToolTip(self.DCC_CB)
         # store the default checkbox background (for when disabled)
         self.defaultbg = self.DCC_CB.cget("background")
         # Only display the checkbox if required (otherwise don't pack it)
         if dcc_state_checkbox: self.DCC_CB.pack(side=LEFT)
             
-    def update_dcc_state(self,valid = True):
+    def dcc_state_change(self):
+        #Focus on the CB to generate a focus-out event for the EB
+        self.DCC_CB.focus()
+        self.update_dcc_state()
+
+    def update_dcc_state(self):
         # If the entry box is empty or disabled then state selection is disabled
-        if not self.eb_enabled.get() or self.eb_entry.get() == "" or not valid:
-            self.DCC_CB.config(state="disabled", text="", bg=self.defaultbg)
+        if not self.eb_enabled.get() or self.eb_entry.get() == "":
             self.dcc_selection.set(False)
+            self.DCC_CB.config(text="")
         else:
-            self.DCC_CB.config(state="normal", bg="white")
             self.dcc_state.set(self.dcc_selection.get())
             if self.dcc_state.get(): self.DCC_CB.configure(text="ON")
-            else: self.DCC_CB.configure(text="OFF")
-        
+            else: self.DCC_CB.configure(text="OFF", bg="white")
+
     def enable(self):
         super().enable()
         self.dcc_selection.set(self.dcc_state.get())
@@ -287,7 +291,7 @@ class dcc_address_entry_box (integer_entry_box):
     def validate(self):
         # Do the basic integer validation (is an integer and in range)
         valid = super().validate(update_validation_status=False)
-        self.update_dcc_state(valid)
+        self.update_dcc_state()
         self.set_validation_status(valid)
         return(valid)
         
@@ -296,6 +300,7 @@ class dcc_address_entry_box (integer_entry_box):
         super().set_value(dcc_command[0])
         self.dcc_state.set(dcc_command[1])
         self.dcc_selection.set(dcc_command[1])
+        self.update_dcc_state()
         
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
@@ -320,6 +325,8 @@ class route_selection_checkbox():
         # last entered state (used to "load" the actual CB state once the EB is valid)        
         self.state = BooleanVar(parent_frame, False)
         self.selection = BooleanVar(parent_frame, False)
+        self.cb_enabled = BooleanVar(parent_frame, True)
+        self.label_text = label
         # Create the checkbox and associated tool tip
         self.CB = Checkbutton(parent_frame, indicatoron = False, variable=self.selection,
                               width = width, text=label, command = self.cb_updated)
@@ -332,21 +339,30 @@ class route_selection_checkbox():
         self.CBTT = CreateToolTip(self.CB, tool_tip)
         
     def cb_updated(self):
-        self.state.set(self.selection.get())
+        self.CB.focus()
+        self.update_cb_state()
+
+    def update_cb_state(self):
+        if not self.cb_enabled.get():
+            self.selection.set(False)
+            self.CB.config(text="")
+        else:
+            self.CB.config(text=self.label_text)
+            self.state.set(self.selection.get())
 
     def enable(self):
         self.selection.set(self.state.get())
-        self.CB.config(state="normal", text=self.label)
-        self.cb_updated()
+        self.cb_enabled.set(True)
+        self.update_cb_state()
 
     def disable(self):
-        self.selection.set(False)
-        self.CB.config(state="disabled", text="")
+        self.cb_enabled.set(False)
+        self.update_cb_state()
         
     def set_value(self, new_value:bool):
         self.selection.set(new_value)
         self.state.set(new_value)
-        self.cb_updated()
+        self.update_cb_state()
         
     def get_value(self,):
         # Will always return False if disabled
@@ -388,7 +404,7 @@ class signal_route_selection_element(integer_entry_box):
         self.set_validation_status(valid)
         # Enable/disable the checkboxes depending on the EB state
         if not self.read_only:
-            if self.eb_entry.get() == "" or not valid:
+            if self.eb_entry.get() == "":
                 self.main.disable()
                 self.lh1.disable()
                 self.lh2.disable()

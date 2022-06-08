@@ -103,16 +103,26 @@ class point_entry_box(common.integer_entry_box):
                          " locked before the signal can be cleared for the route")
         # Create the checkbox and associated tool tip
         self.CB = Checkbutton(parent_frame, width=2, indicatoron = False, 
-            variable=self.selection, command=self.update_state, state="disabled")
+                        variable=self.selection, command=self.cb_state_changed)
         self.CB.pack(side=LEFT)
         self.defaultbg = self.CB.cget("background")
         self.CBTT = common.CreateToolTip(self.CB, "Select the required state for "+
                                          "the point (normal or switched)")
             
-    def update_state(self):
-        self.state.set(self.selection.get())
-        if self.state.get(): self.CB.configure(text=u"\u2191")
-        else: self.CB.configure(text=u"\u2192")
+    def cb_state_changed(self):
+        #Focus on the CB to generate a focus-out event for the EB
+        self.CB.focus()
+        self.update_cb_state()
+        
+    def update_cb_state(self):
+        # Enable/disable the point selections depending on the state of the EB
+        if not self.eb_enabled.get() or self.eb_entry.get() == "":
+            self.selection.set(False)
+            self.CB.config(text="")
+        else:
+            self.state.set(self.selection.get())
+            if self.state.get(): self.CB.configure(text=u"\u2191")
+            else: self.CB.configure(text=u"\u2192")
         
     def validate(self):
         # Do the basic integer validation first (integer, in range, not empty)
@@ -121,31 +131,26 @@ class point_entry_box(common.integer_entry_box):
             if not objects.point_exists(int(self.eb_entry.get())):
                 self.EB_TT.text = "Point does not exist"
                 valid = False
-            # Enable/disable the point selections depending on the state of the EB
-        if not valid or self.eb_entry.get() == "":
-            self.CB.config(state="disabled", text="", bg=self.defaultbg)
-            self.selection.set(False)
-        else:
-            self.CB.config(state="normal", bg="white")
-            self.selection.set(self.state.get())
-            self.update_state()
+        self.update_cb_state()
         self.set_validation_status(valid)
         return(valid)
 
     def enable(self):
-        self.update_state()        
         super().enable()
-        
+        self.selection.set(self.state.get())
+        self.update_cb_state()    
+
     def disable(self):
-        self.state.set(False)
         super().disable()
+        self.update_cb_state()       
         
     def set_value(self, point:[int,bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
         self.state.set(point[1])
         self.selection.set(point[1])
         super().set_value(point[0])
-        
+        self.update_cb_state()       
+       
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
         return([super().get_value(), self.state.get()])          

@@ -169,6 +169,7 @@ def process_signal_updates(signal_id:Union[int,str]):
                 # There should always be a valid route for the signal to be unlocked (and changeable)
                 # so this bit of code should never execute - left here as a catch-all
                 logging.error("RUN LAYOUT - Signal "+str(signal_id)+" - Signal has been changed without a valid route")
+                logging.error("RUN LAYOUT - Edit signal to check and correct signal interlocking configuration")
                 signals.update_signal(signal_id)
         else:
             # Signal ID must be a string (and hence a remote signal) - We therefore don't need to
