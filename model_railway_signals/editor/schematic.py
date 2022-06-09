@@ -108,6 +108,15 @@ def deselect_object(object_id):
     return()
 
 #------------------------------------------------------------------------------------
+# Internal function to select all objects on the layout schematic
+#------------------------------------------------------------------------------------
+
+def select_all_objects(event=None):
+    for object_id in objects.schematic_objects:
+        select_object(object_id)
+    return()
+
+#------------------------------------------------------------------------------------
 # Internal function to deselect all objects (clearing the list of selected objects)
 #------------------------------------------------------------------------------------
 
@@ -186,6 +195,8 @@ def move_selected_objects(xdiff:int,ydiff:int):
             move_line(object_id,xdiff,ydiff,)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
             signals.move_signal(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
+            # Also need to move any associated distant signals (sig_id + 100)
+            signals.move_signal(objects.schematic_objects[object_id]["itemid"]+100,xdiff,ydiff)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
             points.move_point(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
@@ -670,6 +681,7 @@ def create_canvas (root_window):
     # Define the Canvas Popup menu for Right Click (nothing selected)
     popup2 = Menu(tearoff=0)
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
+    popup2.add_command(label="Select all", command=select_all_objects)
     # Now draw the initial grid
     draw_grid()
     # Load the images for the for the "add object" buttons
