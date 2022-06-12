@@ -823,33 +823,33 @@ def create_default_signal(item_type, item_subtype):
     # Each aspect element comprises [add1, add2, add3, add4, add5]
     # Each address element comprises: [address,state]
     schematic_objects[object_id]["dccaspects"] = [
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]] ]
     # Feather Route list comprises: [dark, main, lh1, lh2, rh1, rh2]
     # Each route element comprises: [add1, add2, add3, add4, add5]
     # Each address element comprises: [address,state]
     schematic_objects[object_id]["dccfeathers"] = [
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]],
-                [[0,False],[0,False],[0,False],[0,False],[0,False]] ]
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],
+                [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]] ]
     # Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
     # Each route element comprises: [character, address-sequence]
     # Each address-sequence comprises: [add1, add2, add3, add4, add5]
     # Each address element comprises: [address,state]
     schematic_objects[object_id]["dcctheatre"] = [
-               ["#", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
-               ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
-               ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
-               ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
-               ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]],
-               ["", [[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
+               ["#", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
+               ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
+               ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
+               ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
+               ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]],
+               ["", [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]] ]
 
     # Set the default interlocking tables for the signal
     set_default_signal_interlocking(object_id)

@@ -9,77 +9,6 @@ from . import objects
 from . import common
 
 #------------------------------------------------------------------------------------
-# Class for the signal route selections UI Elements
-#------------------------------------------------------------------------------------
-
-class route_selection():
-    def __init__(self, parent_frame, label, tool_tip, callback=None):
-        self.tooltip = tool_tip
-        self.callback = callback
-        # Create the tkinter var for the route selection CB       
-        self.state = BooleanVar(parent_frame,False)
-        # Create the checkbox and associated tool tip
-        self.CB = Checkbutton(parent_frame, text=label, variable=self.state,
-                                 command=self.selection_changed, state="normal")
-        self.CB.pack(side=LEFT)
-        self.CBTT = common.CreateToolTip(self.CB, self.tooltip)
-    def enable(self):
-        self.CB.configure(state="normal")
-        self.CBTT.text = self.tooltip
-    def disable(self):
-        self.CB.configure(state="disabled")
-        self.CBTT.text = "Disabled to reflect selections on 'configuration' tab"
-    def selection_changed(self):
-        if self.callback is not None: self.callback()
-        
-class route_selections():
-    def __init__(self, parent_frame, label, tool_tip, callback=None):
-        # Create a label frame for the selections
-        self.frame = LabelFrame(parent_frame, text=label)
-        self.frame.pack(padx=2, pady=2, fill='x')
-        # We use a subframe to center the selections boxes
-        self.subframe = Frame(self.frame)
-        self.subframe.pack(padx=2, pady=2)
-        # Create the required selection elements
-        self.main = route_selection(self.subframe,"MAIN", tool_tip, callback)
-        self.lh1 = route_selection(self.subframe,"LH1", tool_tip, callback)
-        self.lh2 = route_selection(self.subframe,"LH2", tool_tip, callback)
-        self.rh1 = route_selection(self.subframe,"RH1", tool_tip, callback)
-        self.rh2 = route_selection(self.subframe,"RH2", tool_tip, callback)        
-
-    def enable(self):
-        self.main.enable()
-        self.lh1.enable()
-        self.lh2.enable()
-        self.rh1.enable()
-        self.rh2.enable()
-        
-    def disable(self):
-        self.main.disable()
-        self.lh1.disable()
-        self.lh2.disable()
-        self.rh1.disable()
-        self.rh2.disable()
-
-    def set_values(self, routes):
-        # Route list comprises: [main, lh1, lh2, rh1, rh2]
-        # Each  element comprises a single boolean value
-        self.main.state.set(routes[0])
-        self.lh1.state.set(routes[1])
-        self.lh2.state.set(routes[2])
-        self.rh1.state.set(routes[3])
-        self.rh2.state.set(routes[4])
-
-    def get_values(self):
-        # Route list comprises: [main, lh1, lh2, rh1, rh2]
-        # Each  element comprises a single boolean value
-        return ([ self.main.state.get(),
-                  self.lh1.state.get(),
-                  self.lh2.state.get(),
-                  self.rh1.state.get(),
-                  self.rh2.state.get() ] )
-
-#------------------------------------------------------------------------------------
 # Class for an point entry box - Builds on the base Integer Entry Box class
 # Public class instance methods overridden by this class are
 #    "disable" - disables/blanks the entry box 
@@ -116,20 +45,20 @@ class point_entry_box(common.integer_entry_box):
         
     def update_cb_state(self):
         # Enable/disable the point selections depending on the state of the EB
-        if not self.eb_enabled.get() or self.eb_entry.get() == "":
+        if not self.enabled.get() or self.entry.get() == "":
             self.selection.set(False)
-            self.CB.config(text="")
+            self.configure(text="")
         else:
             self.state.set(self.selection.get())
-            if self.state.get(): self.CB.configure(text=u"\u2191")
-            else: self.CB.configure(text=u"\u2192")
+            if self.state.get(): self.configure(text=u"\u2191")
+            else: self.configure(text=u"\u2192")
         
     def validate(self):
         # Do the basic integer validation first (integer, in range, not empty)
         valid = super().validate(update_validation_status=False)
-        if valid and self.eb_entry.get() != "":
-            if not objects.point_exists(int(self.eb_entry.get())):
-                self.EB_TT.text = "Point does not exist"
+        if valid and self.entry.get() != "":
+            if not objects.point_exists(int(self.entry.get())):
+                self.TT.text = "Point does not exist"
                 valid = False
         self.update_cb_state()
         self.set_validation_status(valid)
@@ -179,12 +108,12 @@ class signal_entry_box(common.entry_box):
         
     def validate(self):
         valid = False
-        if self.eb_entry.get() == str(self.parent_object.config.sigid.get_value()):
-            self.EB_TT.text = ("Entered signal ID is the same as the current signal ID")
-        elif self.eb_entry.get() == "" or objects.signal_exists(self.eb_entry.get()):
+        if self.entry.get() == str(self.parent_object.config.sigid.get_value()):
+            self.TT.text = ("Entered signal ID is the same as the current signal ID")
+        elif self.entry.get() == "" or objects.signal_exists(self.entry.get()):
             valid = True
         else:
-            self.EB_TT.text = ("Local signal does not exist or "+
+            self.TT.text = ("Local signal does not exist or "+
                            "remote signal has not been subscribed to")
         self.set_validation_status(valid)
         return(valid)
@@ -211,10 +140,10 @@ class instrument_entry_box(common.integer_entry_box):
     def validate(self):
         # Do the basic integer validation first (integer, in range, not empty)
         valid = super().validate(update_validation_status=False)
-        if valid and not self.eb_entry.get() == "":
-            if not objects.instrument_exists(int(self.eb_entry.get())):
+        if valid and not self.entry.get() == "":
+            if not objects.instrument_exists(int(self.entry.get())):
                 valid = False
-                self.EB_TT.text = ("Block Instrument doesn't exist")
+                self.TT.text = ("Block Instrument doesn't exist")
         self.set_validation_status(valid)
         return(valid)
                 
@@ -392,13 +321,13 @@ class conflicting_signals_element():
         self.frame.pack(padx=2, pady=2, fill='x')
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=1)
-        self.sig1 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig1 = common.signal_route_selections(self.frame, read_only=False)
         self.sig1.frame.grid(row=0, column=0)
-        self.sig2 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig2 = common.signal_route_selections(self.frame, read_only=False)
         self.sig2.frame.grid(row=0, column=1)
-        self.sig3 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig3 = common.signal_route_selections(self.frame, read_only=False)
         self.sig3.frame.grid(row=1, column=0)
-        self.sig4 = common.signal_route_selection_element(self.frame, read_only=False)
+        self.sig4 = common.signal_route_selections(self.frame, read_only=False)
         self.sig4.frame.grid(row=1, column=1)
 
     def validate(self):
@@ -482,12 +411,6 @@ class signal_interlocking_tab:
         # These UI elements need the parent object so the current sig_id can be accessed for validation
         self.interlocking = interlocking_route_frame(parent_window, parent_object,
                                 "Signal routes and point interlocking", False)
-        self.sig_routes = route_selections(parent_window, "Enable route interlocking for the main signal",
-                            "Route must be selected to enable the signal to be cleared for the route - "+
-                            "the route display will be dependent on the signal configuration tab selections")
-        self.sub_routes = route_selections(parent_window, "Enable route interlocking for the subsidary signal",
-                            "Route must be selected to enable the subsidary to be cleared for the route - "+
-                            "the route display will be dependent on the signal configuration tab selections")
         
         self.conflicting_sigs = conflicting_signals_frame(parent_window)
         

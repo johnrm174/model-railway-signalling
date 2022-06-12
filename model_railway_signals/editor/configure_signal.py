@@ -26,8 +26,6 @@ def load_state(signal):
     signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
     signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"])
-    signal.config.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
-    signal.config.sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"])
     signal.config.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
     signal.config.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
     signal.config.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
@@ -36,20 +34,25 @@ def load_state(signal):
     signal.config.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
     signal.config.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
     signal.config.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
+    signal.config.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
     # These are the general settings for the signal
-    sig_button = not objects.schematic_objects[object_id]["fullyautomatic"]
-    dist_button = not objects.schematic_objects[object_id]["distautomatic"]
     if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
     else:rot = False
-    signal.config.settings.set_values(rot, sig_button, dist_button)
+    signal.config.settings.set_value(rot)
     # These elements are for the signal intelocking tab
-    signal.locking.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
-    signal.locking.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
+#    signal.locking.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
     signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
     signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
+    
     ##########################################################################################
     ################################ TODO - Automation UI elements ###########################
     ##########################################################################################
+#    sig_button = not objects.schematic_objects[object_id]["fullyautomatic"]
+#    dist_button = not objects.schematic_objects[object_id]["distautomatic"]
+#    signal.automation.settings.set_values(sig_button,dist_button)
+#    signal.config.sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"])
+#    signal.config.sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"])
+
     # Configure the initial Route indication selection
     feathers = objects.schematic_objects[object_id]["feathers"]
     if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -67,12 +70,12 @@ def load_state(signal):
     else:
         signal.config.routetype.set_value(1)      
     # Set the initial UI selections
-    update_tab1_signal_subtype_selections(signal)
-    update_tab1_signal_selection_elements(signal)
-    update_tab1_signal_aspect_selections(signal)
-    update_tab1_signal_button_selections(signal)
-    update_tab1_signal_sensor_selections(signal)
-    update_tab2_available_signal_routes(signal)
+#    update_tab1_signal_subtype_selections(signal)
+#    update_tab1_signal_selection_elements(signal)
+#    update_tab1_signal_aspect_selections(signal)
+#    update_tab1_signal_button_selections(signal) #############################################
+#    update_tab1_signal_sensor_selections(signal) #############################################
+#    update_tab2_available_signal_routes(signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -87,31 +90,31 @@ def save_state(signal, close_window):
         signal.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    elif ( signal.config.sigid.validate() and signal.config.sensors.validate() and
-           signal.config.aspects.validate() and signal.config.theatre.validate() and
-           signal.config.feathers.validate() and signal.config.semaphores.validate() and
-           signal.locking.interlocking.validate() and signal.locking.conflicting_sigs.validate() ):
+    elif ( signal.config.sigid.validate() and signal.config.aspects.validate() and
+           signal.config.theatre.validate() and signal.config.feathers.validate() and
+           signal.config.semaphores.validate() and signal.locking.interlocking.validate() and
+           signal.locking.conflicting_sigs.validate() ):
         ##########################################################################################
         ####################### TODO - Validation of Automation UI elements ######################
         ##########################################################################################
+#        # and signal.automation.sensors.validate()
+
+        
         # Get the Signal ID (this may or may not have changed) - Note that we don't save  
         # the value to the dictionary - instead we pass to the update signal function
         new_id = signal.config.sigid.get_value()
         # Update all object configuration settings from the Tkinter variables
         objects.schematic_objects[object_id]["itemtype"] = signal.config.sigtype.get_value()
         objects.schematic_objects[object_id]["itemsubtype"] = signal.config.subtype.get_value()
-        objects.schematic_objects[object_id]["passedsensor"] = signal.config.sensors.passed.get_value()
-        objects.schematic_objects[object_id]["approachsensor"] = signal.config.sensors.approach.get_value()
         objects.schematic_objects[object_id]["subsidary"] = signal.config.aspects.get_subsidary()
         objects.schematic_objects[object_id]["feathers"] = signal.config.feathers.get_feathers()
         objects.schematic_objects[object_id]["dccaspects"] = signal.config.aspects.get_addresses()
         objects.schematic_objects[object_id]["dccfeathers"] = signal.config.feathers.get_addresses()
         objects.schematic_objects[object_id]["dcctheatre"] = signal.config.theatre.get_theatre()
         objects.schematic_objects[object_id]["sigarms"] = signal.config.semaphores.get_arms()
+        objects.schematic_objects[object_id]["subroutes"] = signal.config.sub_routes.get_values()
         # These are the general settings for the signal
-        rot, sig_button, dist_button = signal.config.settings.get_values()
-        objects.schematic_objects[object_id]["fullyautomatic"] = not sig_button
-        objects.schematic_objects[object_id]["distautomatic"] = not dist_button
+        rot = signal.config.settings.get_value()
         if rot: objects.schematic_objects[object_id]["orientation"] = 180
         else: objects.schematic_objects[object_id]["orientation"] = 0
         # Set the Theatre route indicator flag if that particular radio button is selected
@@ -122,13 +125,19 @@ def save_state(signal, close_window):
             objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
             objects.schematic_objects[object_id]["theatreroute"] = False
         # These elements are for the signal intelocking tab
-        objects.schematic_objects[object_id]["sigroutes"] = signal.locking.sig_routes.get_values()
-        objects.schematic_objects[object_id]["subroutes"] = signal.locking.sub_routes.get_values()
+#        objects.schematic_objects[object_id]["sigroutes"] = signal.locking.sig_routes.get_values()
         objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
         objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
+        
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
         ##########################################################################################
+#        objects.schematic_objects[object_id]["passedsensor"] = signal.config.sensors.passed.get_value()
+#        objects.schematic_objects[object_id]["approachsensor"] = signal.config.sensors.approach.get_value()
+#        rot, sig_button, dist_button = signal.automation.settings.get_values()
+#        objects.schematic_objects[object_id]["fullyautomatic"] = not sig_button
+#        objects.schematic_objects[object_id]["distautomatic"] = not dist_button
+
         # Update the signal (recreate in its new configuration)
         objects.update_signal(object_id, item_id = new_id)
         # Close window on "OK" or re-load UI for "apply"
@@ -190,17 +199,16 @@ def update_tab1_signal_sensor_selections(signal):
 
 def update_tab1_signal_selection_elements(signal):
     # Pack_forget everything first - then we pack everything in the right order
-    # Signal Type, Subtype, gen settings and and Signal events always remain packed
-    signal.config.routetype.frame.pack_forget()
+    # Sig Id/Type, Subtype, gen/route settings and and Signal events always remain packed
     signal.config.aspects.frame.pack_forget()
     signal.config.semaphores.frame.pack_forget()
     signal.config.feathers.frame.pack_forget()
     signal.config.theatre.frame.pack_forget()
+    signal.config.sub_routes.frame.pack_forget()
     # Only pack those elements relevant to the signal type and route type
     if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         # Main UI elements to pack are the Aspects (DCC addresses) and Route Type selections
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
-        signal.config.routetype.frame.pack(padx=2, pady=2, fill='x')
         # Enable the available route type selections for colour light signals
         if signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
             # 2 aspect distant colour light signals do not support route indications
@@ -210,6 +218,9 @@ def update_tab1_signal_selection_elements(signal):
             signal.config.routetype.B4.configure(state="disabled")
             signal.config.feathers.disable()
             signal.config.theatre.disable()
+            # Distant signals do not have subsidary signals
+            signal.config.sub_routes.disable()
+            signal.config.aspects.disable_subsidary_selection()
         else:
             # If Route Arms are currently selected we change this to Feathers
             if signal.config.routetype.get_value() == 4: signal.config.routetype.set_value(2)
@@ -217,6 +228,8 @@ def update_tab1_signal_selection_elements(signal):
             signal.config.routetype.B2.configure(state="normal")
             signal.config.routetype.B3.configure(state="normal")
             signal.config.routetype.B4.configure(state="disabled")
+            # All colour light types apart from distants can have a subsidary
+            signal.config.aspects.enable_subsidary_selection()
             # Pack the selected route selection UI elements
             if signal.config.routetype.get_value() == 1:
                 signal.config.feathers.disable()
@@ -229,26 +242,39 @@ def update_tab1_signal_selection_elements(signal):
                 signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
                 signal.config.theatre.enable()
                 signal.config.feathers.disable()
-        
+            # If the signal has a subsidary then enable the subsidary route selections
+            if signal.config.aspects.get_subsidary()[0]:
+                signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+                signal.config.sub_routes.enable()
+            else:
+                signal.config.sub_routes.disable()
+
     elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+        # No route indications supported for ground signals
+        signal.config.routetype.set_value(1)
+        signal.config.routetype.B2.configure(state="disabled")
+        signal.config.routetype.B3.configure(state="disabled")
+        signal.config.routetype.B4.configure(state="disabled")
         # Main UI element to pack is the Aspects (DCC addresses)
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
+        # A ground signal can also support multiple routes
+        signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+        signal.config.sub_routes.enable()
         
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         # Main UI elements to pack are the Route Type selections and semaphore arm selections
-        signal.config.routetype.frame.pack(padx=2, pady=2, fill='x')
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
         # Enable the available route type selections for Semaphore signals
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
-            # Distant signals use the main signal button
-            signal.config.settings.enable_dist_button()
+            signal.config.semaphores.disable_subsidaries()
+            signal.config.semaphores.disable_distants()
             # distant semaphore signals do not support route indications
             signal.config.routetype.set_value(1)
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="disabled")
             signal.config.routetype.B4.configure(state="disabled")
-            signal.config.semaphores.disable_subsidaries()
-            signal.config.semaphores.disable_distants()
+            # Distant signals do not have subsidary signals
+            signal.config.sub_routes.disable()
         else:
             signal.config.semaphores.enable_subsidaries()
             signal.config.semaphores.enable_distants()
@@ -263,19 +289,37 @@ def update_tab1_signal_selection_elements(signal):
                 signal.config.semaphores.disable_routes()
             elif signal.config.routetype.get_value() == 3:
                 signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
-                signal.config.theatre.enable()
                 signal.config.semaphores.disable_routes()
+                signal.config.theatre.enable()
             elif signal.config.routetype.get_value() == 4:
-                signal.config.theatre.disable()
                 signal.config.semaphores.enable_routes()
+                signal.config.theatre.disable()
+            # If the signal has a subsidary then enable the subsidary route selections
+            if ( signal.config.semaphores.main.sub.get_element()[0] or
+                 signal.config.semaphores.lh1.sub.get_element()[0] or
+                 signal.config.semaphores.lh2.sub.get_element()[0] or
+                 signal.config.semaphores.rh1.sub.get_element()[0] or
+                 signal.config.semaphores.rh2.sub.get_element()[0] ) :
+                signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+                signal.config.sub_routes.enable()
+            else:
+                signal.config.sub_routes.disable()
                 
     elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         # Main UI element to pack is the Semaphore Arms (DCC addresses)
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
+        # No route indications supported for ground signals
+        signal.config.routetype.set_value(1)
+        signal.config.routetype.B2.configure(state="disabled")
+        signal.config.routetype.B3.configure(state="disabled")
+        signal.config.routetype.B4.configure(state="disabled")
         # Only the main signal arm is supported for ground discs
         signal.config.semaphores.disable_routes()
         signal.config.semaphores.disable_subsidaries()
         signal.config.semaphores.disable_distants()
+        # A ground signal can also support multiple routes
+        signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+        signal.config.sub_routes.enable()
     
     return()
 
@@ -375,22 +419,7 @@ def update_tab1_signal_aspect_selections(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab2_available_signal_routes(signal):
-    # Only display the subsidary route selection if the signal is configured with a subsidary 
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-           signal.config.aspects.get_subsidary()[0] ):
-        signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-        signal.locking.sub_routes.enable()
-    elif ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           ( signal.config.semaphores.main.sub.get_element()[0] or
-             signal.config.semaphores.lh1.sub.get_element()[0] or
-             signal.config.semaphores.lh2.sub.get_element()[0] or
-             signal.config.semaphores.rh1.sub.get_element()[0] or
-             signal.config.semaphores.rh2.sub.get_element()[0] ) ):
-        signal.locking.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-        signal.locking.sub_routes.enable()
-    else:
-        signal.locking.sub_routes.frame.pack_forget()
-        signal.locking.sub_routes.disable()
+
     return()
 
 # def update_tab2_available_signal_routes(signal):
@@ -491,33 +520,40 @@ class edit_signal:
         load_state(self)
         
     def sig_type_updated(self):
-        self.config.subtype.set_value(1)
-        update_tab1_signal_subtype_selections(self)
-        update_tab1_signal_selection_elements(self)
-        update_tab1_signal_aspect_selections(self)
-        update_tab1_signal_button_selections(self)
-        update_tab1_signal_sensor_selections(self)
-        update_tab2_available_signal_routes(self) 
+        print("sig type updated")
+#        self.config.subtype.set_value(1)
+#        update_tab1_signal_selection_elements(self)
+#        update_tab1_signal_subtype_selections(self)
+#        update_tab1_signal_aspect_selections(self)
+#        update_tab1_signal_button_selections(self)
+#        update_tab1_signal_sensor_selections(self)
+#        update_tab2_available_signal_routes(self)
         
     def sub_type_updated(self):
-        update_tab1_signal_aspect_selections(self)
-        update_tab1_signal_selection_elements(self)
-        update_tab1_signal_button_selections(self)
-        update_tab1_signal_sensor_selections(self)
-        update_tab2_available_signal_routes(self) 
+        print("sub type updated")
+#        update_tab1_signal_selection_elements(self)
+#        update_tab1_signal_aspect_selections(self)
+#        update_tab1_signal_button_selections(self)
+#        update_tab1_signal_sensor_selections(self)
+#        update_tab2_available_signal_routes(self) 
         
     def route_type_updated(self):
-        update_tab1_signal_selection_elements(self)
-        update_tab2_available_signal_routes(self) 
+        print("route type updated")
+#        update_tab1_signal_selection_elements(self)
+#        update_tab2_available_signal_routes(self) 
         
     def route_selections_updated(self):
-        update_tab2_available_signal_routes(self) 
+        print("route selections updated")
+#        update_tab2_available_signal_routes(self) 
 
     def sig_arms_updated(self):
-        update_tab1_signal_button_selections(self)
-        update_tab2_available_signal_routes(self) 
+        print("sig arms updated")
+#        update_tab1_signal_button_selections(self)
+#        update_tab2_available_signal_routes(self) 
 
     def sub_arms_updated(self):
-        update_tab2_available_signal_routes(self) 
+        print("sub arms updated")
+#        update_tab1_signal_selection_elements(self)
+#        update_tab2_available_signal_routes(self)
 
 #############################################################################################
