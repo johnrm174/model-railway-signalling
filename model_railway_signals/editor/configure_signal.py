@@ -70,7 +70,8 @@ def load_state(signal):
     else:
         signal.config.routetype.set_value(1)      
     # Set the initial UI selections
-#    update_tab1_signal_subtype_selections(signal)
+    update_tab1_signal_ui_elements(signal)
+    update_tab1_signal_subtype_selections(signal)
 #    update_tab1_signal_selection_elements(signal)
 #    update_tab1_signal_aspect_selections(signal)
 #    update_tab1_signal_button_selections(signal) #############################################
@@ -196,6 +197,47 @@ def update_tab1_signal_sensor_selections(signal):
 # Hide/show the various route indication UI elements depending on what is selected
 # Also update the available route selections depending on signal type / syb-type
 #------------------------------------------------------------------------------------
+
+def update_tab1_signal_ui_elements(signal):
+    # Unpack all the optional elements first
+    signal.config.aspects.frame.pack_forget()
+    signal.config.semaphores.frame.pack_forget()
+    signal.config.theatre.frame.pack_forget()
+    signal.config.feathers.frame.pack_forget()
+    signal.config.sub_routes.frame.pack_forget()
+
+    # Only pack those elements relevant to the signal type and route type
+    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+        signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
+
+    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+        signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
+
+    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+        signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
+
+    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+        signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
+        signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+    
+    # Pack the Route selections according to type
+    if signal.config.routetype.get_value() == 2:
+        signal.config.feathers.frame.pack(padx=2, pady=2, fill='x')
+    elif signal.config.routetype.get_value() == 3:
+        signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
+
+    # If the signal has a subsidary then enable the subsidary route selections
+    if ( signal.config.semaphores.main.sub.get_element()[0] or
+         signal.config.semaphores.lh1.sub.get_element()[0] or
+         signal.config.semaphores.lh2.sub.get_element()[0] or
+         signal.config.semaphores.rh1.sub.get_element()[0] or
+         signal.config.semaphores.rh2.sub.get_element()[0]  or
+         signal.config.aspects.get_subsidary()[0] ):
+        signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
+
+    return()
+
+
 
 def update_tab1_signal_selection_elements(signal):
     # Pack_forget everything first - then we pack everything in the right order
@@ -521,9 +563,10 @@ class edit_signal:
         
     def sig_type_updated(self):
         print("sig type updated")
-#        self.config.subtype.set_value(1)
+        self.config.subtype.set_value(1)
+        update_tab1_signal_subtype_selections(self)
+        update_tab1_signal_ui_elements(self)
 #        update_tab1_signal_selection_elements(self)
-#        update_tab1_signal_subtype_selections(self)
 #        update_tab1_signal_aspect_selections(self)
 #        update_tab1_signal_button_selections(self)
 #        update_tab1_signal_sensor_selections(self)
@@ -531,6 +574,7 @@ class edit_signal:
         
     def sub_type_updated(self):
         print("sub type updated")
+        update_tab1_signal_ui_elements(self)
 #        update_tab1_signal_selection_elements(self)
 #        update_tab1_signal_aspect_selections(self)
 #        update_tab1_signal_button_selections(self)
@@ -538,6 +582,7 @@ class edit_signal:
 #        update_tab2_available_signal_routes(self) 
         
     def route_type_updated(self):
+        update_tab1_signal_ui_elements(self)
         print("route type updated")
 #        update_tab1_signal_selection_elements(self)
 #        update_tab2_available_signal_routes(self) 
@@ -553,6 +598,7 @@ class edit_signal:
 
     def sub_arms_updated(self):
         print("sub arms updated")
+        update_tab1_signal_ui_elements(self)
 #        update_tab1_signal_selection_elements(self)
 #        update_tab2_available_signal_routes(self)
 

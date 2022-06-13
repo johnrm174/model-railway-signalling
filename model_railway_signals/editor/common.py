@@ -124,7 +124,7 @@ class check_box(Checkbutton):
 
 class state_box(Checkbutton):
     def __init__(self, parent_frame, label_off:str, label_on:str, tool_tip:str,
-                         callback=None, width:int=None,read_only:bool=False):
+                         width:int=None, callback=None, read_only:bool=False):
         # Store the local instance configuration variables
         self.callback = callback
         self.parent_frame = parent_frame
@@ -154,11 +154,11 @@ class state_box(Checkbutton):
 
     def update_cb_state(self):
         if not self.enabled.get():
-            self.CB_CB.config(text="")
+            self.configure(text="")
         else:
             self.state.set(self.selection.get())
-            if self.selection.get(): self.config(text=self.labelon)
-            else: self.config(text=self.labeloff)
+            if self.selection.get(): self.configure(text=self.labelon)
+            else: self.configure(text=self.labeloff)
 
     def enable(self):
         if not self.read_only:
@@ -283,7 +283,7 @@ class integer_entry_box(entry_box):
         self.max_value = max_value
         self.min_value = min_value
         # Create the entry box, event bindings and associated default tooltip
-        super().__init__(parent_frame, width, tool_tip, callback=callback)
+        super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
                 
     def validate(self, update_validation_status=True):
         valid = False
@@ -329,9 +329,9 @@ class integer_entry_box(entry_box):
 #------------------------------------------------------------------------------------
 
 class dcc_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, callback=None):
+    def __init__(self, parent_frame, callback=None,
+            tool_tip:str="Enter a DCC address (1-2047) or leave blank"):
         # Call the common base class init function to create the EB
-        tool_tip="Enter a DCC address (1-2047) or leave blank"
         super().__init__(parent_frame, width=4 , min_value=1, max_value=2047,
                             tool_tip=tool_tip, callback=callback)
 
@@ -350,7 +350,7 @@ class dcc_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class item_id_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, tool_tip, exists_function, callback=None):
+    def __init__(self, parent_frame, exists_function, tool_tip:str, callback=None):
         # This is the function to call to see if the item exists
         self.exists_function = exists_function
         # Call the common base class init function to create the EB
@@ -426,12 +426,12 @@ class dcc_command_entry():
         self.EB = dcc_entry_box(parent_frame, callback=self.eb_updated)
         self.EB.pack(side=LEFT)
         self.CB = state_box(parent_frame, label_off="OFF", label_on="ON",
-                    tool_tip="Set the DCC command logic")
-        self.defaultbg = self.CB.cget("background")
+                    tool_tip="Set the DCC logic for the command")
         self.CB.pack(side=LEFT)
     
     def eb_updated(self):
-        if self.EB.entry == "": CB.disable()
+        if self.EB.entry.get() == "":
+            self.CB.disable()
         else: self.CB.enable()
 
     def validate(self):
@@ -449,7 +449,8 @@ class dcc_command_entry():
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
         self.EB.set_value(dcc_command[0])
         self.CB.set_value(dcc_command[1])
-        
+        self.eb_updated()
+
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
         # When disabled (or empty) will always return [0,False]
@@ -458,6 +459,7 @@ class dcc_command_entry():
 
 #------------------------------------------------------------------------------------
 # Class for a signal route selection element (Sig ID EB + route selection CBs)
+# Used by the signals and points interlocking tabs (read only for points tab)
 # Public class instance methods provided by this class are
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
@@ -465,7 +467,7 @@ class dcc_command_entry():
 #------------------------------------------------------------------------------------
 
 class signal_route_selections():
-    def __init__(self, parent_frame, read_only=False):
+    def __init__(self, parent_frame, read_only:bool=False):
         self.read_only = read_only
         # Create a frame to hold all the elements
         self.frame = Frame(parent_frame)
@@ -474,23 +476,29 @@ class signal_route_selections():
             tool_tip1 = "Edit the associated signal to configure (signal interlocking tab)"
             tool_tip2 = "Edit the associated signal to configure (signal interlocking tab)"
         else:
-            tool_tip1 = "Specify any signals which (when cleared) would conflict with this signal route"
-            tool_tip2 = "Select the signal routes that (when cleared) would conflict with the current signal"
+            tool_tip1 = "Specify any signals which conflict with this route for the current signal"
+            tool_tip2 = "Select the signal routes that would conflict with the current signal"
         self.EB = item_id_entry_box(self.frame, tool_tip=tool_tip1,
                 exists_function=objects.signal_exists, callback=self.eb_updated)
+        self.EB.pack(side=LEFT)
         # Disable the EB (we don't use the disable method as we wantto display the value_
-        if self.read_only: self.EB.config(state="disabled")
+        if self.read_only: self.EB.configure(state="disabled")
         # Now create the UI Elements for each of the possible route selections
         self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
                                   tool_tip=tool_tip2, read_only = read_only)
+        self.main.pack(side=LEFT)
         self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
                                   tool_tip=tool_tip2, read_only = read_only)
+        self.lh1.pack(side=LEFT)
         self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
                                   tool_tip=tool_tip2, read_only = read_only)
+        self.lh2.pack(side=LEFT)
         self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
                                   tool_tip=tool_tip2, read_only = read_only)
+        self.rh1.pack(side=LEFT)
         self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
                                   tool_tip=tool_tip2, read_only = read_only)
+        self.rh2.pack(side=LEFT)
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
@@ -520,6 +528,7 @@ class signal_route_selections():
         self.lh2.set_value(signal[1][2])
         self.rh1.set_value(signal[1][3])
         self.rh2.set_value(signal[1][4])
+        self.eb_updated()
 
     def get_values(self):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]

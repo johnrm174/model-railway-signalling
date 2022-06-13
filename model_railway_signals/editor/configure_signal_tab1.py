@@ -53,7 +53,7 @@ class semaphore_route_element():
         if self.callback is not None: self.callback()
         
     def update_eb_state(self):
-        if self.CB.selection: self.EB.enable()
+        if self.CB.selection.get(): self.EB.enable()
         else: self.EB.disable()
         
     def enable(self):
@@ -110,7 +110,7 @@ class semaphore_route_group():
         self.dist.frame.pack(side=LEFT)
         
     def sig_arms_updated(self):
-        self.enable_distants()
+        self.enable_distant()
         if self.sig_arms_callback is not None: self.sig_arms_callback()
         
     def sub_arms_updated(self):
@@ -171,15 +171,25 @@ class semaphore_signal_arms():
         # Create a frame for this UI element.
         self.frame = LabelFrame(parent_frame, text="Semaphore Signal Arms and DCC Addresses")
         # Create the individual UI elements for each route (sign, sub, dist)
-        self.main = semaphore_route_group(self.frame, sig_arms_updated, subs_arms_updated, "Main")
+        self.main = semaphore_route_group(self.frame, label="Main",
+                                sig_arms_updated_callback=sig_arms_updated,
+                                sub_arms_updated_callback=subs_arms_updated)
         self.main.frame.pack()
-        self.lh1 = semaphore_route_group(self.frame, sig_arms_updated, subs_arms_updated, "LH1")
+        self.lh1 = semaphore_route_group(self.frame, label="LH1",
+                                sig_arms_updated_callback=sig_arms_updated,
+                                sub_arms_updated_callback=subs_arms_updated)
         self.lh1.frame.pack()
-        self.lh2 = semaphore_route_group(self.frame, sig_arms_updated, subs_arms_updated, "LH2")
+        self.lh2 = semaphore_route_group(self.frame, label="LH2",
+                                sig_arms_updated_callback=sig_arms_updated,
+                                sub_arms_updated_callback=subs_arms_updated)
         self.lh2.frame.pack()
-        self.rh1 = semaphore_route_group(self.frame, sig_arms_updated, subs_arms_updated, "RH1")
+        self.rh1 = semaphore_route_group(self.frame, label="RH1",
+                                sig_arms_updated_callback=sig_arms_updated,
+                                sub_arms_updated_callback=subs_arms_updated)
         self.rh1.frame.pack()
-        self.rh2 = semaphore_route_group(self.frame, sig_arms_updated, subs_arms_updated, "RH2")
+        self.rh2 = semaphore_route_group(self.frame, label="RH2",
+                                sig_arms_updated_callback=sig_arms_updated,
+                                sub_arms_updated_callback=subs_arms_updated)
         self.rh2.frame.pack()
         # The signal arm for the main route cannot be deselected
         self.main.sig.CB.set_value(True)
@@ -482,7 +492,7 @@ class colour_light_aspects():
                  self.dylw.validate() and
                  self.fylw.validate() and
                  self.fdylw.validate() and
-                 self.subsidary.validate() )
+                 self.EB.validate() )
     
     def set_addresses(self, addresses):
         # Colour Light Aspects list comprises: [grn, red, ylw, dylw, fylw, fdylw]
@@ -547,12 +557,18 @@ class route_indications:
         # as the frame gets packed/unpacked depending on UI selections
         self.frame = LabelFrame(parent_frame, text=frame_label)
         # Create the individual route selection elements
-        self.dark = dcc_entry_element(self.frame, "(Dark)", 5, theatre, feathers, callback, True)
-        self.main = dcc_entry_element(self.frame, "MAIN", 5, theatre, feathers, callback, False)
-        self.lh1 = dcc_entry_element(self.frame, "LH1", 5, theatre, feathers, callback, False)
-        self.lh2 = dcc_entry_element(self.frame, "LH2", 5, theatre, feathers, callback, False)
-        self.rh1 = dcc_entry_element(self.frame, "RH1", 5, theatre, feathers, callback, False)
-        self.rh2 = dcc_entry_element(self.frame, "RH2", 5, theatre, feathers, callback, False)
+        self.dark = dcc_entry_element(self.frame, label="(Dark)", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=True)
+        self.main = dcc_entry_element(self.frame, label="MAIN", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=False)
+        self.lh1 = dcc_entry_element(self.frame, label="LH1", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=True)
+        self.lh2 = dcc_entry_element(self.frame, label="LH2", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=True)
+        self.rh1 = dcc_entry_element(self.frame, label="RH1", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=True)
+        self.rh2 = dcc_entry_element(self.frame, label="RH2", width=5, theatre=theatre,
+                    feathers=feathers, callback=callback, enable_addresses_on_selection=True)
         # Inhibit the Selection box / entry box for the "Dark" aspect - always deselected as no indication
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit
@@ -604,6 +620,7 @@ class route_indications:
         self.lh2.set_feather(feathers[2])
         self.rh1.set_feather(feathers[3])
         self.rh2.set_feather(feathers[4])
+        self.auto_inhibit_update()
     
     def get_feathers(self):
         # Feather Route list comprises: [main, lh1, lh2, rh1, rh2]
@@ -625,7 +642,8 @@ class route_indications:
         self.lh2.set_theatre(theatre[3])
         self.rh1.set_theatre(theatre[4])
         self.rh2.set_theatre(theatre[5])
-    
+        self.auto_inhibit_update()
+
     def get_theatre(self):
         # Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
         # Each route element comprises: [character, address-sequence]
@@ -684,11 +702,16 @@ class subsidary_route_selections():
         self.subframe.pack(padx=2, pady=2)
         # Create the required selection elements
         tool_tip = "Select the routes controlled by the subsidary signal aspect"
-        self.main = common.check_box(self.subframe, "MAIN", tool_tip, callback=callback)
-        self.lh1 = common.check_box(self.subframe, "LH1", tool_tip, callback=callback)
-        self.lh2 = common.check_box(self.subframe, "LH2", tool_tip, callback=callback)
-        self.rh1 = common.check_box(self.subframe, "RH1", tool_tip, callback=callback)
-        self.rh2 = common.check_box(self.subframe, "RH2", tool_tip, callback=callback)        
+        self.main = common.check_box(self.subframe, label="MAIN", tool_tip=tool_tip, callback=callback)
+        self.main.pack(side=LEFT)
+        self.lh1 = common.check_box(self.subframe, label="LH1", tool_tip=tool_tip, callback=callback)
+        self.lh1.pack(side=LEFT)
+        self.lh2 = common.check_box(self.subframe, label="LH2", tool_tip=tool_tip, callback=callback)
+        self.lh2.pack(side=LEFT)
+        self.rh1 = common.check_box(self.subframe, label="RH1", tool_tip=tool_tip, callback=callback)
+        self.rh1.pack(side=LEFT)
+        self.rh2 = common.check_box(self.subframe, label="RH2", tool_tip=tool_tip, callback=callback)        
+        self.rh2.pack(side=LEFT)
 
     def enable(self):
         self.main.enable()
@@ -762,16 +785,7 @@ class signal_configuration_tab:
                 "Theatre route indications and associated DCC commands", theatre=True)
         self.feathers = route_indications(parent_tab, route_selections_updated,
                 "Feather route indications and associated DCC commands", feathers=True)
-        # Create the Checkboxes and Entry Boxes for the Semaphore Route Indications
-        # Note the callback to update whether a "distant button" can be selected
         self.semaphores = semaphore_signal_arms(parent_tab, sig_arms_updated, sub_arms_updated)
-        # Create the Subsidary route selections UI Element
         self.sub_routes = subsidary_route_selections(parent_tab, route_selections_updated)
-
-        self.aspects.frame.pack(padx=2, pady=2, fill='x')
-        self.theatre.frame.pack(padx=2, pady=2, fill='x')
-        self.feathers.frame.pack(padx=2, pady=2, fill='x')
-        self.semaphores.frame.pack(padx=2, pady=2, fill='x')
-        self.sub_routes.frame.pack(padx=2, pady=2, fill='x')
 
 #############################################################################################
