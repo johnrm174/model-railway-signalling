@@ -1,3 +1,7 @@
+#------------------------------------------------------------------------------------
+# These are the Public API functions (when you 'from model_railway_signals import *'
+#------------------------------------------------------------------------------------
+
 from .library.points import point_type
 from .library.points import point_callback_type
 from .library.points import create_point
@@ -77,6 +81,8 @@ from .library.file_interface import load_layout_state
 from .library.block_instruments import block_callback_type
 from .library.block_instruments import create_block_instrument
 from .library.block_instruments import block_section_ahead_clear
+
+from .editor.editor import run_editor
 
 __all__ = [
       # Public point types
