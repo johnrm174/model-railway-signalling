@@ -1,10 +1,23 @@
 #------------------------------------------------------------------------------------
 # These are common classes used across multiple UI Elements
+#
+# Provides the following base classes for use across the editor UI
+#    CreateToolTip(widget,tool_tip)
+#    check_box(entry)
+#    state_box(entry)
+#    entry_box(entry)
+#    integer_entry_box(entry_box)
+#    dcc_entry_box(integer_entry_box)
+#    int_item_id_entry_box (integer_entry_box)
+#    str_item_id_entry_box(entry_box)
+#    object_id_selection(integer_entry_box)
+#    dcc_command_entry() - combines dcc_entry_box and state_box
+#    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
+#    selection_buttons() - combines 5 RadioButtons
+#    window_controls() - apply/ok/reset/cancel
 #------------------------------------------------------------------------------------
 
 from tkinter import *
-
-from . import objects
 
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
@@ -63,7 +76,7 @@ class CreateToolTip():
         if tw: tw.destroy()
 
 #------------------------------------------------------------------------------------
-# Base class for a generic Checkbox - Builds on the tkinter checkbutton class
+# Base class for a generic Checkbox - Builds on the tkinter checkbutton class.
 # Additional class methods provided are:
 #    "set_value" - will set the CB state (bool)
 #    "get_value" - will return the state (False if disabled) (bool)
@@ -75,7 +88,6 @@ class check_box(Checkbutton):
     def __init__(self, parent_frame, label:str, tool_tip:str, width:int=None, callback=None):
         # Store the local instance configuration variables
         self.parent_frame = parent_frame
-        self.tool_tip = tool_tip
         self.callback = callback
         # If width hasn't been specified set to the width of the label
         if width is None: width = len(label)
@@ -114,7 +126,8 @@ class check_box(Checkbutton):
         return (self.selection.get())
 
 #------------------------------------------------------------------------------------
-# Base class for a generic State Box - Builds on the tkinter checkbutton class
+# Base class for a generic State Box (like a check box but with labels for off/on 
+# and blank when disabled) - Builds on the tkinter checkbutton class.
 # Additional class methods provided are:
 #    "set_value" - will set the CB state (bool)
 #    "get_value" - will return the current state (False if disabled) (bool)
@@ -126,8 +139,8 @@ class state_box(Checkbutton):
     def __init__(self, parent_frame, label_off:str, label_on:str, tool_tip:str,
                          width:int=None, callback=None, read_only:bool=False):
         # Store the local instance configuration variables
-        self.callback = callback
         self.parent_frame = parent_frame
+        self.callback = callback
         self.labelon = label_on
         self.labeloff = label_off
         self.read_only = read_only
@@ -145,6 +158,8 @@ class state_box(Checkbutton):
                 text=self.labeloff, variable=self.selection, command=self.cb_updated)
         if self.read_only: self.configure(state="disabled")
         self.TT = CreateToolTip(self, tool_tip)
+        # Get the default background colour (to set when disabled)
+        self.default_background = self.cget('bg')
         
     def cb_updated(self):
         # Focus on the Checkbox to remove focus from other widgets (such as EBs)
@@ -155,6 +170,7 @@ class state_box(Checkbutton):
     def update_cb_state(self):
         if not self.enabled.get():
             self.configure(text="")
+            if self.selection.get(): self.selection.set(False)
         else:
             self.state.set(self.selection.get())
             if self.selection.get(): self.configure(text=self.labelon)
@@ -182,28 +198,27 @@ class state_box(Checkbutton):
         return (self.selection.get())
 
 #------------------------------------------------------------------------------------
-# Common Base Class for a generic "Entry box" - Builds on the tkinter Entry class
-# Additional public class methods provided are:
-#    "disable" - disables/blanks the entry box
-#    "enable"  enables/loads the entry box (with the last value)
-#    "validate" - This gets overridden by the child class function
+# Common Base Class for a generic "Entry box" - Builds on the tkinter Entry class.
+# Additional class methods provided are:
 #    "set_value" - set the initial value of the entry box (string) 
 #    "get_value" - get the last "validated" value of the entry box (string) 
 #    "get_initial_value" - get the initial value of the entry box (string)
+#    "validate" - This gets overridden by the child class function
+#    "disable" - disables/blanks the entry box
+#    "enable"  enables/loads the entry box (with the last value)
 # Class methods/objects intended for use by child classes that inherit:
-#    "set_validation_status" - Updates the status of the EB
+#    "set_validation_status" - to be called following external validation
 #    "TT.text" - The tooltip for the entry box (to change the tooltip text)
 #    "entry" - is the current entry box value (may or may not be valid)
 #    "value" - is the last validated value of the entry box
-#    "initial_value" - as set by the last 'set_value' call 
 #------------------------------------------------------------------------------------
 
 class entry_box(Entry):
     def __init__(self, parent_frame, width:int, tool_tip:str, callback=None):
         # Store the local instance configuration variables
         self.parent_frame = parent_frame
-        self.tool_tip = tool_tip
         self.callback = callback
+        self.tool_tip = tool_tip
         # Create the tkinter vars for the entry box
         self.entry = StringVar(self.parent_frame, "")
         self.value = StringVar(self.parent_frame, "")
@@ -211,7 +226,7 @@ class entry_box(Entry):
         # Flag to track whether entry box is enabled/disabled
         self.enabled = BooleanVar(self.parent_frame, True)
         # Create the entry box, event bindings and associated default tooltip
-        super().__init__(self.parent_frame, width=width, textvariable=self.entry)
+        super().__init__(self.parent_frame, width=width, textvariable=self.entry, justify='center')
         self.bind('<Return>', self.entry_box_updated)
         self.bind('<Escape>', self.entry_box_cancel)
         self.bind('<FocusOut>', self.entry_box_updated)
@@ -228,11 +243,13 @@ class entry_box(Entry):
         self.parent_frame.focus()
         
     def validate(self):
-        self.set_validation_status(True)
+        self.set_validation_status(None)
         return(True)
     
     def set_validation_status(self, valid:bool):
-        if valid:
+        if valid is None:
+            self.value.set(self.entry.get())
+        elif valid == True: 
             self.configure(fg='black')
             self.TT.text = self.tool_tip
             self.value.set(self.entry.get())
@@ -264,7 +281,7 @@ class entry_box(Entry):
         return(self.initial_value.get())
 
 #------------------------------------------------------------------------------------
-# Common Class for an "Integer Entry box" - builds on the base Entry Box class
+# Common Class for an "Integer Entry box" - builds on the Entry Box class (above)
 # Public class instance methods inherited from the base Entry Box class are:
 #    "disable" - disables/blanks the entry box 
 #    "enable"  enables/loads the entry box (with the last value)
@@ -273,6 +290,11 @@ class entry_box(Entry):
 #    "get_value" - get the last "validated" value of the entry box (int) 
 #    "get_initial_value" - get the initial value of the entry box (int) 
 #    "validate" - Validates an integer, within range and whether empty 
+# Class methods/objects intended for use by child classes that inherit:
+#    "set_validation_status" - to be called following external validation
+#    "TT.text" - The tooltip for the entry box (to change the tooltip text)
+#    "entry" - is the current entry box value (may or may not be valid)
+#    "value" - is the last validated value of the entry box
 #------------------------------------------------------------------------------------
 
 class integer_entry_box(entry_box):
@@ -324,7 +346,6 @@ class integer_entry_box(entry_box):
 #    "enable"  enables/loads the entry box (with the last value)
 #    "set_value" - set the initial value of the entry box (int) 
 #    "get_value" - get the last "validated" value of the entry box (int) 
-#    "get_initial_value" - get the initial value of the entry box (int) 
 #    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
@@ -336,23 +357,27 @@ class dcc_entry_box (integer_entry_box):
                             tool_tip=tool_tip, callback=callback)
 
 #------------------------------------------------------------------------------------
-# Common class for an Item-specific entry boxes - builds on the Integer Entry Box
+# Common class for an Item-specific Integer entry box - builds on the Integer Entry Box
 # These classes are for entering local signal/point/instrument/section IDs (integers)
-# They do not accept remote signal IDs (where the compound Sig_id is a string)
+# They do not accept remote Signal or Instrument IDs (where the ID can be an int or str)
+# The class uses the 'exists_function' to check that the item exists on the schematic
+# If a 'current_id_function' is specified then this function is also used to validate
+# that the entered ID is not the same as the current ID of the item.
 # Public class instance methods inherited from the base Integer Entry Box are:
 #    "disable" - disables/blanks the entry box 
 #    "enable"  enables/loads the entry box (with the last value)
 #    "set_value" - set the initial value of the entry box (int) 
 #    "get_value" - get the last "validated" value of the entry box (int) 
-#    "get_initial_value" - get the initial value of the entry box (int)
 # Public class instance methods overridden by this class are
-#    "validate" - Also validates that the entered item ID exists on the layout 
+#    "validate" - Validation as described above 
 #------------------------------------------------------------------------------------
 
-class item_id_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, exists_function, tool_tip:str, callback=None):
-        # This is the function to call to see if the item exists
+class int_item_id_entry_box (integer_entry_box):
+    def __init__(self, parent_frame, tool_tip:str, callback=None,
+                 exists_function=None, current_id_function=None):
+        # These are the function calls used for validation
         self.exists_function = exists_function
+        self.current_id_function = current_id_function
         # Call the common base class init function to create the EB
         super().__init__(parent_frame, width=3 , min_value=1, max_value=99,
                             tool_tip=tool_tip, callback=callback)
@@ -360,15 +385,83 @@ class item_id_entry_box (integer_entry_box):
     def validate(self, update_validation_status=True):
         # Do the basic integer validation (integer, in range)
         valid = super().validate(update_validation_status=False)
-        # Now do the additional "does the enterd item ID exist" validation
-        if valid and self.entry.get() != "" and not self.exists_function(self.entry.get()):
-            self.TT.text = "Specified ID does not exist"
-            valid = False
+        # Now do the additional validation
+        if valid:
+            if self.exists_function is not None:
+                if self.entry.get() != "" and not self.exists_function(self.entry.get()):
+                    self.TT.text = "Specified ID does not exist"
+                    valid = False
+            if self.current_id_function is not None:
+                if self.entry.get() == str(self.current_id_function()):
+                    self.TT.text = "Entered ID is the same as the current Item ID"
+                    valid = False
+        if update_validation_status: self.set_validation_status(valid)
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Common class for an Item-specific String entry box - builds on the common Entry Box
+# These classes are for entering LOCAL or REMOTE signal or instrument IDs (where the ID
+# can be an int or str). The class uses the 'exists_function' to check that the item exists
+# on the schematic. If a 'current_id_function' is specified then this function is also used
+# to validate that the entered ID is not the same as the current ID of the item.
+# Public class instance methods inherited from the base Entry Box class are:
+#    "disable" - disables/blanks the entry box 
+#    "enable"  enables/loads the entry box (with the last value)
+#    "set_value" - set the initial value of the entry box (str) 
+#    "get_value" - get the last "validated" value of the entry box (str) 
+# Public class instance methods overridden by this class are
+#    "validate" - Validation as described above 
+#------------------------------------------------------------------------------------
+
+class str_item_id_entry_box (entry_box):
+    def __init__(self, parent_frame, tool_tip:str, callback=None,
+                 exists_function = None, current_id_function=None):
+        # These are the function calls used for validation
+        self.exists_function = exists_function
+        self.current_id_function = current_id_function
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame, width=8, tool_tip=tool_tip, callback=callback)
+
+    def validate(self, update_validation_status=True):
+        valid = True
+        # First validate that the entered value is either an integer (for a local Item ID)
+        # or a valid remote Item Id format (<NODE>-<ID>) - where the NODE element can be any
+        # non zero length string but the ID element must be a valid integer between 1 and 99
+        if self.entry.get() != "":
+            try:
+                item_id = int(self.entry.get())
+                if item_id < 1 or item_id > 99: valid = False
+            except:
+                if '-' not in self.entry.get():
+                    valid = False
+                else:
+                    [node_str, item_str] = self.entry.get().rsplit('-')
+                    try:
+                        item_id = int(item_str)
+                        if item_id < 1 or item_id > 99: valid = False
+                    except:
+                        valid = False
+                    else:
+                        if node_str == "":
+                            valid = False
+            if not valid: self.TT.text = ("Invalid item ID - must either be an integer "+
+                            "between 1 and 99 (for a local ID) or of the form 'node-id' "+
+                            "with the 'id' element between 1 and 99 (for a remote ID)")
+        # Next do the optional validation for item existing and not the same as the current ID
+        if valid and self.exists_function is not None:
+            if self.entry.get() != "" and not self.exists_function(self.entry.get()):
+                self.TT.text = "Specified ID does not exist"
+                valid = False
+        if valid and self.current_id_function is not None:
+            if self.entry.get() == str(self.current_id_function()):
+                self.TT.text = "Entered ID is the same as the current Item ID"
+                valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
 #------------------------------------------------------------------------------------
 # Common Class for an "Object ID" Entry Frame - builds on the Integer Entry Box class
+# This is used across all object edit windows for displaying / changing the item ID
 # Public class instance methods inherited from the base Integer Entry Box are:
 #    "disable" - disables/blanks the entry box 
 #    "enable"  enables/loads the entry box (with the last value)
@@ -376,8 +469,8 @@ class item_id_entry_box (integer_entry_box):
 #    "get_value" - get the last "validated" value of the entry box (int) 
 #    "get_initial_value" - get the initial value of the entry box (int)
 # Public class instance methods overridden by this class are
-#    "validate" - Validates that the entered Item ID is "free" and can
-#                 be assigned to this item (or it is the initial value)
+#    "validate" - Validates that the entered Item ID is "free" (and can therefore be
+#               assigned to this item) or is being changed back to the initial value
 #------------------------------------------------------------------------------------
 
 class object_id_selection(integer_entry_box):
@@ -409,7 +502,7 @@ class object_id_selection(integer_entry_box):
 
 #------------------------------------------------------------------------------------
 # Common class for a DCC command (address + command logic) entry element box
-# Uses the dcc_entry_box and state_box classes
+# Uses the dcc_entry_box and state_box classes from above
 # Public class instance methods provided by this class are
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value [address:int, state:bool]
@@ -453,8 +546,8 @@ class dcc_command_entry():
 
     def get_value(self):
         # Returns a 2 element list of [DCC_Address, DCC_State]
-        # When disabled (or empty) will always return [0,False]
-        # When invalid will return [last valid value, last valid state]
+        # When disabled (or empty) will always return [0, False]
+        # When invalid will return [last valid address, current state]
         return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
@@ -464,40 +557,37 @@ class dcc_command_entry():
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
 #    "get_values" - Gets the EB value and all route selection CBs 
+#    "enable" - Enables/loads the EB value and all route selection CBs 
+#    "disable" - Disables/blanks EB value and all route selection CBs 
 #------------------------------------------------------------------------------------
 
 class signal_route_selections():
-    def __init__(self, parent_frame, read_only:bool=False):
+    def __init__(self, parent_frame, tool_tip:str, exists_function=None,
+                  current_id_function=None, read_only:bool=False):
         self.read_only = read_only
         # Create a frame to hold all the elements
         self.frame = Frame(parent_frame)
         # Call the common base class init function to create the EB
-        if self.read_only:
-            tool_tip1 = "Edit the associated signal to configure (signal interlocking tab)"
-            tool_tip2 = "Edit the associated signal to configure (signal interlocking tab)"
-        else:
-            tool_tip1 = "Specify any signals which conflict with this route for the current signal"
-            tool_tip2 = "Select the signal routes that would conflict with the current signal"
-        self.EB = item_id_entry_box(self.frame, tool_tip=tool_tip1,
-                exists_function=objects.signal_exists, callback=self.eb_updated)
+        self.EB = int_item_id_entry_box(self.frame, tool_tip=tool_tip, callback=self.eb_updated,
+                    exists_function=exists_function, current_id_function=current_id_function)
         self.EB.pack(side=LEFT)
-        # Disable the EB (we don't use the disable method as we wantto display the value_
+        # Disable the EB (we don't use the disable method as we want to display the value_
         if self.read_only: self.EB.configure(state="disabled")
         # Now create the UI Elements for each of the possible route selections
         self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
-                                  tool_tip=tool_tip2, read_only = read_only)
+                                    tool_tip=tool_tip, read_only = read_only)
         self.main.pack(side=LEFT)
         self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
-                                  tool_tip=tool_tip2, read_only = read_only)
+                                    tool_tip=tool_tip, read_only = read_only)
         self.lh1.pack(side=LEFT)
         self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
-                                  tool_tip=tool_tip2, read_only = read_only)
+                                    tool_tip=tool_tip, read_only = read_only)
         self.lh2.pack(side=LEFT)
         self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
-                                  tool_tip=tool_tip2, read_only = read_only)
+                                    tool_tip=tool_tip, read_only = read_only)
         self.rh1.pack(side=LEFT)
         self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
-                                  tool_tip=tool_tip2, read_only = read_only)
+                                    tool_tip=tool_tip, read_only = read_only)
         self.rh2.pack(side=LEFT)
 
     def eb_updated(self):
@@ -519,6 +609,14 @@ class signal_route_selections():
     def validate(self):
         return(EB.validate())
     
+    def enable(self):
+        self.EB.enable()
+        self.eb_updated()
+        
+    def disable(self):
+        self.EB.disable()
+        self.eb_updated()
+        
     def set_values(self, signal:[int,[bool,bool,bool,bool,bool]]):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
@@ -550,10 +648,10 @@ class signal_route_selections():
 #------------------------------------------------------------------------------------
 
 class selection_buttons():
-    def __init__(self, parent_frame, frame_label, tool_tip = "",
-            callback=None,b1=None, b2=None, b3=None, b4=None, b5=None):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, 
+                        b1=None, b2=None, b3=None, b4=None, b5=None):
         # Create a labelframe to hold the buttons
-        self.frame = LabelFrame(parent_frame, text = frame_label)
+        self.frame = LabelFrame(parent_frame, text=label)
         self.value = IntVar(self.frame, 0)
         # This is the external callback to make when a selection is made
         self.callback = callback
@@ -612,12 +710,12 @@ class window_controls():
         self.frame = Frame(self.window)
         self.frame.pack(padx=2, pady=2)
         # Create the buttons and tooltips
-        self.B1 = Button (self.frame, text = "Apply",command=self.apply)
+        self.B1 = Button (self.frame, text = "Ok",command=self.ok)
         self.B1.pack(side=LEFT, padx=2, pady=2)
-        self.TT1 = CreateToolTip(self.B1, "Apply selections")
-        self.B2 = Button (self.frame, text = "Ok",command=self.ok)
+        self.TT1 = CreateToolTip(self.B1, "Apply selections and close window")
+        self.B2 = Button (self.frame, text = "Apply",command=self.apply)
         self.B2.pack(side=LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.B2, "Apply selections and close window")
+        self.TT2 = CreateToolTip(self.B2, "Apply selections")
         self.B3 = Button (self.frame, text = "Reset",command=self.reset)
         self.B3.pack(side=LEFT, padx=2, pady=2)
         self.TT3 = CreateToolTip(self.B3, "Abandon edit and reload original configuration")

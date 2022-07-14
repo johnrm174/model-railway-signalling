@@ -3,247 +3,182 @@
 #------------------------------------------------------------------------------------
 
 from tkinter import *
-from tkinter import ttk
 
-from . import objects
 from . import common
+from . import objects
 
 #------------------------------------------------------------------------------------
-# Class for an point entry box - Builds on the base Integer Entry Box class
-# Public class instance methods overridden by this class are
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box 
-#    "set_value" - set the initial value of the entry box
-#    "get_value" - get the last "validated" value of the entry box
-#    "get_initial_value" - get the initial value of the entry box 
-#    "validate" - Validates an integer, within range and whether empty 
+# Class for a point interlocking entry element (point_id + point_state)
+# Uses the common int_item_id_entry_box and state_box classes
+# Public class instance methods provided are:
+#    "validate" - validate the current entry box value and return True/false
+#    "set_value" - will set the current value [point_id:int, state:bool]
+#    "get_value" - will return the last "valid" value [point_id:int, state:bool]
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
 #------------------------------------------------------------------------------------
 
-class point_entry_box(common.integer_entry_box):
-    def __init__(self, parent_frame):
-        # Create the tkinter vars for the Point state CB - 'selection' is the actual CB state
-        # which will be 'unchecked' if the EB value is empty or not valid and 'state' is the
-        # last entered state (used to "load" the actual CB state once the EB is valid)        
-        self.state = BooleanVar(parent_frame,False)
-        self.selection = BooleanVar(parent_frame,False)
-        # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=3, min_value=1, max_value=99,
-                         tool_tip = "Specify the points that need to be set and"+
-                         " locked before the signal can be cleared for the route")
-        # Create the checkbox and associated tool tip
-        self.CB = Checkbutton(parent_frame, width=2, indicatoron = False, 
-                        variable=self.selection, command=self.cb_state_changed)
+class point_interlocking_entry():
+    def __init__(self, parent_frame, point_exists_function):
+        # Create the point ID entry box and associated state box (packed in the parent frame)
+        self.EB = common.int_item_id_entry_box(parent_frame, exists_function=point_exists_function,
+                    tool_tip = "Specify the points that need to be set and locked before the "+
+                        "signal can be cleared for the route", callback=self.eb_updated)
+        self.EB.pack(side=LEFT)
+        self.CB = common.state_box(parent_frame, label_off=u"\u2192", label_on="\u2191", width=2,
+                    tool_tip="Select the required state for the point (normal or switched)")
         self.CB.pack(side=LEFT)
-        self.defaultbg = self.CB.cget("background")
-        self.CBTT = common.CreateToolTip(self.CB, "Select the required state for "+
-                                         "the point (normal or switched)")
-            
-    def cb_state_changed(self):
-        #Focus on the CB to generate a focus-out event for the EB
-        self.CB.focus()
-        self.update_cb_state()
-        
-    def update_cb_state(self):
-        # Enable/disable the point selections depending on the state of the EB
-        if not self.enabled.get() or self.entry.get() == "":
-            self.selection.set(False)
-            self.configure(text="")
-        else:
-            self.state.set(self.selection.get())
-            if self.state.get(): self.configure(text=u"\u2191")
-            else: self.configure(text=u"\u2192")
+                            
+    def eb_updated(self):
+        if self.EB.entry.get() == "":
+            self.CB.disable()
+        else: self.CB.enable()
         
     def validate(self):
-        # Do the basic integer validation first (integer, in range, not empty)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            if not objects.point_exists(int(self.entry.get())):
-                self.TT.text = "Point does not exist"
-                valid = False
-        self.update_cb_state()
-        self.set_validation_status(valid)
-        return(valid)
-
+        return (self.EB.validate())
+    
     def enable(self):
-        super().enable()
-        self.selection.set(self.state.get())
-        self.update_cb_state()    
-
-    def disable(self):
-        super().disable()
-        self.update_cb_state()       
+        self.EB.enable()
+        self.eb_updated()
         
-    def set_value(self, point:[int,bool]):
+    def disable(self):
+        self.EB.disable()
+        self.eb_updated()
+        
+    def set_value(self, point:[int, bool]):
         # A Point comprises a 2 element list of [Point_id, Point_state]
-        self.state.set(point[1])
-        self.selection.set(point[1])
-        super().set_value(point[0])
-        self.update_cb_state()       
-       
+        self.EB.set_value(point[0])
+        self.CB.set_value(point[1])
+        self.eb_updated()
+        
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
-        return([super().get_value(), self.state.get()])          
-
-#------------------------------------------------------------------------------------
-# Class for an signal ID entry box - Builds on the base Entry Box class
-# Note that we use the base string EB class to support remote sig IDs
-# Public class instance methods inherited from the parent class are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box 
-#    "set_value" - set the initial value of the entry box
-#    "get_value" - get the last "validated" value of the entry box
-#    "get_initial_value" - get the initial value of the entry box 
-# Public class instance methods overridden by this class are
-#    "validate" - Validates an integer, within range and whether empty 
-#------------------------------------------------------------------------------------
-
-class signal_entry_box(common.entry_box):
-    def __init__(self, parent_frame, parent_object):
-        # We need the parent object for accessing the current sig ID entry
-        self.parent_object = parent_object
-        # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=6, tool_tip = "Enter the ID of the "+
-                "next signal along the specified route - This can be a local signal "+
-                "or a remote signal (subscribed to via MQTT networking)")
-        
-    def validate(self):
-        valid = False
-        if self.entry.get() == str(self.parent_object.config.sigid.get_value()):
-            self.TT.text = ("Entered signal ID is the same as the current signal ID")
-        elif self.entry.get() == "" or objects.signal_exists(self.entry.get()):
-            valid = True
-        else:
-            self.TT.text = ("Local signal does not exist or "+
-                           "remote signal has not been subscribed to")
-        self.set_validation_status(valid)
-        return(valid)
-
-#------------------------------------------------------------------------------------
-# Class for an Instrument entry box - Builds on the base Entry Box class
-# Public class instance methods inherited from the parent class are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box 
-#    "set_value" - set the initial value of the entry box
-#    "get_value" - get the last "validated" value of the entry box
-#    "get_initial_value" - get the initial value of the entry box 
-# Public class instance methods overridden by this class are
-#    "validate" - Validates an integer, within range and whether empty 
-#------------------------------------------------------------------------------------
-
-class instrument_entry_box(common.integer_entry_box):
-    def __init__(self, parent_frame):
-        # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=3,  min_value=1, max_value=99,
-             tool_tip = "Enter the ID of the block instrument associated with "+
-                       " the next block section along the specified route") 
-            
-    def validate(self):
-        # Do the basic integer validation first (integer, in range, not empty)
-        valid = super().validate(update_validation_status=False)
-        if valid and not self.entry.get() == "":
-            if not objects.instrument_exists(int(self.entry.get())):
-                valid = False
-                self.TT.text = ("Block Instrument doesn't exist")
-        self.set_validation_status(valid)
-        return(valid)
+        return([self.EB.get_value(), self.CB.get_value()])          
                 
 #------------------------------------------------------------------------------------
-# Class for a route interlocking group (comprising 7 points and a signal)
-# Uses the base point_entry_box class from above
-# Class instance functions to use externally are:
+# Class for a route interlocking group (comprising 6 points and a signal)
+# Uses the base point_interlocking_entry class from above
+# Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set theroute elements (points & signal)
 #    "get_route" - returns the last "valid" values (points & signal)
+#    "enable_route" - enables the point selections (and sig/block selections if enabled)
+#    "disable_route" - disables all route selections (points, sig ahead, instrument)
+#    "enable_sig_ahead" - enables the Sig ahead selections (if the route is enabled)
+#    "disable_sig_ahead" - disables the Sig ahead selections
+#    "enable_block_ahead" - enables the block ahead selections (if the route is enabled)
+#    "disable_block_ahead" - disables the block ahead selections
 #------------------------------------------------------------------------------------
 
 class interlocking_route_group: 
-    def __init__(self, parent_frame, parent_object, label, subsidary):
-        self.parent_object = parent_object
-        self.subsidary = subsidary
-        # Create a frame for this UI element
+    def __init__(self, parent_frame, parent_object, label:str):
+        self.sig_ahead_enabled = True
+        self.block_ahead_enabled = True
+        self.route_enabled = True
+        # These are the functions used to validate that the entered IDs exist
+        # on the schematic (and the sig ID is different to the current sig ID)
+        instrument_exists_function = objects.instrument_exists
+        signal_exists_function = objects.signal_exists
+        current_id_function = parent_object.config.sigid.get_value
+        instrument_exists_function = objects.instrument_exists
+        point_exists_function = objects.point_exists
+        # Create a frame for this UI element (always packed into the parent frame)
         self.frame = Frame(parent_frame)
         self.frame.pack()
-        # Create the lable and tooltip for the route group
+        # Create the lable and the point interlocking entry elements (these are
+        # packed LEFT in the frame by the parent class when created)
         self.label = Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = LEFT)
-        self.p1 = point_entry_box(self.frame)
-        self.p2 = point_entry_box(self.frame)
-        self.p3 = point_entry_box(self.frame)
-        self.p4 = point_entry_box(self.frame)
-        self.p5 = point_entry_box(self.frame)
-        self.p6 = point_entry_box(self.frame)
-        self.p7 = point_entry_box(self.frame)
-        # Create the optional elements
-        self.label1 = Label(self.frame, text=" Sig:")
-        self.label1.pack(side = LEFT)
-        self.sig = signal_entry_box(self.frame, parent_object)            
-        self.label2 = Label(self.frame, text=" Blk:")
-        self.label2.pack(side = LEFT)
-        self.block = instrument_entry_box(self.frame)
-        # Hide the Signal and Instriment elements if not required
-        if self.subsidary:
-            self.label1.pack_forget()
-            self.label2.pack_forget()
-            self.sig.EB_EB.pack_forget()
-            self.block.EB_EB.pack_forget()
+        self.p1 = point_interlocking_entry(self.frame, point_exists_function)
+        self.p2 = point_interlocking_entry(self.frame, point_exists_function)
+        self.p3 = point_interlocking_entry(self.frame, point_exists_function)
+        self.p4 = point_interlocking_entry(self.frame, point_exists_function)
+        self.p5 = point_interlocking_entry(self.frame, point_exists_function)
+        self.p6 = point_interlocking_entry(self.frame, point_exists_function)
+        # Create the optional elements (sig ahead and inst ahead) in a subframe (always packed)
+        self.subframe = Frame(self.frame)
+        self.subframe.pack(side=LEFT)
+        self.label1 = Label(self.subframe, text=" Sig:")
+        self.label1.pack(side=LEFT)
+        self.sig = common.str_item_id_entry_box(self.subframe, exists_function=signal_exists_function,
+                        tool_tip = "Enter the ID of the next signal along the specified route - This "+
+                        "can be a local signal or a remote signal (subscribed to via MQTT networking)",
+                          current_id_function = current_id_function)
+        self.sig.pack(side=LEFT)
+        self.label2 = Label(self.subframe, text=" Blk:")
+        self.label2.pack(side=LEFT)
+        self.block = common.int_item_id_entry_box(self.subframe, exists_function=instrument_exists_function,
+                                tool_tip="Enter the ID of the local block instrument controlling "+
+                                    "access to the next block section along the specified route") 
+        self.block.pack(side=LEFT)
     
     def validate(self):
         valid = (self.p1.validate() and self.p2.validate() and self.p3.validate() and
                  self.p4.validate() and self.p5.validate() and self.p6.validate() and
-                 self.p7.validate() and self.sig.validate() and self.block.validate())
+                 self.sig.validate() and self.block.validate())
         return(valid)
     
-##    def enable(self):
-##        self.p1.enable()
-##        self.p2.enable()
-##        self.p3.enable()
-##        self.p4.enable()
-##        self.p5.enable()
-##        self.p6.enable()
-##        self.p7.enable()
-##        # Only enable the sigID and InstID EBs for Semaphores and Colour Lights
-##        if (self.parent_object.config.sigtype.get_value() == 1 or
-##              self.parent_object.config.sigtype.get_value() == 3 ):
-##            self.sig.enable()
-##            self.block.enable()
-##        else:
-##            self.sig.disable()
-##            self.block.disable()
-##
-##    def disable(self):
-##        self.p1.disable()
-##        self.p2.disable()
-##        self.p3.disable()
-##        self.p4.disable()
-##        self.p5.disable()
-##        self.p6.disable()
-##        self.p7.disable()
-##        self.sig.disable()
-##        self.block.disable()
-                
-    def set_route(self, interlocking_route):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
-        # Each point element comprises [point_id, point_state]
+    def enable_sig_ahead(self):
+        if self.sig_route_enabled: self.sig.enable()
+        self.sig_ahead_enabled = True
+    
+    def disable_sig_ahead(self):
+        self.sig.disable()
+        self.sig_ahead_enabled = False
+        
+    def enable_block_ahead(self):
+        if self.sig_route_enabled: self.block.enable()
+        self.block_ahead_enabled = True
+    
+    def disable_block_ahead(self):
+        self.block.disable()
+        self.block_ahead_enabled = False
+    
+    def enable_route(self):
+        self.p1.enable()
+        self.p2.enable()
+        self.p3.enable()
+        self.p4.enable()
+        self.p5.enable()
+        self.p6.enable()
+        if self.sig_ahead_enabled: self.sig.enable()
+        if self.block_ahead_enabled: self.block.enable()
+        self.sig_route_enabled = True
+
+    def disable_route(self):
+        self.p1.disable()
+        self.p2.disable()
+        self.p3.disable()
+        self.p4.disable()
+        self.p5.disable()
+        self.p6.disable()
+        self.sig.disable()
+        self.block.disable()
+        self.sig_route_enabled = False
+
+    def set_route(self, interlocking_route:[[int,bool],str,int]):
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each point element in the point list comprises [point_id, point_state]
+        # Note that the sig ID can be a local or remote Signal (so a string)
         self.p1.set_value(interlocking_route[0][0])
         self.p2.set_value(interlocking_route[0][1])
         self.p3.set_value(interlocking_route[0][2])
         self.p4.set_value(interlocking_route[0][3])
         self.p5.set_value(interlocking_route[0][4])
         self.p6.set_value(interlocking_route[0][5])
-        self.p7.set_value(interlocking_route[0][6])
         self.sig.set_value(interlocking_route[1])
         self.block.set_value(interlocking_route[2])
         
     def get_route(self):
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
-        # Each point element comprises [point_id, point_state]
+        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each point element in the point list comprises [point_id, point_state]
+        # Note that the sig ID can be a local or remote Signal (so a string)
         route =  [ [ self.p1.get_value(),
                      self.p2.get_value(),
                      self.p3.get_value(),
                      self.p4.get_value(),
                      self.p5.get_value(),
-                     self.p6.get_value(),
-                     self.p7.get_value() ],
+                     self.p6.get_value() ],
                      self.sig.get_value(),
                      self.block.get_value() ]
         return (route)
@@ -254,80 +189,111 @@ class interlocking_route_group:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_routes" - will set all ui elements (enabled/disabled, addresses)
 #    "get_routes" - returns the last "valid" values (enabled/disabled, addresses)
+#    "enable_sig_ahead" - enables the Sig ahead selections (if the route is enabled)
+#    "disable_sig_ahead" - disables the Sig ahead selections
+#    "enable_block_ahead" - enables the block ahead selections (if the route is enabled)
+#    "disable_block_ahead" - disables the block ahead selections
 #------------------------------------------------------------------------------------
 
 class interlocking_route_frame:
-    def __init__(self, parent_window, parent_object, label, subsidary=False):
-        # Create a frame for this UI element
-        self.frame = LabelFrame(parent_window, text=label)
-        self.frame.pack(padx=2, pady=2, fill='x')
-        # Create the individual UI elements for each route (sign, sub, dist)
-        self.main = interlocking_route_group(self.frame, parent_object, "Main", subsidary)
-        self.lh1 = interlocking_route_group(self.frame, parent_object, "LH1", subsidary)
-        self.lh2 = interlocking_route_group(self.frame, parent_object, "LH2", subsidary)
-        self.rh1 = interlocking_route_group(self.frame, parent_object, "RH1", subsidary)
-        self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2", subsidary)
+    def __init__(self, parent_window, parent_object):
+        # Create a Label Frame for the UI element (packed by the creating function/class)
+        self.frame = LabelFrame(parent_window, text= "Signal routes and point interlocking")
+        # Create the route elements (sign, sub, dist) - these are packed in class instancees
+        self.main = interlocking_route_group(self.frame, parent_object, "Main")
+        self.lh1 = interlocking_route_group(self.frame, parent_object, "LH1")
+        self.lh2 = interlocking_route_group(self.frame, parent_object, "LH2")
+        self.rh1 = interlocking_route_group(self.frame, parent_object, "RH1")
+        self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2")
 
     def validate(self):
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
                self.rh1.validate() and self.rh2.validate())
-    
-##    def enable(self):
-##        self.main.enable()
-##        self.lh1.enable()
-##        self.lh2.enable()
-##        self.rh1.enable()
-##        self.rh2.enable()
-##
-##    def disable(self):
-##        self.main.disable()
-##        self.lh1.disable()
-##        self.lh2.disable()
-##        self.rh1.disable()
-##        self.rh2.disable()
 
-    def set_routes(self, interlocking_routes):
-        # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
-        # Each point element comprises [point_id, point_state]
-        self.main.set_route(interlocking_routes[0])
-        self.lh1.set_route(interlocking_routes[1])
-        self.lh2.set_route(interlocking_routes[2])
-        self.rh1.set_route(interlocking_routes[3])
-        self.rh2.set_route(interlocking_routes[4])
+    def set_routes(self, interlocking_frame:[[[[int,bool],],str,int]]):
+        # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each point element in the point list comprises [point_id, point_state]
+        # Note that the sig ID can be a local or remote Signal (so a string)
+        self.main.set_route(interlocking_frame[0])
+        self.lh1.set_route(interlocking_frame[1])
+        self.lh2.set_route(interlocking_frame[2])
+        self.rh1.set_route(interlocking_frame[3])
+        self.rh2.set_route(interlocking_frame[4])
         
     def get_routes(self):
-        # An interlocking route comprises: [main, lh1, lh2, rh1, rh2]
-        # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
-        # Each point element comprises [point_id, point_state]
+        # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
+        # Each point element in the point list comprises [point_id, point_state]
+        # Note that the sig ID can be a local or remote Signal (so a string)
         return ( [ self.main.get_route(),
                    self.lh1.get_route(),
                    self.lh2.get_route(),
                    self.rh1.get_route(),
                    self.rh2.get_route() ] )
 
+    def enable_sig_ahead(self):
+        self.main.enable_sig_ahead()
+        self.lh1.enable_sig_ahead()
+        self.lh2.enable_sig_ahead()
+        self.rh1.enable_sig_ahead()
+        self.rh2.enable_sig_ahead()
+        
+    def disable_sig_ahead(self):
+        self.main.disable_sig_ahead()
+        self.lh1.disable_sig_ahead()
+        self.lh2.disable_sig_ahead()
+        self.rh1.disable_sig_ahead()
+        self.rh2.disable_sig_ahead()
+        
+    def enable_block_ahead(self):
+        self.main.enable_block_ahead()
+        self.lh1.enable_block_ahead()
+        self.lh2.enable_block_ahead()
+        self.rh1.enable_block_ahead()
+        self.rh2.enable_block_ahead()
+        
+    def disable_block_ahead(self):
+        self.main.disable_block_ahead()
+        self.lh1.disable_block_ahead()
+        self.lh2.disable_block_ahead()
+        self.rh1.disable_block_ahead()
+        self.rh2.disable_block_ahead()
+    
 #------------------------------------------------------------------------------------
 # Class for a conflicting signal UI Element (for interlocking)
 # uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes 
-#    "get_values" - Populates the list of interlocked signals and their routes 
+#    "get_values" - Populates the list of interlocked signals and their routes
+#    "enable_route" - Enables/loads all selections for the route
+#    "disable_route" - Disables/blanks all selections for the route
+#    "validate" - Validates all Entry boxes (Signals exist and not current ID) 
 #------------------------------------------------------------------------------------
 
 class conflicting_signals_element():
-    def __init__(self, parent_frame, route):
-        # Create the Label Frame for the Signal Interlocking List 
-        self.frame = LabelFrame(parent_frame, text=route+" - interlocking with conflicting signals")
+    def __init__(self, parent_frame, parent_object, label:str):
+        # These are the functions used to validate that the entered signal ID
+        # exists on the schematic and is different to the current signal ID
+        exists_function = objects.signal_exists
+        current_id_function = parent_object.config.sigid.get_value
+        # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
+        self.frame = LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=1)
-        self.sig1 = common.signal_route_selections(self.frame, read_only=False)
+        tool_tip = "Specify any signals/routes that would conflict with this signal route"
+        self.sig1 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+                    exists_function=exists_function, current_id_function=current_id_function)
         self.sig1.frame.grid(row=0, column=0)
-        self.sig2 = common.signal_route_selections(self.frame, read_only=False)
+        self.sig2 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+                    exists_function=exists_function, current_id_function=current_id_function)
         self.sig2.frame.grid(row=0, column=1)
-        self.sig3 = common.signal_route_selections(self.frame, read_only=False)
+        self.sig3 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+                    exists_function=exists_function, current_id_function=current_id_function)
         self.sig3.frame.grid(row=1, column=0)
-        self.sig4 = common.signal_route_selections(self.frame, read_only=False)
+        self.sig4 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+                    exists_function=exists_function, current_id_function=current_id_function)
         self.sig4.frame.grid(row=1, column=1)
 
     def validate(self):
@@ -335,7 +301,21 @@ class conflicting_signals_element():
                  self.sig2.validate and
                  self.sig3.validate and
                  self.sig4.validate )
-    
+
+    def enable_route(self):
+        self.frame.pack(padx=2, pady=2, fill='x')
+        self.sig1.enable()
+        self.sig2.enable()
+        self.sig3.enable()
+        self.sig4.enable()
+        
+    def disable_route(self):
+        self.frame.pack_forget() 
+        self.sig1.disable()
+        self.sig2.disable()
+        self.sig3.disable()
+        self.sig4.disable()
+
     def set_values(self, sig_route:[[int,[bool,bool,bool,bool,bool]],]):
         # each sig_route comprises [sig1, sig2, sig3, sig4]
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
@@ -360,18 +340,18 @@ class conflicting_signals_element():
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes 
 #    "get_values" - Populates the list of interlocked signals and their routes 
-#    "validate" - Validates the Entry boxvalue (valid, existing, signal ID) 
+#    "validate" - Validates all Entry boxes (Signals exist and not current ID) 
 #------------------------------------------------------------------------------------
 
 class conflicting_signals_frame():
-    def __init__(self, parent_frame):
-        self.frame = Frame(parent_frame)
-        self.frame.pack(fill='x')
-        self.main = conflicting_signals_element(self.frame,"MAIN Route")
-        self.lh1 = conflicting_signals_element(self.frame,"LH1 Route")
-        self.lh2 = conflicting_signals_element(self.frame,"LH2 Route")
-        self.rh1 = conflicting_signals_element(self.frame,"RH1 Route")
-        self.rh2 = conflicting_signals_element(self.frame,"RH2 Route")
+    def __init__(self, parent_frame, parent_object):
+        # Create the Label Frame for the UI element (packed by the creating function/class)
+        self.frame = LabelFrame(parent_frame, text="Conflicting signals not locked by the above point selections")
+        self.main = conflicting_signals_element(self.frame, parent_object, "MAIN Route")
+        self.lh1 = conflicting_signals_element(self.frame, parent_object, "LH1 Route")
+        self.lh2 = conflicting_signals_element(self.frame, parent_object, "LH2 Route")
+        self.rh1 = conflicting_signals_element(self.frame, parent_object, "RH1 Route")
+        self.rh2 = conflicting_signals_element(self.frame, parent_object, "RH2 Route")
         
     def validate(self):
         return ( self.main.validate and
@@ -407,11 +387,12 @@ class conflicting_signals_frame():
 #------------------------------------------------------------------------------------
 
 class signal_interlocking_tab:
-    def __init__(self, parent_window, parent_object, routes_updated):
+    def __init__(self, parent_tab, parent_object):
+        current_id_function = parent_object.config.sigid.get_value
         # These UI elements need the parent object so the current sig_id can be accessed for validation
-        self.interlocking = interlocking_route_frame(parent_window, parent_object,
-                                "Signal routes and point interlocking", False)
-        
-        self.conflicting_sigs = conflicting_signals_frame(parent_window)
-        
+        self.interlocking = interlocking_route_frame(parent_tab, parent_object)
+        self.interlocking.frame.pack(padx=2, pady=2, fill='x')
+        self.conflicting_sigs = conflicting_signals_frame(parent_tab, parent_object)
+        self.conflicting_sigs.frame.pack(padx=2, pady=2, fill='x')
+
 #############################################################################################

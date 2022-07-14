@@ -1,21 +1,76 @@
 #------------------------------------------------------------------------------------
 # This Module provides all the internal functions for editing the layout schematic
 # in terms of adding/removing objects, drag/drop objects, copy/paste objects etc
+#
+# External API functions intended for use by other editor modules:
+#    create_canvas(root) - Call once on startup - returns canvas object
+#    select_all_objects() - For selecting all objects prior to a "safe" delete
+#    delete_selected_objects() - To delete all objects (once all are selected)
+#    resize_canvas() - Call following a size update (or layout load/canvas resize)
+#    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
+#    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
+#
+# Makes the following external API calls to other editor modules:
+#    settings.get_canvas(object_id) - Get canvas settings (for resize, snap to grid etc)
+#    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
+#    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
+#    < more coming>
+#    objects.delete_signal_object(object_id) - Delete the drawing object prior to redrawing (rotate)
+#    objects.delete_point_object(object_id) - Delete the drawing object prior to redrawing (rotate)
+#    objects.redraw_signal_object(object_id) - Redraw the object on the canvas following a rotate
+#    objects.redraw_point(object_id) - Redraw the object on the canvas following a rotate
+#    run_layout.initialise_layout() - Re process layout after object deletion 
+#    objects.create_default_line() - Create a default object on the schematic
+#    objects.create_default_signal(type,subtype) - Create a default object on the schematic
+#    objects.create_default_point(type) - Create a default object on the schematic
+#    objects.create_default_section() - Create a default object on the schematic
+#    objects.create_default_instrument() - Create a default object on the schematic
+#    objects.delete_line(object_id) - Hard Delete an object when deleted from the schematic
+#    objects.delete_signal(object_id) - Hard Delete an object when deleted from the schematic
+#    objects.delete_point(object_id) - Hard Delete an object when deleted from the schematic
+#    objects.delete_section(object_id) - Hard Delete an object when deleted from the schematic
+#    objects.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
+#    objects.copy_line(object_id) - Copy an existing object to create a new one
+#    objects.copy_signal(object_id) - Copy an existing object to create a new one
+#    objects.copy_point(object_id) - Copy an existing object to create a new one
+#    objects.copy_section(object_id) - Copy an existing object to create a new one
+#    objects.copy_instrument(object_id) - Copy an existing object to create a new one
+#
+# Accesses the following external editor objects directly:
+#    objects.schematic_objects - the dict holding descriptions for all objects
+#    objects.object_type - used to establish the type of the schematic objects
+#
+# Accesses the following external library objects directly:
+#
+#    signals_common.sig_type - Used to access the signal type
+#    signals_colour_lights.signal_sub_type - Used to access the signal subtype
+#    signals_semaphores.semaphore_sub_type - Used to access the signal subtype
+#    signals_ground_position.ground_pos_sub_type - Used to access the signal subtype
+#    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
+#    points.point_type - Used to access the point type
+#
+# Makes the following external API calls to library modules:
+#    signals.move_signal - For moving an object on the canvas
+#    points.move_point - For moving an object on the canvas
+#    block_instruments.move_instrument - For moving an object on the canvas
+#    track_sections.move_section - For moving an object on the canvas
 #------------------------------------------------------------------------------------
 
 from tkinter import *
 
-from ..library import signals
 from ..library import signals_common
 from ..library import signals_colour_lights
 from ..library import signals_semaphores
 from ..library import signals_ground_position
 from ..library import signals_ground_disc
+from ..library import signals
 from ..library import block_instruments
 from ..library import track_sections
 from ..library import points
 
+from . import settings
 from . import objects
+from . import run_layout
 from . import configure_signal
 from . import configure_point
 
@@ -46,10 +101,6 @@ root = None
 # The two tkinter popup menu objects
 popup1 = None
 popup2 = None
-# The tkinter IntVars for the canvas settings
-canvasx = None
-canvasy = None
-canvasgrid = None
 # The tkinter Frame object holding the "add object" buttons
 button_frame = None
 canvas_border = None
@@ -61,13 +112,11 @@ button_images = {}
 #------------------------------------------------------------------------------------
 
 def draw_grid():
-    width = canvasx.get()
-    height = canvasy.get()
-    canvas_grid = canvasgrid.get()
+    width, height, canvas_grid = settings.get_canvas()
     canvas.delete("grid")
     if schematic_state["editingenabled"]: state = "normal"
     else: state = "hidden"
-    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid")
+    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid", state=state)
     for i in range(0, height, canvas_grid):
         canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=state)
     for i in range(0, width, canvas_grid):
@@ -112,6 +161,8 @@ def deselect_object(object_id):
 #------------------------------------------------------------------------------------
 
 def select_all_objects(event=None):
+    # Clear out the list of selected objects first
+    schematic_state["selectedobjects"] = []
     for object_id in objects.schematic_objects:
         select_object(object_id)
     return()
@@ -230,6 +281,8 @@ def delete_selected_objects(event=None):
         # if the deleted object is on the clipboard then remove from the clipboard
         if object_id in schematic_state["clipboardobjects"]:
             schematic_state["clipboardobjects"].remove(object_id)
+        # Re-initialise the layout (to keep config up to date)
+        run_layout.initialise_layout()
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     return()
@@ -249,11 +302,13 @@ def rotate_selected_objects(event=None):
                 objects.schematic_objects[object_id]["orientation"] = 180
             else:
                 objects.schematic_objects[object_id]["orientation"] = 0
-            # Update the object to re-create it (and the associated mappings)
+            # Delete the drawing object from the canvas and then redraw it
             if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-                objects.update_signal(object_id)
+                objects.delete_signal_object(object_id)
+                objects.redraw_signal_object(object_id)
             elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-                objects.update_point(object_id)
+                objects.delete_point_object(object_id)
+                objects.redraw_point_object(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -330,11 +385,11 @@ def find_highlighted_line_end(xpos:int,ypos:int):
             x2 = objects.schematic_objects[object_id]["endx"] 
             y1 = objects.schematic_objects[object_id]["posy"] 
             y2 = objects.schematic_objects[object_id]["endy"] 
-            if math.sqrt((xpos - x1) ** 2 + (ypos - y1) ** 2) <= 5:
+            if math.sqrt((xpos - x1) ** 2 + (ypos - y1) ** 2) <= 10:
                 schematic_state["editlineend1"] = True
                 schematic_state["editlineend2"] = False
                 return(object_id)
-            elif math.sqrt((xpos - x2) ** 2 + (ypos - y2) ** 2) <= 5:
+            elif math.sqrt((xpos - x2) ** 2 + (ypos - y2) ** 2) <= 10:
                 schematic_state["editlineend1"] = False
                 schematic_state["editlineend2"] = True
                 return(object_id)
@@ -345,7 +400,7 @@ def find_highlighted_line_end(xpos:int,ypos:int):
 #------------------------------------------------------------------------------------
 
 def snap_to_grid(xpos:int,ypos:int):
-    grid_size = canvasgrid.get()
+    width, height, grid_size = settings.get_canvas()
     remainderx = xpos%grid_size
     remaindery = ypos%grid_size
     if remainderx < grid_size/2: remainderx = 0 - remainderx
@@ -559,22 +614,12 @@ def left_button_release(event):
 # Externally called Function to resize the canvas (called from menubar module)
 #------------------------------------------------------------------------------------
 
-def resize_canvas(width:int, height:int):
-    canvasx.set(width)
-    canvasy.set(height)
+def resize_canvas():
+    width, height, canvas_grid = settings.get_canvas()
     canvas.config (width=width, height=height, scrollregion=(0,0,width,height))
     canvas.pack()
     draw_grid()
     return()
-
-#------------------------------------------------------------------------------------
-# Externally called Function to get the current canvas size (called from menubar module)
-#------------------------------------------------------------------------------------
-
-def get_canvas_size():
-    width = canvasx.get()
-    height = canvasy.get()
-    return (canvasx.get(), canvasy.get())
 
 #------------------------------------------------------------------------------------
 # Externally called Functions to enable/disable schematic editing (Menubar Mode selection)
@@ -586,7 +631,8 @@ def enable_editing():
     canvas.itemconfig("grid",state="normal")
     for object_id in objects.schematic_objects:
         if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.update_section_object(object_id, edit_mode=True)
+            objects.delete_section_object(object_id)
+            objects.redraw_section_object(object_id, edit_mode=True)
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
     return()
@@ -599,7 +645,8 @@ def disable_editing():
     # Refresh all the Section objects to make them editable/non-editable depending on the mode
     for object_id in objects.schematic_objects:
         if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.update_section_object(object_id, edit_mode=False)
+            objects.delete_section_object(object_id)
+            objects.redraw_section_object(object_id, edit_mode=False)
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
     return()
@@ -624,7 +671,6 @@ def section_event_callback(event, object_id, event_id):
 
 def create_canvas (root_window):
     global root, canvas, popup1, popup2
-    global canvasx, canvasy, canvasgrid
     global button_frame, canvas_border
     global button_images
     global logging
@@ -639,9 +685,7 @@ def create_canvas (root_window):
     button_frame = Frame(frame, borderwidth=1)
     button_frame.pack(side=RIGHT, expand=True, fill=BOTH)
     # Default values for the canvas
-    canvas_width = 1000
-    canvas_height = 500
-    canvas_grid = 25
+    canvas_width, canvas_height, canvas_grid = settings.get_canvas()
     # Create the canvas and scrollbars inside the parentframe
     canvas = Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
     hbar = Scrollbar(canvas_frame, orient=HORIZONTAL)
@@ -653,10 +697,6 @@ def create_canvas (root_window):
     canvas.config(width=canvas_width, height=canvas_height)
     canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
     canvas.pack(side=LEFT, expand=True, fill=BOTH)
-    # configure the Tkinter Intvars for width, height and grid size
-    canvasx = IntVar(canvas, value = canvas_width, name="canvasx")
-    canvasy = IntVar(canvas, value = canvas_height, name="canvasy") 
-    canvasgrid = IntVar(canvas, value = canvas_grid, name="canvasgrid")
     # Bind the Canvas mouse and button events to the various callback functions
     canvas.bind("<Motion>", track_cursor)
     canvas.bind('<Button-1>', left_button_click)
@@ -693,7 +733,7 @@ def create_canvas (root_window):
             with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
                 button_images[file_name] = PhotoImage(file=file_path)
         except:
-            logging.error ("Schematic_Editor - Error loading image file '"+file_name+".png'")
+            logging.error ("SCHEMATIC EDITOR - Error loading image file '"+file_name+".png'")
             button_images[file_name]=None
     # Add The Buttons for creating new objects and adding to the schematic
     # Note that for enumeration types we pass the "value"
@@ -728,13 +768,13 @@ def create_canvas (root_window):
                       command=lambda:objects.create_default_point
                           (points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
-    button8 = Button (button_frame, image=button_images['track_section'],
-                      command=lambda:objects.create_default_section
-                        (section_event_callback))
-    button8.pack (padx=2, pady=2)
-    button9 = Button (button_frame, image=button_images['block_instrument'],
-                      compound=TOP, command=lambda:objects.create_default_instrument())
-    button9.pack (padx=2, pady=2)
+#     button8 = Button (button_frame, image=button_images['track_section'],
+#                       command=lambda:objects.create_default_section
+#                         (section_event_callback))
+#     button8.pack (padx=2, pady=2)
+#     button9 = Button (button_frame, image=button_images['block_instrument'],
+#                       compound=TOP, command=lambda:objects.create_default_instrument())
+#     button9.pack (padx=2, pady=2)
     return(canvas)
 
 ####################################################################################

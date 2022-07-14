@@ -1,12 +1,36 @@
 #------------------------------------------------------------------------------------
 # This module contains all the ui functions for configuring Point objects
+#
+# External API functions intended for use by other editor modules:
+#    edit_point - Open the edit point wtop level window
+#
+# Makes the following external API calls to other editor modules:
+#    objects.point_exists(point_id) - To see if a specified point ID exists
+#    objects.delete_point_object(object_id, new_item_id) - Delete before redrawing (on ok/apply)
+#    objects.redraw_point_object(object_id, new_item_idRedraw after deleting (on ok/apply)
+#    objects.point(point_id) - To get the object_id for a given point_id
+#    run_layout.process_object_update(object_id) - To process updates on ok/apply
+#
+# Accesses the following external editor objects directly:
+#    objects.point_index - To iterate through all the point objects
+#    objects.schematic_objects - To load/save the object configuration
+#
+# Inherits the following common editor base classes (from common):
+#    common.int_item_id_entry_box
+#    common.check_box
+#    common.dcc_entry_box
+#    common.object_id_selection
+#    common.selection_buttons
+#    common.signal_route_selections
+#    common.window_controls
 #------------------------------------------------------------------------------------
 
 from tkinter import *
 from tkinter import ttk
 
-from . import objects
 from . import common
+from . import objects
+from . import run_layout
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -68,8 +92,11 @@ def save_state(point, close_window:bool):
         add, rev = point.config.dccsettings.get_values ()
         objects.schematic_objects[object_id]["dccaddress"] = add
         objects.schematic_objects[object_id]["dccreversed"] = rev
-        # Update the point (recreate in its new configuration)
-        objects.update_point(object_id, item_id = new_id)
+        # Delete the point object from the canvas and redraw in its new configuration
+        objects.delete_point_object(object_id)
+        objects.redraw_point_object(object_id, item_id = new_id)
+        # Process any layout changes (interlocking etc)
+        run_layout.process_object_update(object_id)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)
@@ -85,42 +112,36 @@ def save_state(point, close_window:bool):
 #####################################################################################
 
 #------------------------------------------------------------------------------------
-# Common Class for the "Also Switch" Entry Box - builds on the Item_ID Entry Box
+# Class for the "Also Switch" Entry Box - builds on the common int_item_id_entry_box. 
 # Class instance methods inherited/used from the parent classes are:
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
-# Class instance methods overridden by this class are
-#    "validate" - Also validate that the point is not being 'also switched' by another
-#                  point and that the Point ID is not the same as the current point
+#    "get_initial_value" - will return the original value of the entry box (int)
+# Class instance methods overridden by this class are:
+#    "validate" - Also validate the point is automatic and not switched by another point
 #------------------------------------------------------------------------------------
 
-class also_switch_selection(common.item_id_entry_box):
+class also_switch_selection(common.int_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
-        # We need the reference to the parent object so we can call the sibling
-        # class method to get the current value of the Point ID for validation
-        self.parent_object = parent_object
+        # These are the functions used to validate that the entered signal ID
+        # exists on the schematic and is different to the current signal ID
+        exists_function = objects.point_exists
+        current_id_function = parent_object.pointid.get_value
         # Create the Label Frame for the "also switch" entry box
         self.frame = LabelFrame(parent_frame, text="ID of point to 'Also Switch'")
-        # create a subframe for the entry box (so it is centered)
-        self.subframe = Frame(self.frame)
-        self.subframe.pack()
         # Call the common base class init function to create the EB
-        super().__init__(self.subframe, tool_tip = "Enter the ID of an existing fully "+
-                        "automatic point to be switched with this point (or leave blank)",
-                         exists_function=objects.point_exists)
+        super().__init__(self.frame, tool_tip = "Enter the ID of an existing fully "+
+                "automatic point to be switched with this point (or leave blank)",
+                exists_function=exists_function, current_id_function=current_id_function)
         self.pack(padx=2, pady=2)
         
     def validate(self):
-        # Do the basic integer validation first (integer, in range and exists)
+        # Do the basic item validation first (exists and not current item ID)
         valid = super().validate(update_validation_status=False)
         if valid and self.entry.get() != "":
             autoswitch = int(self.entry.get())
-            # Validate the other point is a different ID to the current
-            # point and that the other point is fully automatic
-            if autoswitch == self.parent_object.pointid.get_value():
-                self.TT.text = "Specified ID is the same ID as the current point"
-                valid = False
-            elif not objects.schematic_objects[objects.point(autoswitch)]["automatic"]:
+            # Validate the other point is fully automatic
+            if not objects.schematic_objects[objects.point(autoswitch)]["automatic"]:
                 self.TT.text = "Point "+str(autoswitch)+" is not 'fully automatic'"
                 valid = False
             else:
@@ -137,7 +158,7 @@ class also_switch_selection(common.item_id_entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Class for the General Settings UI Element
+# Class for the General Settings UI Element.
 # Class instance methods provided by this class:
 #     "validate" - validate the current settings and return True/false
 #     "set_values" - will set the checkbox states (rot, rev, auto, fpl)
@@ -311,11 +332,12 @@ class signal_route_interlocking_frame():
             for sig_interlocking_routes in sig_interlocking_frame:
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(common.signal_route_selection_element(self.subframe, read_only=True))
+                self.sigelements.append(common.signal_route_selections(self.subframe, read_only=True,
+                                    tool_tip="Edit the appropriate signals\nto configure interlocking"))
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text= "Edit the appropriate signals\nto configure interlocking")
+            self.label = Label(self.subframe, text="Edit the appropriate signals\nto configure interlocking")
             self.label.pack()
 
 #------------------------------------------------------------------------------------
