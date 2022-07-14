@@ -226,7 +226,19 @@ def track_sensor_active (sensor_id:int):
         return (False)
     else:
         return (False)
-    
+
+# -------------------------------------------------------------------------
+# Function called on shutdown to set the gpio ports back to their defaults
+# -------------------------------------------------------------------------
+
+def gpio_shutdown():
+    global logging
+    if raspberry_pi:
+        logging.info ("GPIO: Restoring default settings")
+        GPIO.setwarnings(False)
+        GPIO.cleanup()
+    return()
+
 # --------------------------------------------------------------------------------
 # Non public API function for deleting a sensor mapping - This is used by the
 # schematic editor for deleting existing GPIO mappings (before creating new ones)

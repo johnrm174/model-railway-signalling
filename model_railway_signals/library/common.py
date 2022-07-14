@@ -9,6 +9,8 @@ import logging
 import time
 from . import mqtt_interface
 from . import file_interface
+from . import pi_sprog_interface
+from . import track_sensors
 
 # -------------------------------------------------------------------------
 # Global variables used within the Common Module
@@ -37,14 +39,21 @@ shutdown_initiated = False
 # signals functions to stop scheduling further "after" commands and exit 
 #-------------------------------------------------------------------------
 
-def on_closing():
+def on_closing(ask_to_save_state=True):
     global logging
     global shutdown_initiated
-    if file_interface.save_state_and_quit():
-        logging.info ("Initiating Shutdown")
+    global root_window
+    if ask_to_save_state: confirm_quit = file_interface.save_state_and_quit()
+    else: confirm_quit = True 
+    if confirm_quit:       
+        logging.info ("Initiating Application Shutdown")
         shutdown_initiated = True
         # Clear out any retained messages and disconnect from broker
         mqtt_interface.mqtt_shutdown()
+        # Turn off the DCC bus power and close the comms port
+        pi_sprog_interface.sprog_shutdown()
+        # Return the GPIO ports to their original configuration
+        track_sensors.gpio_shutdown()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
         # We need to put a timeout around this to deal with any ongoing timed signal sequences
         # (although its unlikely the user would initiate a shut down until these have finished)

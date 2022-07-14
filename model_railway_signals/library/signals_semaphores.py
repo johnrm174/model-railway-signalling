@@ -56,7 +56,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
     ##########################################################################################################
     if distant:
-        logging.warning ("Signal "+str(sig_id)+": 'distant' flag is DEPRECATED - Use 'signal_subtype' instead")
+        logging.warning ("Signal "+str(sig_id)+": 'distant' flag is DEPRECATED - Set 'signal_subtype' instead")
         signal_subtype = semaphore_sub_type.distant
     ##########################################################################################################
     
