@@ -7,8 +7,14 @@
 #----------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
 import logging
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
 
 # Set the logging level
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.WARNING)
@@ -509,33 +515,32 @@ create_colour_light_signal (canvas,25,1000,500, sig_callback=signal_button,
                             position_light = True)
 
 # 6th row of signals (ground position signals)
-create_ground_position_signal (canvas,26,200,600, sig_callback=signal_button,
-                            shunt_ahead = False, modern_type = False)
+create_ground_position_signal (canvas,26,200,600, sig_callback=signal_button)
 create_ground_position_signal (canvas,27,400,600, sig_callback=signal_button,
-                            shunt_ahead = True, modern_type = False)
+                               signal_subtype=ground_pos_sub_type.early_shunt_ahead)
 create_ground_position_signal (canvas,28,600,600, sig_callback=signal_button,
-                            shunt_ahead = False, modern_type = True,
-                            sig_passed_button=True)
+                               signal_subtype=ground_pos_sub_type.standard,
+                               sig_passed_button=True)
 create_ground_position_signal (canvas,29,800,600, sig_callback=signal_button,
-                            shunt_ahead = True, modern_type = True)
+                               signal_subtype=ground_pos_sub_type.shunt_ahead)
 create_ground_position_signal (canvas,30,1000,600, sig_callback=signal_button,
-                            shunt_ahead = False, modern_type = False,
-                            sig_passed_button=True)
+                               signal_subtype=ground_pos_sub_type.early_standard,
+                               sig_passed_button=True)
 
 # 7th row of signals (ground position signals)
 # These do not have callbacks defined
-create_ground_position_signal (canvas,31,200,650,
-                            shunt_ahead = False, modern_type = False, orientation = 180)
-create_ground_position_signal (canvas,32,400,650,
-                            shunt_ahead = True, modern_type = False, orientation = 180)
-create_ground_position_signal (canvas,33,600,650,
-                            shunt_ahead = False, modern_type = True, orientation = 180,
-                            sig_passed_button=True)
-create_ground_position_signal (canvas,34,800,650,
-                            shunt_ahead = True, modern_type = True, orientation = 180)
-create_ground_position_signal (canvas,35,1000,650, sig_callback=signal_button,
-                            shunt_ahead = False, modern_type = False, orientation = 180,
-                            sig_passed_button=True)
+create_ground_position_signal (canvas,31,200,650, orientation = 180,
+                               signal_subtype=ground_pos_sub_type.early_standard)
+create_ground_position_signal (canvas,32,400,650, orientation = 180,
+                               signal_subtype=ground_pos_sub_type.early_shunt_ahead)
+create_ground_position_signal (canvas,33,600,650, orientation = 180,
+                               signal_subtype=ground_pos_sub_type.standard,
+                               sig_passed_button=True)
+create_ground_position_signal (canvas,34,800,650, orientation = 180,
+                               signal_subtype=ground_pos_sub_type.shunt_ahead)
+create_ground_position_signal (canvas,35,1000,650, orientation = 180,
+                               signal_subtype=ground_pos_sub_type.early_standard,
+                               sig_passed_button=True, sig_callback=signal_button)
 
 print (" ")
 print ("Negative tests for creating signals")

@@ -7,8 +7,14 @@
 # ---------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
 import logging
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
 
 
 # Set the logging level
@@ -366,7 +372,7 @@ create_semaphore_signal (canvas,101,250,150,
                         lh2_signal = True,
                         rh2_signal = True,
                         sig_callback = main_callback_function,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         refresh_immediately = False,
                         associated_home = 1)
 
@@ -402,7 +408,7 @@ create_semaphore_signal (canvas,104,775,150,
                         lh2_signal = True,
                         rh1_signal = True,
                         sig_callback = main_callback_function,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 4,
                         refresh_immediately = False)
 
@@ -432,7 +438,7 @@ create_semaphore_signal (canvas,6,250,250,
 create_semaphore_signal (canvas,106,250,250,
                         sig_callback = main_callback_function,
                         orientation = 180,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 6)
 
 create_semaphore_signal (canvas,7,425,250,
@@ -472,7 +478,7 @@ create_semaphore_signal (canvas,10,950,250,
 create_semaphore_signal (canvas,110,950,250,
                         orientation = 180,
                         sig_callback = main_callback_function,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 10)
 
 # ----------------------------------------------------------------
@@ -496,7 +502,7 @@ create_semaphore_signal (canvas,12,425,400,
                         sig_passed_button = True)
 
 create_semaphore_signal (canvas,13,600,400,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         lh1_signal = True,
                         rh1_signal = True,
                         refresh_immediately = False,
@@ -505,7 +511,7 @@ create_semaphore_signal (canvas,13,600,400,
                         sig_passed_button = True )
 
 create_semaphore_signal (canvas,14,775,400,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         rh1_signal = True,
                         lh1_signal = True,
                         refresh_immediately = False,
@@ -523,7 +529,7 @@ create_semaphore_signal (canvas,115,950,400,
                         main_signal = False,
                         rh1_signal = True,
                         lh1_signal = True,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 15)
 
 # ----------------------------------------------------------------
@@ -550,7 +556,7 @@ create_semaphore_signal (canvas,118,600,500,
                         orientation = 180,
                         fully_automatic = True,
                         refresh_immediately = False,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 18)
 
 create_semaphore_signal (canvas,19,775,500,
@@ -564,7 +570,7 @@ create_semaphore_signal (canvas,119,775,500,
                         orientation = 180,
                         fully_automatic = True,
                         refresh_immediately = False,
-                        distant = True,
+                        signal_subtype = semaphore_sub_type.distant,
                         associated_home = 19)
 
 create_semaphore_signal (canvas,20,950,500,
@@ -579,7 +585,7 @@ create_ground_disc_signal (canvas,21,250,650,
                            sig_callback=main_callback_function,
                            orientation = 0,
                            sig_passed_button = True,
-                           shunt_ahead = True)
+                           signal_subtype = ground_disc_sub_type.shunt_ahead)
 
 create_ground_disc_signal (canvas, 22, 425, 650,
                            sig_callback=main_callback_function,
@@ -588,7 +594,7 @@ create_ground_disc_signal (canvas, 22, 425, 650,
 
 create_ground_disc_signal (canvas, 23, 600, 650,
                            orientation = 180,
-                           shunt_ahead = True)
+                           signal_subtype = ground_disc_sub_type.shunt_ahead)
 
 create_ground_disc_signal (canvas, 24, 775, 650,
                            orientation = 180)
@@ -599,13 +605,13 @@ create_semaphore_signal (canvas,0,500,500)
 create_semaphore_signal (canvas,1,500,500)
 create_semaphore_signal (canvas,90,500,500, orientation = 90)
 create_semaphore_signal (canvas,91,500,500, lh1_signal=True, theatre_route_indicator = True)
-create_semaphore_signal (canvas,92,500,500, distant=True, theatre_route_indicator = True)
-create_semaphore_signal (canvas,93,500,500, distant=True, lh1_subsidary=True)
-create_semaphore_signal (canvas,94,500,500, distant=True, approach_release_button=True)
-create_semaphore_signal (canvas,95,500,500, distant=False, associated_home = 1)
-create_semaphore_signal (canvas,96,500,500, distant=True, associated_home = 21)
-create_semaphore_signal (canvas,97,500,500, distant=True, associated_home = 13)
-create_semaphore_signal (canvas,98,500,500, distant=True, associated_home = 98)
+create_semaphore_signal (canvas,92,500,500, signal_subtype=semaphore_sub_type.distant, theatre_route_indicator = True)
+create_semaphore_signal (canvas,93,500,500, signal_subtype=semaphore_sub_type.distant, lh1_subsidary=True)
+create_semaphore_signal (canvas,94,500,500, signal_subtype=semaphore_sub_type.distant, approach_release_button=True)
+create_semaphore_signal (canvas,95,500,500, signal_subtype=semaphore_sub_type.home, associated_home = 1)
+create_semaphore_signal (canvas,96,500,500, signal_subtype=semaphore_sub_type.distant, associated_home = 21)
+create_semaphore_signal (canvas,97,500,500, signal_subtype=semaphore_sub_type.distant, associated_home = 13)
+create_semaphore_signal (canvas,98,500,500, signal_subtype=semaphore_sub_type.distant, associated_home = 98)
 create_semaphore_signal (canvas,99,500,500, main_signal = False)
 
 print (" ")

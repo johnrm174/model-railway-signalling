@@ -3,8 +3,14 @@
 # ---------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
 import logging
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
 
 # Global variables to thrack the state of the test functions
 points_locked = False

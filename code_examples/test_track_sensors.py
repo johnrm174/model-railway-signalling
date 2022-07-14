@@ -4,12 +4,19 @@
 # ---------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
-from model_railway_signals.library import common
 
 import logging
 import time
 import threading
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
+from model_railway_signals.library import common
+
 
 logging.basicConfig(format='%(levelname)s: %(message)s',level=logging.DEBUG)
 
