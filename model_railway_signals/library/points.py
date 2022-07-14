@@ -479,17 +479,5 @@ def get_boundary_box(point_id:int):
         bbox=[0,0,0,0]
     return(bbox)
 
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the point is fully automatic
-# Used by the schematic editor to "abstract" the details of the point object
-# ------------------------------------------------------------------------------------------
-
-def automatic(point_id:int):
-    if point_exists(point_id):
-        automatic = points[str(point_id)]["automatic"]
-    else:
-        automatic = False
-    return(automatic)
-
 ###############################################################################
 
