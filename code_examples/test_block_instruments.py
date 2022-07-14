@@ -4,9 +4,15 @@
 # refer to the networked example ('test_networking_1.py' and 'test_networking_2.py')
 #------------------------------------------------------------------------------------
 
-from model_railway_signals import *
 from tkinter import *
 import logging
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
 
 #------------------------------------------------------------------------------------
 # This is for processing callbacks

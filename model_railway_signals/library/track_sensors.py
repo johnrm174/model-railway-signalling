@@ -65,11 +65,22 @@ def null_callback(sensor_id:int,callback_type):
     return(sensor_id,callback_type)
 
 # -------------------------------------------------------------------------
-# Internal functionsto check if mapping exists for a sensor channel
+# Internal function to check if mapping exists for a sensor channel
 # -------------------------------------------------------------------------
 
 def channel_mapped(channel:int):
     return (str(channel) in channels.keys() )
+
+# -------------------------------------------------------------------------
+# Internal function to check if a sensor already exists
+# -------------------------------------------------------------------------
+
+def sensor_mapped(sensor_id:int):
+    channel_mapped = None
+    for channel in channels.keys():
+        if channels[channel]["sensor_id"] == sensor_id:
+            channel_mapped = int(channel)
+    return(channel_mapped)
 
 # -------------------------------------------------------------------------
 # Internal function called each time the external sensor input is triggered
@@ -175,29 +186,25 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
         logging.error ("Sensor "+str(sensor_id)+": Cannot specify a sensor_callback AND map to a signal event")
+    elif sensor_mapped(sensor_id):
+        logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to Channel "+str(sensor_mapped(sensor_id)))
     else:
-        sensor_mapped = False
-        for channel in channels.keys():
-            if channels[str(channel)]["sensor_id"] == sensor_id:
-                logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to Channel "+str(channel))
-                sensor_mapped = True
-        if not sensor_mapped:
-            if raspberry_pi:
-                GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-                # only bother creating an event if an external callback was specified
-                if sensor_callback != null_callback or signal_passed > 0 or signal_approach > 0:
-                    GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
-            else:
-                logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
+        if raspberry_pi:
+            GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            # only bother creating an event if an external callback was specified
+            if sensor_callback != null_callback or signal_passed > 0 or signal_approach > 0:
+                GPIO.add_event_detect(gpio_channel, GPIO.FALLING, callback=track_sensor_triggered)
+        else:
+            logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
 
-            # Add the to the dictionaries of sensors and channels
-            channels[str(gpio_channel)] = {"sensor_id"       : sensor_id,
-                                           "callback"        : sensor_callback,
-                                           "signal_approach" : signal_approach,
-                                           "signal_passed"   : signal_passed,
-                                           "trigger_period"  : trigger_period,
-                                           "timeout_value"   : sensor_timeout,
-                                           "timeout_active"  : False}
+        # Add the to the dictionaries of sensors and channels
+        channels[str(gpio_channel)] = {"sensor_id"       : sensor_id,
+                                       "callback"        : sensor_callback,
+                                       "signal_approach" : signal_approach,
+                                       "signal_passed"   : signal_passed,
+                                       "trigger_period"  : trigger_period,
+                                       "timeout_value"   : sensor_timeout,
+                                       "timeout_active"  : False}
     return() 
 
 # -------------------------------------------------------------------------
@@ -219,5 +226,30 @@ def track_sensor_active (sensor_id:int):
         return (False)
     else:
         return (False)
+
+# -------------------------------------------------------------------------
+# Function called on shutdown to set the gpio ports back to their defaults
+# -------------------------------------------------------------------------
+
+def gpio_shutdown():
+    global logging
+    if raspberry_pi:
+        logging.info ("GPIO: Restoring default settings")
+        GPIO.setwarnings(False)
+        GPIO.cleanup()
+    return()
+
+# --------------------------------------------------------------------------------
+# Non public API function for deleting a sensor mapping - This is used by the
+# schematic editor for deleting existing GPIO mappings (before creating new ones)
+# --------------------------------------------------------------------------------
+
+def delete_sensor_mapping(sensor_id:int):
+    global channels
+    channel = sensor_mapped(sensor_id)
+    if raspberry_pi and channel is not None:
+        GPIO.remove_event_detect(channel)
+        del channels[str(channel)]
+    return()
 
 ############################################################################

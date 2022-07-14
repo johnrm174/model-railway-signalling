@@ -423,7 +423,7 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["sigclear"]     = False                # MANDATORY - State of the main signal control (ON/OFF)
     signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" (overrides main signal control)
     signals[str(sig_id)]["sigstate"]     = None                 # MANDATORY - Displayed 'aspect' of the signal (None on creation)
-    signals[str(sig_id)]["hassubsidary"] = subsidary            # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
+    signals[str(sig_id)]["hassubsidary"] = subsidary            # MANDATORY - Whether the signal has a subsidary aspect or arms
     signals[str(sig_id)]["subclear"]     = False                # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
     signals[str(sig_id)]["siglocked"]    = False                # MANDATORY - State of signal interlocking 
     signals[str(sig_id)]["sublocked"]    = False                # MANDATORY - State of subsidary interlocking

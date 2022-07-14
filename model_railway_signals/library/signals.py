@@ -226,12 +226,20 @@
 # unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
 # signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). To enable
-#                            external point/signal interlocking functions
+#                            signal manual control button (True='OFF', False = 'ON'). If a route
+#                            is specified then the function also tests against the specified route
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
+#   Optional Parameters:
+#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 # 
 # subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). To enable
-#                            external point/signal interlocking functions
+#                            signal manual control button (True='OFF', False = 'ON'). If a route
+#                            is specified then the function also tests against the specified route
+#   Mandatory Parameters:
+#       sig_id:int - The ID for the signal
+#   Optional Parameters:
+#       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 # 
 # signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal. This can be different 
 #                       to the SWITCHED state if the signal is OVERRIDDEN or subject to APPROACH
@@ -333,14 +341,18 @@ import logging
 # Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def signal_clear (sig_id:int):
+def signal_clear (sig_id:int,route:signals_common.route_type = None):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
         sig_clear = False
     else:
-        sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
+        if route is None:
+            sig_clear = signals_common.signals[str(sig_id)]["sigclear"]
+        else:
+            sig_clear = (signals_common.signals[str(sig_id)]["sigclear"] and
+                    signals_common.signals[str(sig_id)]["routeset"] == route)
     return (sig_clear)
 
 # -------------------------------------------------------------------------
@@ -410,7 +422,7 @@ def approach_control_set (sig_id:int):
 # Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def subsidary_clear (sig_id:int):
+def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -420,8 +432,12 @@ def subsidary_clear (sig_id:int):
         logging.error ("Signal "+str(sig_id)+": subsidary_clear - Signal does not have a subsidary")
         sig_clear = False
     else:
-        sig_clear = signals_common.signals[str(sig_id)]["subclear"]
-    return (sig_clear)
+        if route is None:
+            sig_clear = signals_common.signals[str(sig_id)]["subclear"]
+        else:
+            sig_clear = (signals_common.signals[str(sig_id)]["subclear"] and
+                    signals_common.signals[str(sig_id)]["routeset"] == route)
+    return (sig_clear) 
 
 # -------------------------------------------------------------------------
 # Externally called function to Lock the signal (preventing it being cleared)
@@ -621,7 +637,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
                 signals_common.auto_refresh_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             # Do some additional validation specific to this function for semaphore signals
-            if signals_common.signals[str(sig_id)]["distant"]:
+            if signals_common.signals[str(sig_id)]["subtype"] == signals_semaphores.semaphore_sub_type.distant:
                 logging.error("Signal "+str(sig_id)+": Can't set approach control for semaphore distant signals")
             elif release_on_yellow:
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
@@ -711,8 +727,10 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             signals_semaphores.update_semaphore_route_indication (sig_id,route)
             signals_common.update_theatre_route_indication(sig_id,theatre_text)
-        else:
-            logging.error ("Signal "+str(sig_id)+": set_route - Function not supported by signal type")
+        # Even if the signal does not support route indications we still allow the route 
+        # element to be set. This is useful for interlocking where a signal without a route
+        # display (e.g. ground signal) can support more than one interlocked routes
+        signals_common.signals[str(sig_id)]["routeset"] = route
     return()
 
 # -------------------------------------------------------------------------

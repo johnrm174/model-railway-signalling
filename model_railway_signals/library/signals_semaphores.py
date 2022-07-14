@@ -56,7 +56,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
     # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
     ##########################################################################################################
     if distant:
-        logging.warning ("Signal "+str(sig_id)+": 'distant' flag is DEPRECATED - Use 'signal_subtype' instead")
+        logging.warning ("Signal "+str(sig_id)+": 'distant' flag is DEPRECATED - Set 'signal_subtype' instead")
         signal_subtype = semaphore_sub_type.distant
     ##########################################################################################################
     
@@ -170,7 +170,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # to be created underneath the main home signal arms - we therefore need to apply a vertical offset
         if associated_home > 0: armoffset = -10
         else: armoffset = 0
-            
         # Draw the signal arm for the main route
         line_coords = common.rotate_line(x,y,65+armoffset,postoffset+3,65+armoffset,postoffset-8,orientation)
         mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
@@ -334,8 +333,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
         # We test to see if there is a arm for each route (as the signal may not have one for all the routes)
         if loaded_state["sigclear"] or fully_automatic:
-            signals_common.toggle_signal(sig_id)
-            if signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN:
+            if (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.MAIN
+                   and signals_common.signals[str(sig_id)]["main_signal"]==True ):
                 signals_common.signals[str(sig_id)]["main_signal"] = False
             elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.LH1
                    and signals_common.signals[str(sig_id)]["lh1_signal"]==True ):
@@ -349,6 +348,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
                    and signals_common.signals[str(sig_id)]["rh2_signal"]==True ):
                 signals_common.signals[str(sig_id)]["rh2_signal"] = False
+            signals_common.toggle_signal(sig_id)
         # Update the signal to show the initial aspect (and send out DCC commands)
         # We only refresh the signal if it is set to refresh immediately
         if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)

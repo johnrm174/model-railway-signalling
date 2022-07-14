@@ -30,9 +30,15 @@
 # ---------------------------------------------------------------------
 
 from tkinter import *
-from model_railway_signals import *
 import logging
 import threading
+
+# The following should enable this module to correctly import the model_railway_signals
+# package from the folder above if you have just cloned/downloaded the git hub repo
+# rather than installing the model_railway_signals package
+import sys
+sys.path.append("..")
+from model_railway_signals import *
 
 #----------------------------------------------------------------------
 # Configure the log level. If no 'level' is specified specified only warnings and errors
@@ -489,7 +495,7 @@ create_section(canvas1,24,925,150,section_callback=window1_callback_function)
 create_section(canvas1,25,925,100,section_callback=window1_callback_function)
 
 print ("Window 1: Creating Signals")
-create_semaphore_signal (canvas1,21,50,150, distant = True,
+create_semaphore_signal (canvas1,21,50,150, signal_subtype=semaphore_sub_type.distant,
                             sig_callback=window1_callback_function,
                             sig_passed_button = True)
 create_semaphore_signal (canvas1,22,275,150,
