@@ -50,11 +50,13 @@ from ..library import signals
 from ..library import points
 from ..library import block_instruments
 from ..library import signals_common
+from ..library import signals_semaphores
+from ..library import signals_colour_lights
 
 from . import objects
 
 #------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal has a subsidary)
+# Internal helper Function to find if a signal has a subsidary
 #------------------------------------------------------------------------------------
 
 def has_subsidary(signal_id):    
@@ -65,6 +67,18 @@ def has_subsidary(signal_id):
             signal_object["sigarms"][2][1][0] or
             signal_object["sigarms"][3][1][0] or
             signal_object["sigarms"][4][1][0] )
+
+#------------------------------------------------------------------------------------
+# Internal helper Function to find if a signal has a distant arms
+#------------------------------------------------------------------------------------
+
+def has_distant_arms(signal_id):    
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    return (signal_object["sigarms"][0][2][0] or
+            signal_object["sigarms"][1][2][0] or
+            signal_object["sigarms"][2][2][0] or
+            signal_object["sigarms"][3][2][0] or
+            signal_object["sigarms"][4][2][0] )
 
 #------------------------------------------------------------------------------------
 # Internal common Function to find the first set/cleared route for a signal object
@@ -99,6 +113,41 @@ def find_signal_route(signal_object):
     return (signal_route)
 
 #------------------------------------------------------------------------------------
+# Internal common Function to find the signal ahead of another signal (based
+# on the current route settings for the signal - only called for local signals
+#------------------------------------------------------------------------------------
+
+def find_signal_ahead(signal_object):
+    signal_ahead_object = None
+    signal_route = find_signal_route(signal_object)
+    if signal_route is not None:
+        signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
+        if signal_ahead_id != "":
+            signal_ahead_object = objects.schematic_objects[objects.signal(signal_ahead_id)]
+    return (signal_ahead_object)
+
+#------------------------------------------------------------------------------------
+# Internal Function to walk the route ahead of a distant signal to see if any home
+# signals are at DANGER (will return True as soon as this is the case). The forward
+# search will be aborted as soon as another signal type is found
+#------------------------------------------------------------------------------------
+
+def home_signal_ahead_at_danger(signal_object):
+    home_signal_at_danger = False
+    signal_ahead_object = find_signal_ahead(signal_object)
+    if signal_ahead_object is not None:
+        if ( ( signal_ahead_object["itemtype"] == signals_common.sig_type.semaphore.value and
+               signal_ahead_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) or
+            ( signal_ahead_object["itemtype"] == signals_common.sig_type.colour_light.value and
+              signal_ahead_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) ):
+            if signals.signal_state(signal_ahead_object["itemid"]) == signals_common.signal_state_type.DANGER:
+                home_signal_at_danger = True
+            else:
+                # Call the function recursively to find the next signal ahead
+                home_signal_at_danger = home_signal_ahead_at_danger(signal_ahead_object)
+    return (home_signal_at_danger)
+
+#------------------------------------------------------------------------------------
 # Function to find any colour light signals which are configured to update their
 # aspects based on the aspect of the signal that has changed (i.e. signals "behind")
 # This function is recursive and keeps working back along the route until there are
@@ -115,13 +164,10 @@ def update_signal_behind(signal_id:Union[int,str]):
         # As these may be defined with one or more routes (and therefore signals) ahead
         if type(signal_object_to_test["itemid"]) == int:
             if signal_object_to_test["itemtype"] == signals_common.sig_type.colour_light.value:
-                # Find the signal route (where points are set/cleared)
-                signal_route = find_signal_route(signal_object_to_test)
-                if signal_route is not None:
-                    # Test if the signal is "behind" the signal we called into the function with
-                    # Note that the signal Ahead is a string (for local or remote signals)
-                    signal_ahead_id = signal_object_to_test["pointinterlock"][signal_route.value-1][1]
-                    if signal_ahead_id == str(signal_id):
+                # Find the signal ahead (will be None if the points are not set/cleared)
+                signal_ahead_object = find_signal_ahead(signal_object_to_test)
+                if signal_ahead_object is not None:
+                    if signal_ahead_object["itemid"] == str(signal_id):
                         # Fnd the displayed aspect of the signal (before any changes)
                         initial_signal_aspect = signals.signal_state(signal_to_test_id)
                         # Update the signal behind based on the signal we called into the function with
@@ -210,6 +256,16 @@ def process_interlocking():
                                     signals.subsidary_clear(opposing_signal_id,signals_common.route_type(index+1)))):
                                 subsidary_can_be_unlocked = False
                                 signal_can_be_unlocked = False
+                # If its a distant signal at CAUTION and set to be 'interlocked with all home signals ahead' then we
+                # need to work along the selected route to see if any home signals ahead are at DANGER. If we find any
+                # (before we come across a signal that isn't a HOME signal) then the distant signal is locked at CAUTION
+                # Note that the "interlockedahead" flag will only be True if selected and the signal is a distant
+                if signal_object["interlockahead"] and home_signal_ahead_at_danger(signal_object):
+                    if not signals.signal_clear(signal_object["itemid"]):
+                        signal_can_be_unlocked = False
+                ################################################################
+                # TODO - Associated distant interlocking with all signals ahead
+                ################################################################
             # Interlock the main signal with the subsidary
             if signals.signal_clear(signal_id):
                 subsidary_can_be_unlocked = False
