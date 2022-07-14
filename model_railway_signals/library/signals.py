@@ -139,7 +139,6 @@
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
 #       signal_subtype - subtype of the signal - default = semaphore_sub_type.home
-#       distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 #       associated_home:int - Option only valid when creating distant signals - Provide the ID of
 #                             a previously created home signal (and use the same x and y coords)
 #                             to create the distant signal on the same post as the home signal 
@@ -179,8 +178,6 @@
 #       sig_callback:name - Function to call when a signal event happens - default = None
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - default =False
-#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
-#       modern_type: bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # create_ground_disc_signal - Creates a ground disc type signal
 #   Mandatory Parameters:
@@ -193,7 +190,6 @@
 #       sig_callback:name - Function to call when a signal event happens - Default = none
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
-#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
@@ -281,14 +277,6 @@
 #             in front of the signal if specified when the signal was created) is activated,
 #             either manually or via an external sensor event.
 # 
-# signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
-#                                  Function DEPRECATED (will be removed from future releases)
-#                                  use "signal_state" function to get the state of the signal
-# 
-# approach_control_set (sig_id:int) - returns the signal approach control state (True='active')
-#                                  Function DEPRECATED (will be removed from future releases)
-#                                  use "signal_state" function to get the state of the signal
-#
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
@@ -372,48 +360,6 @@ def signal_state (sig_id:Union[int,str]):
     else:
         sig_state = signals_common.signals[str(sig_id)]["sigstate"]
     return (sig_state)
-
-# -------------------------------------------------------------------------
-# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
-# Externally called function to Return the current state of the signal overide
-# Function applicable to ALL signal types created on the local schematic
-# Function does not support REMOTE Signals (with a compound Sig-ID)
-# -------------------------------------------------------------------------
-
-def signal_overridden (sig_id:int):
-    global logging
-    # Validate the signal exists
-    logging.warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": signal_overridden - Signal does not exist")
-        sig_overridden = False
-    else:
-        sig_overridden = signals_common.signals[str(sig_id)]["override"]
-    return (sig_overridden)
-
-# -------------------------------------------------------------------------
-# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
-# Externally called function to Return the current state of the approach control
-# Function applicable to ALL signal types created on the local schematic
-# (will return False if the particular signal type not supported)
-# Function does not support REMOTE Signals (with a compound Sig-ID)
-# -------------------------------------------------------------------------
-
-def approach_control_set (sig_id:int):
-    global logging
-    logging.warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
-    # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": approach_control_set - Signal does not exist")
-        approach_control_active = False
-    # get the signal state to return - only supported for semaphores and colour_lights
-    elif (signals_common.signals[str(sig_id)]["sigtype"] in
-          (signals_common.sig_type.colour_light, signals_common.sig_type.semaphore)):
-        approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"]
-                               or signals_common.signals[str(sig_id)]["releaseonyel"])
-    else:
-        approach_control_active = False
-    return (approach_control_active)
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary

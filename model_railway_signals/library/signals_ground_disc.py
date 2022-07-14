@@ -29,17 +29,8 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                signal_subtype=ground_disc_sub_type.standard,
                                sig_callback = None,
                                orientation:int = 0,
-                               sig_passed_button: bool = False, 
-                               shunt_ahead: bool = False):   ################ DEPRECATED #################
+                               sig_passed_button: bool = False):
     global logging
-
-    ##########################################################################################################
-    # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
-    ##########################################################################################################
-    if shunt_ahead:
-        logging.warning ("Signal "+str(sig_id)+": 'shunt_ahead' flag is DEPRECATED - Use 'signal_subtype' instead")
-        signal_subtype = ground_disc_sub_type.shunt_ahead
-    ##########################################################################################################
 
     logging.info ("Signal "+str(sig_id)+": Creating Ground Disc Signal")
     # Do some basic validation on the parameters we have been given

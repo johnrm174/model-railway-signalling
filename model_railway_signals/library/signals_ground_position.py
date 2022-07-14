@@ -31,23 +31,9 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                     signal_subtype=ground_pos_sub_type.early_standard,
                                     sig_callback = None,
                                     orientation:int = 0,
-                                    sig_passed_button: bool = False, 
-                                    shunt_ahead: bool = False,    ################ DEPRECATED #################
-                                    modern_type: bool = False):   ################ DEPRECATED #################
+                                    sig_passed_button: bool = False):
     global logging
     
-    ##########################################################################################################
-    # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
-    ##########################################################################################################
-    if shunt_ahead:
-        logging.warning ("Signal "+str(sig_id)+": 'shunt_ahead' flag is DEPRECATED - Use 'signal_subtype' instead")
-    elif modern_type:
-        logging.warning ("Signal "+str(sig_id)+": 'modern_type' flag is DEPRECATED - Use 'signal_subtype' instead")
-    if shunt_ahead and modern_type: signal_subtype = ground_pos_sub_type.shunt_ahead
-    elif shunt_ahead: signal_subtype = ground_pos_sub_type.early_shunt_ahead
-    elif modern_type: signal_subtype = ground_pos_sub_type.standard
-    ##########################################################################################################
-
     logging.info ("Signal "+str(sig_id)+": Creating Ground Position Signal")
     # Do some basic validation on the parameters we have been given
     if signals_common.sig_exists(sig_id):

@@ -31,7 +31,6 @@ class semaphore_sub_type(enum.Enum):
     
 def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 signal_subtype=semaphore_sub_type.home,
-                                distant:bool=False,    ################ DEPRECATED #################
                                 associated_home:int = 0,
                                 sig_callback = None,
                                 orientation:int = 0,
@@ -51,14 +50,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 refresh_immediately:bool = True,
                                 fully_automatic:bool=False):
     global logging
-    
-    ##########################################################################################################
-    # Set the signal type based on the specified subtype and the DEPRECATED "distant" Flag
-    ##########################################################################################################
-    if distant:
-        logging.warning ("Signal "+str(sig_id)+": 'distant' flag is DEPRECATED - Set 'signal_subtype' instead")
-        signal_subtype = semaphore_sub_type.distant
-    ##########################################################################################################
     
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating Semaphore Signal")
