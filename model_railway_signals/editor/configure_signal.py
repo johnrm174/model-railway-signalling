@@ -124,12 +124,13 @@ def load_state(signal):
     # These elements are for the signal intelocking tab
     signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
     signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
+    signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
     
     ##########################################################################################
     ################################ TODO - Automation UI elements ###########################
     ##########################################################################################
-#   a = objects.schematic_objects[object_id]["fullyautomatic"]
-#   b = objects.schematic_objects[object_id]["distautomatic"]
+#   a = objects.schematic_objects[object_id]["fullyautomatic"] # i.e. no main signal button
+#   b = objects.schematic_objects[object_id]["distautomatic"] # i.e. no button for secondary distant arms
 #   c = objects.schematic_objects[object_id]["passedsensor"]
 #   d = objects.schematic_objects[object_id]["approachsensor"]
 
@@ -155,6 +156,7 @@ def load_state(signal):
     update_tab1_route_selection_elements(signal)
     update_tab1_signal_ui_elements(signal)
     update_tab2_available_signal_routes(signal)
+    update_tab2_interlock_ahead_selection(signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -206,6 +208,7 @@ def save_state(signal, close_window):
         # These elements are for the signal intelocking tab
         objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
         objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
+        objects.schematic_objects[object_id]["interlockahead"] = signal.locking.interlock_ahead.get_value()
         
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
@@ -551,6 +554,23 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocking.disable_sig_ahead()
     return()
 
+#------------------------------------------------------------------------------------
+# Enable/disable the Distant Signal interlocking UI Element - this is only avaliable
+# for selection for Colour light or Semaphore distant signal types
+#------------------------------------------------------------------------------------
+
+def update_tab2_interlock_ahead_selection(signal):
+    if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value) or
+         ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+           signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
+         ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
+           has_distant(signal) ) ):
+        signal.locking.interlock_ahead.enable()
+    else:
+        signal.locking.interlock_ahead.disable()
+    return()
 
 #------------------------------------------------------------------------------------
 # Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 
@@ -591,6 +611,7 @@ class edit_signal:
         update_tab1_route_selection_elements(self)
         update_tab1_signal_ui_elements(self)
         update_tab2_available_signal_routes(self)
+        update_tab2_interlock_ahead_selection(self)
         
     def sub_type_updated(self):
 #        print("sub type updated")
@@ -598,6 +619,7 @@ class edit_signal:
         update_tab1_route_selection_elements(self)
         update_tab1_signal_ui_elements(self)
         update_tab2_available_signal_routes(self)
+        update_tab2_interlock_ahead_selection(self)
         
     def route_type_updated(self):
 #        print("route type updated")
@@ -621,6 +643,6 @@ class edit_signal:
 
     def dist_selections_updated(self):
 #        print("dist selections updated")
-        pass
+        update_tab2_interlock_ahead_selection(self)
 
 #############################################################################################

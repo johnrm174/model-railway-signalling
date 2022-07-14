@@ -383,6 +383,30 @@ class conflicting_signals_frame():
                   self.rh2.get_values() ] )
 
 #------------------------------------------------------------------------------------
+# Class for the Distant 'interlock with home signals ahead" ui element
+# Inherits from the common.check_box class (get_value/set_value). Overridden
+# class methods are enable/disable (they also pack / forget the element)
+#------------------------------------------------------------------------------------
+
+class interlock_with_signals_ahead(common.check_box):
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the UI element (packed by the creating function/class)
+        self.frame = LabelFrame(parent_frame, text="Distant signal interlocking")
+        super().__init__(self.frame, width=35, label="Interlock distant with all home signals ahead",
+                        tool_tip="Select to lock the distant signal at CAUTION if any home signals "+
+                        "on the route ahead are at DANGER (if the distant signal is CLEAR it "+
+                        "will remain unlocked so it can be returned to CAUTION at any time)")
+        self.pack(padx=2, pady=2)
+        
+    def enable(self):
+        self.frame.pack(padx=2, pady=2, fill='x')
+        super().enable()
+        
+    def disable(self):
+        self.frame.pack_forget()
+        super().disable()
+
+#------------------------------------------------------------------------------------
 # Top level Class for the Signal Interlocking Tab
 #------------------------------------------------------------------------------------
 
@@ -394,5 +418,7 @@ class signal_interlocking_tab:
         self.interlocking.frame.pack(padx=2, pady=2, fill='x')
         self.conflicting_sigs = conflicting_signals_frame(parent_tab, parent_object)
         self.conflicting_sigs.frame.pack(padx=2, pady=2, fill='x')
+        self.interlock_ahead = interlock_with_signals_ahead(parent_tab)
+        self.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
 
 #############################################################################################

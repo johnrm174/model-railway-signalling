@@ -191,6 +191,7 @@ default_signal_object["feathers"] = [False,False,False,False,False]
 default_signal_object["dccautoinhibit"] = False
 default_signal_object["fullyautomatic"] = False
 default_signal_object["distautomatic"] = False
+default_signal_object["interlockahead"] = False
 # The signal arms table comprises a list of route elements: [main, LH1, LH2, RH1, RH2]
 # Each Route element comprises a list of signal elements: [sig, sub, dist]
 # Each signal element comprises [enabled/disabled, associated DCC address]
@@ -983,22 +984,26 @@ def copy_signal(object_id):
     schematic_objects[new_object_id]["posy"] += position_offset
     # Reset the interlocking tables and for the signal (not copied)
     # Now set the default values for all elements we don't want to copy:
+    # Associated track sensors (will need different GPIO inputs allocating)
     schematic_objects[new_object_id]["passedsensor"] = default_signal_object["passedsensor"]
     schematic_objects[new_object_id]["approachsensor"] = default_signal_object["approachsensor"]
+    # Enabled routes for the signal (all route definitions are cleared with interlocking)
     schematic_objects[new_object_id]["sigroutes"] = default_signal_object["sigroutes"]
     schematic_objects[new_object_id]["subroutes"] = default_signal_object["subroutes"]
+    # All interlocking elements (will be completely different for the new signal)
     schematic_objects[new_object_id]["pointinterlock"] = default_signal_object["pointinterlock"]
     schematic_objects[new_object_id]["siginterlock"] = default_signal_object["siginterlock"]
+    schematic_objects[new_object_id]["interlockahead"] = default_signal_object["interlockahead"]
+    # All DCC Addresses (will be completely different for the new signal)
     schematic_objects[new_object_id]["dccaspects"] = default_signal_object["dccaspects"]
     schematic_objects[new_object_id]["dccfeathers"] = default_signal_object["dccfeathers"]
     schematic_objects[new_object_id]["dcctheatre"] = default_signal_object["dcctheatre"]
+    # Any DCC addresses for the semaphore signal arms
     for index1,route in enumerate(schematic_objects[new_object_id]["sigarms"]):
         for index2,signal in enumerate(route):
             schematic_objects[new_object_id]["sigarms"][index1][index2][1] = 0
-        
-    ##########################################################################################
-    # TO DO - Reset all the DCC addresses for the signal - but leave other aspects unchanged)
-    ##########################################################################################
+    # The DCC Address for the subsidary signal
+    schematic_objects[new_object_id]["subsidary"][1] = 0
     # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Create/draw the new object on the canvas
