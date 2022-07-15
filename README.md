@@ -31,11 +31,10 @@ There are some example layout files in the 'configuration_examples' folder.
 What's supported in the MVP:
 * Schematic editing - points, signals and lines
 * SPROG interface - DCC control of signals and points
-* Basic interlocking of signals and points
+* Full interlocking of signals and points
 * Save and load of layout schematic and state
 
 What's coming soon:
-* Interlocking - of distant signals with the home signals ahead
 * Schematic editing - Track sections and block instruments
 * Automation - sensor events and integration with track sections and signals
 * Application documentation
