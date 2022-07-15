@@ -24,6 +24,8 @@
 #    signals_common.sig_callback_type - for accessing the enum value
 #    points.point_callback_type - for accessing the enum value
 #    block_instruments.block_callback_type - for accessing the enum value
+#    signals_colour_lights.signal_sub_type - for accessing the enum value
+#    signals_semaphores.semaphore_sub_type - for accessing the enum value
 #    <MORE COMING>
 #
 # Makes the following external API calls to library modules:
@@ -72,8 +74,7 @@ def has_subsidary(signal_id):
 # Internal helper Function to find if a signal has a distant arms
 #------------------------------------------------------------------------------------
 
-def has_distant_arms(signal_id):    
-    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+def has_distant_arms(signal_object):    
     return (signal_object["sigarms"][0][2][0] or
             signal_object["sigarms"][1][2][0] or
             signal_object["sigarms"][2][2][0] or
@@ -113,8 +114,8 @@ def find_signal_route(signal_object):
     return (signal_route)
 
 #------------------------------------------------------------------------------------
-# Internal common Function to find the signal ahead of another signal (based
-# on the current route settings for the signal - only called for local signals
+# Internal common Function to find the signal ahead of a signal (based on
+# the route set/cleared for the signal) - only called for local signals
 #------------------------------------------------------------------------------------
 
 def find_signal_ahead(signal_object):
@@ -127,93 +128,92 @@ def find_signal_ahead(signal_object):
     return (signal_ahead_object)
 
 #------------------------------------------------------------------------------------
-# Internal Function to walk the route ahead of a distant signal to see if any home
-# signals are at DANGER (will return True as soon as this is the case). The forward
-# search will be aborted as soon as another signal type is found
+# Internal common Function to find the signal behind by testing each of the other
+# layout signals in turn to see if the signal ahead on the set/cleared route matches
+# Can be called for local or remote signals (sig if is integer or a string
 #------------------------------------------------------------------------------------
 
-def home_signal_ahead_at_danger(signal_object):
+def find_signal_behind(signal_object):
+    signal_behind_object = None
+    for signal_id_to_test in objects.signal_index:
+        signal_object_to_test = objects.schematic_objects[objects.signal(signal_id_to_test)]
+        signal_ahead_object = find_signal_ahead(signal_object_to_test)
+        if signal_ahead_object == signal_object:
+            signal_behind_object = signal_object_to_test
+            break
+    return (signal_behind_object)
+
+#------------------------------------------------------------------------------------
+# Internal Function to walk the route ahead of a distant signal to see if any
+# signals are at DANGER (will return True as soon as this is the case). The 
+# forward search will be aborted as soon as a "non-home" signal type is found
+# (this includes where a home semaphore also has secondary distant arms)
+# A maximum recursion depth provides a level of protection
+#------------------------------------------------------------------------------------
+
+def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
+    global logging
     home_signal_at_danger = False
-    signal_ahead_object = find_signal_ahead(signal_object)
-    if signal_ahead_object is not None:
-        if ( ( signal_ahead_object["itemtype"] == signals_common.sig_type.semaphore.value and
-               signal_ahead_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) or
-            ( signal_ahead_object["itemtype"] == signals_common.sig_type.colour_light.value and
-              signal_ahead_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) ):
+    if recursion_level < 20:
+        signal_ahead_object = find_signal_ahead(signal_object)
+        if signal_ahead_object is not None:
             if signals.signal_state(signal_ahead_object["itemid"]) == signals_common.signal_state_type.DANGER:
                 home_signal_at_danger = True
-            else:
+            elif ( ( signal_ahead_object["itemtype"] == signals_common.sig_type.colour_light.value and
+                     signal_ahead_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) or
+                   ( signal_ahead_object["itemtype"] == signals_common.sig_type.semaphore.value and
+                     signal_ahead_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) and
+                     not has_distant_arms(signal_ahead_object) ):
                 # Call the function recursively to find the next signal ahead
-                home_signal_at_danger = home_signal_ahead_at_danger(signal_ahead_object)
+                home_signal_at_danger = home_signal_ahead_at_danger(signal_ahead_object, recursion_level+1)
+    else:
+        logging.error("RUN LAYOUT - Interlock with Signal ahead - Maximum recursion level reached")
     return (home_signal_at_danger)
 
 #------------------------------------------------------------------------------------
-# Function to find any colour light signals which are configured to update their
-# aspects based on the aspect of the signal that has changed (i.e. signals "behind")
-# This function is recursive and keeps working back along the route until there are
-# no further aspect changes (that need propagating backwards)
+# Function to find any colour light signals which are configured to update their aspects
+# based on the aspect of the signal that has changed (i.e. signals "behind"). The function
+# is recursive and keeps working back along the route until there are no further changes
+# that need propagating backwards. A maximum recursion depth provides a level of protection.
 #------------------------------------------------------------------------------------
 
-def update_signal_behind(signal_id:Union[int,str]):
-    # The Signal that has changed could either be a local signal (sig ID is an integer)
-    # or a remote signal (Signal ID is a string) - In either case, we need to work back
-    # back along the route to update any local signals behind.
-    for signal_to_test_id in objects.signal_index:
-        signal_object_to_test = objects.schematic_objects[objects.signal(signal_to_test_id)]
-        # We only need to "update on signal ahead" if it is a local signal (integer)
-        # As these may be defined with one or more routes (and therefore signals) ahead
-        if type(signal_object_to_test["itemid"]) == int:
-            if signal_object_to_test["itemtype"] == signals_common.sig_type.colour_light.value:
-                # Find the signal ahead (will be None if the points are not set/cleared)
-                signal_ahead_object = find_signal_ahead(signal_object_to_test)
-                if signal_ahead_object is not None:
-                    if signal_ahead_object["itemid"] == str(signal_id):
-                        # Fnd the displayed aspect of the signal (before any changes)
-                        initial_signal_aspect = signals.signal_state(signal_to_test_id)
-                        # Update the signal behind based on the signal we called into the function with
-                        signals.update_signal(signal_to_test_id, signal_id)
-                        # If the aspect has changed then also need to update the 
-                        # signal behindby calling the same function recursively
-                        if signals.signal_state(signal_to_test_id) != initial_signal_aspect:
-                            update_signal_behind(signal_to_test_id)
+def update_signal_behind(signal_object, force_update:bool=False, recursion_level:int=0):
+    if recursion_level < 20:
+        signal_behind_object = find_signal_behind(signal_object)
+        if signal_behind_object is not None:
+            if signal_behind_object["itemtype"] == signals_common.sig_type.colour_light.value:
+                signal_id = signal_object["itemid"]
+                signal_behind_id = signal_behind_object["itemid"]
+                # Fnd the displayed aspect of the signal (before any changes)
+                initial_signal_aspect = signals.signal_state(signal_behind_id)
+                # Update the signal behind based on the signal we called into the function with
+                signals.update_signal(signal_behind_id, signal_id)
+                # If the aspect has changed then we need to continute working backwards 
+                if force_update or signals.signal_state(signal_behind_id) != initial_signal_aspect:
+                    update_signal_behind(signal_behind_object, recursion_level+1)
+    else:
+        logging.error("RUN LAYOUT - Update Signal Behind - Maximum recursion level reached")
     return()
 
 #------------------------------------------------------------------------------------
-# Functions to update a signal aspect based on the signal ahead and then to
-# work back along the set route to update any other signals that need changing
-# Called on Called on sig_switched event - for colour light signals only
+# Functions to update a signal aspect based on the signal ahead and then to work back
+# along the set route to update any other signals that need changing. Called on Called
+# on sig_switched or sig_updated events. The Signal that has changed could either be a
+# local signal (sig ID is an integer) or a remote signal (Signal ID is a string)
 #------------------------------------------------------------------------------------
 
-def process_signal_updates(signal_id:Union[int,str], force_update:bool=False):
-    # The Signal that has changed could either be a local signal (sig ID is an integer)
-    # or a remote signal (Signal ID is a string)
-    signal_object = objects.schematic_objects[objects.signal(signal_id)]
-    # We only need to "update on signal ahead" if it is a local signal (integer)
-    # As these may be defined with one or more routes (and therefore signals) ahead
-    if type(signal_id)== int:
-        if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
-            # Find the route set for the signal (where points are set and locked)
-            signal_route = find_signal_route(signal_object)
-            if signal_route is not None:
-                # Find the current signal aspect (this call takes an integer or a string)
-                initial_signal_aspect = signals.signal_state(signal_id)
-                # If a signal ahead has been defined then we can update on the signal ahead
-                # Otherwise we just update the signal based on its current state
-                # Note that the signal Ahead is a string (for local or remote signals)
-                signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
-                if signal_ahead_id != "": signals.update_signal(signal_id, signal_ahead_id)
-                else: signals.update_signal(signal_id)
-                # If the state of the signal has changed, we need to work back along the route
-                # We also do this if the force_update flag is set (i.e. created/updated signal)
-                if force_update or signals.signal_state(signal_id) != initial_signal_aspect:
-                    update_signal_behind(signal_id)
-            else:
-                # No valid route for the signal (it should therefore be locked)
-                signals.update_signal(signal_id)
+def process_signal_updates(signal_object, force_update:bool=False):
+    # First update on the signal ahead (only if its a colour light signal)
+    # Other signal types are updated automatically when switched
+    if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
+        signal_ahead_object = find_signal_ahead(signal_object)
+        if signal_ahead_object is not None:
+            signals.update_signal(signal_object["itemid"], signal_ahead_object["itemid"])
         else:
-            # Signal ID must be a string (and hence a remote signal) - We therefore don't need to
-            # update the signal (its on another layout) but we do need to update any "signals behind"
-            update_signal_behind(signal_id)
+            signals.update_signal(signal_object["itemid"])
+    # Work back along the route to update signals behind. Note that we do this
+    # for all signal types as there could be colour light signals behind this one
+    update_signal_behind(signal_object, force_update)
     return()
 
 #------------------------------------------------------------------------------------
@@ -228,15 +228,17 @@ def process_interlocking():
         # We only interlock local signals (Sig ID = int). Remote signals (subscribed to
         # via MQTT networking) are only used for setting route on the route ahead
         if type(signal_object["itemid"]) == int:
-            # 'sigarms' comprises a list of route elements: [main, LH1, LH2, RH1, RH2]
-            # Each Route element comprises a list of signal elements: [sig, sub, dist]
-            # Each signal element comprises [enabled/disabled, associated DCC address]
+            # Note that the ID of any associated distant signal is sig_id+100
+            associated_distant_id = signal_object["itemid"]+100
+            distant_arms_can_be_unlocked = has_distant_arms(signal_object)
             signal_can_be_unlocked = False
             subsidary_can_be_unlocked = False
             # Find the route (where points are set/cleared)
             signal_route = find_signal_route(signal_object)
             # If there is a set/locked route then the signal/subsidary can be unlocked
             if signal_route is not None:
+                # 'sigroutes' and 'subroutes' represent the routes supported by the
+                # signal (and its subsidary) - of the form [main, lh1, lh2, rh1, rh2]
                 if signal_object["sigroutes"][signal_route.value-1]:
                     signal_can_be_unlocked = True
                 if signal_object["subroutes"][signal_route.value-1]:
@@ -256,32 +258,34 @@ def process_interlocking():
                                     signals.subsidary_clear(opposing_signal_id,signals_common.route_type(index+1)))):
                                 subsidary_can_be_unlocked = False
                                 signal_can_be_unlocked = False
-                # If its a distant signal at CAUTION and set to be 'interlocked with all home signals ahead' then we
-                # need to work along the selected route to see if any home signals ahead are at DANGER. If we find any
-                # (before we come across a signal that isn't a HOME signal) then the distant signal is locked at CAUTION
-                # Note that the "interlockedahead" flag will only be True if selected and the signal is a distant
+                # The "interlockedahead" flag will only be True if selected and it can only be selected for
+                # a semaphore dustant, a colour light distant or a semaphore home with secondary distant arms
+                # In the latter case then a call to "has_associated distant" will be true (false for all other types)
                 if signal_object["interlockahead"] and home_signal_ahead_at_danger(signal_object):
-                    if not signals.signal_clear(signal_object["itemid"]):
-                        signal_can_be_unlocked = False
-                ################################################################
-                # TODO - Associated distant interlocking with all signals ahead
-                ################################################################
+                    if has_distant_arms(signal_object):
+                        # Must be a home semaphore signal with secondary distant arms
+                        if not signals.signal_clear(signal_object["itemid"]+100):
+                            distant_arms_can_be_unlocked = False
+                    else:
+                        # Must be a distant signal (colour light or semaphore)
+                        if not signals.signal_clear(signal_object["itemid"]):
+                            signal_can_be_unlocked = False
             # Interlock the main signal with the subsidary
             if signals.signal_clear(signal_id):
                 subsidary_can_be_unlocked = False
             if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
                 signal_can_be_unlocked = False
             # Lock/unlock the signal as required
-            if signal_can_be_unlocked:
-                signals.unlock_signal(signal_id)
-            else:
-                signals.lock_signal(signal_id)
-            # Lock/unlock the subsidary as required
+            if signal_can_be_unlocked: signals.unlock_signal(signal_id)
+            else: signals.lock_signal(signal_id)
+            # Lock/unlock the subsidary as required (if the signal has one)
             if has_subsidary(signal_id):
-                if subsidary_can_be_unlocked:
-                    signals.unlock_subsidary(signal_id)
-                else:
-                    signals.lock_subsidary(signal_id)
+                if subsidary_can_be_unlocked: signals.unlock_subsidary(signal_id)
+                else: signals.lock_subsidary(signal_id)
+            # lock/unlock the associated distant arms (if the signal has any)
+            if has_distant_arms(signal_object):
+                if distant_arms_can_be_unlocked: signals.unlock_signal(associated_distant_id)
+                else: signals.lock_signal(associated_distant_id)
     # Process the Point Interlocking
     for point_id in objects.point_index:
         point_object = objects.schematic_objects[objects.point(point_id)]
@@ -308,14 +312,18 @@ def process_interlocking():
 def schematic_callback(item_id,callback_type):
     global logging
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-    # Process the signal updates (update signals based on signal ahead)
-    # This is primarily for coour light signals where the displayed aspect
-    # if clear will depend on the displayed aspect of the signal ahead
+    # Process the signal updates (update signals based on the signal ahead)
+    # This is primarily for colour light signals where the displayed aspect (if
+    # the signal is OFF) will depend on the displayed aspect of the signal ahead
     if ( callback_type == signals_common.sig_callback_type.sig_switched or
          callback_type == signals_common.sig_callback_type.sub_switched or
          callback_type == signals_common.sig_callback_type.sig_updated or
          callback_type == signals_common.sig_callback_type.sig_released ):
-        process_signal_updates(item_id)
+        # We need to differentiate if the callback was from an semaphore "associated distant"
+        # (i.e. a semaphore home that has secondary distant arms). If so then we need to
+        # adjust the signal ID to point to the ID of the main semaphore home signal
+        if type(item_id) == int and item_id > 100: item_id = item_id-100
+        process_signal_updates(objects.schematic_objects[objects.signal(item_id)])
 
     # Process the signal/point/block_instrument interlocking
     if ( callback_type == signals_common.sig_callback_type.sig_switched or
@@ -336,7 +344,7 @@ def schematic_callback(item_id,callback_type):
 
 def process_object_update(object_id):
     if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        process_signal_updates(objects.schematic_objects[object_id]["itemid"], force_update=True)
+        process_signal_updates(objects.schematic_objects[object_id], force_update=True)
     process_interlocking()
     return()
 
@@ -346,12 +354,9 @@ def process_object_update(object_id):
 
 def initialise_layout():
     # Force update of the displayed aspect for all signals.
-    # We use the integer/string value representing a local/remote signal
-    # We don't use the 'signal' dictionary key as that is always a string
-    for sig_id_str in objects.signal_index:
-        signal_object = objects.schematic_objects[objects.signal(sig_id_str)]
-        signal_id = signal_object["itemid"]
-        process_signal_updates(signal_id, force_update=True)
+    for sig_id in objects.signal_index:
+        signal_object = objects.schematic_objects[objects.signal(sig_id)]
+        process_signal_updates(signal_object, force_update=True)
     # Process the interlocking to ensure a valid default configuration
     process_interlocking()
     return()
