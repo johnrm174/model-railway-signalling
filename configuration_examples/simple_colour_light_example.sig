@@ -7,7 +7,7 @@
                 false,
                 0
             ],
-            "bbox": 146,
+            "bbox": 1504,
             "dccaspects": [
                 [
                     [
@@ -510,6 +510,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 2,
             "itemsubtype": 5,
@@ -978,26 +979,26 @@
             "theatreroute": false
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 150,
-            "end1": 148,
-            "end2": 149,
+            "bbox": 1508,
+            "end1": 1506,
+            "end2": 1507,
             "endx": 725,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 147,
+            "line": 1505,
             "posx": 425,
             "posy": 250
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 154,
-            "end1": 152,
-            "end2": 153,
+            "bbox": 1512,
+            "end1": 1510,
+            "end2": 1511,
             "endx": 775,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 151,
+            "line": 1509,
             "posx": 1100,
             "posy": 250
         },
@@ -1006,7 +1007,7 @@
                 false,
                 0
             ],
-            "bbox": 166,
+            "bbox": 1524,
             "dccaspects": [
                 [
                     [
@@ -1509,6 +1510,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 6,
             "itemsubtype": 1,
@@ -1981,7 +1983,7 @@
                 false,
                 0
             ],
-            "bbox": 185,
+            "bbox": 1543,
             "dccaspects": [
                 [
                     [
@@ -2484,6 +2486,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 3,
             "itemsubtype": 5,
@@ -2956,7 +2959,7 @@
                 false,
                 0
             ],
-            "bbox": 204,
+            "bbox": 1562,
             "dccaspects": [
                 [
                     [
@@ -3459,6 +3462,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 8,
             "itemsubtype": 5,
@@ -3929,7 +3933,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 3,
             "automatic": false,
-            "bbox": 211,
+            "bbox": 1569,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -3975,26 +3979,26 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 215,
-            "end1": 213,
-            "end2": 214,
+            "bbox": 1573,
+            "end1": 1571,
+            "end2": 1572,
             "endx": 725,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 212,
+            "line": 1570,
             "posx": 425,
             "posy": 200
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 219,
-            "end1": 217,
-            "end2": 218,
+            "bbox": 1577,
+            "end1": 1575,
+            "end2": 1576,
             "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 216,
+            "line": 1574,
             "posx": 925,
             "posy": 200
         },
@@ -4003,7 +4007,7 @@
                 false,
                 0
             ],
-            "bbox": 238,
+            "bbox": 1596,
             "dccaspects": [
                 [
                     [
@@ -4506,6 +4510,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 4,
             "itemsubtype": 5,
@@ -4976,7 +4981,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 245,
+            "bbox": 1603,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4991,21 +4996,21 @@
             "siginterlock": []
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 249,
-            "end1": 247,
-            "end2": 248,
+            "bbox": 1607,
+            "end1": 1605,
+            "end2": 1606,
             "endx": 0,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 246,
+            "line": 1604,
             "posx": 375,
             "posy": 250
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 256,
+            "bbox": 1614,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -5051,14 +5056,14 @@
             ]
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 260,
-            "end1": 258,
-            "end2": 259,
+            "bbox": 1618,
+            "end1": 1616,
+            "end2": 1617,
             "endx": 225,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 257,
+            "line": 1615,
             "posx": 375,
             "posy": 200
         },
@@ -5067,7 +5072,7 @@
                 false,
                 0
             ],
-            "bbox": 272,
+            "bbox": 1630,
             "dccaspects": [
                 [
                     [
@@ -5570,6 +5575,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 5,
             "itemsubtype": 1,
@@ -6040,7 +6046,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 279,
+            "bbox": 1637,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -6059,7 +6065,7 @@
                 false,
                 0
             ],
-            "bbox": 291,
+            "bbox": 1649,
             "dccaspects": [
                 [
                     [
@@ -6562,6 +6568,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 7,
             "itemsubtype": 1,
@@ -7034,7 +7041,7 @@
                 false,
                 0
             ],
-            "bbox": 310,
+            "bbox": 1668,
             "dccaspects": [
                 [
                     [
@@ -7537,6 +7544,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 1,
             "itemsubtype": 5,
@@ -8040,7 +8048,7 @@
             "version": "Version 3.0.0"
         },
         "logging": {
-            "level": 4
+            "level": 2
         },
         "sprog": {
             "baud": 115200,

@@ -7,7 +7,7 @@
                 false,
                 0
             ],
-            "bbox": 211,
+            "bbox": 1775,
             "dccaspects": [
                 [
                     [
@@ -510,6 +510,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 2,
             "itemsubtype": 1,
@@ -978,27 +979,27 @@
             "theatreroute": false
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 215,
-            "end1": 213,
-            "end2": 214,
+            "bbox": 1779,
+            "end1": 1777,
+            "end2": 1778,
             "endx": 725,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 212,
+            "line": 1776,
             "posx": 425,
             "posy": 250
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 219,
-            "end1": 217,
-            "end2": 218,
+            "bbox": 1783,
+            "end1": 1781,
+            "end2": 1782,
             "endx": 775,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 216,
-            "posx": 1100,
+            "line": 1780,
+            "posx": 1400,
             "posy": 250
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
@@ -1006,7 +1007,7 @@
                 false,
                 0
             ],
-            "bbox": 228,
+            "bbox": 1792,
             "dccaspects": [
                 [
                     [
@@ -1509,6 +1510,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 6,
             "itemsubtype": 1,
@@ -1981,7 +1983,7 @@
                 false,
                 0
             ],
-            "bbox": 256,
+            "bbox": 1820,
             "dccaspects": [
                 [
                     [
@@ -2484,6 +2486,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 3,
             "itemsubtype": 1,
@@ -2956,7 +2959,7 @@
                 false,
                 0
             ],
-            "bbox": 287,
+            "bbox": 1851,
             "dccaspects": [
                 [
                     [
@@ -3459,6 +3462,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": true,
             "item": "signal",
             "itemid": 8,
             "itemsubtype": 2,
@@ -3929,11 +3933,11 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 3,
             "automatic": false,
-            "bbox": 294,
+            "bbox": 1858,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 4,
             "itemtype": 1,
@@ -3975,26 +3979,1022 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 298,
-            "end1": 296,
-            "end2": 297,
+            "bbox": 1862,
+            "end1": 1860,
+            "end2": 1861,
             "endx": 725,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 295,
+            "line": 1859,
             "posx": 425,
             "posy": 200
         },
+        "a0e3c3f6-2477-4bc6-a9f3-94d730dd47f2": {
+            "approachsensor": [
+                false,
+                0
+            ],
+            "bbox": 1890,
+            "dccaspects": [
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ]
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ]
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 9,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "passedsensor": [
+                true,
+                0
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 1300,
+            "posy": 250,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ]
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "theatreroute": false
+        },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 302,
-            "end1": 300,
-            "end2": 301,
+            "bbox": 1894,
+            "end1": 1892,
+            "end2": 1893,
             "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 299,
+            "line": 1891,
             "posx": 925,
             "posy": 200
         },
@@ -4003,7 +5003,7 @@
                 false,
                 0
             ],
-            "bbox": 330,
+            "bbox": 1947,
             "dccaspects": [
                 [
                     [
@@ -4506,6 +5506,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": true,
             "item": "signal",
             "itemid": 4,
             "itemsubtype": 1,
@@ -4543,7 +5544,7 @@
                             false
                         ]
                     ],
-                    "",
+                    "9",
                     0
                 ],
                 [
@@ -4680,7 +5681,7 @@
                         0
                     ],
                     [
-                        false,
+                        true,
                         0
                     ]
                 ],
@@ -4976,7 +5977,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 337,
+            "bbox": 1954,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4991,21 +5992,21 @@
             "siginterlock": []
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 341,
-            "end1": 339,
-            "end2": 340,
+            "bbox": 1958,
+            "end1": 1956,
+            "end2": 1957,
             "endx": 0,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 338,
+            "line": 1955,
             "posx": 375,
             "posy": 250
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 348,
+            "bbox": 1965,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -5019,20 +6020,20 @@
             "reverse": false,
             "siginterlock": [
                 [
-                    8,
+                    6,
                     [
                         true,
-                        true,
+                        false,
                         false,
                         false,
                         false
                     ]
                 ],
                 [
-                    6,
+                    8,
                     [
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false
@@ -5061,14 +6062,14 @@
             ]
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 352,
-            "end1": 350,
-            "end2": 351,
+            "bbox": 1969,
+            "end1": 1967,
+            "end2": 1968,
             "endx": 225,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 349,
+            "line": 1966,
             "posx": 375,
             "posy": 200
         },
@@ -5077,7 +6078,7 @@
                 false,
                 0
             ],
-            "bbox": 361,
+            "bbox": 1978,
             "dccaspects": [
                 [
                     [
@@ -5580,6 +6581,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 5,
             "itemsubtype": 1,
@@ -6050,7 +7052,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 368,
+            "bbox": 1985,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -6069,7 +7071,7 @@
                 false,
                 0
             ],
-            "bbox": 377,
+            "bbox": 1994,
             "dccaspects": [
                 [
                     [
@@ -6572,6 +7574,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 7,
             "itemsubtype": 1,
@@ -7044,7 +8047,7 @@
                 false,
                 0
             ],
-            "bbox": 408,
+            "bbox": 2025,
             "dccaspects": [
                 [
                     [
@@ -7547,6 +8550,7 @@
                 false
             ],
             "fullyautomatic": false,
+            "interlockahead": false,
             "item": "signal",
             "itemid": 1,
             "itemsubtype": 1,
@@ -8029,12 +9033,12 @@
         "3": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "4": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
     "sections": {},
@@ -8042,15 +9046,15 @@
         "canvas": {
             "grid": 25,
             "height": 500,
-            "width": 1100
+            "width": 1400
         },
         "general": {
             "editmode": true,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/simple_semaphore_example.sig",
-            "version": "Version 3.0.0 beta 1"
+            "version": "Version 3.0.0"
         },
         "logging": {
-            "level": 4
+            "level": 2
         },
         "sprog": {
             "baud": 115200,
@@ -8072,15 +9076,26 @@
             "sublocked": false,
             "theatretext": "NONE"
         },
-        "2": {
+        "104": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
-            "sublocked": true,
+            "sublocked": false,
+            "theatretext": "NONE"
+        },
+        "2": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 2,
+            "sigclear": false,
+            "siglocked": true,
+            "subclear": false,
+            "sublocked": false,
             "theatretext": "NONE"
         },
         "3": {
@@ -8089,7 +9104,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -8133,12 +9148,23 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
         },
         "8": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": true,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": "NONE"
+        },
+        "9": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
