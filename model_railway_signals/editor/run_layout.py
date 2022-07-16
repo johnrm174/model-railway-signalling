@@ -190,7 +190,7 @@ def update_signal_behind(signal_object, force_update:bool=False, recursion_level
                 signals.update_signal(signal_behind_id, signal_id)
                 # If the aspect has changed then we need to continute working backwards 
                 if force_update or signals.signal_state(signal_behind_id) != initial_signal_aspect:
-                    update_signal_behind(signal_behind_object, recursion_level+1)
+                    update_signal_behind(signal_behind_object, force_update, recursion_level+1)
     else:
         logging.error("RUN LAYOUT - Update Signal Behind - Maximum recursion level reached")
     return()
