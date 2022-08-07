@@ -89,15 +89,17 @@ class check_box(Checkbutton):
         # Store the local instance configuration variables
         self.parent_frame = parent_frame
         self.callback = callback
-        # If width hasn't been specified set to the width of the label
-        if width is None: width = len(label)
         # Create the vars for the CB - 'selection' is the actual CB state and 'state' is the
         # last entered state (used to "load" the actual CB state when the CB is enabled)        
         self.selection = BooleanVar(self.parent_frame, False)
         self.state = BooleanVar(self.parent_frame, False)
         self.enabled = BooleanVar(self.parent_frame, True)
         # Create the checkbox and associated tool tip
-        super().__init__(self.parent_frame, width = width, text=label, anchor="w",
+        if width is None: 
+            super().__init__(self.parent_frame, text=label, anchor="w",
+                       variable=self.selection, command=self.cb_updated)
+        else:
+            super().__init__(self.parent_frame, width = width, text=label, anchor="w",
                        variable=self.selection, command=self.cb_updated)
         self.TT = CreateToolTip(self, tool_tip)
         
@@ -144,17 +146,17 @@ class state_box(Checkbutton):
         self.labelon = label_on
         self.labeloff = label_off
         self.read_only = read_only
-        # If width hasn't been specified set to the width of the widest label
-        if width is None:
-            if len(label_off) > len(label_on): width = len(label_off)
-            else: width = len(label_on)
         # Create the vars for the CB - 'selection' is the actual CB state and 'state' is the
         # last entered state (used to "load" the actual CB state when the CB is enabled)        
         self.selection = BooleanVar(self.parent_frame, False)
         self.state = BooleanVar(self.parent_frame, False)
         self.enabled = BooleanVar(self.parent_frame, True)
         # Create the checkbox and associated tool tip
-        super().__init__(parent_frame, indicatoron = False, width=width,
+        if width is None: 
+            super().__init__(parent_frame, indicatoron = False,
+                text=self.labeloff, variable=self.selection, command=self.cb_updated)
+        else:
+            super().__init__(parent_frame, indicatoron = False, width=width,
                 text=self.labeloff, variable=self.selection, command=self.cb_updated)
         if self.read_only: self.configure(state="disabled")
         self.TT = CreateToolTip(self, tool_tip)
@@ -519,7 +521,7 @@ class dcc_command_entry():
         self.EB = dcc_entry_box(parent_frame, callback=self.eb_updated)
         self.EB.pack(side=LEFT)
         self.CB = state_box(parent_frame, label_off="OFF", label_on="ON",
-                    tool_tip="Set the DCC logic for the command")
+                    width=4, tool_tip="Set the DCC logic for the command")
         self.CB.pack(side=LEFT)
     
     def eb_updated(self):
@@ -551,8 +553,69 @@ class dcc_command_entry():
         return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
+# Common class for a route selection element (route selection CBs)
+# Public class instance methods provided by this class are
+#    "set_values" - Sets the route selection CBs 
+#    "get_values" - Gets route selection CBs 
+#    "enable" - Enables/loads the route selection CBs 
+#    "disable" - Disables/blanks the route selection CBs 
+#------------------------------------------------------------------------------------
+
+class route_selections():
+    def __init__(self, parent_frame, tool_tip:str, read_only=False, callback=None):
+        # create the UI Elements for each of the possible route selections
+        self.main = state_box(parent_frame, label_off="MAIN", label_on="MAIN",
+                width=5, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.main.pack(side=LEFT)
+        self.lh1 = state_box(parent_frame, label_off="LH1", label_on="LH1",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.lh1.pack(side=LEFT)
+        self.lh2 = state_box(parent_frame, label_off="LH2", label_on="LH2",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.lh2.pack(side=LEFT)
+        self.rh1 = state_box(parent_frame, label_off="RH1", label_on="RH1",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.rh1.pack(side=LEFT)
+        self.rh2 = state_box(parent_frame, label_off="RH2", label_on="RH2",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.rh2.pack(side=LEFT)
+
+    def enable(self):
+        self.main.enable()
+        self.lh1.enable()
+        self.lh2.enable()
+        self.rh1.enable()
+        self.rh2.enable()
+
+    def disable(self):
+        self.main.disable()
+        self.lh1.disable()
+        self.lh2.disable()
+        self.rh1.disable()
+        self.rh2.disable()
+
+    def set_values(self, routes:[bool,bool,bool,bool,bool]):
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        self.main.set_value(routes[0])
+        self.lh1.set_value(routes[1])
+        self.lh2.set_value(routes[2])
+        self.rh1.set_value(routes[3])
+        self.rh2.set_value(routes[4])
+
+    def get_values(self):
+        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Where each route element is a boolean value (True or False)
+        return ( [ self.main.get_value(),
+                   self.lh1.get_value(),
+                   self.lh2.get_value(),
+                   self.rh1.get_value(),
+                   self.rh2.get_value() ])
+
+#------------------------------------------------------------------------------------
 # Class for a signal route selection element (Sig ID EB + route selection CBs)
 # Used by the signals and points interlocking tabs (read only for points tab)
+# Inherits from the common route_selections class (above)
 # Public class instance methods provided by this class are
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
@@ -561,7 +624,7 @@ class dcc_command_entry():
 #    "disable" - Disables/blanks EB value and all route selection CBs 
 #------------------------------------------------------------------------------------
 
-class signal_route_selections():
+class signal_route_selections(route_selections):
     def __init__(self, parent_frame, tool_tip:str, exists_function=None,
                   current_id_function=None, read_only:bool=False):
         self.read_only = read_only
@@ -573,38 +636,16 @@ class signal_route_selections():
         self.EB.pack(side=LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value_
         if self.read_only: self.EB.configure(state="disabled")
-        # Now create the UI Elements for each of the possible route selections
-        self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.main.pack(side=LEFT)
-        self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.lh1.pack(side=LEFT)
-        self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.lh2.pack(side=LEFT)
-        self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.rh1.pack(side=LEFT)
-        self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.rh2.pack(side=LEFT)
+        # Create the UI Elements for each of the possible route selections
+        super().__init__(self.frame, tool_tip, read_only)
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
         if not self.read_only:
             if self.EB.entry.get() == "":
-                self.main.disable()
-                self.lh1.disable()
-                self.lh2.disable()
-                self.rh1.disable()
-                self.rh2.disable()
+                super().disable()
             else:
-                self.main.enable()
-                self.lh1.enable()
-                self.lh2.enable()
-                self.rh1.enable()
-                self.rh2.enable()
+                super().enable()
     
     def validate(self):
         return(EB.validate())
@@ -621,22 +662,13 @@ class signal_route_selections():
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
         self.EB.set_value(signal[0])
-        self.main.set_value(signal[1][0])
-        self.lh1.set_value(signal[1][1])
-        self.lh2.set_value(signal[1][2])
-        self.rh1.set_value(signal[1][3])
-        self.rh2.set_value(signal[1][4])
+        super().set_values(signal[1])
         self.eb_updated()
 
     def get_values(self):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
-        return ( [ self.EB.get_value(),
-                   [ self.main.get_value(),
-                     self.lh1.get_value(),
-                     self.lh2.get_value(),
-                     self.rh1.get_value(),
-                     self.rh2.get_value() ] ])
+        return ( [ self.EB.get_value(), super().get_values() ])
    
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons

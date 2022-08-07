@@ -386,7 +386,7 @@ class colour_light_aspects():
         self.callback = callback
         # Create a label frame (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame,
-                text="DCC commands for Colour Light signal aspects")
+                text="DCC command sequences for Colour Light signal aspects")
         # Create the DCC Entry Elements (packed into the frame by the parent class)
         self.red = colour_light_aspect(self.frame, label="Danger")
         self.grn = colour_light_aspect(self.frame, label="Proceed")
@@ -941,8 +941,8 @@ class route_selections():
 
 class signal_configuration_tab:
     def __init__(self, parent_tab, sig_type_updated, sub_type_updated,
-                route_type_updated, route_selections_updated, sig_selections_updated,
-                sub_selections_updated, dist_selections_updated):
+                route_type_updated, route_selections_updated, sig_routes_updated,
+                sub_routes_updated, dist_routes_updated):
         # Create a Frame for the Sig ID and Signal Type Selections (always packed)
         self.frame1 = Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
@@ -968,11 +968,11 @@ class signal_configuration_tab:
         self.routetype.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
         # Packed / hidden depending on signal types and route type selections
-        self.aspects = colour_light_aspects(parent_tab, sub_selections_updated)
+        self.aspects = colour_light_aspects(parent_tab, sub_routes_updated)
         self.theatre = theatre_route_indications(parent_tab, route_selections_updated)
         self.feathers = feather_route_indications(parent_tab, route_selections_updated)
-        self.semaphores = semaphore_signal_arms(parent_tab, sig_selections_updated,
-                                        sub_selections_updated, dist_selections_updated)
+        self.semaphores = semaphore_signal_arms(parent_tab, sig_routes_updated,
+                                        sub_routes_updated, dist_routes_updated)
         self.sig_routes = route_selections(parent_tab, 
                         "Routes to be controlled by the Main Signal",
                         "Select one or more routes to be controlled by the signal",
@@ -982,13 +982,4 @@ class signal_configuration_tab:
                         "Select one or more routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
         
-########################## TEST ###############################################
-#         self.aspects.frame.pack(padx=2, pady=2, fill='x')
-#         self.semaphores.frame.pack(padx=2, pady=2, fill='x')
-#         self.theatre.frame.pack(padx=2, pady=2, fill='x')
-#         self.feathers.frame.pack(padx=2, pady=2, fill='x')
-#         self.sig_routes.frame.pack(padx=2, pady=2, fill='x')
-#         self.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-########################## TEST ###############################################
-
 #############################################################################################

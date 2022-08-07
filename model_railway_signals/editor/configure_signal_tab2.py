@@ -384,27 +384,18 @@ class conflicting_signals_frame():
 
 #------------------------------------------------------------------------------------
 # Class for the Distant 'interlock with home signals ahead" ui element
-# Inherits from the common.check_box class (get_value/set_value). Overridden
-# class methods are enable/disable (they also pack / forget the element)
+# Inherits from  common.check_box class (get_value/set_value/enable/disable)
 #------------------------------------------------------------------------------------
 
 class interlock_with_signals_ahead(common.check_box):
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame, text="Distant signal interlocking")
-        super().__init__(self.frame, width=35, label="Interlock distant with all home signals ahead",
+        super().__init__(self.frame, label="Interlock distant with all home signals ahead",
                         tool_tip="Select to lock the distant signal at CAUTION if any home signals "+
                         "on the route ahead are at DANGER (if the distant signal is CLEAR it "+
                         "will remain unlocked so it can be returned to CAUTION at any time)")
-        self.pack(padx=2, pady=2)
-        
-    def enable(self):
-        self.frame.pack(padx=2, pady=2, fill='x')
-        super().enable()
-        
-    def disable(self):
-        self.frame.pack_forget()
-        super().disable()
+        self.pack()
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Signal Interlocking Tab
@@ -412,8 +403,6 @@ class interlock_with_signals_ahead(common.check_box):
 
 class signal_interlocking_tab:
     def __init__(self, parent_tab, parent_object):
-        current_id_function = parent_object.config.sigid.get_value
-        # These UI elements need the parent object so the current sig_id can be accessed for validation
         self.interlocking = interlocking_route_frame(parent_tab, parent_object)
         self.interlocking.frame.pack(padx=2, pady=2, fill='x')
         self.conflicting_sigs = conflicting_signals_frame(parent_tab, parent_object)

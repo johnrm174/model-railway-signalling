@@ -10,6 +10,7 @@ from . import objects
 from . import run_layout
 from . import configure_signal_tab1 
 from . import configure_signal_tab2
+from . import configure_signal_tab3
 
 from ..library import signals_common
 from ..library import signals_colour_lights
@@ -44,56 +45,89 @@ def has_distant(signal):
 def get_sig_routes(signal):
     # Get the route selections from the appropriate UI element
     if signal.config.routetype.get_value() == 1:
-        sig_routes = signal.config.sig_routes.get_values()
+        # MAIN route is always enabled (and greyed out)
+        routes = signal.config.sig_routes.get_values()
     elif signal.config.routetype.get_value() == 2:
         # MAIN route is enabled even if a feather hasn't been selected
-        sig_routes = signal.config.feathers.get_feathers()
-        sig_routes[0] = True 
+        routes = signal.config.feathers.get_feathers()
+        routes[0] = True 
     elif signal.config.routetype.get_value() == 3:
         # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
         # Each route element comprises: [character, DCC_command_sequence]
         # MAIN route is enabled even if a theatre character hasn't been selected
         theatre_routes = signal.config.theatre.get_theatre()
-        sig_routes = [True, False, False, False, False]
-        if theatre_routes[2][0] != "": sig_routes[1] = True
-        if theatre_routes[3][0] != "": sig_routes[2] = True
-        if theatre_routes[4][0] != "": sig_routes[3] = True
-        if theatre_routes[5][0] != "": sig_routes[4] = True
+        routes = [True, False, False, False, False]
+        if theatre_routes[2][0] != "": routes[1] = True
+        if theatre_routes[3][0] != "": routes[2] = True
+        if theatre_routes[4][0] != "": routes[3] = True
+        if theatre_routes[5][0] != "": routes[4] = True
     elif signal.config.routetype.get_value() == 4:
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]        
         # MAIN route should always be enabled for a semaphore
         semaphore_routes = signal.config.semaphores.get_arms()
-        sig_routes = [True, False, False, False, False]
-        sig_routes[1] = semaphore_routes[1][0][0]
-        sig_routes[2] = semaphore_routes[2][0][0]
-        sig_routes[3] = semaphore_routes[3][0][0]
-        sig_routes[4] = semaphore_routes[4][0][0]
+        routes = [True, False, False, False, False]
+        routes[1] = semaphore_routes[1][0][0]
+        routes[2] = semaphore_routes[2][0][0]
+        routes[3] = semaphore_routes[3][0][0]
+        routes[4] = semaphore_routes[4][0][0]
     else:
         # Defensive programming (MAIN route always enabled)
-        sig_routes = [True, False, False, False, False]
-    return(sig_routes)      
+        routes = [True, False, False, False, False]
+    return(routes)      
 
 def get_sub_routes(signal):
     # Get the route selections from the appropriate UI element
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value or
           signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value):
-        sub_routes = [False, False, False, False, False]
+        routes = [False, False, False, False, False]
     elif signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        sub_routes = signal.config.sub_routes.get_values()
+        routes = signal.config.sub_routes.get_values()
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         semaphore_routes = signal.config.semaphores.get_arms()
-        sub_routes = [False, False, False, False, False]
-        sub_routes[0] = semaphore_routes[0][1][0]
-        sub_routes[1] = semaphore_routes[1][1][0]
-        sub_routes[2] = semaphore_routes[2][1][0]
-        sub_routes[3] = semaphore_routes[3][1][0]
-        sub_routes[4] = semaphore_routes[4][1][0]
+        routes = [False, False, False, False, False]
+        routes[0] = semaphore_routes[0][1][0]
+        routes[1] = semaphore_routes[1][1][0]
+        routes[2] = semaphore_routes[2][1][0]
+        routes[3] = semaphore_routes[3][1][0]
+        routes[4] = semaphore_routes[4][1][0]
     else:
         # Defensive programming (no subsidary routes)
-        sub_routes = [False, False, False, False, False]
-    return(sub_routes)
+        routes = [False, False, False, False, False]
+    return(routes)
+
+def get_dist_routes(signal):
+    # Get the route selections from the appropriate UI element
+    semaphore_routes = signal.config.semaphores.get_arms()
+    if signal.config.routetype.get_value() == 1 and semaphore_routes[0][2][0]:
+        # MAIN route is always enabled (and greyed out)
+        routes = signal.config.sig_routes.get_values()
+    elif signal.config.routetype.get_value() == 3 and semaphore_routes[0][2][0]:
+        # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
+        # Each route element comprises: [character, DCC_command_sequence]
+        # MAIN route is enabled even if a theatre character hasn't been selected
+        theatre_routes = signal.config.theatre.get_theatre()
+        routes = [True, False, False, False, False]
+        if theatre_routes[2][0] != "": routes[1] = True
+        if theatre_routes[3][0] != "": routes[2] = True
+        if theatre_routes[4][0] != "": routes[3] = True
+        if theatre_routes[5][0] != "": routes[4] = True
+    elif signal.config.routetype.get_value() == 4:
+        # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+        # Each Route element comprises: [signal, subsidary, distant]
+        # Each signal element comprises [enabled/disabled, address]        
+        # MAIN route should always be enabled for a semaphore
+        routes = [False, False, False, False, False]
+        routes[0] = semaphore_routes[0][2][0]
+        routes[1] = semaphore_routes[1][2][0]
+        routes[2] = semaphore_routes[2][2][0]
+        routes[3] = semaphore_routes[3][2][0]
+        routes[4] = semaphore_routes[4][2][0]
+    else:
+        # All other signal types do not support secondary distant arms
+        routes = [False, False, False, False, False]
+    return(routes)
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -157,6 +191,11 @@ def load_state(signal):
     update_tab1_signal_ui_elements(signal)
     update_tab2_available_signal_routes(signal)
     update_tab2_interlock_ahead_selection(signal)
+    update_tab3_general_settings_selections(signal)
+    update_tab3_secondary_distant_signal_routes(signal)
+    update_tab3_timed_signal_selections(signal)
+    update_tab3_approach_control_selections(signal)
+    update_tab3_track_section_ahead_routes(signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -267,6 +306,8 @@ def update_tab1_signal_ui_elements(signal):
             signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
     elif signal.config.routetype.get_value() == 3:
         signal.config.theatre.frame.pack(padx=2, pady=2, fill='x')
+        if has_subsidary(signal):
+            signal.config.sub_routes.frame.pack(padx=2, pady=2, fill='x')
     return()
 
 #------------------------------------------------------------------------------------
@@ -275,17 +316,17 @@ def update_tab1_signal_ui_elements(signal):
 
 def update_tab1_signal_subtype_selections(signal):
     if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        signal.config.subtype.B1.configure(text="2 Asp G/R ")
-        signal.config.subtype.B2.configure(text="2 Asp G/Y ")
-        signal.config.subtype.B3.configure(text="2 Asp Y/R ")
-        signal.config.subtype.B4.configure(text="3 Aspect  ")
-        signal.config.subtype.B5.configure(text="4 Aspect  ")
+        signal.config.subtype.B1.configure(text="2 Asp G/R")
+        signal.config.subtype.B2.configure(text="2 Asp G/Y")
+        signal.config.subtype.B3.configure(text="2 Asp Y/R")
+        signal.config.subtype.B4.configure(text="3 Aspect")
+        signal.config.subtype.B5.configure(text="4 Aspect")
         signal.config.subtype.B3.pack(side=LEFT)
         signal.config.subtype.B4.pack(side=LEFT)
         signal.config.subtype.B5.pack(side=LEFT)
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        signal.config.subtype.B1.configure(text="Home    ")
-        signal.config.subtype.B2.configure(text="Distant ")
+        signal.config.subtype.B1.configure(text="Home")
+        signal.config.subtype.B2.configure(text="Distant")
         signal.config.subtype.B3.pack_forget()
         signal.config.subtype.B4.pack_forget()
         signal.config.subtype.B5.pack_forget()
@@ -507,28 +548,31 @@ def update_tab2_available_signal_routes(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
-    # Enable/disable the signal interlocking routes (i.e point interlocking)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
+    # LH1 Route (sig or sub)
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.enable_route()
     else:
         signal.locking.interlocking.lh1.disable_route()
         signal.locking.conflicting_sigs.lh1.disable_route()
+    # LH2 Route (sig or sub)
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.enable_route()
     else:
         signal.locking.interlocking.lh2.disable_route()
         signal.locking.conflicting_sigs.lh2.disable_route()
+    # RH1 Route (sig or sub)
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.enable_route()
-    else:
+    else: 
         signal.locking.interlocking.rh1.disable_route()
         signal.locking.conflicting_sigs.rh1.disable_route()
+    # RH2 Route (sig or sub)
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.enable_route()
@@ -567,9 +611,164 @@ def update_tab2_interlock_ahead_selection(signal):
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
            has_distant(signal) ) ):
+        signal.locking.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.interlock_ahead.enable()
     else:
+        signal.locking.interlock_ahead.frame.pack_forget()
         signal.locking.interlock_ahead.disable()
+    return()
+
+#------------------------------------------------------------------------------------
+# Enable/disable the Tab3 general settings depending on what is selected
+#------------------------------------------------------------------------------------
+
+def update_tab3_general_settings_selections(signal):
+    # Enable/disable the "Fully Automatic" (no signal button) selection
+    if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value  or
+         signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value):
+        signal.automation.general_settings.enable_fully_auto()
+    else:
+        signal.automation.general_settings.disable_fully_auto()
+    # Enable/disable the "override distant signal behind" selection
+    if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value) or
+         ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+           signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value) ):
+        signal.automation.general_settings.enable_dist_override()
+    else:
+        signal.automation.general_settings.disable_dist_override()
+    return()
+
+#------------------------------------------------------------------------------------
+# Enable/disable the Tab3 track occupancy route selection elements
+#------------------------------------------------------------------------------------
+
+def update_tab3_track_section_ahead_routes(signal):
+    # Get the current route selections
+    sig_routes = get_sig_routes(signal)
+    sub_routes = get_sub_routes(signal)
+    # MAIN Route (sig or sub)
+    signal.automation.track_occupancy.section_ahead.main.enable()
+    # LH1 Route (sig or sub)
+    if sig_routes[1] or sub_routes[1]:
+        signal.automation.track_occupancy.section_ahead.lh1.enable()
+    else:
+        signal.automation.track_occupancy.section_ahead.lh1.disable()
+    # LH2 Route (sig or sub)
+    if sig_routes[2] or sub_routes[2]:
+        signal.automation.track_occupancy.section_ahead.lh2.enable()
+    else:
+        signal.automation.track_occupancy.section_ahead.lh2.disable()
+    # RH1 Route (sig or sub)
+    if sig_routes[3] or sub_routes[3]:
+        signal.automation.track_occupancy.section_ahead.rh1.enable()
+    else: 
+        signal.automation.track_occupancy.section_ahead.rh1.disable()
+    # RH2 Route (sig or sub)
+    if sig_routes[4] or sub_routes[4]:
+        signal.automation.track_occupancy.section_ahead.rh2.enable()
+    else:
+        signal.automation.track_occupancy.section_ahead.rh2.disable()
+    return()
+
+#------------------------------------------------------------------------------------
+# Enable/disable the Tab3 Timed Signal and approach control route selection elements
+#------------------------------------------------------------------------------------
+
+def update_tab3_timed_signal_selections(signal):
+    # Get the current route selections
+    sig_routes = get_sig_routes(signal)
+    # work out if the signal supports timed signal sequences
+    timed_signal = (
+           signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value or
+           signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value )
+    # MAIN Route (sig or sub)
+    if timed_signal: signal.automation.timed_signal.main.enable()
+    else: signal.automation.timed_signal.main.disable()
+    # LH1 Route (sig or sub)
+    if sig_routes[1] and timed_signal: signal.automation.timed_signal.lh1.enable()
+    else: signal.automation.timed_signal.lh1.disable()
+    # LH2 Route (sig or sub)
+    if sig_routes[2] and timed_signal: signal.automation.timed_signal.lh2.enable()
+    else: signal.automation.timed_signal.lh2.disable()
+    # RH1 Route (sig or sub)
+    if sig_routes[3] and timed_signal: signal.automation.timed_signal.rh1.enable()
+    else: signal.automation.timed_signal.rh1.disable()
+    # RH2 Route (sig or sub)
+    if sig_routes[4] and timed_signal: signal.automation.timed_signal.rh2.enable()
+    else: signal.automation.timed_signal.rh2.disable()
+    # Refresh (enable/disable the other selection elements)
+    signal.automation.timed_signal.update_route_selections()
+    return()
+
+#------------------------------------------------------------------------------------
+# Enable/disable the Tab3 Timed Signal and approach control route selection elements
+#------------------------------------------------------------------------------------
+
+def update_tab3_approach_control_selections(signal):
+    # Get the current route selections
+    sig_routes = get_sig_routes(signal)
+    # Work out if the signal type supports approach control:
+    rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+                     signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value) or
+                   ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+                     signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.distant.value ) )
+    rel_on_yel = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and not
+                     signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value and not
+                     signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.red_ylw.value ) )
+    approach_control = rel_on_red or rel_on_yel
+    if approach_control:
+        # Deal with the approach control selections first
+        if rel_on_yel: signal.automation.approach_control.enable_release_on_yellow()
+        else: signal.automation.approach_control.disable_release_on_yellow()
+        if rel_on_red: signal.automation.approach_control.enable_release_on_red()
+        else: signal.automation.approach_control.disable_release_on_red()
+        # MAIN Route (sig or sub)
+        signal.automation.approach_control.main.enable()
+        # LH1 Route (sig or sub)
+        if sig_routes[1] and approach_control: signal.automation.approach_control.lh1.enable()
+        else: signal.automation.approach_control.lh1.disable()
+        # LH2 Route (sig or sub)
+        if sig_routes[2] and approach_control: signal.automation.approach_control.lh2.enable()
+        else: signal.automation.approach_control.lh2.disable()
+        # RH1 Route (sig or sub)
+        if sig_routes[3] and approach_control: signal.automation.approach_control.rh1.enable()
+        else: signal.automation.approach_control.rh1.disable()
+        # RH2 Route (sig or sub)
+        if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable()
+        else: signal.automation.approach_control.rh2.disable()
+    else:
+        signal.automation.approach_control.main.disable()
+        signal.automation.approach_control.lh1.disable()
+        signal.automation.approach_control.lh2.disable()
+        signal.automation.approach_control.rh1.disable()
+        signal.automation.approach_control.rh2.disable()
+        signal.automation.approach_control.disable_release_on_yellow()
+        signal.automation.approach_control.disable_release_on_red()
+    return()
+
+#------------------------------------------------------------------------------------
+# Enable/disable the Tab3 Secondary distant route selection elements
+#------------------------------------------------------------------------------------
+
+def update_tab3_secondary_distant_signal_routes(signal):
+    # Get the current route selections
+    dist_routes = get_dist_routes(signal)
+    # MAIN Route (sig or sub)
+    if dist_routes[0]: signal.automation.secondary_distant_arms.main.enable()
+    else: signal.automation.secondary_distant_arms.main.disable()
+    # LH1 Route (sig or sub)
+    if dist_routes[1]: signal.automation.secondary_distant_arms.lh1.enable()
+    else: signal.automation.secondary_distant_arms.lh1.disable()
+    # LH2 Route (sig or sub)
+    if dist_routes[2]: signal.automation.secondary_distant_arms.lh2.enable()
+    else: signal.automation.secondary_distant_arms.lh2.disable()
+    # RH1 Route (sig or sub)
+    if dist_routes[3]: signal.automation.secondary_distant_arms.rh1.enable()
+    else: signal.automation.secondary_distant_arms.rh1.disable()
+    # RH2 Route (sig or sub)
+    if dist_routes[4]: signal.automation.secondary_distant_arms.rh2.enable()
+    else: signal.automation.secondary_distant_arms.rh2.disable()
     return()
 
 #------------------------------------------------------------------------------------
@@ -590,12 +789,18 @@ class edit_signal:
         self.tab2 = Frame(self.tabs)
         self.tabs.add(self.tab2, text="Interlocking")
         self.tabs.pack()
+        self.tab3 = Frame(self.tabs)
+        self.tabs.add(self.tab3, text="Automation")
+        self.tabs.pack()
+        # The config tab needs references to all the 'config changed' callback functions
         self.config = configure_signal_tab1.signal_configuration_tab(self.tab1,
                 self.sig_type_updated, self.sub_type_updated, self.route_type_updated,
-                self.route_selections_updated, self.sig_selections_updated,
-                self.sub_selections_updated, self.dist_selections_updated)
-        # This tab needs the parent object so the sig_id can be accessed for validation
+                self.route_selections_updated, self.sig_routes_updated,
+                self.sub_routes_updated, self.dist_routes_updated)
+        # The interlocking tab needs the parent object so the sig_id can be accessed for validation
         self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
+        # The automation tab needs the parent object so the sig_id can be accessed for validation
+        self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
@@ -604,7 +809,7 @@ class edit_signal:
         load_state(self)
         
     def sig_type_updated(self):
-#        print("sig type updated")
+        # The signal type has been changed (colour-light/semaphore/ground-pos-ground-disc)
         self.config.subtype.set_value(1)
         update_tab1_signal_subtype_selections(self)
         update_tab1_signal_aspect_selections(self)
@@ -612,37 +817,71 @@ class edit_signal:
         update_tab1_signal_ui_elements(self)
         update_tab2_available_signal_routes(self)
         update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_general_settings_selections(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
+        update_tab3_secondary_distant_signal_routes(self)
         
     def sub_type_updated(self):
-#        print("sub type updated")
+        # The signal subtype has been changed (choices dependant on signal type)
         update_tab1_signal_aspect_selections(self)
         update_tab1_route_selection_elements(self)
         update_tab1_signal_ui_elements(self)
         update_tab2_available_signal_routes(self)
         update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_general_settings_selections(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
+        update_tab3_secondary_distant_signal_routes(self)
         
     def route_type_updated(self):
-#        print("route type updated")
+        # The route indication type has changed (none/theatre/feather/semaphore-arms)
         update_tab1_route_selection_elements(self)
         update_tab1_signal_ui_elements(self)
-        update_tab2_available_signal_routes(self) 
+        update_tab2_available_signal_routes(self)
+        update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
+        update_tab3_secondary_distant_signal_routes(self)
         
     def route_selections_updated(self):
-#        print("route selections updated")
-        update_tab2_available_signal_routes(self) 
-
-    def sig_selections_updated(self):
-#        print("sig selections updated")
+        # A Theatre route has been enabled/disabled on Tab1
+        # A Feather route has been enabled/disabled on Tab1
+        # A signal route (no route indications) has been enabled/disabled on Tab1
+        # A subsidary route (no route indications) has been enabled/disabled on Tab1
         update_tab2_available_signal_routes(self)
+        update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
 
-    def sub_selections_updated(self):
-#        print("sub selections updated")
+    def sig_routes_updated(self):
+        # A semaphore main signal arm has been enabled/disabled on Tab1
+        # This means any secondary distant arm will also be enabled/disabled)
+        update_tab2_available_signal_routes(self)
+        update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
+        update_tab3_secondary_distant_signal_routes(self)
+        
+    def sub_routes_updated(self):
+        # A semaphore subsidary arm has been enabled/disabled on Tab1
+        # A colour light subsidary has been enabled/disabled on Tab1
         update_tab1_route_selection_elements(self)
         update_tab1_signal_ui_elements(self)
         update_tab2_available_signal_routes(self)
-
-    def dist_selections_updated(self):
-#        print("dist selections updated")
         update_tab2_interlock_ahead_selection(self)
+        update_tab3_track_section_ahead_routes(self)
+        update_tab3_timed_signal_selections(self)
+        update_tab3_approach_control_selections(self)
+
+    def dist_routes_updated(self):
+        # A secondary semaphore distant arm has been enabled/disabled on Tab1
+        update_tab2_interlock_ahead_selection(self)
+        update_tab3_secondary_distant_signal_routes(self)
 
 #############################################################################################
