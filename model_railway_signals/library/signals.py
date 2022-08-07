@@ -666,17 +666,22 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
     else:
-        # call the signal type-specific functions to update the signal
-        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.update_feather_route_indication (sig_id,route)
-            signals_common.update_theatre_route_indication(sig_id,theatre_text)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            signals_semaphores.update_semaphore_route_indication (sig_id,route)
-            signals_common.update_theatre_route_indication(sig_id,theatre_text)
-        # Even if the signal does not support route indications we still allow the route 
-        # element to be set. This is useful for interlocking where a signal without a route
-        # display (e.g. ground signal) can support more than one interlocked routes
-        signals_common.signals[str(sig_id)]["routeset"] = route
+        if route is not None:
+            # call the signal type-specific functions to update the signal
+            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+                signals_colour_lights.update_feather_route_indication (sig_id,route)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_semaphores.update_semaphore_route_indication (sig_id,route)
+            # Even if the signal does not support route indications we still allow the route 
+            # element to be set. This is useful for interlocking where a signal without a route
+            # display (e.g. ground signal) can support more than one interlocked routes
+            signals_common.signals[str(sig_id)]["routeset"] = route
+        if theatre_text is not None:
+            # call the signal type-specific functions to update the signal
+            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+                signals_common.update_theatre_route_indication(sig_id,theatre_text)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_common.update_theatre_route_indication(sig_id,theatre_text)
     return()
 
 # -------------------------------------------------------------------------
@@ -699,8 +704,6 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
-    elif signals_common.signals[str(sig_id)]["override"]:
-        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal is already overriden - not triggering")
     else:
         # call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:

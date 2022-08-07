@@ -303,7 +303,12 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.signals[str(sig_id)]["rh1suboff"]        = rh1suboff              # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rh2subon"]         = rh2subon               # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rh2suboff"]        = rh2suboff              # Type-specific - drawing object
-        
+
+        # Create the timed sequence class instances for the signal (one per route)
+        signals_common.signals[str(sig_id)]["timedsequence"] = []
+        for route in signals_common.route_type:
+            signals_common.signals[str(sig_id)]["timedsequence"].append(timed_sequence(sig_id,route))
+                    
         # if there is an associated signal then we also need to update that signal to refer back to this one
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
 
@@ -538,6 +543,8 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updating_associated_signal:bool=False):
     
     global logging
+
+    route = signals_common.signals[str(sig_id)]["routeset"]
     
     # Get the ID of the associated signal (to make the following code more readable)
     associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
@@ -549,6 +556,9 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN"
+        elif signals_common.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+            new_aspect = signals_common.signal_state_type.CAUTION
+            log_message = " (CAUTION) - signal is on a timed sequence"
         elif associated_signal > 0 and signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.DANGER:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = (" (CAUTION) - signal is OFF but slotted with home signal "+str(associated_signal)+" at DANGER")
@@ -566,6 +576,9 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (DANGER) - signal is OVERRIDDEN"
+        elif signals_common.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+            new_aspect = signals_common.signal_state_type.DANGER
+            log_message = " (DANGER) - signal is on a timed sequence"
         elif signals_common.signals[str(sig_id)]["releaseonred"]:
             new_aspect = signals_common.signal_state_type.DANGER
             log_message = " (DANGER) - signal is subject to \'release on red\' approach control"
@@ -628,66 +641,89 @@ def update_semaphore_route_indication (sig_id,route_to_set = None):
         associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
         if signals_common.signals[str(sig_id)]["subtype"] == semaphore_sub_type.home and associated_signal > 0:
             update_semaphore_route_indication (associated_signal,route_to_set)
+        # Refresh the signal aspect (a catch-all to ensure the signal displays the correct aspect
+        # in case the signal is in the middle of a timed sequence for the old route or the new route
+        if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)
     return()
 
+
 # -------------------------------------------------------------------------
-# Function to 'override' a Semaphore signal (to ON) and then clearing it again
-# after a specified delay - intended for automation of 'exit' signals on a layout
+# Class for a timed signal sequence. A class instance is created for each
+# route for each signal. When a timed signal is triggered the existing
+# instance is first aborted. A new instance is then created/started
+# -------------------------------------------------------------------------
+
+class timed_sequence():
+    def __init__(self, sig_id:int, route, start_delay:int=0, time_delay:int=0):
+        self.sig_id = sig_id
+        self.sig_route = route
+        self.start_delay = start_delay
+        self.time_delay = time_delay
+        self.sequence_abort_flag = False
+        self.sequence_in_progress = False
+
+    def abort(self):
+        self.sequence_abort_flag = True
+            
+    def start(self):
+        global logging
+        if self.sequence_abort_flag:
+            self.sequence_in_progress = False
+        else:
+            self.sequence_in_progress = True
+            # For a start delay of zero we assume the intention is not to make a callback (on the basis
+            # that the user has triggered the timed signal in the first place). For start delays > 0 the 
+            # sequence is initiated after the specified delay and this will trigger a callback
+            # Note that we only change the aspect and generate the callback if the same route is set
+            if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                if self.start_delay > 0:                 
+                    logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
+                    update_semaphore_signal(self.sig_id)
+                    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+                    # mqtt interface has been successfully configured and the signal has been set to publish passed events
+                    signals_common.publish_signal_passed_event(self.sig_id)
+                    signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id,signals_common.sig_callback_type.sig_passed)
+                else:
+                    update_semaphore_signal(self.sig_id)
+            # We need to schedule the sequence completion (i.e. back to clear
+            common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
+
+    def timed_signal_sequence_end(self):
+        global logging
+        # We've finished - Set the signal back to its "normal" condition
+        self.sequence_in_progress = False
+        if not self.sequence_abort_flag:
+            logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+            update_semaphore_signal(self.sig_id)
+            signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
+
+# -------------------------------------------------------------------------
+# Function to initiate a timed signal sequence - setting the signal initially to ON
+# and then returning to OFF (assuming the signal is clear and nor overridden) after
+# the specified time delay. Intended for automation of 'exit' signals on a layout.
 # The start_delay is the initial delay (in seconds) before the signal is set to ON
-# The time_delay is the delay (in seconds) before the signal is Cleared
-# A 'sig_passed' callback event will be generated when the signal is overriden if
-# and only if a start delay (> 0) is specified. When the override is cleared then
-# a'sig_updated' callback event will be generated
+# and the time_delay is the delay before the signal returns to OFF. A 'sig_passed'
+# callback event will be generated when the signal is set to ON if if a start delay
+# is specified. When returning to OFF, a 'sig_updated' callback event will be generated.
 # -------------------------------------------------------------------------
 
 def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    
-    def timed_signal_sequence_start(start_delay, time_delay):
-        global logging
-        
-        # Override the signal (to display its overridden aspect
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        
-        # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
-        # to the external code (on the basis that it would have been the external code  that triggered the timed
-        # signal in the first place. For this particular case, we override the signal before starting the sequence
-        # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
-        # delay and this will trigger a callback to be handled by the external code)
-        if start_delay > 0:
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-            update_semaphore_signal(sig_id)
-            # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
-            # mqtt interface has been successfully configured and the signal has been set to publish passed events
-            signals_common.publish_signal_passed_event(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        else:
-            update_semaphore_signal(sig_id)
-
-        # We need to schedule the sequence completion (i.e. back to clear
-        common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
-        return()
-
-    def timed_signal_sequence_end():
-        global logging
-        # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
-        signals_common.signals[str(sig_id)]["override"] = False
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
-        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        update_semaphore_signal(sig_id)
-        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-        return()
-
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
     else:
+        # Abort any timed signal sequences already in progess
+        route = signals_common.signals[str(sig_id)]["routeset"]
+        signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
+        # Create a new instnce of the time signal class - this should have the effect of "destroying"
+        # the old instance when it goes out of scope, leaving us with the newly created instance
+        signals_common.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
         # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
         # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
         if start_delay > 0:
-            common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+            common.root_window.after(start_delay*1000,lambda:signals_common.signals[str(sig_id)]["timedsequence"][route.value].start())
         else:
-            timed_signal_sequence_start(start_delay, time_delay)
+            signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
     return()
 
 ###############################################################################
