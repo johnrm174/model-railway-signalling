@@ -395,13 +395,15 @@ def update_tab1_signal_aspect_selections(signal):
         signal.config.aspects.fylw.disable_addresses()
         signal.config.aspects.fdylw.disable_addresses()
     else:
+        # Signal is a semaphore or ground disc - disable the entire UI element as this
+        # will be hidden and the semaphore signals arm UI element will be displayed
         signal.config.aspects.disable_aspects()
-    # Enable/Disable the Colour Light subsidary selection
+    # Enable/Disable the Colour Light subsidary selection (disabled for 2 aspect GRN/YLW)
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-         signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value ):
-        signal.config.aspects.enable_subsidary()
-    else:
+         signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value ):
         signal.config.aspects.disable_subsidary()
+    else:
+        signal.config.aspects.enable_subsidary()
     return()
 
 #------------------------------------------------------------------------------------
@@ -410,28 +412,30 @@ def update_tab1_signal_aspect_selections(signal):
 
 def update_tab1_route_selection_elements(signal):
     if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
-        # If Route Arms are selected change to Feathers and disable all route arm indications
-        if signal.config.routetype.get_value() == 4: signal.config.routetype.set_value(2)
+        # Disable the Semaphore-specific route selections (this UI element will be hidden)
+        signal.config.semaphores.disable_main_route()
         signal.config.semaphores.disable_diverging_routes()
-        signal.config.semaphores.disable_subsidaries()
-        signal.config.semaphores.disable_distants()
-        signal.config.semaphores.disable_signal()
-        # Enable the available route type selections for colour light signals
+        # Enable the available route type selections depending on the type of colour light signal
         if signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value:
-            # 2 aspect distant colour light signals do not support route indications
+            # 2 aspect distant signals do not support route indications so set the route indications
+            # to 'None' and disable all associated route selections (these UI elements will be hidden)
             signal.config.routetype.set_value(1)
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="disabled")
             signal.config.routetype.B4.configure(state="disabled")
+            # Disable all route selections (main signal and subsidary)
             signal.config.feathers.disable_selection()
             signal.config.theatre.disable_selection()
             signal.config.sub_routes.disable_selection()
             signal.config.sig_routes.disable_selection()
         else:
-            # Available selections are None, Feathers, theatre (not route Arms)
+            # If 'Route Arms' are selected (semaphore only) then change to 'Feathers'
+            if signal.config.routetype.get_value() == 4: signal.config.routetype.set_value(2)
+            # Non-distant signals can support 'None', 'Feathers' or 'Theatre' route indications
             signal.config.routetype.B2.configure(state="normal")
             signal.config.routetype.B3.configure(state="normal")
             signal.config.routetype.B4.configure(state="disabled")
+            # Enable/disable the appropriate UI elements based on the selected indication type
             if signal.config.routetype.get_value() == 1:
                 signal.config.feathers.disable_selection()
                 signal.config.theatre.disable_selection()
@@ -449,37 +453,40 @@ def update_tab1_route_selection_elements(signal):
             else: signal.config.sub_routes.disable_selection()
         
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        # If Feathers are selected change this to Route Arms and disable feather indications 
+        # If Feathers are selected (Colour light signals only) then change to Route Arms 
         if signal.config.routetype.get_value() == 2: signal.config.routetype.set_value(4)
+        # Disable the Colour-light-specific 'feathers' selection (this UI element will be hidden)
         signal.config.feathers.disable_selection()
-        signal.config.semaphores.enable_signal()
-        # Enable the available route type selections for Semaphore signals
+        # Enable the main route selections for the semaphore signal (main, subsidary, dist arms)
+        # Note that the distant and subsidary selections will be disabled for distant signals
+        signal.config.semaphores.enable_main_route()
+        # Enable the diverging route selections depending on the type of Semaphore signal
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
-            # Available selections are None and Route Arms (not distants, subsidaries or theatre)
+            # Distant signals only support 'Route Arms' or 'None' so disable all other selections
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="disabled")
             signal.config.routetype.B4.configure(state="normal")
-            signal.config.sub_routes.disable_selection()
-            signal.config.theatre.disable_selection()
+            # Enable/disable the appropriate UI elements based on the selected indication type
             if signal.config.routetype.get_value() == 1:
-                signal.config.sig_routes.enable_selection()
                 signal.config.semaphores.disable_diverging_routes()
-                signal.config.semaphores.disable_subsidaries()
-                signal.config.semaphores.disable_distants()
             elif signal.config.routetype.get_value() == 4:
-                signal.config.sig_routes.disable_selection()
                 signal.config.semaphores.enable_diverging_routes()
-                signal.config.semaphores.disable_subsidaries()
-                signal.config.semaphores.disable_distants()
+            # Disable all selections for subsidaries, secondary distants and theatre indicators
+            # Also disable the generic 'sig_routes' (only one signal in front of the distant)
+            signal.config.theatre.disable_selection()
+            signal.config.semaphores.disable_subsidaries()
+            signal.config.semaphores.disable_distants()
+            signal.config.sig_routes.disable_selection()
+            signal.config.sub_routes.disable_selection()
         else:
-            # If Feathers are selected then change selection to Route Arms
-            if signal.config.routetype.get_value() == 2: signal.config.routetype.set_value(4)
-            # Available selections are None, Route Arms, theatre (not Feathers)
+            # Home signals can support 'None', 'Route Arms', or 'Theatre'
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="normal")
             signal.config.routetype.B4.configure(state="normal")
+            # Home signals can support subsidaries and secondary distant arms
             signal.config.semaphores.enable_subsidaries()
             signal.config.semaphores.enable_distants()
+            # Enable/disable the appropriate UI elements based on the selected indication type
             if signal.config.routetype.get_value() == 1:
                 signal.config.semaphores.disable_diverging_routes()
                 signal.config.sig_routes.enable_selection()
@@ -492,7 +499,6 @@ def update_tab1_route_selection_elements(signal):
                 signal.config.semaphores.disable_diverging_routes()
                 signal.config.theatre.enable_selection()
                 signal.config.sig_routes.disable_selection()
-                signal.config.sub_routes.disable_selection()
                 # If the MAIN subsidary is selected then enable the subsidary route selections
                 # i.e. we still allow the single subsidary arm to control multiple routes
                 if has_subsidary(signal): signal.config.sub_routes.enable_selection()
@@ -500,7 +506,6 @@ def update_tab1_route_selection_elements(signal):
             elif signal.config.routetype.get_value() == 4:
                 signal.config.semaphores.enable_diverging_routes()
                 signal.config.theatre.disable_selection()
-                signal.config.feathers.disable_selection()
                 signal.config.sig_routes.disable_selection()
                 signal.config.sub_routes.disable_selection()
 
@@ -510,16 +515,16 @@ def update_tab1_route_selection_elements(signal):
         signal.config.routetype.B2.configure(state="disabled")
         signal.config.routetype.B3.configure(state="disabled")
         signal.config.routetype.B4.configure(state="disabled")
+        # Only the main signal arm is supported but this can support multiple routes
+        signal.config.semaphores.enable_main_route()
+        signal.config.sig_routes.enable_selection()
+        # All other subsidary, secondary distant and route selections are sisabled
         signal.config.semaphores.disable_diverging_routes()
         signal.config.semaphores.disable_subsidaries()
         signal.config.semaphores.disable_distants()
         signal.config.feathers.disable_selection()
         signal.config.theatre.disable_selection()
         signal.config.sub_routes.disable_selection()
-        # Only the main signal arm is supported for ground discs
-        signal.config.semaphores.enable_signal()
-        # A ground signal can also support multiple routes
-        signal.config.sig_routes.enable_selection()
 
     elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
         # No route indications supported for ground signals
@@ -527,15 +532,16 @@ def update_tab1_route_selection_elements(signal):
         signal.config.routetype.B2.configure(state="disabled")
         signal.config.routetype.B3.configure(state="disabled")
         signal.config.routetype.B4.configure(state="disabled")
+        # A ground signal can also support multiple routes
+        signal.config.sig_routes.enable_selection()
+        # All other subsidary, secondary distant and route selections are sisabled
+        signal.config.semaphores.disable_diverging_routes()
+        signal.config.semaphores.disable_main_route()
         signal.config.semaphores.disable_subsidaries()
         signal.config.semaphores.disable_distants()
-        signal.config.semaphores.disable_diverging_routes()
-        signal.config.semaphores.disable_signal()
         signal.config.feathers.disable_selection()
         signal.config.theatre.disable_selection()
         signal.config.sub_routes.disable_selection()
-        # A ground signal can also support multiple routes
-        signal.config.sig_routes.enable_selection()
         
     return()
 
@@ -551,28 +557,25 @@ def update_tab2_available_signal_routes(signal):
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
-    # LH1 Route (sig or sub)
+    # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.enable_route()
     else:
         signal.locking.interlocking.lh1.disable_route()
         signal.locking.conflicting_sigs.lh1.disable_route()
-    # LH2 Route (sig or sub)
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.enable_route()
     else:
         signal.locking.interlocking.lh2.disable_route()
         signal.locking.conflicting_sigs.lh2.disable_route()
-    # RH1 Route (sig or sub)
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.enable_route()
     else: 
         signal.locking.interlocking.rh1.disable_route()
         signal.locking.conflicting_sigs.rh1.disable_route()
-    # RH2 Route (sig or sub)
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.enable_route()
@@ -580,6 +583,9 @@ def update_tab2_available_signal_routes(signal):
         signal.locking.interlocking.rh2.disable_route()
         signal.locking.conflicting_sigs.rh2.disable_route()
     # Enable/disable the signal / block instrument ahead selections on signal type
+    # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
+    # Block Ahead selection is only enabled for Semaphore or Colour Light Home signals
+    # both are disabled for Ground Position and Ground disc signal types
     if signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         signal.locking.interlocking.enable_sig_ahead()
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:

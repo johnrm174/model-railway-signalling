@@ -72,9 +72,6 @@ class point_interlocking_entry():
 
 class interlocking_route_group: 
     def __init__(self, parent_frame, parent_object, label:str):
-        self.sig_ahead_enabled = True
-        self.block_ahead_enabled = True
-        self.route_enabled = True
         # These are the functions used to validate that the entered IDs exist
         # on the schematic (and the sig ID is different to the current sig ID)
         instrument_exists_function = objects.instrument_exists
@@ -119,20 +116,16 @@ class interlocking_route_group:
         return(valid)
     
     def enable_sig_ahead(self):
-        if self.sig_route_enabled: self.sig.enable()
-        self.sig_ahead_enabled = True
+        self.sig.enable1()
     
     def disable_sig_ahead(self):
-        self.sig.disable()
-        self.sig_ahead_enabled = False
+        self.sig.disable1()
         
     def enable_block_ahead(self):
-        if self.sig_route_enabled: self.block.enable()
-        self.block_ahead_enabled = True
+        self.block.enable1()
     
     def disable_block_ahead(self):
-        self.block.disable()
-        self.block_ahead_enabled = False
+        self.block.disable1()
     
     def enable_route(self):
         self.p1.enable()
@@ -141,9 +134,8 @@ class interlocking_route_group:
         self.p4.enable()
         self.p5.enable()
         self.p6.enable()
-        if self.sig_ahead_enabled: self.sig.enable()
-        if self.block_ahead_enabled: self.block.enable()
-        self.sig_route_enabled = True
+        self.sig.enable()
+        self.block.enable()
 
     def disable_route(self):
         self.p1.disable()
@@ -154,7 +146,6 @@ class interlocking_route_group:
         self.p6.disable()
         self.sig.disable()
         self.block.disable()
-        self.sig_route_enabled = False
 
     def set_route(self, interlocking_route:[[int,bool],str,int]):
         # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
