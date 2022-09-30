@@ -440,7 +440,7 @@ class colour_light_aspects():
         # Create a subframe to hold the subsidary signal entry box (always packed)
         self.subframe = Frame(self.frame)
         self.subframe.pack()
-        self.CB = common.check_box(self.subframe, label="Subsidary signal",   
+        self.CB = common.check_box(self.subframe, label="Subsidary signal aspect",   
                     tool_tip="Select for a subsidary signal",callback=self.sub_updated)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.EB = common.dcc_entry_box(self.subframe)

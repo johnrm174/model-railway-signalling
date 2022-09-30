@@ -81,7 +81,7 @@ class section_behind_element(common.int_item_id_entry_box):
     def __init__(self, parent_frame):
         self.frame = Frame(parent_frame)
         self.frame.pack()
-        tool_tip = "Sepecify the track section to be cleared when the signal is passed"
+        tool_tip = "Sepecify the track section before the signal (to be cleared when the signal is passed)"
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=LEFT)
         self.label = Label(self.frame, text=" ==>")
@@ -93,8 +93,8 @@ class section_ahead_element(common.int_item_id_entry_box):
         self.frame.pack()
         self.label1 = Label(self.frame, text=label, width=10)
         self.label1.pack(side=LEFT)
-        tool_tip = ("Specify the track section to be occupied for "+
-                            "this route when the signal is passed")
+        tool_tip = ("Specify the track section on the route after the signal "+
+                             "(to be occupied when the signal is passed)")
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=LEFT)
         self.label2 = Label(self.frame, width=1)
@@ -170,7 +170,7 @@ class general_settings_frame():
         self.frame = LabelFrame(parent_frame, text="General settings")        
         self.override = common.check_box(self.frame, width=22,
                     label="  Override signal to ON if\n  section ahead occupied",
-                    tool_tip="Select to override the signal state to ON if "+
+                    tool_tip="Select to override the signal to ON if "+
                     "the track section ahead of the signal is occupied",
                     callback=self.update_override_selections)
         self.override.pack(padx=2, pady=2)
@@ -221,58 +221,145 @@ class general_settings_frame():
                  self.fully_auto.get_value() )
 
 #------------------------------------------------------------------------------------
-# Class for the Timed Signal automation subframe - builds on common.route_selection class
-# Public Class instance methods (inherited from the base class) are:
-#    "set_values" - Sets the EB/CB value and all route selection CBs 
-#    "get_values" - Gets the EB/CB value and all route selection CBs
-#    "update_route_selections"- to "refresh" the UI element following route changes
-# Individual routes are enabled/disabled by calling the sub-class methods:
-#    "<route>.disable" - disables/blanks the entry box 
-#    "<route>.enable"  enables/loads the entry box
+# Class for a Timed signal route element comprising a route selection checkbox, a
+# signal ID entry box and two integer entry boxes for specifying the timed sequence
+# Public class instance methods provided by this class are 
+#    "disable" - disables/blanks all checkboxes and selection boxes 
+#    "enable"  enables/loads all checkboxes and selection boxes
+#    "set_values" - set the initial values for the check box and entry boxes) 
+#    "get_values" - get the last "validated" values of the check box and entry boxes
 #------------------------------------------------------------------------------------
 
-class timed_signal_frame(common.route_selections):
-    def __init__(self, parent_frame):
-        self.frame = LabelFrame(parent_frame, text="Timed signal sequence")
-        self.subframe = Frame(self.frame)
-        self.subframe.pack()
-        self.label1 = Label(self.subframe, text="Routes:")
-        self.label1.pack(padx=2, pady=2, side=LEFT)
-        tool_tip = "Select the signal routes to trigger the timed sequence"
-        super().__init__(self.subframe, tool_tip, callback=self.update_route_selections)
-        self.label2 = Label(self.subframe, text="  Delay:")
-        self.label2.pack(padx=2, pady=2, side=LEFT)
-        self.time_delay = common.integer_entry_box(self.subframe, width=3, min_value=1,
-                max_value=30, tool_tip="Specify the time delay between aspect changes in "+
-                " seconds (0-30)", allow_empty=False)
-        self.time_delay.pack(padx=2, pady=2, side=LEFT)
-        self.clear_override = common.check_box(self.subframe, width=20,
-                    label=" Clear section ahead",
-                    tool_tip="Select to clear the section ahead when the "+
-                    "signal is cleared during the timed sequence")
-        self.clear_override.pack(padx=2, pady=2)
+class timed_signal_route_element():
+    def __init__(self, parent_frame, label:str, ):
+        # Create a frame for the route element
+        self.frame = Frame(parent_frame)
+        self.frame.pack()
+        # Create the route element (selection, sig ID, start delay, aspect change delay)
+        self.label1 = Label(self.frame, width=5, text=label, anchor='w')
+        self.label1.pack(side=LEFT)
+        self.route = common.check_box(self.frame, label="", callback=self.route_selected,
+                tool_tip="Select to trigger a timed signal sequence when the signal is passed (for this route)")
+        self.route.pack(side=LEFT)
+        self.label2 = Label(self.frame, text="  Signal to trigger:")
+        self.label2.pack(side=LEFT)
+        self.sig = common.int_item_id_entry_box(self.frame, callback=self.signal_selected,
+                exists_function=objects.signal_exists, tool_tip="Enter the ID of the signal to "+
+                   "trigger. This can be the current signal or another semaphore / colour light "+
+                            "signal (on the route ahead of the current signal)")
+        self.sig.pack(side=LEFT)
+        self.label3 = Label(self.frame, text="  Start delay:")
+        self.label3.pack(side=LEFT)
+        self.start = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
+                            allow_empty=False, tool_tip="Specify the time delay (in seconds) "+
+                            "before triggering the signal (set to zero for triggering the current signal)")
+        self.start.pack(side=LEFT)
+        self.label4 = Label(self.frame, text="  Time delay:")
+        self.label4.pack(side=LEFT)
+        self.delay = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
+                            allow_empty=False, tool_tip="Specify the time period (in seconds) "+
+                                                        "between signal aspect changes")
+        self.delay.pack(side=LEFT)
 
-    def update_route_selections(self):
-        routes = super().get_values()
-        if routes[0] or routes[1] or routes[2] or routes[3] or routes[4]:
-            self.time_delay.enable()
-            self.clear_override.enable()
+    def route_selected(self):
+        if self.route.get_value(): self.sig.enable1()
+        else: self.sig.disable1()
+        self.signal_selected()
+            
+    def signal_selected(self):
+        if self.sig.get_value() != 0:
+            self.start.enable1()
+            self.delay.enable1()
         else:
-            self.time_delay.disable()
-            self.clear_override.disable()        
+            self.start.disable1()
+            self.delay.disable1()
+    
+    def enable(self):
+        self.route.enable()
+        self.sig.enable()
+        self.start.enable()
+        self.delay.enable()
 
-    def set_values(self, timed_sig_config):
-        # timed_signal_config is a list comprising [routes, delay, clear_section]
-        # where routes is a list comprising [MAIN, LH1, LH2, RH1, RH2]
-        super().set_values(timed_sig_config[0])
-        self.time_delay.set_value(timed_sig_config[1])
-        self.clear_override.set_value(timed_sig_config[2])
-        self.update_route_selections()
+    def disable(self):
+        self.route.disable()
+        self.sig.disable()
+        self.start.disable()
+        self.delay.disable()
+
+    def set_values(self, route:[bool,int,int,int]):
+        # A route comprises a list of [selected, sig_id,start_delay, time_delay)
+        self.route.set_value(route[0])
+        self.sig.set_value(route[1])
+        self.start.set_value(route[2])
+        self.delay.set_value(route[3])
+        self.route_selected()
+        
+    def get_values(self):
+        # A route comprises a list of [selected, sig_id,start_delay, time_delay)
+        return ( [ self.route.get_value(),
+                   self.sig.get_value(),
+                   self.start.get_value(),
+                   self.delay.get_value() ] )
+
+    def validate(self):
+        # Validate the sig_id, start delay and time delay
+        return ( self.sig.validate() and
+                 self.start.validate() and
+                 self.delay.validate() )
+
+#------------------------------------------------------------------------------------
+# Class for a Timed signal route frame (comprising selections for each route)
+# Public class instance methods provided by this class are: 
+#    "set_values" - set the initial values for the check box and entry boxes) 
+#    "get_values" - get the last "validated" values of the check box and entry boxes
+#    "validate" - validate all signal IDs and entered timed sequence parameters
+# Note that no overall enable/disable functions are provided - External functions 
+# should call the individaua enable/disable functions for each route element
+#------------------------------------------------------------------------------------
+
+class timed_signal_frame():
+    def __init__(self, parent_frame):
+        # Create a label frame for the UI element
+        self.frame = LabelFrame(parent_frame, text="Trigger timed signal sequence")
+        # Create a subframe for the context label
+        self.subframe1 = Frame(self.frame)
+        self.subframe1.pack(side=LEFT, padx=2, pady=2, fill='both')        
+        self.label = Label(self.frame, text="Routes to\ntrigger", anchor='w')
+        self.label.pack(side=LEFT)
+        # Create a subframe for the route elements
+        self.subframe2 = Frame(self.frame)
+        self.subframe2.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)        
+        self.main=timed_signal_route_element(self.subframe2, label="MAIN")
+        self.lh1=timed_signal_route_element(self.subframe2, label="LH1")
+        self.lh2=timed_signal_route_element(self.subframe2, label="LH2")
+        self.rh1=timed_signal_route_element(self.subframe2, label="RH1")
+        self.rh2=timed_signal_route_element(self.subframe2, label="RH2")
+        
+    def set_values(self, timed_sequence:[[bool,int,int,int],]):
+        # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+        self.main.set_values(timed_sequence[0])
+        self.lh1.set_values(timed_sequence[1])
+        self.lh2.set_values(timed_sequence[2])
+        self.rh1.set_values(timed_sequence[3])
+        self.rh2.set_values(timed_sequence[4])
 
     def get_values(self):
-        return ( [ super().get_values(), 
-                   self.time_delay.get_value(),
-                   self.clear_override.get_value() ] )
+        # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+        return ( [ self.main.get_values(),
+                   self.lh1.get_values(),
+                   self.lh2.get_values(),
+                   self.rh1.get_values(),
+                   self.rh2.get_values() ] )
+
+    def validate(self):
+        # Validate the sig_id, start delay and time delay for all routes
+        return ( self.main.validate() and
+                 self.lh1.validate() and
+                 self.lh2.validate() and
+                 self.rh1.validate() and
+                 self.rh2.validate() )
         
 #------------------------------------------------------------------------------------
 # Class for the Approach Control UI Element - builds on common.route_selection class

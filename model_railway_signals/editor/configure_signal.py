@@ -39,7 +39,8 @@ def has_distant(signal):
                signal.config.semaphores.rh2.dist.get_element()[0] ) )
 
 #------------------------------------------------------------------------------------
-# Helper functions to return a list of the selected signal and subsidary routes
+# Helper functions to return a list of the selected signal, distant and subsidary
+# routes epending on the route indication type that has been selected
 #------------------------------------------------------------------------------------
 
 def get_sig_routes(signal):
@@ -99,6 +100,7 @@ def get_sub_routes(signal):
 
 def get_dist_routes(signal):
     # Get the route selections from the appropriate UI element
+    # Note this is only applicable to semaphore signals
     semaphore_routes = signal.config.semaphores.get_arms()
     if signal.config.routetype.get_value() == 1 and semaphore_routes[0][2][0]:
         # MAIN route is always enabled (and greyed out)
@@ -159,6 +161,8 @@ def load_state(signal):
     signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
     signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
     signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
+    # These elements are for the Automation tab
+    signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
     
     ##########################################################################################
     ################################ TODO - Automation UI elements ###########################
@@ -213,7 +217,7 @@ def save_state(signal, close_window):
     elif ( signal.config.sigid.validate() and signal.config.aspects.validate() and
            signal.config.theatre.validate() and signal.config.feathers.validate() and
            signal.config.semaphores.validate() and signal.locking.interlocking.validate() and
-           signal.locking.conflicting_sigs.validate() ):
+           signal.locking.conflicting_sigs.validate() and signal.automation.timed_signal.validate() ):
         
         ##########################################################################################
         ####################### TODO - Validation of Automation UI elements ######################
@@ -248,6 +252,8 @@ def save_state(signal, close_window):
         objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
         objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
         objects.schematic_objects[object_id]["interlockahead"] = signal.locking.interlock_ahead.get_value()
+        # These elements are for the Automation tab
+        objects.schematic_objects[object_id]["timedsequences"] = signal.automation.timed_signal.get_values()
         
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
@@ -400,10 +406,10 @@ def update_tab1_signal_aspect_selections(signal):
         signal.config.aspects.disable_aspects()
     # Enable/Disable the Colour Light subsidary selection (disabled for 2 aspect GRN/YLW)
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-         signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value ):
-        signal.config.aspects.disable_subsidary()
-    else:
+         signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value ):
         signal.config.aspects.enable_subsidary()
+    else:
+        signal.config.aspects.disable_subsidary()
     return()
 
 #------------------------------------------------------------------------------------
@@ -551,6 +557,12 @@ def update_tab1_route_selection_elements(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab2_available_signal_routes(signal):
+    # Hide (pack.forget) all the Conflicting signal elements for diverging routes
+    # The ones that need to be enabled get re-packed (in the right order) below
+    signal.locking.conflicting_sigs.lh1.frame.pack_forget()
+    signal.locking.conflicting_sigs.lh2.frame.pack_forget()
+    signal.locking.conflicting_sigs.rh1.frame.pack_forget()
+    signal.locking.conflicting_sigs.rh2.frame.pack_forget()
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
@@ -561,24 +573,28 @@ def update_tab2_available_signal_routes(signal):
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.enable_route()
+        signal.locking.conflicting_sigs.lh1.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh1.disable_route()
         signal.locking.conflicting_sigs.lh1.disable_route()
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.enable_route()
+        signal.locking.conflicting_sigs.lh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh2.disable_route()
         signal.locking.conflicting_sigs.lh2.disable_route()
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.enable_route()
+        signal.locking.conflicting_sigs.rh1.frame.pack(padx=2, pady=2, fill='x')
     else: 
         signal.locking.interlocking.rh1.disable_route()
         signal.locking.conflicting_sigs.rh1.disable_route()
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.enable_route()
+        signal.locking.conflicting_sigs.rh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.rh2.disable_route()
         signal.locking.conflicting_sigs.rh2.disable_route()
@@ -682,13 +698,12 @@ def update_tab3_track_section_ahead_routes(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab3_timed_signal_selections(signal):
+    pass
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
-    # work out if the signal supports timed signal sequences
-    timed_signal = (
-           signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value or
-           signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value )
-    # MAIN Route (sig or sub)
+    # Enable/disable the UI element depending on whether the signal supports timed signal sequences
+    timed_signal = (signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value or
+                    signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value )
     if timed_signal: signal.automation.timed_signal.main.enable()
     else: signal.automation.timed_signal.main.disable()
     # LH1 Route (sig or sub)
@@ -703,8 +718,6 @@ def update_tab3_timed_signal_selections(signal):
     # RH2 Route (sig or sub)
     if sig_routes[4] and timed_signal: signal.automation.timed_signal.rh2.enable()
     else: signal.automation.timed_signal.rh2.disable()
-    # Refresh (enable/disable the other selection elements)
-    signal.automation.timed_signal.update_route_selections()
     return()
 
 #------------------------------------------------------------------------------------
@@ -838,7 +851,6 @@ class edit_signal:
         update_tab2_interlock_ahead_selection(self)
         update_tab3_track_section_ahead_routes(self)
         update_tab3_general_settings_selections(self)
-        update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
         update_tab3_secondary_distant_signal_routes(self)
         

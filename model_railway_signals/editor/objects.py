@@ -2,44 +2,54 @@
 # This module contains all the functions for managing layout objects
 #
 # External API functions intended for use by other editor modules:
+#
 #    set_canvas(canvas) called on start up to set a local canvas object reference
+#
 #    signal(item_id) - helper function to find the object Id by Item ID
 #    point(item_id) - helper function to find the object Id by Item ID
 #    section(Id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id) - helper function to find the object Id by Item ID
+#
 #    signal_exists (item_id) - helper function to find if an item of the specified ID exists
 #    point_exists (item_id) - helper function to find if an item of the specified ID exists
 #    section_exists (item_id) - helper function to find if an item of the specified ID exists
 #    instrument_exists (item_id) - helper function to find if an item of the specified ID exists
+#
 #    delete_line_object(object_id) - Delete the drawing object prior to redrawing (update)
 #    delete_signal_object(object_id) - Delete the drawing object prior to redrawing (rotate/update)
 #    delete_point_object(object_id) - Delete the drawing object prior to redrawing (rotate/update)
 #    delete_section_object(object_id) - Delete the drawing object prior to redrawing (update)
 #    delete_instrument_object(object_id) - Delete the drawing object prior to redrawing (update)
+#
 #    redraw_line_object(object_id) - Redraw the object on the canvas following a delete (rotate/update)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following a delete (rotate/update)
 #    redraw_point(object_id) - Redraw the object on the canvas following a delete (rotate/update)
 #    redraw_section(object_id) - Redraw the object on the canvas following a delete (rotate/update)
 #    redraw_instrument(object_id) - Redraw the object on the canvas following a delete (rotate/update)
+#
 #    create_default_line() - Create a default object on the schematic
 #    create_default_signal(type,subtype) - Create a default object on the schematic
 #    create_default_point(type) - Create a default object on the schematic
 #    create_default_section() - Create a default object on the schematic
 #    create_default_instrument() - Create a default object on the schematic
+#
 #    delete_line(object_id) - Hard Delete an object when deleted from the schematic
 #    delete_signal(object_id) - Hard Delete an object when deleted from the schematic
 #    delete_point(object_id) - Hard Delete an object when deleted from the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
+#
 #    copy_line(object_id) - Copy an existing object to create a new one
 #    copy_signal(object_id) - Copy an existing object to create a new one
 #    copy_point(object_id) - Copy an existing object to create a new one
 #    copy_section(object_id) - Copy an existing object to create a new one
 #    copy_instrument(object_id) - Copy an existing object to create a new one
+#
 #    set_all(new_objects) - Takes in the loaded dict of objects (following a load)
 #    get_all() - returns the current dict of objects (for saving to file)
 #
 # Objects intended to be accessed directly by other editor modules:
+#
 #    object_type - Enumeration type for the supported objects
 #    schematic_objects - For accessing/editing the configuration of an object
 #    signal_index - for iterating through all the signal objects
@@ -48,12 +58,15 @@
 #    section_index - for iterating through all the section objects
 #
 # Makes the following external API calls to other editor modules:
+#
 #    settings.get_canvas() - To get the canvas parameters when creating objects 
 #    
 # Accesses the following external editor objects directly:
+#
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #
 # Accesses the following external library objects directly:
+#
 #    points.point_type - for setting the enum value when creating the object
 #    signals_common.sig_type - for setting the enum value when creating the object
 #    signals_colour_lights.signal_sub_type - for setting the enum value when creating the object
@@ -62,31 +75,38 @@
 #    signals_ground_disc.ground_disc_sub_type - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
+#
 #    points.delete_point(id) - delete library object when deleted / prior to redrawing
 #    points.create_point(id) - create library object when deleted / prior to redrawing
 #    points.get_boundary_box(id) - get the boundary box for the point (i.e. selection area)
 #    points.point_switched(id) - test if a point is switched (when updating dependent objects)
 #    points.toggle_point_state(id) - internal func to toggle point (when updating dependent objects)
+#
 #    signals.delete_signal(id) - delete library object when deleted / prior to redrawing
 #    signals.get_boundary_box(id) - get the boundary box for the point (i.e. selection area)
-#    signals.update_signal(id) - To set the initial colourr light signal aspect following creation
+#    signals.update_signal(id) - To set the initial colour light signal aspect following creation
 #    signals.set_route(id,route) - To set the initial route for a signal following creation
 #    signals_colour_lights.create_colour_light_signal - To create the library object (create or redraw)
 #    signals_semaphores.create_semaphore_signal - To create the library object (create or redraw)
 #    signals_ground_position.create_ground_position_signal - To create the library object (create or redraw)
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
+#
 #    block_instruments.create_block_instrument - To create the library object (create or redraw)
 #    block_instruments.get_boundary_box - get the boundary box for the point (i.e. selection area)
+#
 #    track_sections.create_section - To create the library object (create or redraw)
 #    track_sections.get_boundary_box - get the boundary box for the point (i.e. selection area)
 #    track_sections.bind_selection_events - re-bind the selection events to the new drawing objects (following re-draw)
+#
 #    dcc_control.delete_signal_mapping - delete library object when deleted / prior to recreating
 #    dcc_control.delete_point_mapping - delete library object when deleted / prior to recreating
 #    dcc_control.map_dcc_signal - to create the new DCC mapping (creation or updating)
 #    dcc_control.map_semaphore_signal - to create the new DCC mapping (creation or updating)
 #    dcc_control.map_dcc_point - to create the new DCC mapping (creation or updating)
+#
 #    track_sensors.delete_sensor_mapping - delete library object when deleted / prior to recreating
 #    track_sensors.create_track_sensor - To create the library object (create or redraw)
+#
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -183,11 +203,9 @@ default_signal_object["itemid"] = 0
 default_signal_object["itemtype"] = None
 default_signal_object["itemsubtype"] = None
 default_signal_object["orientation"] = 0 
-default_signal_object["passedsensor"] = [True,0]     # [button, gpio_port]
-default_signal_object["approachsensor"] = [False,0]  # [button, gpio_port]
-default_signal_object["subsidary"] = [False,0]       # [has_subsidary, dcc_address]
+default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
-default_signal_object["feathers"] = [False,False,False,False,False]
+default_signal_object["feathers"] = [False,False,False,False,False]  # [MAIN,LH1,LH2,RH1,RH2]
 default_signal_object["dccautoinhibit"] = False
 default_signal_object["fullyautomatic"] = False
 default_signal_object["distautomatic"] = False
@@ -276,6 +294,16 @@ default_signal_object["pointinterlock"] = default_signal_point_interlocking_tabl
 default_signal_object["siginterlock"] = default_signal_signal_interlocking_table
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [True,False,False,False,False]
+# Set the default  automation tables for the signal
+default_signal_object["passedsensor"] = [True,0]     # [button, gpio_port]
+default_signal_object["approachsensor"] = [False,0]  # [button, gpio_port]
+# A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+# Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
+                                            [False, 0, 0, 0],
+                                            [False, 0, 0, 0],
+                                            [False, 0, 0, 0],
+                                            [False, 0, 0, 0] ]
 
 #------------------------------------------------------------------------------------
 # Default Point Objects (i.e. state at creation)

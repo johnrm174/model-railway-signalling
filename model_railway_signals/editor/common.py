@@ -389,10 +389,16 @@ class integer_entry_box(entry_box):
                 
     def validate(self, update_validation_status=True):
         valid = False
-        if self.entry.get() == "":
-            # If empty and not allowed then we just reload the last valid value
-            if not self.empty_allowed: self.entry.set(self.value)
-            valid = True
+        if self.entry.get() == "" or self.entry.get() == "#":
+            # The EB value can be blank if the entry box is inhibited (get_value will return zero)
+            if self.empty_allowed or not (self.enabled0 and self.enabled1 and self.enabled2):
+                valid = True
+            else:
+                # If empty is not allowed we need to put a character into the entry box
+                # to give a visual indication that there is an error on the form
+                self.entry.set("#")
+                self.TT.text = ("Must specify a value between "+
+                        str(self.min_value)+ " and "+str(self.max_value) )            
         else:
             try:
                 value = int(self.entry.get())
@@ -408,11 +414,11 @@ class integer_entry_box(entry_box):
         return(valid)
     
     def set_value(self, value:int):
-        if value == 0: super().set_value("")
+        if value == 0 and self.empty_allowed: super().set_value("")
         else: super().set_value(str(value))
 
     def get_value(self):
-        if super().get_value() == "": return(0)
+        if super().get_value() == "" or super().get_value() == "#": return(0)
         else: return(int(super().get_value()))
 
     def get_initial_value(self):

@@ -56,8 +56,8 @@ class point_interlocking_entry():
         return([self.EB.get_value(), self.CB.get_value()])          
                 
 #------------------------------------------------------------------------------------
-# Class for a route interlocking group (comprising 6 points and a signal)
-# Uses the base point_interlocking_entry class from above
+# Class for a route interlocking group (comprising 6 points, a signal and an instrument)
+# Uses the point_interlocking_entry class from above for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set theroute elements (points & signal)
@@ -92,24 +92,23 @@ class interlocking_route_group:
         self.p4 = point_interlocking_entry(self.frame, point_exists_function)
         self.p5 = point_interlocking_entry(self.frame, point_exists_function)
         self.p6 = point_interlocking_entry(self.frame, point_exists_function)
-        # Create the optional elements (sig ahead and inst ahead) in a subframe (always packed)
-        self.subframe = Frame(self.frame)
-        self.subframe.pack(side=LEFT)
-        self.label1 = Label(self.subframe, text=" Sig:")
+        # Create the signal ahead and instrument ahead elements (always packed)
+        self.label1 = Label(self.frame, text=" Sig:")
         self.label1.pack(side=LEFT)
-        self.sig = common.str_item_id_entry_box(self.subframe, exists_function=signal_exists_function,
+        self.sig = common.str_item_id_entry_box(self.frame, exists_function=signal_exists_function,
                         tool_tip = "Enter the ID of the next signal along the specified route - This "+
                         "can be a local signal or a remote signal (subscribed to via MQTT networking)",
                           current_id_function = current_id_function)
         self.sig.pack(side=LEFT)
-        self.label2 = Label(self.subframe, text=" Blk:")
+        self.label2 = Label(self.frame, text=" Blk:")
         self.label2.pack(side=LEFT)
-        self.block = common.int_item_id_entry_box(self.subframe, exists_function=instrument_exists_function,
+        self.block = common.int_item_id_entry_box(self.frame, exists_function=instrument_exists_function,
                                 tool_tip="Enter the ID of the local block instrument controlling "+
                                     "access to the next block section along the specified route") 
         self.block.pack(side=LEFT)
     
     def validate(self):
+        # Validates all point, signal and block instrument entries
         valid = (self.p1.validate() and self.p2.validate() and self.p3.validate() and
                  self.p4.validate() and self.p5.validate() and self.p6.validate() and
                  self.sig.validate() and self.block.validate())
@@ -198,6 +197,7 @@ class interlocking_route_frame:
         self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2")
 
     def validate(self):
+        # Validates all point, signal and block instrument entries for all routes
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
                self.rh1.validate() and self.rh2.validate())
 
@@ -288,20 +288,19 @@ class conflicting_signals_element():
         self.sig4.frame.grid(row=1, column=1)
 
     def validate(self):
+        # Validate all conflicting signal entries
         return ( self.sig1.validate and
                  self.sig2.validate and
                  self.sig3.validate and
                  self.sig4.validate )
 
     def enable_route(self):
-        self.frame.pack(padx=2, pady=2, fill='x')
         self.sig1.enable()
         self.sig2.enable()
         self.sig3.enable()
         self.sig4.enable()
         
     def disable_route(self):
-        self.frame.pack_forget() 
         self.sig1.disable()
         self.sig2.disable()
         self.sig3.disable()
