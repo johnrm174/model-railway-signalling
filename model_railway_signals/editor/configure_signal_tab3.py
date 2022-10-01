@@ -230,6 +230,13 @@ class general_settings_frame():
 #    "get_values" - get the last "validated" values of the check box and entry boxes
 #------------------------------------------------------------------------------------
 
+#####################################################################################
+# TODO - consider better validation of the timed signal selections, namely:
+# 1) Should only be able to select a main semaphore or colour light signal type
+# 2) If triggering the current signal then the start delay should be Zero
+# Low priority enhancement as these things get handled gracefully at run time
+#####################################################################################
+
 class timed_signal_route_element():
     def __init__(self, parent_frame, label:str, ):
         # Create a frame for the route element
@@ -243,7 +250,7 @@ class timed_signal_route_element():
         self.route.pack(side=LEFT)
         self.label2 = Label(self.frame, text="  Signal to trigger:")
         self.label2.pack(side=LEFT)
-        self.sig = common.int_item_id_entry_box(self.frame, callback=self.signal_selected,
+        self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False,
                 exists_function=objects.signal_exists, tool_tip="Enter the ID of the signal to "+
                    "trigger. This can be the current signal or another semaphore / colour light "+
                             "signal (on the route ahead of the current signal)")
@@ -262,15 +269,12 @@ class timed_signal_route_element():
         self.delay.pack(side=LEFT)
 
     def route_selected(self):
-        if self.route.get_value(): self.sig.enable1()
-        else: self.sig.disable1()
-        self.signal_selected()
-            
-    def signal_selected(self):
-        if self.sig.get_value() != 0:
+        if self.route.get_value():
+            self.sig.enable1()
             self.start.enable1()
             self.delay.enable1()
         else:
+            self.sig.disable1()
             self.start.disable1()
             self.delay.disable1()
     

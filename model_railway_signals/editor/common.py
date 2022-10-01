@@ -459,14 +459,14 @@ class dcc_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class int_item_id_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, tool_tip:str, callback=None,
-                 exists_function=None, current_id_function=None):
+    def __init__(self, parent_frame, tool_tip:str, callback=None, allow_empty=True,
+                            exists_function=None, current_id_function=None):
         # These are the function calls used for validation
         self.exists_function = exists_function
         self.current_id_function = current_id_function
         # Call the common base class init function to create the EB
         super().__init__(parent_frame, width=3 , min_value=1, max_value=99,
-                            tool_tip=tool_tip, callback=callback)
+                allow_empty=allow_empty, tool_tip=tool_tip, callback=callback)
 
     def validate(self, update_validation_status=True):
         # Do the basic integer validation (integer, in range)
