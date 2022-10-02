@@ -51,7 +51,13 @@
 #    signal(item_id) - helper function to find the object Id by Item ID
 #    point(item_id) - helper function to find the object Id by Item ID
 #    section(Id:int) - helper function to find the object Id by Item ID
-#    instrument(item_id) - helper function to find the object Id by Item ID#
+#    instrument(item_id) - helper function to find the object Id by Item ID
+#
+#    signal_exists (item_id) - Common function to see if a given item exists
+#    point_exists (item_id) - Common function to see if a given item exists
+#    section_exists (item_id) - Common function to see if a given item exists
+#    instrument_exists (item_id) - Common function to see if a given item exists
+#
 #------------------------------------------------------------------------------------
 
 import copy 
@@ -66,14 +72,21 @@ from .objects_common import set_bbox as set_bbox
 from .objects_common import set_canvas as set_canvas
 from .objects_common import object_type as object_type
 from .objects_common import schematic_objects as schematic_objects
+
 from .objects_common import signal_index as signal_index
 from .objects_common import point_index as point_index
 from .objects_common import section_index as section_index
 from .objects_common import instrument_index as instrument_index
+
 from .objects_common import signal as signal
 from .objects_common import point as point
 from .objects_common import section as section
 from .objects_common import instrument as instrument
+
+from .objects_common import signal_exists as signal_exists
+from .objects_common import point_exists as point_exists
+from .objects_common import section_exists as section_exists
+from .objects_common import instrument_exists as instrument_exists
 
 from .objects_signals import create_default_signal as create_default_signal
 from .objects_signals import delete_signal as delete_signal
