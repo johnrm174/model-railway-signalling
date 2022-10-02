@@ -668,7 +668,7 @@ def section_event_callback(event, object_id, event_id):
     return()
 
 #------------------------------------------------------------------------------------
-# Externally Called Initialisation function for the Canvas object (returns canvas)
+# Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
 def create_canvas (root_window):
@@ -771,12 +771,14 @@ def create_canvas (root_window):
                           (points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
     button8 = Button (button_frame, image=button_images['track_section'],
-                      command=lambda:objects.create_default_section
-                         (section_event_callback))
+                      command=lambda:objects.create_default_section())
     button8.pack (padx=2, pady=2)
     button9 = Button (button_frame, image=button_images['block_instrument'],
                       compound=TOP, command=lambda:objects.create_default_instrument())
     button9.pack (padx=2, pady=2)
-    return(canvas)
+    # Initialise the Objects Module with the Canvas reference and the callback to use
+    # for track section cursor events
+    objects.set_canvas(canvas, canvas_callback=section_event_callback)
+    return()
 
 ####################################################################################

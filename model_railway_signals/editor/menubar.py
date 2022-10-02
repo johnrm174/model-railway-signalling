@@ -533,9 +533,7 @@ class main_menubar:
                 # ensure they are also deselected and removed from the clibboard 
                 schematic.select_all_objects()
                 schematic.delete_selected_objects()
-                # Store the requireded information in the appropriate dictionaries and
-                # then purge the loaded state (to stope it being erroneously inherited
-                # when items are deleted and then new items created with the same IDs)
+                # Store the newly loaded settings
                 settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
@@ -559,6 +557,8 @@ class main_menubar:
                 if power: self.dcc_power_on()
                 # Create the loaded layout objects then purge the loaded state information
                 objects.set_all(layout_state["objects"])
+                # Purge the loaded state (to stope it being erroneously inherited
+                # when items are deleted and then new items created with the same IDs)
                 file_interface.purge_loaded_state_information()
                 # Initialise the loaded layout
                 run_layout.initialise_layout()

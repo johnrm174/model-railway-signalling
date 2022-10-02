@@ -46,6 +46,14 @@ from .objects_common import schematic_objects as schematic_objects
 from .objects_common import section_index as section_index
 
 #------------------------------------------------------------------------------------
+# The section_event_callback holds the reference to the callback function in the
+# 'schematic' module to process cursor events associated with the section button
+# when in schematic edit mode (i.e. otherwise clicking would just change the state)
+#------------------------------------------------------------------------------------
+
+section_event_callback = None
+
+#------------------------------------------------------------------------------------
 # Default Track Section Objects (i.e. state at creation)
 #------------------------------------------------------------------------------------
 
@@ -54,7 +62,6 @@ default_section_object["item"] = objects_common.object_type.section
 default_section_object["itemid"] = 0
 default_section_object["label"] = "Occupied"
 default_section_object["editable"] = True
-default_section_object["callback"] = None
 
 #------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Track Section object on the schematic. Called
@@ -100,10 +107,10 @@ def redraw_section_object(object_id, edit_mode:bool=True, new_item_id:int=None):
     
     # Set up a callback for mouse clicks / movement on the button - otherwise we'll
     # end up just toggling the button and never getting a canvas mouse event
-    callback = schematic_objects[object_id]["callback"]
     item_id = schematic_objects[object_id]["itemid"]
+    callback = objects_common.callback
     # Only bind the mouse events if we are in edit mode
-    if edit_mode: track_sections.bind_selection_events(item_id,object_id,callback)
+    if edit_mode: track_sections.bind_selection_events(item_id, object_id, callback)
     
     return()
 
@@ -111,7 +118,7 @@ def redraw_section_object(object_id, edit_mode:bool=True, new_item_id:int=None):
 # Function to Create a new default Track Section (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_section(callback):
+def create_default_section():
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -123,7 +130,6 @@ def create_default_section(callback):
     schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["posx"] = x
     schematic_objects[object_id]["posy"] = y
-    schematic_objects[object_id]["callback"] = callback
     # Add the new object to the index of sections
     section_index[str(item_id)] = object_id 
     # Draw the object on the canvas

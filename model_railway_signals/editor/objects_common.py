@@ -3,7 +3,8 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    set_canvas(canvas) called on start up to set a local canvas object reference
+#    set_canvas(canvas,callback) called on start up to set a local canvas object reference
+#       Also sets a callback function for canvas related events (used for track sections)
 #    set_bbox - Common function to create boundary box for a schematic object
 #    find_initial_canvas_position - common function to find the next 'free' position 
 #    new_item_id - Common function - Find the next 'free' item ID hen creating objects
@@ -115,9 +116,12 @@ default_object["bbox"] = None   # Tkinter canvas object
 #------------------------------------------------------------------------------------
 
 canvas = None
-def set_canvas (canvas_object):
-    global canvas
+callback = None
+
+def set_canvas (canvas_object, canvas_callback=None):
+    global canvas, callback
     canvas = canvas_object
+    callback = canvas_callback
     return()
 
 #------------------------------------------------------------------------------------

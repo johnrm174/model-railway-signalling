@@ -129,7 +129,7 @@ from .objects_lines import default_line_object as default_line_object
 
 def set_all(new_objects):
     global logging
-    # for each loaded object, create a new default object of the same type
+    # For each loaded object, create a new default object of the same type
     # and then copy across each element in turn. This is defensive programming
     # to populate the objects gracefully whilst handling changes to an object
     # structre (e.g. new element introduced since the file was last saved)

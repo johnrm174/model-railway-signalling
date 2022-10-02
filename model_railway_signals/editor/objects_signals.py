@@ -243,7 +243,13 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                 for index2, conflicting_signal in enumerate(list_of_conflicting_signals):
                     if conflicting_signal[0] == old_item_id:
                         schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1][index2][0] = new_item_id
-                        
+            # Update any "Trigger Timed signal" references to the signal (either from
+            # the current signal or another signal on the schematic (ahead of the signal)
+            list_of_timed_sequences = schematic_objects[objects_common.signal(signal_id)]["timedsequences"]
+            for index1, timed_sequence in enumerate(list_of_timed_sequences):
+                if timed_sequence[1] == old_item_id:
+                    schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1][1] = new_item_id
+
         #####################################################################################
         # TODO - update any references to the signal from the Instrument interlocking tables
         # TODO - update any references to the signal from the Track Section automation tables
@@ -483,11 +489,7 @@ def copy_signal(object_id):
     width, height, position_offset = settings.get_canvas()
     schematic_objects[new_object_id]["posx"] += position_offset
     schematic_objects[new_object_id]["posy"] += position_offset
-    # Reset the interlocking tables and for the signal (not copied)
     # Now set the default values for all elements we don't want to copy:
-    # Associated track sensors (will need different GPIO inputs allocating)
-    schematic_objects[new_object_id]["passedsensor"] = default_signal_object["passedsensor"]
-    schematic_objects[new_object_id]["approachsensor"] = default_signal_object["approachsensor"]
     # Enabled routes for the signal (all route definitions are cleared with interlocking)
     schematic_objects[new_object_id]["sigroutes"] = default_signal_object["sigroutes"]
     schematic_objects[new_object_id]["subroutes"] = default_signal_object["subroutes"]
@@ -499,6 +501,11 @@ def copy_signal(object_id):
     schematic_objects[new_object_id]["dccaspects"] = default_signal_object["dccaspects"]
     schematic_objects[new_object_id]["dccfeathers"] = default_signal_object["dccfeathers"]
     schematic_objects[new_object_id]["dcctheatre"] = default_signal_object["dcctheatre"]
+    # Associated track sensors (will need different GPIO inputs allocating)
+    schematic_objects[new_object_id]["passedsensor"] = default_signal_object["passedsensor"]
+    schematic_objects[new_object_id]["approachsensor"] = default_signal_object["approachsensor"]
+    # Any Timed Signal sequences need to be cleared
+    schematic_objects[new_object_id]["timedsequences"] = default_signal_object["timedsequences"]
     # Any DCC addresses for the semaphore signal arms
     for index1,route in enumerate(schematic_objects[new_object_id]["sigarms"]):
         for index2,signal in enumerate(route):
@@ -562,8 +569,8 @@ def delete_signal(object_id):
         for index1, interlocked_route in enumerate(list_of_interlocked_point_routes):
             if interlocked_route[1] == str(schematic_objects[object_id]["itemid"]):
                 schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][1] = ""
-        list_of_interlocked_signal_routes = schematic_objects[objects_common.signal(signal_id)]["siginterlock"]
         # Remove and references from the conflicting signals
+        list_of_interlocked_signal_routes = schematic_objects[objects_common.signal(signal_id)]["siginterlock"]
         for index1, interlocked_route in enumerate(list_of_interlocked_signal_routes):
             list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
             for index2, conflicting_signal in enumerate(list_of_conflicting_signals):
@@ -571,10 +578,14 @@ def delete_signal(object_id):
                     null_entry = [0, [False, False, False, False, False]]
                     schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1].pop(index2)
                     schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1].append(null_entry)
+        # Remove any "Trigger Timed signal" references to the signal
+        list_of_timed_sequences = schematic_objects[objects_common.signal(signal_id)]["timedsequences"]
+        for index1, timed_sequence in enumerate(list_of_timed_sequences):
+            if timed_sequence[1] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1] = [False,0,0,0]
     
         ########################################################################
         # TODO - remove any Track Section (automation) references to signal
-        # TODO - remove any Timed Signal (automation) references to signal
         # TODO - remove any Block Instrument interlocking references to signal
         #########################################################################
     

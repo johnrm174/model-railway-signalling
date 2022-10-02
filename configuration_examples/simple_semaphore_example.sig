@@ -7,7 +7,7 @@
                 false,
                 0
             ],
-            "bbox": 1775,
+            "bbox": 566,
             "dccaspects": [
                 [
                     [
@@ -976,29 +976,61 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 1779,
-            "end1": 1777,
-            "end2": 1778,
+            "bbox": 570,
+            "end1": 568,
+            "end2": 569,
             "endx": 725,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1776,
+            "line": 567,
             "posx": 425,
             "posy": 250
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 1783,
-            "end1": 1781,
-            "end2": 1782,
+            "bbox": 574,
+            "end1": 572,
+            "end2": 573,
             "endx": 775,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1780,
+            "line": 571,
             "posx": 1400,
             "posy": 250
         },
@@ -1007,7 +1039,7 @@
                 false,
                 0
             ],
-            "bbox": 1792,
+            "bbox": 583,
             "dccaspects": [
                 [
                     [
@@ -1976,14 +2008,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 1820,
+            "bbox": 611,
             "dccaspects": [
                 [
                     [
@@ -2952,14 +3016,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 1851,
+            "bbox": 642,
             "dccaspects": [
                 [
                     [
@@ -3928,12 +4024,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 3,
             "automatic": false,
-            "bbox": 1858,
+            "bbox": 649,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -3979,14 +4107,14 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 1862,
-            "end1": 1860,
-            "end2": 1861,
+            "bbox": 653,
+            "end1": 651,
+            "end2": 652,
             "endx": 725,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1859,
+            "line": 650,
             "posx": 425,
             "posy": 200
         },
@@ -3995,7 +4123,7 @@
                 false,
                 0
             ],
-            "bbox": 1890,
+            "bbox": 681,
             "dccaspects": [
                 [
                     [
@@ -4984,17 +5112,49 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 1894,
-            "end1": 1892,
-            "end2": 1893,
+            "bbox": 685,
+            "end1": 683,
+            "end2": 684,
             "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1891,
+            "line": 682,
             "posx": 925,
             "posy": 200
         },
@@ -5003,7 +5163,7 @@
                 false,
                 0
             ],
-            "bbox": 1947,
+            "bbox": 738,
             "dccaspects": [
                 [
                     [
@@ -5972,12 +6132,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1954,
+            "bbox": 745,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -5992,21 +6184,21 @@
             "siginterlock": []
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 1958,
-            "end1": 1956,
-            "end2": 1957,
+            "bbox": 749,
+            "end1": 747,
+            "end2": 748,
             "endx": 0,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1955,
+            "line": 746,
             "posx": 375,
             "posy": 250
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 1965,
+            "bbox": 756,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -6062,14 +6254,14 @@
             ]
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 1969,
-            "end1": 1967,
-            "end2": 1968,
+            "bbox": 760,
+            "end1": 758,
+            "end2": 759,
             "endx": 225,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1966,
+            "line": 757,
             "posx": 375,
             "posy": 200
         },
@@ -6078,7 +6270,7 @@
                 false,
                 0
             ],
-            "bbox": 1978,
+            "bbox": 769,
             "dccaspects": [
                 [
                     [
@@ -7047,12 +7239,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1985,
+            "bbox": 776,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7071,7 +7295,7 @@
                 false,
                 0
             ],
-            "bbox": 1994,
+            "bbox": 785,
             "dccaspects": [
                 [
                     [
@@ -8040,14 +8264,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 2025,
+            "bbox": 816,
             "dccaspects": [
                 [
                     [
@@ -9016,7 +9272,39 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         }
     },
     "points": {

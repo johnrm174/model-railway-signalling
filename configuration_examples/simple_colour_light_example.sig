@@ -7,7 +7,7 @@
                 false,
                 0
             ],
-            "bbox": 1504,
+            "bbox": 146,
             "dccaspects": [
                 [
                     [
@@ -976,29 +976,61 @@
                 true,
                 24
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 1508,
-            "end1": 1506,
-            "end2": 1507,
+            "bbox": 150,
+            "end1": 148,
+            "end2": 149,
             "endx": 725,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1505,
+            "line": 147,
             "posx": 425,
             "posy": 250
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 1512,
-            "end1": 1510,
-            "end2": 1511,
+            "bbox": 154,
+            "end1": 152,
+            "end2": 153,
             "endx": 775,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1509,
+            "line": 151,
             "posx": 1100,
             "posy": 250
         },
@@ -1007,7 +1039,7 @@
                 false,
                 0
             ],
-            "bbox": 1524,
+            "bbox": 166,
             "dccaspects": [
                 [
                     [
@@ -1976,14 +2008,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 1543,
+            "bbox": 185,
             "dccaspects": [
                 [
                     [
@@ -2952,14 +3016,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 1562,
+            "bbox": 204,
             "dccaspects": [
                 [
                     [
@@ -3928,12 +4024,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 3,
             "automatic": false,
-            "bbox": 1569,
+            "bbox": 211,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -3979,26 +4107,26 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 1573,
-            "end1": 1571,
-            "end2": 1572,
+            "bbox": 215,
+            "end1": 213,
+            "end2": 214,
             "endx": 725,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1570,
+            "line": 212,
             "posx": 425,
             "posy": 200
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 1577,
-            "end1": 1575,
-            "end2": 1576,
+            "bbox": 219,
+            "end1": 217,
+            "end2": 218,
             "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1574,
+            "line": 216,
             "posx": 925,
             "posy": 200
         },
@@ -4007,7 +4135,7 @@
                 false,
                 0
             ],
-            "bbox": 1596,
+            "bbox": 238,
             "dccaspects": [
                 [
                     [
@@ -4976,12 +5104,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1603,
+            "bbox": 245,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4996,21 +5156,21 @@
             "siginterlock": []
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 1607,
-            "end1": 1605,
-            "end2": 1606,
+            "bbox": 249,
+            "end1": 247,
+            "end2": 248,
             "endx": 0,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 1604,
+            "line": 246,
             "posx": 375,
             "posy": 250
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 1614,
+            "bbox": 256,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -5056,14 +5216,14 @@
             ]
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 1618,
-            "end1": 1616,
-            "end2": 1617,
+            "bbox": 260,
+            "end1": 258,
+            "end2": 259,
             "endx": 225,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 1615,
+            "line": 257,
             "posx": 375,
             "posy": 200
         },
@@ -5072,7 +5232,7 @@
                 false,
                 0
             ],
-            "bbox": 1630,
+            "bbox": 272,
             "dccaspects": [
                 [
                     [
@@ -6041,12 +6201,44 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1637,
+            "bbox": 279,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -6065,7 +6257,7 @@
                 false,
                 0
             ],
-            "bbox": 1649,
+            "bbox": 291,
             "dccaspects": [
                 [
                     [
@@ -7034,14 +7226,46 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 1668,
+            "bbox": 310,
             "dccaspects": [
                 [
                     [
@@ -8010,7 +8234,39 @@
                 false,
                 0
             ],
-            "theatreroute": false
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ]
         }
     },
     "points": {

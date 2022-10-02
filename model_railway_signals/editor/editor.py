@@ -28,9 +28,7 @@ def run_editor():
     # Create the menubar
     main_window_menubar = menubar.main_menubar(root)
     # Create the editor canvas (canvas size will be set on creation)
-    main_canvas = schematic.create_canvas(root)
-    # Initialise the Objects module with the canvas reference
-    objects.set_canvas(main_canvas)
+    schematic.create_canvas(root)
     # Set the edit mode (2nd param in the returned tuple) from the default settings
     if settings.get_general()[1]: main_window_menubar.edit_mode()
     else: main_window_menubar.run_mode()
