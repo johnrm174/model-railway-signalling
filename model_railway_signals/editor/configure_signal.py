@@ -265,7 +265,7 @@ def save_state(signal, close_window):
 
         # Delete the point object from the canvas and redraw in its new configuration
         objects.delete_signal_object(object_id)
-        objects.redraw_signal_object(object_id, item_id=new_id)
+        objects.redraw_signal_object(object_id, new_item_id=new_id)
         # Process any layout changes (signal aspect updates, interlocking etc)
         run_layout.process_object_update(object_id)
 

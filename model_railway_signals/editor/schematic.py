@@ -231,8 +231,10 @@ def move_line_end(xdiff:int,ydiff:int):
         canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
         objects.schematic_objects[object_id]["endx"] += xdiff
         objects.schematic_objects[object_id]["endy"] += ydiff
-    # Update the boundary box to reflect the new line position
+    # Update the boundary box to reflect the new line position ################################
+    ########################## May be able to get rid of this following refactoring ###########
     objects.set_bbox (object_id,canvas.bbox(objects.schematic_objects[object_id]["line"]))
+    ###########################################################################################
     return()
 
 #------------------------------------------------------------------------------------
@@ -768,13 +770,13 @@ def create_canvas (root_window):
                       command=lambda:objects.create_default_point
                           (points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
-#     button8 = Button (button_frame, image=button_images['track_section'],
-#                       command=lambda:objects.create_default_section
-#                         (section_event_callback))
-#     button8.pack (padx=2, pady=2)
-#     button9 = Button (button_frame, image=button_images['block_instrument'],
-#                       compound=TOP, command=lambda:objects.create_default_instrument())
-#     button9.pack (padx=2, pady=2)
+    button8 = Button (button_frame, image=button_images['track_section'],
+                      command=lambda:objects.create_default_section
+                         (section_event_callback))
+    button8.pack (padx=2, pady=2)
+    button9 = Button (button_frame, image=button_images['block_instrument'],
+                      compound=TOP, command=lambda:objects.create_default_instrument())
+    button9.pack (padx=2, pady=2)
     return(canvas)
 
 ####################################################################################

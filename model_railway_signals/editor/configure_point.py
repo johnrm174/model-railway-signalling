@@ -94,7 +94,7 @@ def save_state(point, close_window:bool):
         objects.schematic_objects[object_id]["dccreversed"] = rev
         # Delete the point object from the canvas and redraw in its new configuration
         objects.delete_point_object(object_id)
-        objects.redraw_point_object(object_id, item_id = new_id)
+        objects.redraw_point_object(object_id, new_item_id = new_id)
         # Process any layout changes (interlocking etc)
         run_layout.process_object_update(object_id)
         # Close window on "OK" or re-load UI for "apply"
@@ -146,8 +146,8 @@ class also_switch_selection(common.int_item_id_entry_box):
                 valid = False
             else:
                 # Test to see if the entered point is already being autoswitched by another point
-                if self.initial_value.get() == "": initial_autoswitch = 0
-                else: initial_autoswitch = int(self.initial_value.get())
+                if self.initial_value == "": initial_autoswitch = 0
+                else: initial_autoswitch = int(self.initial_value)
                 for point_id in objects.point_index:
                     other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
                     if other_autoswitch == autoswitch and autoswitch != initial_autoswitch:
