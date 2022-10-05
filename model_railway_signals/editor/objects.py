@@ -5,6 +5,8 @@
 # External API functions / objects intended for use by other editor modules:
 #
 #    set_canvas(canvas) called on start up to set a local canvas object reference
+#    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
+#    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
 #    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
@@ -39,8 +41,6 @@
 ########################################################################################
 # TO DO
 # 1) Move Edit function from Schematic into this module for consistency
-# 3) "update_object" function for Signals - follow the pattern for points
-#    Need to update objects_signals, and configure_signal
 # 4) Refactor schematic so it only updates an object once (finalise move)
 # The above should lay the groundwork for undo/redo
 # 5) new function "clear_all" - called on new layout
@@ -65,6 +65,9 @@ from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
 from . import run_layout
+
+from .objects_sections import enable_editing as enable_editing
+from .objects_sections import disable_editing as disable_editing
 
 from .objects_common import set_canvas as set_canvas
 from .objects_common import object_type as object_type
@@ -118,9 +121,9 @@ def update_object(object_id, new_object):
     elif type_of_object == object_type.point:
         objects_points.update_point(object_id, new_object)
     elif type_of_object == object_type.section:
-        pass
+        objects_sections.update_section(object_id, new_object)
     elif type_of_object == object_type.instrument:
-        pass
+        objects_instruments.update_instrument(object_id, new_object)
     # Process any layout changes (interlocking, signal ahead etc)
     # that might be dependent on the object configuration change
     run_layout.process_object_update(object_id)

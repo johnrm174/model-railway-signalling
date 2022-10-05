@@ -574,10 +574,8 @@ def enable_editing():
     global schematic_state
     schematic_state["editingenabled"] = True
     canvas.itemconfig("grid",state="normal")
-    for object_id in objects.schematic_objects:
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.delete_section_object(object_id)
-            objects.redraw_section_object(object_id, edit_mode=True)
+    # Refresh all the Section objects to make them editable
+    objects.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
     return()
@@ -587,11 +585,8 @@ def disable_editing():
     schematic_state["editingenabled"] = False
     canvas.itemconfig("grid",state="hidden")
     deselect_all_objects()
-    # Refresh all the Section objects to make them editable/non-editable depending on the mode
-    for object_id in objects.schematic_objects:
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.delete_section_object(object_id)
-            objects.redraw_section_object(object_id, edit_mode=False)
+    # Refresh all the Section objects to make them non-editable
+    objects.disable_editing()
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
     return()

@@ -5,10 +5,13 @@
 # External API functions intended for use by other editor modules:
 #    create_section(type) - Create a default object on the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
+#    update_section(obj_id,new_obj) - Update the configuration of an existing section object
 #    paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
+#    enable_editing() - Called when 'Edit' Mode is selected (from Schematic Module)
+#    disable_editing() - Called when 'Run' Mode is selected (from Schematic Module)
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
@@ -16,6 +19,7 @@
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.section_exists - Common function to see if a given item exists
+#    objects_common.section(item_id) - Returns the Object_ID
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
@@ -38,9 +42,9 @@ import copy
 
 from ..library import track_sections
 
-from . import run_layout 
 from . import settings
 from . import objects_common
+from . import run_layout 
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import section_index as section_index
@@ -49,9 +53,12 @@ from .objects_common import section_index as section_index
 # The section_event_callback holds the reference to the callback function in the
 # 'schematic' module to process cursor events associated with the section button
 # when in schematic edit mode (i.e. otherwise clicking would just change the state)
+# The editing_enabled flag is used to control whether the track section object
+# is created as 'editable' or 'non-editable' (i.e. when 'running' the layout)
 #------------------------------------------------------------------------------------
 
 section_event_callback = None
+editing_enabled = True
 
 #------------------------------------------------------------------------------------
 # Default Track Section Objects (i.e. state at creation)
@@ -64,34 +71,69 @@ default_section_object["label"] = "Occupied"
 default_section_object["editable"] = True
 
 #------------------------------------------------------------------------------------
+# Functions to delete/re-draw the track section objects on schematic mode change.
+#------------------------------------------------------------------------------------
+
+def redraw_all_section_objects():
+    for item_id in section_index:
+        object_id = objects_common.section(item_id)
+        delete_section_object(object_id)
+    for item_id in section_index:
+        object_id = objects_common.section(item_id)
+        redraw_section_object(object_id)
+    return()
+
+def enable_editing():
+    global editing_enabled
+    editing_enabled = True
+    redraw_all_section_objects()
+    return()
+
+def disable_editing():
+    global editing_enabled
+    editing_enabled = False
+    redraw_all_section_objects()
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Track Section object on the schematic. Called
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
 
-def redraw_section_object(object_id, edit_mode:bool=True, new_item_id:int=None):
+def update_section(object_id, new_object_configuration):
     global schematic_objects
-    
-    # Check to see if the Type-specific ID has been changed
+    # We need to track whether the Item ID has changed
     old_item_id = schematic_objects[object_id]["itemid"]
-    if new_item_id is not None and old_item_id != new_item_id:
-        # Update the Item Id and the type-specific index
-        schematic_objects[object_id]["itemid"] = new_item_id
+    new_item_id = new_object_configuration["itemid"]
+    # Delete the existing section object, copy across the new config and redraw
+    delete_section_object(object_id)
+    schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
+    redraw_section_object(object_id)
+    # Check to see if the Type-specific ID has been changed
+    if old_item_id != new_item_id:
+        # Update the type-specific index
         del section_index[str(old_item_id)]
         section_index[str(new_item_id)] = object_id
-        
         #####################################################################################
         # TODO - Update any references to the section from the Signal automation tables
         #####################################################################################
+    return()
 
+#------------------------------------------------------------------------------------
+# Function to redraw a Section object on the schematic. Called when the object is first
+# created or after the object configuration has been updated.
+#------------------------------------------------------------------------------------
+
+def redraw_section_object(object_id):
+    global schematic_objects, editing_enabled
     # If we are in edit mode then we need to make the section non-editable so we
     # can use the mouse events for selecting and moving the section object
-    if edit_mode:
+    if editing_enabled:
         section_enabled = False
         section_label = " SECT "+ format(schematic_objects[object_id]["itemid"],'02d') + " "
     else:
         section_enabled = schematic_objects[object_id]["editable"]
         section_label = schematic_objects[object_id]["label"]
-        
     # Create the new track section object
     track_sections.create_section (
                 canvas = objects_common.canvas,
@@ -101,17 +143,14 @@ def redraw_section_object(object_id, edit_mode:bool=True, new_item_id:int=None):
                 section_callback = run_layout.schematic_callback,
                 label = section_label,
                 editable = section_enabled)
-    
     # Create/update the selection rectangle for the track section (based on the boundary box)
     objects_common.set_bbox (object_id, track_sections.get_boundary_box(schematic_objects[object_id]["itemid"]))
-    
     # Set up a callback for mouse clicks / movement on the button - otherwise we'll
     # end up just toggling the button and never getting a canvas mouse event
     item_id = schematic_objects[object_id]["itemid"]
     callback = objects_common.callback
     # Only bind the mouse events if we are in edit mode
-    if edit_mode: track_sections.bind_selection_events(item_id, object_id, callback)
-    
+    if editing_enabled: track_sections.bind_selection_events(item_id, object_id, callback)
     return()
 
 #------------------------------------------------------------------------------------

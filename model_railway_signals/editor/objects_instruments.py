@@ -5,6 +5,7 @@
 # External API functions intended for use by other editor modules:
 #    create_instrument(type) - Create a default object on the schematic
 #    delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
+#    update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
 #    paste_instrument(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    redraw_instrument_object(object_id) - Redraw the object on the canvas following an update
@@ -38,9 +39,9 @@ import copy
 
 from ..library import block_instruments
 
-from . import run_layout 
 from . import settings
 from . import objects_common
+from . import run_layout 
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import instrument_index as instrument_index
@@ -63,14 +64,18 @@ default_instrument_object["linkedto"] = None
 # when the object is first created or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def redraw_instrument_object(object_id, item_id:int=None):
+def redraw_instrument_object(object_id, new_object_configuration):
     global schematic_objects
-    
-    # Check to see if the Type-specific ID has been changed
+    # We need to track whether the Item ID has changed
     old_item_id = schematic_objects[object_id]["itemid"]
-    if item_id is not None and old_item_id != item_id:
-        # Update the Item Id and the type-specific index
-        schematic_objects[object_id]["itemid"] = item_id
+    new_item_id = new_object_configuration["itemid"]
+    # Delete the existing instrument object, copy across the new config and redraw
+    delete_instrument_object(object_id)
+    schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
+    redraw_instrument_object(object_id)
+    # Check to see if the Type-specific ID has been changed
+    if old_item_id != item_id:
+        # Update the type-specific index
         del instrument_index[str(old_item_id)]
         instrument_index[str(item_id)] = object_id
         # Update any signal 'block ahead' references when the instID is changed
@@ -82,7 +87,15 @@ def redraw_instrument_object(object_id, item_id:int=None):
             for index, signal_route in enumerate (signal_interlocking):
                 if signal_route[2] == str(old_item_id):
                     schematic_objects[signal(signal_id)]["pointinterlock"][index][2] = str(item_id)
+    return()
 
+#------------------------------------------------------------------------------------
+# Function to redraw an Instrument object on the schematic. Called when the object is first
+# created or after the object configuration has been updated.
+#------------------------------------------------------------------------------------
+
+def redraw_instrument_object(object_id):
+    global schematic_objects
     # Create the new Block Instrument object
     block_instruments.create_block_instrument (
                 canvas = objects_common.canvas,
@@ -94,10 +107,8 @@ def redraw_instrument_object(object_id, item_id:int=None):
                 bell_sound_file = schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = schematic_objects[object_id]["keysound"],
                 linked_to = schematic_objects[object_id]["linkedto"])
-    
     # Create/update the selection rectangle for the instrument (based on the boundary box)
     objects_common.set_bbox (object_id, block_instruments.get_boundary_box(schematic_objects[object_id]["itemid"]))
-    
     return()
 
 #------------------------------------------------------------------------------------
