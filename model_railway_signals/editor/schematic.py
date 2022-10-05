@@ -4,44 +4,28 @@
 #
 # External API functions intended for use by other editor modules:
 #    create_canvas(root) - Call once on startup - returns canvas object
-#    select_all_objects() - For selecting all objects prior to a "safe" delete
-#    delete_selected_objects() - To delete all objects (once all are selected)
+#    select_all_objects() - For selecting all objects prior to a "safe" delete ####################################
+#    delete_selected_objects() - To delete all objects (once all are selected) #####################################
 #    resize_canvas() - Call following a size update (or layout load/canvas resize)
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas(object_id) - Get canvas settings (for resize, snap to grid etc)
-#    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
-#    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
-#    < more coming>
-#    objects.delete_signal_object(object_id) - Delete the drawing object prior to redrawing (rotate)
-#    objects.delete_point_object(object_id) - Delete the drawing object prior to redrawing (rotate)
-#    objects.redraw_signal_object(object_id) - Redraw the object on the canvas following a rotate
-#    objects.redraw_point(object_id) - Redraw the object on the canvas following a rotate
+#    objects.create_object(obj, type, subtype) - Create a default object on the schematic
+#    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
+#    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
+#    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
+#    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
+#    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click) ####################################
+#    configure_point.edit_point(root,object_id) - Open point edit window (on double click) ####################################
 #    run_layout.initialise_layout() - Re process layout after object deletion 
-#    objects.create_default_line() - Create a default object on the schematic
-#    objects.create_default_signal(type,subtype) - Create a default object on the schematic
-#    objects.create_default_point(type) - Create a default object on the schematic
-#    objects.create_default_section() - Create a default object on the schematic
-#    objects.create_default_instrument() - Create a default object on the schematic
-#    objects.delete_line(object_id) - Hard Delete an object when deleted from the schematic
-#    objects.delete_signal(object_id) - Hard Delete an object when deleted from the schematic
-#    objects.delete_point(object_id) - Hard Delete an object when deleted from the schematic
-#    objects.delete_section(object_id) - Hard Delete an object when deleted from the schematic
-#    objects.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
-#    objects.copy_line(object_id) - Copy an existing object to create a new one
-#    objects.copy_signal(object_id) - Copy an existing object to create a new one
-#    objects.copy_point(object_id) - Copy an existing object to create a new one
-#    objects.copy_section(object_id) - Copy an existing object to create a new one
-#    objects.copy_instrument(object_id) - Copy an existing object to create a new one
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
 #
 # Accesses the following external library objects directly:
-#
 #    signals_common.sig_type - Used to access the signal type
 #    signals_colour_lights.signal_sub_type - Used to access the signal subtype
 #    signals_semaphores.semaphore_sub_type - Used to access the signal subtype
@@ -267,24 +251,10 @@ def move_selected_objects(xdiff:int,ydiff:int):
 #------------------------------------------------------------------------------------
 
 def delete_selected_objects(event=None):
-    global schematic_state
-    for object_id in schematic_state["selectedobjects"]:
-        # Delete the selected object depending on type
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-            objects.delete_line(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            objects.delete_signal(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            objects.delete_point(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            objects.delete_section(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-             objects.delete_instrument(object_id)
-        # if the deleted object is on the clipboard then remove from the clipboard
-        if object_id in schematic_state["clipboardobjects"]:
-            schematic_state["clipboardobjects"].remove(object_id)
-        # Re-initialise the layout (to keep config up to date)
-        run_layout.initialise_layout()
+    # Delete the objects from the schematic
+    objects.delete_objects(schematic_state["selectedobjects"])
+    # Re-initialise the layout (to keep config up to date)
+    run_layout.initialise_layout()
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     return()
@@ -294,23 +264,7 @@ def delete_selected_objects(event=None):
 #------------------------------------------------------------------------------------
 
 def rotate_selected_objects(event=None):
-    for object_id in schematic_state["selectedobjects"]:
-        # Rotate the selected object depending on type (and update the selection rectangle)
-        # Only Points and Signals can be rotated - all other objects are unchanged
-        if (objects.schematic_objects[object_id]["item"] in
-                (objects.object_type.signal,objects.object_type.point)):
-            # Work out the orientation change based on the current orientation
-            if objects.schematic_objects[object_id]["orientation"] == 0:
-                objects.schematic_objects[object_id]["orientation"] = 180
-            else:
-                objects.schematic_objects[object_id]["orientation"] = 0
-            # Delete the drawing object from the canvas and then redraw it
-            if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-                objects.delete_signal_object(object_id)
-                objects.redraw_signal_object(object_id)
-            elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-                objects.delete_point_object(object_id)
-                objects.redraw_point_object(object_id)
+    objects.rotate_objects(schematic_state["selectedobjects"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -319,7 +273,7 @@ def rotate_selected_objects(event=None):
         
 def copy_selected_objects(event=None):
     global schematic_state
-    schematic_state["clipboardobjects"] = copy.deepcopy(schematic_state["selectedobjects"])
+    objects.copy_objects(schematic_state["selectedobjects"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -328,24 +282,13 @@ def copy_selected_objects(event=None):
 
 def paste_clipboard_objects(event=None):
     global schematic_state
-    # Clear down any object selections prior to the "paste"
+    # Paste the objects and re-copy (for a subsequent paste)
+    list_of_new_object_ids = objects.paste_objects()
+    objects.copy_objects(list_of_new_object_ids)
+    # Select the pasted objects
     deselect_all_objects()
-    for object_id in schematic_state["clipboardobjects"]:
-        # Create a new Copy the object (depending on type)
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-            new_object_id = objects.copy_line(object_id)
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            new_object_id = objects.copy_signal(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            new_object_id = objects.copy_point(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            new_object_id = objects.copy_section(object_id)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-            new_object_id = objects.copy_instrument(object_id)
-        # Add the new object to the list of selected objects
-        select_object(new_object_id)
-    # Make the list of "Copied" Objects reflect what we have just pasted
-    schematic_state["clipboardobjects"]=copy.deepcopy(schematic_state["selectedobjects"])
+    for object_id in list_of_new_object_ids:
+        select_object(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -740,41 +683,41 @@ def create_canvas (root_window):
     # Add The Buttons for creating new objects and adding to the schematic
     # Note that for enumeration types we pass the "value"
     button1 = Button (button_frame, image=button_images['line'],
-                      command=lambda:objects.create_default_line())
+                      command=lambda:objects.create_object(objects.object_type.line))
     button1.pack (padx=2 ,pady=2)
     button2 = Button (button_frame, image=button_images['colour_light'],
-                      command=lambda:objects.create_default_signal
-                          (signals_common.sig_type.colour_light.value,
+                      command=lambda:objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.colour_light.value,
                            signals_colour_lights.signal_sub_type.four_aspect.value) )
     button2.pack (padx=2, pady=2)
     button3 = Button (button_frame, image=button_images['semaphore'],
-                      command=lambda:objects.create_default_signal
-                          (signals_common.sig_type.semaphore.value,
+                      command=lambda:objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.semaphore.value,
                            signals_semaphores.semaphore_sub_type.home.value))
     button3.pack (padx=2, pady=2)
     button4 = Button (button_frame, image=button_images['ground_position'],
-                      command=lambda:objects.create_default_signal
-                          (signals_common.sig_type.ground_position.value,
+                      command=lambda:objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.ground_position.value,
                            signals_ground_position.ground_pos_sub_type.standard.value))
     button4.pack (padx=2, pady=2)
     button5 = Button (button_frame, image=button_images['ground_disc'],
-                      command=lambda:objects.create_default_signal
-                          (signals_common.sig_type.ground_disc.value,
+                      command=lambda:objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.ground_disc.value,
                            signals_ground_disc.ground_disc_sub_type.standard.value))
     button5.pack (padx=2, pady=2)
     button6 = Button (button_frame, image=button_images['left_hand_point'],
-                      command=lambda:objects.create_default_point
-                          (points.point_type.LH.value))
+                      command=lambda:objects.create_object(objects.object_type.point,
+                           points.point_type.LH.value))
     button6.pack (padx=2, pady=2)
     button7 = Button (button_frame, image=button_images['right_hand_point'],
-                      command=lambda:objects.create_default_point
-                          (points.point_type.RH.value))
+                      command=lambda:objects.create_object(objects.object_type.point,
+                            points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
     button8 = Button (button_frame, image=button_images['track_section'],
-                      command=lambda:objects.create_default_section())
+                      command=lambda:objects.create_object(objects.object_type.section))
     button8.pack (padx=2, pady=2)
     button9 = Button (button_frame, image=button_images['block_instrument'],
-                      compound=TOP, command=lambda:objects.create_default_instrument())
+                      command=lambda:objects.create_object(objects.object_type.instrument))
     button9.pack (padx=2, pady=2)
     # Initialise the Objects Module with the Canvas reference and the callback to use
     # for track section cursor events

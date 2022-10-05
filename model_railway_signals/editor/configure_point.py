@@ -1,15 +1,14 @@
 #------------------------------------------------------------------------------------
 # This module contains all the ui functions for configuring Point objects
+#------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
 #    edit_point - Open the edit point wtop level window
 #
 # Makes the following external API calls to other editor modules:
+#    objects.update_point(obj_id,new_obj) - Update the configuration of an existing point object
 #    objects.point_exists(point_id) - To see if a specified point ID exists
-#    objects.delete_point_object(object_id, new_item_id) - Delete before redrawing (on ok/apply)
-#    objects.redraw_point_object(object_id, new_item_idRedraw after deleting (on ok/apply)
 #    objects.point(point_id) - To get the object_id for a given point_id
-#    run_layout.process_object_update(object_id) - To process updates on ok/apply
 #
 # Accesses the following external editor objects directly:
 #    objects.point_index - To iterate through all the point objects
@@ -25,12 +24,14 @@
 #    common.window_controls
 #------------------------------------------------------------------------------------
 
+import copy
+
 from tkinter import *
 from tkinter import ttk
 
 from . import common
 from . import objects
-from . import run_layout
+from . import objects_points
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -74,29 +75,26 @@ def save_state(point, close_window:bool):
     # been validated on entry, but changes to other objects may have been made since then
     elif (point.config.pointid.validate() and point.config.alsoswitch.validate() and
              point.config.settings.validate() and point.config.dccsettings.validate()):
-        # Get the Point ID (this may or may not have changed) - Note that we don't save  
-        # the value to the dictionary - instead we pass to the update point function
-        new_id = point.config.pointid.get_value()
-        # Update the point coniguration from the current user selections
-        objects.schematic_objects[object_id]["itemtype"] = point.config.pointtype.get_value()
-        objects.schematic_objects[object_id]["alsoswitch"] = point.config.alsoswitch.get_value()
+        # Copy the original point Configuration (elements get overwritten as required)
+        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
+        # Update the point coniguration elements from the current user selections
+        new_object_configuration["itemid"] = point.config.pointid.get_value()
+        new_object_configuration["itemtype"] = point.config.pointtype.get_value()
+        new_object_configuration["alsoswitch"] = point.config.alsoswitch.get_value()
         # These are the general settings
         rot, rev, auto, fpl = point.config.settings.get_values()
-        objects.schematic_objects[object_id]["reverse"] = rev
-        objects.schematic_objects[object_id]["automatic"] = auto
-        objects.schematic_objects[object_id]["hasfpl"] = fpl
-        if rot: objects.schematic_objects[object_id]["orientation"] = 180
-        else: objects.schematic_objects[object_id]["orientation"] = 0
+        new_object_configuration["reverse"] = rev
+        new_object_configuration["automatic"] = auto
+        new_object_configuration["hasfpl"] = fpl
+        if rot: new_object_configuration["orientation"] = 180
+        else: new_object_configuration["orientation"] = 0
         # Get the  DCC address - note that dcc.get_value returns [address,state]
         # in this instance we only need the DCC address element(element [0])
         add, rev = point.config.dccsettings.get_values ()
-        objects.schematic_objects[object_id]["dccaddress"] = add
-        objects.schematic_objects[object_id]["dccreversed"] = rev
-        # Delete the point object from the canvas and redraw in its new configuration
-        objects.delete_point_object(object_id)
-        objects.redraw_point_object(object_id, new_item_id = new_id)
-        # Process any layout changes (interlocking etc)
-        run_layout.process_object_update(object_id)
+        new_object_configuration["dccaddress"] = add
+        new_object_configuration["dccreversed"] = rev
+        # Save the updated configuration (and re-draw the object)
+        objects.update_object(object_id, new_object_configuration)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)

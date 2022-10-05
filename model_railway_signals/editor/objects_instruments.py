@@ -3,11 +3,11 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_default_instrument(type) - Create a default object on the schematic
-#    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    create_instrument(type) - Create a default object on the schematic
 #    delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_instrument(object_id) - Redraw the object on the canvas following an update
-#    copy_instrument(object_id) - Copy an existing object to create a new one
+#    paste_instrument(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    redraw_instrument_object(object_id) - Redraw the object on the canvas following an update
 #    default_instrument_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
@@ -104,7 +104,7 @@ def redraw_instrument_object(object_id, item_id:int=None):
 # Function to Create a new default Block Instrument (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_instrument():
+def create_instrument():
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -126,11 +126,11 @@ def create_default_instrument():
 # Function to Create a copy of an existing Block Instrument  - returns the new Object ID
 #------------------------------------------------------------------------------------
 
-def copy_instrument(object_id):
+def paste_instrument(object_to_paste):
     global schematic_objects
     # Create a deep copy of the new Object (with a new UUID)
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
     schematic_objects[new_object_id]["itemid"] = new_id

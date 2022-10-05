@@ -5,38 +5,14 @@
 # External API functions / objects intended for use by other editor modules:
 #
 #    set_canvas(canvas) called on start up to set a local canvas object reference
-#    set_all(new_objects) - Takes in the loaded dict of objects (following a load)
-#    get_all() - returns the current dict of objects (for saving to file)
-#
-#    create_default_signal(type,subtype) - Create a default object on the schematic
-#    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
-#    delete_signal(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
-#    copy_signal(object_id) - Copy an existing object to create a new one
-#
-#    create_default_point(type) - Create a default object on the schematic
-#    delete_point_object(object_id) - Soft delete the drawing object (prior to recreating))
-#    delete_point(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_point(object_id) - Redraw the object on the canvas following an update
-#    copy_point(object_id) - Copy an existing object to create a new one
-#
-#    create_default_section(-) - Create a default object on the schematic
-#    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
-#    delete_section(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_section(object_id) - Redraw the object on the canvas following an update
-#    copy_section(object_id) - Copy an existing object to create a new one
-#
-#    create_default_instrument(-) - Create a default object on the schematic
-#    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating))
-#    delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_instrument(object_id) - Redraw the object on the canvas following an update
-#    copy_instrument(object_id) - Copy an existing object to create a new one
-#
-#    create_default_line(-) - Create a default object on the schematic
-#    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
-#    redraw_line_object(object_id) - Redraw the object on the canvas following an update
-#    delete_line(object_id) - Hard Delete an object when deleted from the schematic
-#    copy_line(object_id) - Copy an existing object to create a new one
+#    set_all(new_objects) - Creates a new dictionary of objects (following a load)
+#    get_all() - returns the current dictionary of objects (for saving to file)
+#    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
+#    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
+#    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
+#    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
+#    paste_objects() - Paste selected objects onto the canvas (returnslist of new IDs)
+#    update_object(object ID, new_object) - update the config of an existing object
 #
 # Objects intended to be accessed directly by other editor modules:
 #
@@ -60,6 +36,20 @@
 #
 #------------------------------------------------------------------------------------
 
+########################################################################################
+# TO DO
+# 1) Move Edit function from Schematic into this module for consistency
+# 3) "update_object" function for Signals - follow the pattern for points
+#    Need to update objects_signals, and configure_signal
+# 4) Refactor schematic so it only updates an object once (finalise move)
+# The above should lay the groundwork for undo/redo
+# 5) new function "clear_all" - called on new layout
+# 6) Refactor "save/reload to move more logic into this module
+# 7) Ensure no other modules are calling any internal functions below this module
+#
+# Common initialisation function (called on editor start or layout load)
+########################################################################################
+
 import copy 
 import logging
 
@@ -68,6 +58,13 @@ import logging
 # this as an external function after re-factoring of the Schematic Module
 from .objects_common import set_bbox as set_bbox
 ##############################################################################
+
+from . import objects_signals
+from . import objects_points
+from . import objects_lines
+from . import objects_sections
+from . import objects_instruments
+from . import run_layout
 
 from .objects_common import set_canvas as set_canvas
 from .objects_common import object_type as object_type
@@ -88,43 +85,137 @@ from .objects_common import point_exists as point_exists
 from .objects_common import section_exists as section_exists
 from .objects_common import instrument_exists as instrument_exists
 
-from .objects_signals import create_default_signal as create_default_signal
-from .objects_signals import delete_signal as delete_signal
-from .objects_signals import copy_signal as copy_signal
-from .objects_signals import redraw_signal_object as redraw_signal_object
-from .objects_signals import delete_signal_object as delete_signal_object
-from .objects_signals import default_signal_object as default_signal_object
+#------------------------------------------------------------------------------------
+# Function to Create a new schematic object and draw it on the canvas
+# Called from the Schematic Module when an "add object" button is clicked
+#------------------------------------------------------------------------------------
 
-from .objects_points import create_default_point as create_default_point
-from .objects_points import delete_point as delete_point
-from .objects_points import copy_point as copy_point
-from .objects_points import redraw_point_object as redraw_point_object
-from .objects_points import delete_point_object as delete_point_object
-from .objects_points import default_point_object as default_point_object
-
-from .objects_sections import create_default_section as create_default_section
-from .objects_sections import delete_section as delete_section
-from .objects_sections import copy_section as copy_section
-from .objects_sections import redraw_section_object as redraw_section_object
-from .objects_sections import delete_section_object as delete_section_object
-from .objects_sections import default_section_object as default_section_object
-
-from .objects_instruments import create_default_instrument as create_default_instrument
-from .objects_instruments import delete_instrument as delete_instrument
-from .objects_instruments import copy_instrument as copy_instrument
-from .objects_instruments import redraw_instrument_object as redraw_instrument_object
-from .objects_instruments import delete_instrument_object as delete_instrument_object
-from .objects_instruments import default_instrument_object as default_instrument_object
-
-from .objects_lines import create_default_line as create_default_line
-from .objects_lines import delete_line as delete_line
-from .objects_lines import copy_line as copy_line
-from .objects_lines import redraw_line_object as redraw_line_object
-from .objects_lines import delete_line_object as delete_line_object
-from .objects_lines import default_line_object as default_line_object
+def create_object(new_object_type, item_type=None, item_subtype=None):
+    if new_object_type == object_type.line:
+        objects_lines.create_line() 
+    elif new_object_type == object_type.signal:
+        objects_signals.create_signal(item_type, item_subtype)
+    elif new_object_type == object_type.point:
+         objects_points.create_point(item_type)
+    elif new_object_type == object_type.section:
+        objects_sections.create_section()
+    elif new_object_type == object_type.instrument:
+        objects_instruments.create_instrument()    
+    # As we are creating 'new' objects we don't need to process layout changes
+    return()
 
 #------------------------------------------------------------------------------------
-# Functions to set (re-create) all schematic objects (following a file load)
+# Function to update the configuration of an existing schematic object and re-draw it
+# in its new configuration (delete the drawing objects then re-draw in the new configuration)
+#------------------------------------------------------------------------------------
+
+def update_object(object_id, new_object):
+    type_of_object = schematic_objects[object_id]["item"]
+    if type_of_object == object_type.line:
+        pass
+    elif type_of_object == object_type.signal:
+        objects_signals.update_signal(object_id, new_object)
+    elif type_of_object == object_type.point:
+        objects_points.update_point(object_id, new_object)
+    elif type_of_object == object_type.section:
+        pass
+    elif type_of_object == object_type.instrument:
+        pass
+    # Process any layout changes (interlocking, signal ahead etc)
+    # that might be dependent on the object configuration change
+    run_layout.process_object_update(object_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to permanently Delete one or more objects from the schematic
+# Called from the Schematic Module when selected objects are deleted
+#------------------------------------------------------------------------------------
+
+def delete_objects(list_of_object_ids):
+    for object_id in list_of_object_ids:
+        type_of_object = schematic_objects[object_id]["item"]
+        if type_of_object == object_type.line:
+            objects_lines.delete_line(object_id) 
+        elif type_of_object == object_type.signal:
+            objects_signals.delete_signal(object_id)
+        elif type_of_object == object_type.point:
+             objects_points.delete_point(object_id)
+        elif type_of_object == object_type.section:
+            objects_sections.delete_section(object_id)
+        elif type_of_object == object_type.instrument:
+            objects_instruments.delete_instrument(object_id)
+    # Process any schematic interlocking changes
+    run_layout.initialise_layout()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Rotate one or more objects on the schematic
+# Called from the Schematic Module when selected objects are rotated
+# Only Points and Signals can be rotated - all other objects are unchanged
+#------------------------------------------------------------------------------------
+
+def rotate_objects(list_of_object_ids):
+    # Note that we do all deletions prior to re-drawing as tkinter doesn't seem to like
+    # processing a load of intermixed deletes/creates when it returns to the main loop
+    for object_id in list_of_object_ids:
+        type_of_object = schematic_objects[object_id]["item"]            
+        # Delete the drawing objects from the canvas
+        if type_of_object == object_type.signal: delete_signal_object(object_id)
+        elif type_of_object == object_type.point: delete_point_object(object_id)
+    # Re-draw the drawing objects on the canvas in their new position
+    for object_id in list_of_object_ids:
+        type_of_object = schematic_objects[object_id]["item"]            
+        if type_of_object in (object_type.signal,object_type.point):
+            # Work out the orientation change based on the current orientation
+            orientation = schematic_objects[object_id]["orientation"]
+            if orientation == 0: schematic_objects[object_id]["orientation"] = 180
+            else: schematic_objects[object_id]["orientation"] = 0
+            if type_of_object == object_type.signal:redraw_signal_object(object_id)
+            elif type_of_object == object_type.point: redraw_point_object(object_id)    
+    # As we are just rotating objects we don't need to process layout changes
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Copy one or more objects on the schematic to the clipboard
+# Called from the Schematic Module when selected objects are copied
+#------------------------------------------------------------------------------------
+
+clipboard=[]
+
+def copy_objects(list_of_object_ids):
+    global clipboard
+    clipboard=[]
+    for object_id in list_of_object_ids:
+        clipboard.append(copy.deepcopy(schematic_objects[object_id]))
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to paste copies of the current clipboard objects to the canvas
+# Called from the Schematic Modulee on 'paste' - returns a list of new object_ids
+# Note that the object_ids, item_ids and canvas positions are reassigned on 'paste'
+#------------------------------------------------------------------------------------
+
+def paste_objects():
+    list_of_new_object_ids=[]
+    for object_to_paste in clipboard:
+        # Create a new Copy the object (depending on type)
+        if object_to_paste["item"] == object_type.line:
+            new_object_id = objects_lines.paste_line(object_to_paste)
+        if object_to_paste["item"] == object_type.signal:
+            new_object_id = objects_signals.paste_signal(object_to_paste)
+        elif object_to_paste["item"] == object_type.point:
+            new_object_id = objects_points.paste_point(object_to_paste)
+        elif object_to_paste["item"] == object_type.section:
+            new_object_id = objects_sections.paste_section(object_to_paste)
+        elif object_to_paste["item"] == object_type.instrument:
+            new_object_id = objects_instruments.paste_instrument(object_to_paste)
+        # Add the new object to the list of selected objects
+        list_of_new_object_ids.append(new_object_id)
+    # As we are just pasting 'new' objects we don't need to process layout changes
+    return(list_of_new_object_ids)
+
+#------------------------------------------------------------------------------------
+# Function to set (re-create) all schematic objects (following a file load)
 #------------------------------------------------------------------------------------
 
 def set_all(new_objects):
@@ -134,53 +225,55 @@ def set_all(new_objects):
     # to populate the objects gracefully whilst handling changes to an object
     # structre (e.g. new element introduced since the file was last saved)
     for object_id in new_objects:
-        item_type = new_objects[object_id]["item"]
-        if item_type == object_type.line:
-            default_object = default_line_object
-        elif item_type == object_type.signal:
-            default_object = default_signal_object
-        elif item_type == object_type.point:
-            default_object = default_point_object
-        elif item_type == object_type.section:
-            default_object = default_section_object
-        elif item_type == object_type.instrument:
-            default_object = default_instrument_object
+        new_object_type = new_objects[object_id]["item"]
+        if new_object_type == object_type.line:
+            default_object = objects_lines.default_line_object
+        elif new_object_type == object_type.signal:
+            default_object = objects_signals.default_signal_object
+        elif new_object_type == object_type.point:
+            default_object = objects_points.default_point_object
+        elif new_object_type == object_type.section:
+            default_object = objects_sections.default_section_object
+        elif new_object_type == object_type.instrument:
+            default_object = objects_instruments.default_instrument_object
         else:
             default_object = {}
-            logging.error("LOAD LAYOUT - Object type '"+item_type+" not recognised")
+            logging.error("LOAD LAYOUT - Object type '"+new_object_type+" not recognised")
         # Populate each element at a time and report any elements not recognised
         if default_object != {}:
             schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
                 if element not in default_object.keys():
-                    logging.error("LOAD LAYOUT - Unexpected "+item_type+" element '"+element+"'")
+                    logging.error("LOAD LAYOUT - Unexpected "+new_object_type+" element '"+element+"'")
                 else:
                     schematic_objects[object_id][element] = new_objects[object_id][element]        
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
                 if element not in new_objects[object_id].keys():
-                    logging.warning("LOAD LAYOUT - Missing "+item_type+" element '"+element+"'")        
+                    logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")        
             schematic_objects[object_id]["bbox"] = None
             # Update the object indexes and all redraw each object on the schematic
-            if item_type == object_type.line:
-                redraw_line_object(object_id)
-            elif item_type == object_type.signal:
+            if new_object_type == object_type.line:
+                objects_lines.redraw_line_object(object_id)
+            elif new_object_type == object_type.signal:
                 item_id = schematic_objects[object_id]["itemid"]
                 signal_index[str(item_id)] = object_id
-                redraw_signal_object(object_id)
-            elif item_type == object_type.point:
+                objects_signals.redraw_signal_object(object_id)
+            elif new_object_type == object_type.point:
                 item_id = schematic_objects[object_id]["itemid"]
                 point_index[str(item_id)] = object_id
-                redraw_point_object(object_id,propogate_changes=False)
-            elif item_type == object_type.section:
+                objects_points.redraw_point_object(object_id)
+            elif new_object_type == object_type.section:
                 item_id = schematic_objects[object_id]["itemid"]
                 section_index[str(item_id)] = object_id
-                redraw_section_object(object_id)
-            elif item_type == object_type.instrument:
+                objects_sections.redraw_section_object(object_id)
+            elif new_object_type == object_type.instrument:
                 item_id = schematic_objects[object_id]["itemid"]
                 instrument_index[str(item_id)] = object_id
-                redraw_instrument_object(object_id)
+                objects_instruments.redraw_instrument_object(object_id)
+    # Process any schematic interlocking changes
+    run_layout.initialise_layout()    
     return()
 
 #------------------------------------------------------------------------------------

@@ -3,11 +3,12 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
-#    create_default_signal(type,subtype) - Create a default object on the schematic
-#    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
+#    create_signal(type,subtype) - Create a default object on the schematic
 #    delete_signal(object_id) - Hard Delete an object when deleted from the schematic
+#    update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
+#    paste_signal(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
-#    copy_signal(object_id) - Copy an existing object to create a new one
 #    default_signal_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
@@ -64,9 +65,9 @@ from ..library import signals_ground_disc
 from ..library import dcc_control
 from ..library import track_sensors
 
-from . import run_layout
 from . import settings
 from . import objects_common
+from . import run_layout
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import signal_index as signal_index
@@ -137,7 +138,7 @@ default_signal_object["dcctheatre"] = [
 # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7] sig_id, block_id]
 # Where Each point element (in the list of points) comprises [point_id, point_state]
 # Note that Sig ID and Block ID in this case are strings (local or remote IDs)
-default_signal_point_interlocking_table = [
+default_signal_object["pointinterlock"] = [
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
@@ -148,7 +149,7 @@ default_signal_point_interlocking_table = [
 # Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
 # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Where each route element is a boolean value (True or False)
-default_signal_signal_interlocking_table = [
+default_signal_object["siginterlock"] = [
              [ [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]], 
@@ -169,9 +170,7 @@ default_signal_signal_interlocking_table = [
                [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]], 
                [0, [False, False, False, False, False]] ] ]
-# Set the default interlocking tables for the signal
-default_signal_object["pointinterlock"] = default_signal_point_interlocking_table
-default_signal_object["siginterlock"] = default_signal_signal_interlocking_table
+# Set the default route selections for the signal
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [True,False,False,False,False]
 # Set the default  automation tables for the signal
@@ -201,9 +200,8 @@ def has_associated_distant(object_id):
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
 
-def redraw_signal_object(object_id, new_item_id:int=None):
+def update_signal(object_id, new_object_configuration):
     global schematic_objects
-    
     # Delete any interlocking entries to the Signal from the affected points
     # We do this here so we handle any changes to the Signal ID (the signal
     # gets added to the interlocking lists of any affected points later on)
@@ -214,12 +212,16 @@ def redraw_signal_object(object_id, new_item_id:int=None):
         for index, interlocked_signal in enumerate(list_of_interlocked_signals):
             if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
                 schematic_objects[objects_common.point(point_id)]["siginterlock"].pop(index)
-                
+    # We need to track whether the Item ID has changed
+    old_item_id = schematic_objects[object_id]["itemid"]
+    new_item_id = new_object_configuration["itemid"]    
+    # Delete the existing signal object, copy across the new configuration and redraw
+    delete_signal_object(object_id)
+    schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
+    redraw_signal_object(object_id)                
     # Check to see if the Type-specific ID has been changed
-    old_item_id = schematic_objects[object_id]["itemid"]                
-    if new_item_id is not None and old_item_id != new_item_id:
-        # Update the Item Id and the type-specific index
-        schematic_objects[object_id]["itemid"] = new_item_id
+    if old_item_id != new_item_id:
+        # Update the type-specific index
         del signal_index[str(old_item_id)]
         signal_index[str(new_item_id)] = object_id
         # Update any "signal Ahead" references when signal ID is changed
@@ -249,12 +251,10 @@ def redraw_signal_object(object_id, new_item_id:int=None):
             for index1, timed_sequence in enumerate(list_of_timed_sequences):
                 if timed_sequence[1] == old_item_id:
                     schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1][1] = new_item_id
-
         #####################################################################################
         # TODO - update any references to the signal from the Instrument interlocking tables
         # TODO - update any references to the signal from the Track Section automation tables
         #####################################################################################
-
     # Add any interlocked routes to the locking tables of affected points
     # Signal 'pointinterlock' comprises: [main, lh1, lh2, rh1, rh2]
     # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
@@ -275,10 +275,17 @@ def redraw_signal_object(object_id, new_item_id:int=None):
         if point_interlocked_by_signal:
             interlocked_signal = [schematic_objects[object_id]["itemid"], interlocked_routes]
             schematic_objects[objects_common.point(point_id)]["siginterlock"].append(interlocked_signal)
+    return()
 
+#------------------------------------------------------------------------------------
+# Function to redraw a Signal object on the schematic. Called when the object is first
+# created or after the object configuration has been updated.
+#------------------------------------------------------------------------------------
+
+def redraw_signal_object(object_id):
+    global schematic_objects
     # Turn the signal type value back into the required enumeration type
     sig_type = signals_common.sig_type(schematic_objects[object_id]["itemtype"])
-    
     # Create the sensor mappings for the signal (if any have been specified)
     # As we are using these for signal events, we assign an arbitary item ID
     if schematic_objects[object_id]["passedsensor"][1] > 0:     
@@ -291,7 +298,6 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                         gpio_channel = schematic_objects[object_id]["approachsensor"][1],
                         sensor_callback = run_layout.schematic_callback,
                         signal_passed = schematic_objects[object_id]["itemid"] )
-
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
             sig_type == signals_common.sig_type.ground_position):
@@ -335,7 +341,6 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                     lh2_signal = schematic_objects[object_id]["sigarms"][2][2][1],
                     rh1_signal = schematic_objects[object_id]["sigarms"][3][2][1],
                     rh2_signal = schematic_objects[object_id]["sigarms"][4][2][1] )
-
     # Create the new signal object (according to the signal type)
     if sig_type == signals_common.sig_type.colour_light:
         # Turn the signal subtype value back into the required enumeration type
@@ -366,7 +371,6 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                     theatre_text = schematic_objects[object_id]["dcctheatre"][1][0])
         # update the signal to show the initial aspect
         signals.update_signal(schematic_objects[object_id]["itemid"])
-
     elif sig_type == signals_common.sig_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals_semaphores.semaphore_sub_type(schematic_objects[object_id]["itemsubtype"])
@@ -411,7 +415,6 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                     rh1_signal = schematic_objects[object_id]["sigarms"][3][2][0],
                     rh2_signal = schematic_objects[object_id]["sigarms"][4][2][0],
                     fully_automatic = schematic_objects[object_id]["distautomatic"])
-
     elif sig_type == signals_common.sig_type.ground_position:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals_ground_position.ground_pos_sub_type(schematic_objects[object_id]["itemsubtype"])
@@ -425,7 +428,6 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                     sig_callback = run_layout.schematic_callback,
                     orientation = schematic_objects[object_id]["orientation"],
                     sig_passed_button = schematic_objects[object_id]["passedsensor"][0])
-        
     elif sig_type == signals_common.sig_type.ground_disc:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals_ground_disc.ground_disc_sub_type(schematic_objects[object_id]["itemsubtype"])
@@ -438,18 +440,16 @@ def redraw_signal_object(object_id, new_item_id:int=None):
                     signal_subtype = sub_type,
                     sig_callback = run_layout.schematic_callback,
                     orientation = schematic_objects[object_id]["orientation"],
-                    sig_passed_button = schematic_objects[object_id]["passedsensor"][0])
-        
+                    sig_passed_button = schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the selection rectangle for the signal (based on the boundary box)
     objects_common.set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
-
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new default signal (and draw it on the canvas)
 #------------------------------------------------------------------------------------
 
-def create_default_signal(item_type, item_subtype):
+def create_signal(item_type, item_subtype):
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -476,11 +476,11 @@ def create_default_signal(item_type, item_subtype):
 # default values as it will need to be configured specific to the new signal
 #------------------------------------------------------------------------------------
 
-def copy_signal(object_id):
+def paste_signal(object_to_paste):
     global schematic_objects
      # Create a deep copy of the new Object (with a new UUID)
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.signal_exists)
     schematic_objects[new_object_id]["itemid"] = new_id
@@ -583,18 +583,15 @@ def delete_signal(object_id):
         for index1, timed_sequence in enumerate(list_of_timed_sequences):
             if timed_sequence[1] == schematic_objects[object_id]["itemid"]:
                 schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1] = [False,0,0,0]
-    
         ########################################################################
         # TODO - remove any Track Section (automation) references to signal
         # TODO - remove any Block Instrument interlocking references to signal
         #########################################################################
-    
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
     del signal_index[str(schematic_objects[object_id]["itemid"])]
     del schematic_objects[object_id]
     return()
-
 
 ####################################################################################

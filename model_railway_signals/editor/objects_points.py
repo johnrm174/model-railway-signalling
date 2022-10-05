@@ -3,11 +3,12 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_default_point(type) - Create a default object on the schematic
-#    delete_point_object(object_id) - Soft delete the drawing object (prior to recreating))
-#    delete_point(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_point(object_id) - Redraw the object on the canvas following an update
-#    copy_point(object_id) - Copy an existing object to create a new one
+#    create_point(type) - Create a default object on the schematic
+#    delete_point(obj_id) - Hard Delete an object when deleted from the schematic
+#    update_point(obj_id,new_obj) - Update the configuration of an existing point object
+#    paste_point(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    delete_point_object(object_id) - Soft delete the drawing object (prior to recreating)
+#    redraw_point_object(object_id) - Redraw the object on the canvas following an update
 #    default_point_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
@@ -48,9 +49,9 @@ import copy
 from ..library import points
 from ..library import dcc_control
 
-from . import run_layout
 from . import settings
 from . import objects_common
+from . import run_layout
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import signal_index as signal_index
@@ -76,21 +77,25 @@ default_point_object["dccreversed"] = False
 # The Table comprises a variable length list of interlocked signals
 # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Each route element in the list of routes is a boolean value (True or False)
-default_point_signal_interlocking_table = []
-default_point_object["siginterlock"] = default_point_signal_interlocking_table
+default_point_object["siginterlock"] = []
 
 #------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Point object on the schematic. Called
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
 
-def redraw_point_object(object_id, new_item_id:int=None, propogate_changes:bool=True):
+def update_point(object_id, new_object_configuration):
     global schematic_objects
-    # Check to see if the Type-specific ID has been changed
+    # We need to track whether the Item ID has changed
     old_item_id = schematic_objects[object_id]["itemid"]
-    if new_item_id is not None and old_item_id != new_item_id:
-        # Update the Item Id and the type-specific index
-        schematic_objects[object_id]["itemid"] = new_item_id
+    new_item_id = new_object_configuration["itemid"]
+    # Delete the existing point object, copy across the new configuration and redraw
+    delete_point_object(object_id)
+    schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
+    redraw_point_object(object_id)
+    # Check to see if the Type-specific ID has been changed
+    if old_item_id != new_item_id:
+        # Update the type-specific index
         del point_index[str(old_item_id)]
         point_index[str(new_item_id)] = object_id
         # Update any other points that "also switch" this point to use the new ID
@@ -111,16 +116,40 @@ def redraw_point_object(object_id, new_item_id:int=None, propogate_changes:bool=
                 for index2, interlocked_point in enumerate(list_of_interlocked_points):
                     if interlocked_point[0] == old_item_id:
                         schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
+    # Finally, we need to ensure that all points in an 'auto switch' chain are set
+    # to the same switched/not-switched state so they switch together correctly
+    # First, test to see if the current point is configured to "auto switch" with 
+    # another point and, if so, toggle the current point to the same setting
+    current_point_id = schematic_objects[object_id]["itemid"]
+    also_switch_id = schematic_objects[object_id]["alsoswitch"]
+    for point_id in point_index:
+        if schematic_objects[objects_common.point(point_id)]["alsoswitch"] == current_point_id:
+            if points.point_switched(point_id):
+                # Use the non-public-api call to bypass the validation for "toggle_point"
+                points.toggle_point_state(current_point_id,True)
+    # Next, test to see if the current point is configured to "auto switch" another
+    # point and, if so, toggle that point to the same setting (this will also toggle
+    # any other points downstream in the "auto-switch" chain)
+    if  also_switch_id > 0:
+        if points.point_switched(also_switch_id) != points.point_switched(current_point_id):
+            # Use the non-public-api call to bypass validation (can't toggle "auto" points)
+            points.toggle_point_state(also_switch_id,True)
+    return()
 
+#------------------------------------------------------------------------------------
+# Function to redraw a Point object on the schematic. Called when the object is first
+# created or after the object configuration has been updated.
+#------------------------------------------------------------------------------------
+
+def redraw_point_object(object_id):
+    global schematic_objects
     # Create the new DCC Mapping for the point
     if schematic_objects[object_id]["dccaddress"] > 0:
         dcc_control.map_dcc_point (schematic_objects[object_id]["itemid"],
                                    schematic_objects[object_id]["dccaddress"],
                                    schematic_objects[object_id]["dccreversed"])
-        
     # Turn the point type value back into the required enumeration type
     point_type = points.point_type(schematic_objects[object_id]["itemtype"])
-    
     # Create the new point object
     points.create_point (
                 canvas = objects_common.canvas,
@@ -135,37 +164,15 @@ def redraw_point_object(object_id, new_item_id:int=None, propogate_changes:bool=
                 reverse = schematic_objects[object_id]["reverse"],
                 auto = schematic_objects[object_id]["automatic"],
                 fpl = schematic_objects[object_id]["hasfpl"])
-    
     # Create/update the selection rectangle for the point (based on the boundary box)
-    objects_common.set_bbox (object_id, points.get_boundary_box(schematic_objects[object_id]["itemid"]))
-
-    if propogate_changes:
-        # Finally, we need to ensure that all points in an 'auto switch' chain are set
-        # to the same switched/not-switched state so they switch together correctly
-        # First, test to see if the current point is configured to "auto switch" with 
-        # another point and, if so, toggle the current point to the same setting
-        current_point_id = schematic_objects[object_id]["itemid"]
-        also_switch_id = schematic_objects[object_id]["alsoswitch"]
-        for point_id in point_index:
-            if schematic_objects[objects_common.point(point_id)]["alsoswitch"] == current_point_id:
-                if points.point_switched(point_id):
-                    # Use the non-public-api call to bypass the validation for "toggle_point"
-                    points.toggle_point_state(current_point_id,True)
-        # Next, test to see if the current point is configured to "auto switch" another
-        # point and, if so, toggle that point to the same setting (this will also toggle
-        # any other points downstream in the "auto-switch" chain)
-        if  also_switch_id > 0:
-            if points.point_switched(also_switch_id) != points.point_switched(current_point_id):
-                # Use the non-public-api call to bypass validation (can't toggle "auto" points)
-                points.toggle_point_state(also_switch_id,True)
-                
+    objects_common.set_bbox (object_id, points.get_boundary_box(schematic_objects[object_id]["itemid"]))         
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new default Point (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_point(item_type):
+def create_point(item_type):
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -186,16 +193,16 @@ def create_default_point(item_type):
 
 #------------------------------------------------------------------------------------
 # Function to Create a copy of an existing point - returns the new Object ID
-# Note that only the basic point configuration is copied. Underlying configuration
+# Note that only the basic point configuration is Pasted. Underlying configuration
 # such as signal interlocking, dcc addresses  etc is set back to the default
 # values as it will need to be configured specific to the new point
 #------------------------------------------------------------------------------------
 
-def copy_point(object_id):
+def paste_point(object_to_paste):
     global schematic_objects
     # Create a deep copy of the new Object (with a new UUID)
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.point_exists)
     schematic_objects[new_object_id]["itemid"] = new_id

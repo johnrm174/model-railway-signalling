@@ -1,13 +1,33 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal Pop up Window
+# This module contains all the ui functions for configuring Signal objects
 #------------------------------------------------------------------------------------
+#
+# External API functions intended for use by other editor modules:
+#    edit_signal - Open the edit point wtop level window
+#
+# Makes the following external API calls to other editor modules:
+#    objects.update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
+#    objects.signal_exists(point_id) - To see if a specified signal ID exists
+#    objects.signal(point_id) - To get the object_id for a given signal_id
+#
+# Accesses the following external editor objects directly:
+#    objects.signal_index - To iterate through all the point objects
+#    objects.schematic_objects - To load/save the object configuration
+#
+# Uses the classes from the following modules for each configuration tab:
+#    configure_signal_tab1 - General signal configuration
+#    configure_signal_tab2 - Point and signal interlocking
+#    configure_signal_tab3 - signal automation
+#    common.window_controls - the common load/save/cancel/OK controls
+#------------------------------------------------------------------------------------
+
+import copy
 
 from tkinter import *
 from tkinter import ttk
 
 from . import common
 from . import objects
-from . import run_layout
 from . import configure_signal_tab1 
 from . import configure_signal_tab2
 from . import configure_signal_tab3
@@ -223,52 +243,48 @@ def save_state(signal, close_window):
         ####################### TODO - Validation of Automation UI elements ######################
         ##########################################################################################
         
-        # Get the Signal ID (this may or may not have changed) - Note that we don't save  
-        # the value to the dictionary - instead we pass to the update signal function
-        new_id = signal.config.sigid.get_value()
-        # Update all object configuration settings from the Tkinter variables
-        objects.schematic_objects[object_id]["itemtype"] = signal.config.sigtype.get_value()
-        objects.schematic_objects[object_id]["itemsubtype"] = signal.config.subtype.get_value()
-        objects.schematic_objects[object_id]["subsidary"] = signal.config.aspects.get_subsidary()
-        objects.schematic_objects[object_id]["feathers"] = signal.config.feathers.get_feathers()
-        objects.schematic_objects[object_id]["dccaspects"] = signal.config.aspects.get_addresses()
-        objects.schematic_objects[object_id]["dccfeathers"] = signal.config.feathers.get_addresses()
-        objects.schematic_objects[object_id]["dcctheatre"] = signal.config.theatre.get_theatre()
-        objects.schematic_objects[object_id]["sigarms"] = signal.config.semaphores.get_arms()
-        objects.schematic_objects[object_id]["sigroutes"] = get_sig_routes(signal)
-        objects.schematic_objects[object_id]["subroutes"] = get_sub_routes(signal)
+        # Copy the original signal Configuration (elements get overwritten as required)
+        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
+        # Update the signal coniguration elements from the current user selections
+        new_object_configuration["itemid"] = signal.config.sigid.get_value()
+        new_object_configuration["itemtype"] = signal.config.sigtype.get_value()
+        new_object_configuration["itemsubtype"] = signal.config.subtype.get_value()
+        new_object_configuration["subsidary"] = signal.config.aspects.get_subsidary()
+        new_object_configuration["feathers"] = signal.config.feathers.get_feathers()
+        new_object_configuration["dccaspects"] = signal.config.aspects.get_addresses()
+        new_object_configuration["dccfeathers"] = signal.config.feathers.get_addresses()
+        new_object_configuration["dcctheatre"] = signal.config.theatre.get_theatre()
+        new_object_configuration["sigarms"] = signal.config.semaphores.get_arms()
+        new_object_configuration["sigroutes"] = get_sig_routes(signal)
+        new_object_configuration["subroutes"] = get_sub_routes(signal)
         # These are the general settings for the signal
         rot = signal.config.settings.get_value()
-        if rot: objects.schematic_objects[object_id]["orientation"] = 180
-        else: objects.schematic_objects[object_id]["orientation"] = 0
+        if rot: new_object_configuration["orientation"] = 180
+        else: new_object_configuration["orientation"] = 0
         # Set the Theatre route indicator flag if that particular radio button is selected
         if signal.config.routetype.get_value() == 3:
-            objects.schematic_objects[object_id]["theatreroute"] = True
-            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.theatre.get_auto_inhibit()
+            new_object_configuration["theatreroute"] = True
+            new_object_configuration["dccautoinhibit"] = signal.config.theatre.get_auto_inhibit()
         else:
-            objects.schematic_objects[object_id]["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
-            objects.schematic_objects[object_id]["theatreroute"] = False
+            new_object_configuration["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
+            new_object_configuration["theatreroute"] = False
         # These elements are for the signal intelocking tab
-        objects.schematic_objects[object_id]["pointinterlock"] = signal.locking.interlocking.get_routes()
-        objects.schematic_objects[object_id]["siginterlock"] = signal.locking.conflicting_sigs.get_values()
-        objects.schematic_objects[object_id]["interlockahead"] = signal.locking.interlock_ahead.get_value()
+        new_object_configuration["pointinterlock"] = signal.locking.interlocking.get_routes()
+        new_object_configuration["siginterlock"] = signal.locking.conflicting_sigs.get_values()
+        new_object_configuration["interlockahead"] = signal.locking.interlock_ahead.get_value()
         # These elements are for the Automation tab
-        objects.schematic_objects[object_id]["timedsequences"] = signal.automation.timed_signal.get_values()
+        new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
         
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
         ##########################################################################################
-#        objects.schematic_objects[object_id]["passedsensor"] = a
-#        objects.schematic_objects[object_id]["approachsensor"] = b
-#        objects.schematic_objects[object_id]["fullyautomatic"] = c
-#        objects.schematic_objects[object_id]["distautomatic"] = d
+#        new_object_configuration["passedsensor"] = a
+#        new_object_configuration["approachsensor"] = b
+#        new_object_configuration["fullyautomatic"] = c
+#        new_object_configuration["distautomatic"] = d
 
-        # Delete the point object from the canvas and redraw in its new configuration
-        objects.delete_signal_object(object_id)
-        objects.redraw_signal_object(object_id, new_item_id=new_id)
-        # Process any layout changes (signal aspect updates, interlocking etc)
-        run_layout.process_object_update(object_id)
-
+        # Save the updated configuration (and re-draw the object)
+        objects.update_object(object_id, new_object_configuration)
         # Close window on "OK" or re-load UI for "apply"
         if close_window: signal.window.destroy()
         else: load_state(signal)

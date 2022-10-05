@@ -3,11 +3,11 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_default_section(type) - Create a default object on the schematic
-#    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    create_section(type) - Create a default object on the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
-#    redraw_section(object_id) - Redraw the object on the canvas following an update
-#    copy_section(object_id) - Copy an existing object to create a new one
+#    paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
@@ -118,7 +118,7 @@ def redraw_section_object(object_id, edit_mode:bool=True, new_item_id:int=None):
 # Function to Create a new default Track Section (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_section():
+def create_section():
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -140,11 +140,11 @@ def create_default_section():
 # Function to Create a copy of an existing Track Section - returns the new Object ID
 #------------------------------------------------------------------------------------
 
-def copy_section(object_id):
+def paste_section(object_to_paste):
     global schematic_objects
      # Create a deep copy of the new Object (with a new UUID)
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.section_exists)
     schematic_objects[new_object_id]["itemid"] = new_id

@@ -3,11 +3,11 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_default_line(type) - Create a default object on the schematic
+#    create_line(type) - Create a default object on the schematic
+#    delete_line(object_id) - Hard Delete an object when deleted from the schematic
+#    paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    redraw_line_object(object_id) - Redraw the object on the canvas following an update
-#    delete_line(object_id) - Hard Delete an object when deleted from the schematic
-#    copy_line(object_id) - Copy an existing object to create a new one
 #    default_line_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
@@ -74,7 +74,7 @@ def redraw_line_object(object_id):
 # Function to Create a new default Line (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_default_line():
+def create_line():
     global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
@@ -94,11 +94,11 @@ def create_default_line():
 # Function to Create a copy of an existing line - returns the new Object ID
 #------------------------------------------------------------------------------------
 
-def copy_line(object_id):
+def paste_line(object_to_paste):
     global schematic_objects
      # Create a deep copy of the new Object (with a new UUID)
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = copy.deepcopy(schematic_objects[object_id])
+    schematic_objects[new_object_id] = object_to_paste
     # New objects are "pasted" at a slightly offset position on the canvas
     # The other end of the line also needs to be shifted
     width, height, position_offset = settings.get_canvas()
