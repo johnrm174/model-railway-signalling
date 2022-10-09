@@ -29,6 +29,10 @@ def run_editor():
     main_window_menubar = menubar.main_menubar(root)
     # Create the editor canvas (canvas size will be set on creation)
     schematic.create_canvas(root)
+
+########################################################################################
+### TO DO - Common initialisation function (called on editor start or layout load) #####
+########################################################################################
     # Set the edit mode (2nd param in the returned tuple) from the default settings
     if settings.get_general()[1]: main_window_menubar.edit_mode()
     else: main_window_menubar.run_mode()
@@ -44,6 +48,8 @@ def run_editor():
     port, baud, debug, startup, power = settings.get_sprog()
     if startup: main_window_menubar.sprog_connect()
     if power: main_window_menubar.dcc_power_on()
+########################################################################################
+
     # Enter the TKinter main loop (with exception handling to handle keyboardinterrupt
     try: root.mainloop()
     except KeyboardInterrupt:

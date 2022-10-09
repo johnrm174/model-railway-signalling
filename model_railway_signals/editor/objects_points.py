@@ -56,6 +56,8 @@ from . import run_layout
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import signal_index as signal_index
 from .objects_common import point_index as point_index
+from .objects_common import signal as signal
+from .objects_common import point as point
 
 #------------------------------------------------------------------------------------
 # Default Point Objects (i.e. state at creation)
@@ -100,8 +102,8 @@ def update_point(object_id, new_object_configuration):
         point_index[str(new_item_id)] = object_id
         # Update any other points that "also switch" this point to use the new ID
         for point_id in point_index:
-            if schematic_objects[objects_common.point(point_id)]["alsoswitch"] == old_item_id:
-                schematic_objects[objects_common.point(point_id)]["alsoswitch"] = new_item_id
+            if schematic_objects[point(point_id)]["alsoswitch"] == old_item_id:
+                schematic_objects[point(point_id)]["alsoswitch"] = new_item_id
                 redraw_point_object(point(point_id))
         # Update any affected signal interlocking tables to reference the new point ID
         # Signal 'pointinterlock' comprises: [main, lh1, lh2, rh1, rh2]
@@ -110,12 +112,12 @@ def update_point(object_id, new_object_configuration):
         # Point'siginterlock' comprises a variable length list of interlocked signals
         # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         for signal_id in signal_index:
-            interlocking_table = schematic_objects[objects_common.signal(signal_id)]["pointinterlock"]
+            interlocking_table = schematic_objects[signal(signal_id)]["pointinterlock"]
             for index1, signal_route in enumerate(interlocking_table):
                 list_of_interlocked_points = signal_route[0]
                 for index2, interlocked_point in enumerate(list_of_interlocked_points):
                     if interlocked_point[0] == old_item_id:
-                        schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
+                        schematic_objects[signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
     # Finally, we need to ensure that all points in an 'auto switch' chain are set
     # to the same switched/not-switched state so they switch together correctly
     # First, test to see if the current point is configured to "auto switch" with 
@@ -123,7 +125,7 @@ def update_point(object_id, new_object_configuration):
     current_point_id = schematic_objects[object_id]["itemid"]
     also_switch_id = schematic_objects[object_id]["alsoswitch"]
     for point_id in point_index:
-        if schematic_objects[objects_common.point(point_id)]["alsoswitch"] == current_point_id:
+        if schematic_objects[point(point_id)]["alsoswitch"] == current_point_id:
             if points.point_switched(point_id):
                 # Use the non-public-api call to bypass the validation for "toggle_point"
                 points.toggle_point_state(current_point_id,True)
@@ -246,20 +248,20 @@ def delete_point(object_id):
     delete_point_object(object_id)
     # Remove any references to the point from other points ('also switch' points).
     for point_id in point_index:
-        if schematic_objects[objects_common.point(point_id)]["alsoswitch"] == schematic_objects[object_id]["itemid"]:
-            schematic_objects[objects_common.point(point_id)]["alsoswitch"] = 0
+        if schematic_objects[point(point_id)]["alsoswitch"] == schematic_objects[object_id]["itemid"]:
+            schematic_objects[point(point_id)]["alsoswitch"] = 0
     # Remove any references to the point from the signal interlocking tables
     # Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
     # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
     # Where sig_id in this case is a string (for local or remote signals)
     for signal_id in signal_index:
-        list_of_interlocked_routes = schematic_objects[objects_common.signal(signal_id)]["pointinterlock"]
+        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
         for index1, interlocked_route in enumerate(list_of_interlocked_routes):
             list_of_interlocked_points = interlocked_route[0]
             for index2, interlocked_point in enumerate(list_of_interlocked_points):
                 if interlocked_point[0] == schematic_objects[object_id]["itemid"]:
-                    schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][0].pop(index2)
-                    schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][0].append([0,False])
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].pop(index2)
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].append([0,False])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])

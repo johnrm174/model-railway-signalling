@@ -30,25 +30,7 @@
 #
 #------------------------------------------------------------------------------------
 
-from tkinter import *
 from typing import Union
-import uuid
-import copy
-import logging
-
-from ..library import points
-from ..library import signals
-from ..library import signals_common
-from ..library import signals_colour_lights
-from ..library import signals_semaphores
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
-from ..library import block_instruments
-from ..library import track_sections
-from ..library import dcc_control
-from ..library import track_sensors
-
-from . import run_layout
 from . import settings
 
 #------------------------------------------------------------------------------------

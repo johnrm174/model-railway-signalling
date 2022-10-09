@@ -13,6 +13,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
+#    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
@@ -46,6 +47,7 @@ from . import run_layout
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import instrument_index as instrument_index
 from .objects_common import signal_index as signal_index
+from .objects_common import signal as signal
 
 #------------------------------------------------------------------------------------
 # Default Block Instrument Objects (i.e. state at creation)
@@ -64,7 +66,7 @@ default_instrument_object["linkedto"] = None
 # when the object is first created or after the object attributes have been updated
 #------------------------------------------------------------------------------------
 
-def redraw_instrument_object(object_id, new_object_configuration):
+def update_instrument(object_id, new_object_configuration):
     global schematic_objects
     # We need to track whether the Item ID has changed
     old_item_id = schematic_objects[object_id]["itemid"]
@@ -150,6 +152,8 @@ def paste_instrument(object_to_paste):
     width, height, position_offset = settings.get_canvas()
     schematic_objects[new_object_id]["posx"] += position_offset
     schematic_objects[new_object_id]["posy"] += position_offset
+    # Now set the default values for all elements we don't want to copy:
+    schematic_objects[new_object_id]["linkedto"] = default_instrument_object["linkedto"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object

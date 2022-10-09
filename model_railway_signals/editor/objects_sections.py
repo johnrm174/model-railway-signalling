@@ -15,6 +15,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
+#    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
@@ -25,6 +26,7 @@
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.section_index - The index of Section Objects (for iterating)
+#    objects_common.signal_index - The index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -48,6 +50,8 @@ from . import run_layout
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import section_index as section_index
+from .objects_common import signal_index as signal_index
+from .objects_common import signal as signal
 
 #------------------------------------------------------------------------------------
 # The section_event_callback holds the reference to the callback function in the

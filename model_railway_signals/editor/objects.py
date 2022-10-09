@@ -12,8 +12,9 @@
 #    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
+#    move_objects(list of obj IDs) - Finalises the move of selected objects
 #    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
-#    paste_objects() - Paste selected objects onto the canvas (returnslist of new IDs)
+#    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #
 # Objects intended to be accessed directly by other editor modules:
@@ -38,27 +39,10 @@
 #
 #------------------------------------------------------------------------------------
 
-########################################################################################
-# TO DO
-# 1) Move Edit function from Schematic into this module for consistency
-# 4) Refactor schematic so it only updates an object once (finalise move)
-# The above should lay the groundwork for undo/redo
-# 5) new function "clear_all" - called on new layout
-# 6) Refactor "save/reload to move more logic into this module
-# 7) Ensure no other modules are calling any internal functions below this module
-#
-# Common initialisation function (called on editor start or layout load)
-########################################################################################
-
 import copy 
 import logging
 
-##############################################################################
-# Used by schematic module when moving lines - may be able to avoid exposing
-# this as an external function after re-factoring of the Schematic Module
-from .objects_common import set_bbox as set_bbox
-##############################################################################
-
+from . import objects_common
 from . import objects_signals
 from . import objects_points
 from . import objects_lines
@@ -179,6 +163,35 @@ def rotate_objects(list_of_object_ids):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to finalise the move of selected objects on the schematic. The objects
+# themselves will have already been moved on the canvas and snapped to the grid
+# so we just need to update the object configuration to reflect the new positions.
+# Note that the function also caters for the editing of lines - in this case we will
+# be given a single object id and either the xdiff1/ydiff1 or xdiff2/ydiff2 will be
+# passed to signify which end of the line needs to be updated
+#------------------------------------------------------------------------------------
+
+def move_objects(list_of_object_ids, xdiff1:int=None,
+            ydiff1:int=None, xdiff2:int=None, ydiff2:int=None):
+    for object_id in list_of_object_ids:
+        type_of_object = schematic_objects[object_id]["item"]            
+        if type_of_object == object_type.line:
+            if xdiff1 is not None and ydiff1 is not None:
+                schematic_objects[object_id]["posx"] += xdiff1 
+                schematic_objects[object_id]["posy"] += ydiff1 
+            if xdiff2 is not None and ydiff2 is not None:
+                schematic_objects[object_id]["endx"] += xdiff2 
+                schematic_objects[object_id]["endy"] += ydiff2 
+            # Update the boundary box to reflect the new line position
+            objects_common.set_bbox(object_id,objects_common.canvas.bbox
+                            (schematic_objects[object_id]["line"]))
+        else:
+            schematic_objects[object_id]["posx"] += xdiff1 
+            schematic_objects[object_id]["posy"] += ydiff2 
+    # As we are just moving objects we don't need to process layout changes
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to Copy one or more objects on the schematic to the clipboard
 # Called from the Schematic Module when selected objects are copied
 #------------------------------------------------------------------------------------
@@ -202,17 +215,19 @@ def paste_objects():
     list_of_new_object_ids=[]
     for object_to_paste in clipboard:
         # Create a new Copy the object (depending on type)
-        if object_to_paste["item"] == object_type.line:
+        type_of_object = object_to_paste["item"]
+        if type_of_object == object_type.line:
             new_object_id = objects_lines.paste_line(object_to_paste)
-        if object_to_paste["item"] == object_type.signal:
+        if type_of_object == object_type.signal:
             new_object_id = objects_signals.paste_signal(object_to_paste)
-        elif object_to_paste["item"] == object_type.point:
+        elif type_of_object == object_type.point:
             new_object_id = objects_points.paste_point(object_to_paste)
-        elif object_to_paste["item"] == object_type.section:
+        elif type_of_object == object_type.section:
             new_object_id = objects_sections.paste_section(object_to_paste)
-        elif object_to_paste["item"] == object_type.instrument:
+        elif type_of_object == object_type.instrument:
             new_object_id = objects_instruments.paste_instrument(object_to_paste)
-        # Add the new object to the list of selected objects
+        # Add the new object to the list of clipboard objects
+        # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
     # As we are just pasting 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
@@ -275,7 +290,7 @@ def set_all(new_objects):
                 item_id = schematic_objects[object_id]["itemid"]
                 instrument_index[str(item_id)] = object_id
                 objects_instruments.redraw_instrument_object(object_id)
-    # Process any schematic interlocking changes
+    # Initialise the layout (interlocking changes, signal aspects etc)
     run_layout.initialise_layout()    
     return()
 

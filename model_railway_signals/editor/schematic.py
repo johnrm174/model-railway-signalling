@@ -1,11 +1,12 @@
 #------------------------------------------------------------------------------------
 # This Module provides all the internal functions for editing the layout schematic
 # in terms of adding/removing objects, drag/drop objects, copy/paste objects etc
+#------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
 #    create_canvas(root) - Call once on startup - returns canvas object
-#    select_all_objects() - For selecting all objects prior to a "safe" delete ####################################
-#    delete_selected_objects() - To delete all objects (once all are selected) #####################################
+#    select_all_objects() - For selecting all objects prior to a "safe" delete
+#    delete_selected_objects() - To delete all objects (once all are selected)
 #    resize_canvas() - Call following a size update (or layout load/canvas resize)
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
@@ -17,9 +18,9 @@
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
-#    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click) ####################################
-#    configure_point.edit_point(root,object_id) - Open point edit window (on double click) ####################################
-#    run_layout.initialise_layout() - Re process layout after object deletion 
+#    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
+#    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
+#    ########################## More to be added ########################################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -38,6 +39,7 @@
 #    points.move_point - For moving an object on the canvas
 #    block_instruments.move_instrument - For moving an object on the canvas
 #    track_sections.move_section - For moving an object on the canvas
+#
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -70,6 +72,8 @@ import copy
 schematic_state:dict = {}
 schematic_state["startx"] = 0
 schematic_state["starty"] = 0
+schematic_state["lastx"] = 0
+schematic_state["lasty"] = 0
 schematic_state["moveobjects"] = False
 schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
@@ -188,8 +192,6 @@ def move_line(object_id,xdiff:int,ydiff:int):
     canvas.move(objects.schematic_objects[object_id]["line"],xdiff,ydiff)
     canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
     canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
-    objects.schematic_objects[object_id]["endx"] += xdiff
-    objects.schematic_objects[object_id]["endy"] += ydiff
     return()
 
 #------------------------------------------------------------------------------------
@@ -200,25 +202,19 @@ def move_line(object_id,xdiff:int,ydiff:int):
         
 def move_line_end(xdiff:int,ydiff:int):
     object_id = schematic_state["selectedobjects"][0]       
-    x1 = objects.schematic_objects[object_id]["posx"]
-    y1 = objects.schematic_objects[object_id]["posy"]
-    x2 = objects.schematic_objects[object_id]["endx"]
-    y2 = objects.schematic_objects[object_id]["endy"]
+    startx = objects.schematic_objects[object_id]["posx"]
+    starty = objects.schematic_objects[object_id]["posy"]
+    endx = objects.schematic_objects[object_id]["endx"]
+    endy = objects.schematic_objects[object_id]["endy"]
     # Move the end of the line that has been selected
     if schematic_state["editlineend1"]:
-        canvas.coords(objects.schematic_objects[object_id]["line"],x1+xdiff,y1+ydiff,x2,y2)
         canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
-        objects.schematic_objects[object_id]["posx"] += xdiff
-        objects.schematic_objects[object_id]["posy"] += ydiff
+        x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end1"])
+        canvas.coords(objects.schematic_objects[object_id]["line"],(x1+x2)/2,(y1+y2)/2,endx,endy)
     elif schematic_state["editlineend2"]:
-        canvas.coords(objects.schematic_objects[object_id]["line"],x1,y1,x2+xdiff,y2+ydiff)
         canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
-        objects.schematic_objects[object_id]["endx"] += xdiff
-        objects.schematic_objects[object_id]["endy"] += ydiff
-    # Update the boundary box to reflect the new line position ################################
-    ########################## May be able to get rid of this following refactoring ###########
-    objects.set_bbox (object_id,canvas.bbox(objects.schematic_objects[object_id]["line"]))
-    ###########################################################################################
+        x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end2"])
+        canvas.coords(objects.schematic_objects[object_id]["line"],startx,starty,(x1+x2)/2,(y1+y2)/2)
     return()
 
 #------------------------------------------------------------------------------------
@@ -240,8 +236,6 @@ def move_selected_objects(xdiff:int,ydiff:int):
             track_sections.move_section(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
         elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
             block_instruments.move_instrument(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
-        objects.schematic_objects[object_id]["posx"] += xdiff
-        objects.schematic_objects[object_id]["posy"] += ydiff
         # Move the selection rectangle for the object
         canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
     return()
@@ -253,8 +247,6 @@ def move_selected_objects(xdiff:int,ydiff:int):
 def delete_selected_objects(event=None):
     # Delete the objects from the schematic
     objects.delete_objects(schematic_state["selectedobjects"])
-    # Re-initialise the layout (to keep config up to date)
-    run_layout.initialise_layout()
     # Remove the objects from the list of selected objects
     schematic_state["selectedobjects"]=[]
     return()
@@ -285,7 +277,7 @@ def paste_clipboard_objects(event=None):
     # Paste the objects and re-copy (for a subsequent paste)
     list_of_new_object_ids = objects.paste_objects()
     objects.copy_objects(list_of_new_object_ids)
-    # Select the pasted objects
+    # Select the pasted objects (in case the user wants to paste again)
     deselect_all_objects()
     for object_id in list_of_new_object_ids:
         select_object(object_id)
@@ -395,6 +387,8 @@ def left_button_click(event,highlighted_object=None):
             bbox=canvas.coords(objects.schematic_objects[highlighted_object]["bbox"])
             schematic_state["startx"] = posx + event.x - (bbox[2]-bbox[0])/2
             schematic_state["starty"] = posy + event.y - (bbox[3]-bbox[1])/2
+            schematic_state["lastx"] = schematic_state["startx"]
+            schematic_state["lasty"] = schematic_state["starty"]
             schematic_state["moveobjects"] = True
             if highlighted_object not in schematic_state["selectedobjects"]:
                 # Clear any current selections and select the highlighted object
@@ -404,6 +398,8 @@ def left_button_click(event,highlighted_object=None):
             # For canvas events we can use the canvas coordinates
             schematic_state["startx"] = event.x 
             schematic_state["starty"] = event.y
+            schematic_state["lastx"] = schematic_state["startx"] 
+            schematic_state["lasty"] = schematic_state["starty"]
             # See if the cursor is over the "end" of an already selected line 
             highlighted_object = find_highlighted_line_end(event.x,event.y)
             if highlighted_object:
@@ -489,21 +485,21 @@ def track_cursor(event,object_id=None):
                 deltax = event.x - (bbox[2]-bbox[0])/2 
                 deltay = event.y - (bbox[3]-bbox[1])/2
             else:
-                deltax = event.x-schematic_state["startx"]
-                deltay = event.y-schematic_state["starty"]
+                deltax = event.x - schematic_state["lastx"]
+                deltay = event.y - schematic_state["lasty"]
             # Move all the objects that are selected
             move_selected_objects(deltax,deltay)
-            # Reset the "start" position for the next move
-            schematic_state["startx"] = event.x
-            schematic_state["starty"] = event.y
+            # Set the 'last' position for the next move event
+            schematic_state["lastx"] += deltax
+            schematic_state["lasty"] += deltay
         elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
-            deltax = event.x-schematic_state["startx"]
-            deltay = event.y-schematic_state["starty"]
+            deltax = event.x - schematic_state["lastx"]
+            deltay = event.y - schematic_state["lasty"]
             # Move all the objects that are selected
             move_line_end(deltax,deltay)
             # Reset the "start" position for the next move
-            schematic_state["startx"] = event.x
-            schematic_state["starty"] = event.y
+            schematic_state["lastx"] += deltax
+            schematic_state["lasty"] += deltay
         elif schematic_state["selectarea"]:
             # Dynamically resize the selection area
             x1 = schematic_state["startx"]
@@ -524,24 +520,42 @@ def left_button_release(event):
             # Finish the move by snapping all objects to the grid - we only need to work
             # out the xdiff and xdiff for one of the selected objects to get the diff
             obj = schematic_state["selectedobjects"][0]
-            xdiff,ydiff = snap_to_grid(objects.schematic_objects[obj]["posx"],
-                                       objects.schematic_objects[obj]["posy"])
+            xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
+                                       schematic_state["lasty"]- schematic_state["starty"])
             move_selected_objects(xdiff,ydiff)
+            # Calculate the total deltas for the move (from the startposition)
+            finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
+            finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
+            # Finalise the move by updating the current object position
+            objects.move_objects(schematic_state["selectedobjects"],
+                    xdiff1=finalx, ydiff1=finaly, xdiff2=finalx, ydiff2=finaly )
             # Clear the "select object mode" - but leave all objects selected
             schematic_state["moveobjects"] = False
         elif schematic_state["editlineend1"]:
             # Finish the move by snapping the line end to the grid
             obj = schematic_state["selectedobjects"][0]
-            xdiff,ydiff = snap_to_grid(objects.schematic_objects[obj]["posx"],
-                                       objects.schematic_objects[obj]["posy"])
+            xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
+                                       schematic_state["lasty"]- schematic_state["starty"])
             move_line_end(xdiff,ydiff)
+            # Calculate the total deltas for the move (from the startposition)
+            finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
+            finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
+            # Finalise the move by updating the current object position
+            objects.move_objects(schematic_state["selectedobjects"], xdiff1=finalx, ydiff1=finaly)
+            # Clear the "Edit line mode" - but leave the line selected
             schematic_state["editlineend1"] = False
         elif schematic_state["editlineend2"]:
             # Finish the move by snapping the line end to the grid
             obj = schematic_state["selectedobjects"][0]
-            xdiff,ydiff = snap_to_grid(objects.schematic_objects[obj]["endx"],
-                                       objects.schematic_objects[obj]["endy"])
+            xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
+                                       schematic_state["lasty"]- schematic_state["starty"])
             move_line_end(xdiff,ydiff)
+            # Calculate the total deltas for the move (from the startposition)
+            finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
+            finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
+            # Finalise the move by updating the current object position
+            objects.move_objects(schematic_state["selectedobjects"], xdiff2=finalx, ydiff2=finaly)
+            # Clear the "Edit line mode" - but leave the line selected
             schematic_state["editlineend2"] = False
         elif schematic_state["selectarea"]:
             # Select all Objects that are fully within the Area Selection Box

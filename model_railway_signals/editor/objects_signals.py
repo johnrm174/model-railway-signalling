@@ -72,6 +72,8 @@ from . import run_layout
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import signal_index as signal_index
 from .objects_common import point_index as point_index
+from .objects_common import signal as signal
+from .objects_common import point as point
 
 #------------------------------------------------------------------------------------
 # Default Signal Objects (i.e. state at creation)
@@ -208,10 +210,10 @@ def update_signal(object_id, new_object_configuration):
     # Point'siginterlock' comprises a variable length list of interlocked signals
     # Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
     for point_id in point_index:
-        list_of_interlocked_signals = schematic_objects[objects_common.point(point_id)]["siginterlock"]
+        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
         for index, interlocked_signal in enumerate(list_of_interlocked_signals):
             if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[objects_common.point(point_id)]["siginterlock"].pop(index)
+                schematic_objects[point(point_id)]["siginterlock"].pop(index)
     # We need to track whether the Item ID has changed
     old_item_id = schematic_objects[object_id]["itemid"]
     new_item_id = new_object_configuration["itemid"]    
@@ -234,23 +236,23 @@ def update_signal(object_id, new_object_configuration):
         # Where each route element is a boolean value (True or False)
         for signal_id in signal_index:
             # Update any references for the signal ahead (on the interlocked routes)
-            list_of_interlocked_point_routes = schematic_objects[objects_common.signal(signal_id)]["pointinterlock"]
+            list_of_interlocked_point_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
             for index1, interlocked_route in enumerate (list_of_interlocked_point_routes):
                 if interlocked_route[1] == str(old_item_id):
-                    schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][1] = str(new_item_id)
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][1] = str(new_item_id)
             # Update any references for conflicting signals
-            list_of_interlocked_signal_routes = schematic_objects[objects_common.signal(signal_id)]["siginterlock"]
+            list_of_interlocked_signal_routes = schematic_objects[signal(signal_id)]["siginterlock"]
             for index1, interlocked_route in enumerate(list_of_interlocked_signal_routes):
                 list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
                 for index2, conflicting_signal in enumerate(list_of_conflicting_signals):
                     if conflicting_signal[0] == old_item_id:
-                        schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1][index2][0] = new_item_id
+                        schematic_objects[signal(signal_id)]["siginterlock"][index1][index2][0] = new_item_id
             # Update any "Trigger Timed signal" references to the signal (either from
             # the current signal or another signal on the schematic (ahead of the signal)
-            list_of_timed_sequences = schematic_objects[objects_common.signal(signal_id)]["timedsequences"]
+            list_of_timed_sequences = schematic_objects[signal(signal_id)]["timedsequences"]
             for index1, timed_sequence in enumerate(list_of_timed_sequences):
                 if timed_sequence[1] == old_item_id:
-                    schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1][1] = new_item_id
+                    schematic_objects[signal(signal_id)]["timedsequences"][index1][1] = new_item_id
         #####################################################################################
         # TODO - update any references to the signal from the Instrument interlocking tables
         # TODO - update any references to the signal from the Track Section automation tables
@@ -274,7 +276,7 @@ def update_signal(object_id, new_object_configuration):
                     point_interlocked_by_signal = True
         if point_interlocked_by_signal:
             interlocked_signal = [schematic_objects[object_id]["itemid"], interlocked_routes]
-            schematic_objects[objects_common.point(point_id)]["siginterlock"].append(interlocked_signal)
+            schematic_objects[point(point_id)]["siginterlock"].append(interlocked_signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -506,6 +508,9 @@ def paste_signal(object_to_paste):
     schematic_objects[new_object_id]["approachsensor"] = default_signal_object["approachsensor"]
     # Any Timed Signal sequences need to be cleared
     schematic_objects[new_object_id]["timedsequences"] = default_signal_object["timedsequences"]
+    #######################################################################################
+    ######### TO Do - Clear other automation configuration elements #######################
+    #######################################################################################
     # Any DCC addresses for the semaphore signal arms
     for index1,route in enumerate(schematic_objects[new_object_id]["sigarms"]):
         for index2,signal in enumerate(route):
@@ -551,10 +556,10 @@ def delete_signal(object_id):
     # Point 'siginterlock' comprises a variable length list of interlocked signals
     # Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
     for point_id in point_index:
-        list_of_interlocked_signals = schematic_objects[objects_common.point(point_id)]["siginterlock"]
+        list_of_interlocked_signals = schematic_objects[point(point_id)]["siginterlock"]
         for index, interlocked_signal in enumerate(list_of_interlocked_signals):
             if interlocked_signal[0] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[objects_common.point(point_id)]["siginterlock"].pop(index)
+                schematic_objects[point(point_id)]["siginterlock"].pop(index)
     # Remove any references from other signals (routes and conflicting signals)
     # Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
     # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
@@ -565,24 +570,24 @@ def delete_signal(object_id):
     # Where each route element is a boolean value (True or False)
     for signal_id in signal_index:
         # Remove any references from the signal ahead on the interlocked routes
-        list_of_interlocked_point_routes = schematic_objects[objects_common.signal(signal_id)]["pointinterlock"]
+        list_of_interlocked_point_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
         for index1, interlocked_route in enumerate(list_of_interlocked_point_routes):
             if interlocked_route[1] == str(schematic_objects[object_id]["itemid"]):
-                schematic_objects[objects_common.signal(signal_id)]["pointinterlock"][index1][1] = ""
+                schematic_objects[signal(signal_id)]["pointinterlock"][index1][1] = ""
         # Remove and references from the conflicting signals
-        list_of_interlocked_signal_routes = schematic_objects[objects_common.signal(signal_id)]["siginterlock"]
+        list_of_interlocked_signal_routes = schematic_objects[signal(signal_id)]["siginterlock"]
         for index1, interlocked_route in enumerate(list_of_interlocked_signal_routes):
             list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
             for index2, conflicting_signal in enumerate(list_of_conflicting_signals):
                 if conflicting_signal[0] == schematic_objects[object_id]["itemid"]:
                     null_entry = [0, [False, False, False, False, False]]
-                    schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1].pop(index2)
-                    schematic_objects[objects_common.signal(signal_id)]["siginterlock"][index1].append(null_entry)
+                    schematic_objects[signal(signal_id)]["siginterlock"][index1].pop(index2)
+                    schematic_objects[signal(signal_id)]["siginterlock"][index1].append(null_entry)
         # Remove any "Trigger Timed signal" references to the signal
-        list_of_timed_sequences = schematic_objects[objects_common.signal(signal_id)]["timedsequences"]
+        list_of_timed_sequences = schematic_objects[signal(signal_id)]["timedsequences"]
         for index1, timed_sequence in enumerate(list_of_timed_sequences):
             if timed_sequence[1] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[objects_common.signal(signal_id)]["timedsequences"][index1] = [False,0,0,0]
+                schematic_objects[signal(signal_id)]["timedsequences"][index1] = [False,0,0,0]
         ########################################################################
         # TODO - remove any Track Section (automation) references to signal
         # TODO - remove any Block Instrument interlocking references to signal

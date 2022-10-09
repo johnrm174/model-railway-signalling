@@ -493,7 +493,8 @@ class main_menubar:
     def new_schematic(self,root_window):
         if messagebox.askokcancel("New Schematic", "Are you sure you want to "+
                          "discard all changes and create a new blank schematic"):
-            # Properly delete all current layout objects and restore default settings
+            # We use the schematic functions to delete all existing objects to
+            # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
             schematic.delete_selected_objects()
             settings.restore_defaults()
@@ -540,6 +541,9 @@ class main_menubar:
                 # Update the window title and re-size the canvas as appropriate
                 root_window.title(file_loaded)
                 schematic.resize_canvas()
+########################################################################################
+### TO DO - Common initialisation function (called on editor start or layout load) #####
+########################################################################################
                 # Set the edit mode (2nd param in the returned tuple)
                 if settings.get_general()[1]: self.edit_mode()
                 else: self.run_mode()
@@ -555,13 +559,12 @@ class main_menubar:
                 port, baud, debug, startup, power = settings.get_sprog()
                 if startup: self.sprog_connect()
                 if power: self.dcc_power_on()
+########################################################################################
                 # Create the loaded layout objects then purge the loaded state information
                 objects.set_all(layout_state["objects"])
                 # Purge the loaded state (to stope it being erroneously inherited
                 # when items are deleted and then new items created with the same IDs)
                 file_interface.purge_loaded_state_information()
-                # Initialise the loaded layout
-                run_layout.initialise_layout()
                 # Set the flag so we don't enforce a "save as" on next save
                 self.file_has_been_saved = True
             else:
