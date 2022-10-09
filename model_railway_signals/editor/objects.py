@@ -50,14 +50,6 @@ from . import objects_sections
 from . import objects_instruments
 from . import run_layout
 
-####################################################################################################
-# To Do - Clear down any Signal overrides when going back into edit mode (as all sections are cleared
-# Probably a main function here calling sub functions in the sections and signals modules
-####################################################################################################
-
-from .objects_sections import enable_editing as enable_editing
-from .objects_sections import disable_editing as disable_editing
-
 from .objects_common import set_canvas as set_canvas
 from .objects_common import object_type as object_type
 from .objects_common import schematic_objects as schematic_objects
@@ -76,6 +68,20 @@ from .objects_common import signal_exists as signal_exists
 from .objects_common import point_exists as point_exists
 from .objects_common import section_exists as section_exists
 from .objects_common import instrument_exists as instrument_exists
+
+#------------------------------------------------------------------------------------
+# Functions to make any necessary object configuration changes when changing mode
+# Called from the Schematic Module when the mode is changed (edit or Run)
+#------------------------------------------------------------------------------------
+
+def enable_editing():
+    objects_sections.enable_editing()
+    objects_signals.enable_editing()
+    return()
+
+def disable_editing():
+    objects_sections.disable_editing()
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to Create a new schematic object and draw it on the canvas

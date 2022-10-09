@@ -362,10 +362,9 @@ def update_signal_overrides():
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         signal_route = find_signal_route(signal_object)
-        if signal_route is not None and signal_object["overridesignal"]:
-            ############################ TO DO ####################################
-            # Check the Main signal supports the route - otherwise don't override #
-            #######################################################################
+        # Only override if the signal (as opposed to the subsidary) supports the route
+        if ( signal_route is not None and signal_object["overridesignal"] and
+                 signal_object["sigroutes"][signal_route.value-1] ):
             section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
             if section_ahead > 0:
                 if track_sections.section_occupied(section_ahead):

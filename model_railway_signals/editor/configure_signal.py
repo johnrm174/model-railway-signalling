@@ -286,7 +286,6 @@ def save_state(signal, close_window):
         new_object_configuration["overridebehind"] = override_distant
         new_object_configuration["fullyautomatic"] = fully_automatic
         new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
-        
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
         ##########################################################################################
