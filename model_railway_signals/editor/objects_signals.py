@@ -90,8 +90,7 @@ default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
 default_signal_object["feathers"] = [False,False,False,False,False]  # [MAIN,LH1,LH2,RH1,RH2]
 default_signal_object["dccautoinhibit"] = False
-default_signal_object["fullyautomatic"] = False
-default_signal_object["distautomatic"] = False
+# Interlock a distant signal with all home signals ahead
 default_signal_object["interlockahead"] = False
 # The signal arms table comprises a list of route elements: [main, LH1, LH2, RH1, RH2]
 # Each Route element comprises a list of signal elements: [sig, sub, dist]
@@ -178,6 +177,16 @@ default_signal_object["subroutes"] = [True,False,False,False,False]
 # Set the default  automation tables for the signal
 default_signal_object["passedsensor"] = [True,0]     # [button, gpio_port]
 default_signal_object["approachsensor"] = [False,0]  # [button, gpio_port]
+# Track sections is a list of [section_behind, sections_ahead]
+# where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
+default_signal_object["tracksections"] = [0, [0, 0, 0, 0, 0]]
+default_signal_object["overridesignal"] = False
+# Override the distant signal on the route behind the signal
+default_signal_object["overridebehind"] = False
+default_signal_object["fullyautomatic"] = False
+
+default_signal_object["distautomatic"] = False
+
 # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
 # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
 default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
@@ -292,13 +301,11 @@ def redraw_signal_object(object_id):
     # As we are using these for signal events, we assign an arbitary item ID
     if schematic_objects[object_id]["passedsensor"][1] > 0:     
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10,
-                        gpio_channel = schematic_objects[object_id]["passedsensor"][1],
-                        sensor_callback = run_layout.schematic_callback,
+                        gpio_channel = schematic_objects[object_id]["passedsensor"],
                         signal_passed = schematic_objects[object_id]["itemid"] )
     if schematic_objects[object_id]["approachsensor"][1] > 0:  
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10+1,
-                        gpio_channel = schematic_objects[object_id]["approachsensor"][1],
-                        sensor_callback = run_layout.schematic_callback,
+                        gpio_channel = schematic_objects[object_id]["approachsensor"],
                         signal_passed = schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or

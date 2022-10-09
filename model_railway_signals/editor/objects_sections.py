@@ -221,9 +221,16 @@ def delete_section(object_id):
     global schematic_objects
     # Delete the associated library objects from the canvas
     delete_section_object(object_id)
-    #################################################################################
-    # TODO - remove any references to the section from the signal automation tables
-    #################################################################################
+    # Remove any references to the section from the signal track occupancy tables
+    for signal_id in signal_index:
+        track_sections = schematic_objects[signal(signal_id)]["tracksections"]
+        # Check with the track section behind the signal
+        if track_sections[0] == schematic_objects[object_id]["itemid"]:
+            track_sections[0] = 0
+        #Check the track section in front of the signal
+        for index1, section_ahead in enumerate(track_sections[1]):
+            if section_ahead == schematic_objects[object_id]["itemid"]:
+                schematic_objects[signal(signal_id)]["tracksections"][1][index1] = 0
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])

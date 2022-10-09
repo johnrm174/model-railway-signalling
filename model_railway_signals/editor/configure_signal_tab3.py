@@ -8,15 +8,15 @@ from . import common
 from . import objects
 
 #------------------------------------------------------------------------------------
-# Class for a Signal Sensor Entry Box - based on the common integer_entry_box class
+# Class for a Track Sensor Entry Box - based on the common integer_entry_box class
 # Public Class instance methods (inherited from the integer_entry_box) are
 #    "set_value" - will set the current value (integer)
 #    "get_value" - will return the last "valid" value (integer)
-# Public Class instance methods provided by this class:
-#    "validate" - validate the entry box value and return True/false
+# Overridden Public Class instance methods provided by this class:
+#    "validate" - Must be a valid GPIO port and not assigned to another signal
 #------------------------------------------------------------------------------------
 
-class signal_sensor_entry_box(common.integer_entry_box):
+class track_sensor_entry_box(common.integer_entry_box):
     def __init__(self, parent_frame, parent_object, tool_tip:str):
         # We need the reference to the parent object so we can call the sibling
         # class method to get the current value of the Signal ID for validation
@@ -24,7 +24,7 @@ class signal_sensor_entry_box(common.integer_entry_box):
         super().__init__(parent_frame, width=3, min_value=4, max_value=26,
                               tool_tip=tool_tip, allow_empty=True)
             
-    def validate(self):
+    def validate(self, update_validation_status=True):
         # Do the basic integer validation first (integer, in range)
         valid = super().validate(update_validation_status=False)
         if valid and self.entry.get() != "":
@@ -34,20 +34,16 @@ class signal_sensor_entry_box(common.integer_entry_box):
                 valid = False
             else:
                 # Test to see if the gpio channel is alreay assigned to another signal
-                current_channel = self.initial_value.get()
+                current_channel = self.initial_value
                 for signal_id in objects.signal_index:
                     signal_object = objects.schematic_objects[objects.signal(signal_id)]
-                    if ( signal_object["itemid"] != int(self.parent_object.sigid.get_initial_value()) and
-                         ( signal_object["passedsensor"][1] == new_channel or
-                              signal_object["approachsensor"][1] == new_channel ) ):
+                    if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
+                         ( signal_object["passedsensor"] == new_channel or
+                              signal_object["approachsensor"] == new_channel ) ):
                         self.TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
                                         +str(signal_object["itemid"]))
                         valid = False
-                ##################################################################################
-                # TODO - validate that it isn't the same sensor as the other sensor for the signal
-                # Probably have to pass in "other sensor" function to __init__ method
-                ##################################################################################
-        self.set_validation_status(valid)
+        if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
 #------------------------------------------------------------------------------------
@@ -55,10 +51,11 @@ class signal_sensor_entry_box(common.integer_entry_box):
 # Public Class instance methods (inherited from the signal_sensor_entry_box) are
 #    "set_value" - will set the current value (integer)
 #    "get_value" - will return the last "valid" value (integer)
-#    "validate" - validate the entry box value and return True/false
+# Overridden Public Class instance methods provided by this class:
+#    "validate" - validate the GPIO port is not assigned to the "approach" sensor 
 #------------------------------------------------------------------------------------
 
-class signal_sensor_frame(signal_sensor_entry_box):
+class signal_passed_sensor_frame(track_sensor_entry_box):
     def __init__(self, parent_frame, parent_object):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame, text="Signal Passed Sensor")        
@@ -67,6 +64,18 @@ class signal_sensor_frame(signal_sensor_entry_box):
         super().__init__(self.frame, parent_object, tool_tip="Specify a GPIO channel "+
                "in the range 4-13 or 16-26 for the signal 'passed' sensor (or leave blank)")
         self.pack(side=LEFT, padx=2, pady=2)
+        
+    def validate(self):
+        # Do the basic integer validation first (integer, in range)
+        valid = super().validate(update_validation_status=False)
+#         if valid and self.entry.get() != "":
+#             new_channel = int(self.entry.get())
+#             if new_channel == self.parent_object.automation.approac_sensor.get_value() :
+#                 self.TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned "+
+#                                       "to the signal 'approached' sensor")
+#                 valid = False
+        self.set_validation_status(valid)
+        return(valid)
             
 #------------------------------------------------------------------------------------
 # Sub Classes for the Track Occupancy automation subframe
@@ -107,6 +116,10 @@ class section_ahead_frame():
         self.lh2 = section_ahead_element(parent_frame, label=" LH2 ==> ")
         self.rh1 = section_ahead_element(parent_frame, label=" RH1 ==> ")
         self.rh2 = section_ahead_element(parent_frame, label=" RH2 ==> ")
+        
+    def validate(self):
+        return (self.main.validate() and self.lh1.validate() and self.lh2.validate()
+                             and self.rh1.validate() and self.rh2.validate() )
 
 #------------------------------------------------------------------------------------
 # Class for the Track Occupancy Frame - inherits from the sub-classes above
@@ -150,6 +163,11 @@ class track_occupancy_frame():
                      self.section_ahead.rh1.get_value(),
                      self.section_ahead.rh2.get_value() ] ])
 
+    def validate(self):
+        # Validates all track section entry boxes
+        return ( self.section_behind.validate() and
+                 self.section_ahead.validate() )
+
 #------------------------------------------------------------------------------------
 # Class for the General automation settings subframe
 # Public Class instance methods provided by this class:
@@ -164,55 +182,53 @@ class track_occupancy_frame():
 
 class general_settings_frame():
     def __init__(self, parent_frame):
-        self.override_dist_enabled = False
-        self.fully_auto_enabled = False
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="General settings")        
+        self.frame = LabelFrame(parent_frame, text="General settings")
+        self.fully_auto = common.check_box(self.frame, width=22,
+                    label="  Fully automatic signal\n (no signal button)",
+                    tool_tip="Select to create without a main signal button "+
+                    "(signal will have a default signal state of OFF)")
+        self.fully_auto.pack(padx=2, pady=2)
         self.override = common.check_box(self.frame, width=22,
                     label="  Override signal to ON if\n  section ahead occupied",
                     tool_tip="Select to override the signal to ON if "+
                     "the track section ahead of the signal is occupied",
                     callback=self.update_override_selections)
         self.override.pack(padx=2, pady=2)
-        self.fully_auto = common.check_box(self.frame, width=22,
-                    label="  Fully automatic signal",
-                    tool_tip="Select to create without a main signal button "+
-                    "(signal will have a default signal state of OFF)")
-        self.fully_auto.pack(padx=2, pady=2)
         self.override_dist = common.check_box(self.frame, width=22,
                     label="  Propogate override to\n distant signal behind",
                     tool_tip="Select to also override the distant signal on the "+
                     "route behind if this home signal is overridden")
         self.override_dist.pack(padx=2, pady=2)
-
+        
     def update_override_selections(self):
-        if self.override.get_value():
-            if self.override_dist_enabled: self.override_dist.enable()
-            if self.fully_auto_enabled: self.fully_auto.enable()
-        else:
-            self.override_dist.disable()
-            self.fully_auto.disable()
+        if self.override.get_value(): self.override_dist.enable1()
+        else: self.override_dist.disable1()
+        
+    def enable_override(self):
+        self.override.enable() 
+        self.update_override_selections() 
+
+    def disable_override(self):
+        self.override.disable()
+        self.update_override_selections()
         
     def enable_dist_override(self):
-        self.override_dist_enabled = True
-        self.update_override_selections()
+        self.override_dist.enable() 
 
     def disable_dist_override(self):
         self.override_dist.disable()
-        self.override_dist_enabled = False
         
     def enable_fully_auto(self):
-        self.fully_auto_enabled = True
-        self.update_override_selections()
+        self.fully_auto.enable()
 
     def disable_fully_auto(self):
         self.fully_auto.disable()
-        self.fully_auto_enabled = False
 
-    def set_values(self, sig:bool, dist:bool, auto:bool):
-        self.override.set_value(sig)
-        self.override_dist.set_value(dist)
-        self.fully_auto.set_value(dist)
+    def set_values(self, override_sig:bool, override_dist_behind:bool, fully_automatic:bool):
+        self.override.set_value(override_sig)
+        self.override_dist.set_value(override_dist_behind)
+        self.fully_auto.set_value(fully_automatic)
         self.update_override_selections()
         
     def get_values(self):
@@ -407,7 +423,7 @@ class approach_control_frame(common.route_selections):
                                                 "be subject to approach control")
         self.label2 = Label(self.subframe1, text="  GPIO Channel:")
         self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.gpio = signal_sensor_entry_box(self.subframe1, parent_object, tool_tip=
+        self.gpio = track_sensor_entry_box(self.subframe1, parent_object, tool_tip=
                         "Specify a GPIO channel in the range 4-13 or 16-26 "+
                         "for the signal 'approached' sensor (or leave blank)")
         self.gpio.pack(side=LEFT, padx=5, pady=2)
@@ -499,7 +515,7 @@ class signal_automation_tab():
         # Create a Frame for the Sensor, track occupancy and general settings
         self.frame1 = Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.passed_sensor = signal_sensor_frame(self.frame1, parent_object)
+        self.passed_sensor = signal_passed_sensor_frame(self.frame1, parent_object)
         self.passed_sensor.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
         self.track_occupancy = track_occupancy_frame(self.frame1)
         self.track_occupancy.frame.pack(side=LEFT, padx=2, pady=2, fill='y')

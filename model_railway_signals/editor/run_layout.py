@@ -42,7 +42,9 @@
 #    points.fpl_active(point_id) - To test if a facing point lock is active
 #    points.point_switched(point_id) - To test if a point is switched
 #    points.lock_point(point_id) - To intelock a point
-#    points.unlock_point (point_id) - To unlock a point
+#    track_sections.set_section_occupied (section_id) - Set "Occupied"
+#    track_sections.clear_section_occupied (section_id) - Clear "Occupied"
+#    track_sections.section_occupied (section_id) - To test if a section is occupied
 #    <MORE COMING>
 #------------------------------------------------------------------------------------
 
@@ -55,6 +57,7 @@ from ..library import block_instruments
 from ..library import signals_common
 from ..library import signals_semaphores
 from ..library import signals_colour_lights
+from ..library import track_sections
 
 from . import objects
 
@@ -306,14 +309,35 @@ def process_interlocking():
         else: points.unlock_point(point_id)
     return()
 
+#------------------------------------------------------------------------------------
+# Function to Update track occupancy based on signal passed events - Note that we
+# have to use "signal clear" to assume the direction of travel. i.e. if the signal
+# sensor is triggered and the signal is clear we assume the direction of travel
+# is towards the signal. If the signal is at red then we assume the direction of
+# travel is in the other direction and so tqake no action
+#------------------------------------------------------------------------------------
+
+def update_track_occupancy(signal_object):
+    section_behind = signal_object["tracksections"][0] 
+    signal_route = find_signal_route(signal_object)
+    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
+        section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
+        if section_ahead > 0 and section_behind > 0:
+            track_sections.set_section_occupied (section_ahead,
+                track_sections.clear_section_occupied(section_behind))
+        elif section_ahead > 0:
+            track_sections.set_section_occupied (section_ahead)
+        elif section_behind > 0:
+            track_sections.clear_section_occupied(section_behind)
+    return()
 
 #------------------------------------------------------------------------------------
-# Function to trigger any timed signal sequences
+# Function to trigger any timed signal sequences (only trigger if signal is clear)
 #------------------------------------------------------------------------------------
 
 def trigger_timed_signal(signal_object):
     signal_route = find_signal_route(signal_object)
-    if signal_route is not None:
+    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
         if ( signal_object["timedsequences"][signal_route.value-1][0] and
                 signal_object["timedsequences"][signal_route.value-1][1] !=0 ):
             # Get the details of the timed signal sequence to initiate
@@ -331,6 +355,27 @@ def trigger_timed_signal(signal_object):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to trigger any timed signal sequences (only trigger if signal is clear)
+#------------------------------------------------------------------------------------
+
+def update_signal_overrides():
+    for signal_id in objects.signal_index:
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
+        signal_route = find_signal_route(signal_object)
+        if signal_route is not None and signal_object["overridesignal"]:
+            ############################ TO DO ####################################
+            # Check the Main signal supports the route - otherwise don't override #
+            #######################################################################
+            section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
+            if section_ahead > 0:
+                if track_sections.section_occupied(section_ahead):
+                    signals.set_signal_override(signal_id)
+                else:
+                    signals.clear_signal_override(signal_id)
+                process_signal_updates(signal_object)
+    return()
+
+#------------------------------------------------------------------------------------
 # Main callback function for when anything on the layout changes
 #------------------------------------------------------------------------------------
 
@@ -340,8 +385,14 @@ def schematic_callback(item_id,callback_type):
     
     # First process any signal sensor events (signal passed events)
     if ( callback_type == signals_common.sig_callback_type.sig_passed ):
+        update_track_occupancy (objects.schematic_objects[objects.signal(item_id)])
         trigger_timed_signal(objects.schematic_objects[objects.signal(item_id)])
-    
+
+    # Process any signal override changes (based on track occupancy)
+    if ( callback_type == signals_common.sig_callback_type.sig_passed or
+         callback_type == track_sections.section_callback_type.section_updated):
+        update_signal_overrides()
+
     # Process the signal updates (update signals based on the signal ahead)
     # This is primarily for colour light signals where the displayed aspect (if
     # the signal is OFF) will depend on the displayed aspect of the signal ahead

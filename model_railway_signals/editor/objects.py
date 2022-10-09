@@ -50,6 +50,11 @@ from . import objects_sections
 from . import objects_instruments
 from . import run_layout
 
+####################################################################################################
+# To Do - Clear down any Signal overrides when going back into edit mode (as all sections are cleared
+# Probably a main function here calling sub functions in the sections and signals modules
+####################################################################################################
+
 from .objects_sections import enable_editing as enable_editing
 from .objects_sections import disable_editing as disable_editing
 

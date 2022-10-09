@@ -182,14 +182,19 @@ def load_state(signal):
     signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
     signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
     # These elements are for the Automation tab
+    signal.automation.passed_sensor.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
+    signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
+    override = objects.schematic_objects[object_id]["overridesignal"]
+    override_distant = objects.schematic_objects[object_id]["overridebehind"]
+    fully_automatic = objects.schematic_objects[object_id]["fullyautomatic"]
+    signal.automation.general_settings.set_values(override, override_distant, fully_automatic)
     signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
+    
     
     ##########################################################################################
     ################################ TODO - Automation UI elements ###########################
     ##########################################################################################
-#   a = objects.schematic_objects[object_id]["fullyautomatic"] # i.e. no main signal button
 #   b = objects.schematic_objects[object_id]["distautomatic"] # i.e. no button for secondary distant arms
-#   c = objects.schematic_objects[object_id]["passedsensor"]
 #   d = objects.schematic_objects[object_id]["approachsensor"]
 
     # Configure the initial Route indication selection
@@ -237,7 +242,8 @@ def save_state(signal, close_window):
     elif ( signal.config.sigid.validate() and signal.config.aspects.validate() and
            signal.config.theatre.validate() and signal.config.feathers.validate() and
            signal.config.semaphores.validate() and signal.locking.interlocking.validate() and
-           signal.locking.conflicting_sigs.validate() and signal.automation.timed_signal.validate() ):
+           signal.locking.conflicting_sigs.validate() and signal.automation.passed_sensor.validate() and
+           signal.automation.track_occupancy.validate() and signal.automation.timed_signal.validate() ):
         
         ##########################################################################################
         ####################### TODO - Validation of Automation UI elements ######################
@@ -273,14 +279,18 @@ def save_state(signal, close_window):
         new_object_configuration["siginterlock"] = signal.locking.conflicting_sigs.get_values()
         new_object_configuration["interlockahead"] = signal.locking.interlock_ahead.get_value()
         # These elements are for the Automation tab
+        new_object_configuration["passedsensor"][1] = signal.automation.passed_sensor.get_value()
+        new_object_configuration["tracksections"] = signal.automation.track_occupancy.get_values()
+        override, override_distant, fully_automatic = signal.automation.general_settings.get_values()
+        new_object_configuration["overridesignal"] = override
+        new_object_configuration["overridebehind"] = override_distant
+        new_object_configuration["fullyautomatic"] = fully_automatic
         new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
         
         ##########################################################################################
         ################################ TODO - Automation UI elements ###########################
         ##########################################################################################
-#        new_object_configuration["passedsensor"] = a
 #        new_object_configuration["approachsensor"] = b
-#        new_object_configuration["fullyautomatic"] = c
 #        new_object_configuration["distautomatic"] = d
 
         # Save the updated configuration (and re-draw the object)
@@ -661,12 +671,14 @@ def update_tab2_interlock_ahead_selection(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab3_general_settings_selections(signal):
-    # Enable/disable the "Fully Automatic" (no signal button) selection
+    # Enable/disable the "Fully Automatic"(no signal button) and "Override" selections
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value  or
          signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value):
         signal.automation.general_settings.enable_fully_auto()
+        signal.automation.general_settings.enable_override()
     else:
         signal.automation.general_settings.disable_fully_auto()
+        signal.automation.general_settings.disable_override()
     # Enable/disable the "override distant signal behind" selection
     if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value) or
@@ -675,6 +687,7 @@ def update_tab3_general_settings_selections(signal):
         signal.automation.general_settings.enable_dist_override()
     else:
         signal.automation.general_settings.disable_dist_override()
+    
     return()
 
 #------------------------------------------------------------------------------------
