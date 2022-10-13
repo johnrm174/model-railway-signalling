@@ -313,11 +313,11 @@ def redraw_signal_object(object_id):
     # As we are using these for signal events, we assign an arbitary item ID
     if schematic_objects[object_id]["passedsensor"][1] > 0:     
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10,
-                        gpio_channel = schematic_objects[object_id]["passedsensor"],
+                        gpio_channel = schematic_objects[object_id]["passedsensor"][1],
                         signal_passed = schematic_objects[object_id]["itemid"] )
     if schematic_objects[object_id]["approachsensor"][1] > 0:  
         track_sensors.create_track_sensor(schematic_objects[object_id]["itemid"]*10+1,
-                        gpio_channel = schematic_objects[object_id]["approachsensor"],
+                        gpio_channel = schematic_objects[object_id]["approachsensor"][1],
                         signal_passed = schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
