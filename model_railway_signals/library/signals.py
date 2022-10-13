@@ -731,6 +731,7 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             signals_common.signals[sig_identifier] = {}
             signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+            signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
     return()
 
@@ -749,6 +750,7 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             signals_common.signals[sig_identifier] = {}
             signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+            signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
     return()
 
