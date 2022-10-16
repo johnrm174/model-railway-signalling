@@ -126,10 +126,10 @@ class also_switch_selection(common.int_item_id_entry_box):
         exists_function = objects.point_exists
         current_id_function = parent_object.pointid.get_value
         # Create the Label Frame for the "also switch" entry box
-        self.frame = LabelFrame(parent_frame, text="ID of point to 'Also Switch'")
+        self.frame = LabelFrame(parent_frame, text="Automatically switch another point")
         # Call the common base class init function to create the EB
-        super().__init__(self.frame, tool_tip = "Enter the ID of an existing fully "+
-                "automatic point to be switched with this point (or leave blank)",
+        super().__init__(self.frame, tool_tip = "Enter the ID of another (fully "+
+                "automatic) point to be switched with this point (or leave blank)",
                 exists_function=exists_function, current_id_function=current_id_function)
         self.pack(padx=2, pady=2)
         
@@ -179,17 +179,17 @@ class general_settings():
                         tool_tip="Select to rotate point by 180 degrees")
         self.CB1.pack(side=LEFT, padx=2, pady=2)
         self.CB2 = common.check_box(self.subframe1, label="Facing point lock", width=16,
-                tool_tip="Select for a Facing Point Lock (not fully automatic points)")
+                tool_tip="Select to include a Facing Point Lock (manually switched points only)")
         self.CB2.pack(side=LEFT, padx=2, pady=2)
         # Create a subframe to hold the second 2 buttons
         self.subframe2 = Frame(self.frame)
         self.subframe2.pack()
         self.CB3 = common.check_box(self.subframe2, label="Reversed", width=9,
-                        tool_tip="Select to reverse the point blades")
+                        tool_tip="Select to reverse the switching logic of the point blades")
         self.CB3.pack(side=LEFT, padx=2, pady=2)
         self.CB4 = common.check_box(self.subframe2, label="Fully automatic", width=16,
-            tool_tip="Select to enable this point to be 'also switched' "+
-                        "by another point", callback= self.automatic_updated)
+            tool_tip="Select to create the point without manual controls (to be switched "+
+                        "with another point)", callback= self.automatic_updated)
         self.CB4.pack(side=LEFT, padx=2, pady=2)
 
     def automatic_updated(self):
@@ -357,8 +357,12 @@ class edit_point():
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
         self.window.attributes('-topmost',True)
-        # Create the Window tabs
+        # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
+        # When you change tabs tkinter focuses on the first entry box - we don't want this
+        # So we bind the tab changed event to a function which will focus on something else 
+        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
+        # Create the Window tabs
         self.tab1 = Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
         self.tab2 = Frame(self.tabs)
@@ -372,5 +376,11 @@ class edit_point():
         self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
+
+    def tab_changed(self,event):
+        # Focus on the top level window to remove focus from the first entry box
+        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
+        self.window.focus()
+        pass
 
 #############################################################################################

@@ -185,9 +185,8 @@ def load_state(signal):
     signal.automation.passed_sensor.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
     signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
     override = objects.schematic_objects[object_id]["overridesignal"]
-    override_distant = objects.schematic_objects[object_id]["overridebehind"]
     fully_automatic = objects.schematic_objects[object_id]["fullyautomatic"]
-    signal.automation.general_settings.set_values(override, override_distant, fully_automatic)
+    signal.automation.general_settings.set_values(override, fully_automatic)
     signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
     
     
@@ -220,11 +219,11 @@ def load_state(signal):
     update_tab1_signal_ui_elements(signal)
     update_tab2_available_signal_routes(signal)
     update_tab2_interlock_ahead_selection(signal)
+    update_tab3_track_section_ahead_routes(signal)
     update_tab3_general_settings_selections(signal)
-    update_tab3_secondary_distant_signal_routes(signal)
     update_tab3_timed_signal_selections(signal)
     update_tab3_approach_control_selections(signal)
-    update_tab3_track_section_ahead_routes(signal)
+#    update_tab3_secondary_distant_signal_routes(signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -281,9 +280,8 @@ def save_state(signal, close_window):
         # These elements are for the Automation tab
         new_object_configuration["passedsensor"][1] = signal.automation.passed_sensor.get_value()
         new_object_configuration["tracksections"] = signal.automation.track_occupancy.get_values()
-        override, override_distant, fully_automatic = signal.automation.general_settings.get_values()
+        override, fully_automatic = signal.automation.general_settings.get_values()
         new_object_configuration["overridesignal"] = override
-        new_object_configuration["overridebehind"] = override_distant
         new_object_configuration["fullyautomatic"] = fully_automatic
         new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
         ##########################################################################################
@@ -673,20 +671,9 @@ def update_tab3_general_settings_selections(signal):
     # Enable/disable the "Fully Automatic"(no signal button) and "Override" selections
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value  or
          signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value):
-        signal.automation.general_settings.enable_fully_auto()
-        signal.automation.general_settings.enable_override()
+        signal.automation.general_settings.enable()
     else:
-        signal.automation.general_settings.disable_fully_auto()
-        signal.automation.general_settings.disable_override()
-    # Enable/disable the "override distant signal behind" selection
-    if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value) or
-         ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-           signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value) ):
-        signal.automation.general_settings.enable_dist_override()
-    else:
-        signal.automation.general_settings.disable_dist_override()
-    
+        signal.automation.general_settings.disable()
     return()
 
 #------------------------------------------------------------------------------------
@@ -726,7 +713,6 @@ def update_tab3_track_section_ahead_routes(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab3_timed_signal_selections(signal):
-    pass
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     # Enable/disable the UI element depending on whether the signal supports timed signal sequences
@@ -766,31 +752,31 @@ def update_tab3_approach_control_selections(signal):
     approach_control = rel_on_red or rel_on_yel
     if approach_control:
         # Deal with the approach control selections first
-        if rel_on_yel: signal.automation.approach_control.enable_release_on_yellow()
-        else: signal.automation.approach_control.disable_release_on_yellow()
+        if rel_on_yel: signal.automation.approach_control.enable_release_on_yel()
+        else: signal.automation.approach_control.disable_release_on_yel()
         if rel_on_red: signal.automation.approach_control.enable_release_on_red()
         else: signal.automation.approach_control.disable_release_on_red()
         # MAIN Route (sig or sub)
-        signal.automation.approach_control.main.enable()
+        signal.automation.approach_control.main.enable_route()
         # LH1 Route (sig or sub)
-        if sig_routes[1] and approach_control: signal.automation.approach_control.lh1.enable()
-        else: signal.automation.approach_control.lh1.disable()
+        if sig_routes[1] and approach_control: signal.automation.approach_control.lh1.enable_route()
+        else: signal.automation.approach_control.lh1.disable_route()
         # LH2 Route (sig or sub)
-        if sig_routes[2] and approach_control: signal.automation.approach_control.lh2.enable()
-        else: signal.automation.approach_control.lh2.disable()
+        if sig_routes[2] and approach_control: signal.automation.approach_control.lh2.enable_route()
+        else: signal.automation.approach_control.lh2.disable_route()
         # RH1 Route (sig or sub)
-        if sig_routes[3] and approach_control: signal.automation.approach_control.rh1.enable()
-        else: signal.automation.approach_control.rh1.disable()
+        if sig_routes[3] and approach_control: signal.automation.approach_control.rh1.enable_route()
+        else: signal.automation.approach_control.rh1.disable_route()
         # RH2 Route (sig or sub)
-        if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable()
-        else: signal.automation.approach_control.rh2.disable()
+        if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
+        else: signal.automation.approach_control.rh2.disable_route()
     else:
-        signal.automation.approach_control.main.disable()
-        signal.automation.approach_control.lh1.disable()
-        signal.automation.approach_control.lh2.disable()
-        signal.automation.approach_control.rh1.disable()
-        signal.automation.approach_control.rh2.disable()
-        signal.automation.approach_control.disable_release_on_yellow()
+        signal.automation.approach_control.main.disable_route()
+        signal.automation.approach_control.lh1.disable_route()
+        signal.automation.approach_control.lh2.disable_route()
+        signal.automation.approach_control.rh1.disable_route()
+        signal.automation.approach_control.rh2.disable_route()
+        signal.automation.approach_control.disable_release_on_yel()
         signal.automation.approach_control.disable_release_on_red()
     return()
 
@@ -824,13 +810,18 @@ def update_tab3_secondary_distant_signal_routes(signal):
 
 class edit_signal:
     def __init__(self, root, object_id):
+        self.root=root
         # This is the UUID for the object being edited
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Toplevel(root)
         self.window.attributes('-topmost',True)
-        # Create the Window tabs
+        # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
+        # When you change tabs tkinter focuses on the first entry box - we don't want this
+        # So we bind the tab changed event to a function which will focus on something else 
+        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
+        # Create the Window tabs
         self.tab1 = Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
         self.tab2 = Frame(self.tabs)
@@ -855,6 +846,12 @@ class edit_signal:
         # load the initial UI state
         load_state(self)
         
+    def tab_changed(self,event):
+        # Focus on the top level window to remove focus from the first entry box
+        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
+        # self.window.focus()
+        pass
+        
     def sig_type_updated(self):
         # The signal type has been changed (colour-light/semaphore/ground-pos-ground-disc)
         self.config.subtype.set_value(1)
@@ -868,7 +865,7 @@ class edit_signal:
         update_tab3_general_settings_selections(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-        update_tab3_secondary_distant_signal_routes(self)
+#        update_tab3_secondary_distant_signal_routes(self)
         
     def sub_type_updated(self):
         # The signal subtype has been changed (choices dependant on signal type)
@@ -880,7 +877,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_general_settings_selections(self)
         update_tab3_approach_control_selections(self)
-        update_tab3_secondary_distant_signal_routes(self)
+#        update_tab3_secondary_distant_signal_routes(self)
         
     def route_type_updated(self):
         # The route indication type has changed (none/theatre/feather/semaphore-arms)
@@ -891,7 +888,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-        update_tab3_secondary_distant_signal_routes(self)
+#        update_tab3_secondary_distant_signal_routes(self)
         
     def route_selections_updated(self):
         # A Theatre route has been enabled/disabled on Tab1
@@ -912,7 +909,7 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-        update_tab3_secondary_distant_signal_routes(self)
+#        update_tab3_secondary_distant_signal_routes(self)
         
     def sub_routes_updated(self):
         # A semaphore subsidary arm has been enabled/disabled on Tab1

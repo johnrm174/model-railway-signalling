@@ -58,7 +58,7 @@ class track_sensor_entry_box(common.integer_entry_box):
 class signal_passed_sensor_frame(track_sensor_entry_box):
     def __init__(self, parent_frame, parent_object):
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Signal Passed Sensor")        
+        self.frame = LabelFrame(parent_frame, text="Track Sensor")        
         self.label = Label(self.frame, text="GPIO Channel:")
         self.label.pack(side=LEFT, padx=2, pady=2)
         super().__init__(self.frame, parent_object, tool_tip="Specify a GPIO channel "+
@@ -135,7 +135,7 @@ class section_ahead_frame():
 class track_occupancy_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Track occupancy")        
+        self.frame = LabelFrame(parent_frame, text="Track occupancy changes")        
         self.subframe1 = Frame(self.frame)
         self.subframe1.pack(side=LEFT)
         self.section_behind = section_behind_element(self.subframe1)
@@ -171,70 +171,42 @@ class track_occupancy_frame():
 #------------------------------------------------------------------------------------
 # Class for the General automation settings subframe
 # Public Class instance methods provided by this class:
-#     "enable_dist_override" - enable the override distant checkbox
-#     "disable_dist_override"- disable the override distant checkbox
-#     "enable_fully_auto" - enable the fully automatic checkbox
-#     "disable_fully_auto"- disable the fully automatic checkbox
-#  (note the above are only enbabled if the main override selection is checked)
-#     "set_values" - will set the current values (override, dist_override, auto)
-#     "get_values" - will return the "valid" values (override, dist_override, auto)
+#     "enable" - enable the automatic and override checkboxes
+#     "disable"- disable the automatic and override checkboxes
+#     "set_values" - will set the current values (override, auto)
+#     "get_values" - will return the "valid" values (override, auto)
 #------------------------------------------------------------------------------------
 
 class general_settings_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame, text="General settings")
-        self.fully_auto = common.check_box(self.frame, width=22,
+        self.automatic = common.check_box(self.frame, width=22,
                     label="  Fully automatic signal\n (no signal button)",
                     tool_tip="Select to create without a main signal button "+
                     "(signal will have a default signal state of OFF)")
-        self.fully_auto.pack(padx=2, pady=2)
+        self.automatic.pack(padx=2, pady=2)
         self.override = common.check_box(self.frame, width=22,
                     label="  Override signal to ON if\n  section ahead occupied",
                     tool_tip="Select to override the signal to ON if "+
-                    "the track section ahead of the signal is occupied",
-                    callback=self.update_override_selections)
+                    "the track section ahead of the signal is occupied")
         self.override.pack(padx=2, pady=2)
-        self.override_dist = common.check_box(self.frame, width=22,
-                    label="  Propogate override to\n distant signal behind",
-                    tool_tip="Select to also override the distant signal on the "+
-                    "route behind if this home signal is overridden")
-        self.override_dist.pack(padx=2, pady=2)
         
-    def update_override_selections(self):
-        if self.override.get_value(): self.override_dist.enable1()
-        else: self.override_dist.disable1()
+    def enable(self):
+        self.override.enable()
+        self.automatic.enable()
         
-    def enable_override(self):
-        self.override.enable() 
-        self.update_override_selections() 
-
-    def disable_override(self):
+    def disable(self):
         self.override.disable()
-        self.update_override_selections()
-        
-    def enable_dist_override(self):
-        self.override_dist.enable() 
-
-    def disable_dist_override(self):
-        self.override_dist.disable()
-        
-    def enable_fully_auto(self):
-        self.fully_auto.enable()
-
-    def disable_fully_auto(self):
-        self.fully_auto.disable()
-
-    def set_values(self, override_sig:bool, override_dist_behind:bool, fully_automatic:bool):
+        self.automatic.disable()
+                
+    def set_values(self, override_sig:bool, fully_automatic:bool):
         self.override.set_value(override_sig)
-        self.override_dist.set_value(override_dist_behind)
-        self.fully_auto.set_value(fully_automatic)
-        self.update_override_selections()
+        self.automatic.set_value(fully_automatic)
         
     def get_values(self):
         return ( self.override.get_value(),
-                 self.override_dist.get_value(),
-                 self.fully_auto.get_value() )
+                 self.automatic.get_value() )
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route element comprising a route selection checkbox, a
@@ -254,7 +226,9 @@ class general_settings_frame():
 #####################################################################################
 
 class timed_signal_route_element():
-    def __init__(self, parent_frame, label:str, ):
+    def __init__(self, parent_frame, parent_object, label:str):
+        # This is the parent object (the signal instance)
+        self.parent_object = parent_object
         # Create a frame for the route element
         self.frame = Frame(parent_frame)
         self.frame.pack()
@@ -289,6 +263,11 @@ class timed_signal_route_element():
             self.sig.enable1()
             self.start.enable1()
             self.delay.enable1()
+            # If no siganl ID is configured then set the ID to the current Signal ID
+            # So we start off with a valid configuration for the user to edit
+            if self.sig.get_value() == 0:
+                self.sig.set_value(self.parent_object.config.sigid.get_initial_value())
+
         else:
             self.sig.disable1()
             self.start.disable1()
@@ -330,15 +309,14 @@ class timed_signal_route_element():
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route frame (comprising selections for each route)
 # Public class instance methods provided by this class are: 
-#    "set_values" - set the initial values for the check box and entry boxes) 
+#    "set_values" - set the initial values for the check box and entry boxes
 #    "get_values" - get the last "validated" values of the check box and entry boxes
-#    "validate" - validate all signal IDs and entered timed sequence parameters
 # Note that no overall enable/disable functions are provided - External functions 
-# should call the individaua enable/disable functions for each route element
+# should call the individual enable/disable functions for each route element
 #------------------------------------------------------------------------------------
 
 class timed_signal_frame():
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, parent_object):
         # Create a label frame for the UI element
         self.frame = LabelFrame(parent_frame, text="Trigger timed signal sequence")
         # Create a subframe for the context label
@@ -349,11 +327,11 @@ class timed_signal_frame():
         # Create a subframe for the route elements
         self.subframe2 = Frame(self.frame)
         self.subframe2.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)        
-        self.main=timed_signal_route_element(self.subframe2, label="MAIN")
-        self.lh1=timed_signal_route_element(self.subframe2, label="LH1")
-        self.lh2=timed_signal_route_element(self.subframe2, label="LH2")
-        self.rh1=timed_signal_route_element(self.subframe2, label="RH1")
-        self.rh2=timed_signal_route_element(self.subframe2, label="RH2")
+        self.main=timed_signal_route_element(self.subframe2, parent_object, label="MAIN")
+        self.lh1=timed_signal_route_element(self.subframe2, parent_object, label="LH1")
+        self.lh2=timed_signal_route_element(self.subframe2, parent_object, label="LH2")
+        self.rh1=timed_signal_route_element(self.subframe2, parent_object, label="RH1")
+        self.rh2=timed_signal_route_element(self.subframe2, parent_object, label="RH2")
         
     def set_values(self, timed_sequence:[[bool,int,int,int],]):
         # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
@@ -380,75 +358,179 @@ class timed_signal_frame():
                  self.lh2.validate() and
                  self.rh1.validate() and
                  self.rh2.validate() )
-        
+
 #------------------------------------------------------------------------------------
-# Class for the Approach Control UI Element - builds on common.route_selection class
-# Public Class instance methods (inherited from the base class) are
-#    "set_values" - Sets the route selection CBs 
-#    "get_values" - Gets route selection CBs 
-#    "enable" - Enables/loads the route selection CBs 
-#    "disable" - Disables/blanks the route selection CBs 
-#    "update_route_selections"- to "refresh" the UI element following route changes
-# Individual routes are enabled/disabled by calling the sub-class methods:
-#    "<route>.disable" - disables/blanks the entry box 
-#    "<route>.enable"  enables/loads the entry box
+# Class for a approach control route element comprising a route selection checkbox,
+# And radio buttons to select the approach control mode
+#    "disable_route" - disables/blanks all checkboxes and radio buttons 
+#    "enable_route"  enables/loads all checkboxes and radio buttons
+#    "disable_red" - disables/blanks the "Release on Red" radio button 
+#    "enable_red"  enables/loads the "Release on Red" radio button
+#    "disable_yel" - disables/blanks the "Release on yellow" radio button 
+#    "enable_yel"  enables/loads the "Release on yellow" radio button
+#    "set_values" - set the initial values for the check box and radio buttons
+#    "get_values" - get the current values of the check box and radio buttons
 #------------------------------------------------------------------------------------
 
-class approach_control_frame(common.route_selections):
-    def __init__(self, parent_frame, parent_object):
-        self.frame = LabelFrame(parent_frame, text="Approach control")
-        # Create a subframe for the Approach control option buttons
-        self.subframe2 = Frame(self.frame)
-        self.subframe2.pack()
-        self.selection = IntVar(self.subframe2, 0)
-        tool_tip = "Select the Approach control mode for the signal"
-        self.B0 = Radiobutton(self.subframe2, text="No Release Control",anchor='w',
-                    variable=self.selection, value=0, command=self.selection_changed)
-        self.B0.pack(side=LEFT, padx=2, pady=2)
-        self.B0TT = common.CreateToolTip(self.B0, tool_tip)
-        self.B1 = Radiobutton(self.subframe2, text="Release on RED", anchor='w',
-                    variable=self.selection, value=1, command=self.selection_changed)
-        self.B1.pack(side=LEFT, padx=2, pady=2)
-        self.B1TT = common.CreateToolTip(self.B1, tool_tip)
-        self.B2 = Radiobutton(self.subframe2, text="Release on YELLOW", anchor='w',
-                    variable=self.selection, value=2, command=self.selection_changed)
-        self.B2.pack(side=LEFT, padx=2, pady=2)
-        self.B2TT = common.CreateToolTip(self.B2, tool_tip)
-        # Create a subframe to hold the GPIO channel and routes element
-        self.subframe1 = Frame(self.frame)
-        self.subframe1.pack()
-        self.label1 = Label(self.subframe1, text="Routes:")
-        self.label1.pack(padx=2, pady=2, side=LEFT)
-        super().__init__(self.subframe1, tool_tip="Select the signal routes to "+
-                                                "be subject to approach control")
-        self.label2 = Label(self.subframe1, text="  GPIO Channel:")
-        self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.gpio = track_sensor_entry_box(self.subframe1, parent_object, tool_tip=
-                        "Specify a GPIO channel in the range 4-13 or 16-26 "+
-                        "for the signal 'approached' sensor (or leave blank)")
-        self.gpio.pack(side=LEFT, padx=5, pady=2)
+class approach_control_route_element():
+    def __init__(self, parent_frame, label:str):
+        # Create a frame for the route element
+        self.frame = Frame(parent_frame)
+        self.frame.pack()
+        # Create the route element (selection, sig ID, start delay, aspect change delay)
+        self.label1 = Label(self.frame, width=5, text=label, anchor='w')
+        self.label1.pack(side=LEFT)
+        self.route = common.check_box(self.frame, label="", callback=self.route_selected,
+                tool_tip="Select to enable 'Approach Control' for this route")
+        self.route.pack(side=LEFT)
+        # Add a bit of white space
+        self.label2 = Label(self.frame, text="     Mode:")
+        self.label2.pack(side=LEFT)
+        # Create the approach control mode selection radiobuttons
+        self.selection = IntVar(self.frame, 0)
+        self.approach_mode = 0
+        self.red_enabled = True
+        self.yel_enabled = True
+        self.route_enabled = True
+        self.B1 = Radiobutton(self.frame, text="Release on Red", anchor='w',
+                command=self.mode_selected, variable=self.selection, value=1)
+        self.B1.pack(side=LEFT)
+        self.B1TT = common.CreateToolTip(self.B1, "Signal will remain at Red until the train approaches")
+        self.B2 = Radiobutton(self.frame, text="Release on Yellow", anchor='w',
+                command=self.mode_selected, variable=self.selection, value=2)
+        self.B2.pack(side=LEFT)
+        self.B2TT = common.CreateToolTip(self.B2, "Signal will remain at Yellow until the train approaches")
 
-    def selection_changed(self):
-        if self.selection.get() == 1 or self.selection.get() == 2: self.gpio.enable()
-        else: self.disable()
-            
-    def enable_release_on_yellow(self):
-        self.B2.config(state="normal")
-        
-    def disable_release_on_yellow(self):
-        self.B2.config(state="disabled")
-        if self.selection.get() == 2:
+    def mode_selected(self):
+        self.approach_mode = self.selection.get()
+
+    def route_selected(self):
+        if self.route.get_value():
+            if self.red_enabled: self.B1.configure(state="normal")
+            else: self.B1.configure(state="disabled")
+            if self.yel_enabled: self.B2.configure(state="normal")
+            else: self.B2.configure(state="disabled")
+            self.selection.set(self.approach_mode)
+        else:
+            self.B1.configure(state="disabled")
+            self.B2.configure(state="disabled")
             self.selection.set(0)
-            self.selection_changed()
 
+    def enable_route(self):
+        self.route.enable()
+        self.route_selected()
+        self.route_enabled = True
+
+    def disable_route(self):
+        self.route.disable()
+        self.route_selected()
+        self.route_enabled = False
+        
+    def enable_red(self):
+        self.red_enabled = True
+        self.route_selected()
+        
+    def disable_red(self):
+        self.red_enabled = False
+        self.route_selected()
+        
+    def enable_yel(self):
+        self.yel_enabled = True
+        self.route_selected()
+        
+    def disable_yel(self):
+        self.yel_enabled = False
+        self.route_selected()
+
+    def set_values(self, route:[bool,bool]):
+        # List of [release_on_red:bool, release_on_yel:bool]
+        self.route.set_value(route[0] or route[1])
+        if route[0]: self.approach_mode = 1
+        elif route[1]: self.approach_mode = 2
+        else: self.approach_mode = 0
+        self.selection.set(self.approach_mode)
+    
+    def get_values(self):
+        # List of [release_on_red:bool, release_on_yel:bool]
+        return ( [self.selection.get()==1, self.selection.get()==2] )
+
+#------------------------------------------------------------------------------------
+# Class for a Approach Control route frame (comprising selections for each route)
+# Public class instance methods provided by this class are: 
+#    "disable_red" - disables/blanks the "Release on Red" radio button 
+#    "enable_red"  enables/loads the "Release on Red" radio button
+#    "disable_yel" - disables/blanks the "Release on yellow" radio button 
+#    "enable_yel"  enables/loads the "Release on yellow" radio button
+#    "set_values" - set the initial values for the check box and entry boxes) 
+#    "get_values" - get the last "validated" values of the check box and entry boxes
+#    "validate" - validate all signal IDs and entered timed sequence parameters
+# Note that no route enable/disable functions are provided - External functions 
+# should call the individal route_enable/disable functions for each element
+#------------------------------------------------------------------------------------
+
+class approach_control_frame():
+    def __init__(self, parent_frame):
+        # Create a label frame for the UI element
+        self.frame = LabelFrame(parent_frame, text="Approach control selections")
+        # Create a subframe for the context label
+        self.subframe1 = Frame(self.frame)
+        self.subframe1.pack(side=LEFT, padx=2, pady=2, fill='both')        
+        self.label = Label(self.frame, text="Routes subject to\napproach control", anchor='w')
+        self.label.pack(side=LEFT)
+        # Create a subframe for the route elements
+        self.subframe2 = Frame(self.frame)
+        self.subframe2.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)        
+        self.main=approach_control_route_element(self.subframe2, label="MAIN")
+        self.lh1=approach_control_route_element(self.subframe2, label="LH1")
+        self.lh2=approach_control_route_element(self.subframe2, label="LH2")
+        self.rh1=approach_control_route_element(self.subframe2, label="RH1")
+        self.rh2=approach_control_route_element(self.subframe2, label="RH2")
+        
     def enable_release_on_red(self):
-        self.B1.config(state="normal")
+        self.main.enable_red()
+        self.lh1.enable_red()
+        self.lh2.enable_red()
+        self.rh1.enable_red()
+        self.rh2.enable_red()
         
     def disable_release_on_red(self):
-        self.B1.config(state="disabled")
-        if self.selection.get() == 1:
-            self.selection.set(0)
-            self.selection_changed()
+        self.main.disable_red()
+        self.lh1.disable_red()
+        self.lh2.disable_red()
+        self.rh1.disable_red()
+        self.rh2.disable_red()
+        
+    def enable_release_on_yel(self):
+        self.main.enable_yel()
+        self.lh1.enable_yel()
+        self.lh2.enable_yel()
+        self.rh1.enable_yel()
+        self.rh2.enable_yel()
+        
+    def disable_release_on_yel(self):
+        self.main.disable_yel()
+        self.lh1.disable_yel()
+        self.lh2.disable_yel()
+        self.rh1.disable_yel()
+        self.rh2.disable_yel()
+        
+    def set_values(self, approach_control:[[bool, bool],]):
+        # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # where each element is List of [release_on_red:bool, release_on_yel:bool]
+        self.main.set_values(approach_control[0])
+        self.lh1.set_values(approach_control[1])
+        self.lh2.set_values(approach_control[2])
+        self.rh1.set_values(approach_control[3])
+        self.rh2.set_values(approach_control[4])
+
+    def get_values(self):
+        # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+        # where each element is List of [release_on_red:bool, release_on_yel:bool]
+        return ( [  self.main.get_values().
+                    self.lh1.get_values(),
+                    self.lh2.get_values(),
+                    self.rh1.get_values(),
+                    self.rh2.get_values() ] )
         
 #------------------------------------------------------------------------------------
 # Class for the Secondary distant Arms UI Element
@@ -515,21 +597,21 @@ class signal_automation_tab():
         # Create a Frame for the Sensor, track occupancy and general settings
         self.frame1 = Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
-        self.passed_sensor = signal_passed_sensor_frame(self.frame1, parent_object)
-        self.passed_sensor.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
         self.track_occupancy = track_occupancy_frame(self.frame1)
         self.track_occupancy.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
         self.general_settings = general_settings_frame(self.frame1)
-        self.general_settings.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.general_settings.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
+        self.passed_sensor = signal_passed_sensor_frame(self.frame1, parent_object)
+        self.passed_sensor.frame.pack(side=LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create a Frame for the timed signal configuration
         self.frame2 = Frame(parent_tab)
         self.frame2.pack(padx=2, pady=2, fill='x')
-        self.timed_signal = timed_signal_frame(self.frame2)
+        self.timed_signal = timed_signal_frame(self.frame2, parent_object)
         self.timed_signal.frame.pack(padx=2, pady=2, fill='x', expand=True)
         # Create a Frame for the Signal Approach control
         self.frame3 = Frame(parent_tab)
         self.frame3.pack(padx=2, pady=2, fill='x')
-        self.approach_control = approach_control_frame(self.frame3, parent_object)
+        self.approach_control = approach_control_frame(self.frame3)
         self.approach_control.frame.pack(padx=2, pady=2, fill='x', expand=True)
         # Create a Frame for the Secondary distant arms
         self.frame4 = Frame(parent_tab)

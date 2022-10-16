@@ -440,8 +440,8 @@ class colour_light_aspects():
         # Create a subframe to hold the subsidary signal entry box (always packed)
         self.subframe = Frame(self.frame)
         self.subframe.pack()
-        self.CB = common.check_box(self.subframe, label="Subsidary signal aspect",   
-                    tool_tip="Select for a subsidary signal",callback=self.sub_updated)
+        self.CB = common.check_box(self.subframe, label="Subsidary signal",   
+                    tool_tip="Select to include a seperate subsidary signal",callback=self.sub_updated)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.EB = common.dcc_entry_box(self.subframe)
         self.EB.pack(side=LEFT, padx=2, pady=2)
@@ -658,7 +658,7 @@ class theatre_route_indications:
         # Create the checkbox and tool tip for auto route inhibit selection
         self.CB = common.check_box(self.frame, label="Auto inhibit route indications on DANGER",
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
-                            "inhibits route indications if the signal is at DANGER otherwise the DCC " +
+                            "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB.pack(padx=2, pady=2) 
 
@@ -843,7 +843,7 @@ class feather_route_indications:
         # Create the checkbox and tool tip for auto route inhibit
         self.CB = common.check_box(self.frame, label="Auto inhibit route indications on DANGER",
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
-                            "inhibits route indications if the signal is at DANGER otherwise the DCC " +
+                            "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB.pack(padx=2, pady=2) 
 
@@ -1045,11 +1045,11 @@ class signal_configuration_tab:
                                         sub_routes_updated, dist_routes_updated)
         self.sig_routes = route_selections(parent_tab, 
                         "Routes to be controlled by the Main Signal",
-                        "Select one or more routes to be controlled by the signal",
+                        "Select the routes to be controlled by the main signal",
                         callback=route_selections_updated, main_signal=True)
         self.sub_routes = route_selections(parent_tab,
                         "Routes to be controlled by the Subsidary Signal",
-                        "Select one or more routes to be controlled by the subsidary signal",
+                        "Select the routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
         
 #############################################################################################

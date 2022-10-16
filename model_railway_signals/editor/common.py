@@ -106,7 +106,7 @@ class check_box(Checkbutton):
             super().__init__(self.parent_frame, width = width, text=label, anchor="w",
                        variable=self.selection, command=self.cb_updated)
         self.TT = CreateToolTip(self, tool_tip)
-        
+
     def cb_updated(self):
         # Focus on the Checkbox to remove focus from other widgets (such as EBs)
         self.parent_frame.focus()
@@ -840,15 +840,15 @@ class window_controls():
         self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
         
     def apply(self):
-        self.frame.focus()
+        self.window.focus()
         self.save_callback(self.parent_object,False)
         
     def ok(self):
-        self.frame.focus()
+        self.window.focus()
         self.save_callback(self.parent_object,True)
         
     def reset(self):
-        self.frame.focus()
+        self.window.focus()
         self.load_callback(self.parent_object)
         
     def cancel(self):
