@@ -158,8 +158,8 @@ def rotate_objects(list_of_object_ids):
     for object_id in list_of_object_ids:
         type_of_object = schematic_objects[object_id]["item"]            
         # Delete the drawing objects from the canvas
-        if type_of_object == object_type.signal: delete_signal_object(object_id)
-        elif type_of_object == object_type.point: delete_point_object(object_id)
+        if type_of_object == object_type.signal: objects_signals.delete_signal_object(object_id)
+        elif type_of_object == object_type.point: objects_points.delete_point_object(object_id)
     # Re-draw the drawing objects on the canvas in their new position
     for object_id in list_of_object_ids:
         type_of_object = schematic_objects[object_id]["item"]            
@@ -168,8 +168,8 @@ def rotate_objects(list_of_object_ids):
             orientation = schematic_objects[object_id]["orientation"]
             if orientation == 0: schematic_objects[object_id]["orientation"] = 180
             else: schematic_objects[object_id]["orientation"] = 0
-            if type_of_object == object_type.signal:redraw_signal_object(object_id)
-            elif type_of_object == object_type.point: redraw_point_object(object_id)    
+            if type_of_object == object_type.signal: objects_signals.redraw_signal_object(object_id)
+            elif type_of_object == object_type.point: objects_points.redraw_point_object(object_id)    
     # As we are just rotating objects we don't need to process layout changes
     return()
 

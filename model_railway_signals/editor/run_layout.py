@@ -310,6 +310,29 @@ def process_interlocking():
     return()
 
 #------------------------------------------------------------------------------------
+# Function to trigger any timed signal sequences (from the signal 'passed' event)
+#------------------------------------------------------------------------------------
+
+def trigger_timed_sequence(signal_object):
+    signal_route = find_signal_route(signal_object)
+    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
+        if ( signal_object["timedsequences"][signal_route.value-1][0] and
+                signal_object["timedsequences"][signal_route.value-1][1] !=0 ):
+            # Get the details of the timed signal sequence to initiate
+            current_sig_id = signal_object["itemid"]
+            sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
+            start_delay = signal_object["timedsequences"][signal_route.value-1][2]
+            time_delay = signal_object["timedsequences"][signal_route.value-1][3]
+            # If the signal to trigger is the same as the current signal then we enforce
+            # a start delay of Zero - otherwise, every time the signal changes to RED
+            # (after the start delay) a "signal passed" event will be generated which
+            # would then trigger another timed signal sequence and so on and so on
+            if sig_id_to_trigger == current_sig_id: start_delay = 0
+            # Trigger the timed sequence
+            signals.trigger_timed_signal(sig_id_to_trigger, start_delay, time_delay)                
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to Update track occupancy (from the signal 'passed' event) - Note that we
 # have to use "signal clear" to assume the direction of travel. i.e. if the signal
 # sensor is triggered and the signal is clear we assume the direction of travel
@@ -373,50 +396,10 @@ def process_overrides():
                 set_signal_override(signal_object)
             else:
                 clear_signal_override(signal_object)
-            # Ensure any aspect updates are propagated back along the route
-            process_aspect_updates(signal_object)
-        # Override/clear the signal behind based on the section behind
-        signal_behind_object = find_signal_behind(signal_object)
-        if signal_behind_object is not None:
-            signal_route = find_signal_route(signal_behind_object)
-            ###################################################################################
-            #### TO DO - need to use the route the signal is actually set to rather than
-            #### the route described by the current point selections as the toute for the
-            #### signal behind never gets cleared as the point has already been switched so
-            #### there is no route from the signal behind
-            ###################################################################################
-            if signal_route is not None:
-                section_ahead = signal_behind_object["tracksections"][1][signal_route.value-1] 
-                if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
-                        and signal_object["sigroutes"][signal_route.value-1] ):
-                    set_signal_override(signal_behind_object)
-                else:
-                    clear_signal_override(signal_behind_object)
-                # Ensure any aspect updates are propagated back along the route
-                process_aspect_updates(signal_behind_object)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to trigger any timed signal sequences (from the signal 'passed' event)
-#------------------------------------------------------------------------------------
-
-def trigger_timed_sequence(signal_object):
-    signal_route = find_signal_route(signal_object)
-    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
-        if ( signal_object["timedsequences"][signal_route.value-1][0] and
-                signal_object["timedsequences"][signal_route.value-1][1] !=0 ):
-            # Get the details of the timed signal sequence to initiate
-            current_sig_id = signal_object["itemid"]
-            sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
-            start_delay = signal_object["timedsequences"][signal_route.value-1][2]
-            time_delay = signal_object["timedsequences"][signal_route.value-1][3]
-            # If the signal to trigger is the same as the current signal then we enforce
-            # a start delay of Zero - otherwise, every time the signal changes to RED
-            # (after the start delay) a "signal passed" event will be generated which
-            # would then trigger another timed signal sequence and so on and so on
-            if sig_id_to_trigger == current_sig_id: start_delay = 0
-            # Trigger the timed sequence
-            signals.trigger_timed_signal(sig_id_to_trigger, start_delay, time_delay)                
+        else:
+            clear_signal_override(signal_object)
+        # Ensure any aspect updates are propagated back along the route
+        process_aspect_updates(signal_object)
     return()
 
 #------------------------------------------------------------------------------------
