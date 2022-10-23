@@ -180,13 +180,19 @@ default_signal_object["approachsensor"] = [False,0]  # [button, gpio_port]
 # Track sections is a list of [section_behind, sections_ahead]
 # where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
 default_signal_object["tracksections"] = [0, [0, 0, 0, 0, 0]]
+# General automation settings for the signal
+# 'overrideahead' will override distant if any home signals ahead are at DANGER
+default_signal_object["fullyautomatic"] = False # Main signal is automatic (no button
+default_signal_object["distautomatic"] = False # Semaphore associated distant is automatic
+default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
-# Override the distant signal on the route behind the signal
-default_signal_object["overridebehind"] = False
-default_signal_object["fullyautomatic"] = False
-
-default_signal_object["distautomatic"] = False
-
+# Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
+# where each element is List of [release_on_red:bool, release_on_yel:bool]
+default_signal_object["approachcontrol"] = [ [False, False],
+                                             [False, False],             
+                                             [False, False],             
+                                             [False, False],             
+                                             [False, False] ]            
 # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
 # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
 default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
@@ -522,14 +528,16 @@ def paste_signal(object_to_paste):
     schematic_objects[new_object_id]["dccaspects"] = default_signal_object["dccaspects"]
     schematic_objects[new_object_id]["dccfeathers"] = default_signal_object["dccfeathers"]
     schematic_objects[new_object_id]["dcctheatre"] = default_signal_object["dcctheatre"]
-    # Associated track sensors (will need different GPIO inputs allocating)
+    # Associated track sensors and sections (will need different GPIO inputs allocating)
+    schematic_objects[new_object_id]["tracksections"] = default_signal_object["tracksections"]
     schematic_objects[new_object_id]["passedsensor"] = default_signal_object["passedsensor"]
     schematic_objects[new_object_id]["approachsensor"] = default_signal_object["approachsensor"]
-    # Any Timed Signal sequences need to be cleared
+    # Any Timed Signal sequences or approach control need to be cleared
     schematic_objects[new_object_id]["timedsequences"] = default_signal_object["timedsequences"]
-    #######################################################################################
-    ######### TO Do - Clear other automation configuration elements #######################
-    #######################################################################################
+    schematic_objects[new_object_id]["approachcontrol"] = default_signal_object["approachcontrol"]
+    # Any override selections will need to be cleared (fully automatic selection can be left)
+    schematic_objects[new_object_id]["overrideahead"] = default_signal_object["overrideahead"]
+    schematic_objects[new_object_id]["overridesignal"] = default_signal_object["overridesignal"]
     # Any DCC addresses for the semaphore signal arms
     for index1,route in enumerate(schematic_objects[new_object_id]["sigarms"]):
         for index2,signal in enumerate(route):

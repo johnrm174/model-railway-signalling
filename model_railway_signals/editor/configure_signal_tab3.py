@@ -16,13 +16,16 @@ from . import objects
 #    "validate" - Must be a valid GPIO port and not assigned to another signal
 #------------------------------------------------------------------------------------
 
-class track_sensor_entry_box(common.integer_entry_box):
-    def __init__(self, parent_frame, parent_object, tool_tip:str):
+class signal_sensor(common.integer_entry_box):
+    def __init__(self, parent_frame, parent_object, callback, label:str, tool_tip:str):
         # We need the reference to the parent object so we can call the sibling
         # class method to get the current value of the Signal ID for validation
-        self.parent_object = parent_object
+        self.parent_object = parent_object 
+        self.label = Label(parent_frame, text=label)
+        self.label.pack(side=LEFT, padx=2, pady=2)
         super().__init__(parent_frame, width=3, min_value=4, max_value=26,
-                              tool_tip=tool_tip, allow_empty=True)
+                callback = callback, tool_tip=tool_tip, allow_empty=True)
+        self.pack(side=LEFT, padx=2, pady=2)
             
     def validate(self, update_validation_status=True):
         # Do the basic integer validation first (integer, in range)
@@ -38,8 +41,8 @@ class track_sensor_entry_box(common.integer_entry_box):
                 for signal_id in objects.signal_index:
                     signal_object = objects.schematic_objects[objects.signal(signal_id)]
                     if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
-                         ( signal_object["passedsensor"] == new_channel or
-                              signal_object["approachsensor"] == new_channel ) ):
+                         ( signal_object["passedsensor"][1] == new_channel or
+                              signal_object["approachsensor"][1] == new_channel ) ):
                         self.TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
                                         +str(signal_object["itemid"]))
                         valid = False
@@ -47,35 +50,45 @@ class track_sensor_entry_box(common.integer_entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Class for the Signal Passed Sensor Frame - based on the common integer_entry_box class
-# Public Class instance methods (inherited from the signal_sensor_entry_box) are
-#    "set_value" - will set the current value (integer)
-#    "get_value" - will return the last "valid" value (integer)
-# Overridden Public Class instance methods provided by this class:
-#    "validate" - validate the GPIO port is not assigned to the "approach" sensor 
+# Class for the Signal Passed Sensor Frame - uses the Track Sensor Entry Box class
+# Public Class instance methods used from the base classes are
+#    "approach.enable" - disables/blanks the checkbox and entry box 
+#    "approach.disable" - enables/loads the checkbox and entry box
+#    "approach.set_value" - will set the current value (int)
+#    "approach.get_value" - returns the last "valid" value (int)
+#    "passed.set_value" - will set the current value (int)
+#    "passed.get_value" - returns the last "valid" value (int)
+# Public Class instance methods provided by this class:
+#    "validate" - validate both entry box values and return True/false
 #------------------------------------------------------------------------------------
 
-class signal_passed_sensor_frame(track_sensor_entry_box):
+class signal_passed_sensor_frame:
     def __init__(self, parent_frame, parent_object):
-        # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Track Sensor")        
-        self.label = Label(self.frame, text="GPIO Channel:")
-        self.label.pack(side=LEFT, padx=2, pady=2)
-        super().__init__(self.frame, parent_object, tool_tip="Specify a GPIO channel "+
-               "in the range 4-13 or 16-26 for the signal 'passed' sensor (or leave blank)")
-        self.pack(side=LEFT, padx=2, pady=2)
+        # The child class instances need the reference to the parent object so they can call
+        # the sibling class method to get the current value of the Signal ID for validation
+        self.frame = LabelFrame(parent_frame, text="Track sensors to associate with signal")
+        # Create the elements in a subframe so they are centered
+        self.subframe = Frame(self.frame)
+        self.subframe.pack()
+        self.passed = signal_sensor(self.subframe, parent_object, callback=self.validate,
+                label="  Signal 'passed' sensor:", tool_tip = "Specify a GPIO channel in "+
+                "the range 4-13 or 16-26 for the signal 'passed' event (or leave blank)")
+        self.approach = signal_sensor(self.subframe, parent_object, callback=self.validate,
+                label="  Signal 'approached' sensor:", tool_tip = "Specify a GPIO channel in "+
+                "the range 4-13 or 16-26 for the signal 'approached' event (or leave blank)")
         
     def validate(self):
-        # Do the basic integer validation first (integer, in range)
-        valid = super().validate(update_validation_status=False)
-#         if valid and self.entry.get() != "":
-#             new_channel = int(self.entry.get())
-#             if new_channel == self.parent_object.automation.approac_sensor.get_value() :
-#                 self.TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned "+
-#                                       "to the signal 'approached' sensor")
-#                 valid = False
-        self.set_validation_status(valid)
-        return(valid)
+        if self.passed.entry.get() != "" and self.passed.entry.get() == self.approach.entry.get():
+            error_text = "GPIO channels for signal 'passed' and signal 'approached' must be different"
+            self.passed.TT.text = error_text
+            self.approach.TT.text = error_text
+            self.passed.set_validation_status(False)
+            self.approach.set_validation_status(False)
+            return(False)
+        else:
+            self.passed.set_validation_status(self.passed.validate())
+            self.approach.set_validation_status(self.approach.validate())
+            return(self.passed.validate() and self.approach.validate())
             
 #------------------------------------------------------------------------------------
 # Sub Classes for the Track Occupancy automation subframe
@@ -84,12 +97,16 @@ class signal_passed_sensor_frame(track_sensor_entry_box):
 #    "enable"  enables/loads the entry box
 #    "set_value" - will set the current value (integer)
 #    "get_value" - will return the last "valid" value (integer)
+# Public Class instance methods provided by the section_ahead_frame class:
+#    "validate" - validate all 'section ahead' entry box values and return True/false
 #------------------------------------------------------------------------------------
 
 class section_behind_element(common.int_item_id_entry_box):
     def __init__(self, parent_frame):
         self.frame = Frame(parent_frame)
         self.frame.pack()
+        self.label1 = Label(self.frame, width=1)
+        self.label1.pack(side=LEFT)
         tool_tip = "Sepecify the track section before the signal (to be cleared when the signal is passed)"
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=LEFT)
@@ -126,7 +143,7 @@ class section_ahead_frame():
 # Public Class instance methods provided by this class:
 #    "set_values" - will set the current values [behind,[MAIN,LH1,LH2,RH1,RH2]]
 #    "get_values" - will return the "valid" values [behind,[MAIN,LH1,LH2,RH1,RH2]]
-#    "validate" - validate both entry box values and return True/false
+#    "validate" - validate all entry box values and return True/false
 # Individual routes are enabled/disabled by calling the sub-class methods:
 #    "section_ahead.<route>.disable" - disables/blanks the entry box 
 #    "section_ahead.<route>.enable"  enables/loads the entry box
@@ -171,8 +188,12 @@ class track_occupancy_frame():
 #------------------------------------------------------------------------------------
 # Class for the General automation settings subframe
 # Public Class instance methods provided by this class:
-#     "enable" - enable the automatic and override checkboxes
-#     "disable"- disable the automatic and override checkboxes
+#     "override.enable" - enable the override checkbox
+#     "override.disable"- disable the override checkbox
+#     "automatic.enable" - enable the automatic checkbox
+#     "automatic.disable"- disable the automatic checkbox
+#     "override_ahead.enable" - enable the override ahead checkbox
+#     "override_ahead.disable"- disable the override ahead checkbox
 #     "set_values" - will set the current values (override, auto)
 #     "get_values" - will return the "valid" values (override, auto)
 #------------------------------------------------------------------------------------
@@ -181,32 +202,31 @@ class general_settings_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame, text="General settings")
-        self.automatic = common.check_box(self.frame, width=22,
-                    label="  Fully automatic signal\n (no signal button)",
+        self.automatic = common.check_box(self.frame, width=40,
+                    label="  Fully automatic signal (no signal button)",
                     tool_tip="Select to create without a main signal button "+
                     "(signal will have a default signal state of OFF)")
         self.automatic.pack(padx=2, pady=2)
-        self.override = common.check_box(self.frame, width=22,
-                    label="  Override signal to ON if\n  section ahead occupied",
+        self.override = common.check_box(self.frame, width=40,
+                    label="  Override signal to ON if section ahead occupied",
                     tool_tip="Select to override the signal to ON if "+
                     "the track section ahead of the signal is occupied")
         self.override.pack(padx=2, pady=2)
-        
-    def enable(self):
-        self.override.enable()
-        self.automatic.enable()
-        
-    def disable(self):
-        self.override.disable()
-        self.automatic.disable()
-                
-    def set_values(self, override_sig:bool, fully_automatic:bool):
+        self.override_ahead = common.check_box(self.frame, width=40,
+                    label="  Override if home signals ahead are at DANGER",
+                    tool_tip="Select to override distant signal to ON if "+
+                    "any home signals on the route ahead are at DANGER")
+        self.override_ahead.pack(padx=2, pady=2)
+                        
+    def set_values(self, override_sig:bool, fully_automatic:bool, override_ahead:bool):
         self.override.set_value(override_sig)
         self.automatic.set_value(fully_automatic)
+        self.override_ahead.set_value(override_ahead)
         
     def get_values(self):
         return ( self.override.get_value(),
-                 self.automatic.get_value() )
+                 self.automatic.get_value(),
+                 self.override_ahead.get_value() )
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route element comprising a route selection checkbox, a
@@ -267,7 +287,6 @@ class timed_signal_route_element():
             # So we start off with a valid configuration for the user to edit
             if self.sig.get_value() == 0:
                 self.sig.set_value(self.parent_object.config.sigid.get_initial_value())
-
         else:
             self.sig.disable1()
             self.start.disable1()
@@ -391,7 +410,6 @@ class approach_control_route_element():
         self.approach_mode = 0
         self.red_enabled = True
         self.yel_enabled = True
-        self.route_enabled = True
         self.B1 = Radiobutton(self.frame, text="Release on Red", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=1)
         self.B1.pack(side=LEFT)
@@ -410,6 +428,10 @@ class approach_control_route_element():
             else: self.B1.configure(state="disabled")
             if self.yel_enabled: self.B2.configure(state="normal")
             else: self.B2.configure(state="disabled")
+            # Ensure the selection is valid
+            if self.red_enabled and not self.yel_enabled: self.approach_mode = 1
+            elif self.yel_enabled and not self.red_enabled: self.approach_mode = 2
+            elif self.red_enabled and self.yel_enabled and self.approach_mode == 0: self.approach_mode = 1
             self.selection.set(self.approach_mode)
         else:
             self.B1.configure(state="disabled")
@@ -419,12 +441,10 @@ class approach_control_route_element():
     def enable_route(self):
         self.route.enable()
         self.route_selected()
-        self.route_enabled = True
 
     def disable_route(self):
         self.route.disable()
         self.route_selected()
-        self.route_enabled = False
         
     def enable_red(self):
         self.red_enabled = True
@@ -448,19 +468,23 @@ class approach_control_route_element():
         if route[0]: self.approach_mode = 1
         elif route[1]: self.approach_mode = 2
         else: self.approach_mode = 0
-        self.selection.set(self.approach_mode)
+        self.route_selected()
     
     def get_values(self):
         # List of [release_on_red:bool, release_on_yel:bool]
+        # Values will both be zero if the selections are disabled
         return ( [self.selection.get()==1, self.selection.get()==2] )
+
+    def approach_control_selected(self):
+        return self.route.get_value()
 
 #------------------------------------------------------------------------------------
 # Class for a Approach Control route frame (comprising selections for each route)
 # Public class instance methods provided by this class are: 
-#    "disable_red" - disables/blanks the "Release on Red" radio button 
-#    "enable_red"  enables/loads the "Release on Red" radio button
-#    "disable_yel" - disables/blanks the "Release on yellow" radio button 
-#    "enable_yel"  enables/loads the "Release on yellow" radio button
+#    "enable_release_on_red" - disables/blanks the "Release on Red" radio button 
+#    "disable_release_on_red"  enables/loads the "Release on Red" radio button
+#    "enable_release_on_yel" - disables/blanks the "Release on yellow" radio button 
+#    "disable_release_on_yel"  enables/loads the "Release on yellow" radio button
 #    "set_values" - set the initial values for the check box and entry boxes) 
 #    "get_values" - get the last "validated" values of the check box and entry boxes
 #    "validate" - validate all signal IDs and entered timed sequence parameters
@@ -526,67 +550,74 @@ class approach_control_frame():
     def get_values(self):
         # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
         # where each element is List of [release_on_red:bool, release_on_yel:bool]
-        return ( [  self.main.get_values().
+        return ( [  self.main.get_values(),
                     self.lh1.get_values(),
                     self.lh2.get_values(),
                     self.rh1.get_values(),
                     self.rh2.get_values() ] )
+    
+    def is_selected(self):
+        return ( self.main.approach_control_selected() or
+                 self.lh1.approach_control_selected() or
+                 self.lh2.approach_control_selected() or
+                 self.rh1.approach_control_selected() or
+                 self.rh2.approach_control_selected() )
         
-#------------------------------------------------------------------------------------
-# Class for the Secondary distant Arms UI Element
-# Public Class instance methods provided by this class:
-#    "validate" - validate the entry box value and return True/false
-#    "set_values" - Sets the route selection EBs 
-#    "get_values" - Gets route selection EBs 
-# Individual routes are enabled/disabled by calling the sub-class methods:
-#    "<route>.disable" - disables/blanks the entry box 
-#    "<route>.enable"  enables/loads the entry box
-#------------------------------------------------------------------------------------
-
-class secondary_distant_arms_frame():
-    def __init__(self, parent_frame, parent_object):
-        signal_exists_function = objects.signal_exists
-        current_id_function = parent_object.config.sigid.get_value
-        self.frame = LabelFrame(parent_frame, text="Secondary distant arms")
-        self.subframe2 = Frame(self.frame)
-        self.subframe2.pack()
-        tool_tip = ("Enter the ID of another distant signal to mirror for this route (this "+
-                "can be a local signal or a remote signal subscribed to via MQTT networking) "+
-                "or leave all fields blank to retain the distant signal control button")
-        self.label1 = Label(self.subframe2, text="MAIN:")
-        self.label1.pack(side=LEFT, padx=2, pady=2)
-        self.main = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-            exists_function=signal_exists_function, current_id_function=current_id_function)
-        self.main.pack(side=LEFT)
-        self.label2 = Label(self.subframe2, text="LH1:")
-        self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.lh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-            exists_function=signal_exists_function, current_id_function=current_id_function)
-        self.lh1.pack(side=LEFT)
-        self.label3 = Label(self.subframe2, text="LH2:")
-        self.label3.pack(side=LEFT, padx=2, pady=2)
-        self.lh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-            exists_function=signal_exists_function, current_id_function=current_id_function)
-        self.lh2.pack(side=LEFT)
-        self.label4 = Label(self.subframe2, text="RH1")
-        self.label4.pack(side=LEFT, padx=2, pady=2)
-        self.rh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-            exists_function=signal_exists_function, current_id_function=current_id_function)
-        self.rh1.pack(side=LEFT)
-        self.label5 = Label(self.subframe2, text="RH2")
-        self.label5.pack(side=LEFT, padx=2, pady=2)
-        self.rh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-            exists_function=signal_exists_function, current_id_function=current_id_function)
-        self.rh2.pack(side=LEFT)
-
-    def validate(self):
-        pass   ## TODO
-
-    def set_values(self, signals):
-        pass   ##TODO
-
-    def get_values(self):
-        return(["","","","",""])   ##TODO
+###------------------------------------------------------------------------------------
+### Class for the Secondary distant Arms UI Element
+### Public Class instance methods provided by this class:
+###    "validate" - validate the entry box value and return True/false
+###    "set_values" - Sets the route selection EBs 
+###    "get_values" - Gets route selection EBs 
+### Individual routes are enabled/disabled by calling the sub-class methods:
+###    "<route>.disable" - disables/blanks the entry box 
+###    "<route>.enable"  enables/loads the entry box
+###------------------------------------------------------------------------------------
+##
+##class secondary_distant_arms_frame():
+##    def __init__(self, parent_frame, parent_object):
+##        signal_exists_function = objects.signal_exists
+##        current_id_function = parent_object.config.sigid.get_value
+##        self.frame = LabelFrame(parent_frame, text="Secondary distant arms")
+##        self.subframe2 = Frame(self.frame)
+##        self.subframe2.pack()
+##        tool_tip = ("Enter the ID of another distant signal to mirror for this route (this "+
+##                "can be a local signal or a remote signal subscribed to via MQTT networking) "+
+##                "or leave all fields blank to retain the distant signal control button")
+##        self.label1 = Label(self.subframe2, text="MAIN:")
+##        self.label1.pack(side=LEFT, padx=2, pady=2)
+##        self.main = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
+##            exists_function=signal_exists_function, current_id_function=current_id_function)
+##        self.main.pack(side=LEFT)
+##        self.label2 = Label(self.subframe2, text="LH1:")
+##        self.label2.pack(side=LEFT, padx=2, pady=2)
+##        self.lh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
+##            exists_function=signal_exists_function, current_id_function=current_id_function)
+##        self.lh1.pack(side=LEFT)
+##        self.label3 = Label(self.subframe2, text="LH2:")
+##        self.label3.pack(side=LEFT, padx=2, pady=2)
+##        self.lh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
+##            exists_function=signal_exists_function, current_id_function=current_id_function)
+##        self.lh2.pack(side=LEFT)
+##        self.label4 = Label(self.subframe2, text="RH1")
+##        self.label4.pack(side=LEFT, padx=2, pady=2)
+##        self.rh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
+##            exists_function=signal_exists_function, current_id_function=current_id_function)
+##        self.rh1.pack(side=LEFT)
+##        self.label5 = Label(self.subframe2, text="RH2")
+##        self.label5.pack(side=LEFT, padx=2, pady=2)
+##        self.rh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
+##            exists_function=signal_exists_function, current_id_function=current_id_function)
+##        self.rh2.pack(side=LEFT)
+##
+##    def validate(self):
+##        pass   ## TODO
+##
+##    def set_values(self, signals):
+##        pass   ##TODO
+##
+##    def get_values(self):
+##        return(["","","","",""])   ##TODO
     
 #------------------------------------------------------------------------------------
 # Top level Class for the Edit Signal Window Automation Tab
@@ -594,28 +625,23 @@ class secondary_distant_arms_frame():
 
 class signal_automation_tab():
     def __init__(self, parent_tab, parent_object):
-        # Create a Frame for the Sensor, track occupancy and general settings
+        # Create the signal sensor frame (always packed)
+        self.track_sensors = signal_passed_sensor_frame(parent_tab, parent_object)
+        self.track_sensors.frame.pack(padx=2, pady=2, fill='x')
+        # Create a Frame for the track occupancy and general settings (always packed)
         self.frame1 = Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.track_occupancy = track_occupancy_frame(self.frame1)
-        self.track_occupancy.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
+        self.track_occupancy.frame.pack(side=LEFT, padx=2, pady=2)
         self.general_settings = general_settings_frame(self.frame1)
-        self.general_settings.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
-        self.passed_sensor = signal_passed_sensor_frame(self.frame1, parent_object)
-        self.passed_sensor.frame.pack(side=LEFT, padx=2, pady=2, fill='both', expand=True)
-        # Create a Frame for the timed signal configuration
-        self.frame2 = Frame(parent_tab)
-        self.frame2.pack(padx=2, pady=2, fill='x')
-        self.timed_signal = timed_signal_frame(self.frame2, parent_object)
-        self.timed_signal.frame.pack(padx=2, pady=2, fill='x', expand=True)
-        # Create a Frame for the Signal Approach control
-        self.frame3 = Frame(parent_tab)
-        self.frame3.pack(padx=2, pady=2, fill='x')
-        self.approach_control = approach_control_frame(self.frame3)
-        self.approach_control.frame.pack(padx=2, pady=2, fill='x', expand=True)
-        # Create a Frame for the Secondary distant arms
-        self.frame4 = Frame(parent_tab)
-        self.frame4.pack(padx=2, pady=2, fill='x')
-        self.secondary_distant_arms = secondary_distant_arms_frame(self.frame4, parent_object)
-        self.secondary_distant_arms.frame.pack(padx=2, pady=2, fill='x', expand=True)
+        self.general_settings.frame.pack(side=LEFT, padx=2, pady=2, fill='both', expand=True)
+        # Create a Frame for the timed signal configuration (packed according to signal type)
+        self.timed_signal = timed_signal_frame(parent_tab, parent_object)
+        # Create a Frame for the Signal Approach control (packed according to signal type)
+        self.approach_control = approach_control_frame(parent_tab)
+##        # Create a Frame for the Secondary distant arms
+##        self.frame4 = Frame(parent_tab)
+##        self.frame4.pack(padx=2, pady=2, fill='x')
+##        self.secondary_distant_arms = secondary_distant_arms_frame(self.frame4, parent_object)
+##        self.secondary_distant_arms.frame.pack(padx=2, pady=2, fill='x', expand=True)
 

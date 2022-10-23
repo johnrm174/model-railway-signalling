@@ -3,6 +3,28 @@
     "instruments": {},
     "objects": {
         "02febfbf-ee80-4c08-b52d-84b72fa9c23b": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -501,7 +523,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -516,6 +537,8 @@
             "itemsubtype": 5,
             "itemtype": 1,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -1008,6 +1031,16 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
@@ -1035,6 +1068,28 @@
             "posy": 250
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -1533,7 +1588,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -1548,6 +1602,8 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -2040,9 +2096,41 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -2541,7 +2629,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -2556,6 +2643,8 @@
             "itemsubtype": 5,
             "itemtype": 1,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -3048,9 +3137,41 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -3549,7 +3670,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -3564,6 +3684,8 @@
             "itemsubtype": 5,
             "itemtype": 1,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -4056,6 +4178,16 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
@@ -4131,6 +4263,28 @@
             "posy": 200
         },
         "ac294bf3-a8ee-473e-877b-24db735b8d76": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -4629,7 +4783,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -4644,6 +4797,8 @@
             "itemsubtype": 5,
             "itemtype": 1,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -5136,6 +5291,16 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
@@ -5228,6 +5393,28 @@
             "posy": 200
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -5726,7 +5913,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -5741,6 +5927,8 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -6233,6 +6421,16 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "df337c59-d6c8-420a-9165-628b58e8be08": {
@@ -6253,6 +6451,28 @@
             "siginterlock": []
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -6751,7 +6971,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -6766,6 +6985,8 @@
             "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -7258,9 +7479,41 @@
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ]
             ]
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
+            "approachcontrol": [
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ],
+                [
+                    false,
+                    false
+                ]
+            ],
             "approachsensor": [
                 false,
                 0
@@ -7759,7 +8012,6 @@
                     ]
                 ]
             ],
-            "distautomatic": false,
             "feathers": [
                 false,
                 true,
@@ -7774,6 +8026,8 @@
             "itemsubtype": 5,
             "itemtype": 1,
             "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
             "passedsensor": [
                 true,
                 0
@@ -8262,6 +8516,16 @@
                 ],
                 [
                     false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    0,
+                    0,
                     0,
                     0,
                     0

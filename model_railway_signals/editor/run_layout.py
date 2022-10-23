@@ -206,7 +206,7 @@ def update_signal_behind(signal_object, force_update:bool=False, recursion_level
 # local signal (sig ID is an integer) or a remote signal (Signal ID is a string)
 #------------------------------------------------------------------------------------
 
-def process_signal_updates(signal_object, force_update:bool=False):
+def process_aspect_updates(signal_object, force_update:bool=False):
     # First update on the signal ahead (only if its a colour light signal)
     # Other signal types are updated automatically when switched
     if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -263,8 +263,8 @@ def process_interlocking():
                                 subsidary_can_be_unlocked = False
                                 signal_can_be_unlocked = False
                 # The "interlockedahead" flag will only be True if selected and it can only be selected for
-                # a semaphore dustant, a colour light distant or a semaphore home with secondary distant arms
-                # In the latter case then a call to "has_associated distant" will be true (false for all other types)
+                # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
+                # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
                 if signal_object["interlockahead"] and home_signal_ahead_at_danger(signal_object):
                     if has_distant_arms(signal_object):
                         # Must be a home semaphore signal with secondary distant arms
@@ -310,32 +310,97 @@ def process_interlocking():
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Update track occupancy based on signal passed events - Note that we
+# Function to Update track occupancy (from the signal 'passed' event) - Note that we
 # have to use "signal clear" to assume the direction of travel. i.e. if the signal
 # sensor is triggered and the signal is clear we assume the direction of travel
 # is towards the signal. If the signal is at red then we assume the direction of
-# travel is in the other direction and so tqake no action
+# travel is in the other direction and so take no action
 #------------------------------------------------------------------------------------
+#####################################################################################
+### TODO - will have to put some logic in here for distant signals as they can 
+### be Passed even when ON and we have to cater for distants on a bi-directional   
+### running line - perhaps need to support a signal_approached sensor to detect
+### The direction of travel to decide which sections to clear / occupy
+#####################################################################################
 
 def update_track_occupancy(signal_object):
-    section_behind = signal_object["tracksections"][0] 
-    signal_route = find_signal_route(signal_object)
-    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
-        section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
+    if signals.signal_clear(signal_object["itemid"]):
+        # Update the track occupancy sections behind and ahead of the signal
+        # Also set/clear any overrides for this signal and the signal behind
+        signal_route = find_signal_route(signal_object)
+        section_behind = signal_object["tracksections"][0]
+        if signal_route is not None:
+            section_ahead = signal_object["tracksections"][1][signal_route.value-1]
+        else:
+            section_ahead = 0
         if section_ahead > 0 and section_behind > 0:
             track_sections.set_section_occupied (section_ahead,
-                track_sections.clear_section_occupied(section_behind))
+                   track_sections.clear_section_occupied(section_behind))
         elif section_ahead > 0:
-            track_sections.set_section_occupied (section_ahead)
+            track_sections.set_section_occupied(section_ahead)
         elif section_behind > 0:
             track_sections.clear_section_occupied(section_behind)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to trigger any timed signal sequences (only trigger if signal is clear)
+# Function to Process signal overrides based on track occupancy. If this results
+# in an aspect change then we also work back to update any dependent signals
 #------------------------------------------------------------------------------------
 
-def trigger_timed_signal(signal_object):
+def set_signal_override(signal_object):
+    signal_id = signal_object["itemid"]
+    if signal_object["overridesignal"] and type(signal_id) == int:
+        signals.set_signal_override(signal_id)
+        if has_distant_arms(signal_object):
+            signals.set_signal_override(signal_id+100)
+
+def clear_signal_override(signal_object):
+    signal_id = signal_object["itemid"]
+    if signal_object["overridesignal"] and type(signal_id) == int:
+        signals.clear_signal_override(signal_id)
+        if has_distant_arms(signal_object):
+            signals.clear_signal_override(signal_id+100)
+
+def process_overrides():
+    for signal_id in objects.signal_index:
+        # Override/clear the current signal based on the section ahead
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
+        signal_route = find_signal_route(signal_object)
+        if signal_route is not None:
+            section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
+            if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
+                       and signal_object["sigroutes"][signal_route.value-1] ):
+                set_signal_override(signal_object)
+            else:
+                clear_signal_override(signal_object)
+            # Ensure any aspect updates are propagated back along the route
+            process_aspect_updates(signal_object)
+        # Override/clear the signal behind based on the section behind
+        signal_behind_object = find_signal_behind(signal_object)
+        if signal_behind_object is not None:
+            signal_route = find_signal_route(signal_behind_object)
+            ###################################################################################
+            #### TO DO - need to use the route the signal is actually set to rather than
+            #### the route described by the current point selections as the toute for the
+            #### signal behind never gets cleared as the point has already been switched so
+            #### there is no route from the signal behind
+            ###################################################################################
+            if signal_route is not None:
+                section_ahead = signal_behind_object["tracksections"][1][signal_route.value-1] 
+                if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
+                        and signal_object["sigroutes"][signal_route.value-1] ):
+                    set_signal_override(signal_behind_object)
+                else:
+                    clear_signal_override(signal_behind_object)
+                # Ensure any aspect updates are propagated back along the route
+                process_aspect_updates(signal_behind_object)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to trigger any timed signal sequences (from the signal 'passed' event)
+#------------------------------------------------------------------------------------
+
+def trigger_timed_sequence(signal_object):
     signal_route = find_signal_route(signal_object)
     if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
         if ( signal_object["timedsequences"][signal_route.value-1][0] and
@@ -355,25 +420,29 @@ def trigger_timed_signal(signal_object):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to trigger any timed signal sequences (only trigger if signal is clear)
+# Function to override any distant signals that have been configured to be overridden
+# to CAUTION if any of the home signals on the route ahead are at DANGER. If this
+# results in an aspect change then we also work back to update any dependent signals
 #------------------------------------------------------------------------------------
 
-def update_signal_overrides():
+def process_distant_overrides():
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
-        signal_route = find_signal_route(signal_object)
-        # Only override if the signal (as opposed to the subsidary) supports the route
-        if ( signal_route is not None and signal_object["overridesignal"] and
-                 signal_object["sigroutes"][signal_route.value-1] ):
-            section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
-            if section_ahead > 0:
-                if track_sections.section_occupied(section_ahead):
-                    signals.set_signal_override(signal_id)
-                else:
-                    signals.clear_signal_override(signal_id)
-                process_signal_updates(signal_object)
+        signal_should_be_overridden = False
+        distant_should_be_overridden = False
+        # Test if the signal should be overridden based on the status of home signals ahead
+        # The "overrideahead" flag will only be True if selected and it can only be selected for
+        # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
+        # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
+        if signal_object["overrideahead"] and home_signal_ahead_at_danger(signal_object):
+            if has_distant_arms(signal_object):
+                signals.set_signal_override(int(signal_id)+100)
+            else:
+                signals.set_signal_override(int(signal_id))
+            # Ensure any aspect updates are propagated back along the route
+            process_aspect_updates(signal_object)
     return()
-
+        
 #------------------------------------------------------------------------------------
 # Main callback function for when anything on the layout changes
 #------------------------------------------------------------------------------------
@@ -382,37 +451,44 @@ def schematic_callback(item_id,callback_type):
     global logging
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     
-    # First process any signal sensor events (signal passed events)
     if ( callback_type == signals_common.sig_callback_type.sig_passed ):
-        update_track_occupancy (objects.schematic_objects[objects.signal(item_id)])
-        trigger_timed_signal(objects.schematic_objects[objects.signal(item_id)])
-
-    # Process any signal override changes (based on track occupancy)
-    if ( callback_type == signals_common.sig_callback_type.sig_passed or
-         callback_type == track_sections.section_callback_type.section_updated):
-        update_signal_overrides()
-
-    # Process the signal updates (update signals based on the signal ahead)
-    # This is primarily for colour light signals where the displayed aspect (if
-    # the signal is OFF) will depend on the displayed aspect of the signal ahead
-    if ( callback_type == signals_common.sig_callback_type.sig_switched or
-         callback_type == signals_common.sig_callback_type.sub_switched or
-         callback_type == signals_common.sig_callback_type.sig_updated or
+        # Sig passed events are only generated for the main sig ID (not associated distants)
+        trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
+        update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+        process_overrides()             # This will also propagate any aspect updates
+        process_distant_overrides()     # This will also propagate any aspect updates
+        
+    if ( callback_type == signals_common.sig_callback_type.sig_updated or
          callback_type == signals_common.sig_callback_type.sig_released ):
+        # Sig updated events are generated as part of a timed signal sequence
+        # Sig Released events are triggered by the "Signal Approached" sensor
+        process_overrides()             # This will also propagate any aspect updates
+        process_distant_overrides()     # This will also propagate any aspect updates
+
+    if ( callback_type == signals_common.sig_callback_type.sig_switched ):
         # We need to differentiate if the callback was from an semaphore "associated distant"
         # (i.e. a semaphore home that has secondary distant arms). If so then we need to
         # adjust the signal ID to point to the ID of the main semaphore home signal
         if type(item_id) == int and item_id > 100: item_id = item_id-100
-        process_signal_updates(objects.schematic_objects[objects.signal(item_id)])
+        process_overrides()             # This will also propagate any aspect updates
+        process_distant_overrides()     # This will also propagate any aspect updates
+        process_interlocking()
+
+    if ( callback_type == points.point_callback_type.point_switched or
+         callback_type == points.point_callback_type.fpl_switched ):
+        process_overrides()             # This will also propagate any aspect updates
+        process_distant_overrides()     # This will also propagate any aspect updates
+        process_interlocking()
 
     # Process the signal/point/block_instrument interlocking
-    if ( callback_type == signals_common.sig_callback_type.sig_switched or
-         callback_type == signals_common.sig_callback_type.sub_switched or
-         callback_type == points.point_callback_type.point_switched or
-         callback_type == points.point_callback_type.fpl_switched or
+    if ( callback_type == signals_common.sig_callback_type.sub_switched or
          callback_type == block_instruments.block_callback_type.block_section_ahead_updated ):
         process_interlocking()
-        
+
+    if ( callback_type == track_sections.section_callback_type.section_updated):
+        process_overrides()              # This will also propagate any aspect updates
+        process_distant_overrides()      # This will also propagate any aspect updates
+
     logging.info("**************************************************************************************")
     
     return()
@@ -426,7 +502,8 @@ def schematic_callback(item_id,callback_type):
 
 def process_object_update(object_id):
     if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        process_signal_updates(objects.schematic_objects[object_id], force_update=True)
+        process_aspect_updates(objects.schematic_objects[object_id], force_update=True)
+        process_distant_overrides()
     process_interlocking()
     return()
 
@@ -438,8 +515,8 @@ def initialise_layout():
     # Force update of the displayed aspect for all signals.
     for sig_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(sig_id)]
-        process_signal_updates(signal_object, force_update=True)
-    # Process the interlocking to ensure a valid default configuration
+        process_aspect_updates(signal_object, force_update=True)
+    process_distant_overrides()
     process_interlocking()
     return()
 
