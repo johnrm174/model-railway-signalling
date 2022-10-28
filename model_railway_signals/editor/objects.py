@@ -76,11 +76,12 @@ from .objects_common import instrument_exists as instrument_exists
 
 def enable_editing():
     objects_sections.enable_editing()
-    objects_signals.enable_editing()
+    run_layout.enable_editing()
     return()
 
 def disable_editing():
     objects_sections.disable_editing()
+    run_layout.disable_editing()
     return()
 
 #------------------------------------------------------------------------------------

@@ -523,6 +523,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -1588,6 +1589,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -2629,6 +2631,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -3670,6 +3673,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -4236,7 +4240,8 @@
                         false
                     ]
                 ]
-            ]
+            ],
+            "switchedwith": 0
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
             "bbox": 215,
@@ -4783,6 +4788,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -5318,7 +5324,8 @@
             "posx": 750,
             "posy": 200,
             "reverse": false,
-            "siginterlock": []
+            "siginterlock": [],
+            "switchedwith": 0
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
             "bbox": 249,
@@ -5378,7 +5385,8 @@
                         false
                     ]
                 ]
-            ]
+            ],
+            "switchedwith": 0
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
             "bbox": 260,
@@ -5913,6 +5921,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -6448,7 +6457,8 @@
             "posx": 400,
             "posy": 200,
             "reverse": false,
-            "siginterlock": []
+            "siginterlock": [],
+            "switchedwith": 0
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
             "approachcontrol": [
@@ -6971,6 +6981,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 false,
@@ -8012,6 +8023,7 @@
                     ]
                 ]
             ],
+            "distautomatic": false,
             "feathers": [
                 false,
                 true,

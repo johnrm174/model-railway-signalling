@@ -29,7 +29,7 @@
                 false,
                 0
             ],
-            "bbox": 168,
+            "bbox": 417,
             "dccaspects": [
                 [
                     [
@@ -1045,26 +1045,26 @@
             ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 172,
-            "end1": 170,
-            "end2": 171,
+            "bbox": 421,
+            "end1": 419,
+            "end2": 420,
             "endx": 725,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 169,
+            "line": 418,
             "posx": 425,
             "posy": 250
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 176,
-            "end1": 174,
-            "end2": 175,
+            "bbox": 425,
+            "end1": 423,
+            "end2": 424,
             "endx": 775,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 173,
+            "line": 422,
             "posx": 1400,
             "posy": 250
         },
@@ -1095,7 +1095,7 @@
                 false,
                 0
             ],
-            "bbox": 185,
+            "bbox": 434,
             "dccaspects": [
                 [
                     [
@@ -2137,7 +2137,7 @@
                 false,
                 0
             ],
-            "bbox": 213,
+            "bbox": 462,
             "dccaspects": [
                 [
                     [
@@ -3179,7 +3179,7 @@
                 false,
                 0
             ],
-            "bbox": 244,
+            "bbox": 493,
             "dccaspects": [
                 [
                     [
@@ -4197,7 +4197,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 3,
             "automatic": false,
-            "bbox": 251,
+            "bbox": 500,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -4240,17 +4240,18 @@
                         false
                     ]
                 ]
-            ]
+            ],
+            "switchedwith": 0
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 255,
-            "end1": 253,
-            "end2": 254,
+            "bbox": 504,
+            "end1": 502,
+            "end2": 503,
             "endx": 725,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 252,
+            "line": 501,
             "posx": 425,
             "posy": 200
         },
@@ -4281,7 +4282,7 @@
                 false,
                 0
             ],
-            "bbox": 283,
+            "bbox": 532,
             "dccaspects": [
                 [
                     [
@@ -5317,14 +5318,14 @@
             ]
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 287,
-            "end1": 285,
-            "end2": 286,
+            "bbox": 536,
+            "end1": 534,
+            "end2": 535,
             "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 284,
+            "line": 533,
             "posx": 925,
             "posy": 200
         },
@@ -5355,7 +5356,7 @@
                 false,
                 0
             ],
-            "bbox": 340,
+            "bbox": 589,
             "dccaspects": [
                 [
                     [
@@ -6373,7 +6374,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 347,
+            "bbox": 596,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -6385,24 +6386,25 @@
             "posx": 750,
             "posy": 200,
             "reverse": false,
-            "siginterlock": []
+            "siginterlock": [],
+            "switchedwith": 0
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 351,
-            "end1": 349,
-            "end2": 350,
+            "bbox": 600,
+            "end1": 598,
+            "end2": 599,
             "endx": 0,
             "endy": 250,
             "item": "line",
             "itemid": null,
-            "line": 348,
+            "line": 597,
             "posx": 375,
             "posy": 250
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 358,
+            "bbox": 607,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -6455,17 +6457,18 @@
                         false
                     ]
                 ]
-            ]
+            ],
+            "switchedwith": 0
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 362,
-            "end1": 360,
-            "end2": 361,
+            "bbox": 611,
+            "end1": 609,
+            "end2": 610,
             "endx": 225,
             "endy": 200,
             "item": "line",
             "itemid": null,
-            "line": 359,
+            "line": 608,
             "posx": 375,
             "posy": 200
         },
@@ -6496,7 +6499,7 @@
                 false,
                 0
             ],
-            "bbox": 371,
+            "bbox": 620,
             "dccaspects": [
                 [
                     [
@@ -7514,7 +7517,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 378,
+            "bbox": 627,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7526,7 +7529,8 @@
             "posx": 400,
             "posy": 200,
             "reverse": false,
-            "siginterlock": []
+            "siginterlock": [],
+            "switchedwith": 0
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
             "approachcontrol": [
@@ -7555,7 +7559,7 @@
                 false,
                 0
             ],
-            "bbox": 387,
+            "bbox": 636,
             "dccaspects": [
                 [
                     [
@@ -8597,7 +8601,7 @@
                 false,
                 0
             ],
-            "bbox": 418,
+            "bbox": 667,
             "dccaspects": [
                 [
                     [

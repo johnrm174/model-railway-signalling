@@ -73,7 +73,14 @@ class point_interlocking_entry():
 class interlocking_route_group: 
     def __init__(self, parent_frame, parent_object, label:str):
         # These are the functions used to validate that the entered IDs exist
-        # on the schematic (and the sig ID is different to the current sig ID)
+        # on the schematic (and the sig ID is different to the current sig ID) 
+        #################################################################################
+        ### TODO - when we eventually support remote signals we can't use the current ###
+        ### signal_exists function as that only checks if the signal exists in the    ###
+        ### dictionary of schematic objects so won't pick up any signals subscribed   ###
+        ### to via the MQTT networking - we'll therefore have to use the internal     ###
+        ### library function or validate also against a list of subscribed signals    ###                
+        #################################################################################
         instrument_exists_function = objects.instrument_exists
         signal_exists_function = objects.signal_exists
         current_id_function = parent_object.config.sigid.get_value

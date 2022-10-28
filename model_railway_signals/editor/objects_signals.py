@@ -202,18 +202,6 @@ default_signal_object["timedsequences"] = [ [False, 0, 0, 0],
                                             [False, 0, 0, 0] ]
 
 #------------------------------------------------------------------------------------
-# Function to clear any signal overrides and approach control when entering edit mode.
-#------------------------------------------------------------------------------------
-
-def enable_editing():
-    for sig_id in signal_index:
-        signals.clear_signal_override(sig_id)
-        #######################################################################
-        ### TODO - clear any approach control for sig types that support it ###
-        #######################################################################
-    return()
-
-#------------------------------------------------------------------------------------
 # Internal Helper function to test if a semaphore has an associated distant signal
 #------------------------------------------------------------------------------------
 

@@ -70,6 +70,7 @@ default_point_object["itemtype"] = None
 default_point_object["orientation"] = 0
 default_point_object["colour"] = "black"
 default_point_object["alsoswitch"] = 0
+default_point_object["switchedwith"] = 0
 default_point_object["reverse"] = False
 default_point_object["automatic"] = False
 default_point_object["hasfpl"] = False
@@ -80,6 +81,20 @@ default_point_object["dccreversed"] = False
 # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Each route element in the list of routes is a boolean value (True or False)
 default_point_object["siginterlock"] = []
+
+#------------------------------------------------------------------------------------
+# Function to set the read-only "switchedby" parameter. This is the back-reference
+# to the point that is configured to auto-switch another point (else zero)
+#------------------------------------------------------------------------------------
+
+def refresh_switched_by_points():
+    for point_id in point_index:
+        schematic_objects[point(point_id)]["switchedwith"] = 0
+    for point_id in point_index:
+        also_switch_point_id = schematic_objects[point(point_id)]["alsoswitch"]
+        if also_switch_point_id > 0:
+            schematic_objects[point(also_switch_point_id)]["switchedwith"] = int(point_id)
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Point object on the schematic. Called
@@ -118,7 +133,7 @@ def update_point(object_id, new_object_configuration):
                 for index2, interlocked_point in enumerate(list_of_interlocked_points):
                     if interlocked_point[0] == old_item_id:
                         schematic_objects[signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
-    # Finally, we need to ensure that all points in an 'auto switch' chain are set
+    # We need to ensure that all points in an 'auto switch' chain are set
     # to the same switched/not-switched state so they switch together correctly
     # First, test to see if the current point is configured to "auto switch" with 
     # another point and, if so, toggle the current point to the same setting
@@ -136,6 +151,8 @@ def update_point(object_id, new_object_configuration):
         if points.point_switched(also_switch_id) != points.point_switched(current_point_id):
             # Use the non-public-api call to bypass validation (can't toggle "auto" points)
             points.toggle_point_state(also_switch_id,True)
+    # Update any back references to points configured to "auto switch"
+    refresh_switched_by_points()
     return()
 
 #------------------------------------------------------------------------------------
@@ -215,6 +232,7 @@ def paste_point(object_to_paste):
     schematic_objects[new_object_id]["posy"] += position_offset
     # Now set the default values for all elements we don't want to copy:
     schematic_objects[new_object_id]["alsoswitch"] = default_point_object["alsoswitch"]
+    schematic_objects[new_object_id]["switchedwith"] = default_point_object["switchedwith"]
     schematic_objects[new_object_id]["dccaddress"] = default_point_object["dccaddress"]
     schematic_objects[new_object_id]["dccreversed"] = default_point_object["dccreversed"]
     schematic_objects[new_object_id]["siginterlock"] = default_point_object["siginterlock"]
@@ -267,6 +285,8 @@ def delete_point(object_id):
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
     del point_index[str(schematic_objects[object_id]["itemid"])]
     del schematic_objects[object_id]
+    # Update any back references to points configured to "auto switch"
+    refresh_switched_by_points()
     return()
 
 ####################################################################################

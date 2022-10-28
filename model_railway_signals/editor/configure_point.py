@@ -45,6 +45,7 @@ def load_state(point):
     # Set the Initial UI state from the current object settings
     point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
     point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
+    point.config.alsoswitch.set_switched_with(objects.schematic_objects[object_id]["switchedwith"])
     point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     # These are the general settings for the point
     auto = objects.schematic_objects[object_id]["automatic"]
@@ -115,8 +116,9 @@ def save_state(point, close_window:bool):
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
 #    "get_initial_value" - will return the original value of the entry box (int)
-# Class instance methods overridden by this class are:
+# Class instance methods provided by this class are:
 #    "validate" - Also validate the point is automatic and not switched by another point
+#    "set_switched_with" - to set the read-only value for the "switched_with" point
 #------------------------------------------------------------------------------------
 
 class also_switch_selection(common.int_item_id_entry_box):
@@ -126,13 +128,23 @@ class also_switch_selection(common.int_item_id_entry_box):
         exists_function = objects.point_exists
         current_id_function = parent_object.pointid.get_value
         # Create the Label Frame for the "also switch" entry box
-        self.frame = LabelFrame(parent_frame, text="Automatically switch another point")
+        self.frame = LabelFrame(parent_frame, text="Automatic switching")
         # Call the common base class init function to create the EB
+        self.label1 = Label(self.frame,text="Switch point:")
+        self.label1.pack(side=LEFT, padx=2, pady=2)
         super().__init__(self.frame, tool_tip = "Enter the ID of another (fully "+
                 "automatic) point to be switched with this point (or leave blank)",
                 exists_function=exists_function, current_id_function=current_id_function)
-        self.pack(padx=2, pady=2)
-        
+        self.pack(side=LEFT, padx=2, pady=2)
+        # This is the read-only element for the point this is switched with
+        self.switched_with = StringVar(parent_frame, "")
+        self.label2 = Label(self.frame,text="Switched with:")
+        self.label2.pack(side=LEFT, padx=2, pady=2)
+        self.switched_entry = Entry(self.frame, width=3, textvariable=self.switched_with,
+                                            justify='center',state="disabled")
+        self.switched_entry.pack(side=LEFT, padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.switched_entry, "The ID of the point that "+
+                                       "this fully automatic point will be switched with")
     def validate(self):
         # Do the basic item validation first (exists and not current item ID)
         valid = super().validate(update_validation_status=False)
@@ -155,6 +167,10 @@ class also_switch_selection(common.int_item_id_entry_box):
         self.set_validation_status(valid)
         return(valid)
 
+    def set_switched_with(self, point_id:int):
+        if point_id > 0: self.switched_with.set(str(point_id))
+        else: self.switched_with.set("")
+            
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element.
 # Class instance methods provided by this class:

@@ -38,6 +38,7 @@
 #    pi_sprog_interface.initialise_pi_sprog -After update of Pi Sprog Settings
 #------------------------------------------------------------------------------------
 
+import os
 from tkinter import *
 import tkinter.messagebox as messagebox
 import logging
@@ -517,8 +518,9 @@ class main_menubar:
                                                  filename_to_save, save_as=save_as)
         # Reset the filename / root window title to the name of the file we have saved
         if saved_filename is not None:
-            settings.set_general(filename=saved_filename)
-            root_window.title(saved_filename)
+            path, name = os.path.split(saved_filename)
+            settings.set_general(filename=name)
+            root_window.title(name)
             self.file_has_been_saved = True
         return()
 
@@ -539,7 +541,8 @@ class main_menubar:
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
                 # Update the window title and re-size the canvas as appropriate
-                root_window.title(file_loaded)
+                path, name = os.path.split(file_loaded)
+                root_window.title(name)
                 schematic.resize_canvas()
 ########################################################################################
 ### TO DO - Common initialisation function (called on editor start or layout load) #####
