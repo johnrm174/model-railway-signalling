@@ -3,6 +3,7 @@
 # 
 # External API functions intended for use by other editor modules:
 #    main_menubar(root) - the main menubar class - call once on initialisation
+#    main_menubar.initialise_editor() - call once on initialisation
 #
 # Makes the following external API calls to other editor modules:
 #    objects.set_all(new_objects) - Set the dict of objects following a load
@@ -85,12 +86,13 @@ Schematic functions:
 8) <backspace> will permanently delete all selected object from the schematic
 9) <cntl-c> will copy all currently selected objects to a copy/paste buffer
 10) <cntl-v> will paste the selected objects at a slightly offset position
+11) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
 
 1) File - All the functions you would expect
-2) Mode - Toggle between the two schematic modes
-3) SPROG - Configure the serial port and initialise the SPROG
+2) Mode - Selects the schematic editor mode (Edit Mode or Run Mode)
+3) SPROG - Opens the serial port and connects to the SPROG
 3) DCC Power - Toggle the DCC bus supply (SPROG must be initialised)
 4) Settings-Canvas - Change the display size of the schematic
 5) Settings-Logging - Set the log level for running the layout
@@ -395,15 +397,16 @@ class edit_canvas_settings():
 
 class main_menubar:
     def __init__(self, root):
+        self.root = root
         # Create the menu bar
-        self.mainmenubar = Menu(root)
-        root.configure(menu=self.mainmenubar)    
+        self.mainmenubar = Menu(self.root)
+        self.root.configure(menu=self.mainmenubar)    
         # Create the various menubar items for the File Dropdown
         self.file_menu = Menu(self.mainmenubar, tearoff=False)
-        self.file_menu.add_command(label=" New", command=lambda:self.new_schematic(root))
-        self.file_menu.add_command(label=" Open...", command=lambda:self.load_schematic(root))
-        self.file_menu.add_command(label=" Save", command=lambda:self.save_schematic(root,False))
-        self.file_menu.add_command(label=" Save as...", command=lambda:self.save_schematic(root,True))
+        self.file_menu.add_command(label=" New", command=self.new_schematic)
+        self.file_menu.add_command(label=" Open...", command=self.load_schematic)
+        self.file_menu.add_command(label=" Save", command=lambda:self.save_schematic(False))
+        self.file_menu.add_command(label=" Save as...", command=lambda:self.save_schematic(True))
         self.file_menu.add_separator()
         self.file_menu.add_command(label=" Quit",command=lambda:self.quit_schematic())
         self.mainmenubar.add_cascade(label="File  ", menu=self.file_menu)
@@ -426,24 +429,53 @@ class main_menubar:
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Menu(self.mainmenubar,tearoff=False)
-        self.settings_menu.add_command(label =" Canvas...", command=lambda:edit_canvas_settings(root))
-        self.settings_menu.add_command(label =" MQTT...", command=lambda:edit_mqtt_settings(root))
-        self.settings_menu.add_command(label =" SPROG...", command=lambda:edit_sprog_settings(root, self))
-        self.settings_menu.add_command(label =" Logging...", command=lambda:edit_logging_settings(root))
+        self.settings_menu.add_command(label =" Canvas...", command=lambda:edit_canvas_settings(self.root))
+        self.settings_menu.add_command(label =" MQTT...", command=lambda:edit_mqtt_settings(self.root))
+        self.settings_menu.add_command(label =" SPROG...", command=lambda:edit_sprog_settings(self.root, self))
+        self.settings_menu.add_command(label =" Logging...", command=lambda:edit_logging_settings(self.root))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Menu(self.mainmenubar,tearoff=False)
-        self.help_menu.add_command(label =" Help...", command=lambda:display_help(root))
-        self.help_menu.add_command(label =" About...", command=lambda:display_about(root))
+        self.help_menu.add_command(label =" Help...", command=lambda:display_help(self.root))
+        self.help_menu.add_command(label =" About...", command=lambda:display_about(self.root))
         self.mainmenubar.add_cascade(label = "Help  ", menu=self.help_menu)
-        # Use the signals Lib function to find & store the root window reference
+        # Use the signals Lib function to find/store the root window reference
         # And then re-bind the close window event to the editor quit function
         library_common.find_root_window(self.mainmenubar)
-        root.protocol("WM_DELETE_WINDOW", self.quit_schematic)
+        self.root.protocol("WM_DELETE_WINDOW", self.quit_schematic)
+        # Bind the other keyboard shortcut events
+        self.root.bind('m', self.toggle_mode)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         
+    # Common initialisation function (called on editor start or layout load)
+    def initialise_editor(self):
+        # Set the root window label to the name of the current file (split from the dir path)
+        # The fully qualified filename is the first parameter provided by 'get_general'
+        path, name = os.path.split(settings.get_general()[0])
+        self.root.title(name)
+        # Set the edit mode (2nd param in the returned tuple)
+        if settings.get_general()[1]: self.edit_mode()
+        else: self.run_mode()
+        # Set the log level before creating the new layout objects
+        initial_log_level = settings.get_logging()
+        logging.basicConfig(format='%(levelname)s: %(message)s')
+        if initial_log_level == 1: logging.getLogger().setLevel(logging.ERROR)
+        elif initial_log_level == 2: logging.getLogger().setLevel(logging.WARNING)
+        elif initial_log_level == 3: logging.getLogger().setLevel(logging.INFO)
+        elif initial_log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+        # Initialise the SPROG (if configured). Note that we use the menubar functions
+        # for connection and the DCC power so these are correctly reflected in the UI
+        port, baud, debug, startup, power = settings.get_sprog()
+        if startup: self.sprog_connect()
+        if power: self.dcc_power_on()
+        
+    def toggle_mode(self, event=None):
+        # the Edit mode flagis the second parameter returned
+        if settings.get_general()[1]: self.run_mode()
+        else: self.edit_mode()
+
     def edit_mode(self):
         new_label = "Mode:Edit  "
         self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
@@ -491,21 +523,20 @@ class main_menubar:
             library_common.on_closing(ask_to_save_state=False)
         return()
                 
-    def new_schematic(self,root_window):
+    def new_schematic(self):
         if messagebox.askokcancel("New Schematic", "Are you sure you want to "+
                          "discard all changes and create a new blank schematic"):
             # We use the schematic functions to delete all existing objects to
             # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
             schematic.delete_selected_objects()
+            # Restore the default settings and update the editor config
             settings.restore_defaults()
-            # Update the title of the root window (to the default filename)
-            # The filename is the first element of the returned tuple
-            root_window.title(settings.get_general()[0])
-            self.file_has_been_saved = False
+            schematic.resize_canvas()
+            self.initialise_editor()
         return()
 
-    def save_schematic(self,root_window, save_as:bool=False):
+    def save_schematic(self, save_as:bool=False):
         settings_to_save = settings.get_all()
         objects_to_save = objects.get_all()
         filename_to_save = settings.get_general()[0]
@@ -520,11 +551,11 @@ class main_menubar:
         if saved_filename is not None:
             path, name = os.path.split(saved_filename)
             settings.set_general(filename=name)
-            root_window.title(name)
+            self.root.title(name)
             self.file_has_been_saved = True
         return()
 
-    def load_schematic(self,root_window):
+    def load_schematic(self):
         global logging
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
@@ -540,29 +571,10 @@ class main_menubar:
                 settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
-                # Update the window title and re-size the canvas as appropriate
-                path, name = os.path.split(file_loaded)
-                root_window.title(name)
+                # Re-size the canvas to reflect the new schematic size
                 schematic.resize_canvas()
-########################################################################################
-### TO DO - Common initialisation function (called on editor start or layout load) #####
-########################################################################################
-                # Set the edit mode (2nd param in the returned tuple)
-                if settings.get_general()[1]: self.edit_mode()
-                else: self.run_mode()
-                # Set the log level before creating the new layout objects
-                initial_log_level = settings.get_logging()
-                logging.basicConfig(format='%(levelname)s: %(message)s')
-                if initial_log_level == 1: logging.getLogger().setLevel(logging.ERROR)
-                elif initial_log_level == 2: logging.getLogger().setLevel(logging.WARNING)
-                elif initial_log_level == 3: logging.getLogger().setLevel(logging.INFO)
-                elif initial_log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
-                # Initialise the SPROG (if configured). Note that we use the menubar functions
-                # for connection and the DCC power so these are correctly reflected in the UI
-                port, baud, debug, startup, power = settings.get_sprog()
-                if startup: self.sprog_connect()
-                if power: self.dcc_power_on()
-########################################################################################
+                # Re-initailise the editor with the new configuration
+                self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information
                 objects.set_all(layout_state["objects"])
                 # Purge the loaded state (to stope it being erroneously inherited

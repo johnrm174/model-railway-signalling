@@ -375,6 +375,7 @@ def right_button_click(event,highlighted_object=None):
 
 def left_button_click(event,highlighted_object=None):
     global schematic_state
+    print(event)
     # set keyboard focus for the canvas (so that any key bindings will work)
     canvas.focus_set()
     # Only process the button click if we are in "Edit" Mode

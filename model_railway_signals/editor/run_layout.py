@@ -220,8 +220,6 @@ def update_signal_behind(signal_object, recursion_level:int=0):
 #------------------------------------------------------------------------------------
 
 def process_aspect_updates(signal_object):
-    # Fnd the displayed aspect of the signal (before any changes)
-    initial_signal_aspect = signals.signal_state(signal_object["itemid"])
     # First update on the signal ahead (only if its a colour light signal)
     # Other signal types are updated automatically when switched
     if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -230,11 +228,9 @@ def process_aspect_updates(signal_object):
             signals.update_signal(signal_object["itemid"], signal_ahead_object["itemid"])
         else:
             signals.update_signal(signal_object["itemid"])
-    # If the aspect has changed then we need to work back along the route to
-    # update signals behind. Note that we do this for all signal types as there
-    # could be colour light signals that depend on the aspect behind this one 
-    if signals.signal_state(signal_object["itemid"]) != initial_signal_aspect:
-        update_signal_behind(signal_object)
+    # Now work back along the route to update signals behind. Note that we do this for
+    # all signal types as there could be colour light signals behind this signal
+    update_signal_behind(signal_object)
     return()
 
 #------------------------------------------------------------------------------------
