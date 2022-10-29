@@ -199,7 +199,11 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                             (schematic_objects[object_id]["line"]))
         else:
             schematic_objects[object_id]["posx"] += xdiff1 
-            schematic_objects[object_id]["posy"] += ydiff2 
+            schematic_objects[object_id]["posy"] += ydiff2
+    # Ensure all track sections are on top
+    for object_id in schematic_objects:
+        if schematic_objects[object_id]["item"] == objects_common.object_type.section:
+            objects_common.canvas.tag_raise(schematic_objects[object_id]["tags"])
     # As we are just moving objects we don't need to process layout changes
     return()
 
@@ -241,6 +245,10 @@ def paste_objects():
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
+    # Ensure all track sections are on top
+    for object_id in schematic_objects:
+        if schematic_objects[object_id]["item"] == objects_common.object_type.section:
+            objects_common.canvas.tag_raise(schematic_objects[object_id]["tags"])
     # As we are just pasting 'new' objects we don't need to process layout changes
     return(list_of_new_object_ids)
 
@@ -302,6 +310,10 @@ def set_all(new_objects):
                 item_id = schematic_objects[object_id]["itemid"]
                 instrument_index[str(item_id)] = object_id
                 objects_instruments.redraw_instrument_object(object_id)
+    # Ensure all track sections are on top
+    for object_id in schematic_objects:
+        if schematic_objects[object_id]["item"] == objects_common.object_type.section:
+            objects_common.canvas.tag_raise(schematic_objects[object_id]["tags"])
     # Initialise the layout (interlocking changes, signal aspects etc)
     run_layout.initialise_layout()    
     return()

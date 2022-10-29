@@ -91,19 +91,18 @@ default_object["item"] = object_type.none
 default_object["posx"] = 0
 default_object["posy"] = 0
 default_object["itemid"] = 0
-default_object["bbox"] = None   # Tkinter canvas object
+default_object["bbox"] = None   # Tkinter canvas object for the boundary box
+default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 
 #------------------------------------------------------------------------------------
 # The Canvas Object is saved as a global variable for subsequent use
 #------------------------------------------------------------------------------------
 
 canvas = None
-callback = None
 
-def set_canvas (canvas_object, canvas_callback=None):
-    global canvas, callback
+def set_canvas (canvas_object):
+    global canvas
     canvas = canvas_object
-    callback = canvas_callback
     return()
 
 #------------------------------------------------------------------------------------

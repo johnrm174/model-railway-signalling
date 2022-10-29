@@ -133,30 +133,34 @@ def redraw_section_object(object_id):
     # If we are in edit mode then we need to make the section non-editable so we
     # can use the mouse events for selecting and moving the section object
     if editing_enabled:
-        section_enabled = False
-        section_label = " SECT "+ format(schematic_objects[object_id]["itemid"],'02d') + " "
+        section_label = "SECT-"+ format(schematic_objects[object_id]["itemid"],'02d')
+        section_tags = "section"+ str(schematic_objects[object_id]["itemid"])
+        schematic_objects[object_id]["tags"] = section_tags
+        objects_common.canvas.create_rectangle(
+                    schematic_objects[object_id]["posx"]-35,
+                    schematic_objects[object_id]["posy"]-12,
+                    schematic_objects[object_id]["posx"]+35,
+                    schematic_objects[object_id]["posy"]+12,
+                    fill="black", tags=section_tags)
+        objects_common.canvas.create_text(
+                    schematic_objects[object_id]["posx"],
+                    schematic_objects[object_id]["posy"],
+                    text = section_label, font=('Ariel',8,"normal"),
+                    fill = "white",tags=section_tags)
+        # Create/update the selection rectangle for the track section (based on the boundary box)
+        objects_common.set_bbox (object_id, objects_common.canvas.bbox(section_tags))
     else:
-        section_enabled = schematic_objects[object_id]["editable"]
-        section_label = schematic_objects[object_id]["label"]
-    # Create the new track section object
-    track_sections.create_section (
-                canvas = objects_common.canvas,
-                section_id = schematic_objects[object_id]["itemid"],
-                x = schematic_objects[object_id]["posx"],
-                y = schematic_objects[object_id]["posy"],
-                section_callback = run_layout.schematic_callback,
-                label = section_label,
-                editable = section_enabled)
-    # Create/update the selection rectangle for the track section (based on the boundary box)
-    objects_common.set_bbox (object_id, track_sections.get_boundary_box(schematic_objects[object_id]["itemid"]))
-    # Set up a callback for mouse clicks / movement on the button - otherwise we'll
-    # end up just toggling the button and never getting a canvas mouse event
-    item_id = schematic_objects[object_id]["itemid"]
-    callback = objects_common.callback
-    # Only bind the mouse events if we are in edit mode
-    if editing_enabled: track_sections.bind_selection_events(item_id, object_id, callback)
+        track_sections.create_section(
+                    canvas = objects_common.canvas,
+                    section_id = schematic_objects[object_id]["itemid"],
+                    x = schematic_objects[object_id]["posx"],
+                    y = schematic_objects[object_id]["posy"],
+                    section_callback = run_layout.schematic_callback,
+                    label = schematic_objects[object_id]["label"],
+                    editable = schematic_objects[object_id]["editable"])
+        schematic_objects[object_id]["bbox"] = None
     return()
-
+ 
 #------------------------------------------------------------------------------------
 # Function to Create a new default Track Section (and draw it on the canvas)
 #------------------------------------------------------------------------------------
@@ -210,6 +214,7 @@ def paste_section(object_to_paste):
 
 def delete_section_object(object_id):
     track_sections.delete_section(schematic_objects[object_id]["itemid"])
+    objects_common.canvas.delete(schematic_objects[object_id]["tags"])
     return()
 
 #------------------------------------------------------------------------------------

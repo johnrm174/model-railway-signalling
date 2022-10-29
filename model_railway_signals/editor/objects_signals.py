@@ -38,7 +38,7 @@
 #
 # Makes the following external API calls to library modules:
 #    signals.delete_signal(id) - delete library drawing object (part of soft delete)
-#    signals.get_boundary_box(id) - get the boundary box for the point (i.e. selection area)
+#    signals.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals.update_signal(id) - To set the initial colour light signal aspect following creation
 #    signals.set_route(id,route) - To set the initial route for a signal following creation
 #    signals_colour_lights.create_colour_light_signal - To create the library object (create or redraw)
@@ -456,8 +456,9 @@ def redraw_signal_object(object_id):
                     sig_callback = run_layout.schematic_callback,
                     orientation = schematic_objects[object_id]["orientation"],
                     sig_passed_button = schematic_objects[object_id]["passedsensor"][0]) 
-    # Create/update the selection rectangle for the signal (based on the boundary box)
-    objects_common.set_bbox (object_id, signals.get_boundary_box(schematic_objects[object_id]["itemid"]))
+    # Create/update the canvas "tags" and selection rectangle for the signal
+    schematic_objects[object_id]["tags"] = signals.get_tags(schematic_objects[object_id]["itemid"])
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
 
 #------------------------------------------------------------------------------------

@@ -31,7 +31,7 @@
 # Makes the following external API calls to library modules:
 #    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
-#    block_instruments.get_boundary_box(id) - get the boundary box for the section (i.e. selection area)
+#    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
 #
 #------------------------------------------------------------------------------------
 
@@ -109,8 +109,9 @@ def redraw_instrument_object(object_id):
                 bell_sound_file = schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = schematic_objects[object_id]["keysound"],
                 linked_to = schematic_objects[object_id]["linkedto"])
-    # Create/update the selection rectangle for the instrument (based on the boundary box)
-    objects_common.set_bbox (object_id, block_instruments.get_boundary_box(schematic_objects[object_id]["itemid"]))
+    # Create/update the canvas "tags" and selection rectangle for the signal
+    schematic_objects[object_id]["tags"] = block_instruments.get_tags(schematic_objects[object_id]["itemid"])
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
 
 #------------------------------------------------------------------------------------

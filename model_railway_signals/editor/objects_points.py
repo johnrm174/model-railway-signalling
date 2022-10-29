@@ -35,7 +35,7 @@
 # Makes the following external API calls to library modules:
 #    points.delete_point(id) - delete library drawing object (part of soft delete)
 #    points.create_point(id) -  To create the library object (create or redraw)
-#    points.get_boundary_box(id) - get the boundary box for the point (i.e. selection area)
+#    points.get_tags(id) - get the canvas 'tags' for the point drawing objects
 #    points.point_switched(id) - test if a point is switched (when updating dependent objects)
 #    points.toggle_point_state(id) - internal function to toggle point (when updating dependent objects)
 #    dcc_control.delete_point_mapping - delete library object when deleted / prior to recreating
@@ -183,8 +183,9 @@ def redraw_point_object(object_id):
                 reverse = schematic_objects[object_id]["reverse"],
                 auto = schematic_objects[object_id]["automatic"],
                 fpl = schematic_objects[object_id]["hasfpl"])
-    # Create/update the selection rectangle for the point (based on the boundary box)
-    objects_common.set_bbox (object_id, points.get_boundary_box(schematic_objects[object_id]["itemid"]))         
+    # Create/update the canvas "tags" and selection rectangle for the point
+    schematic_objects[object_id]["tags"] = points.get_tags(schematic_objects[object_id]["itemid"])
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
 
 #------------------------------------------------------------------------------------

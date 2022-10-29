@@ -34,12 +34,6 @@
 #    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
 #    points.point_type - Used to access the point type
 #
-# Makes the following external API calls to library modules:
-#    signals.move_signal - For moving an object on the canvas
-#    points.move_point - For moving an object on the canvas
-#    block_instruments.move_instrument - For moving an object on the canvas
-#    track_sections.move_section - For moving an object on the canvas
-#
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -49,14 +43,10 @@ from ..library import signals_colour_lights
 from ..library import signals_semaphores
 from ..library import signals_ground_position
 from ..library import signals_ground_disc
-from ..library import signals
-from ..library import block_instruments
-from ..library import track_sections
 from ..library import points
 
 from . import settings
 from . import objects
-from . import run_layout
 from . import configure_signal
 from . import configure_point
 
@@ -185,16 +175,6 @@ def edit_selected_object():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to move a line object on the canvas.
-#------------------------------------------------------------------------------------
-        
-def move_line(object_id,xdiff:int,ydiff:int):
-    canvas.move(objects.schematic_objects[object_id]["line"],xdiff,ydiff)
-    canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
-    canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
-    return()
-
-#------------------------------------------------------------------------------------
 # Internal function to edit a line object on the canvas. The "editlineend1" and
 # "editlineend2" dictionary elements specify the line end that needs to be moved
 # Only a single Object will be selected when this function is called
@@ -223,20 +203,8 @@ def move_line_end(xdiff:int,ydiff:int):
         
 def move_selected_objects(xdiff:int,ydiff:int):
     for object_id in schematic_state["selectedobjects"]:
-        # Move the selected object depending on type
-        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-            move_line(object_id,xdiff,ydiff,)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-            signals.move_signal(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
-            # Also need to move any associated distant signals (sig_id + 100)
-            signals.move_signal(objects.schematic_objects[object_id]["itemid"]+100,xdiff,ydiff)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-            points.move_point(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-            track_sections.move_section(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
-        elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-            block_instruments.move_instrument(objects.schematic_objects[object_id]["itemid"],xdiff,ydiff)
-        # Move the selection rectangle for the object
+        # All drawing objects should be "tagged" apart from the bbox
+        canvas.move(objects.schematic_objects[object_id]["tags"],xdiff,ydiff)
         canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
     return()
 
@@ -350,13 +318,12 @@ def snap_to_grid(xpos:int,ypos:int):
 # Right Button Click - Bring Up Context specific Popup menu
 #------------------------------------------------------------------------------------
 
-def right_button_click(event,highlighted_object=None):
+def right_button_click(event):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
     if schematic_state["editingenabled"]:
-        # If its an object event then use the ID we've been given for the section button
-        # Otherwise find the object at the current cursor position (if there is one)
-        if not highlighted_object: highlighted_object = find_highlighted_object(event.x,event.y)
+        # Find the object at the current cursor position (if there is one)
+        highlighted_object = find_highlighted_object(event.x,event.y)
         if highlighted_object:
             # Clear any current selections and select the highlighted item
             deselect_all_objects()
@@ -373,95 +340,73 @@ def right_button_click(event,highlighted_object=None):
 # Move Selected Objects / Edit Selected Line / Select Area
 #------------------------------------------------------------------------------------
 
-def left_button_click(event,highlighted_object=None):
+def left_button_click(event):
     global schematic_state
-    print(event)
     # set keyboard focus for the canvas (so that any key bindings will work)
     canvas.focus_set()
     # Only process the button click if we are in "Edit" Mode
     if schematic_state["editingenabled"]:
+        # For canvas events we can use the canvas coordinates
+        schematic_state["startx"] = event.x 
+        schematic_state["starty"] = event.y
+        schematic_state["lastx"] = event.x 
+        schematic_state["lasty"] = event.y
+        # See if the cursor is over the "end" of an already selected line 
+        highlighted_object = find_highlighted_line_end(event.x,event.y)
         if highlighted_object:
-            # If its an object event (section button) then find the canvas coordinates
-            # relative to the button event coordinates and set "moveobjects"
-            posx = objects.schematic_objects[highlighted_object]["posx"]
-            posy = objects.schematic_objects[highlighted_object]["posy"]
-            bbox=canvas.coords(objects.schematic_objects[highlighted_object]["bbox"])
-            schematic_state["startx"] = posx + event.x - (bbox[2]-bbox[0])/2
-            schematic_state["starty"] = posy + event.y - (bbox[3]-bbox[1])/2
-            schematic_state["lastx"] = schematic_state["startx"]
-            schematic_state["lasty"] = schematic_state["starty"]
-            schematic_state["moveobjects"] = True
-            if highlighted_object not in schematic_state["selectedobjects"]:
-                # Clear any current selections and select the highlighted object
-                deselect_all_objects()
-                select_object(highlighted_object)
+            # Clear selections and select the highlighted line. Note that the edit line
+            # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
+            deselect_all_objects()
+            select_object(highlighted_object)
         else:
-            # For canvas events we can use the canvas coordinates
-            schematic_state["startx"] = event.x 
-            schematic_state["starty"] = event.y
-            schematic_state["lastx"] = schematic_state["startx"] 
-            schematic_state["lasty"] = schematic_state["starty"]
-            # See if the cursor is over the "end" of an already selected line 
-            highlighted_object = find_highlighted_line_end(event.x,event.y)
+            # See if the cursor is over any other canvas object
+            highlighted_object = find_highlighted_object(event.x,event.y)
             if highlighted_object:
-                # Clear selections and select the highlighted line. Note that the edit line
-                # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
-                deselect_all_objects()
-                select_object(highlighted_object)
-            else:
-                # See if the cursor is over any other canvas object
-                highlighted_object = find_highlighted_object(event.x,event.y)
-                if highlighted_object:
-                    schematic_state["moveobjects"] = True
-                    if highlighted_object not in schematic_state["selectedobjects"]:
-                        # Clear any current selections and select the highlighted object
-                        deselect_all_objects()
-                        select_object(highlighted_object)
-                else:
-                    # Cursor is not over any object - Could be the start of a new area selection or
-                    # just clearing the current selection - In either case we deselect all objects
+                schematic_state["moveobjects"] = True
+                if highlighted_object not in schematic_state["selectedobjects"]:
+                    # Clear any current selections and select the highlighted object
                     deselect_all_objects()
-                    schematic_state["selectarea"] = True
-                    #  Make the "select area" box visible (create it if necessary)
-                    if not schematic_state["selectbox"]:
-                        schematic_state["selectbox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-                    canvas.coords(schematic_state["selectbox"],event.x,event.y,event.x,event.y)
-                    canvas.itemconfigure(schematic_state["selectbox"],state="normal")
+                    select_object(highlighted_object)
+            else:
+                # Cursor is not over any object - Could be the start of a new area selection or
+                # just clearing the current selection - In either case we deselect all objects
+                deselect_all_objects()
+                schematic_state["selectarea"] = True
+                #  Make the "select area" box visible (create it if necessary)
+                if not schematic_state["selectbox"]:
+                    schematic_state["selectbox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+                canvas.coords(schematic_state["selectbox"],event.x,event.y,event.x,event.y)
+                canvas.itemconfigure(schematic_state["selectbox"],state="normal")
     return()
 
 #------------------------------------------------------------------------------------
 # Left-Shift-Click - Select/deselect Object
 #------------------------------------------------------------------------------------
 
-def left_shift_click(event,highlighted_object=None):
+def left_shift_click(event):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
     if schematic_state["editingenabled"]:
-        # If its an object event (section button) then use the object ID we've been given.
-        # Otherwise find the object at the current cursor position (if there is one)
-        if not highlighted_object:
-            highlighted_object = find_highlighted_object(event.x,event.y)
-        if highlighted_object:
-            if highlighted_object in schematic_state["selectedobjects"]:
-                # Deselect just the highlighted object (leave everything else selected)
-                deselect_object(highlighted_object)
-            else:
-                # Select the highlighted object to the list of selected objects
-                select_object(highlighted_object)
+        # Find the object at the current cursor position (if there is one)
+        highlighted_object = find_highlighted_object(event.x,event.y)
+        if highlighted_object and highlighted_object in schematic_state["selectedobjects"]:
+            # Deselect just the highlighted object (leave everything else selected)
+            deselect_object(highlighted_object)
+        else:
+            # Select the highlighted object to the list of selected objects
+            select_object(highlighted_object)
     return()
 
 #------------------------------------------------------------------------------------
 # Left-Double-Click - Bring up edit object dialog for object
 #------------------------------------------------------------------------------------
 
-def left_double_click(event,highlighted_object=None):
+def left_double_click(event):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
     if schematic_state["editingenabled"]:
-        # If its an object event (section button) then use the object ID we've been given.
-        # Otherwise find the object at the current cursor position (if there is one)
-        if not highlighted_object:
-           highlighted_object = find_highlighted_object(event.x,event.y)
+        # Find the object at the current cursor position (if there is one)
+        highlighted_object = find_highlighted_object(event.x,event.y)
         if highlighted_object:
             # Clear any current selections and select the highlighted item
             deselect_all_objects()
@@ -474,20 +419,14 @@ def left_double_click(event,highlighted_object=None):
 # Track Cursor - Move Selected Objects / Edit Selected Line / Change Area Selection
 #------------------------------------------------------------------------------------
 
-def track_cursor(event,object_id=None):
+def track_cursor(event):
     global schematic_state
     # Only process the button click if we are in "Edit" Mode
     if schematic_state["editingenabled"]:
         if schematic_state["moveobjects"]:
-            # If its an object event (section button) then use the event coordinates
-            # associated with the button event - else use the normal canvas coordinates
-            if object_id:
-                bbox=canvas.coords(objects.schematic_objects[object_id]["bbox"])
-                deltax = event.x - (bbox[2]-bbox[0])/2 
-                deltay = event.y - (bbox[3]-bbox[1])/2
-            else:
-                deltax = event.x - schematic_state["lastx"]
-                deltay = event.y - schematic_state["lasty"]
+            # Work out the delta movement since the last re-draw
+            deltax = event.x - schematic_state["lastx"]
+            deltay = event.y - schematic_state["lasty"]
             # Move all the objects that are selected
             move_selected_objects(deltax,deltay)
             # Set the 'last' position for the next move event
@@ -607,20 +546,6 @@ def disable_editing():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Callback function up for Track Occupancy Sections events - we need to use
-# this in place of the canvas callbacks as the Section Objects are Button Objects
-#------------------------------------------------------------------------------------
-
-def section_event_callback(event, object_id, event_id):
-    if event_id == 0: track_cursor(event,object_id)
-    elif event_id == 1: left_button_click(event,object_id)
-    elif event_id == 2: right_button_click(event,object_id)
-    elif event_id == 3: left_shift_click(event,object_id)
-    elif event_id == 4: left_button_release(event) # Note Obj ID not needed here
-    elif event_id == 5: left_double_click(event,object_id)
-    return()
-
-#------------------------------------------------------------------------------------
 # Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
@@ -729,9 +654,8 @@ def create_canvas (root_window):
     button9 = Button (button_frame, image=button_images['block_instrument'],
                       command=lambda:objects.create_object(objects.object_type.instrument))
     button9.pack (padx=2, pady=2)
-    # Initialise the Objects Module with the Canvas reference and the callback to use
-    # for track section cursor events
-    objects.set_canvas(canvas, canvas_callback=section_event_callback)
+    # Initialise the Objects Module with the Canvas reference
+    objects.set_canvas(canvas)
     return()
 
 ####################################################################################

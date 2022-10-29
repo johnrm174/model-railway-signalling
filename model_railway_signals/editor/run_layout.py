@@ -234,6 +234,17 @@ def process_aspect_updates(signal_object):
     return()
 
 #------------------------------------------------------------------------------------
+# Functions to update all signal aspects based on the signal ahead and then to work back
+# along the set route to update any other signals that need changing. Called on layout
+# initialisation and other changes where we dont process track occupancy
+#------------------------------------------------------------------------------------
+
+def update_all_signals():
+    for signal_id in objects.signal_index:
+        process_aspect_updates(objects.schematic_objects[objects.signal(signal_id)])
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to update the signal route based on the 'interlocking routes' configuration
 # of the signal and the current setting of the points (and FPL) on the schematic
 #------------------------------------------------------------------------------------
@@ -498,8 +509,9 @@ def schematic_callback(item_id,callback_type):
     if ( callback_type == signals_common.sig_callback_type.sig_passed ):
         # Sig passed events are only generated for the main sig ID (not associated distants)
         trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
-        if not editing_enabled: update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
-        process_overrides()             # Will also process aspect updates for ALL signals
+        if not editing_enabled:
+            update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+            process_overrides()             # Will also process aspect updates for ALL signals
         process_distant_overrides()     # Will also process aspect updates for updated signals
         
     if ( callback_type == signals_common.sig_callback_type.sig_updated or
@@ -515,14 +527,18 @@ def schematic_callback(item_id,callback_type):
         # adjust the signal ID to point to the ID of the main semaphore home signal
         if type(item_id) == int and item_id > 100: item_id = item_id-100
         process_route_updates(objects.schematic_objects[objects.signal(item_id)])
-        process_overrides()             # Will also process aspect updates for ALL signals
+        # Need to ensure all signal aspects are updated whether or not we are in edit mode
+        if not editing_enabled: process_overrides()
+        else: process_aspect_updates(objects.schematic_objects[objects.signal(item_id)]) 
         process_distant_overrides()     # Will also process aspect updates for updated signals
         process_signal_interlocking()
         process_point_interlocking()
 
     if ( callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched ):
-        process_overrides()             # Will also process aspect updates for ALL signals
+        # Need to ensure all signal aspects are updated whether or not we are in edit mode
+        if not editing_enabled: process_overrides()
+        else: update_all_signals() 
         process_distant_overrides()     # Will also process aspect updates for updated signals
         process_signal_interlocking()
 
@@ -534,7 +550,9 @@ def schematic_callback(item_id,callback_type):
         process_signal_interlocking()
 
     if ( callback_type == track_sections.section_callback_type.section_updated):
-        process_overrides()             # Will also process aspect updates for ALL signals
+        # Need to ensure all signal aspects are updated whether or not we are in edit mode
+        if not editing_enabled: process_overrides()
+        else: update_all_signals() 
         process_distant_overrides()     # Will also process aspect updates for updated signals
 
     logging.info("**************************************************************************************")
@@ -551,8 +569,10 @@ def schematic_callback(item_id,callback_type):
 def process_object_update(object_id):
     if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
         process_route_updates(objects.schematic_objects[object_id])
-    process_overrides()             # Will also process aspect updates for ALL signals
-    process_distant_overrides()     # Will also process aspect updates for updated signals
+    # Need to ensure all signal aspects are updated whether or not we are in edit mode
+    if not editing_enabled: process_overrides()
+    else: update_all_signals() 
+    process_distant_overrides()    
     process_signal_interlocking()
     process_point_interlocking()
     return()
@@ -564,8 +584,10 @@ def process_object_update(object_id):
 def initialise_layout():
     for sig_id in objects.signal_index:
         process_route_updates(objects.schematic_objects[objects.signal(sig_id)])
-    process_overrides()             # Will also process aspect updates for ALL signals
-    process_distant_overrides()     # Will also process aspect updates for updated signals
+    # Need to ensure all signal aspects are updated whether or not we are in edit mode
+    if not editing_enabled: process_overrides()
+    else: update_all_signals() 
+    process_distant_overrides() 
     process_signal_interlocking()
     process_point_interlocking()
     return()

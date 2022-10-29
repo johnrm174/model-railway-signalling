@@ -63,11 +63,12 @@ def redraw_line_object(object_id):
     y1 = schematic_objects[object_id]["posy"]
     x2 = schematic_objects[object_id]["endx"]
     y2 = schematic_objects[object_id]["endy"]
-    schematic_objects[object_id]["line"] = objects_common.canvas.create_line(x1,y1,x2,y2,fill="black",width=3)
-    schematic_objects[object_id]["end1"] = objects_common.canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden')
-    schematic_objects[object_id]["end2"] = objects_common.canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden')
-    # Create/update the selection rectangle for the line (based on the boundary box)
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["line"]))
+    schematic_objects[object_id]["line"] = objects_common.canvas.create_line(x1,y1,x2,y2,fill="black",width=3,tags=object_id)
+    schematic_objects[object_id]["end1"] = objects_common.canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden',tags=object_id)
+    schematic_objects[object_id]["end2"] = objects_common.canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden',tags=object_id)
+    # Create/update the canvas "tags" and selection rectangle for the point
+    schematic_objects[object_id]["tags"] = object_id
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
 
 #------------------------------------------------------------------------------------
