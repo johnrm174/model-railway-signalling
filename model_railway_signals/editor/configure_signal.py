@@ -6,7 +6,7 @@
 #    edit_signal - Open the edit point wtop level window
 #
 # Makes the following external API calls to other editor modules:
-#    objects.update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
+#    objects.update_object(obj_id,new_obj) - Update the configuration of the signal object
 #    objects.signal_exists(point_id) - To see if a specified signal ID exists
 #    objects.signal(point_id) - To get the object_id for a given signal_id
 #

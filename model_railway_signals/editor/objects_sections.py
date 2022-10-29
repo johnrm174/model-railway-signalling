@@ -71,8 +71,15 @@ editing_enabled = True
 default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
 default_section_object["itemid"] = 0
-default_section_object["label"] = "Occupied"
+default_section_object["label"] = "OCCUPIED"
 default_section_object["editable"] = True
+default_section_object["mirror"] = ""
+# This is the default signal events table for the track section
+# The Table comprises a variable length list of signals
+# Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each route element in the list of routes is a boolean value (True or False)
+default_section_object["sigsahead"] = []
+default_section_object["sigsbehind"] = []
 
 #------------------------------------------------------------------------------------
 # Functions to delete/re-draw the track section objects on schematic mode change.
@@ -137,10 +144,10 @@ def redraw_section_object(object_id):
         section_tags = "section"+ str(schematic_objects[object_id]["itemid"])
         schematic_objects[object_id]["tags"] = section_tags
         objects_common.canvas.create_rectangle(
-                    schematic_objects[object_id]["posx"]-35,
-                    schematic_objects[object_id]["posy"]-12,
-                    schematic_objects[object_id]["posx"]+35,
-                    schematic_objects[object_id]["posy"]+12,
+                    schematic_objects[object_id]["posx"]-37,
+                    schematic_objects[object_id]["posy"]-11,
+                    schematic_objects[object_id]["posx"]+37,
+                    schematic_objects[object_id]["posy"]+11,
                     fill="black", tags=section_tags)
         objects_common.canvas.create_text(
                     schematic_objects[object_id]["posx"],
@@ -200,6 +207,10 @@ def paste_section(object_to_paste):
     width, height, position_offset = settings.get_canvas()
     schematic_objects[new_object_id]["posx"] += position_offset
     schematic_objects[new_object_id]["posy"] += position_offset
+    # Now set the default values for all elements we don't want to copy:
+    schematic_objects[new_object_id]["sigsahead"] = default_section_object["sigsahead"]
+    schematic_objects[new_object_id]["sigsbehind"] = default_section_object["sigsbehind"]
+    schematic_objects[new_object_id]["mirror"] = default_section_object["mirror"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object

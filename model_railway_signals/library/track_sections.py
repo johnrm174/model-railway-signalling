@@ -424,7 +424,12 @@ def send_mqtt_section_updated_event(section_id:int):
 
 def delete_section(section_id:int):
     global sections
+    global entry_box_window
     if section_exists(section_id):
+        # If a text entry box is open then we need to destroy it
+        if entry_box_window is not None:
+            text_entry_box.destroy()
+            sections[str(section_id)]["canvas"].delete(entry_box_window)
         # Delete all the tkinter canvas drawing objects associated with the section
         sections[str(section_id)]["canvas"].delete("section"+str(section_id))
         # Delete all the tkinter button objects created for the section

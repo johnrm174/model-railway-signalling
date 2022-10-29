@@ -6,7 +6,7 @@
 #    edit_point - Open the edit point wtop level window
 #
 # Makes the following external API calls to other editor modules:
-#    objects.update_point(obj_id,new_obj) - Update the configuration of an existing point object
+#    objects.update_object(obj_id,new_obj) - Update the configuration of the point object
 #    objects.point_exists(point_id) - To see if a specified point ID exists
 #    objects.point(point_id) - To get the object_id for a given point_id
 #
@@ -31,7 +31,6 @@ from tkinter import ttk
 
 from . import common
 from . import objects
-from . import objects_points
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -396,7 +395,7 @@ class edit_point():
     def tab_changed(self,event):
         # Focus on the top level window to remove focus from the first entry box
         # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
-        self.window.focus()
+        # self.window.focus()
         pass
 
 #############################################################################################

@@ -581,7 +581,7 @@ class object_id_selection(integer_entry_box):
             current_id = self.get_initial_value()
             new_id = int(self.entry.get())
             if self.exists_function(new_id) and new_id != current_id:
-                self.EB_TT.text = "ID already assigned"
+                self.TT.text = "ID already assigned"
                 valid = False
         self.set_validation_status(valid)
         return(valid)
