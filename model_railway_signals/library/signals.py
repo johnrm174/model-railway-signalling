@@ -807,25 +807,10 @@ def delete_signal(sig_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving a signal object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving signals around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the signal
 # ------------------------------------------------------------------------------------------
 
-def move_signal(sig_id:int,xdiff:int,ydiff:int):
-    if signals_common.sig_exists(sig_id):
-        signals_common.signals[str(sig_id)]["canvas"].move("signal"+str(sig_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the signal tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(sig_id:int):
-    if signals_common.sig_exists(sig_id):
-        bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
+def get_tags(sig_id:int):
+    return("signal"+str(sig_id))
 
 ##########################################################################################

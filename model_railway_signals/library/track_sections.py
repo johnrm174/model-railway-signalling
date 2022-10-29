@@ -434,36 +434,11 @@ def delete_section(section_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving a section object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving sections around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the section
 # ------------------------------------------------------------------------------------------
 
-def move_section(section_id:int,xdiff:int,ydiff:int):
-    if section_exists(section_id):
-        sections[str(section_id)]["canvas"].move("section"+str(section_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the section tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(section_id:int):
-    if section_exists(section_id):
-        bbox=sections[str(section_id)]["canvas"].bbox("section"+str(section_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
-
-def bind_selection_events(section_id:int,object_id, callback):
-    sections[str(section_id)]["button1"].bind('<Motion>',lambda event:callback(event,object_id,event_id=0))
-    sections[str(section_id)]["button1"].bind('<Button-1>',lambda event:callback(event,object_id,event_id=1))
-    sections[str(section_id)]["button1"].bind('<Button-2>',lambda event:callback(event,object_id,event_id=2))
-    sections[str(section_id)]["button1"].bind('<Button-3>',lambda event:callback(event,object_id,event_id=2))
-    sections[str(section_id)]["button1"].bind('<Shift-Button-1>',lambda event:callback(event,object_id,event_id=3))
-    sections[str(section_id)]["button1"].bind('<ButtonRelease-1>',lambda event:callback(event,object_id,event_id=4))
-    sections[str(section_id)]["button1"].bind('<Double-Button-1>',lambda event:callback(event,object_id,event_id=5))
-    return()
+def get_tags(section_id:int):
+    return("section"+str(section_id))
 
 ###############################################################################
 

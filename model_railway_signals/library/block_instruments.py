@@ -650,6 +650,7 @@ def send_mqtt_ring_section_bell_event(block_id:int):
     # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
     mqtt_interface.send_mqtt_message("instrument_telegraph_event",block_id,data=data,log_message=log_message,retain=False)
     return()
+
 # ------------------------------------------------------------------------------------------
 # Non public API function for deleting an instrument object (including all the drawing objects)
 # This is used by the schematic editor for changing instrument types where we delete the existing
@@ -670,25 +671,10 @@ def delete_instrument(block_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving an instrument object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving instruments around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the block instrument
 # ------------------------------------------------------------------------------------------
 
-def move_instrument(block_id:int,xdiff:int,ydiff:int):
-    if instrument_exists(block_id):
-        instruments[str(block_id)]["canvas"].move("instrument"+str(block_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the signal tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(block_id:int):
-    if instrument_exists(block_id):
-        bbox=instruments[str(block_id)]["canvas"].bbox("instrument"+str(block_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
+def get_tags(block_id:int):
+    return("instrument"+str(block_id))
 
 ###############################################################################
