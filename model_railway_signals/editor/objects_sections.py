@@ -51,6 +51,7 @@ from . import run_layout
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import section_index as section_index
 from .objects_common import signal_index as signal_index
+from .objects_common import section as section
 from .objects_common import signal as signal
 
 #------------------------------------------------------------------------------------
@@ -80,6 +81,52 @@ default_section_object["mirror"] = ""
 # Each route element in the list of routes is a boolean value (True or False)
 default_section_object["sigsahead"] = []
 default_section_object["sigsbehind"] = []
+
+#------------------------------------------------------------------------------------
+# Function to remove all references to a signal that has been deleted
+# Section 'sigsahead/sigsbehind' comprises a variable length list of signals
+# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each route element is a boolean value (True or False)
+#------------------------------------------------------------------------------------
+
+def delete_back_references_to_signal(object_id):
+    for section_id in section_index:
+        list_of_sigs_ahead = schematic_objects[section(section_id)]["sigsahead"]
+        for index, referenced_signal in enumerate(list_of_sigs_ahead):
+            if referenced_signal[0] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[section(section_id)]["sigsahead"].pop(index)
+        list_of_sigs_behind = schematic_objects[section(section_id)]["sigsbehind"]
+        for index, referenced_signal in enumerate(list_of_sigs_behind):
+            if referenced_signal[0] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[section(section_id)]["sigsbehind"].pop(index)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update all references to a signal that has been deleted
+# Signal "tracksections" comprises a list of [section_behind, sections_ahead]
+# where sections_ahead is a list of [MAIN, LH1, LH2, RH1, RH2] (each a section ID(
+# Section 'sigsahead/sigsbehind' comprises a variable length list of interlocked signals
+# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+# Each route element is a boolean value (True or False)
+#------------------------------------------------------------------------------------
+
+def add_back_references_to_signal(object_id):
+    section_behind_signal = schematic_objects[object_id]["tracksections"][0]
+    sections_ahead_of_signal = schematic_objects[object_id]["tracksections"][1]
+    for section_id in section_index:
+        if section_behind_signal == int(section_id):
+            signal_entry = [schematic_objects[object_id]["itemid"],[True,True,True,True,True]]
+            schematic_objects[section(section_id)]["sigsahead"].append(signal_entry)
+        signal_routes_to_set = [False, False, False, False, False]
+        add_signal_to_signals_behind_list = False
+        for index, section_ahead in enumerate(sections_ahead_of_signal):
+            if section_ahead == int(section_id):
+                signal_routes_to_set[index] = True
+                add_signal_to_signals_behind_list = True
+        if add_signal_to_signals_behind_list:
+            signal_entry = [schematic_objects[object_id]["itemid"],signal_routes_to_set]
+            schematic_objects[section(section_id)]["sigsbehind"].append(signal_entry)
+    return()
 
 #------------------------------------------------------------------------------------
 # Functions to delete/re-draw the track section objects on schematic mode change.
@@ -237,6 +284,7 @@ def delete_section(object_id):
     global schematic_objects
     # Delete the associated library objects from the canvas
     delete_section_object(object_id)
+    ##################################### TO MOVE #########################################
     # Remove any references to the section from the signal track occupancy tables
     for signal_id in signal_index:
         track_sections = schematic_objects[signal(signal_id)]["tracksections"]
@@ -247,6 +295,7 @@ def delete_section(object_id):
         for index1, section_ahead in enumerate(track_sections[1]):
             if section_ahead == schematic_objects[object_id]["itemid"]:
                 schematic_objects[signal(signal_id)]["tracksections"][1][index1] = 0
+    ##################################### TO MOVE #########################################
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
