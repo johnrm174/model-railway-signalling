@@ -33,10 +33,16 @@
 #       section_id:int - The ID to be used for the section 
 #   Optional Parameters:
 #       label:str - An updated label to display when occupied (Default = No Change)
+#       publish:bool - Publish updates via MQTT Broker (Default = True)
 # 
-# clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-#                   Returns the current value of the Section Lable (as a string) to allow this
-#                   to be 'passed' to the next section (via the set_section_occupied function)  
+# clear_section_occupied - Sets the specified section to "CLEAR"
+#           Returns the current value of the Section Lable (as a string) to allow this
+#           to be 'passed' to the next section (via the set_section_occupied function)  
+#   Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
+#   Optional Parameters:
+#       label:str - An updated label to display when occupied (Default = No Change)
+#       publish:bool - Publish updates via MQTT Broker (Default = True)
 # 
 # ------------------------------------------------------------------------------------------
 #
@@ -307,7 +313,7 @@ def section_label (section_id:Union[int,str]):
 # Public API function to Set a section to OCCUPIED (and optionally update the label)
 # -------------------------------------------------------------------------
 
-def set_section_occupied (section_id:int,label:str=None):
+def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
@@ -321,33 +327,41 @@ def set_section_occupied (section_id:int,label:str=None):
             toggle_section(section_id)
             # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            send_mqtt_section_updated_event(section_id)
+            if publish: send_mqtt_section_updated_event(section_id)
         elif label is not None and sections[str(section_id)]["labeltext"] != label:
             # Section state remains unchanged but we need to update the Label
             sections[str(section_id)]["button1"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
             # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            send_mqtt_section_updated_event(section_id)
+            if publish: send_mqtt_section_updated_event(section_id)
     return()
 
 # -------------------------------------------------------------------------
 # Public API function to Set a section to CLEAR (returns the label)
 # -------------------------------------------------------------------------
 
-def clear_section_occupied (section_id:int):
+def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
         section_label = ""
     elif section_occupied(section_id):
+        # Need to toggle the section - ALSO update the label if that has been changed
+        if label is not None and sections[str(section_id)]["labeltext"] != label:
+            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["labeltext"]= label
         toggle_section(section_id)
         # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        send_mqtt_section_updated_event(section_id)
+        if publish: send_mqtt_section_updated_event(section_id)
         section_label = sections[str(section_id)]["labeltext"]
     else:
+        # Section state remains unchanged but we need to update the Label
+        if label is not None and sections[str(section_id)]["labeltext"] != label:
+            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["labeltext"]= label
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
 
