@@ -13,7 +13,7 @@ from . import menubar
 from ..library import common as library_common
 
 #------------------------------------------------------------------------------------
-# This is where the code begins
+# This is where the code begins  
 #------------------------------------------------------------------------------------
 
 def run_editor():
