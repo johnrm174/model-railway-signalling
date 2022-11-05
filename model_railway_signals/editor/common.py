@@ -530,7 +530,7 @@ class str_item_id_entry_box (entry_box):
                     else:
                         if node_str == "":
                             valid = False
-            if not valid: self.TT.text = ("Invalid item ID - must either be an integer "+
+            if not valid: self.TT.text = ("Invalid ID - must be an integer "+
                             "between 1 and 99 (for a local ID) or of the form 'node-id' "+
                             "with the 'id' element between 1 and 99 (for a remote ID)")
         # Next do the optional validation for item existing and not the same as the current ID
