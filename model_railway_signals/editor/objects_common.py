@@ -113,8 +113,8 @@ def set_canvas (canvas_object):
 
 def set_bbox(object_id:str,bbox:[int,int,int,int]):
     global schematic_objects
-    x1, y1 = bbox[0] - 5, bbox[1] - 5
-    x2, y2 = bbox[2] + 5, bbox[3] + 5
+    x1, y1 = bbox[0] - 2, bbox[1] - 2
+    x2, y2 = bbox[2] + 2, bbox[3] + 2
     # If we are moving it we leave it in its current selected/unselected state
     # If we are creating it for the first time - we hide it (object unselected)
     if schematic_objects[object_id]["bbox"]:

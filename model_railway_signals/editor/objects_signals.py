@@ -19,12 +19,13 @@
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.signal_exists - Common function to see if a given item exists
+#    objects_points.delete_back_references_to_signal - for keeping point interlocking in step
+#    objects_points.add_back_references_to_signal - for keeping point interlocking in step
 #
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.signal_index - The Index of Signal Objects (for iterating)
-#    objects_common.point_index - The Index of Point Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -68,14 +69,11 @@ from ..library import track_sensors
 from . import settings
 from . import objects_common
 from . import objects_points
-from . import objects_sections
 from . import run_layout
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import signal_index as signal_index
-from .objects_common import point_index as point_index
 from .objects_common import signal as signal
-from .objects_common import point as point
 
 #------------------------------------------------------------------------------------
 # Default Signal Objects (i.e. state at creation)
@@ -215,6 +213,98 @@ def has_associated_distant(object_id):
              schematic_objects[object_id]["sigarms"][4][2][0] )
 
 #------------------------------------------------------------------------------------
+# Function to remove all references to a point from the signal interlocking tables
+# Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
+# Where sig_id in this case is a string (for local or remote signals)
+#------------------------------------------------------------------------------------
+
+def remove_references_to_point(object_id):
+    for signal_id in signal_index:
+        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
+        for index1, interlocked_route in enumerate(list_of_interlocked_routes):
+            list_of_interlocked_points = interlocked_route[0]
+            for index2, interlocked_point in enumerate(list_of_interlocked_points):
+                if interlocked_point[0] == schematic_objects[object_id]["itemid"]:
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].pop(index2)
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].append([0,False])
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update any references to a Point from the signal interlocking tables
+#------------------------------------------------------------------------------------
+
+def update_references_to_point(old_item_id, new_item_id):
+    for signal_id in signal_index:
+        interlocking_table = schematic_objects[signal(signal_id)]["pointinterlock"]
+        for index1, signal_route in enumerate(interlocking_table):
+            list_of_interlocked_points = signal_route[0]
+            for index2, interlocked_point in enumerate(list_of_interlocked_points):
+                if interlocked_point[0] == old_item_id:
+                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Track Section from the signal automation tables
+# 'tracksections' is a list of [section_behind, sections_ahead]
+# where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
+#------------------------------------------------------------------------------------
+
+def remove_references_to_section(object_id):
+    for signal_id in signal_index:
+        track_sections = schematic_objects[signal(signal_id)]["tracksections"]
+        # Check the track section behind the signal
+        if track_sections[0] == schematic_objects[object_id]["itemid"]:
+            track_sections[0] = 0
+        #Check the track sections in front of the signal
+        for index1, section_ahead in enumerate(track_sections[1]):
+            if section_ahead == schematic_objects[object_id]["itemid"]:
+                schematic_objects[signal(signal_id)]["tracksections"][1][index1] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function topdate any references to a Track Section from the signal automation tables
+#------------------------------------------------------------------------------------
+
+def update_references_to_section(old_item_id, new_item_id):
+    for signal_id in signal_index:
+        track_sections = schematic_objects[signal(signal_id)]["tracksections"]
+        # Check the track section behind the signal
+        if track_sections[0] == old_item_id: track_sections[0] = new_item_id
+        #Check the track sections in front of the signal
+        for index1, section_ahead in enumerate(track_sections[1]):
+            if section_ahead == old_item_id:
+                schematic_objects[signal(signal_id)]["tracksections"][1][index1] = new_item_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Block Instrument from the signal interlocking tables
+# Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
+# Where sig_id in this case is a string (for local or remote signals)
+#------------------------------------------------------------------------------------
+
+def remove_references_to_instrument(object_id):
+    for signal_id in signal_index:
+        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
+        for index1, interlocked_route in enumerate(list_of_interlocked_routes):
+            if interlocked_route[2] == schematic_objects[object_id]["itemid"]:
+                schematic_objects[signal(signal_id)]["pointinterlock"][index1][2] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update any references to a Block Instrument from the signal interlocking tables
+#------------------------------------------------------------------------------------
+
+def update_references_to_instrument(old_item_id, new_item_id):
+    for signal_id in signal_index:
+        signal_interlocking = schematic_objects[signal(signal_id)]["pointinterlock"]
+        for index, signal_route in enumerate (signal_interlocking):
+            if signal_route[2] == old_item_id:
+                schematic_objects[signal(signal_id)]["pointinterlock"][index][2] = str(new_item_id)
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Signal object on the schematic. Called
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
@@ -223,8 +313,6 @@ def update_signal(object_id, new_object_configuration):
     global schematic_objects
     # Delete any point configuration interlocking entries(recreated later)
     objects_points.delete_back_references_to_signal(object_id)
-    # Similarly Delete any Track Section back references (for signal ahead/behind)
-    objects_sections.delete_back_references_to_signal(object_id)
     #####################################################################################
     # TODO - Remove any references to the signal from the Instrument interlocking tables
     #####################################################################################
@@ -250,6 +338,7 @@ def update_signal(object_id, new_object_configuration):
         # Where each route element is a boolean value (True or False)
         for signal_id in signal_index:
             # Update any references for the signal ahead (on the interlocked routes)
+            # We use strings as the signal ahead IDs support local or remote sections
             list_of_interlocked_point_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
             for index1, interlocked_route in enumerate (list_of_interlocked_point_routes):
                 if interlocked_route[1] == str(old_item_id):
@@ -269,8 +358,6 @@ def update_signal(object_id, new_object_configuration):
                     schematic_objects[signal(signal_id)]["timedsequences"][index1][1] = new_item_id
     # Add any interlocked routes to the locking tables of affected points
     objects_points.add_back_references_to_signal(object_id)
-    # Similarly add any Track Section back references (for signal ahead/behind)
-    objects_sections.add_back_references_to_signal(object_id)
     #####################################################################################
     # TODO - Add any references to the signal from the Instrument interlocking tables
     #####################################################################################
@@ -552,8 +639,6 @@ def delete_signal(object_id):
     delete_signal_object(object_id)
     # Delete any point configuration interlocking entries(recreated later)
     objects_points.delete_back_references_to_signal(object_id)
-    # Similarly Delete any Track Section back references (for signal ahead/behind)
-    objects_sections.delete_back_references_to_signal(object_id)
     #####################################################################################
     # TODO - Remove any references to the signal from the Instrument interlocking tables
     #####################################################################################

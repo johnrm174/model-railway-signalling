@@ -15,18 +15,18 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
-#    objects_common.signal - To get The Object_ID for a given Item_ID
+#    objects_common.section - To get The Object_ID for a given Item_ID
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.section_exists - Common function to see if a given item exists
-#    objects_common.section(item_id) - Returns the Object_ID
+#    objects_signals.update_references_to_section - called when point ID changes
+#    objects_signals.remove_references_to_section - called when Point is deleted
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.section_index - The index of Section Objects (for iterating)
-#    objects_common.signal_index - The index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -46,24 +46,12 @@ from ..library import track_sections
 
 from . import settings
 from . import objects_common
+from . import objects_signals
 from . import run_layout 
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import section_index as section_index
-from .objects_common import signal_index as signal_index
 from .objects_common import section as section
-from .objects_common import signal as signal
-
-#------------------------------------------------------------------------------------
-# The section_event_callback holds the reference to the callback function in the
-# 'schematic' module to process cursor events associated with the section button
-# when in schematic edit mode (i.e. otherwise clicking would just change the state)
-# The editing_enabled flag is used to control whether the track section object
-# is created as 'editable' or 'non-editable' (i.e. when 'running' the layout)
-#------------------------------------------------------------------------------------
-
-section_event_callback = None
-editing_enabled = True
 
 #------------------------------------------------------------------------------------
 # Default Track Section Objects (i.e. state at creation)
@@ -72,61 +60,17 @@ editing_enabled = True
 default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
 default_section_object["itemid"] = 0
-default_section_object["label"] = "OCCUPIED"
+default_section_object["label"] = None
+default_section_object["state"] = False
 default_section_object["editable"] = True
 default_section_object["mirror"] = ""
-# This is the default signal events table for the track section
-# The Table comprises a variable length list of signals
-# Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-# Each route element in the list of routes is a boolean value (True or False)
-default_section_object["sigsahead"] = []
-default_section_object["sigsbehind"] = []
 
 #------------------------------------------------------------------------------------
-# Function to remove all references to a signal that has been deleted
-# Section 'sigsahead/sigsbehind' comprises a variable length list of signals
-# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-# Each route element is a boolean value (True or False)
+# The editing_enabled flag is used to control whether the track section object
+# is created as 'editable' or 'non-editable' (i.e. when 'running' the layout)
 #------------------------------------------------------------------------------------
 
-def delete_back_references_to_signal(object_id):
-    for section_id in section_index:
-        list_of_sigs_ahead = schematic_objects[section(section_id)]["sigsahead"]
-        for index, referenced_signal in enumerate(list_of_sigs_ahead):
-            if referenced_signal[0] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[section(section_id)]["sigsahead"].pop(index)
-        list_of_sigs_behind = schematic_objects[section(section_id)]["sigsbehind"]
-        for index, referenced_signal in enumerate(list_of_sigs_behind):
-            if referenced_signal[0] == schematic_objects[object_id]["itemid"]:
-                schematic_objects[section(section_id)]["sigsbehind"].pop(index)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update all references to a signal that has been deleted
-# Signal "tracksections" comprises a list of [section_behind, sections_ahead]
-# where sections_ahead is a list of [MAIN, LH1, LH2, RH1, RH2] (each a section ID(
-# Section 'sigsahead/sigsbehind' comprises a variable length list of interlocked signals
-# Each list entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-# Each route element is a boolean value (True or False)
-#------------------------------------------------------------------------------------
-
-def add_back_references_to_signal(object_id):
-    section_behind_signal = schematic_objects[object_id]["tracksections"][0]
-    sections_ahead_of_signal = schematic_objects[object_id]["tracksections"][1]
-    for section_id in section_index:
-        if section_behind_signal == int(section_id):
-            signal_entry = [schematic_objects[object_id]["itemid"],[True,True,True,True,True]]
-            schematic_objects[section(section_id)]["sigsahead"].append(signal_entry)
-        signal_routes_to_set = [False, False, False, False, False]
-        add_signal_to_signals_behind_list = False
-        for index, section_ahead in enumerate(sections_ahead_of_signal):
-            if section_ahead == int(section_id):
-                signal_routes_to_set[index] = True
-                add_signal_to_signals_behind_list = True
-        if add_signal_to_signals_behind_list:
-            signal_entry = [schematic_objects[object_id]["itemid"],signal_routes_to_set]
-            schematic_objects[section(section_id)]["sigsbehind"].append(signal_entry)
-    return()
+editing_enabled = True
 
 #------------------------------------------------------------------------------------
 # Functions to delete/re-draw the track section objects on schematic mode change.
@@ -144,6 +88,12 @@ def redraw_all_section_objects():
 def enable_editing():
     global editing_enabled
     editing_enabled = True
+    # Save the current state of the track section object
+    for section_id in section_index:
+        current_state = track_sections.section_occupied(int(section_id))
+        current_label = track_sections.section_label(int(section_id))
+        schematic_objects[section(section_id)]["state"] = current_state
+        schematic_objects[section(section_id)]["label"] = current_label
     redraw_all_section_objects()
     return()
 
@@ -172,9 +122,13 @@ def update_section(object_id, new_object_configuration):
         # Update the type-specific index
         del section_index[str(old_item_id)]
         section_index[str(new_item_id)] = object_id
-        #####################################################################################
-        # TODO - Update any references to the section from the Signal automation tables
-        #####################################################################################
+        # Update any references to the section from the Signal automation tables
+        objects_signals.update_references_to_section(old_item_id, new_item_id)
+        # Update any references from other Track Sections (mirrored section)
+        # We use strings as the IDs support local or remote sections
+        for section_id in section_index:
+            if schematic_objects[section(section_id)]["mirror"] == str(old_item_id):
+                schematic_objects[section(section_id)]["mirror"] = str(new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -210,8 +164,18 @@ def redraw_section_object(object_id):
                     x = schematic_objects[object_id]["posx"],
                     y = schematic_objects[object_id]["posy"],
                     section_callback = run_layout.schematic_callback,
-                    label = schematic_objects[object_id]["label"],
+                    label = "OCCUPIED",
                     editable = schematic_objects[object_id]["editable"])
+        # Track sections are always created as "Not Occupied"
+        # Set the state of the track section as appropriate
+        section_id = schematic_objects[object_id]["itemid"]
+        if schematic_objects[object_id]["label"] is not None:
+            section_label = schematic_objects[object_id]["label"]
+            if schematic_objects[object_id]["state"]:
+                track_sections.set_section_occupied(section_id, section_label)
+            else:
+                track_sections.clear_section_occupied(section_id, section_label)
+        # Set the boundary box to None as it is not selectable in run mode
         schematic_objects[object_id]["bbox"] = None
     return()
  
@@ -255,9 +219,9 @@ def paste_section(object_to_paste):
     schematic_objects[new_object_id]["posx"] += position_offset
     schematic_objects[new_object_id]["posy"] += position_offset
     # Now set the default values for all elements we don't want to copy:
-    schematic_objects[new_object_id]["sigsahead"] = default_section_object["sigsahead"]
-    schematic_objects[new_object_id]["sigsbehind"] = default_section_object["sigsbehind"]
     schematic_objects[new_object_id]["mirror"] = default_section_object["mirror"]
+    schematic_objects[new_object_id]["label"] = default_section_object["label"]
+    schematic_objects[new_object_id]["state"] = default_section_object["state"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
@@ -284,18 +248,14 @@ def delete_section(object_id):
     global schematic_objects
     # Delete the associated library objects from the canvas
     delete_section_object(object_id)
-    ##################################### TO MOVE #########################################
     # Remove any references to the section from the signal track occupancy tables
-    for signal_id in signal_index:
-        track_sections = schematic_objects[signal(signal_id)]["tracksections"]
-        # Check with the track section behind the signal
-        if track_sections[0] == schematic_objects[object_id]["itemid"]:
-            track_sections[0] = 0
-        #Check the track section in front of the signal
-        for index1, section_ahead in enumerate(track_sections[1]):
-            if section_ahead == schematic_objects[object_id]["itemid"]:
-                schematic_objects[signal(signal_id)]["tracksections"][1][index1] = 0
-    ##################################### TO MOVE #########################################
+    objects_signals.remove_references_to_section(object_id)
+    # Remove any references from other Track Sections (mirrored section)
+    # We use string comparison as the IDs support local or remote sections
+    item_id_str = str(schematic_objects[object_id]["itemid"])
+    for section_id in section_index:
+        if schematic_objects[section(section_id)]["mirror"] == item_id_str:
+            schematic_objects[section(section_id)]["mirror"] = ""
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])

@@ -282,14 +282,15 @@ def set_all(new_objects):
             schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
                 if element not in default_object.keys():
-                    logging.error("LOAD LAYOUT - Unexpected "+new_object_type+" element '"+element+"'")
+                    logging.warning("LOAD LAYOUT - Unexpected "+new_object_type+" element '"+element+"'")
                 else:
                     schematic_objects[object_id][element] = new_objects[object_id][element]        
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
                 if element not in new_objects[object_id].keys():
-                    logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")        
+                    logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")
+            # Set the Boundary box for the new object to None so it gets created on re-draw
             schematic_objects[object_id]["bbox"] = None
             # Update the object indexes and all redraw each object on the schematic
             if new_object_type == object_type.line:
@@ -314,6 +315,10 @@ def set_all(new_objects):
     for object_id in schematic_objects:
         if schematic_objects[object_id]["item"] == objects_common.object_type.section:
             objects_common.canvas.tag_raise(schematic_objects[object_id]["tags"])
+    # Refresh the point interlocking tables to reflect the signal interlocking
+    # selections - this is a belt and braces thing as the loaded point interlocking
+    # tables should exactly match the loaded signal interlocking tables
+    objects_points.reset_point_interlocking_tables()
     # Initialise the layout (interlocking changes, signal aspects etc)
     run_layout.initialise_layout()    
     return()

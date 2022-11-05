@@ -14,16 +14,16 @@
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
 #    objects_common.point - To get The Object_ID for a given Item_ID
-#    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.point_exists - Common function to see if a given item exists
-#    
+#    objects_signals.update_references_to_point - called when point ID changes
+#    objects_signals.remove_references_to_point - called when Point is deleted
+#
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.signal_index - The index of Signal Objects (for iterating)
 #    objects_common.point_index - The index of Point Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
@@ -51,12 +51,11 @@ from ..library import dcc_control
 
 from . import settings
 from . import objects_common
+from . import objects_signals
 from . import run_layout
 
 from .objects_common import schematic_objects as schematic_objects
-from .objects_common import signal_index as signal_index
 from .objects_common import point_index as point_index
-from .objects_common import signal as signal
 from .objects_common import point as point
 
 #------------------------------------------------------------------------------------
@@ -70,7 +69,6 @@ default_point_object["itemtype"] = None
 default_point_object["orientation"] = 0
 default_point_object["colour"] = "black"
 default_point_object["alsoswitch"] = 0
-default_point_object["switchedwith"] = 0
 default_point_object["reverse"] = False
 default_point_object["automatic"] = False
 default_point_object["hasfpl"] = False
@@ -81,6 +79,18 @@ default_point_object["dccreversed"] = False
 # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Each route element in the list of routes is a boolean value (True or False)
 default_point_object["siginterlock"] = []
+
+
+#------------------------------------------------------------------------------------
+# Function to reset the point interlocking tables for all points
+#------------------------------------------------------------------------------------
+
+def reset_point_interlocking_tables():
+    for point_id in objects_common.point_index:
+        schematic_objects[objects_common.point(point_id)]["siginterlock"] = []
+    for signal_id in objects_common.signal_index:
+        add_back_references_to_signal(objects_common.signal(signal_id))
+    return()
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a signal from the point interlocking tables
@@ -123,20 +133,6 @@ def add_back_references_to_signal(object_id):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to set the read-only "switchedby" parameter. This is the back-reference
-# to the point that is configured to auto-switch another point (else zero)
-#------------------------------------------------------------------------------------
-
-def refresh_switched_by_points():
-    for point_id in point_index:
-        schematic_objects[point(point_id)]["switchedwith"] = 0
-    for point_id in point_index:
-        also_switch_point_id = schematic_objects[point(point_id)]["alsoswitch"]
-        if also_switch_point_id > 0:
-            schematic_objects[point(also_switch_point_id)]["switchedwith"] = int(point_id)
-    return()
-
-#------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Point object on the schematic. Called
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
@@ -159,22 +155,10 @@ def update_point(object_id, new_object_configuration):
         for point_id in point_index:
             if schematic_objects[point(point_id)]["alsoswitch"] == old_item_id:
                 schematic_objects[point(point_id)]["alsoswitch"] = new_item_id
+                delete_point_object(point(point_id))
                 redraw_point_object(point(point_id))
-        ##################################### TO MOVE #########################################
         # Update any affected signal interlocking tables to reference the new point ID
-        # Signal 'pointinterlock' comprises: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], signal, block_inst]
-        # Each point element (in the list of points) comprises [point_id, point_state]
-        # Point'siginterlock' comprises a variable length list of interlocked signals
-        # Each signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        for signal_id in signal_index:
-            interlocking_table = schematic_objects[signal(signal_id)]["pointinterlock"]
-            for index1, signal_route in enumerate(interlocking_table):
-                list_of_interlocked_points = signal_route[0]
-                for index2, interlocked_point in enumerate(list_of_interlocked_points):
-                    if interlocked_point[0] == old_item_id:
-                        schematic_objects[signal(signal_id)]["pointinterlock"][index1][0][index2][0] = new_item_id
-        ##################################### TO MOVE #########################################
+        objects_signals.update_references_to_point(old_item_id, new_item_id)
     # We need to ensure that all points in an 'auto switch' chain are set
     # to the same switched/not-switched state so they switch together correctly
     # First, test to see if the current point is configured to "auto switch" with 
@@ -193,8 +177,6 @@ def update_point(object_id, new_object_configuration):
         if points.point_switched(also_switch_id) != points.point_switched(current_point_id):
             # Use the non-public-api call to bypass validation (can't toggle "auto" points)
             points.toggle_point_state(also_switch_id,True)
-    # Update any back references to points configured to "auto switch"
-    refresh_switched_by_points()
     return()
 
 #------------------------------------------------------------------------------------
@@ -242,7 +224,7 @@ def create_point(item_type):
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
     item_id = objects_common.new_item_id(exists_function=objects_common.point_exists)
-    # Add the specific elements for this particular instance of the signal
+    # Add the specific elements for this particular instance of the point
     schematic_objects[object_id]["itemid"] = item_id
     schematic_objects[object_id]["itemtype"] = item_type
     schematic_objects[object_id]["posx"] = x
@@ -275,7 +257,6 @@ def paste_point(object_to_paste):
     schematic_objects[new_object_id]["posy"] += position_offset
     # Now set the default values for all elements we don't want to copy:
     schematic_objects[new_object_id]["alsoswitch"] = default_point_object["alsoswitch"]
-    schematic_objects[new_object_id]["switchedwith"] = default_point_object["switchedwith"]
     schematic_objects[new_object_id]["dccaddress"] = default_point_object["dccaddress"]
     schematic_objects[new_object_id]["dccreversed"] = default_point_object["dccreversed"]
     schematic_objects[new_object_id]["siginterlock"] = default_point_object["siginterlock"]
@@ -311,27 +292,13 @@ def delete_point(object_id):
     for point_id in point_index:
         if schematic_objects[point(point_id)]["alsoswitch"] == schematic_objects[object_id]["itemid"]:
             schematic_objects[point(point_id)]["alsoswitch"] = 0
-    ##################################### TO MOVE #########################################
     # Remove any references to the point from the signal interlocking tables
-    # Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-    # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
-    # Where sig_id in this case is a string (for local or remote signals)
-    for signal_id in signal_index:
-        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
-        for index1, interlocked_route in enumerate(list_of_interlocked_routes):
-            list_of_interlocked_points = interlocked_route[0]
-            for index2, interlocked_point in enumerate(list_of_interlocked_points):
-                if interlocked_point[0] == schematic_objects[object_id]["itemid"]:
-                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].pop(index2)
-                    schematic_objects[signal(signal_id)]["pointinterlock"][index1][0].append([0,False])
-    ##################################### TO MOVE #########################################
+    objects_signals.remove_references_to_point(object_id)
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
     del point_index[str(schematic_objects[object_id]["itemid"])]
     del schematic_objects[object_id]
-    # Update any back references to points configured to "auto switch"
-    refresh_switched_by_points()
     return()
 
 ####################################################################################

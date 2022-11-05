@@ -13,12 +13,13 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - To get the canvas parameters when creating objects
-#    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.instrument_exists - Common function to see if a given item exists
-#    
+#    objects_signals.update_references_to_instrument - when the instrument ID is changed
+#    objects_signals.remove_references_to_instrument - when the instrument is deleted
+#
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -42,12 +43,11 @@ from ..library import block_instruments
 
 from . import settings
 from . import objects_common
+from . import objects_signals
 from . import run_layout 
 
 from .objects_common import schematic_objects as schematic_objects
 from .objects_common import instrument_index as instrument_index
-from .objects_common import signal_index as signal_index
-from .objects_common import signal as signal
 
 #------------------------------------------------------------------------------------
 # Default Block Instrument Objects (i.e. state at creation)
@@ -76,19 +76,15 @@ def update_instrument(object_id, new_object_configuration):
     schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     redraw_instrument_object(object_id)
     # Check to see if the Type-specific ID has been changed
-    if old_item_id != item_id:
+    if old_item_id != new_item_id:
         # Update the type-specific index
         del instrument_index[str(old_item_id)]
-        instrument_index[str(item_id)] = object_id
+        instrument_index[str(new_item_id)] = object_id
         # Update any signal 'block ahead' references when the instID is changed
-        # Signal 'pointinterlock' comprises: [main, lh1, lh2, rh1, rh2]
-        # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, inst_id]
-        # Note that the inst_id in this case is a string (for local or remote signals)
-        for signal_id in signal_index:
-            signal_interlocking = schematic_objects[signal(signal_id)]["pointinterlock"]
-            for index, signal_route in enumerate (signal_interlocking):
-                if signal_route[2] == str(old_item_id):
-                    schematic_objects[signal(signal_id)]["pointinterlock"][index][2] = str(item_id)
+        objects_signals.update_references_to_instrument(old_item_id, new_item_id)
+        ###########################################################################
+        ## TO DO - update any "linkedto" references for other block insttruments ##
+        ###########################################################################
     return()
 
 #------------------------------------------------------------------------------------
@@ -181,14 +177,7 @@ def delete_instrument(object_id):
     # Delete the associated library objects from the canvas
     delete_instrument_object(object_id)
     # Remove any references to the block instrument from the signal interlocking tables
-    # Signal 'pointinterlock' comprises a list of routes: [main, lh1, lh2, rh1, rh2]
-    # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, block_id]
-    # Where sig_id in this case is a string (for local or remote signals)
-    for signal_id in signal_index:
-        list_of_interlocked_routes = schematic_objects[signal(signal_id)]["pointinterlock"]
-        for index1, interlocked_route in enumerate(list_of_interlocked_routes):
-            if interlocked_route[2] == str(schematic_objects[object_id]["itemid"]):
-                schematic_objects[signal(signal_id)]["pointinterlock"][index1][2] = ""
+    objects_signals.remove_references_to_instrument(object_id)
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
