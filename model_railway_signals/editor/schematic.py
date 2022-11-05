@@ -34,6 +34,7 @@
 #    signals_ground_position.ground_pos_sub_type - Used to access the signal subtype
 #    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
 #    points.point_type - Used to access the point type
+#    ########################## More to be added ########################################
 #
 #------------------------------------------------------------------------------------
 
@@ -261,21 +262,21 @@ def paste_clipboard_objects(event=None):
 
 def find_highlighted_object(xpos:int,ypos:int):
     for object_id in objects.schematic_objects:
-        # First check if the cursor is within the boundary box of the object
         bbox = canvas.coords(objects.schematic_objects[object_id]["bbox"])
-        if (bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos):
-            if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-                # For lines we also need to check if the cursor is "close" to the line
-                x1 = objects.schematic_objects[object_id]["posx"] 
-                x2 = objects.schematic_objects[object_id]["endx"] 
-                y1 = objects.schematic_objects[object_id]["posy"] 
-                y2 = objects.schematic_objects[object_id]["endy"] 
-                a, b, c = y1-y2, x2-x1,(x1-x2)*y1 + (y2-y1)*x1
-                if ((abs(a * xpos + b * ypos + c)) / math.sqrt(a * a + b * b)) <= 5:
-                    return(object_id)
-            else:
-                # Other objects are highlighted if the cursor is in the boundary box
+        # For lines we need to check if the cursor is "close" to the line
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+            x1 = objects.schematic_objects[object_id]["posx"] 
+            x2 = objects.schematic_objects[object_id]["endx"] 
+            y1 = objects.schematic_objects[object_id]["posy"] 
+            y2 = objects.schematic_objects[object_id]["endy"] 
+            a, b, c = y1-y2, x2-x1,(x1-x2)*y1 + (y2-y1)*x1
+            if ( ( (xpos>x1 and xpos<x2) or (xpos>x2 and xpos<x1) or
+                   (ypos>y1 and ypos<y2) or (ypos>y2 and ypos<y1) ) and
+                 ( (abs(a * xpos + b * ypos + c)) / math.sqrt(a * a + b * b)) <= 8 ):
                 return(object_id)
+        # For other objects check if the cursor is within the boundary box of the object
+        elif (bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos):
+            return(object_id)
     return(None)
 
 #------------------------------------------------------------------------------------
@@ -530,7 +531,7 @@ def enable_editing():
     global schematic_state
     schematic_state["editingenabled"] = True
     canvas.itemconfig("grid",state="normal")
-    # Refresh all the Section objects to make them editable
+    # Enable editing of the schematic objects
     objects.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
@@ -541,7 +542,7 @@ def disable_editing():
     schematic_state["editingenabled"] = False
     canvas.itemconfig("grid",state="hidden")
     deselect_all_objects()
-    # Refresh all the Section objects to make them non-editable
+    # Disable editing of the schematic objects
     objects.disable_editing()
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
