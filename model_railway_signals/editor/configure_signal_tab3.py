@@ -562,62 +562,6 @@ class approach_control_frame():
                  self.lh2.approach_control_selected() or
                  self.rh1.approach_control_selected() or
                  self.rh2.approach_control_selected() )
-        
-###------------------------------------------------------------------------------------
-### Class for the Secondary distant Arms UI Element
-### Public Class instance methods provided by this class:
-###    "validate" - validate the entry box value and return True/false
-###    "set_values" - Sets the route selection EBs 
-###    "get_values" - Gets route selection EBs 
-### Individual routes are enabled/disabled by calling the sub-class methods:
-###    "<route>.disable" - disables/blanks the entry box 
-###    "<route>.enable"  enables/loads the entry box
-###------------------------------------------------------------------------------------
-##
-##class secondary_distant_arms_frame():
-##    def __init__(self, parent_frame, parent_object):
-##        signal_exists_function = objects.signal_exists
-##        current_id_function = parent_object.config.sigid.get_value
-##        self.frame = LabelFrame(parent_frame, text="Secondary distant arms")
-##        self.subframe2 = Frame(self.frame)
-##        self.subframe2.pack()
-##        tool_tip = ("Enter the ID of another distant signal to mirror for this route (this "+
-##                "can be a local signal or a remote signal subscribed to via MQTT networking) "+
-##                "or leave all fields blank to retain the distant signal control button")
-##        self.label1 = Label(self.subframe2, text="MAIN:")
-##        self.label1.pack(side=LEFT, padx=2, pady=2)
-##        self.main = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-##            exists_function=signal_exists_function, current_id_function=current_id_function)
-##        self.main.pack(side=LEFT)
-##        self.label2 = Label(self.subframe2, text="LH1:")
-##        self.label2.pack(side=LEFT, padx=2, pady=2)
-##        self.lh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-##            exists_function=signal_exists_function, current_id_function=current_id_function)
-##        self.lh1.pack(side=LEFT)
-##        self.label3 = Label(self.subframe2, text="LH2:")
-##        self.label3.pack(side=LEFT, padx=2, pady=2)
-##        self.lh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-##            exists_function=signal_exists_function, current_id_function=current_id_function)
-##        self.lh2.pack(side=LEFT)
-##        self.label4 = Label(self.subframe2, text="RH1")
-##        self.label4.pack(side=LEFT, padx=2, pady=2)
-##        self.rh1 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-##            exists_function=signal_exists_function, current_id_function=current_id_function)
-##        self.rh1.pack(side=LEFT)
-##        self.label5 = Label(self.subframe2, text="RH2")
-##        self.label5.pack(side=LEFT, padx=2, pady=2)
-##        self.rh2 = common.str_item_id_entry_box(self.subframe2, tool_tip=tool_tip,
-##            exists_function=signal_exists_function, current_id_function=current_id_function)
-##        self.rh2.pack(side=LEFT)
-##
-##    def validate(self):
-##        pass   ## TODO
-##
-##    def set_values(self, signals):
-##        pass   ##TODO
-##
-##    def get_values(self):
-##        return(["","","","",""])   ##TODO
     
 #------------------------------------------------------------------------------------
 # Top level Class for the Edit Signal Window Automation Tab
@@ -639,9 +583,5 @@ class signal_automation_tab():
         self.timed_signal = timed_signal_frame(parent_tab, parent_object)
         # Create a Frame for the Signal Approach control (packed according to signal type)
         self.approach_control = approach_control_frame(parent_tab)
-##        # Create a Frame for the Secondary distant arms
-##        self.frame4 = Frame(parent_tab)
-##        self.frame4.pack(padx=2, pady=2, fill='x')
-##        self.secondary_distant_arms = secondary_distant_arms_frame(self.frame4, parent_object)
-##        self.secondary_distant_arms.frame.pack(padx=2, pady=2, fill='x', expand=True)
 
+######################################################################################

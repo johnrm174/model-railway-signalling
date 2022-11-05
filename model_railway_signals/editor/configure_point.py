@@ -3,10 +3,10 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    edit_point - Open the edit point wtop level window
+#    edit_point - Open the edit point top level window
 #
 # Makes the following external API calls to other editor modules:
-#    objects.update_object(obj_id,new_obj) - Update the configuration of the point object
+#    objects.update_object(obj_id,new_obj) - Update the configuration on save
 #    objects.point_exists(point_id) - To see if a specified point ID exists
 #    objects.point(point_id) - To get the object_id for a given point_id
 #
@@ -22,6 +22,7 @@
 #    common.selection_buttons
 #    common.signal_route_selections
 #    common.window_controls
+#
 #------------------------------------------------------------------------------------
 
 import copy
@@ -31,6 +32,20 @@ from tkinter import ttk
 
 from . import common
 from . import objects
+
+#------------------------------------------------------------------------------------
+# Function to set the read-only "switched with" parameter. This is the back-reference
+# to the point that is configured to auto-switch the current point (else zero). This
+# is only used within the UI so doesn't need to be tracked in the point object dict
+#------------------------------------------------------------------------------------
+
+def switched_with_point(object_id):
+    switched_with_point_id = 0
+    for point_id in objects.point_index:
+        also_switch_point_id = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
+        if also_switch_point_id == objects.schematic_objects[object_id]["itemid"]:
+            switched_with_point_id = int(point_id)
+    return(switched_with_point_id)
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -44,7 +59,7 @@ def load_state(point):
     # Set the Initial UI state from the current object settings
     point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
     point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
-    point.config.alsoswitch.set_switched_with(objects.schematic_objects[object_id]["switchedwith"])
+    point.config.alsoswitch.set_switched_with(switched_with_point(object_id))
     point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
     # These are the general settings for the point
     auto = objects.schematic_objects[object_id]["automatic"]
@@ -88,9 +103,8 @@ def save_state(point, close_window:bool):
         new_object_configuration["hasfpl"] = fpl
         if rot: new_object_configuration["orientation"] = 180
         else: new_object_configuration["orientation"] = 0
-        # Get the  DCC address - note that dcc.get_value returns [address,state]
-        # in this instance we only need the DCC address element(element [0])
-        add, rev = point.config.dccsettings.get_values ()
+        # Get the  DCC address
+        add, rev = point.config.dccsettings.get_values()
         new_object_configuration["dccaddress"] = add
         new_object_configuration["dccreversed"] = rev
         # Save the updated configuration (and re-draw the object)
@@ -135,15 +149,15 @@ class also_switch_selection(common.int_item_id_entry_box):
                 "automatic) point to be switched with this point (or leave blank)",
                 exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=LEFT, padx=2, pady=2)
-        # This is the read-only element for the point this is switched with
+        # This is the read-only element for the point this point is switched with
         self.switched_with = StringVar(parent_frame, "")
         self.label2 = Label(self.frame,text="Switched with:")
         self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.switched_entry = Entry(self.frame, width=3, textvariable=self.switched_with,
+        self.switched_eb = Entry(self.frame, width=3, textvariable=self.switched_with,
                                             justify='center',state="disabled")
-        self.switched_entry.pack(side=LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.switched_entry, "The ID of the point that "+
-                                       "this fully automatic point will be switched with")
+        self.switched_eb.pack(side=LEFT, padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.switched_eb, "ID of the point that "+
+                                       "will automatically switch this point")
     def validate(self):
         # Do the basic item validation first (exists and not current item ID)
         valid = super().validate(update_validation_status=False)
@@ -161,7 +175,7 @@ class also_switch_selection(common.int_item_id_entry_box):
                     other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
                     if other_autoswitch == autoswitch and autoswitch != initial_autoswitch:
                         self.TT.text = ("Point "+str(autoswitch)+" is already configured "+
-                                              "to 'also switch' with point "+point_id)
+                                              "to be switched with point "+point_id)
                         valid = False       
         self.set_validation_status(valid)
         return(valid)
@@ -222,7 +236,7 @@ class general_settings():
             for point_id in objects.point_index:
                 other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
                 if other_autoswitch == self.parent_object.pointid.get_initial_value():
-                    self.CB4.TT.text = ("Point is configured to be 'also switched' by point " +
+                    self.CB4.TT.text = ("Point is configured to switch with point " +
                                            point_id + " so must remain 'fully automatic'")
                     self.CB4.config(fg="red")
                     valid = False
@@ -281,7 +295,6 @@ class dcc_address_settings(common.dcc_entry_box):
         self.entry_updated()
         
     def get_values(self):
-        # Note that we only need the address element from the dcc entry box
         return (self.EB.get_value(), self.CB.get_value())
     
 #------------------------------------------------------------------------------------
@@ -345,12 +358,12 @@ class signal_route_interlocking_frame():
             for sig_interlocking_routes in sig_interlocking_frame:
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(common.signal_route_selections(self.subframe, read_only=True,
-                                    tool_tip="Edit the appropriate signals\nto configure interlocking"))
+                self.sigelements.append(common.signal_route_selections(self.subframe,read_only=True,
+                        tool_tip="Edit the appropriate signals\nto configure interlocking"))
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text="Edit the appropriate signals\nto configure interlocking")
+            self.label = Label(self.subframe, text="No interlocked signals")
             self.label.pack()
 
 #------------------------------------------------------------------------------------

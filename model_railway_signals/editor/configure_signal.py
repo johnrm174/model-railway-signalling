@@ -219,7 +219,6 @@ def load_state(signal):
     update_tab3_timed_signal_selections(signal)
     update_tab3_approach_control_selections(signal)
     update_tab3_signal_ui_elements(signal)
-##    update_tab3_secondary_distant_signal_routes(signal)
     return()
 
 #------------------------------------------------------------------------------------
@@ -814,30 +813,6 @@ def update_tab3_approach_control_selections(signal):
     return()
 
 #------------------------------------------------------------------------------------
-# Enable/disable the Tab3 Secondary distant route selection elements
-#------------------------------------------------------------------------------------
-
-def update_tab3_secondary_distant_signal_routes(signal):
-    # Get the current route selections
-    dist_routes = get_dist_routes(signal)
-    # MAIN Route (sig or sub)
-    if dist_routes[0]: signal.automation.secondary_distant_arms.main.enable()
-    else: signal.automation.secondary_distant_arms.main.disable()
-    # LH1 Route (sig or sub)
-    if dist_routes[1]: signal.automation.secondary_distant_arms.lh1.enable()
-    else: signal.automation.secondary_distant_arms.lh1.disable()
-    # LH2 Route (sig or sub)
-    if dist_routes[2]: signal.automation.secondary_distant_arms.lh2.enable()
-    else: signal.automation.secondary_distant_arms.lh2.disable()
-    # RH1 Route (sig or sub)
-    if dist_routes[3]: signal.automation.secondary_distant_arms.rh1.enable()
-    else: signal.automation.secondary_distant_arms.rh1.disable()
-    # RH2 Route (sig or sub)
-    if dist_routes[4]: signal.automation.secondary_distant_arms.rh2.enable()
-    else: signal.automation.secondary_distant_arms.rh2.disable()
-    return()
-
-#------------------------------------------------------------------------------------
 # Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 
 #------------------------------------------------------------------------------------
 
@@ -899,7 +874,6 @@ class edit_signal:
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
         update_tab3_signal_ui_elements(self)
-##        update_tab3_secondary_distant_signal_routes(self)
         
     def sub_type_updated(self):
         # The signal subtype has been changed (choices dependant on signal type)
@@ -912,7 +886,6 @@ class edit_signal:
         update_tab3_general_settings_selections(self)
         update_tab3_approach_control_selections(self)
         update_tab3_signal_ui_elements(self)
-##        update_tab3_secondary_distant_signal_routes(self)
         
     def route_type_updated(self):
         # The route indication type has changed (none/theatre/feather/semaphore-arms)
@@ -923,7 +896,6 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-##        update_tab3_secondary_distant_signal_routes(self)
         
     def route_selections_updated(self):
         # A Theatre route has been enabled/disabled on Tab1
@@ -944,7 +916,6 @@ class edit_signal:
         update_tab3_track_section_ahead_routes(self)
         update_tab3_timed_signal_selections(self)
         update_tab3_approach_control_selections(self)
-##        update_tab3_secondary_distant_signal_routes(self)
         
     def sub_routes_updated(self):
         # A semaphore subsidary arm has been enabled/disabled on Tab1
@@ -961,6 +932,5 @@ class edit_signal:
         # A secondary semaphore distant arm has been enabled/disabled on Tab1
         update_tab2_interlock_ahead_selection(self)
         update_tab3_general_settings_selections(self)
-##        update_tab3_secondary_distant_signal_routes(self)
 
 #############################################################################################

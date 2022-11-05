@@ -6,7 +6,7 @@
 #    edit_section - Open the edit section top level window
 #
 # Makes the following external API calls to other editor modules:
-#    objects.update_object(obj_id,new_obj) - Update the configuration of the section object
+#    objects.update_object(obj_id,new_obj) - Update the configuration on save
 #    objects.section_exists(section_id) - To see if a specified section ID exists
 #    objects.section(section_id) - To get the object_id for a given section ID
 #
@@ -20,6 +20,7 @@
 #    common.object_id_selection
 #    common.signal_route_selections
 #    common.window_controls
+#
 #------------------------------------------------------------------------------------
 
 import copy
@@ -29,6 +30,70 @@ from tkinter import ttk
 
 from . import common
 from . import objects
+
+#------------------------------------------------------------------------------------
+# Function to return the read-only "mirrored by" parameter. This is the back-reference
+# to the section that is configured to mirror the current section (else zero). This
+# is only used within the UI so doesn't need to be tracked in the section object dict
+# Note that the mirrored element is a string to support local and remote sections
+#------------------------------------------------------------------------------------
+
+def mirrored_by_section(object_id):
+    mirrored_by_section_id = ""
+    for section_id in objects.section_index:
+        mirrored_section_id = objects.schematic_objects[objects.section(section_id)]["mirror"]
+        if mirrored_section_id == str(objects.schematic_objects[object_id]["itemid"]):
+            mirrored_by_section_id = section_id
+    return(mirrored_by_section_id)
+
+
+#------------------------------------------------------------------------------------
+# Helper Function to return the list of available signal routes for the signal ahead
+#------------------------------------------------------------------------------------
+
+def get_signal_routes(object_id):
+    sig_routes = objects.schematic_objects[object_id]["sigroutes"]
+    sub_routes = objects.schematic_objects[object_id]["subroutes"]
+    return ( [ sig_routes[0] or sub_routes[0],
+               sig_routes[1] or sub_routes[1],
+               sig_routes[2] or sub_routes[2],
+               sig_routes[3] or sub_routes[3],
+               sig_routes[4] or sub_routes[4] ] )
+
+#------------------------------------------------------------------------------------
+# Function to return the read-only "signals ahead" element. This is the back-reference
+# to the signals that are configured to clear the track section when passed
+#------------------------------------------------------------------------------------
+
+def signals_ahead(object_id):
+    list_of_signals_ahead = []
+    for signal_id in objects.signal_index:
+        section_behind_signal = objects.schematic_objects[objects.signal(signal_id)]["tracksections"][0]
+        if section_behind_signal == int(objects.schematic_objects[object_id]["itemid"]):
+            signal_routes = get_signal_routes(objects.signal(signal_id))
+            signal_entry = [objects.schematic_objects[object_id]["itemid"],signal_routes]
+            list_of_signals_ahead.append(signal_entry)
+    return(list_of_signals_ahead)
+
+#------------------------------------------------------------------------------------
+# Function to return the read-only "signals behind" element. This is the back-reference
+# to the signals that are configured to set the track section to occupied when passed
+#------------------------------------------------------------------------------------
+
+def signals_behind(object_id):
+    list_of_signals_behind = []
+    for signal_id in objects.signal_index:
+        sections_ahead_of_signal = objects.schematic_objects[objects.signal(signal_id)]["tracksections"][1]
+        signal_routes_to_set = [False, False, False, False, False]
+        add_signal_to_signals_behind_list = False
+        for index, section_ahead in enumerate(sections_ahead_of_signal):
+            if section_ahead == int(objects.schematic_objects[object_id]["itemid"]):
+                signal_routes_to_set[index] = True
+                add_signal_to_signals_behind_list = True
+        if add_signal_to_signals_behind_list:
+            signal_entry = [int(signal_id), signal_routes_to_set]
+            list_of_signals_behind.append(signal_entry)
+    return(list_of_signals_behind)
 
 #------------------------------------------------------------------------------------
 # Function to load the initial UI state when the Edit window is created
@@ -43,8 +108,9 @@ def load_state(section):
     section.config.sectionid.set_value(objects.schematic_objects[object_id]["itemid"])
     section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
     section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
-    section.automation.ahead.set_values(objects.schematic_objects[object_id]["sigsahead"])
-    section.automation.behind.set_values(objects.schematic_objects[object_id]["sigsbehind"])
+    section.config.mirror.set_mirrored_by(mirrored_by_section(object_id))
+    section.automation.ahead.set_values(signals_ahead(object_id))
+    section.automation.behind.set_values(signals_behind(object_id))
     return()
     
 #------------------------------------------------------------------------------------
@@ -89,26 +155,71 @@ def save_state(section, close_window:bool):
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
 #    "validate" - Also validate the point is automatic and not switched by another point
+# Class instance methods provided by this class are:
+#    "validate" - Also validate the section is not mirrored by another section
+#    "set_mirrored_by" - to set the read-only value for the "mirrored_by" section
 #------------------------------------------------------------------------------------
 
 class mirrored_section(common.str_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
         # These are the functions used to validate that the entered signal ID
         # exists on the schematic and is different to the current signal ID
-        #######################################################################
-        #### TO DO - will need changes to cater for subscribed Track Sections
-        #######################################################################
+        ##################################################################################
+        ### TODO - when we eventually support remote sections we can't use the current ###
+        ### section_exists function as that only checks if the section exists in the   ###
+        ### dictionary of schematic objects so won't pick up any sections subscribed   ###
+        ### to via the MQTT networking - we'll therefore have to use the internal      ###
+        ### library function or validate also against a list of subscribed sections    ###
+        ### Note that the validation function will also need to change                 ###
+        ##################################################################################
         exists_function = objects.section_exists
         current_id_function = parent_object.sectionid.get_value
-        # Create the Label Frame for the "also switch" entry box
+        # Create the Label Frame for the "mirrored section" entry box
         self.frame = LabelFrame(parent_frame, text="Link to other track section")
+        # Create a frame for the "Section to mirror" elements
+        self.subframe1 = Frame(self.frame)
+        self.subframe1.pack()
         # Call the common base class init function to create the EB
-        self.label1 = Label(self.frame,text="Section to mirror:")
+        self.label1 = Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=LEFT, padx=2, pady=2)
-        super().__init__(self.frame, tool_tip = "Enter the ID of the track section to mirror - This can "+
+        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - This can "+
                     "be a local section or a remote section (subscribed to via MQTT networking)",
                     exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=LEFT, padx=2, pady=2)
+        # Create a frame for the "Mirrored by" elements
+        self.subframe2 = Frame(self.frame)
+        self.subframe2.pack()
+        self.mirrored_by = StringVar(parent_frame, "")
+        self.label2 = Label(self.subframe2,text="Mirrored by section:")
+        self.label2.pack(side=LEFT, padx=2, pady=2)
+        self.mirrored_by_eb = Entry(self.subframe2, width=3, textvariable=self.mirrored_by,
+                                            justify='center',state="disabled")
+        self.mirrored_by_eb.pack(side=LEFT, padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.mirrored_by_eb, "ID of the track "+
+                            "section that that will be mirrored by this section")
+
+    def validate(self):
+        # Do the basic item validation first (exists and not current item ID)
+        valid = super().validate(update_validation_status=False)
+        if valid and self.entry.get() != "":
+            mirrored_section = int(self.entry.get())
+            # Test to see if the entered section is already being mirrored by another section
+            if self.initial_value == "": initial_mirrored = 0
+            else: initial_mirrored = int(self.initial_value)
+            for section_id in objects.section_index:
+                other_section = objects.schematic_objects[objects.section(section_id)]["mirror"]
+                if other_section == "": other_mirrored = 0
+                else: other_mirrored = int(other_section)
+                if other_mirrored == mirrored_section and mirrored_section != initial_mirrored:
+                    self.TT.text = ("Track section "+str(mirrored_section)+" is already "+
+                                          "mirrored by section "+section_id)
+                    valid = False       
+        self.set_validation_status(valid)
+        return(valid)
+
+    def set_mirrored_by(self, section_id:str):
+        # Strings are used as the mirrored element supports local or remote sections
+        self.mirrored_by.set(section_id)
 
 #------------------------------------------------------------------------------------
 # Class for the main Track Section configuration tab
@@ -171,7 +282,7 @@ class signal_route_frame():
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text="Edit the appropriate signals\nto configure automation")
+            self.label = Label(self.subframe, text="No automation configured")
             self.label.pack()
             
 #------------------------------------------------------------------------------------
@@ -180,7 +291,7 @@ class signal_route_frame():
 
 class section_automation_tab():
     def __init__(self, parent_tab):
-        self.behind = signal_route_frame (parent_tab, label="Signals protecting section")
+        self.behind = signal_route_frame (parent_tab, label="Signals behind section")
         self.ahead = signal_route_frame (parent_tab, label="Signals ahead of section")
 
 #####################################################################################
