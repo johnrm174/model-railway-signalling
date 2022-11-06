@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Interlocking" Tab
+# Functions and sub Classes for the Edit Signal "Interlocking" Tab 
 #------------------------------------------------------------------------------------
 
 from tkinter import *

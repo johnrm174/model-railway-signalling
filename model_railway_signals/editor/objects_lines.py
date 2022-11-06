@@ -2,7 +2,7 @@
 # This module contains all the functions for managing Line objects
 #------------------------------------------------------------------------------------
 #
-# External API functions intended for use by other editor modules:
+# External API functions intended for use by other editor modules: 
 #    create_line(type) - Create a default object on the schematic
 #    delete_line(object_id) - Hard Delete an object when deleted from the schematic
 #    paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)

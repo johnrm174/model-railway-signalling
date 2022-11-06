@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Configuration" Tab
+# Functions and sub Classes for the Edit Signal "Configuration" Tab 
 #------------------------------------------------------------------------------------
 
 from tkinter import *
