@@ -367,10 +367,16 @@ set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' i
       section_id:int - The ID to be used for the section 
   Optional Parameters:
       label:str - An updated label to display when occupied (Default = No Change)
+      publish:bool - Publish updates via MQTT Broker (Default = True)
 
-clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-                  Returns the current value of the Section Lable (as a string) to allow this
-                  to be 'passed' to the next section (via the set_section_occupied function)  
+clear_section_occupied - Sets the section to "CLEAR" (and updates the 'label' if required)
+          Returns the current value of the Section Lable (as a string) to allow this
+          to be 'passed' to the next section (via the set_section_occupied function)  
+  Mandatory Parameters:
+      section_id:int - The ID to be used for the section 
+  Optional Parameters:
+      label:str - An updated label to display when occupied (Default = No Change)
+      publish:bool - Publish updates via MQTT Broker (Default = True)
 </pre>
 
 ## Track Sensors
