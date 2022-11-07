@@ -272,7 +272,7 @@ def find_highlighted_object(xpos:int,ypos:int):
             a, b, c = y1-y2, x2-x1,(x1-x2)*y1 + (y2-y1)*x1
             if ( ( (xpos>x1 and xpos<x2) or (xpos>x2 and xpos<x1) or
                    (ypos>y1 and ypos<y2) or (ypos>y2 and ypos<y1) ) and
-                 ( (abs(a * xpos + b * ypos + c)) / math.sqrt(a * a + b * b)) <= 8 ):
+                 ( (abs(a * xpos + b * ypos + c)) / math.sqrt(a * a + b * b)) <= 5 ):
                 return(object_id)
         # For other objects check if the cursor is within the boundary box of the object
         elif (bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos):
