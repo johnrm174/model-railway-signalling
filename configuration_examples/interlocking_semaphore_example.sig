@@ -7395,7 +7395,7 @@
             "bbox": 767,
             "end1": 765,
             "end2": 766,
-            "endx": 725,
+            "endx": 775,
             "endy": 200,
             "item": "line",
             "itemid": null,
