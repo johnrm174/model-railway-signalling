@@ -63,12 +63,12 @@ help_text = """
 Application documentation is still on the 'ToDo' list, but in the meantime here is some
 basic guidance and top tips for creating your layout signalling system:
 
-1) Save your progress frequently - The editor is very much a  beta release and so may
+1) Save your progress frequently - The editor is very much a work in progress and so may
    not be fully stable (any bugs please do report back to me so I can fix them). Its also
    worth mentioning that there is no 'undo' function as yet, so be forewarned.
 2) Draw the track layout (points and lines) before adding any signals or the schematic may
    get cluttered (making it difficult to select the thing you want to move or edit).
-3) Complete the signal coinfiguration (signal type, routes indications, DCC addresses etc)
+3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
    before interlocking (available interlocking selections are driven by this).
 4) Tooltips (hover-over) have been added to most of the UI elements which will hopefully
    provide an insight as to what information needs to be entered (if they don't then please
@@ -82,21 +82,22 @@ Schematic functions:
 4) Double-left-click on a point or signal to open the object configuraton window
 5) Left-click on the 'end' of a selected line to move/edit the position
 6) Left-click / release (when not over an object) can also be used for an 'area' selection
-7) <r> will rotate all selected point and signal objects by 180 degrees
-8) <backspace> will permanently delete all selected object from the schematic
-9) <cntl-c> will copy all currently selected objects to a copy/paste buffer
-10) <cntl-v> will paste the selected objects at a slightly offset position
-11) <m> will toggle the schematic editor between Edit Mode and Run Mode
+7) Right-click on an object or the canvas to bring up additional options
+8) <r> will rotate all selected point and signal objects by 180 degrees
+9) <backspace> will permanently delete all selected object from the schematic
+10) <cntl-c> will copy all currently selected objects to a copy/paste buffer
+11) <cntl-v> will paste the selected objects at a slightly offset position
+12) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
 
 1) File - All the functions you would expect
 2) Mode - Selects the schematic editor mode (Edit Mode or Run Mode)
 3) SPROG - Opens the serial port and connects to the SPROG
-3) DCC Power - Toggle the DCC bus supply (SPROG must be initialised)
-4) Settings-Canvas - Change the display size of the schematic
-5) Settings-Logging - Set the log level for running the layout
-5) Settings-SPROG - Configure the serial port and SPROG behavior
+4) DCC Power - Toggle the DCC bus supply (SPROG must be initialised)
+5) Settings-Canvas - Change the display size of the schematic
+6) Settings-Logging - Set the log level for running the layout
+7) Settings-SPROG - Configure the serial port and SPROG behavior
 
 Signal / Point configuration
 
@@ -549,8 +550,8 @@ class main_menubar:
                                                  filename_to_save, save_as=save_as)
         # Reset the filename / root window title to the name of the file we have saved
         if saved_filename is not None:
+            settings.set_general(filename=saved_filename)
             path, name = os.path.split(saved_filename)
-            settings.set_general(filename=name)
             self.root.title(name)
             self.file_has_been_saved = True
         return()
