@@ -86,7 +86,9 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
     else:
         # Define the "Tag" for all drawing objects for this signal instance
-        sig_id_tag = "signal"+str(sig_id)
+        # If it is an associated distant then set the tag the same as the home signal
+        if associated_home > 0: sig_id_tag = "signal"+str(associated_home)
+        else: sig_id_tag = "signal"+str(sig_id)
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
@@ -256,7 +258,8 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic,
-                                       distant_button_offset = button_offset)
+                                       distant_button_offset = button_offset,
+                                       tag = sig_id_tag)
         
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,

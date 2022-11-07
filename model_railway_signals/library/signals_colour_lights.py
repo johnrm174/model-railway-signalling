@@ -153,7 +153,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                        orientation = orientation,
                                        subsidary = position_light,
                                        sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic)
+                                       automatic = fully_automatic,
+                                       tag = sig_id_tag)
 
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,

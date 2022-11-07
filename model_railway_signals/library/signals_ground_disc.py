@@ -64,7 +64,8 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                        signal_type = signals_common.sig_type.ground_disc,
                                        ext_callback = sig_callback,
                                        orientation = orientation,
-                                       sig_passed_button = sig_passed_button)
+                                       sig_passed_button = sig_passed_button,
+                                       tag = sig_id_tag)
 
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
         signals_common.signals[str(sig_id)]["sigon"] = sigon           # Type-specific - drawing object

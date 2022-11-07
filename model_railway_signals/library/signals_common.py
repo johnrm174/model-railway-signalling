@@ -361,12 +361,11 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0):
+                                   distant_button_offset:int=0,
+                                   tag:str=""):
     global signals
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
-    # Define the "Tag" for all drawing objects for this signal instance
-    tag = "signal"+str(sig_id)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
     # Assign the button labels. if a distant_button_offset has been defined then this represents the 
