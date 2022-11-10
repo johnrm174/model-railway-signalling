@@ -549,7 +549,8 @@ def schematic_callback(item_id,callback_type):
         if not editing_enabled:
             update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
         
-    if callback_type == signals_common.sig_callback_type.sig_switched:
+    if ( callback_type == signals_common.sig_callback_type.sig_switched or
+         callback_type == signals_common.sig_callback_type.sub_switched ):
         # We need to differentiate if the callback was from an semaphore "associated distant"
         # (i.e. a semaphore home that has secondary distant arms). If so then we need to
         # adjust the signal ID to point to the ID of the main semaphore home signal
@@ -571,9 +572,6 @@ def schematic_callback(item_id,callback_type):
          callback_type == points.point_callback_type.fpl_switched ):
         pass
     
-    if callback_type == signals_common.sig_callback_type.sub_switched:
-        pass
-        
     if callback_type == block_instruments.block_callback_type.block_section_ahead_updated:
         pass
 
