@@ -161,17 +161,6 @@ def deselect_all_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to deselect all objects (clearing the list of selected objects)
-#------------------------------------------------------------------------------------
-
-def handle_escape_keypress(event=None):
-    if schematic_state["moveobjects"]
-    selections = copy.deepcopy(schematic_state["selectedobjects"])
-    for object_id in selections:
-        deselect_object(object_id)
-    return()
-
-#------------------------------------------------------------------------------------
 # Internal function to edit an object configuration (double-click and popup menu)
 # Only a single Object will be selected when this function is called
 #------------------------------------------------------------------------------------
@@ -274,8 +263,14 @@ def paste_clipboard_objects(event=None):
 #------------------------------------------------------------------------------------
 
 def find_highlighted_object(xpos:int,ypos:int):
+    # We do this in a certain order - objects first then lines so we don't
+    # select a line that is under the object the user is trying to select
     for object_id in objects.schematic_objects:
         bbox = canvas.coords(objects.schematic_objects[object_id]["bbox"])
+        if objects.schematic_objects[object_id]["item"] != objects.object_type.line:
+            if bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos:
+                return(object_id)
+    for object_id in objects.schematic_objects:
         # For lines we need to check if the cursor is "close" to the line
         if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
             x1 = objects.schematic_objects[object_id]["posx"] 
@@ -287,9 +282,6 @@ def find_highlighted_object(xpos:int,ypos:int):
                    (ypos>y1 and ypos<y2) or (ypos>y2 and ypos<y1) ) and
                  ( (abs(a * xpos + b * ypos + c)) / math.sqrt(a * a + b * b)) <= 5 ):
                 return(object_id)
-        # For other objects check if the cursor is within the boundary box of the object
-        elif (bbox[0] < xpos and bbox[2] > xpos and bbox[1] < ypos and bbox[3] > ypos):
-            return(object_id)
     return(None)
 
 #------------------------------------------------------------------------------------
