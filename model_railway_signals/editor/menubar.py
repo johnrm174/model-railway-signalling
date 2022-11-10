@@ -444,8 +444,6 @@ class main_menubar:
         # And then re-bind the close window event to the editor quit function
         library_common.find_root_window(self.mainmenubar)
         self.root.protocol("WM_DELETE_WINDOW", self.quit_schematic)
-        # Bind the other keyboard shortcut events
-        self.root.bind('m', self.toggle_mode)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
@@ -472,10 +470,12 @@ class main_menubar:
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
         
-    def toggle_mode(self, event=None):
-        # the Edit mode flagis the second parameter returned
-        if settings.get_general()[1]: self.run_mode()
-        else: self.edit_mode()
+    def handle_canvas_event(self, event=None):
+        # Handle the Toggle Mode Event ('m' key)
+        if event.keysym == 'm':
+            # the Edit mode flag is the second parameter returned
+            if settings.get_general()[1]: self.run_mode()
+            else: self.edit_mode()
 
     def edit_mode(self):
         new_label = "Mode:Edit  "

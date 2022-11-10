@@ -22,7 +22,7 @@ def run_editor():
     root = tkinter.Tk()
     # Create the menubar and editor canvas (canvas size will be set on creation)
     main_window_menubar = menubar.main_menubar(root)
-    schematic.create_canvas(root)
+    schematic.create_canvas(root, main_window_menubar.handle_canvas_event)
     # Initialise the editor (using the default config)
     main_window_menubar.initialise_editor()
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
