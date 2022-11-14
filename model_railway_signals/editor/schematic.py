@@ -71,10 +71,9 @@ schematic_state["moveobjects"] = False
 schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
 schematic_state["selectarea"] = False
-schematic_state["selectbox"] = False
+schematic_state["selectbox"] = None      # Tkinter drawing object
 schematic_state["selectedobjects"] = []
 schematic_state["clipboardobjects"] = []
-schematic_state["editingenabled"] = True
 
 # The Tkinter root window and canvas object references
 canvas = None
@@ -96,14 +95,17 @@ button_images = {}
 
 def draw_grid():
     width, height, canvas_grid = settings.get_canvas()
+    # Note we leave the 'state' of the grid  unchanged when re-drawing
+    # As the 'state' is set (normal or hidden) when enabling/disabling editing
+    grid_state = canvas.itemcget("grid",'state')
     canvas.delete("grid")
-    if schematic_state["editingenabled"]: state = "normal"
-    else: state = "hidden"
-    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid", state=state)
+    if grid_state =="" : state = "normal"
+    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid", state=grid_state)
     for i in range(0, height, canvas_grid):
-        canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=state)
+        canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=grid_state)
     for i in range(0, width, canvas_grid):
-        canvas.create_line(i,0,i,height,fill='#999',tags="grid",state=state)
+        canvas.create_line(i,0,i,height,fill='#999',tags="grid",state=grid_state)
+    # Push the grid to the back (behind any drawing objects)
     canvas.tag_lower("grid")
     return()
 
@@ -568,7 +570,6 @@ def disable_edit_keypress_events():
 def enable_editing():
     global schematic_state
     global canvas_event_callback
-    schematic_state["editingenabled"] = True
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
@@ -591,7 +592,6 @@ def enable_editing():
 
 def disable_editing():
     global schematic_state
-    schematic_state["editingenabled"] = False
     canvas.itemconfig("grid",state="hidden")
     deselect_all_objects()
     # Disable editing of the schematic objects
