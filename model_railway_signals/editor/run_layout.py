@@ -560,8 +560,8 @@ def schematic_callback(item_id,callback_type):
     clear_all_signal_overrides()
     # Note that Track sections (the library objects) only "exist" in run mode
     if not editing_enabled:
-        update_all_signal_overrides()
         update_all_mirrored_sections()
+        update_all_signal_overrides()
     update_all_signals() 
     update_all_distant_overrides()   
     process_all_signal_interlocking()
