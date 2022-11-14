@@ -385,7 +385,7 @@ def left_button_click(event):
             canvas.itemconfigure(schematic_state["selectbox"],state="normal")
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
-    disable_keypress_events()
+    disable_all_keypress_events()
     return()
 
 #------------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ def left_button_release(event):
         canvas.itemconfigure(schematic_state["selectbox"],state="hidden")
         schematic_state["selectarea"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
-    enable_keypress_events()
+    enable_all_keypress_events()
     return()
 
 #------------------------------------------------------------------------------------
@@ -531,24 +531,33 @@ def resize_canvas():
 # Internal Functions to enable/disable the canvas keypress events during a move
 #------------------------------------------------------------------------------------
 
-def enable_keypress_events():
+
+def enable_all_keypress_events():
+    enable_edit_keypress_events()
+    canvas.bind('m', canvas_event_callback)        # Toggle Mode (Edit/Run)
+    return()
+
+def disable_all_keypress_events():
+    disable_edit_keypress_events()
+    canvas.unbind('m')
+    return()
+
+def enable_edit_keypress_events():
     canvas.bind('<BackSpace>', delete_selected_objects)
     canvas.bind('<Delete>', delete_selected_objects)
     canvas.bind('<Escape>', deselect_all_objects)
     canvas.bind('<Control-Key-c>', copy_selected_objects)
     canvas.bind('<Control-Key-v>', paste_clipboard_objects)
     canvas.bind('r', rotate_selected_objects)
-    canvas.bind('m', canvas_event_callback)        # Toggle Mode (Edit/Run)
     return()
 
-def disable_keypress_events():
+def disable_edit_keypress_events():
     canvas.unbind('<BackSpace>')
     canvas.unbind('<Delete>')
     canvas.unbind('<Escape>')
     canvas.unbind('<Control-Key-c>')
     canvas.unbind('<Control-Key-v>')
     canvas.unbind('r')
-    canvas.unbind('m')
     return()
 
 #------------------------------------------------------------------------------------
@@ -574,7 +583,10 @@ def enable_editing():
     canvas.bind('<ButtonRelease-1>', left_button_release)
     canvas.bind('<Double-Button-1>', left_double_click)
     # Bind the canvas keypresses to the associated functions
-    enable_keypress_events()
+    enable_edit_keypress_events()
+    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
+    # it is enabled/disabled only during object moves or area selections on the schematic
+    canvas.bind('m', canvas_event_callback)
     return()
 
 def disable_editing():
@@ -595,7 +607,9 @@ def disable_editing():
     canvas.unbind('<ButtonRelease-1>')
     canvas.unbind('<Double-Button-1>')
     # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
-    disable_keypress_events()
+    disable_edit_keypress_events()
+    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
+    # it is enabled/disabled only during object moves or area selections on the schematic
     canvas.bind('m', canvas_event_callback)
     return()
 
@@ -623,7 +637,9 @@ def create_canvas (root_window, event_callback):
     # Default values for the canvas
     canvas_width, canvas_height, canvas_grid = settings.get_canvas()
     # Create the canvas and scrollbars inside the parentframe
+    # We also set focus on the canvas so the keypress events will take effect
     canvas = Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
+    canvas.focus_set()
     hbar = Scrollbar(canvas_frame, orient=HORIZONTAL)
     hbar.pack(side=BOTTOM, fill=X)
     hbar.config(command=canvas.xview)
