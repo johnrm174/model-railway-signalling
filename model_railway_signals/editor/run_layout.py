@@ -2,8 +2,7 @@
 # This module contains all the functions to "run" the layout
 #
 # External API functions intended for use by other editor modules:
-#    process_object_update(object_id) - call after any change to an existing object
-#    initialise_layout() - call after object deletions or a reload (to re-initialise)
+#    initialise_layout() - call after object changes/deletions or load of a new schematic
 #    schematic_callback(item_id,callback_type) - the callback for all schematic objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
@@ -235,6 +234,11 @@ def set_signal_route(signal_object):
         theatre_text = signal_object["dcctheatre"][signal_route.value-1][0]
         signals.set_route(signal_object["itemid"],
                    route=signal_route,theatre_text=theatre_text)
+        # For Semaphore Signals with secondary distant arms we also need
+        # to set the route for the associated semaphore distant signal
+        if has_distant_arms(signal_object):
+            associated_distant_sig_id = int(signal_object["itemid"])+100
+            signals.set_route(associated_distant_sig_id, route=signal_route)
     return()
 
 #------------------------------------------------------------------------------------
@@ -544,42 +548,20 @@ def schematic_callback(item_id,callback_type):
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     
     if callback_type == signals_common.sig_callback_type.sig_passed:
+        ######################################################################################
+        #### TO DO - Need to handle Remote signal events when MQTT networking is enabled #####
+        ######################################################################################
         trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
         # Track sections (the library objects) only "exist" in run mode"
-        if not editing_enabled:
-            update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+        if not editing_enabled: update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
         
-    if ( callback_type == signals_common.sig_callback_type.sig_switched or
-         callback_type == signals_common.sig_callback_type.sub_switched ):
-        # We need to differentiate if the callback was from an semaphore "associated distant"
-        # (i.e. a semaphore home that has secondary distant arms). If so then we need to
-        # adjust the signal ID to point to the ID of the main semaphore home signal
-        if type(item_id) == int and item_id > 100: item_id = item_id-100
-        set_signal_route(objects.schematic_objects[objects.signal(item_id)])
-
-    if callback_type == track_sections.section_callback_type.section_updated:
-        # Track sections (the library objects) only "exist" in run mode"
-        if not editing_enabled:
-            update_mirrored_section(objects.schematic_objects[objects.section(item_id)])
-
-    if callback_type == signals_common.sig_callback_type.sig_updated:
-        pass
-    
-    if callback_type == signals_common.sig_callback_type.sig_released:
-        pass
-
-    if ( callback_type == points.point_callback_type.point_switched or
-         callback_type == points.point_callback_type.fpl_switched ):
-        pass
-    
-    if callback_type == block_instruments.block_callback_type.block_section_ahead_updated:
-        pass
-
     # These are the common functions to call for any type of callback
-    # Note that Track sections (the library objects) only "exist" in run mode"
-    # The update_all_distant_overrides function will update the aspects of affected signals
+    set_all_signal_routes()
     clear_all_signal_overrides()
-    if not editing_enabled: update_all_signal_overrides()
+    # Note that Track sections (the library objects) only "exist" in run mode
+    if not editing_enabled:
+        update_all_signal_overrides()
+        update_all_mirrored_sections()
     update_all_signals() 
     update_all_distant_overrides()   
     process_all_signal_interlocking()
@@ -590,30 +572,8 @@ def schematic_callback(item_id,callback_type):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to "initialise" the layout following an object configuration change
-# This effectively keeps all layout objects "in step" by ensuring that all
-# signals "behind" a signal are updated to reflect the new (as updated) aspect
-# and that the interlocking of signals/points/instruments is maintained
-#------------------------------------------------------------------------------------
-
-def process_object_update(object_id):
-    global editing_enabled
-    # Process the object type-specific updates
-    if objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        set_signal_route(objects.schematic_objects[object_id])
-    elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-        if not editing_enabled: update_mirrored_section(objects.schematic_objects[object_id])
-    clear_all_signal_overrides()
-    # Track sections (the library objects) only "exist" in run mode"
-    if not editing_enabled: update_all_signal_overrides()
-    update_all_signals() 
-    update_all_distant_overrides()
-    process_all_signal_interlocking()
-    process_all_point_interlocking()
-    return()
-
-#------------------------------------------------------------------------------------
 # Function to "initialise" the layout following a reset / re-load or item deletion
+# Also called after the configuration change of any layout object
 #------------------------------------------------------------------------------------
 
 def initialise_layout():
@@ -634,7 +594,7 @@ def initialise_layout():
 # The behavior of the layout processing will change depending on what mode we are in
 #------------------------------------------------------------------------------------
 
-editing_enabled = True
+editing_enabled = None
 
 def enable_editing():
     global editing_enabled

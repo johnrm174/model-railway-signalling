@@ -122,7 +122,7 @@ def update_object(object_id, new_object):
         objects_instruments.update_instrument(object_id, new_object)
     # Process any layout changes (interlocking, signal ahead etc)
     # that might be dependent on the object configuration change
-    run_layout.process_object_update(object_id)
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
