@@ -107,10 +107,7 @@ def paste_line(object_to_paste):
     schematic_objects[new_object_id]["posy"] += position_offset
     schematic_objects[new_object_id]["endx"] += position_offset
     schematic_objects[new_object_id]["endy"] += position_offset
-    # Set the drawing objects to None so they will be created on redraw
-    schematic_objects[new_object_id]["line"] = None
-    schematic_objects[new_object_id]["end1"] = None
-    schematic_objects[new_object_id]["end2"] = None
+    # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
     redraw_line_object(new_object_id)
