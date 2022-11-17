@@ -484,19 +484,31 @@ def update_mirrored_section(section_object):
 #------------------------------------------------------------------------------------
 
 def update_all_distant_overrides():
+    global editing_enabled
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         signal_should_be_overridden = False
         distant_should_be_overridden = False
-        # Test if the signal should be overridden based on the status of home signals ahead
+        # The signal override based solely on the state of any home signals ahead
         # The "overrideahead" flag will only be True if selected and it can only be selected for
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
         # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
-        if signal_object["overrideahead"] and home_signal_ahead_at_danger(signal_object):
-            if has_distant_arms(signal_object):
-                signals.set_signal_override(int(signal_id)+100)
-            else:
-                signals.set_signal_override(int(signal_id))
+        if signal_object["overrideahead"]:
+            # In 'run' mode, all Signal Overrides will already have been SET or CLEARED based on the state
+            # of the track section ahead of the signal so we need to additional SET the override if any home
+            # signals ahead are at DANGER (we don't want to CLEAR any existing Track Occupancy overrides)
+            # In 'edit' mode the state will be unknown when this function is called so we need to SET or
+            # CLEAR the signal override based solely on the state of any home signals ahead
+            if home_signal_ahead_at_danger(signal_object):
+                if has_distant_arms(signal_object):
+                    signals.set_signal_override(int(signal_id)+100)
+                else:
+                    signals.set_signal_override(int(signal_id))
+            elif editing_enabled:
+                if has_distant_arms(signal_object):
+                    signals.clear_signal_override(int(signal_id)+100)
+                else:
+                    signals.clear_signal_override(int(signal_id))
             # Ensure any aspect updates are propagated back along the route
             process_aspect_updates(signal_object)
     return()
@@ -544,31 +556,38 @@ def update_all_mirrored_sections():
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id,callback_type):
-    global logging, editing_enabled
+    global logging
+    global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-    
+    # Process any event-specific functions
     if callback_type == signals_common.sig_callback_type.sig_passed:
         ######################################################################################
         #### TO DO - Need to handle Remote signal events when MQTT networking is enabled #####
         ######################################################################################
+        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences")
         trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
         # Track sections (the library objects) only "exist" in run mode"
-        if not editing_enabled: update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
-        
+        if not editing_enabled:
+            logging.info("RUN LAYOUT - Updating Track Section occupancy")
+            update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
     # These are the common functions to call for any type of callback
+    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings")
     set_all_signal_routes()
-    clear_all_signal_overrides()
-    # Note that Track sections (the library objects) only "exist" in run mode
+    # Track sections (the library objects) only "exist" in run mode"
     if not editing_enabled:
+        logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_all_mirrored_sections()
+        logging.info("RUN LAYOUT - Overriding Signals to reflect Track Section Occupancy:")
         update_all_signal_overrides()
-    update_all_signals() 
-    update_all_distant_overrides()   
+    logging.info("RUN LAYOUT - Updating Signal Aspects to reflect the aspect of Signals Ahead:")
+    update_all_signals()           
+    logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect the state of Home Signals ahead:")
+    update_all_distant_overrides()    
+    logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
+    logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
-
     logging.info("**************************************************************************************")
-    
     return()
 
 #------------------------------------------------------------------------------------
@@ -578,16 +597,28 @@ def schematic_callback(item_id,callback_type):
 
 def initialise_layout():
     global editing_enabled
+    global logging
+    logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
+    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings")
     set_all_signal_routes()
-    clear_all_signal_overrides()
     # Track sections (the library objects) only "exist" in run mode"
-    if not editing_enabled:
+    if editing_enabled:
+        logging.info("RUN LAYOUT - Clearing down any Signal Overrides:")
+        clear_all_signal_overrides()
+    else:
+        logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_all_mirrored_sections()
+        logging.info("RUN LAYOUT - Overriding Signals to reflect Track Section Occupancy:")
         update_all_signal_overrides()
+    logging.info("RUN LAYOUT - Updating Signal Aspects to reflect the aspect of Signals Ahead:")
     update_all_signals()           
+    logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect the state of Home Signals Ahead:")
     update_all_distant_overrides()    
+    logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
+    logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
+    logging.info("**************************************************************************************")
     return()
 
 #------------------------------------------------------------------------------------
