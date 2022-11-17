@@ -101,7 +101,7 @@ def null_callback (sig_id:int,callback_type):
 
 def signal_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
+    logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
     # toggle the signal state and refresh the signal
     toggle_signal(sig_id)
     auto_refresh_signal(sig_id)
@@ -111,7 +111,7 @@ def signal_button_event (sig_id:int):
 
 def subsidary_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
+    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event **********************************************")
     toggle_subsidary(sig_id)
     #  call the signal type-specific functions to update the signal
     if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:

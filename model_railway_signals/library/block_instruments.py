@@ -165,19 +165,19 @@ def instrument_exists(block_id:int):
 
 def occup_button_event (block_id:int):
     global logging
-    logging.info ("Block Instrument "+str(block_id)+": Occup button event *****************************************")
+    logging.info ("Block Instrument "+str(block_id)+": Occup button event ***********************************************")
     set_section_occupied(block_id)
     return()
 
 def clear_button_event (block_id:int):
     global logging
-    logging.info ("Block Instrument "+str(block_id)+": Clear button event *****************************************")
+    logging.info ("Block Instrument "+str(block_id)+": Clear button event ***********************************************")
     set_section_clear(block_id)
     return()
 
 def blocked_button_event (block_id:int):
     global logging
-    logging.info ("Block Instrument "+str(block_id)+": Blocked button event ***************************************")
+    logging.info ("Block Instrument "+str(block_id)+": Blocked button event *********************************************")
     set_section_blocked(block_id)
     return()
 

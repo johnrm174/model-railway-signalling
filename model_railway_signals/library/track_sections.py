@@ -116,7 +116,7 @@ def section_exists(section_id:int):
 
 def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Toggled *******************************************")
+    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
     toggle_section(section_id)
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section

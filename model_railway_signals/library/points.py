@@ -98,14 +98,14 @@ def null_callback(point_id:int,callback_type):
 
 def fpl_button_event (point_id:int):
     global logging
-    logging.info("Point "+str(point_id)+": FPL Button Event *******************************************")
+    logging.info("Point "+str(point_id)+": FPL Button Event ************************************************************")
     toggle_fpl(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.fpl_switched)
     return ()
 
 def change_button_event (point_id:int):
     global logging
-    logging.info("Point "+str(point_id)+": Change Button Event ****************************************")
+    logging.info("Point "+str(point_id)+": Change Button Event *********************************************************")
     toggle_point(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.point_switched)
     return ()
