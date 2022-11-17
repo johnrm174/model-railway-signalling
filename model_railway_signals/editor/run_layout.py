@@ -489,7 +489,6 @@ def update_all_distant_overrides():
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         signal_should_be_overridden = False
         distant_should_be_overridden = False
-        # The signal override based solely on the state of any home signals ahead
         # The "overrideahead" flag will only be True if selected and it can only be selected for
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
         # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
