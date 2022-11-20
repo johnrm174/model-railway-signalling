@@ -236,15 +236,15 @@ def create_point(item_type):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Create a copy of an existing point - returns the new Object ID
-# Note that only the basic point configuration is Pasted. Underlying configuration
+# Function to paste a copy of an existing point - returns the new Object ID
+# Note that only the basic point configuration is used. Underlying configuration
 # such as signal interlocking, dcc addresses  etc is set back to the default
 # values as it will need to be configured specific to the new point
 #------------------------------------------------------------------------------------
 
 def paste_point(object_to_paste):
     global schematic_objects
-    # Create a deep copy of the new Object (with a new UUID)
+    # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index

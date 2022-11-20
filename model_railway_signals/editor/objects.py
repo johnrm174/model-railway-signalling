@@ -218,6 +218,7 @@ def copy_objects(list_of_object_ids):
     global clipboard
     clipboard=[]
     for object_id in list_of_object_ids:
+        # Take a deep copy of the object and add to the clipboard
         clipboard.append(copy.deepcopy(schematic_objects[object_id]))
     return()
 
@@ -230,7 +231,7 @@ def copy_objects(list_of_object_ids):
 def paste_objects():
     list_of_new_object_ids=[]
     for object_to_paste in clipboard:
-        # Create a new Copy the object (depending on type)
+        # Paste the Copy the object (depending on type)
         type_of_object = object_to_paste["item"]
         if type_of_object == object_type.line:
             new_object_id = objects_lines.paste_line(object_to_paste)

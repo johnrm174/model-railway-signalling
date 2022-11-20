@@ -555,15 +555,15 @@ def create_signal(item_type, item_subtype):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Create a copy of an existing signal - returns the new Object ID
-# Note that only the basic signal configuration is copied. Underlying configuration
+# Function to paste a copy of an existing signal - returns the new Object ID
+# Note that only the basic signal configuration is used. Underlying configuration
 # such as point interlocking, dcc addresses, automation etc is set back to the
 # default values as it will need to be configured specific to the new signal
 #------------------------------------------------------------------------------------
 
 def paste_signal(object_to_paste):
     global schematic_objects
-     # Create a deep copy of the new Object (with a new UUID)
+    # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index

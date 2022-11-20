@@ -92,12 +92,12 @@ def create_line():
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Create a copy of an existing line - returns the new Object ID
+# Function to paste a copy of an existing line - returns the new Object ID
 #------------------------------------------------------------------------------------
 
 def paste_line(object_to_paste):
     global schematic_objects
-     # Create a deep copy of the new Object (with a new UUID)
+    # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     schematic_objects[new_object_id] = object_to_paste
     # New objects are "pasted" at a slightly offset position on the canvas

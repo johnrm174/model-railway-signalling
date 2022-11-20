@@ -133,12 +133,15 @@ def create_instrument():
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Create a copy of an existing Block Instrument  - returns the new Object ID
+# Function to Paste a copy of an existing Block Instrument  - returns the new Object ID
+# Note that only the basic instrument configuration is used. Underlying configuration
+# such as the linked instruments is set back to the defaults as it will need to be
+# configured specific to the new instrument
 #------------------------------------------------------------------------------------
 
 def paste_instrument(object_to_paste):
     global schematic_objects
-    # Create a deep copy of the new Object (with a new UUID)
+    # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
