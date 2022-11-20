@@ -65,6 +65,7 @@ from ..library import signals_colour_lights
 from ..library import track_sections
 
 from . import objects
+from . import objects_common
 
 #------------------------------------------------------------------------------------
 # Internal helper Function to find if a signal has a subsidary
@@ -587,6 +588,8 @@ def schematic_callback(item_id,callback_type):
     logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
     logging.info("**************************************************************************************")
+    # Refocus back on the canvas to ensure that any keypress events function
+    objects_common.canvas.focus_set()
     return()
 
 #------------------------------------------------------------------------------------
