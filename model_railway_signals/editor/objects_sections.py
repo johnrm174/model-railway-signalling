@@ -60,7 +60,8 @@ from .objects_common import section as section
 default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
 default_section_object["itemid"] = 0
-default_section_object["label"] = None
+default_section_object["defaultlabel"] = "XXXXX"
+default_section_object["label"] = default_section_object["defaultlabel"]
 default_section_object["state"] = False
 default_section_object["editable"] = True
 default_section_object["mirror"] = ""
@@ -138,25 +139,32 @@ def update_section(object_id, new_object_configuration):
 
 def redraw_section_object(object_id):
     global schematic_objects, editing_enabled
-    # If we are in edit mode then we need to make the section non-editable so we
-    # can use the mouse events for selecting and moving the section object
+    # If we are in edit mode then we draw a "dummy" Tracck Section using canvas objects
+    # so we can use the mouse events for selecting and moving them (normal Track section
+    # objects are selectable buttons which makes selection/moving overly complicated)
     if editing_enabled:
-        section_label = "SECT-"+ format(schematic_objects[object_id]["itemid"],'02d')
-        section_tags = "section"+ str(schematic_objects[object_id]["itemid"])
-        schematic_objects[object_id]["tags"] = section_tags
-        objects_common.canvas.create_rectangle(
-                    schematic_objects[object_id]["posx"]-37,
-                    schematic_objects[object_id]["posy"]-11,
-                    schematic_objects[object_id]["posx"]+37,
-                    schematic_objects[object_id]["posy"]+11,
-                    fill="black", tags=section_tags)
-        objects_common.canvas.create_text(
+        # Set the tkinter 'tags' to use when creating the drawing objects
+        schematic_objects[object_id]["tags"] = "section"+ str(schematic_objects[object_id]["itemid"])
+        # Create the text item first using the default section label to define the width
+        text_item = objects_common.canvas.create_text(
                     schematic_objects[object_id]["posx"],
                     schematic_objects[object_id]["posy"],
-                    text = section_label, font=('Ariel',8,"normal"),
-                    fill = "white",tags=section_tags)
-        # Create/update the selection rectangle for the track section (based on the boundary box)
-        objects_common.set_bbox (object_id, objects_common.canvas.bbox(section_tags))
+                    text = schematic_objects[object_id]["defaultlabel"],
+                    tags=schematic_objects[object_id]["tags"],
+                    font=('Ariel',8,"normal"), fill="white")
+        # get the boundary box of the text box and use this to create the background rectangle
+        bbox = objects_common.canvas.bbox(text_item)
+        rect_item = objects_common.canvas.create_rectangle(
+                    bbox[0]-6, bbox[1]-6, bbox[2]+6, bbox[3]+6,
+                    tags=schematic_objects[object_id]["tags"],
+                    fill="black")
+        # raise the text item to be in front of the rectangle item
+        objects_common.canvas.tag_raise(text_item,rect_item)
+        # Now the width is set, update the section label to show the section ID
+        section_label = format(schematic_objects[object_id]["itemid"],'02d')
+        objects_common.canvas.itemconfigure(text_item, text=section_label)
+        # Create/update the selection rectangle for the Track Section
+        objects_common.set_bbox(object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     else:
         track_sections.create_section(
                     canvas = objects_common.canvas,
@@ -164,7 +172,7 @@ def redraw_section_object(object_id):
                     x = schematic_objects[object_id]["posx"],
                     y = schematic_objects[object_id]["posy"],
                     section_callback = run_layout.schematic_callback,
-                    label = "OCCUPIED",
+                    label = schematic_objects[object_id]["defaultlabel"],
                     editable = schematic_objects[object_id]["editable"])
         # Track sections are always created as "Not Occupied"
         # Set the state of the track section as appropriate
@@ -175,8 +183,9 @@ def redraw_section_object(object_id):
                 track_sections.set_section_occupied(section_id, section_label)
             else:
                 track_sections.clear_section_occupied(section_id, section_label)
-        # Set the boundary box to None as it is not selectable in run mode
-        schematic_objects[object_id]["bbox"] = None
+            # Create/update the canvas "tags" and selection rectangle for the Track Section
+            schematic_objects[object_id]["tags"] = track_sections.get_tags(schematic_objects[object_id]["itemid"])
+            objects_common.set_bbox(object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
  
 #------------------------------------------------------------------------------------
@@ -202,12 +211,15 @@ def create_section():
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Create a copy of an existing Track Section - returns the new Object ID
+# Function to Paste a copy of an existing Track Section - returns the new Object ID
+# Note that only the basic section configuration is used. Underlying configuration
+# such as the current label, state and reference to any mirrored sections is set back
+# to the defaults as it will need to be configured specific to the new section
 #------------------------------------------------------------------------------------
 
 def paste_section(object_to_paste):
     global schematic_objects
-     # Create a deep copy of the new Object (with a new UUID)
+    # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     schematic_objects[new_object_id] = object_to_paste
     # Assign a new type-specific ID for the object and add to the index
@@ -220,8 +232,9 @@ def paste_section(object_to_paste):
     schematic_objects[new_object_id]["posy"] += position_offset
     # Now set the default values for all elements we don't want to copy:
     schematic_objects[new_object_id]["mirror"] = default_section_object["mirror"]
-    schematic_objects[new_object_id]["label"] = default_section_object["label"]
     schematic_objects[new_object_id]["state"] = default_section_object["state"]
+    # Copy across the default label and "reset" the actual lable to the copied default label
+    schematic_objects[new_object_id]["label"] = schematic_objects[new_object_id]["defaultlabel"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object

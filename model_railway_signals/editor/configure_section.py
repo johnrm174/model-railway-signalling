@@ -109,6 +109,7 @@ def load_state(section):
     section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
     section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
     section.config.mirror.set_mirrored_by(mirrored_by_section(object_id))
+    section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
     section.automation.ahead.set_values(signals_ahead(object_id))
     section.automation.behind.set_values(signals_behind(object_id))
     return()
@@ -125,13 +126,22 @@ def save_state(section, close_window:bool):
         section.window.destroy()
     # Validate all user entries prior to applying the changes. Each of these would have
     # been validated on entry, but changes to other objects may have been made since then
-    elif section.config.sectionid.validate() and section.config.mirror.validate():
+    elif ( section.config.sectionid.validate() and section.config.mirror.validate() and
+              section.config.label.validate() ):
         # Copy the original section Configuration (elements get overwritten as required)
         new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
         # Update the section coniguration elements from the current user selections
         new_object_configuration["itemid"] = section.config.sectionid.get_value()
         new_object_configuration["editable"] = not section.config.readonly.get_value()
         new_object_configuration["mirror"] = section.config.mirror.get_value()
+        # If the default label has changed then we also need to update the actual
+        # label if the actual label text is still set to the old default label text
+        current_label = new_object_configuration["label"]
+        old_default_label = new_object_configuration["defaultlabel"]
+        new_default_label = section.config.label.get_value()
+        new_object_configuration["defaultlabel"] = new_default_label
+        if old_default_label != new_default_label and current_label == old_default_label:
+            new_object_configuration["label"] = new_default_label
         # Save the updated configuration (and re-draw the object)
         objects.update_object(object_id, new_object_configuration)
         # Close window on "OK" or re-load UI for "apply"
@@ -143,7 +153,6 @@ def save_state(section, close_window:bool):
         # Display the validation error message
         section.validation_error.pack()
     return()
-
 
 #####################################################################################
 # Classes for the Track Section Configuration Tab
@@ -222,6 +231,37 @@ class mirrored_section(common.str_item_id_entry_box):
         self.mirrored_by.set(section_id)
 
 #------------------------------------------------------------------------------------
+# Class for the Default lable entry box - builds on the common entry_box class
+# Inherited class methods are:
+#    "set_value" - set the initial value of the entry box (string) 
+#    "get_value" - get the last "validated" value of the entry box (string)
+# Overriden class methods are
+#    "validate" - Validates the length of the entered text (between 2-10 chars)
+#------------------------------------------------------------------------------------
+
+class default_label_entry(common.entry_box):
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the "mirrored section" entry box
+        self.frame = LabelFrame(parent_frame, text="Default section label")
+        super().__init__(self.frame, width=16, tool_tip = "Enter the default label to "+
+                         "display when the section is occupied (this defines the default "+
+                         "width of the Track Section object on the schematic). The default "+
+                         "label should be between 4 and 10 characters")
+        self.pack(padx=2, pady=2)
+
+    def validate(self):
+        label = self.entry.get()
+        if len(label) >= 4 and len(label) <=10:
+            valid = True
+        else:
+            valid = False
+            self.TT.text = ("The default label should be between 4 and 10 characters")
+            # If invalid and the entry is empty or spaces we need to show the error
+            if len(label.strip())== 0: self.entry.set("#")
+        self.set_validation_status(valid)
+        return(valid)
+
+#------------------------------------------------------------------------------------
 # Class for the main Track Section configuration tab
 #------------------------------------------------------------------------------------
 
@@ -244,6 +284,8 @@ class section_configuration_tab():
         # reference to the parent object to access the current value of Section ID
         self.mirror = mirrored_section(parent_tab, self)
         self.mirror.frame.pack(padx=2, pady=2, fill='x')
+        self.label = default_label_entry(parent_tab)
+        self.label.frame.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Classes for the Track Section Automation Tab
