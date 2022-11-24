@@ -29,7 +29,7 @@
                 false,
                 0
             ],
-            "bbox": 3191,
+            "bbox": 2499,
             "dccaspects": [
                 [
                     [
@@ -1046,27 +1046,27 @@
             ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 3195,
-            "end1": 3193,
-            "end2": 3194,
+            "bbox": 2503,
+            "end1": 2501,
+            "end2": 2502,
             "endx": 1400,
             "endy": 275,
             "item": "line",
             "itemid": null,
-            "line": 3192,
+            "line": 2500,
             "posx": 925,
             "posy": 275,
             "tags": "146287d7-4772-46bc-8952-89c98ff36bb0"
         },
         "350ab106-55fd-4920-800f-606a103c9392": {
-            "bbox": 3199,
-            "end1": 3197,
-            "end2": 3198,
+            "bbox": 2507,
+            "end1": 2505,
+            "end2": 2506,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": null,
-            "line": 3196,
+            "line": 2504,
             "posx": 875,
             "posy": 275,
             "tags": "350ab106-55fd-4920-800f-606a103c9392"
@@ -1074,7 +1074,7 @@
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 3206,
+            "bbox": 2514,
             "colour": "black",
             "dccaddress": 1005,
             "dccreversed": false,
@@ -1089,6 +1089,16 @@
             "siginterlock": [
                 [
                     2,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    3,
                     [
                         true,
                         false,
@@ -1126,16 +1136,6 @@
                         true,
                         false
                     ]
-                ],
-                [
-                    3,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
                 ]
             ],
             "tags": "point5"
@@ -1167,7 +1167,7 @@
                 false,
                 0
             ],
-            "bbox": 3225,
+            "bbox": 2533,
             "dccaspects": [
                 [
                     [
@@ -2184,14 +2184,14 @@
             ]
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 3229,
-            "end1": 3227,
-            "end2": 3228,
+            "bbox": 2537,
+            "end1": 2535,
+            "end2": 2536,
             "endx": 925,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3226,
+            "line": 2534,
             "posx": 1400,
             "posy": 225,
             "tags": "3f11b41e-b356-402c-b59e-b314963b3723"
@@ -2223,7 +2223,7 @@
                 false,
                 0
             ],
-            "bbox": 3241,
+            "bbox": 2549,
             "dccaspects": [
                 [
                     [
@@ -3266,7 +3266,7 @@
                 false,
                 0
             ],
-            "bbox": 3260,
+            "bbox": 2569,
             "dccaspects": [
                 [
                     [
@@ -4309,7 +4309,7 @@
                 false,
                 0
             ],
-            "bbox": 3279,
+            "bbox": 2588,
             "dccaspects": [
                 [
                     [
@@ -5352,7 +5352,7 @@
                 false,
                 0
             ],
-            "bbox": 3298,
+            "bbox": 2607,
             "dccaspects": [
                 [
                     [
@@ -6395,7 +6395,7 @@
                 false,
                 0
             ],
-            "bbox": 3310,
+            "bbox": 2619,
             "dccaspects": [
                 [
                     [
@@ -7414,7 +7414,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3317,
+            "bbox": 2626,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -7430,14 +7430,14 @@
             "tags": "point4"
         },
         "8232da6f-9aeb-45bd-8519-039297c6d3b9": {
-            "bbox": 3321,
-            "end1": 3319,
-            "end2": 3320,
+            "bbox": 2630,
+            "end1": 2628,
+            "end2": 2629,
             "endx": 500,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3318,
+            "line": 2627,
             "posx": 825,
             "posy": 225,
             "tags": "8232da6f-9aeb-45bd-8519-039297c6d3b9"
@@ -7469,7 +7469,7 @@
                 false,
                 0
             ],
-            "bbox": 3333,
+            "bbox": 2642,
             "dccaspects": [
                 [
                     [
@@ -8486,14 +8486,14 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 3337,
-            "end1": 3335,
-            "end2": 3336,
+            "bbox": 2646,
+            "end1": 2644,
+            "end2": 2645,
             "endx": 825,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3334,
+            "line": 2643,
             "posx": 500,
             "posy": 175,
             "tags": "8efa0c5d-19c3-4826-a797-34453446bb67"
@@ -8525,7 +8525,7 @@
                 false,
                 0
             ],
-            "bbox": 3356,
+            "bbox": 2665,
             "dccaspects": [
                 [
                     [
@@ -9542,14 +9542,14 @@
             ]
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 3360,
-            "end1": 3358,
-            "end2": 3359,
+            "bbox": 2669,
+            "end1": 2667,
+            "end2": 2668,
             "endx": 875,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3357,
+            "line": 2666,
             "posx": 1100,
             "posy": 175,
             "tags": "a9fca83a-6c10-454f-a141-e4931d7c06d7"
@@ -9581,7 +9581,7 @@
                 false,
                 0
             ],
-            "bbox": 3379,
+            "bbox": 2688,
             "dccaspects": [
                 [
                     [
@@ -10624,7 +10624,7 @@
                 false,
                 0
             ],
-            "bbox": 3398,
+            "bbox": 2707,
             "dccaspects": [
                 [
                     [
@@ -11643,7 +11643,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 3405,
+            "bbox": 2714,
             "colour": "black",
             "dccaddress": 1003,
             "dccreversed": false,
@@ -11661,6 +11661,16 @@
                     [
                         true,
                         true,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    3,
+                    [
+                        true,
+                        false,
                         false,
                         false,
                         false
@@ -11685,29 +11695,19 @@
                         true,
                         false
                     ]
-                ],
-                [
-                    3,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
                 ]
             ],
             "tags": "point3"
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 3409,
-            "end1": 3407,
-            "end2": 3408,
+            "bbox": 2718,
+            "end1": 2716,
+            "end2": 2717,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3406,
+            "line": 2715,
             "posx": 450,
             "posy": 225,
             "tags": "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626"
@@ -11715,7 +11715,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 3416,
+            "bbox": 2725,
             "colour": "black",
             "dccaddress": 1002,
             "dccreversed": false,
@@ -11772,14 +11772,14 @@
             "tags": "point2"
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 3420,
-            "end1": 3418,
-            "end2": 3419,
+            "bbox": 2729,
+            "end1": 2727,
+            "end2": 2728,
             "endx": 250,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3417,
+            "line": 2726,
             "posx": 450,
             "posy": 175,
             "tags": "c8564be9-6891-48f3-999a-53472f24c85f"
@@ -11811,7 +11811,7 @@
                 false,
                 0
             ],
-            "bbox": 3432,
+            "bbox": 2741,
             "dccaspects": [
                 [
                     [
@@ -12830,7 +12830,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3439,
+            "bbox": 2748,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12872,7 +12872,7 @@
                 false,
                 0
             ],
-            "bbox": 3451,
+            "bbox": 2760,
             "dccaspects": [
                 [
                     [
@@ -13915,7 +13915,7 @@
                 false,
                 0
             ],
-            "bbox": 3463,
+            "bbox": 2772,
             "dccaspects": [
                 [
                     [
@@ -14934,7 +14934,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3470,
+            "bbox": 2779,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14976,7 +14976,7 @@
                 false,
                 0
             ],
-            "bbox": 3490,
+            "bbox": 2799,
             "dccaspects": [
                 [
                     [
@@ -15997,12 +15997,12 @@
         "1": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "2": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "3": {
             "fpllock": true,
@@ -16033,8 +16033,8 @@
             "width": 1400
         },
         "general": {
-            "editmode": true,
-            "filename": "D:/JRM/13 - Software/model-railway-signalling-develop/configuration_examples/interlocking_colour_light_example.sig",
+            "editmode": false,
+            "filename": "/home/pi/model-railway-signalling/configuration_examples/interlocking_colour_light_example.sig",
             "version": "Version 3.1.0"
         },
         "logging": {
@@ -16055,9 +16055,9 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
-            "sublocked": true,
+            "sublocked": false,
             "theatretext": "NONE"
         },
         "10": {
@@ -16121,7 +16121,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -16165,7 +16165,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -16176,7 +16176,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
