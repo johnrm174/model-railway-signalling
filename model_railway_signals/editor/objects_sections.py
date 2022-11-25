@@ -89,19 +89,30 @@ def redraw_all_section_objects():
 def enable_editing():
     global editing_enabled
     editing_enabled = True
-    # Save the current state of the track section object
+    # Save the current state of the track section library objects
     for section_id in section_index:
         current_state = track_sections.section_occupied(int(section_id))
         current_label = track_sections.section_label(int(section_id))
         schematic_objects[section(section_id)]["state"] = current_state
         schematic_objects[section(section_id)]["label"] = current_label
+    # Re-draw the section objects - this will delete the library track section
+    # objects and draw dummy objects in their place
     redraw_all_section_objects()
     return()
 
 def disable_editing():
     global editing_enabled
     editing_enabled = False
+    # Re-draw the section objects - this will delete the dummy placeholder objects
+    # and create the 'real' library track section objects in their place
     redraw_all_section_objects()
+    # Set the state of the track section objects to match the retained configuration
+    for section_id in section_index:
+        section_label = schematic_objects[section(section_id)]["label"]
+        if schematic_objects[section(section_id)]["state"]:
+            track_sections.set_section_occupied(section_id, section_label)
+        else:
+            track_sections.clear_section_occupied(section_id, section_label)
     return()
 
 #------------------------------------------------------------------------------------
@@ -174,18 +185,9 @@ def redraw_section_object(object_id):
                     section_callback = run_layout.schematic_callback,
                     label = schematic_objects[object_id]["defaultlabel"],
                     editable = schematic_objects[object_id]["editable"])
-        # Track sections are always created as "Not Occupied"
-        # Set the state of the track section as appropriate
-        section_id = schematic_objects[object_id]["itemid"]
-        if schematic_objects[object_id]["label"] is not None:
-            section_label = schematic_objects[object_id]["label"]
-            if schematic_objects[object_id]["state"]:
-                track_sections.set_section_occupied(section_id, section_label)
-            else:
-                track_sections.clear_section_occupied(section_id, section_label)
-            # Create/update the canvas "tags" and selection rectangle for the Track Section
-            schematic_objects[object_id]["tags"] = track_sections.get_tags(schematic_objects[object_id]["itemid"])
-            objects_common.set_bbox(object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
+        # Create/update the canvas "tags" and selection rectangle for the Track Section
+        schematic_objects[object_id]["tags"] = track_sections.get_tags(schematic_objects[object_id]["itemid"])
+        objects_common.set_bbox(object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
     return()
  
 #------------------------------------------------------------------------------------
