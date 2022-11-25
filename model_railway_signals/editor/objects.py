@@ -143,7 +143,8 @@ def delete_objects(list_of_object_ids):
             objects_sections.delete_section(object_id)
         elif type_of_object == object_type.instrument:
             objects_instruments.delete_instrument(object_id)
-    # Process any schematic interlocking changes
+    # Process any layout changes (interlocking, signal ahead etc)
+    # that might need to change following objet deletion
     run_layout.initialise_layout()
     return()
 

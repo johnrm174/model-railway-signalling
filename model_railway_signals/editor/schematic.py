@@ -13,6 +13,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas(object_id) - Get canvas settings (for resize, snap to grid etc)
+#    objects.set_canvas(canvas) - Initialise the objects module with the canvas reference
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
@@ -20,7 +21,7 @@
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
 #    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
-#    configure_section.edit_point(root,object_id) - Open point edit window (on double click)
+#    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
 #    ########################## More to be added ########################################
 #
 # Accesses the following external editor objects directly:
@@ -62,6 +63,7 @@ import copy
 # Global variables used to track the current selections/state of the Schematic Editor
 #------------------------------------------------------------------------------------
 
+# The schematic_state dict holds the current schematic editor status
 schematic_state:dict = {}
 schematic_state["startx"] = 0
 schematic_state["starty"] = 0
@@ -71,22 +73,23 @@ schematic_state["moveobjects"] = False
 schematic_state["editlineend1"] = False
 schematic_state["editlineend2"] = False
 schematic_state["selectarea"] = False
-schematic_state["selectbox"] = None      # Tkinter drawing object
+schematic_state["selectareabox"] = None      # Tkinter drawing object
 schematic_state["selectedobjects"] = []
-schematic_state["clipboardobjects"] = []
-
-# The Tkinter root window and canvas object references
+# The Root reference is used when calling a "configure object" module (to open a popup window)
+# The Canvas reference is used for configuring and moving canvas widgets for schematic editing
 canvas = None
 root = None
-# The event_callback to make (for selected canvas events)
+# The callback to make (for selected canvas events). Currently only the mode change keypress
+# event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
-# The two tkinter popup menu objects
+# The following Tkinter objects are also treated as global variables as they need to remain
+# "in scope" for the schematic editor functions (i.e. so they don't get garbage collected)
+# The two popup menus (for right click on the canvas or a schematic object)
 popup1 = None
 popup2 = None
-# The tkinter Frame object holding the "add object" buttons
+# The Frame holding the "add object" buttons (for pack/forget on enable/disable editing)
+# and the Tkinter PhotoImage labels for the buttons
 button_frame = None
-canvas_border = None
-# The Tkinter PhotoImage labels for the buttons
 button_images = {}
 
 #------------------------------------------------------------------------------------
@@ -381,10 +384,10 @@ def left_button_click(event):
             deselect_all_objects()
             schematic_state["selectarea"] = True
             #  Make the "select area" box visible (create it if necessary)
-            if not schematic_state["selectbox"]:
-                schematic_state["selectbox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-            canvas.coords(schematic_state["selectbox"],event.x,event.y,event.x,event.y)
-            canvas.itemconfigure(schematic_state["selectbox"],state="normal")
+            if not schematic_state["selectareabox"]:
+                schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
+            canvas.coords(schematic_state["selectareabox"],event.x,event.y,event.x,event.y)
+            canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
     disable_all_keypress_events()
@@ -452,7 +455,7 @@ def track_cursor(event):
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
         y1 = schematic_state["starty"]
-        canvas.coords(schematic_state["selectbox"],x1,y1,event.x,event.y)
+        canvas.coords(schematic_state["selectareabox"],x1,y1,event.x,event.y)
     return()
 
 #------------------------------------------------------------------------------------
@@ -506,13 +509,13 @@ def left_button_release(event):
         schematic_state["editlineend2"] = False
     elif schematic_state["selectarea"]:
         # Select all Objects that are fully within the Area Selection Box
-        abox = canvas.coords(schematic_state["selectbox"])
+        abox = canvas.coords(schematic_state["selectareabox"])
         for object_id in objects.schematic_objects:
             bbox = canvas.coords(objects.schematic_objects[object_id]["bbox"])
             if bbox[0]>abox[0] and bbox[2]<abox[2] and bbox[1]>abox[1] and bbox[3]<abox[3]:
                 select_object(object_id)
         # Clear the Select Area Mode and Hide the area selection rectangle
-        canvas.itemconfigure(schematic_state["selectbox"],state="hidden")
+        canvas.itemconfigure(schematic_state["selectareabox"],state="hidden")
         schematic_state["selectarea"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
     enable_all_keypress_events()
@@ -530,9 +533,9 @@ def resize_canvas():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal Functions to enable/disable the canvas keypress events during a move
+# Internal Functions to enable/disable all canvas keypress events during an object
+# move, line edit or area selection function (to ensure deterministic behavior)
 #------------------------------------------------------------------------------------
-
 
 def enable_all_keypress_events():
     enable_edit_keypress_events()
@@ -543,6 +546,11 @@ def disable_all_keypress_events():
     disable_edit_keypress_events()
     canvas.unbind('m')
     return()
+
+#------------------------------------------------------------------------------------
+# Internal Functions to enable/disable all edit-mode specific keypress events on
+# edit enable / edit disable) - all keypress events apart from the mode toggle event
+#------------------------------------------------------------------------------------
 
 def enable_edit_keypress_events():
     canvas.bind('<BackSpace>', delete_selected_objects)
@@ -619,7 +627,7 @@ def disable_editing():
 
 def create_canvas (root_window, event_callback):
     global root, canvas, popup1, popup2
-    global button_frame, canvas_border
+    global button_frame
     global button_images
     global canvas_event_callback
     global logging
@@ -708,9 +716,9 @@ def create_canvas (root_window, event_callback):
     button8 = Button (button_frame, image=button_images['track_section'],
                       command=lambda:objects.create_object(objects.object_type.section))
     button8.pack (padx=2, pady=2)
-    button9 = Button (button_frame, image=button_images['block_instrument'],
-                      command=lambda:objects.create_object(objects.object_type.instrument))
-    button9.pack (padx=2, pady=2)
+#     button9 = Button (button_frame, image=button_images['block_instrument'],
+#                       command=lambda:objects.create_object(objects.object_type.instrument))
+#     button9.pack (padx=2, pady=2)
     # Initialise the Objects Module with the Canvas reference
     objects.set_canvas(canvas)
     return()
