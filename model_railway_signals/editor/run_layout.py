@@ -266,6 +266,26 @@ def trigger_timed_sequence(signal_object):
     return()
 
 #------------------------------------------------------------------------------------
+# Function to reset a signal's approach control state following sig passed/changed)
+# Only main semaphores and colour light signals support this function
+#------------------------------------------------------------------------------------
+
+def update_signal_approach_control(signal_object):
+    if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
+             signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+        signal_route = find_signal_route(signal_object)
+        if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
+            rel_on_red = signal_object["approachcontrol"][signal_route.value-1][0]
+            rel_on_ylw = signal_object["approachcontrol"][signal_route.value-1][1]
+            if rel_on_red or rel_on_ylw:
+                signals.set_approach_control(signal_object["itemid"],rel_on_ylw)
+            else:
+                signals.clear_approach_control(signal_object["itemid"])
+        else:
+            signals.clear_approach_control(signal_object["itemid"])
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to Update track occupancy (from the signal 'passed' event) - Note that we
 # have to use "signal clear" to assume the direction of travel. i.e. if the signal
 # sensor is triggered and the signal is clear we assume the direction of travel
@@ -331,6 +351,24 @@ def update_track_occupancy(signal_object):
         update_mirrored_section(objects.schematic_objects[objects.section(section_ahead)])
     if section_behind > 0:
         update_mirrored_section(objects.schematic_objects[objects.section(section_behind)])
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to Update any mirrored track sections on a change to one track section
+# Note that the ID is a string (local or remote)
+#------------------------------------------------------------------------------------
+
+def update_mirrored_section(section_object):
+    section_id = str(section_object["itemid"])
+    for other_section_id in objects.section_index:
+        mirrored_section = objects.schematic_objects[objects.section(other_section_id)]["mirror"]
+        if mirrored_section == section_id:
+            label_to_set = track_sections.section_label(section_id)
+            state_to_set = track_sections.section_occupied(section_id)
+            if state_to_set:
+                track_sections.set_section_occupied(other_section_id, label_to_set, publish=False)
+            else:
+                track_sections.clear_section_occupied(other_section_id, label_to_set, publish=False)
     return()
 
 #------------------------------------------------------------------------------------
@@ -430,21 +468,22 @@ def process_all_point_interlocking():
 # Function to Process signal overrides based on track occupancy
 #------------------------------------------------------------------------------------
 
-def set_signal_override(signal_object):
-    signal_id = signal_object["itemid"]
-    if signal_object["overridesignal"] and type(signal_id) == int:
-        signals.set_signal_override(signal_id)
-        if has_distant_arms(signal_object):
-            signals.set_signal_override(signal_id+100)
-
-def clear_signal_override(signal_object):
-    signal_id = signal_object["itemid"]
-    if signal_object["overridesignal"] and type(signal_id) == int:
-        signals.clear_signal_override(signal_id)
-        if has_distant_arms(signal_object):
-            signals.clear_signal_override(signal_id+100)
-
 def update_all_signal_overrides():
+    # Sub-function to set a signal override
+    def set_signal_override(signal_object):
+        signal_id = signal_object["itemid"]
+        if signal_object["overridesignal"] and type(signal_id) == int:
+            signals.set_signal_override(signal_id)
+            if has_distant_arms(signal_object):
+                signals.set_signal_override(signal_id+100)
+    # Sub-function to Clear a signal override
+    def clear_signal_override(signal_object):
+        signal_id = signal_object["itemid"]
+        if signal_object["overridesignal"] and type(signal_id) == int:
+            signals.clear_signal_override(signal_id)
+            if has_distant_arms(signal_object):
+                signals.clear_signal_override(signal_id+100)
+    # Start of main function
     for signal_id in objects.signal_index:
         # Override/clear the current signal based on the section ahead
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
@@ -458,24 +497,6 @@ def update_all_signal_overrides():
                 clear_signal_override(signal_object)
         else:
             clear_signal_override(signal_object)
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to Update any mirrored track sections on a change to one track section
-# Note that the ID is a string (local or remote)
-#------------------------------------------------------------------------------------
-
-def update_mirrored_section(section_object):
-    section_id = str(section_object["itemid"])
-    for other_section_id in objects.section_index:
-        mirrored_section = objects.schematic_objects[objects.section(other_section_id)]["mirror"]
-        if mirrored_section == section_id:
-            label_to_set = track_sections.section_label(section_id)
-            state_to_set = track_sections.section_occupied(section_id)
-            if state_to_set:
-                track_sections.set_section_occupied(other_section_id, label_to_set, publish=False)
-            else:
-                track_sections.clear_section_occupied(other_section_id, label_to_set, publish=False)
     return()
 
 #------------------------------------------------------------------------------------
@@ -552,6 +573,15 @@ def update_all_mirrored_sections():
     return()
 
 #------------------------------------------------------------------------------------
+# Function to Update all signal approach control selections
+#------------------------------------------------------------------------------------
+
+def update_all_signal_approach_control_settings():
+    for sig_id in objects.signal_index:
+        update_signal_approach_control(objects.schematic_objects[objects.signal(sig_id)])
+    return()
+
+#------------------------------------------------------------------------------------
 # Main callback function for when anything on the layout changes
 #------------------------------------------------------------------------------------
 
@@ -564,14 +594,19 @@ def schematic_callback(item_id,callback_type):
         ######################################################################################
         #### TO DO - Need to handle Remote signal events when MQTT networking is enabled #####
         ######################################################################################
-        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences")
+        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences:")
         trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
         # Track sections (the library objects) only "exist" in run mode"
         if not editing_enabled:
-            logging.info("RUN LAYOUT - Updating Track Section occupancy")
+            logging.info("RUN LAYOUT - Updating Track Section occupancy:")
             update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+        logging.info("RUN LAYOUT - Updating Signal Approach Control state:")
+        update_signal_approach_control(objects.schematic_objects[objects.signal(item_id)])
+    elif callback_type == signals_common.sig_callback_type.sig_switched:
+        logging.info("RUN LAYOUT - Updating Signal Approach Control state:")
+        update_signal_approach_control(objects.schematic_objects[objects.signal(item_id)])
     # These are the common functions to call for any type of callback
-    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings")
+    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
     # Track sections (the library objects) only "exist" in run mode"
     if not editing_enabled:
@@ -601,8 +636,10 @@ def initialise_layout():
     global editing_enabled
     global logging
     logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
-    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings")
+    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
+    logging.info("RUN LAYOUT - Updating all Signal Approach Control states:")
+    update_all_signal_approach_control_settings()
     # Track sections (the library objects) only "exist" in run mode"
     if editing_enabled:
         logging.info("RUN LAYOUT - Clearing down any Signal Overrides:")
