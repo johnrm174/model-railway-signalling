@@ -798,10 +798,13 @@ def delete_signal(sig_id:int):
         signals_common.signals[str(sig_id)]["sigbutton"].destroy()
         signals_common.signals[str(sig_id)]["subbutton"].destroy()
         signals_common.signals[str(sig_id)]["passedbutton"].destroy()
-        # This buttons is only common to colour light and semaphore types
         if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
                                                               signals_common.sig_type.semaphore):
+            # This buttons is only common to colour light and semaphore types
             signals_common.signals[str(sig_id)]["releasebutton"].destroy()
+            # Abort any timed signal sequences already in progess
+            route = signals_common.signals[str(sig_id)]["routeset"]
+            signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
         # Finally, delete the signal entry from the dictionary of signals
         del signals_common.signals[str(sig_id)]
     return()
