@@ -4,26 +4,11 @@
     "objects": {
         "02febfbf-ee80-4c08-b52d-84b72fa9c23b": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -1168,26 +1153,11 @@
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -2224,26 +2194,11 @@
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -3267,26 +3222,11 @@
         },
         "566843c0-90fe-4397-9a64-9b9f3cb44514": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -4310,26 +4250,11 @@
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -5353,26 +5278,11 @@
         },
         "624d1f40-9385-4bc6-bf34-480883562b08": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -6396,26 +6306,11 @@
         },
         "64b572a6-a2d0-4010-b33f-cd73b16f3f24": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -7439,26 +7334,11 @@
         },
         "69f55083-33c0-4066-a29d-a3f14cee3bb9": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -8539,26 +8419,11 @@
         },
         "82685c46-2db9-4145-a0f8-7111098f16ec": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -9608,26 +9473,11 @@
         },
         "a3a8d6ac-dc68-4d04-a0c0-8a94f8dd4d5b": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -10651,26 +10501,11 @@
         },
         "a58ae971-dd6e-4f5e-92e3-0d451f28cc36": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -11707,26 +11542,11 @@
         },
         "ac294bf3-a8ee-473e-877b-24db735b8d76": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -12750,26 +12570,11 @@
         },
         "acbd35af-8e88-400e-979b-44e1de8c927d": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -13963,26 +13768,11 @@
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -15058,26 +14848,11 @@
         },
         "ddfcbf50-82fc-45e2-b861-1cc519b08d28": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -16132,26 +15907,11 @@
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -17188,26 +16948,11 @@
         },
         "f030d8c7-4d78-40bd-a046-e5cec8376481": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
@@ -18275,26 +18020,11 @@
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    true
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                2,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 true,
@@ -19318,26 +19048,11 @@
         },
         "fae48e3e-2bfd-4207-afb0-34c9f9a43bf7": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,

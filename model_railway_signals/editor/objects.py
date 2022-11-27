@@ -297,21 +297,17 @@ def set_all(new_objects):
             # Update the object indexes and all redraw each object on the schematic
             if new_object_type == object_type.line:
                 objects_lines.redraw_line_object(object_id)
-            elif new_object_type == object_type.signal:
-                item_id = schematic_objects[object_id]["itemid"]
-                signal_index[str(item_id)] = object_id
+            elif new_object_type == object_type.signal:                
+                signal_index[str(schematic_objects[object_id]["itemid"])] = object_id
                 objects_signals.redraw_signal_object(object_id)
             elif new_object_type == object_type.point:
-                item_id = schematic_objects[object_id]["itemid"]
-                point_index[str(item_id)] = object_id
+                point_index[str(schematic_objects[object_id]["itemid"])] = object_id
                 objects_points.redraw_point_object(object_id)
             elif new_object_type == object_type.section:
-                item_id = schematic_objects[object_id]["itemid"]
-                section_index[str(item_id)] = object_id
+                section_index[str(schematic_objects[object_id]["itemid"])] = object_id
                 objects_sections.redraw_section_object(object_id)
             elif new_object_type == object_type.instrument:
-                item_id = schematic_objects[object_id]["itemid"]
-                instrument_index[str(item_id)] = object_id
+                instrument_index[str(schematic_objects[object_id]["itemid"])] = object_id
                 objects_instruments.redraw_instrument_object(object_id)
     # Ensure all track sections are on top
     for object_id in schematic_objects:

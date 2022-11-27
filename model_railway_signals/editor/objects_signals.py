@@ -187,12 +187,9 @@ default_signal_object["distautomatic"] = False # Semaphore associated distant is
 default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
 # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
-# where each element is List of [release_on_red:bool, release_on_yel:bool]
-default_signal_object["approachcontrol"] = [ [False, False],
-                                             [False, False],             
-                                             [False, False],             
-                                             [False, False],             
-                                             [False, False] ]            
+# Each element represents the approach control mode that has been set
+# release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+default_signal_object["approachcontrol"] = [0, 0, 0, 0, 0]            
 # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
 # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
 default_signal_object["timedsequences"] = [ [False, 0, 0, 0],

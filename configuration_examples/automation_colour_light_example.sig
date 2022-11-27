@@ -4,32 +4,17 @@
     "objects": {
         "02febfbf-ee80-4c08-b52d-84b72fa9c23b": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3606,
+            "bbox": 1080,
             "dccaspects": [
                 [
                     [
@@ -1046,27 +1031,27 @@
             ]
         },
         "146287d7-4772-46bc-8952-89c98ff36bb0": {
-            "bbox": 3610,
-            "end1": 3608,
-            "end2": 3609,
+            "bbox": 1084,
+            "end1": 1082,
+            "end2": 1083,
             "endx": 1400,
             "endy": 275,
             "item": "line",
             "itemid": null,
-            "line": 3607,
+            "line": 1081,
             "posx": 925,
             "posy": 275,
             "tags": "146287d7-4772-46bc-8952-89c98ff36bb0"
         },
         "350ab106-55fd-4920-800f-606a103c9392": {
-            "bbox": 3614,
-            "end1": 3612,
-            "end2": 3613,
+            "bbox": 1088,
+            "end1": 1086,
+            "end2": 1087,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": null,
-            "line": 3611,
+            "line": 1085,
             "posx": 875,
             "posy": 275,
             "tags": "350ab106-55fd-4920-800f-606a103c9392"
@@ -1074,7 +1059,7 @@
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 3621,
+            "bbox": 1095,
             "colour": "black",
             "dccaddress": 1005,
             "dccreversed": false,
@@ -1089,6 +1074,16 @@
             "siginterlock": [
                 [
                     2,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    3,
                     [
                         true,
                         false,
@@ -1126,48 +1121,23 @@
                         true,
                         false
                     ]
-                ],
-                [
-                    3,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
                 ]
             ],
             "tags": "point5"
         },
         "37852e20-d54e-4fce-92ce-1ebd033b6873": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3640,
+            "bbox": 1114,
             "dccaspects": [
                 [
                     [
@@ -2184,46 +2154,31 @@
             ]
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
-            "bbox": 3644,
-            "end1": 3642,
-            "end2": 3643,
+            "bbox": 1118,
+            "end1": 1116,
+            "end2": 1117,
             "endx": 925,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3641,
+            "line": 1115,
             "posx": 1400,
             "posy": 225,
             "tags": "3f11b41e-b356-402c-b59e-b314963b3723"
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3656,
+            "bbox": 1130,
             "dccaspects": [
                 [
                     [
@@ -3240,7 +3195,7 @@
             ]
         },
         "5424b00f-f0ad-4900-8b9c-7d858a2e05d0": {
-            "bbox": 3659,
+            "bbox": 1133,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3254,32 +3209,17 @@
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3678,
+            "bbox": 1153,
             "dccaspects": [
                 [
                     [
@@ -4297,32 +4237,17 @@
         },
         "566843c0-90fe-4397-9a64-9b9f3cb44514": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3697,
+            "bbox": 1172,
             "dccaspects": [
                 [
                     [
@@ -5340,32 +5265,17 @@
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3716,
+            "bbox": 1191,
             "dccaspects": [
                 [
                     [
@@ -6383,32 +6293,17 @@
         },
         "69f55083-33c0-4066-a29d-a3f14cee3bb9": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3728,
+            "bbox": 1203,
             "dccaspects": [
                 [
                     [
@@ -7427,7 +7322,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3735,
+            "bbox": 1210,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -7443,7 +7338,7 @@
             "tags": "point4"
         },
         "768c5e02-b80c-4025-a27a-ab5a225ae105": {
-            "bbox": 3738,
+            "bbox": 1213,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7456,46 +7351,31 @@
             "tags": "section9"
         },
         "8232da6f-9aeb-45bd-8519-039297c6d3b9": {
-            "bbox": 3742,
-            "end1": 3740,
-            "end2": 3741,
+            "bbox": 1217,
+            "end1": 1215,
+            "end2": 1216,
             "endx": 500,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3739,
+            "line": 1214,
             "posx": 825,
             "posy": 225,
             "tags": "8232da6f-9aeb-45bd-8519-039297c6d3b9"
         },
         "82685c46-2db9-4145-a0f8-7111098f16ec": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3754,
+            "bbox": 1229,
             "dccaspects": [
                 [
                     [
@@ -8512,20 +8392,20 @@
             ]
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
-            "bbox": 3758,
-            "end1": 3756,
-            "end2": 3757,
+            "bbox": 1233,
+            "end1": 1231,
+            "end2": 1232,
             "endx": 825,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3755,
+            "line": 1230,
             "posx": 500,
             "posy": 175,
             "tags": "8efa0c5d-19c3-4826-a797-34453446bb67"
         },
         "a19e74b3-1746-478b-92c3-2ae4183b4c71": {
-            "bbox": 3761,
+            "bbox": 1236,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8539,32 +8419,17 @@
         },
         "a3a8d6ac-dc68-4d04-a0c0-8a94f8dd4d5b": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3780,
+            "bbox": 1255,
             "dccaspects": [
                 [
                     [
@@ -9581,46 +9446,31 @@
             ]
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
-            "bbox": 3784,
-            "end1": 3782,
-            "end2": 3783,
+            "bbox": 1259,
+            "end1": 1257,
+            "end2": 1258,
             "endx": 875,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3781,
+            "line": 1256,
             "posx": 1100,
             "posy": 175,
             "tags": "a9fca83a-6c10-454f-a141-e4931d7c06d7"
         },
         "ac294bf3-a8ee-473e-877b-24db735b8d76": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3803,
+            "bbox": 1278,
             "dccaspects": [
                 [
                     [
@@ -10638,32 +10488,17 @@
         },
         "acbd35af-8e88-400e-979b-44e1de8c927d": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3822,
+            "bbox": 1297,
             "dccaspects": [
                 [
                     [
@@ -11680,7 +11515,7 @@
             ]
         },
         "b3b255c4-744a-4476-a7d0-3535e718fac1": {
-            "bbox": 3825,
+            "bbox": 1300,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11693,7 +11528,7 @@
             "tags": "section3"
         },
         "b55de778-8bb5-4d62-965e-d62ca9aa136d": {
-            "bbox": 3828,
+            "bbox": 1303,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11708,7 +11543,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 3835,
+            "bbox": 1310,
             "colour": "black",
             "dccaddress": 1003,
             "dccreversed": false,
@@ -11726,6 +11561,16 @@
                     [
                         true,
                         true,
+                        false,
+                        false,
+                        false
+                    ]
+                ],
+                [
+                    3,
+                    [
+                        true,
+                        false,
                         false,
                         false,
                         false
@@ -11750,29 +11595,19 @@
                         true,
                         false
                     ]
-                ],
-                [
-                    3,
-                    [
-                        true,
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
                 ]
             ],
             "tags": "point3"
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
-            "bbox": 3839,
-            "end1": 3837,
-            "end2": 3838,
+            "bbox": 1314,
+            "end1": 1312,
+            "end2": 1313,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": null,
-            "line": 3836,
+            "line": 1311,
             "posx": 450,
             "posy": 225,
             "tags": "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626"
@@ -11780,7 +11615,7 @@
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 3846,
+            "bbox": 1321,
             "colour": "black",
             "dccaddress": 1002,
             "dccreversed": false,
@@ -11837,46 +11672,31 @@
             "tags": "point2"
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
-            "bbox": 3850,
-            "end1": 3848,
-            "end2": 3849,
+            "bbox": 1325,
+            "end1": 1323,
+            "end2": 1324,
             "endx": 250,
             "endy": 175,
             "item": "line",
             "itemid": null,
-            "line": 3847,
+            "line": 1322,
             "posx": 450,
             "posy": 175,
             "tags": "c8564be9-6891-48f3-999a-53472f24c85f"
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3862,
+            "bbox": 1337,
             "dccaspects": [
                 [
                     [
@@ -12893,7 +12713,7 @@
             ]
         },
         "cf7ab31e-b781-435b-8b96-0398da28e8f1": {
-            "bbox": 3865,
+            "bbox": 1340,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12906,7 +12726,7 @@
             "tags": "section7"
         },
         "d2c6a4dd-630c-4836-ad26-52269177edcc": {
-            "bbox": 3868,
+            "bbox": 1343,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12919,7 +12739,7 @@
             "tags": "section1"
         },
         "d5d3aa4e-cc00-4d66-a1c6-8b52bb7b1a92": {
-            "bbox": 3871,
+            "bbox": 1346,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12934,7 +12754,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3878,
+            "bbox": 1353,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12950,7 +12770,7 @@
             "tags": "point1"
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
-            "bbox": 3881,
+            "bbox": 1356,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12964,32 +12784,17 @@
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3893,
+            "bbox": 1368,
             "dccaspects": [
                 [
                     [
@@ -14007,32 +13812,17 @@
         },
         "f030d8c7-4d78-40bd-a046-e5cec8376481": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3905,
+            "bbox": 1380,
             "dccaspects": [
                 [
                     [
@@ -15049,7 +14839,7 @@
             ]
         },
         "f1dbf1a3-0d5b-43e2-a476-18ccb8b0b920": {
-            "bbox": 3908,
+            "bbox": 1383,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15064,7 +14854,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3915,
+            "bbox": 1390,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15080,7 +14870,7 @@
             "tags": "point6"
         },
         "f771894a-e7a8-4e26-a9d0-d316f9aff774": {
-            "bbox": 3918,
+            "bbox": 1393,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15094,32 +14884,17 @@
         },
         "f7e885c9-faa7-4ee6-87df-9c035c5dadeb": {
             "approachcontrol": [
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ],
-                [
-                    false,
-                    false
-                ]
+                0,
+                0,
+                0,
+                0,
+                0
             ],
             "approachsensor": [
                 false,
                 0
             ],
-            "bbox": 3938,
+            "bbox": 1413,
             "dccaspects": [
                 [
                     [
@@ -16168,7 +15943,52 @@
             "switched": false
         }
     },
-    "sections": {},
+    "sections": {
+        "1": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "11": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "12": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "13": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "2": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "3": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "4": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "6": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "7": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "8": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "9": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        }
+    },
     "settings": {
         "canvas": {
             "grid": 25,
@@ -16176,8 +15996,8 @@
             "width": 1400
         },
         "general": {
-            "editmode": true,
-            "filename": "D:/JRM/13 - Software/model-railway-signalling-develop/configuration_examples/automation_colour_light_example.sig",
+            "editmode": false,
+            "filename": "/home/pi/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "version": "Version 3.1.0"
         },
         "logging": {

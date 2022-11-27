@@ -161,7 +161,7 @@ def find_signal_behind(signal_object):
 def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
     global logging
     home_signal_at_danger = False
-    if recursion_level < 20:
+    if recursion_level < 50:
         signal_ahead_object = find_signal_ahead(signal_object)
         if signal_ahead_object is not None:
             if signals.signal_state(signal_ahead_object["itemid"]) == signals_common.signal_state_type.DANGER:
@@ -185,7 +185,7 @@ def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
 #------------------------------------------------------------------------------------
 
 def update_signal_behind(signal_object, recursion_level:int=0):
-    if recursion_level < 20:
+    if recursion_level < 50:
         signal_behind_object = find_signal_behind(signal_object)
         if signal_behind_object is not None:
             if signal_behind_object["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -266,23 +266,45 @@ def trigger_timed_sequence(signal_object):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to reset a signal's approach control state following sig passed/changed)
-# Only main semaphores and colour light signals support this function
+# Function to reset a signal's 'approach controls state' state following sig passed
+# or changed event. Only main semaphores and colour light signals support this function
 #------------------------------------------------------------------------------------
 
-def update_signal_approach_control(signal_object):
-    if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
-             signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
-        signal_route = find_signal_route(signal_object)
-        if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
-            rel_on_red = signal_object["approachcontrol"][signal_route.value-1][0]
-            rel_on_ylw = signal_object["approachcontrol"][signal_route.value-1][1]
-            if rel_on_red or rel_on_ylw:
-                signals.set_approach_control(signal_object["itemid"],rel_on_ylw)
+def update_signal_approach_control(signal_object,recursion_level:int=0):
+    if recursion_level < 50:
+        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
+                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+            signal_route = find_signal_route(signal_object)
+            if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
+                # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
+                # Each element represents the approach control mode that has been set
+                # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+                # 'released_on_red_home_ahead' is similar to normal 'release_on_red'
+                # but approach control is ONLY set if a home signal ahead along the route
+                # is at danger (primarily for simulating a semaphore block section)
+                if signal_object["approachcontrol"][signal_route.value-1] == 1:
+                    signals.set_approach_control(signal_object["itemid"],release_on_yellow=False)
+                elif signal_object["approachcontrol"][signal_route.value-1] == 2:
+                    signals.set_approach_control(signal_object["itemid"],release_on_yellow=True)
+                elif ( signal_object["approachcontrol"][signal_route.value-1] == 3 and
+                             home_signal_ahead_at_danger(signal_object) ):
+                    signals.set_approach_control(signal_object["itemid"],release_on_yellow=False)
+                else:
+                    signals.clear_approach_control(signal_object["itemid"])
             else:
                 signals.clear_approach_control(signal_object["itemid"])
-        else:
-            signals.clear_approach_control(signal_object["itemid"])
+            # If the signal is a home signal then we need to propogate back along the route
+            # to ensure the "approach control on signals ahead" is updated for all preceding signals
+            if ( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
+                   signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) or
+                 ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
+                   signal_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) ):
+                signal_behind_object = find_signal_behind(signal_object)
+                if signal_behind_object is not None:
+                    update_signal_approach_control(signal_behind_object, recursion_level+1)
+    else:
+        logging.error("RUN LAYOUT - Update Signal Behind - Maximum recursion level reached")
+
     return()
 
 #------------------------------------------------------------------------------------
@@ -472,14 +494,14 @@ def update_all_signal_overrides():
     # Sub-function to set a signal override
     def set_signal_override(signal_object):
         signal_id = signal_object["itemid"]
-        if signal_object["overridesignal"] and type(signal_id) == int:
+        if signal_object["overridesignal"]:
             signals.set_signal_override(signal_id)
             if has_distant_arms(signal_object):
                 signals.set_signal_override(signal_id+100)
     # Sub-function to Clear a signal override
     def clear_signal_override(signal_object):
         signal_id = signal_object["itemid"]
-        if signal_object["overridesignal"] and type(signal_id) == int:
+        if signal_object["overridesignal"]:
             signals.clear_signal_override(signal_id)
             if has_distant_arms(signal_object):
                 signals.clear_signal_override(signal_id+100)
@@ -576,7 +598,7 @@ def update_all_mirrored_sections():
 # Function to Update all signal approach control selections
 #------------------------------------------------------------------------------------
 
-def update_all_signal_approach_control_settings():
+def update_all_signal_approach_control():
     for sig_id in objects.signal_index:
         update_signal_approach_control(objects.schematic_objects[objects.signal(sig_id)])
     return()
@@ -589,40 +611,73 @@ def schematic_callback(item_id,callback_type):
     global logging
     global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-    # Process any event-specific functions
+    
+    # Timed sequences or changes in track occupancy are triggered by 'signal_passed' events
     if callback_type == signals_common.sig_callback_type.sig_passed:
-        ######################################################################################
-        #### TO DO - Need to handle Remote signal events when MQTT networking is enabled #####
-        ######################################################################################
         logging.info("RUN LAYOUT - Triggering any Timed Signal sequences:")
         trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
-        # Track sections (the library objects) only "exist" in run mode"
+        # Note that Track sections (the library objects) only "exist" in run mode
         if not editing_enabled:
             logging.info("RUN LAYOUT - Updating Track Section occupancy:")
             update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+            
+    # Junction Approach control is reset on 'signal_passed' or 'signal_switched' events.
+    # Note that we have 2 passes at approach control - the first pass for the signal that
+    # caused the callback event. Then later when all signal aspects have been updated to
+    # take into account any overrides, we have a second pass to "set approach control on
+    # signals ahead" for all signals. Note that we ignore secondary distants
+    if ( callback_type == signals_common.sig_callback_type.sig_passed or
+         callback_type == signals_common.sig_callback_type.sig_switched ):
         logging.info("RUN LAYOUT - Updating Signal Approach Control state:")
-        update_signal_approach_control(objects.schematic_objects[objects.signal(item_id)])
-    elif callback_type == signals_common.sig_callback_type.sig_switched:
-        logging.info("RUN LAYOUT - Updating Signal Approach Control state:")
-        update_signal_approach_control(objects.schematic_objects[objects.signal(item_id)])
-    # These are the common functions to call for any type of callback
-    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
-    set_all_signal_routes()
-    # Track sections (the library objects) only "exist" in run mode"
-    if not editing_enabled:
-        logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
-        update_all_mirrored_sections()
-        logging.info("RUN LAYOUT - Overriding Signals to reflect Track Section Occupancy:")
-        update_all_signal_overrides()
-    logging.info("RUN LAYOUT - Updating Signal Aspects to reflect the aspect of Signals Ahead:")
-    update_all_signals()           
-    logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect the state of Home Signals ahead:")
-    update_all_distant_overrides()    
-    logging.info("RUN LAYOUT - Updating Signal Interlocking:")
-    process_all_signal_interlocking()
-    logging.info("RUN LAYOUT - Updating Point Interlocking:")
-    process_all_point_interlocking()
+        if item_id < 100:
+            update_signal_approach_control(objects.schematic_objects[objects.signal(item_id)])
+        
+    # Signal routes are updated on 'point_switched' or 'fpl_switched' events
+    if ( callback_type == points.point_callback_type.point_switched or
+         callback_type == points.point_callback_type.fpl_switched ):
+        logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
+        set_all_signal_routes()
+        
+    # 'Mirrored' track sections and signal overrides (i.e. overrides based on track
+    # occupancy) only need to be updated when a track section is manually changed or
+    # on a signal 'passsed' event (which may have updated track section occupancy).
+    # Signal aspects can change as a result of the signal being switched or the signal 
+    # being overridden ('section_updated' or as a result of a 'sig_passed' event) or the
+    # approach control state changing ('sig_passed' or 'sig_switched' or 'sig_released')
+    if ( callback_type == track_sections.section_callback_type.section_updated or
+         callback_type == signals_common.sig_callback_type.sig_released or
+         callback_type == signals_common.sig_callback_type.sig_passed or
+         callback_type == signals_common.sig_callback_type.sig_switched ):
+        # Note that Track sections (the library objects) only "exist" in run mode
+        if not editing_enabled:
+            logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
+            update_all_mirrored_sections()
+            logging.info("RUN LAYOUT - Overriding Signals to reflect Track Section Occupancy:")
+            update_all_signal_overrides()
+        logging.info("RUN LAYOUT - Updating Signal Aspects to reflect the aspect of Signals Ahead:")
+        update_all_signals()           
+        logging.info("RUN LAYOUT - Updating Signal Approach Control to reflect the state of Home Signals ahead:")
+        update_all_signal_approach_control()
+        logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect the state of Home Signals ahead:")
+        update_all_distant_overrides()
+    
+    # Signal interlocking is updated on point, signal or block instrument events
+    if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
+         callback_type == signals_common.sig_callback_type.sig_switched or
+         callback_type == signals_common.sig_callback_type.sub_switched or
+         callback_type == points.point_callback_type.fpl_switched or
+         callback_type == points.point_callback_type.fpl_switched ):
+        logging.info("RUN LAYOUT - Updating Signal Interlocking:")
+        process_all_signal_interlocking()
+        
+    # Point interlocking is updated on signal changed events
+    if ( callback_type == signals_common.sig_callback_type.sig_switched or
+         callback_type == signals_common.sig_callback_type.sub_switched):
+        logging.info("RUN LAYOUT - Updating Point Interlocking:")
+        process_all_point_interlocking()
+        
     logging.info("**************************************************************************************")
+    
     # Refocus back on the canvas to ensure that any keypress events function
     objects_common.canvas.focus_set()
     return()
@@ -638,8 +693,6 @@ def initialise_layout():
     logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
     logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
-    logging.info("RUN LAYOUT - Updating all Signal Approach Control states:")
-    update_all_signal_approach_control_settings()
     # Track sections (the library objects) only "exist" in run mode"
     if editing_enabled:
         logging.info("RUN LAYOUT - Clearing down any Signal Overrides:")
@@ -649,6 +702,8 @@ def initialise_layout():
         update_all_mirrored_sections()
         logging.info("RUN LAYOUT - Overriding Signals to reflect Track Section Occupancy:")
         update_all_signal_overrides()
+    logging.info("RUN LAYOUT - Updating Signal Approach Control states:") 
+    update_all_signal_approach_control()
     logging.info("RUN LAYOUT - Updating Signal Aspects to reflect the aspect of Signals Ahead:")
     update_all_signals()           
     logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect the state of Home Signals Ahead:")

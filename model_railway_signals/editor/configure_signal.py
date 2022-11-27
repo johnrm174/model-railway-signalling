@@ -770,20 +770,26 @@ def update_tab3_approach_control_selections(signal):
     sig_routes = get_sig_routes(signal)
     # Work out if the signal type supports approach control:
     rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-                     signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value) or
+                     signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value ) or
                    ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
                      signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.distant.value ) )
     rel_on_yel = ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.home.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.red_ylw.value )
-    approach_control = rel_on_red or rel_on_yel
+    rel_on_sig = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+                     signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value )or
+                   ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+                     signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value ) )
+    approach_control = rel_on_red or rel_on_yel or rel_on_sig
     if approach_control:
         # Deal with the approach control selections first
         if rel_on_yel: signal.automation.approach_control.enable_release_on_yel()
         else: signal.automation.approach_control.disable_release_on_yel()
         if rel_on_red: signal.automation.approach_control.enable_release_on_red()
         else: signal.automation.approach_control.disable_release_on_red()
+        if rel_on_sig: signal.automation.approach_control.enable_release_on_red_sig_ahead()
+        else: signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # MAIN Route (sig or sub)
         signal.automation.approach_control.main.enable_route()
         # LH1 Route (sig or sub)
@@ -808,9 +814,10 @@ def update_tab3_approach_control_selections(signal):
         signal.automation.approach_control.rh2.disable_route()
         signal.automation.approach_control.disable_release_on_yel()
         signal.automation.approach_control.disable_release_on_red()
+        signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # Disable the Approach sensor entry box
         signal.automation.track_sensors.approach.disable()
-    return()
+    return() 
 
 #------------------------------------------------------------------------------------
 # Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 

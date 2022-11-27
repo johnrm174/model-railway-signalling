@@ -403,21 +403,27 @@ class approach_control_route_element():
                 tool_tip="Select to enable 'Approach Control' for this route")
         self.route.pack(side=LEFT)
         # Add a bit of white space
-        self.label2 = Label(self.frame, text="     Mode:")
+        self.label2 = Label(self.frame, text="   Release on:")
         self.label2.pack(side=LEFT)
         # Create the approach control mode selection radiobuttons
         self.selection = IntVar(self.frame, 0)
         self.approach_mode = 0
         self.red_enabled = True
         self.yel_enabled = True
-        self.B1 = Radiobutton(self.frame, text="Release on Red", anchor='w',
+        self.sig_enabled = True
+        self.B1 = Radiobutton(self.frame, text="Red", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=1)
         self.B1.pack(side=LEFT)
-        self.B1TT = common.CreateToolTip(self.B1, "Signal will remain at Red until the train approaches")
-        self.B2 = Radiobutton(self.frame, text="Release on Yellow", anchor='w',
+        self.B1TT = common.CreateToolTip(self.B1, "Signal will remain at DANGER until the train approaches")
+        self.B2 = Radiobutton(self.frame, text="Yellow", anchor='w',
                 command=self.mode_selected, variable=self.selection, value=2)
         self.B2.pack(side=LEFT)
-        self.B2TT = common.CreateToolTip(self.B2, "Signal will remain at Yellow until the train approaches")
+        self.B2TT = common.CreateToolTip(self.B2, "Signal will remain at CAUTION until the train approaches")
+        self.B3 = Radiobutton(self.frame, text="Red (on signals ahead)", anchor='w',
+                command=self.mode_selected, variable=self.selection, value=3)
+        self.B3.pack(side=LEFT)
+        self.B3TT = common.CreateToolTip(self.B3, "Signal will remain at DANGER until the train approaches "+
+                            "(approach control will only be applied if there is a home signal ahead at danger)")
 
     def mode_selected(self):
         self.approach_mode = self.selection.get()
@@ -428,14 +434,18 @@ class approach_control_route_element():
             else: self.B1.configure(state="disabled")
             if self.yel_enabled: self.B2.configure(state="normal")
             else: self.B2.configure(state="disabled")
+            if self.sig_enabled: self.B3.configure(state="normal")
+            else: self.B3.configure(state="disabled")
             # Ensure the selection is valid
-            if self.red_enabled and not self.yel_enabled: self.approach_mode = 1
-            elif self.yel_enabled and not self.red_enabled: self.approach_mode = 2
-            elif self.red_enabled and self.yel_enabled and self.approach_mode == 0: self.approach_mode = 1
+            if self.approach_mode == 0: self.approach_mode = 1
+            if not self.red_enabled and self.approach_mode == 1: self.approach_mode = 2
+            if not self.yel_enabled and self.approach_mode == 2: self.approach_mode = 1
+            if not self.sig_enabled and self.approach_mode == 3: self.approach_mode = 1
             self.selection.set(self.approach_mode)
         else:
             self.B1.configure(state="disabled")
             self.B2.configure(state="disabled")
+            self.B3.configure(state="disabled")
             self.selection.set(0)
 
     def enable_route(self):
@@ -461,19 +471,26 @@ class approach_control_route_element():
     def disable_yel(self):
         self.yel_enabled = False
         self.route_selected()
+        
+    def enable_sig_ahead(self):
+        self.sig_enabled = True
+        self.route_selected()
+        
+    def disable_sig_ahead(self):
+        self.sig_enabled = False
+        self.route_selected()
 
-    def set_values(self, route:[bool,bool]):
-        # List of [release_on_red:bool, release_on_yel:bool]
-        self.route.set_value(route[0] or route[1])
-        if route[0]: self.approach_mode = 1
-        elif route[1]: self.approach_mode = 2
-        else: self.approach_mode = 0
+    def set_values(self, mode:int):
+        # The 'Mode' value represents the approach control mode that has been set
+        # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+        self.route.set_value(mode != 0)
+        self.approach_mode = mode
         self.route_selected()
     
     def get_values(self):
-        # List of [release_on_red:bool, release_on_yel:bool]
-        # Values will both be zero if the selections are disabled
-        return ( [self.selection.get()==1, self.selection.get()==2] )
+        # The 'Mode' value represents the approach control mode that has been set
+        # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+        return (self.selection.get())
 
     def approach_control_selected(self):
         return self.route.get_value()
@@ -499,7 +516,7 @@ class approach_control_frame():
         # Create a subframe for the context label
         self.subframe1 = Frame(self.frame)
         self.subframe1.pack(side=LEFT, padx=2, pady=2, fill='both')        
-        self.label = Label(self.frame, text="Routes subject to\napproach control", anchor='w')
+        self.label = Label(self.frame, text="Routes\nsubject to\napproach\ncontrol", anchor='w')
         self.label.pack(side=LEFT)
         # Create a subframe for the route elements
         self.subframe2 = Frame(self.frame)
@@ -538,9 +555,24 @@ class approach_control_frame():
         self.rh1.disable_yel()
         self.rh2.disable_yel()
         
-    def set_values(self, approach_control:[[bool, bool],]):
+    def enable_release_on_red_sig_ahead(self):
+        self.main.enable_sig_ahead()
+        self.lh1.enable_sig_ahead()
+        self.lh2.enable_sig_ahead()
+        self.rh1.enable_sig_ahead()
+        self.rh2.enable_sig_ahead()
+        
+    def disable_release_on_red_sig_ahead(self):
+        self.main.disable_sig_ahead()
+        self.lh1.disable_sig_ahead()
+        self.lh2.disable_sig_ahead()
+        self.rh1.disable_sig_ahead()
+        self.rh2.disable_sig_ahead()
+        
+    def set_values(self, approach_control:[int,]):
         # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
-        # where each element is List of [release_on_red:bool, release_on_yel:bool]
+        # Each element represents the approach control mode that has been set
+        # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
         self.main.set_values(approach_control[0])
         self.lh1.set_values(approach_control[1])
         self.lh2.set_values(approach_control[2])
@@ -549,7 +581,8 @@ class approach_control_frame():
 
     def get_values(self):
         # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
-        # where each element is List of [release_on_red:bool, release_on_yel:bool]
+        # Each element represents the approach control mode that has been set
+        # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
         return ( [  self.main.get_values(),
                     self.lh1.get_values(),
                     self.lh2.get_values(),
