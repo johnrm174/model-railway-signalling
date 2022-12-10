@@ -271,6 +271,8 @@
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
+#       force_set:Bool - If False then this function will have no effect in the period between
+#                       the signal being 'released' and the signal being 'passed' (default True)
 # 
 # clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
 #             Signals are also automatically released when the"release button" (displayed just 
@@ -561,7 +563,7 @@ def toggle_subsidary (sig_id:int):
 # supported) Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def set_approach_control (sig_id:int, release_on_yellow:bool = False):
+def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -579,7 +581,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a 2 aspect red/yellow signal")
             else:
                 # Set approach control and refresh the signal following the change in state
-                signals_common.set_approach_control(sig_id,release_on_yellow)            
+                signals_common.set_approach_control(sig_id, release_on_yellow, force_set)            
                 signals_common.auto_refresh_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             # Do some additional validation specific to this function for semaphore signals
@@ -589,7 +591,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
             else:
                 # Set approach control and refresh the signal following the change in state
-                signals_common.set_approach_control(sig_id)
+                signals_common.set_approach_control(sig_id, release_on_yellow, force_set)            
                 signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error ("Signal "+str(sig_id)+": set_approach_control - Function not supported by signal type")
@@ -611,11 +613,8 @@ def clear_approach_control (sig_id:int):
     else:
         # call the signal type-specific functions to update the signal (note that we only update
         # Semaphore and colour light signals if they are configured to update immediately)
-        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            # Clear approach control and refresh the signal following the change in state
-            signals_common.clear_approach_control (sig_id)
-            signals_common.auto_refresh_signal(sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+        if ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light or
+             signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore ):
             # Clear approach control and refresh the signal following the change in state
             signals_common.clear_approach_control (sig_id)
             signals_common.auto_refresh_signal(sig_id)

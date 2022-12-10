@@ -328,6 +328,8 @@ set_approach_control - Normally used when a diverging route has a lower speed re
       sig_id:int - The ID for the signal
   Optional Parameters:
       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
+      force_set:Bool - If False then this function will have no effect in the period between
+                      the signal being 'released' and the signal being 'passed' (default True)
 
 clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
             Signals are also automatically released when the"release button" (displayed just 
