@@ -1,14 +1,44 @@
 # model-railway-signalling
 
-## Library functions
+A DCC model railway signalling system written in Python. Primarily intended for the Raspberry Pi, but 
+will also run on other platforms (albeit without some of the Raspberry-Pi specific interfacing functions). 
+Most types of colour light signals, semaphore signals, and ground signals are supported.
+* Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout
+* Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation
 
-A DCC model railway signalling library written in Python. Primarily intended for the Raspberry Pi, but 
-will also run on other platforms (albeit without some of the Raspberry-Pi specific interfacing functions).
+## Layout editor
+
+From Release 3.0.0, the schematic editor application enables automated and interlocked layout signalling 
+schemes to be designed and configured without the need to write any code. Note that the editor is in
+active development so any comments and suggestions for future features are welcome.
+
+What's supported in Release 3.1.0:
+* Draw your layout schematic with lines, points, signals and track occupancy sections
+* Define the DCC acommand sequences to drive the signals and points out on the layout
+* Configure the signals and points to implement protototypical interlocking schemes
+* Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
+* Save and load your layout schematic and state between running sessions
+
+What's coming soon:
+* Undo/redo for layout editing functions
+* Support for block section instruments
+* MQTT networking (for linking layouts)
+* Application documentation
+
+Any bug reports and feedback you may have would be gratefully appreciated - specifically:
+* What aspects are intuitive? What aspects aren't?
+* What aspects do you particularly like?
+* What aspects particularly irritate you?
+
+There are some example layout files in the 'configuration_examples' folder.
+
+![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
+## Library functions
 
 All of the functions for creating and managing 'signals', 'points', 'sections', 'sensors' and 'block instruments' 
 have been developed as a Python Package to promote re-use across other layouts. This includes functions to support 
 the interlocking of signals, points and block instruments, enabling fully prototypical signalling schemes to be 
-developed. Most types of colour light signals, semaphore signals, and ground signals are supported.
+developed in code.
 
 An interface to a SPROG DCC Command station enables control of the signals and points out on the layout. 
 The signals and points can be mapped to one or more DCC addresses in a manner that should be compatible with 
@@ -19,34 +49,6 @@ multiple signalling applications to be networked together so that complex layout
 signalling sections/areas, with communication between them.
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
-
-## Layout editor
-
-From Release 3.0.0, a basic schematic editor application has been added to enable signalling schemes to
-be designed and developed without the need to write your own code. Note that this should be considered a 
-beta release and at a "Minimum Viable Product" stage so don't expect a polished/stable application just yet.
-
-There are some example layout files in the 'configuration_examples' folder.
-
-What's supported in the MVP:
-* Schematic editing - points, signals and lines
-* SPROG interface - DCC control of signals and points
-* Full interlocking of signals and points
-* Save and load of layout schematic and state
-
-What's coming soon:
-* Schematic editing - Track sections and block instruments
-* Automation - sensor events and integration with track sections and signals
-* Application documentation
-* MQTT networking
-
-Any bug reports and feedback you may have would be gratefully appreciated - specifically:
-* What aspects are intuitive? What aspects aren't?
-* What aspects do you particularly like?
-* What aspects particularly irritate you?
-* what features would you like to see next?
-
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
 ## Installation
 
