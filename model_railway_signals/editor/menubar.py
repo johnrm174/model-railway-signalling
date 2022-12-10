@@ -63,9 +63,9 @@ help_text = """
 Application documentation is still on the 'ToDo' list, but in the meantime here is some
 basic guidance and top tips for creating your layout signalling system:
 
-1) Save your progress frequently - The editor is very much a work in progress and so may
-   not be fully stable (any bugs please do report back to me so I can fix them). Its also
-   worth mentioning that there is no 'undo' function as yet, so be forewarned.
+1) Save your progress - The editor is still in active development so may still contain
+   latent bugs (any you find please do report back to me so I can fix them). Its also
+   worth mentioning that there is no 'undo' function as yet - that's coming soon.
 2) Draw the track layout (points and lines) before adding any signals or the schematic may
    get cluttered (making it difficult to select the thing you want to move or edit).
 3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
@@ -99,9 +99,10 @@ Menubar Options
 6) Settings-Logging - Set the log level for running the layout
 7) Settings-SPROG - Configure the serial port and SPROG behavior
 
-Signal / Point configuration
+Schematic object configuration
 
-1) Use the hover-over Tooltips to get more information on each selection element 
+1) Double click on the object to open the object's configuration window
+2) Use the hover-over Tooltips to get more information on the selections 
 """
 
 class display_help():
