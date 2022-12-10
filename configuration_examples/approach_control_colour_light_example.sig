@@ -20107,68 +20107,7 @@
             "switched": false
         }
     },
-    "sections": {
-        "1": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "10": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "11": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "12": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "13": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "14": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "15": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "2": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "3": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "4": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "5": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "6": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "7": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "8": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "9": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        }
-    },
+    "sections": {},
     "settings": {
         "canvas": {
             "grid": 25,
@@ -20176,7 +20115,7 @@
             "width": 1675
         },
         "general": {
-            "editmode": false,
+            "editmode": true,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/approach_control_colour_light_example.sig",
             "version": "Version 3.1.0"
         },
