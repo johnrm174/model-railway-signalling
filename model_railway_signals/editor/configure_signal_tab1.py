@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Configuration" Tab
+# Functions and sub Classes for the Edit Signal "Configuration" Tab 
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -10,8 +10,8 @@ from . import objects
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element - Builds on the common checkbox class
 # Public class instance methods inherited from the base check box class are:
-#    "set_value" - set the initial value of the entry box (int) 
-#    "get_value" - get the last "validated" value of the entry box (int) 
+#    "set_value" - set the initial value of the Rotate checkbutton (int) 
+#    "get_value" - get the last "validated" value of the Rotate checkbutton (int) 
 #------------------------------------------------------------------------------------
 
 class general_settings(common.check_box):
@@ -35,13 +35,13 @@ class general_settings(common.check_box):
 #------------------------------------------------------------------------------------
 
 class semaphore_route_element():
-    # The basic element comprising checkbox and DCC address entry box
     def __init__(self, parent_frame, label:str, tool_tip:str, callback=None):
+        # Callback for select/deselect of the checkbox
         self.callback = callback
         # Create a frame for the UI element (always packed into the parent frame)
         self.frame = Frame(parent_frame)
         self.frame.pack()
-        # Create the checkbox and DCC entry Box (default tool tip used for Entry Box)
+        # Create the checkbox and DCC entry Box (default tool tip for DCC Entry Box)
         self.CB = common.check_box(parent_frame, label=label,
                         tool_tip=tool_tip, callback=self.cb_updated)
         self.CB.pack(side=LEFT)
@@ -53,21 +53,39 @@ class semaphore_route_element():
         if self.callback is not None: self.callback()
         
     def update_eb_state(self):
-        if self.CB.selection.get(): self.EB.enable()
+        if self.CB.get_value(): self.EB.enable()
         else: self.EB.disable()
         
     def validate(self):
+        # Validate the DCC Address
         return(self.EB.validate())
         
-    def enable(self):
+    def enable0(self):
         self.CB.enable()
         self.update_eb_state()
+        
+    def enable1(self):
+        self.CB.enable1()
+        self.update_eb_state()
+        
+    def enable2(self):
+        self.CB.enable2()
+        self.update_eb_state()
 
-    def disable(self):
+    def disable0(self):
         self.CB.disable()
+        self.update_eb_state()
+
+    def disable1(self):
+        self.CB.disable1()
+        self.update_eb_state()
+        
+    def disable2(self):
+        self.CB.disable2()
         self.update_eb_state()
         
     def set_element(self, signal_arm:[bool,int]):
+        # Each signal element comprises [enabled/disabled, address]
         self.CB.set_value(signal_arm[0])
         self.EB.set_value(signal_arm[1])
         self.update_eb_state()
@@ -86,13 +104,13 @@ class semaphore_route_element():
 #    "enable_distant" - enables/loads the distant checkbox and entry box
 #    "set_route" - will set the element [enabled/disabled, address]
 #    "get_route" - returns the last "valid" value [enabled/disabled, address]
+# The callbacks are made when the signal arms are selected or deselected
 #------------------------------------------------------------------------------------
 
 class semaphore_route_group(): 
-    def __init__(self, parent_frame, label:str,
-                 sig_arms_updated_callback=None,
-                 sub_arms_updated_callback=None,
-                 dist_arms_updated_callback=None):
+    def __init__(self, parent_frame, label:str,sig_arms_updated_callback=None,
+                 sub_arms_updated_callback=None, dist_arms_updated_callback=None):
+        # Callback for change in signal arm selections
         self.sig_arms_callback = sig_arms_updated_callback
         self.sub_arms_callback = sub_arms_updated_callback
         self.dist_arms_callback = dist_arms_updated_callback
@@ -113,7 +131,7 @@ class semaphore_route_group():
                         callback=self.dist_arms_updated)
         
     def sig_arms_updated(self):
-        self.enable_distant()
+        self.enable_disable_distant_arms()
         if self.sig_arms_callback is not None: self.sig_arms_callback()
         
     def sub_arms_updated(self):
@@ -121,31 +139,52 @@ class semaphore_route_group():
         
     def dist_arms_updated(self):
         if self.sig_arms_callback is not None: self.dist_arms_callback()
+        
+    def enable_disable_distant_arms(self):
+        # A route can only have a secondary distant arm if there is a main home arm
+        # Use the 'enable0/disable0' functions ('enable1/disable1' is used to to enable/disable
+        # the entire route and 'enable2/disable2' is used to enable/disable individual sig arms)
+        if self.sig.get_element()[0]: self.dist.enable0()
+        else: self.dist.disable0()
 
     def validate(self):
         return(self.sig.validate() and self.sub.validate() and self.dist.validate())
-
-    def enable_distant(self):
-        # Distant route arms can only be associated with a main home signal arm
-        if self.sig.get_element()[0]: self.dist.enable()
-        else: self.dist.disable()
-
+    
     def enable_route(self):
-        self.sig.enable()
-        self.sub.enable()
-        self.enable_distant()
+        self.sig.enable1()
+        self.sub.enable1()
+        self.dist.enable1()
     
     def disable_route(self):
-        self.sig.disable()
-        self.sub.disable()
-        self.dist.disable()
+        self.sig.disable1()
+        self.sub.disable1()
+        self.dist.disable1()
         
+    def enable_signal(self):
+        self.sig.enable2()
+        
+    def disable_signal(self):
+        self.sig.disable2()
+
+    def enable_subsidary(self):
+        self.sub.enable2()
+        
+    def disable_subsidary(self):
+        self.sub.disable2()
+        
+    def enable_distant(self):
+        self.dist.enable2()
+        
+    def disable_distant(self):
+        self.dist.disable2()
+
     def set_route(self, signal_elements:[[bool,int],]):
         # Signal Group comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
         self.sig.set_element(signal_elements[0])
         self.sub.set_element(signal_elements[1])
         self.dist.set_element(signal_elements[2])
+        self.enable_disable_distant_arms()
         
     def get_route(self):
         # Signal Group comprises: [signal, subsidary, distant]
@@ -167,6 +206,7 @@ class semaphore_route_group():
 #    "enable_subsidaries" - enables/loads all subsidary checkboxes and entry boxes
 #    "set_arms" - will set all ui elements (enabled/disabled, addresses)
 #    "get_arms" - returns the last "valid" values (enabled/disabled, addresses)
+# The callbacks are made when the signal arms are selected or deselected
 #------------------------------------------------------------------------------------
 
 class semaphore_signal_arms():
@@ -194,7 +234,9 @@ class semaphore_signal_arms():
                                 sig_arms_updated_callback=sig_arms_updated,
                                 sub_arms_updated_callback=subs_arms_updated,
                                 dist_arms_updated_callback=dist_arms_updated)
-        # The signal arm for the main route cannot be deselected
+        # The signal arm for the main route cannot be deselected so we need to
+        # set the value and then disable the base tkinter widget (we can't use
+        # the disable function as this would also 'blank' the checkbox)
         self.main.sig.CB.set_value(True)
         self.main.sig.CB.config(state="disabled")
              
@@ -203,29 +245,41 @@ class semaphore_signal_arms():
                     and self.rh1.validate() and self.rh2.validate())
 
     def enable_diverging_routes(self):
-        # only enable/disable the diverging routes (the main route is always selected)
         self.lh1.enable_route()
         self.lh2.enable_route()
         self.rh1.enable_route()
         self.rh2.enable_route()
     
     def disable_diverging_routes(self):
-        # only enable/disable the diverging routes the main arm is always selected
         self.lh1.disable_route()
         self.lh2.disable_route()
         self.rh1.disable_route()
         self.rh2.disable_route()
 
-    def enable_signal(self):
-        # Only enable the main signal arm (other arms are enabled above)
+    def enable_main_route(self):
+        # Enable the main signal route. Note that when the route is enabled
+        # the main signal arm is always selected (and cannot be de-selected)
         self.main.sig.CB.set_value(True)
-        self.main.sig.enable()
+        self.main.enable_route()
         self.main.sig.CB.config(state="disabled")
 
-    def disable_signal(self):
-        # Only disable the main signal arm (other arms are disabled above)
-        self.main.sig.disable()
-        
+    def disable_main_route(self):
+        self.main.disable_route()
+
+    def enable_subsidaries(self):
+        self.main.enable_subsidary()
+        self.lh1.enable_subsidary()
+        self.lh2.enable_subsidary()
+        self.rh1.enable_subsidary()
+        self.rh2.enable_subsidary()
+    
+    def disable_subsidaries(self):
+        self.main.disable_subsidary()
+        self.lh1.disable_subsidary()
+        self.lh2.disable_subsidary()
+        self.rh1.disable_subsidary()
+        self.rh2.disable_subsidary()
+
     def enable_distants(self):
         self.main.enable_distant()
         self.lh1.enable_distant()
@@ -234,25 +288,11 @@ class semaphore_signal_arms():
         self.rh2.enable_distant()
     
     def disable_distants(self):
-        self.main.dist.disable()
-        self.lh1.dist.disable()
-        self.lh2.dist.disable()
-        self.rh1.dist.disable()
-        self.rh2.dist.disable()
-
-    def enable_subsidaries(self):
-        self.main.sub.enable()
-        self.lh1.sub.enable()
-        self.lh2.sub.enable()
-        self.rh1.sub.enable()
-        self.rh2.sub.enable()
-    
-    def disable_subsidaries(self):
-        self.main.sub.disable()
-        self.lh1.sub.disable()
-        self.lh2.sub.disable()
-        self.rh1.sub.disable()
-        self.rh2.sub.disable()
+        self.main.disable_distant()
+        self.lh1.disable_distant()
+        self.lh2.disable_distant()
+        self.rh1.disable_distant()
+        self.rh2.disable_distant()
 
     def set_arms(self, signal_arms:[[[bool,int],],]):
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
@@ -361,6 +401,7 @@ class colour_light_aspect(dcc_entry_boxes):
         # Create a frame for this UI element (always packed)
         self.frame = Frame(parent_frame)
         self.frame.pack()
+        # Create the label for the DCC command sequence
         self.label = Label(self.frame, width=12, text=label, anchor='w')
         self.label.pack(side=LEFT)
         # Call the init function of the class we are inheriting from
@@ -378,15 +419,17 @@ class colour_light_aspect(dcc_entry_boxes):
 #    "enable_subsidary" - enables/loads the subsidary signal selection (CB/address)
 #    "disable_subsidary" - disables/clears the subsidary signal selection (CB/address)
 #    "enable_aspects" - enables/loads the dcc command sequences for all aspects
-#    "disable_aspects" - disables/clears the dcc command sequences for all aspects 
+#    "disable_aspects" - disables/clears the dcc command sequences for all aspects
+# The callback is made when the subsidary signal selection is updated
 #------------------------------------------------------------------------------------
 
 class colour_light_aspects():
     def __init__(self, parent_frame, callback=None):
+        # Callback for select/deselect of the subsidary signal
         self.callback = callback
         # Create a label frame (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame,
-                text="DCC commands for Colour Light signal aspects")
+                text="DCC command sequences for Colour Light signal aspects")
         # Create the DCC Entry Elements (packed into the frame by the parent class)
         self.red = colour_light_aspect(self.frame, label="Danger")
         self.grn = colour_light_aspect(self.frame, label="Proceed")
@@ -398,7 +441,7 @@ class colour_light_aspects():
         self.subframe = Frame(self.frame)
         self.subframe.pack()
         self.CB = common.check_box(self.subframe, label="Subsidary signal",   
-                    tool_tip="Select for a subsidary signal",callback=self.sub_updated)
+                    tool_tip="Select to include a seperate subsidary signal",callback=self.sub_updated)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.EB = common.dcc_entry_box(self.subframe)
         self.EB.pack(side=LEFT, padx=2, pady=2)
@@ -520,14 +563,16 @@ class theatre_route_entry_box(common.entry_box):
 class theatre_route_element(dcc_entry_boxes):
     def __init__(self, parent_frame, label:str, width:int, callback=None,
                                 enable_addresses_on_selection:bool=False):
-        self.callback = callback
-        # The MAIN entry elements will always have the DCC address entries enabled
-        # The DARK  elements will only be enabled if the signal doesn't support auto inhibit
-        # Other DCC address entries will only be enabled if the route is enabled
-        self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create a frame for this UI element (always packed in the parent frame)
         self.frame = Frame(parent_frame)
         self.frame.pack()
+        # Callback to make when the route selections change (Theatre Char EB changes)
+        self.callback = callback
+        # If the enable_addresses_on_selection flag is set to TRUE then the DCC address EBs
+        # will be enabled/disabled when the Theatre character is changed. If false then the current
+        # state of the EBs (enabled or disabled) remains unchanged. This is to support the MAIN
+        # route which will always need a DCC address sequence even if there is no Theartre character
+        self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create the label and entry box for the theatre character
         self.label = Label(self.frame, width=width, text=label, anchor='w')
         self.label.pack(side=LEFT)
@@ -548,6 +593,7 @@ class theatre_route_element(dcc_entry_boxes):
             else: self.disable_addresses()
 
     def validate(self):
+        # Validate the Theatre character EB and all DCC Address EBs
         return (self.EB.validate() and self.validate_addresses())
                     
     def set_theatre(self,theatre:[str,[[int,bool],]]):
@@ -582,6 +628,7 @@ class theatre_route_element(dcc_entry_boxes):
 #    "get_auto_inhibit" - get the "auto inhibit on DANGER" flag for the DCC route indications
 #    "enable_selection" - enables all entries
 #    "disable_selection" - disables all entries
+# The Callback will be made on route selection change (theatre character EB change)
 #------------------------------------------------------------------------------------
 
 class theatre_route_indications:
@@ -590,7 +637,9 @@ class theatre_route_indications:
         # as the frame gets packed/unpacked depending on UI selections
         self.frame = LabelFrame(parent_frame, text="Theatre route indications "+
                                         "and associated DCC command sequences")
-        # Create the DCC Entry Elements (packed into the frame by the parent class)
+        # Create the individual route selection elements.
+        # The MAIN route DCC address EBs remain enabled even if there is no theatre route
+        # The MAIN element is therefore created with enable_addresses_on_selection=False
         self.dark = theatre_route_element(self.frame, label="(Dark)", width=5,
                     callback=callback, enable_addresses_on_selection=True)
         self.main = theatre_route_element(self.frame, label="MAIN", width=5,
@@ -603,12 +652,13 @@ class theatre_route_indications:
                     callback=callback, enable_addresses_on_selection=True)
         self.rh2 = theatre_route_element(self.frame, label="RH2", width=5,
                     callback=callback, enable_addresses_on_selection=True)
-        # Inhibit the Selection box / entry box for the "Dark" aspect - always deselected as no indication
+        # The EB for DARK (signal at red - no route indications displyed) is always
+        # disabled so it can never be selected (not really a route indication as such)
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit selection
         self.CB = common.check_box(self.frame, label="Auto inhibit route indications on DANGER",
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
-                            "inhibits route indications if the signal is at DANGER otherwise the DCC " +
+                            "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB.pack(padx=2, pady=2) 
 
@@ -617,6 +667,7 @@ class theatre_route_indications:
         else: self.dark.enable_addresses()
 
     def validate(self):
+        # Validate all the Theatre EBs and DCC Address entry boxes for all routes and DARK
         return ( self.dark.validate() and
                  self.main.validate() and
                  self.lh1.validate() and
@@ -650,27 +701,30 @@ class theatre_route_indications:
                  self.rh2.get_theatre() ] )
     
     def enable_selection(self):
-        # Enabling of the "dark" DCC address boxes will depend on the state of the
-        # auto inhibit checkbox (the "dark" checkbox remains disabled - always selected)
-        self.auto_inhibit_update()
-        self.main.enable_selection()
-        # Enable the main route DCC Addresses (not updated with the selection)
-        self.main.enable_addresses()
+        # Enable the Theatre EBs for diverging routes (will also enable the address EBs)        
         self.lh1.enable_selection()
         self.lh2.enable_selection()
         self.rh1.enable_selection()
         self.rh2.enable_selection()
+        # The DCC Address EBs for MAIN are enabled even if no theatre character is selected
+        self.main.enable_addresses()
+        self.main.enable_selection()
+        # Enable the "auto inhibit route" CB
         self.CB.enable()
+        # Enabling of the "dark" DCC address EBs will depend on the state of the
+        # auto inhibit checkbox (the "dark" Theatre EB remains disabled and blank)
         self.auto_inhibit_update()
 
     def disable_selection(self):
-        # We only need to disable the "dark" DCC addresses - checkbox is always disabled)
+        # Only disable the "dark" DCC address EBs (the CB is always disabled)
         self.dark.disable_addresses()
+        # Disable the CBs for all routes (will also disable the address EBs)
         self.main.disable_selection()
         self.lh1.disable_selection()
         self.lh2.disable_selection()
         self.rh1.disable_selection()
         self.rh2.disable_selection()
+        # Disable the "auto inhibit route" CB
         self.CB.disable()
 
     def set_auto_inhibit(self, auto_inhibit:bool):
@@ -679,7 +733,7 @@ class theatre_route_indications:
         
     def get_auto_inhibit(self):
         return(self.CB.get_value())
-    
+
 #------------------------------------------------------------------------------------
 # Class to create Feather route indication with a check box to enable the route indication
 # and the associated DCC command sequence. Inherits from the dcc_entry_boxes class (above)
@@ -699,14 +753,16 @@ class theatre_route_indications:
 class feather_route_element(dcc_entry_boxes):
     def __init__(self, parent_frame, label:str, width:int, callback=None,
                           enable_addresses_on_selection=False):
-        self.callback = callback
-        # The MAIN entry elements will always have the DCC address entries enabled
-        # The DARK  elements will only be enabled if the signal doesn't support auto inhibit
-        # Other DCC address entries will only be enabled if the route is enabled
-        self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create a frame for this UI element (always packed in the parent frame)
         self.frame = Frame(parent_frame)
         self.frame.pack()
+        # Callback to make when the route selections change (enabled/disabled)
+        self.callback = callback
+        # If the enable_addresses_on_selection flag is set to TRUE then the DCC address EBs
+        # will be enabled/disabled when the route checkbox is changed. If false then the current
+        # state of the EBs (enabled or disabled) remains unchanged. This is to support the MAIN
+        # route which will always need a DCC address sequence even if there is no feather
+        self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create the label and checkbox for the feather route selection
         self.label = Label(self.frame, width=width, text=label, anchor='w')
         self.label.pack(side=LEFT)
@@ -753,10 +809,11 @@ class feather_route_element(dcc_entry_boxes):
 #    "get_addresses" - return a list of the "validated" DCC addresses/states
 #    "set_feathers" - set the state of the feathers [main,lh1,lh2,rh1,rh2]
 #    "get_feathers" - get the state of the feathers [main,lh1,lh2,rh1,rh2]
-#    "set_auto_inhibit" - set the "auto inhibit on DANGER" flag fro the DCC route indications
-#    "get_auto_inhibit" - get the "auto inhibit on DANGER" flag fro the DCC route indications
+#    "set_auto_inhibit" - set the "auto inhibit on DANGER" selection
+#    "get_auto_inhibit" - get the "auto inhibit on DANGER" selection
 #    "enable_feathers" - enables all entries
 #    "disable_feathers" - disables all entries
+# The Callback will be made on route selection change (enabled/disabled)
 #------------------------------------------------------------------------------------
 
 class feather_route_indications:
@@ -765,7 +822,9 @@ class feather_route_indications:
         # as the frame gets packed/unpacked depending on UI selections
         self.frame = LabelFrame(parent_frame, text="Feather Route Indications "+
                                         "and associated DCC command sequences")
-        # Create the individual route selection elements
+        # Create the individual route selection elements.
+        # The MAIN route DCC address EBs remain enabled even if there is no route feather
+        # The MAIN element is therefore created with enable_addresses_on_selection=False
         self.dark = feather_route_element(self.frame, label="(Dark)", width=5,
                             callback=callback, enable_addresses_on_selection=True)
         self.main = feather_route_element(self.frame, label="MAIN", width=5,
@@ -778,12 +837,13 @@ class feather_route_indications:
                             callback=callback, enable_addresses_on_selection=True)
         self.rh2 = feather_route_element(self.frame, label="RH2", width=5,
                             callback=callback, enable_addresses_on_selection=True)
-        # Inhibit the Selection box / entry box for the "Dark" aspect - always deselected as no indication
+        # The CB for DARK (signal at red - no route indications displyed) is always
+        # disabled so it can never be selected (not really a route indication as such)
         self.dark.disable_selection()
         # Create the checkbox and tool tip for auto route inhibit
         self.CB = common.check_box(self.frame, label="Auto inhibit route indications on DANGER",
                     callback=self.auto_inhibit_update, tool_tip = "Select if the DCC signal automatically " +
-                            "inhibits route indications if the signal is at DANGER otherwise the DCC " +
+                            "inhibits route indications if the signal is at DANGER - If not then the DCC " +
                             "commands to inhibit all route indications (dark) must be specified")
         self.CB.pack(padx=2, pady=2) 
 
@@ -792,6 +852,7 @@ class feather_route_indications:
         else: self.dark.enable_addresses()
 
     def validate(self):
+        # Validate all the DCC Address entry boxes for all routes and DARK
         return ( self.dark.validate() and
                  self.main.validate() and
                  self.lh1.validate() and
@@ -801,7 +862,7 @@ class feather_route_indications:
     
     def set_addresses(self, addresses:[[[int,bool],],]):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
-        # Each route element comprises: [character, DCC_command_sequence]
+        # Each route element comprises: [DCC_command_sequence]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
         self.dark.set_addresses(addresses[0])
@@ -813,7 +874,7 @@ class feather_route_indications:
         
     def get_addresses(self):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
-        # Each route element comprises: [character, DCC_command_sequence]
+        # Each route element comprises: [DCC_command_sequence]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
         return( [self.dark.get_addresses(),
@@ -825,7 +886,7 @@ class feather_route_indications:
                 
     def set_feathers(self,feathers:[bool,bool,bool,bool,bool]):
         # Feather Route list comprises: [main, lh1, lh2, rh1, rh2]
-        # Each  element comprises a single boolean value
+        # Each element comprises a single boolean value
         self.main.set_feather(feathers[0])
         self.lh1.set_feather(feathers[1])
         self.lh2.set_feather(feathers[2])
@@ -835,7 +896,7 @@ class feather_route_indications:
     
     def get_feathers(self):
         # Feather Route list comprises: [main, lh1, lh2, rh1, rh2]
-        # Each  element comprises a single boolean value
+        # Each element comprises a single boolean value
         return( [ self.main.get_feather(),
                   self.lh1.get_feather(),
                   self.lh2.get_feather(),
@@ -843,27 +904,30 @@ class feather_route_indications:
                   self.rh2.get_feather() ] )
     
     def enable_selection(self):
-        # Enabling of the "dark" DCC address boxes will depend on the state of the auto
-        # inhibit checkbox (the "dark" checkbox remains disabled but always selected)
-        self.auto_inhibit_update()
-        self.main.enable_selection()
+        # Enable the CBs for diverging routes (will also enable the address EBs)        
         self.lh1.enable_selection()
         self.lh2.enable_selection()
         self.rh1.enable_selection()
         self.rh2.enable_selection()
-        # Enable the main route DCC Addresses (not updated with the selection)
+        # The DCC Address EBs for MAIN are enabled even if no feather is selected
+        self.main.enable_selection()
         self.main.enable_addresses()
+        # Enable the "auto inhibit route" CB
         self.CB.enable()
+        # Enabling of the "dark" DCC address EBs will depend on the state of the
+        # auto inhibit checkbox (the "dark" CB remains disabled and unselected)
         self.auto_inhibit_update()
         
     def disable_selection(self):
-        # We only need to disable the "dark" DCC addresses - checkbox is always disabled)
+        # Only disable the "dark" DCC address EBs (the CB is always disabled)
         self.dark.disable_addresses()
+        # Disable the CBs for all diverging routes (will also disable the address EBs)
         self.main.disable_selection()
         self.lh1.disable_selection()
         self.lh2.disable_selection()
         self.rh1.disable_selection()
         self.rh2.disable_selection()
+        # Disable the "auto inhibit route" CB
         self.CB.disable()
 
     def set_auto_inhibit(self, auto_inhibit:bool):
@@ -874,12 +938,15 @@ class feather_route_indications:
         return(self.CB.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for the subsidary route selections UI Element (also usedto set the routes 
-# enabled for ground signals_. Class instance functions to use externally are:
+# Class for the 'basic' route selections UI Element for the main signal (if no specific
+# route indications are selected) and the subsidary signal (if one exists). If the class
+# is created for a main signal (or ground signal) then the main route is always selected.
+# Class instance functions to use externally are:
 #    "enable" - disables/blanks the route selection check boxes
 #    "disable"  enables/loads the route selection check boxes
 #    "set_values" - sets the Route Selection Checkboxes
 #    "get_values" - return the states of the Route Selection Checkboxes
+# The Callback will be made on route selection change (enabled/disabled)
 #------------------------------------------------------------------------------------
 
 class route_selections():
@@ -937,12 +1004,14 @@ class route_selections():
 
 #------------------------------------------------------------------------------------
 # Class for the Edit Signal Window Configuration Tab
+# sig_type_updated, sub_type_updated, route_type_updated, route_selections_updated,
+# sig_routes_updated, sub_routes_updated, dist_routes_updated are callback functions
 #------------------------------------------------------------------------------------
 
 class signal_configuration_tab:
     def __init__(self, parent_tab, sig_type_updated, sub_type_updated,
-                route_type_updated, route_selections_updated, sig_selections_updated,
-                sub_selections_updated, dist_selections_updated):
+                route_type_updated, route_selections_updated, sig_routes_updated,
+                sub_routes_updated, dist_routes_updated):
         # Create a Frame for the Sig ID and Signal Type Selections (always packed)
         self.frame1 = Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
@@ -953,7 +1022,7 @@ class signal_configuration_tab:
                     "Select signal type",sig_type_updated,"Colour Light",
                         "Ground Pos","Semaphore","Ground Disc")
         self.sigtype.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
-        # Create the UI Element for Signal subtype selection (always packed
+        # Create the UI Element for Signal subtype selection (always packed)
         self.subtype = common.selection_buttons(parent_tab,"Signal Subtype",
                     "Select signal subtype",sub_type_updated,"-","-","-","-","-")
         self.subtype.frame.pack(padx=2, pady=2, fill='x')
@@ -966,29 +1035,21 @@ class signal_configuration_tab:
                     "Select the route indications for the main signal", route_type_updated,
                     "None", "Route feathers", "Theatre indicator", "Route arms")
         self.routetype.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
-        # Create the Checkboxes and DCC Entry Boxes for the Aspects and routes
-        # Packed / hidden depending on signal types and route type selections
-        self.aspects = colour_light_aspects(parent_tab, sub_selections_updated)
+        # Create the Checkboxes and DCC Entry Box frames for the type-specific selections
+        # These frames are packed / hidden depending on the signal type and route 
+        # indication type selections by the callback functions in "configure_signal.py"
+        self.aspects = colour_light_aspects(parent_tab, sub_routes_updated)
         self.theatre = theatre_route_indications(parent_tab, route_selections_updated)
         self.feathers = feather_route_indications(parent_tab, route_selections_updated)
-        self.semaphores = semaphore_signal_arms(parent_tab, sig_selections_updated,
-                                        sub_selections_updated, dist_selections_updated)
+        self.semaphores = semaphore_signal_arms(parent_tab, sig_routes_updated,
+                                        sub_routes_updated, dist_routes_updated)
         self.sig_routes = route_selections(parent_tab, 
                         "Routes to be controlled by the Main Signal",
-                        "Select one or more routes to be controlled by the signal",
+                        "Select the routes to be controlled by the main signal",
                         callback=route_selections_updated, main_signal=True)
         self.sub_routes = route_selections(parent_tab,
                         "Routes to be controlled by the Subsidary Signal",
-                        "Select one or more routes to be controlled by the subsidary signal",
+                        "Select the routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
         
-########################## TEST ###############################################
-#         self.aspects.frame.pack(padx=2, pady=2, fill='x')
-#         self.semaphores.frame.pack(padx=2, pady=2, fill='x')
-#         self.theatre.frame.pack(padx=2, pady=2, fill='x')
-#         self.feathers.frame.pack(padx=2, pady=2, fill='x')
-#         self.sig_routes.frame.pack(padx=2, pady=2, fill='x')
-#         self.sub_routes.frame.pack(padx=2, pady=2, fill='x')
-########################## TEST ###############################################
-
 #############################################################################################

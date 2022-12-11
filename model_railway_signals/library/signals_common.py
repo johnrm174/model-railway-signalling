@@ -101,7 +101,7 @@ def null_callback (sig_id:int,callback_type):
 
 def signal_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Signal Change Button Event ***************************************")
+    logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
     # toggle the signal state and refresh the signal
     toggle_signal(sig_id)
     auto_refresh_signal(sig_id)
@@ -111,7 +111,7 @@ def signal_button_event (sig_id:int):
 
 def subsidary_button_event (sig_id:int):
     global logging
-    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event ************************************")
+    logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event **********************************************")
     toggle_subsidary(sig_id)
     #  call the signal type-specific functions to update the signal
     if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
@@ -129,6 +129,10 @@ def sig_passed_button_event (sig_id:int):
     if not common.shutdown_initiated:
         signals[str(sig_id)]["passedbutton"].config(bg="red")
         common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+    # Reset the approach control 'released' state (if the signal supports approach control)
+    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+        signals[str(sig_id)]["released"] = False
     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
     # mqtt interface has been successfully configured and the signal has been set to publish passed events
     publish_signal_passed_event(sig_id)
@@ -143,6 +147,10 @@ def approach_release_button_event (sig_id:int):
     if not common.shutdown_initiated:
         signals[str(sig_id)]["releasebutton"].config(bg="red")
         common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+    # Set the approach control 'released' state (if the signal supports approach control)
+    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+        signals[str(sig_id)]["released"] = True
     # Clear the approach control and refresh the signal
     clear_approach_control(sig_id)
     auto_refresh_signal(sig_id)
@@ -214,22 +222,25 @@ def toggle_subsidary (sig_id:int):
 # (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
-def set_approach_control (sig_id:int, release_on_yellow:bool = False):
+def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
     global logging
     global signals
-    # Only set approach control if it is not already set for the signal
-    if ( (release_on_yellow and not signals[str(sig_id)]["releaseonyel"] ) or
-         (not release_on_yellow and not signals[str(sig_id)]["releaseonred"]) ):
-        # give an indication that the approach control has been set for the signal
+    # Only set approach control if the signal is not in the period between 
+    # 'released' and 'passed' events (unless the force_reset flag is set)
+    if force_set or not signals[str(sig_id)]["released"]:
+        # Give an indication that the approach control has been set for the signal
         signals[str(sig_id)]["sigbutton"].config(font=('Courier',common.fontsize,"underline"))
-        if release_on_yellow:
+        # Only set approach control if it is not already set for the signal
+        if release_on_yellow and not signals[str(sig_id)]["releaseonyel"]:
             logging.info ("Signal "+str(sig_id)+": Setting approach control (release on yellow)")
             signals[str(sig_id)]["releaseonyel"] = True
             signals[str(sig_id)]["releaseonred"] = False
-        else:
+        elif not release_on_yellow and not signals[str(sig_id)]["releaseonred"]:
             logging.info ("Signal "+str(sig_id)+": Setting approach control (release on red)")
             signals[str(sig_id)]["releaseonred"] = True
             signals[str(sig_id)]["releaseonyel"] = False
+        # Reset the signal into it's 'not released' state
+        signals[str(sig_id)]["released"] = False
     return()
 
 #-------------------------------------------------------------------------
@@ -361,12 +372,11 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0):
+                                   distant_button_offset:int=0,
+                                   tag:str=""):
     global signals
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
-    # Define the "Tag" for all drawing objects for this signal instance
-    tag = "signal"+str(sig_id)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
     # Assign the button labels. if a distant_button_offset has been defined then this represents the 
@@ -453,6 +463,7 @@ def create_approach_control_elements (canvas,sig_id:int,
     else:
         window = canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
+    signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releasebutton"] = approach_release_button   # SHARED - Button drawing object

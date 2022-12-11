@@ -196,7 +196,6 @@ create_semaphore_signal - Creates a Semaphore signal
       x:int, y:int - Position of the signal on the canvas (in pixels) 
   Optional Parameters:
       signal_subtype - subtype of signal - default = semaphore_sub_type.home
-      distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
       associated_home:int - Option only valid when creating distant signals - Provide the ID of
                             a previously created home signal (and use the same x and y coords)
                             to create the distant signal on the same post as the home signal 
@@ -236,8 +235,6 @@ create_ground_position_signal - create a ground position light signal
       sig_callback:name - Function to call when a signal event happens - default = None
                         Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button - default =False
-      shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
-      modern_type: bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 
 create_ground_disc_signal - Creates a ground disc type signal
   Mandatory Parameters:
@@ -250,7 +247,6 @@ create_ground_disc_signal - Creates a ground disc type signal
       sig_callback:name - Function to call when a signal event happens - Default = none
                         Note that the callback function returns (item_id, callback type)
       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
-      shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 
 set_route - Set (and change) the route indication (either feathers or theatre text)
   Mandatory Parameters:
@@ -282,17 +278,17 @@ lock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be speci
 
 unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 
-signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
-                           signal manual control button (True='OFF', False = 'ON'). If a route
-                           is specified then the function also tests against the specified route
+signal_clear - returns the SWITCHED state of the signal - i.e the state of the 
+               signal manual control button (True='OFF', False = 'ON'). If a route
+               is specified then the function also tests against the specified route
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 
-subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
-                           signal manual control button (True='OFF', False = 'ON'). If a route
-                           is specified then the function also tests against the specified route
+subsidary_clear - returns the SWITCHED state of the subsidary  i.e the state of the 
+                  signal manual control button (True='OFF', False = 'ON'). If a route
+                  is specified then the function also tests against the specified route
   Mandatory Parameters:
       sig_id:int - The ID for the signal
   Optional Parameters:
@@ -332,19 +328,13 @@ set_approach_control - Normally used when a diverging route has a lower speed re
       sig_id:int - The ID for the signal
   Optional Parameters:
       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
+      force_set:Bool - If False then this function will have no effect in the period between
+                      the signal being 'released' and the signal being 'passed' (default True)
 
 clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
             Signals are also automatically released when the"release button" (displayed just 
             in front of the signal if specified when the signal was created) is activated,
             either manually or via an external sensor event.
-
-signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
-                                 Function DEPRECATED (will be removed from future releases)
-                                 use "signal_state" function to get the state of the signal
-
-approach_control_set (sig_id:int) - returns the signal approach control state (True='active')
-                                 Function DEPRECATED (will be removed from future releases)
-                                 use "signal_state" function to get the state of the signal
 </pre>
 
 ## Track Occupancy
@@ -379,10 +369,16 @@ set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' i
       section_id:int - The ID to be used for the section 
   Optional Parameters:
       label:str - An updated label to display when occupied (Default = No Change)
+      publish:bool - Publish updates via MQTT Broker (Default = True)
 
-clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-                  Returns the current value of the Section Lable (as a string) to allow this
-                  to be 'passed' to the next section (via the set_section_occupied function)  
+clear_section_occupied - Sets the section to "CLEAR" (and updates the 'label' if required)
+          Returns the current value of the Section Lable (as a string) to allow this
+          to be 'passed' to the next section (via the set_section_occupied function)  
+  Mandatory Parameters:
+      section_id:int - The ID to be used for the section 
+  Optional Parameters:
+      label:str - An updated label to display when occupied (Default = No Change)
+      publish:bool - Publish updates via MQTT Broker (Default = True)
 </pre>
 
 ## Track Sensors
@@ -678,7 +674,6 @@ configure_networking - Configures the local client and opens a connection to the
       broker_port:int - The network port for the broker host (default = 1883)
       broker_username:str - the username to log into the MQTT Broker (default = None)
       broker_password:str - the password to log into the MQTT Broker (default = None)
-      publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands'
       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
 
 set_node_to_publish_dcc_commands - Enables publishing of DCC commands to other network nodes

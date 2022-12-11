@@ -153,7 +153,8 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                        orientation = orientation,
                                        subsidary = position_light,
                                        sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic)
+                                       automatic = fully_automatic,
+                                       tag = sig_id_tag)
 
         # Create the signal elements for a Theatre Route indicator
         signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=offset+80, yoff = -20,
@@ -184,6 +185,11 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.signals[str(sig_id)]["rhf45"] = rhf45                             # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rhf90"] = rhf90                             # Type-specific - drawing object
 
+        # Create the timed sequence class instances for the signal (one per route)
+        signals_common.signals[str(sig_id)]["timedsequence"] = []
+        for route in signals_common.route_type:
+            signals_common.signals[str(sig_id)]["timedsequence"].append(timed_sequence(sig_id,route))
+            
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
@@ -247,11 +253,13 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
 
     global logging
 
+    route = signals_common.signals[str(sig_id)]["routeset"]
+    
     # ---------------------------------------------------------------------------------
     #  First deal with the Signal ON, Overridden or "Release on Red" cases
     #  as they will apply to all colour light signal types (2, 3 or 4 aspect)
     # ---------------------------------------------------------------------------------
-    
+
     # If signal is set to "ON" then its DANGER (or CAUTION if its a 2 aspect distant)
     if not signals_common.signals[str(sig_id)]["sigclear"]:
         if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
@@ -265,6 +273,11 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
     elif signals_common.signals[str(sig_id)]["override"]:
         new_aspect = signals_common.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
+
+    # If signal is triggered on a timed sequence then set to the sequence aspect
+    elif signals_common.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
+        new_aspect = signals_common.signals[str(sig_id)]["timedsequence"][route.value].aspect
+        log_message = " (signal is on a timed sequence)"
 
     # Set to DANGER if the signal is subject to "Release on Red" approach control
     # Note that this state should never apply to 2 aspect distant signals
@@ -469,7 +482,10 @@ def update_feather_route_indication (sig_id:int,route_to_set):
                 # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
                 dcc_control.update_dcc_signal_route (sig_id, signals_common.signals[str(sig_id)]["routeset"],
                                                         signal_change = False, sig_at_danger = True)
-         # Update the feathers on the display
+            # Refresh the signal aspect (a catch-all to ensure the signal displays the correct aspect
+            # in case the signal is in the middle of a timed sequence for the old route or the new route
+            if signals_common.signals[str(sig_id)]["refresh"]: update_colour_light_signal(sig_id)
+        # Update the feathers on the display
         update_feathers(sig_id)
     return()
 
@@ -527,102 +543,124 @@ def update_feathers(sig_id:int):
     return()
 
 # -------------------------------------------------------------------------
-# Function to 'override' a colour light signal (changing it to RED) and then
-# cycle through all of the supported aspects all the way back to GREEN - when the
-# override will be cleared - intended for automation of 'exit' signals on a layout
-# The start_delay is the initial delay (in seconds) before the signal is changed to RED
-# the time_delay is the delay (in seconds) between each aspect change
-# A 'sig_passed' callback event will be generated when the signal is overriden if
-# and only if a start delay (> 0) is specified. For each subsequent aspect change
-# a'sig_updated' callback event will be generated
+# Class for a timed signal sequence. A class instance is created for each
+# route for each signal. When a timed signal is triggered the existing
+# instance is first aborted. A new instance is then created/started
+# -------------------------------------------------------------------------
+
+class timed_sequence():
+    def __init__(self, sig_id:int, route, start_delay:int=0, time_delay:int=0):
+        self.sig_id = sig_id
+        self.sig_route = route
+        self.aspect = signals_common.signals[str(sig_id)]["overriddenaspect"]
+        self.start_delay = start_delay
+        self.time_delay = time_delay
+        self.sequence_abort_flag = False
+        self.sequence_in_progress = False
+
+    def abort(self):
+        self.sequence_abort_flag = True
+            
+    def start(self):
+        global logging
+        if self.sequence_abort_flag:
+            self.sequence_in_progress = False
+        else:
+            self.sequence_in_progress = True
+            # For a start delay of zero we assume the intention is not to make a callback (on the basis
+            # that the user has triggered the timed signal in the first place). For start delays > 0 the 
+            # sequence is initiated after the specified delay and this will trigger a callback
+            # Note that we only change the aspect and generate the callback if the same route is set
+            if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                if self.start_delay > 0: 
+                    logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
+                    # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
+                    update_colour_light_signal(self.sig_id)
+                    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
+                    # mqtt interface has been successfully configured and the signal has been set to publish passed events
+                    signals_common.publish_signal_passed_event(self.sig_id)
+                    signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_passed)
+                else:
+                    update_colour_light_signal(self.sig_id)
+            # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
+            if signals_common.signals[str(self.sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
+                common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_yellow())
+            else:
+                common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
+
+    def timed_signal_sequence_yellow(self):
+        global logging
+        if self.sequence_abort_flag:
+            self.sequence_in_progress = False
+        else:
+            # This sequence step only applicable to 3 and 4 aspect signals
+            self.aspect = signals_common.signal_state_type.CAUTION
+            # Only change the aspect and generate the callback if the same route is set
+            if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+                update_colour_light_signal(self.sig_id)
+                signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
+            # We only need to schedule the next DOUBLE YELLOW aspect for 4 aspect signals - otherwise schedule sequence completion
+            if signals_common.signals[str(self.sig_id)]["subtype"] == signal_sub_type.four_aspect:
+                common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_double_yellow())
+            else:
+                common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
+    
+    def timed_signal_sequence_double_yellow(self):
+        global logging
+        if self.sequence_abort_flag:
+            self.sequence_in_progress = False
+        else:
+            # This sequence step only applicable to 4 aspect signals
+            self.aspect = signals_common.signal_state_type.PRELIM_CAUTION
+            # Only change the aspect and generate the callback if the same route is set
+            if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+                update_colour_light_signal(self.sig_id)
+                signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
+            # Schedule the next aspect change (which will be the sequence completion)
+            common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
+    
+    def timed_signal_sequence_end(self): 
+        global logging
+        # We've finished - Set the signal back to its "normal" condition
+        self.sequence_in_progress = False
+        if not self.sequence_abort_flag:
+            # Only change the aspect and generate the callback if the same route is set
+            if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
+                logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
+                update_colour_light_signal(self.sig_id)
+                signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
+
+# -------------------------------------------------------------------------
+# Function to initiate a timed signal sequence - setting the signal to RED and then
+# cycling through all of the supported aspects all the way back to GREEN (or YELLOW
+# in the case of a RED/YELLOW 2-aspect signal). Intended for automation of 'exit' 
+# signals on a layout. The start_delay is the initial delay (in seconds) before the 
+# signal is changed to RED and the time_delay is the delay (in seconds) between each 
+# aspect change. A 'sig_passed' callback event will be generated when the signal is 
+# overriden if a start delay (> 0) is specified. For each subsequent aspect change
+# a 'sig_updated' callback event will be generated.
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-        
-    def timed_signal_sequence_start(start_delay, time_delay):
-        global logging
-        
-        # Ensure the Overridden aspect is set correctly before we start
-        if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
-        else:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
-            
-        # Override the signal (to display its overridden aspect
-        signals_common.signals[str(sig_id)]["override"] = True
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="red",disabledforeground="red")
-        
-        # If a start delay of zero has been specified then we assume the intention is not to make any callbacks
-        # to the external code (on the basis that it would have been the external code that triggered the timed
-        # signal in the first place. For this particular case, we override the signal before starting the sequence
-        # to ensure deterministic behavior (for start delays > 0 the signal is Overriden after the specified start
-        # delay and this will trigger a callback to be handled by the external code)
-        if start_delay > 0:
-            logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Passed Event **************************")
-            # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
-            update_colour_light_signal(sig_id)
-            # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
-            # mqtt interface has been successfully configured and the signal has been set to publish passed events
-            signals_common.publish_signal_passed_event(sig_id)
-            signals_common.signals[str(sig_id)]["extcallback"] (sig_id,signals_common.sig_callback_type.sig_passed)
-        else:
-            update_colour_light_signal(sig_id)
-            
-        # We only need to schedule the next YELLOW aspect for 3 and 4 aspect signals - otherwise schedule sequence completion
-        if signals_common.signals[str(sig_id)]["subtype"] in (signal_sub_type.three_aspect, signal_sub_type.four_aspect):
-            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_yellow(time_delay))
-        else:
-            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
-        return()
-
-    def timed_signal_sequence_yellow (time_delay):
-        global logging
-        # This sequence step only applicable to 3 and 4 aspect signals
-        signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
-        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        update_colour_light_signal(sig_id)
-        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-        # We only need to schedule the next DOUBLE YELLOW aspect for 4 aspect signals - otherwise schedule sequence completion
-        if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.four_aspect:
-            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_double_yellow(time_delay))
-        else:
-            common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
-        return()
-    
-    def timed_signal_sequence_double_yellow (time_delay):
-        global logging
-        # This sequence step only applicable to 4 aspect signals
-        signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.PRELIM_CAUTION
-        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        update_colour_light_signal(sig_id)
-        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-        # Schedule the next aspect change (which will be the sequence completion)
-        common.root_window.after(time_delay*1000,lambda:timed_signal_sequence_end())
-        return()
-    
-    def timed_signal_sequence_end(): 
-        global logging
-        # We've finished - Clear the signal override and set the Overriden aspect back to its initial condition
-        signals_common.signals[str(sig_id)]["override"] = False
-        signals_common.signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
-        if signals_common.signals[str(sig_id)]["subtype"] == signal_sub_type.distant:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.CAUTION
-        else:
-            signals_common.signals[str(sig_id)]["overriddenaspect"] = signals_common.signal_state_type.DANGER
-        logging.info("Signal "+str(sig_id)+": Timed Signal - Signal Updated Event *************************")
-        update_colour_light_signal(sig_id)
-        signals_common.signals[str(sig_id)]["extcallback"] (sig_id, signals_common.sig_callback_type.sig_updated)
-        return()
+    global logging
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
     else:
+        # Abort any timed signal sequences already in progess
+        route = signals_common.signals[str(sig_id)]["routeset"]
+        signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
+        # Create a new instnce of the time signal class - this should have the effect of "destroying"
+        # the old instance when it goes out of scope, leaving us with the newly created instance
+        signals_common.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
         # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
         # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
         if start_delay > 0:
-            common.root_window.after(start_delay*1000,lambda:timed_signal_sequence_start(start_delay,time_delay))
+            common.root_window.after(start_delay*1000,
+                    lambda:signals_common.signals[str(sig_id)]["timedsequence"][route.value].start())
         else:
-            timed_signal_sequence_start(start_delay, time_delay)
-    return()
+            signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
 
 ###############################################################################

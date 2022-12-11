@@ -33,10 +33,16 @@
 #       section_id:int - The ID to be used for the section 
 #   Optional Parameters:
 #       label:str - An updated label to display when occupied (Default = No Change)
+#       publish:bool - Publish updates via MQTT Broker (Default = True)
 # 
-# clear_section_occupied (section_id:int) - Sets the specified section to "CLEAR"
-#                   Returns the current value of the Section Lable (as a string) to allow this
-#                   to be 'passed' to the next section (via the set_section_occupied function)  
+# clear_section_occupied - Sets the section to "CLEAR" (and updates the 'label' if required)
+#           Returns the current value of the Section Lable (as a string) to allow this
+#           to be 'passed' to the next section (via the set_section_occupied function)  
+#   Mandatory Parameters:
+#       section_id:int - The ID to be used for the section 
+#   Optional Parameters:
+#       label:str - An updated label to display when occupied (Default = No Change)
+#       publish:bool - Publish updates via MQTT Broker (Default = True)
 # 
 # ------------------------------------------------------------------------------------------
 #
@@ -110,7 +116,7 @@ def section_exists(section_id:int):
 
 def section_button_event (section_id:int):
     global logging
-    logging.info ("Section "+str(section_id)+": Track Section Toggled *******************************************")
+    logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
     toggle_section(section_id)
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
@@ -307,7 +313,7 @@ def section_label (section_id:Union[int,str]):
 # Public API function to Set a section to OCCUPIED (and optionally update the label)
 # -------------------------------------------------------------------------
 
-def set_section_occupied (section_id:int,label:str=None):
+def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
@@ -321,33 +327,41 @@ def set_section_occupied (section_id:int,label:str=None):
             toggle_section(section_id)
             # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            send_mqtt_section_updated_event(section_id)
+            if publish: send_mqtt_section_updated_event(section_id)
         elif label is not None and sections[str(section_id)]["labeltext"] != label:
             # Section state remains unchanged but we need to update the Label
             sections[str(section_id)]["button1"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
             # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
-            send_mqtt_section_updated_event(section_id)
+            if publish: send_mqtt_section_updated_event(section_id)
     return()
 
 # -------------------------------------------------------------------------
 # Public API function to Set a section to CLEAR (returns the label)
 # -------------------------------------------------------------------------
 
-def clear_section_occupied (section_id:int):
+def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
     global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
         section_label = ""
     elif section_occupied(section_id):
+        # Need to toggle the section - ALSO update the label if that has been changed
+        if label is not None and sections[str(section_id)]["labeltext"] != label:
+            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["labeltext"]= label
         toggle_section(section_id)
         # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
-        send_mqtt_section_updated_event(section_id)
+        if publish: send_mqtt_section_updated_event(section_id)
         section_label = sections[str(section_id)]["labeltext"]
     else:
+        # Section state remains unchanged but we need to update the Label
+        if label is not None and sections[str(section_id)]["labeltext"] != label:
+            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["labeltext"]= label
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
 
@@ -424,7 +438,12 @@ def send_mqtt_section_updated_event(section_id:int):
 
 def delete_section(section_id:int):
     global sections
+    global entry_box_window
     if section_exists(section_id):
+        # If a text entry box is open then we need to destroy it
+        if entry_box_window is not None:
+            text_entry_box.destroy()
+            sections[str(section_id)]["canvas"].delete(entry_box_window)
         # Delete all the tkinter canvas drawing objects associated with the section
         sections[str(section_id)]["canvas"].delete("section"+str(section_id))
         # Delete all the tkinter button objects created for the section
@@ -434,36 +453,11 @@ def delete_section(section_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving a section object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving sections around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the section
 # ------------------------------------------------------------------------------------------
 
-def move_section(section_id:int,xdiff:int,ydiff:int):
-    if section_exists(section_id):
-        sections[str(section_id)]["canvas"].move("section"+str(section_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the section tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(section_id:int):
-    if section_exists(section_id):
-        bbox=sections[str(section_id)]["canvas"].bbox("section"+str(section_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
-
-def bind_selection_events(section_id:int,object_id, callback):
-    sections[str(section_id)]["button1"].bind('<Motion>',lambda event:callback(event,object_id,event_id=0))
-    sections[str(section_id)]["button1"].bind('<Button-1>',lambda event:callback(event,object_id,event_id=1))
-    sections[str(section_id)]["button1"].bind('<Button-2>',lambda event:callback(event,object_id,event_id=2))
-    sections[str(section_id)]["button1"].bind('<Button-3>',lambda event:callback(event,object_id,event_id=2))
-    sections[str(section_id)]["button1"].bind('<Shift-Button-1>',lambda event:callback(event,object_id,event_id=3))
-    sections[str(section_id)]["button1"].bind('<ButtonRelease-1>',lambda event:callback(event,object_id,event_id=4))
-    sections[str(section_id)]["button1"].bind('<Double-Button-1>',lambda event:callback(event,object_id,event_id=5))
-    return()
+def get_tags(section_id:int):
+    return("section"+str(section_id))
 
 ###############################################################################
 

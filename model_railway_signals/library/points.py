@@ -98,14 +98,14 @@ def null_callback(point_id:int,callback_type):
 
 def fpl_button_event (point_id:int):
     global logging
-    logging.info("Point "+str(point_id)+": FPL Button Event *******************************************")
+    logging.info("Point "+str(point_id)+": FPL Button Event ************************************************************")
     toggle_fpl(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.fpl_switched)
     return ()
 
 def change_button_event (point_id:int):
     global logging
-    logging.info("Point "+str(point_id)+": Change Button Event ****************************************")
+    logging.info("Point "+str(point_id)+": Change Button Event *********************************************************")
     toggle_point(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.point_switched)
     return ()
@@ -458,38 +458,11 @@ def delete_point(point_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving a point object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving points around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the point
 # ------------------------------------------------------------------------------------------
 
-def move_point(point_id:int,xdiff:int,ydiff:int):
-    if point_exists(point_id):
-        points[str(point_id)]["canvas"].move("point"+str(point_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the point tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(point_id:int):
-    if point_exists(point_id):
-        bbox=points[str(point_id)]["canvas"].bbox("point"+str(point_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the point is fully automatic
-# Used by the schematic editor to "abstract" the details of the point object
-# ------------------------------------------------------------------------------------------
-
-def automatic(point_id:int):
-    if point_exists(point_id):
-        automatic = points[str(point_id)]["automatic"]
-    else:
-        automatic = False
-    return(automatic)
+def get_tags(point_id:int):
+    return("point"+str(point_id))
 
 ###############################################################################
 

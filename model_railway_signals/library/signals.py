@@ -139,7 +139,6 @@
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #   Optional Parameters:
 #       signal_subtype - subtype of the signal - default = semaphore_sub_type.home
-#       distant:bool - ####### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 #       associated_home:int - Option only valid when creating distant signals - Provide the ID of
 #                             a previously created home signal (and use the same x and y coords)
 #                             to create the distant signal on the same post as the home signal 
@@ -179,8 +178,6 @@
 #       sig_callback:name - Function to call when a signal event happens - default = None
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - default =False
-#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
-#       modern_type: bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # create_ground_disc_signal - Creates a ground disc type signal
 #   Mandatory Parameters:
@@ -193,7 +190,6 @@
 #       sig_callback:name - Function to call when a signal event happens - Default = none
 #                         Note that the callback function returns (item_id, callback type)
 #       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
-#       shunt_ahead:bool - ###### FLAG DEPRECATED - Use "signal_subtype" parameter instead #######
 # 
 # set_route - Set (and change) the route indication (either feathers or theatre text)
 #   Mandatory Parameters:
@@ -225,17 +221,17 @@
 # 
 # unlock_subsidary(*sig_id:int) - for interlocking (multiple Signal_IDs can be specified)
 # 
-# signal_clear(sig_id:int) - returns the SWITCHED state of the signal - i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). If a route
-#                            is specified then the function also tests against the specified route
+# signal_clear - returns the SWITCHED state of the signal - i.e the state of the 
+#                signal manual control button (True='OFF', False = 'ON'). If a route
+#                is specified then the function also tests against the specified route
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       route:signals_common.route_type - MAIN, LH1, LH2, RH1 or RH2 - default = 'NONE'
 # 
-# subsidary_clear(sig_id:int) - returns the SWITCHED state of the subsidary  i.e the state of the 
-#                            signal manual control button (True='OFF', False = 'ON'). If a route
-#                            is specified then the function also tests against the specified route
+# subsidary_clear - returns the SWITCHED state of the subsidary  i.e the state of the 
+#                   signal manual control button (True='OFF', False = 'ON'). If a route
+#                   is specified then the function also tests against the specified route
 #   Mandatory Parameters:
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
@@ -275,20 +271,14 @@
 #       sig_id:int - The ID for the signal
 #   Optional Parameters:
 #       release_on_yellow:Bool - True for Release on Yellow - default = False (Release on Red)
+#       force_set:Bool - If False then this function will have no effect in the period between
+#                       the signal being 'released' and the signal being 'passed' (default True)
 # 
 # clear_approach_control (sig_id:int) - This "releases" the signal to display the normal aspect. 
 #             Signals are also automatically released when the"release button" (displayed just 
 #             in front of the signal if specified when the signal was created) is activated,
 #             either manually or via an external sensor event.
 # 
-# signal_overridden (sig_id:int) - returns the signal override state (True='overridden')
-#                                  Function DEPRECATED (will be removed from future releases)
-#                                  use "signal_state" function to get the state of the signal
-# 
-# approach_control_set (sig_id:int) - returns the signal approach control state (True='active')
-#                                  Function DEPRECATED (will be removed from future releases)
-#                                  use "signal_state" function to get the state of the signal
-#
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
@@ -372,48 +362,6 @@ def signal_state (sig_id:Union[int,str]):
     else:
         sig_state = signals_common.signals[str(sig_id)]["sigstate"]
     return (sig_state)
-
-# -------------------------------------------------------------------------
-# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
-# Externally called function to Return the current state of the signal overide
-# Function applicable to ALL signal types created on the local schematic
-# Function does not support REMOTE Signals (with a compound Sig-ID)
-# -------------------------------------------------------------------------
-
-def signal_overridden (sig_id:int):
-    global logging
-    # Validate the signal exists
-    logging.warning ("Signal "+str(sig_id)+": signal_overridden - This function is DEPRECATED")
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": signal_overridden - Signal does not exist")
-        sig_overridden = False
-    else:
-        sig_overridden = signals_common.signals[str(sig_id)]["override"]
-    return (sig_overridden)
-
-# -------------------------------------------------------------------------
-# ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED ##### DEPRECATED #####
-# Externally called function to Return the current state of the approach control
-# Function applicable to ALL signal types created on the local schematic
-# (will return False if the particular signal type not supported)
-# Function does not support REMOTE Signals (with a compound Sig-ID)
-# -------------------------------------------------------------------------
-
-def approach_control_set (sig_id:int):
-    global logging
-    logging.warning ("Signal "+str(sig_id)+": approach_control_set - This function is DEPRECATED")
-    # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": approach_control_set - Signal does not exist")
-        approach_control_active = False
-    # get the signal state to return - only supported for semaphores and colour_lights
-    elif (signals_common.signals[str(sig_id)]["sigtype"] in
-          (signals_common.sig_type.colour_light, signals_common.sig_type.semaphore)):
-        approach_control_active = (signals_common.signals[str(sig_id)]["releaseonred"]
-                               or signals_common.signals[str(sig_id)]["releaseonyel"])
-    else:
-        approach_control_active = False
-    return (approach_control_active)
 
 # -------------------------------------------------------------------------
 # Externally called function to Return the current state of the subsidary
@@ -615,7 +563,7 @@ def toggle_subsidary (sig_id:int):
 # supported) Function does not support REMOTE Signals (with a compound Sig-ID)
 # -------------------------------------------------------------------------
 
-def set_approach_control (sig_id:int, release_on_yellow:bool = False):
+def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
     global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
@@ -633,7 +581,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for a 2 aspect red/yellow signal")
             else:
                 # Set approach control and refresh the signal following the change in state
-                signals_common.set_approach_control(sig_id,release_on_yellow)            
+                signals_common.set_approach_control(sig_id, release_on_yellow, force_set)            
                 signals_common.auto_refresh_signal(sig_id)
         elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
             # Do some additional validation specific to this function for semaphore signals
@@ -643,7 +591,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False):
                 logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
             else:
                 # Set approach control and refresh the signal following the change in state
-                signals_common.set_approach_control(sig_id)
+                signals_common.set_approach_control(sig_id, release_on_yellow, force_set)            
                 signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error ("Signal "+str(sig_id)+": set_approach_control - Function not supported by signal type")
@@ -665,11 +613,8 @@ def clear_approach_control (sig_id:int):
     else:
         # call the signal type-specific functions to update the signal (note that we only update
         # Semaphore and colour light signals if they are configured to update immediately)
-        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            # Clear approach control and refresh the signal following the change in state
-            signals_common.clear_approach_control (sig_id)
-            signals_common.auto_refresh_signal(sig_id)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+        if ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light or
+             signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore ):
             # Clear approach control and refresh the signal following the change in state
             signals_common.clear_approach_control (sig_id)
             signals_common.auto_refresh_signal(sig_id)
@@ -720,17 +665,22 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
     else:
-        # call the signal type-specific functions to update the signal
-        if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
-            signals_colour_lights.update_feather_route_indication (sig_id,route)
-            signals_common.update_theatre_route_indication(sig_id,theatre_text)
-        elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
-            signals_semaphores.update_semaphore_route_indication (sig_id,route)
-            signals_common.update_theatre_route_indication(sig_id,theatre_text)
-        # Even if the signal does not support route indications we still allow the route 
-        # element to be set. This is useful for interlocking where a signal without a route
-        # display (e.g. ground signal) can support more than one interlocked routes
-        signals_common.signals[str(sig_id)]["routeset"] = route
+        if route is not None:
+            # call the signal type-specific functions to update the signal
+            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+                signals_colour_lights.update_feather_route_indication (sig_id,route)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_semaphores.update_semaphore_route_indication (sig_id,route)
+            # Even if the signal does not support route indications we still allow the route 
+            # element to be set. This is useful for interlocking where a signal without a route
+            # display (e.g. ground signal) can support more than one interlocked routes
+            signals_common.signals[str(sig_id)]["routeset"] = route
+        if theatre_text is not None:
+            # call the signal type-specific functions to update the signal
+            if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
+                signals_common.update_theatre_route_indication(sig_id,theatre_text)
+            elif signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore:
+                signals_common.update_theatre_route_indication(sig_id,theatre_text)
     return()
 
 # -------------------------------------------------------------------------
@@ -753,8 +703,6 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
-    elif signals_common.signals[str(sig_id)]["override"]:
-        logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal is already overriden - not triggering")
     else:
         # call the signal type-specific functions to update the signal
         if signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light:
@@ -782,6 +730,7 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             signals_common.signals[sig_identifier] = {}
             signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+            signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
     return()
 
@@ -800,6 +749,7 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             signals_common.signals[sig_identifier] = {}
             signals_common.signals[sig_identifier]["sigtype"] = signals_common.sig_type.remote_signal
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+            signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
     return()
 
@@ -847,34 +797,22 @@ def delete_signal(sig_id:int):
         signals_common.signals[str(sig_id)]["sigbutton"].destroy()
         signals_common.signals[str(sig_id)]["subbutton"].destroy()
         signals_common.signals[str(sig_id)]["passedbutton"].destroy()
-        # This buttons is only common to colour light and semaphore types
         if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
                                                               signals_common.sig_type.semaphore):
+            # This buttons is only common to colour light and semaphore types
             signals_common.signals[str(sig_id)]["releasebutton"].destroy()
+            # Abort any timed signal sequences already in progess
+            route = signals_common.signals[str(sig_id)]["routeset"]
+            signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
         # Finally, delete the signal entry from the dictionary of signals
         del signals_common.signals[str(sig_id)]
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for moving a signal object (i.e. all the associated drawing objects)
-# This is used by the schematic editor for moving signals around on the canvas. According to
-# all the info out there this is much more performant than deleting and then recreating
+# Non public API function to return the tkinter canvas 'tags' for the signal
 # ------------------------------------------------------------------------------------------
 
-def move_signal(sig_id:int,xdiff:int,ydiff:int):
-    if signals_common.sig_exists(sig_id):
-        signals_common.signals[str(sig_id)]["canvas"].move("signal"+str(sig_id),xdiff,ydiff)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to "test" if the cursor is within the signal tkinter boundary box
-# ------------------------------------------------------------------------------------------
-
-def get_boundary_box(sig_id:int):
-    if signals_common.sig_exists(sig_id):
-        bbox=signals_common.signals[str(sig_id)]["canvas"].bbox("signal"+str(sig_id))
-    else:
-        bbox=[0,0,0,0]
-    return(bbox)
+def get_tags(sig_id:int):
+    return("signal"+str(sig_id))
 
 ##########################################################################################

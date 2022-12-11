@@ -36,7 +36,6 @@
 #       broker_port:int - The network port for the broker host (default = 1883)
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
-#       publish_dcc_commands - NO LONGER SUPPORTED - use 'set_node_to_publish_dcc_commands'
 #       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
 #
 #-----------------------------------------------------------------------------------------------
@@ -189,7 +188,6 @@ def configure_networking (broker_host:str,
                           broker_port:int = 1883,
                           broker_username:str = None,
                           broker_password:str = None,
-                          publish_dcc_commands:bool = False,
                           mqtt_enhanced_debugging:bool = False):
     global logging
     global node_config
@@ -221,14 +219,6 @@ def configure_networking (broker_host:str,
         if not node_config["connected_to_broker"]:
             logging.warning("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
             
-        if publish_dcc_commands:
-            logging.error("###########################################################################")
-            logging.error("MQTT-Client: The 'publish_dcc_commands' Flag is NO LONGER SUPPORTED (sorry)")
-            logging.error("MQTT-Client: Use the 'set_node_to_publish_dcc_commands()' function instead")
-            logging.error("MQTT-Client: Other MQTT Network Configuration Parameters remain unchanged")
-            logging.error("###########################################################################")
-            time.sleep(5.0)
-
     return()
 
 #-----------------------------------------------------------------------------------------------

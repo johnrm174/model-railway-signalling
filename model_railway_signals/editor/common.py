@@ -82,44 +82,73 @@ class CreateToolTip():
 #    "get_value" - will return the state (False if disabled) (bool)
 #    "disable" - disables/blanks the CB (i.e. sets it to False)
 #    "enable"  enables/loads the CB (with the last state)
+#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
+#        AND function where both flags need to be set to enable the CB
 #------------------------------------------------------------------------------------
 
 class check_box(Checkbutton):
     def __init__(self, parent_frame, label:str, tool_tip:str, width:int=None, callback=None):
-        # Store the local instance configuration variables
+        # Create the local instance configuration variables
+        # 'selection' is the current CB state and 'state' is the last entered state
+        # 'enabled' is the flag to track whether the checkbox is enabled or not
         self.parent_frame = parent_frame
         self.callback = callback
-        # If width hasn't been specified set to the width of the label
-        if width is None: width = len(label)
-        # Create the vars for the CB - 'selection' is the actual CB state and 'state' is the
-        # last entered state (used to "load" the actual CB state when the CB is enabled)        
         self.selection = BooleanVar(self.parent_frame, False)
-        self.state = BooleanVar(self.parent_frame, False)
-        self.enabled = BooleanVar(self.parent_frame, True)
+        self.state = False
+        self.enabled0 = True
+        self.enabled1 = True
+        self.enabled2 = True
         # Create the checkbox and associated tool tip
-        super().__init__(self.parent_frame, width = width, text=label, anchor="w",
+        if width is None: 
+            super().__init__(self.parent_frame, text=label, anchor="w",
+                       variable=self.selection, command=self.cb_updated)
+        else:
+            super().__init__(self.parent_frame, width = width, text=label, anchor="w",
                        variable=self.selection, command=self.cb_updated)
         self.TT = CreateToolTip(self, tool_tip)
-        
+
     def cb_updated(self):
         # Focus on the Checkbox to remove focus from other widgets (such as EBs)
         self.parent_frame.focus()
-        self.state.set(self.selection.get())
+        self.state = self.selection.get()
         if self.callback is not None: self.callback()
 
+    def enable_disable_checkbox(self):
+        if self.enabled0 and self.enabled1 and self.enabled2:
+            self.selection.set(self.state)
+            self.configure(state="normal")
+        else:
+            self.configure(state="disabled")
+            self.selection.set(False)
+            
     def enable(self):
-        self.selection.set(self.state.get())
-        self.configure(state="normal")
-        self.enabled.set(True)
+        self.enabled0 = True
+        self.enable_disable_checkbox()
 
     def disable(self):
-        self.configure(state="disabled")
-        self.selection.set(False)
-        self.enabled.set(False)
+        self.enabled0 = False
+        self.enable_disable_checkbox()
+
+    def enable1(self):
+        self.enabled1 = True
+        self.enable_disable_checkbox()
+
+    def disable1(self):
+        self.enabled1 = False
+        self.enable_disable_checkbox()
+        
+    def enable2(self):
+        self.enabled2 = True
+        self.enable_disable_checkbox()
+
+    def disable2(self):
+        self.enabled2 = False
+        self.enable_disable_checkbox()
         
     def set_value(self, new_value:bool):
-        self.state.set(new_value)
-        if self.enabled.get(): self.selection.set(new_value)
+        self.state = new_value
+        if self.enabled0 and self.enabled1 and self.enabled2:
+            self.selection.set(new_value)
 
     def get_value(self):
         # Will always return False if disabled
@@ -133,33 +162,35 @@ class check_box(Checkbutton):
 #    "get_value" - will return the current state (False if disabled) (bool)
 #    "disable" - disables/blanks the CB (i.e. sets it to False)
 #    "enable"  enables/loads the CB (with the last state)
+#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
+#        AND function where both flags need to be set to enable the CB
 #------------------------------------------------------------------------------------
 
 class state_box(Checkbutton):
     def __init__(self, parent_frame, label_off:str, label_on:str, tool_tip:str,
                          width:int=None, callback=None, read_only:bool=False):
-        # Store the local instance configuration variables
+        # Create the local instance configuration variables
+        # 'selection' is the current CB state and 'state' is the last entered state
+        # 'enabled' is the flag to track whether the checkbox is enabled or not
         self.parent_frame = parent_frame
         self.callback = callback
         self.labelon = label_on
         self.labeloff = label_off
         self.read_only = read_only
-        # If width hasn't been specified set to the width of the widest label
-        if width is None:
-            if len(label_off) > len(label_on): width = len(label_off)
-            else: width = len(label_on)
-        # Create the vars for the CB - 'selection' is the actual CB state and 'state' is the
-        # last entered state (used to "load" the actual CB state when the CB is enabled)        
         self.selection = BooleanVar(self.parent_frame, False)
-        self.state = BooleanVar(self.parent_frame, False)
-        self.enabled = BooleanVar(self.parent_frame, True)
+        self.state = False
+        self.enabled0 = True
+        self.enabled1 = True
+        self.enabled2 = True
         # Create the checkbox and associated tool tip
-        super().__init__(parent_frame, indicatoron = False, width=width,
+        if width is None: 
+            super().__init__(parent_frame, indicatoron = False,
+                text=self.labeloff, variable=self.selection, command=self.cb_updated)
+        else:
+            super().__init__(parent_frame, indicatoron = False, width=width,
                 text=self.labeloff, variable=self.selection, command=self.cb_updated)
         if self.read_only: self.configure(state="disabled")
         self.TT = CreateToolTip(self, tool_tip)
-        # Get the default background colour (to set when disabled)
-        self.default_background = self.cget('bg')
         
     def cb_updated(self):
         # Focus on the Checkbox to remove focus from other widgets (such as EBs)
@@ -168,29 +199,49 @@ class state_box(Checkbutton):
         if self.callback is not None: self.callback()
 
     def update_cb_state(self):
-        if not self.enabled.get():
-            self.configure(text="")
-            if self.selection.get(): self.selection.set(False)
-        else:
-            self.state.set(self.selection.get())
-            if self.selection.get(): self.configure(text=self.labelon)
+        if self.enabled0 and self.enabled1 and self.enabled2:
+            self.state = self.selection.get()
+            if self.state: self.configure(text=self.labelon)
             else: self.configure(text=self.labeloff)
+        else:
+            self.configure(text="")
+            self.selection.set(False)
+
+    def enable_disable_checkbox(self):
+        if not self.read_only:
+            if self.enabled0 and self.enabled1 and self.enabled2:
+                self.selection.set(self.state)
+            else:
+                self.selection.set(False)
+            self.update_cb_state()
 
     def enable(self):
-        if not self.read_only:
-            self.selection.set(self.state.get())
-            self.enabled.set(True)
-            self.update_cb_state()
+        self.enabled0 = True
+        self.enable_disable_checkbox()
 
     def disable(self):
-        if not self.read_only:
-            self.enabled.set(False)
-            self.selection.set(False)
-            self.update_cb_state()
+        self.enabled0 = False
+        self.enable_disable_checkbox()
+
+    def enable1(self):
+        self.enabled1 = True
+        self.enable_disable_checkbox()
+
+    def disable1(self):
+        self.enabled1 = False
+        self.enable_disable_checkbox()
+        
+    def enable2(self):
+        self.enabled2 = True
+        self.enable_disable_checkbox()
+
+    def disable2(self):
+        self.enabled2 = False
+        self.enable_disable_checkbox()
 
     def set_value(self, new_value:bool):
         self.selection.set(new_value)
-        self.state.set(new_value)
+        self.state = new_value
         self.update_cb_state()
         
     def get_value(self,):
@@ -206,6 +257,8 @@ class state_box(Checkbutton):
 #    "validate" - This gets overridden by the child class function
 #    "disable" - disables/blanks the entry box
 #    "enable"  enables/loads the entry box (with the last value)
+#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
+#        AND function where both flags need to be set to enable the EB
 # Class methods/objects intended for use by child classes that inherit:
 #    "set_validation_status" - to be called following external validation
 #    "TT.text" - The tooltip for the entry box (to change the tooltip text)
@@ -215,16 +268,19 @@ class state_box(Checkbutton):
 
 class entry_box(Entry):
     def __init__(self, parent_frame, width:int, tool_tip:str, callback=None):
-        # Store the local instance configuration variables
+        # Create the local instance configuration variables
+        # 'entry' is the current EB value and 'value' is the last entered value
+        # 'enabled' is the flag to track whether the checkbox is enabled or not
+        # 'tooltip' is the default tooltip text(if no validation errors are present)
         self.parent_frame = parent_frame
         self.callback = callback
         self.tool_tip = tool_tip
-        # Create the tkinter vars for the entry box
         self.entry = StringVar(self.parent_frame, "")
-        self.value = StringVar(self.parent_frame, "")
-        self.initial_value = StringVar(self.parent_frame, "")
-        # Flag to track whether entry box is enabled/disabled
-        self.enabled = BooleanVar(self.parent_frame, True)
+        self.value = ""
+        self.initial_value = ""
+        self.enabled0 =  True
+        self.enabled1 =  True
+        self.enabled2 =  True
         # Create the entry box, event bindings and associated default tooltip
         super().__init__(self.parent_frame, width=width, textvariable=self.entry, justify='center')
         self.bind('<Return>', self.entry_box_updated)
@@ -238,7 +294,7 @@ class entry_box(Entry):
         if self.callback is not None: self.callback()
         
     def entry_box_cancel(self, event):
-        self.entry.set(self.value.get())
+        self.entry.set(self.value)
         self.configure(fg='black')
         self.parent_frame.focus()
         
@@ -247,38 +303,62 @@ class entry_box(Entry):
         return(True)
     
     def set_validation_status(self, valid:bool):
+        # Colour of text is set according to validation status (red=error)
+        # The inheriting validation function will override the default tool tip
         if valid is None:
-            self.value.set(self.entry.get())
+            self.value = self.entry.get()
         elif valid == True: 
             self.configure(fg='black')
             self.TT.text = self.tool_tip
-            self.value.set(self.entry.get())
+            self.value = self.entry.get()
         else:
             self.configure(fg='red')
-            
+
+    def enable_disable_entrybox(self):
+        if self.enabled0 and self.enabled1 and self.enabled2:
+            self.configure(state="normal")
+            self.entry.set(self.value)
+            self.validate()
+        else:
+            self.configure(state="disabled")
+            self.entry.set("")
+
     def enable(self):
-        self.configure(state="normal")
-        self.entry.set(self.value.get())
-        self.validate()
-        self.enabled.set(True)
+        self.enabled0 = True
+        self.enable_disable_entrybox()
         
     def disable(self):
-        self.configure(state="disabled")
-        self.entry.set("")
-        self.enabled.set(False)
+        self.enabled0 = False
+        self.enable_disable_entrybox()
+        
+    def enable1(self):
+        self.enabled1 = True
+        self.enable_disable_entrybox()
+
+    def disable1(self):
+        self.enabled1 = False
+        self.enable_disable_entrybox()
+        
+    def enable2(self):
+        self.enabled2 = True
+        self.enable_disable_entrybox()
+
+    def disable2(self):
+        self.enabled2 = False
+        self.enable_disable_entrybox()
         
     def set_value(self, value:str):
-        self.value.set(value)
-        self.initial_value.set(value)
+        self.value = value
+        self.initial_value = value
         self.entry.set(value)
         self.validate()
 
     def get_value(self):
-        if not self.enabled.get(): return("")
-        else: return(self.value.get())
+        if self.enabled0 and self.enabled1 and self.enabled2: return(self.value)
+        else: return("")
 
     def get_initial_value(self):
-        return(self.initial_value.get())
+        return(self.initial_value)
 
 #------------------------------------------------------------------------------------
 # Common Class for an "Integer Entry box" - builds on the Entry Box class (above)
@@ -309,10 +389,16 @@ class integer_entry_box(entry_box):
                 
     def validate(self, update_validation_status=True):
         valid = False
-        if self.entry.get() == "":
-            # If empty and not allowed then we just reload the last valid value
-            if not self.empty_allowed: self.entry.set(self.value.get())
-            valid = True
+        if self.entry.get() == "" or self.entry.get() == "#":
+            # The EB value can be blank if the entry box is inhibited (get_value will return zero)
+            if self.empty_allowed or not (self.enabled0 and self.enabled1 and self.enabled2):
+                valid = True
+            else:
+                # If empty is not allowed we need to put a character into the entry box
+                # to give a visual indication that there is an error on the form
+                self.entry.set("#")
+                self.TT.text = ("Must specify a value between "+
+                        str(self.min_value)+ " and "+str(self.max_value) )            
         else:
             try:
                 value = int(self.entry.get())
@@ -328,11 +414,11 @@ class integer_entry_box(entry_box):
         return(valid)
     
     def set_value(self, value:int):
-        if value == 0: super().set_value("")
+        if value == 0 and self.empty_allowed: super().set_value("")
         else: super().set_value(str(value))
 
     def get_value(self):
-        if super().get_value() == "": return(0)
+        if super().get_value() == "" or super().get_value() == "#": return(0)
         else: return(int(super().get_value()))
 
     def get_initial_value(self):
@@ -373,14 +459,14 @@ class dcc_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class int_item_id_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, tool_tip:str, callback=None,
-                 exists_function=None, current_id_function=None):
+    def __init__(self, parent_frame, tool_tip:str, callback=None, allow_empty=True,
+                            exists_function=None, current_id_function=None):
         # These are the function calls used for validation
         self.exists_function = exists_function
         self.current_id_function = current_id_function
         # Call the common base class init function to create the EB
         super().__init__(parent_frame, width=3 , min_value=1, max_value=99,
-                            tool_tip=tool_tip, callback=callback)
+                allow_empty=allow_empty, tool_tip=tool_tip, callback=callback)
 
     def validate(self, update_validation_status=True):
         # Do the basic integer validation (integer, in range)
@@ -444,7 +530,7 @@ class str_item_id_entry_box (entry_box):
                     else:
                         if node_str == "":
                             valid = False
-            if not valid: self.TT.text = ("Invalid item ID - must either be an integer "+
+            if not valid: self.TT.text = ("Invalid ID - must be an integer "+
                             "between 1 and 99 (for a local ID) or of the form 'node-id' "+
                             "with the 'id' element between 1 and 99 (for a remote ID)")
         # Next do the optional validation for item existing and not the same as the current ID
@@ -495,7 +581,7 @@ class object_id_selection(integer_entry_box):
             current_id = self.get_initial_value()
             new_id = int(self.entry.get())
             if self.exists_function(new_id) and new_id != current_id:
-                self.EB_TT.text = "ID already assigned"
+                self.TT.text = "ID already assigned"
                 valid = False
         self.set_validation_status(valid)
         return(valid)
@@ -519,7 +605,7 @@ class dcc_command_entry():
         self.EB = dcc_entry_box(parent_frame, callback=self.eb_updated)
         self.EB.pack(side=LEFT)
         self.CB = state_box(parent_frame, label_off="OFF", label_on="ON",
-                    tool_tip="Set the DCC logic for the command")
+                    width=4, tool_tip="Set the DCC logic for the command")
         self.CB.pack(side=LEFT)
     
     def eb_updated(self):
@@ -551,8 +637,69 @@ class dcc_command_entry():
         return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
+# Common class for a route selection element (route selection CBs)
+# Public class instance methods provided by this class are
+#    "set_values" - Sets the route selection CBs 
+#    "get_values" - Gets route selection CBs 
+#    "enable" - Enables/loads the route selection CBs 
+#    "disable" - Disables/blanks the route selection CBs 
+#------------------------------------------------------------------------------------
+
+class route_selections():
+    def __init__(self, parent_frame, tool_tip:str, read_only=False, callback=None):
+        # create the UI Elements for each of the possible route selections
+        self.main = state_box(parent_frame, label_off="MAIN", label_on="MAIN",
+                width=5, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.main.pack(side=LEFT)
+        self.lh1 = state_box(parent_frame, label_off="LH1", label_on="LH1",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.lh1.pack(side=LEFT)
+        self.lh2 = state_box(parent_frame, label_off="LH2", label_on="LH2",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.lh2.pack(side=LEFT)
+        self.rh1 = state_box(parent_frame, label_off="RH1", label_on="RH1",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.rh1.pack(side=LEFT)
+        self.rh2 = state_box(parent_frame, label_off="RH2", label_on="RH2",
+                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
+        self.rh2.pack(side=LEFT)
+
+    def enable(self):
+        self.main.enable()
+        self.lh1.enable()
+        self.lh2.enable()
+        self.rh1.enable()
+        self.rh2.enable()
+
+    def disable(self):
+        self.main.disable()
+        self.lh1.disable()
+        self.lh2.disable()
+        self.rh1.disable()
+        self.rh2.disable()
+
+    def set_values(self, routes:[bool,bool,bool,bool,bool]):
+        # A 'Route' comprises a list of route selections [main, lh1, lh2, rh1, rh2]
+        # Where each route selection is a boolean value (True or False)
+        self.main.set_value(routes[0])
+        self.lh1.set_value(routes[1])
+        self.lh2.set_value(routes[2])
+        self.rh1.set_value(routes[3])
+        self.rh2.set_value(routes[4])
+
+    def get_values(self):
+        # A 'Route' comprises a list of route selections [main, lh1, lh2, rh1, rh2]
+        # Where each route selection is a boolean value (True or False)
+        return ( [ self.main.get_value(),
+                   self.lh1.get_value(),
+                   self.lh2.get_value(),
+                   self.rh1.get_value(),
+                   self.rh2.get_value() ])
+
+#------------------------------------------------------------------------------------
 # Class for a signal route selection element (Sig ID EB + route selection CBs)
 # Used by the signals and points interlocking tabs (read only for points tab)
+# Inherits from the common route_selections class (above)
 # Public class instance methods provided by this class are
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
@@ -561,7 +708,7 @@ class dcc_command_entry():
 #    "disable" - Disables/blanks EB value and all route selection CBs 
 #------------------------------------------------------------------------------------
 
-class signal_route_selections():
+class signal_route_selections(route_selections):
     def __init__(self, parent_frame, tool_tip:str, exists_function=None,
                   current_id_function=None, read_only:bool=False):
         self.read_only = read_only
@@ -573,38 +720,16 @@ class signal_route_selections():
         self.EB.pack(side=LEFT)
         # Disable the EB (we don't use the disable method as we want to display the value_
         if self.read_only: self.EB.configure(state="disabled")
-        # Now create the UI Elements for each of the possible route selections
-        self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.main.pack(side=LEFT)
-        self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.lh1.pack(side=LEFT)
-        self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.lh2.pack(side=LEFT)
-        self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.rh1.pack(side=LEFT)
-        self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
-                                    tool_tip=tool_tip, read_only = read_only)
-        self.rh2.pack(side=LEFT)
+        # Create the UI Elements for each of the possible route selections
+        super().__init__(self.frame, tool_tip, read_only)
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
         if not self.read_only:
             if self.EB.entry.get() == "":
-                self.main.disable()
-                self.lh1.disable()
-                self.lh2.disable()
-                self.rh1.disable()
-                self.rh2.disable()
+                super().disable()
             else:
-                self.main.enable()
-                self.lh1.enable()
-                self.lh2.enable()
-                self.rh1.enable()
-                self.rh2.enable()
+                super().enable()
     
     def validate(self):
         return(EB.validate())
@@ -618,25 +743,16 @@ class signal_route_selections():
         self.eb_updated()
         
     def set_values(self, signal:[int,[bool,bool,bool,bool,bool]]):
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # Each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
         self.EB.set_value(signal[0])
-        self.main.set_value(signal[1][0])
-        self.lh1.set_value(signal[1][1])
-        self.lh2.set_value(signal[1][2])
-        self.rh1.set_value(signal[1][3])
-        self.rh2.set_value(signal[1][4])
+        super().set_values(signal[1])
         self.eb_updated()
 
     def get_values(self):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
-        return ( [ self.EB.get_value(),
-                   [ self.main.get_value(),
-                     self.lh1.get_value(),
-                     self.lh2.get_value(),
-                     self.rh1.get_value(),
-                     self.rh2.get_value() ] ])
+        return ( [ self.EB.get_value(), super().get_values() ])
    
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
@@ -724,15 +840,15 @@ class window_controls():
         self.TT4 = CreateToolTip(self.B4, "Abandon edit and close window")
         
     def apply(self):
-        self.frame.focus()
+        self.window.focus()
         self.save_callback(self.parent_object,False)
         
     def ok(self):
-        self.frame.focus()
+        self.window.focus()
         self.save_callback(self.parent_object,True)
         
     def reset(self):
-        self.frame.focus()
+        self.window.focus()
         self.load_callback(self.parent_object)
         
     def cancel(self):

@@ -201,7 +201,7 @@ create_colour_light_signal (canvas, 3, 550, 150,
 
 create_semaphore_signal (canvas, 7, 50, 300,
                         sig_callback = middle_line_callback,
-                        distant = True, 
+                        signal_subtype = semaphore_sub_type.distant,
                         sig_passed_button = True)
 create_semaphore_signal (canvas, 8, 300, 300,
                         sig_callback = middle_line_callback,
@@ -211,7 +211,8 @@ create_semaphore_signal (canvas, 9, 550, 300,
                         sig_passed_button = True)
 
 create_semaphore_signal (canvas, 10, 700, 350,
-                        distant = True, orientation = 180,
+                        signal_subtype = semaphore_sub_type.distant,
+                        orientation = 180,
                         sig_callback = lower_line_callback,
                         sig_passed_button = True)
 create_semaphore_signal (canvas, 11, 450, 350, orientation = 180,

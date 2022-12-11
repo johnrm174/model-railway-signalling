@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Interlocking" Tab
+# Functions and sub Classes for the Edit Signal "Interlocking" Tab 
 #------------------------------------------------------------------------------------
 
 from tkinter import *
@@ -56,8 +56,8 @@ class point_interlocking_entry():
         return([self.EB.get_value(), self.CB.get_value()])          
                 
 #------------------------------------------------------------------------------------
-# Class for a route interlocking group (comprising 6 points and a signal)
-# Uses the base point_interlocking_entry class from above
+# Class for a route interlocking group (comprising 6 points, a signal and an instrument)
+# Uses the point_interlocking_entry class from above for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set theroute elements (points & signal)
@@ -72,11 +72,15 @@ class point_interlocking_entry():
 
 class interlocking_route_group: 
     def __init__(self, parent_frame, parent_object, label:str):
-        self.sig_ahead_enabled = True
-        self.block_ahead_enabled = True
-        self.route_enabled = True
         # These are the functions used to validate that the entered IDs exist
-        # on the schematic (and the sig ID is different to the current sig ID)
+        # on the schematic (and the sig ID is different to the current sig ID) 
+        #################################################################################
+        ### TODO - when we eventually support remote signals we can't use the current ###
+        ### signal_exists function as that only checks if the signal exists in the    ###
+        ### dictionary of schematic objects so won't pick up any signals subscribed   ###
+        ### to via the MQTT networking - we'll therefore have to use the internal     ###
+        ### library function or validate also against a list of subscribed signals    ###                
+        #################################################################################
         instrument_exists_function = objects.instrument_exists
         signal_exists_function = objects.signal_exists
         current_id_function = parent_object.config.sigid.get_value
@@ -95,44 +99,39 @@ class interlocking_route_group:
         self.p4 = point_interlocking_entry(self.frame, point_exists_function)
         self.p5 = point_interlocking_entry(self.frame, point_exists_function)
         self.p6 = point_interlocking_entry(self.frame, point_exists_function)
-        # Create the optional elements (sig ahead and inst ahead) in a subframe (always packed)
-        self.subframe = Frame(self.frame)
-        self.subframe.pack(side=LEFT)
-        self.label1 = Label(self.subframe, text=" Sig:")
+        # Create the signal ahead and instrument ahead elements (always packed)
+        self.label1 = Label(self.frame, text=" Sig:")
         self.label1.pack(side=LEFT)
-        self.sig = common.str_item_id_entry_box(self.subframe, exists_function=signal_exists_function,
+        self.sig = common.str_item_id_entry_box(self.frame, exists_function=signal_exists_function,
                         tool_tip = "Enter the ID of the next signal along the specified route - This "+
                         "can be a local signal or a remote signal (subscribed to via MQTT networking)",
                           current_id_function = current_id_function)
         self.sig.pack(side=LEFT)
-        self.label2 = Label(self.subframe, text=" Blk:")
+        self.label2 = Label(self.frame, text=" Blk:")
         self.label2.pack(side=LEFT)
-        self.block = common.int_item_id_entry_box(self.subframe, exists_function=instrument_exists_function,
+        self.block = common.int_item_id_entry_box(self.frame, exists_function=instrument_exists_function,
                                 tool_tip="Enter the ID of the local block instrument controlling "+
                                     "access to the next block section along the specified route") 
         self.block.pack(side=LEFT)
     
     def validate(self):
+        # Validates all point, signal and block instrument entries
         valid = (self.p1.validate() and self.p2.validate() and self.p3.validate() and
                  self.p4.validate() and self.p5.validate() and self.p6.validate() and
                  self.sig.validate() and self.block.validate())
         return(valid)
     
     def enable_sig_ahead(self):
-        if self.sig_route_enabled: self.sig.enable()
-        self.sig_ahead_enabled = True
+        self.sig.enable1()
     
     def disable_sig_ahead(self):
-        self.sig.disable()
-        self.sig_ahead_enabled = False
+        self.sig.disable1()
         
     def enable_block_ahead(self):
-        if self.sig_route_enabled: self.block.enable()
-        self.block_ahead_enabled = True
+        self.block.enable1()
     
     def disable_block_ahead(self):
-        self.block.disable()
-        self.block_ahead_enabled = False
+        self.block.disable1()
     
     def enable_route(self):
         self.p1.enable()
@@ -141,9 +140,8 @@ class interlocking_route_group:
         self.p4.enable()
         self.p5.enable()
         self.p6.enable()
-        if self.sig_ahead_enabled: self.sig.enable()
-        if self.block_ahead_enabled: self.block.enable()
-        self.sig_route_enabled = True
+        self.sig.enable()
+        self.block.enable()
 
     def disable_route(self):
         self.p1.disable()
@@ -154,7 +152,6 @@ class interlocking_route_group:
         self.p6.disable()
         self.sig.disable()
         self.block.disable()
-        self.sig_route_enabled = False
 
     def set_route(self, interlocking_route:[[int,bool],str,int]):
         # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
@@ -207,6 +204,7 @@ class interlocking_route_frame:
         self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2")
 
     def validate(self):
+        # Validates all point, signal and block instrument entries for all routes
         return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
                self.rh1.validate() and self.rh2.validate())
 
@@ -297,20 +295,19 @@ class conflicting_signals_element():
         self.sig4.frame.grid(row=1, column=1)
 
     def validate(self):
+        # Validate all conflicting signal entries
         return ( self.sig1.validate and
                  self.sig2.validate and
                  self.sig3.validate and
                  self.sig4.validate )
 
     def enable_route(self):
-        self.frame.pack(padx=2, pady=2, fill='x')
         self.sig1.enable()
         self.sig2.enable()
         self.sig3.enable()
         self.sig4.enable()
         
     def disable_route(self):
-        self.frame.pack_forget() 
         self.sig1.disable()
         self.sig2.disable()
         self.sig3.disable()
@@ -383,16 +380,31 @@ class conflicting_signals_frame():
                   self.rh2.get_values() ] )
 
 #------------------------------------------------------------------------------------
+# Class for the Distant 'interlock with home signals ahead" ui element
+# Inherits from  common.check_box class (get_value/set_value/enable/disable)
+#------------------------------------------------------------------------------------
+
+class interlock_with_signals_ahead(common.check_box):
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the UI element (packed by the creating function/class)
+        self.frame = LabelFrame(parent_frame, text="Distant signal interlocking")
+        super().__init__(self.frame, label="Interlock distant with all home signals ahead",
+                        tool_tip="Select to lock the distant signal at CAUTION if any home signals "+
+                        "on the route ahead are at DANGER (if the distant signal is CLEAR it "+
+                        "will remain unlocked so it can be returned to CAUTION at any time)")
+        self.pack()
+
+#------------------------------------------------------------------------------------
 # Top level Class for the Signal Interlocking Tab
 #------------------------------------------------------------------------------------
 
 class signal_interlocking_tab:
     def __init__(self, parent_tab, parent_object):
-        current_id_function = parent_object.config.sigid.get_value
-        # These UI elements need the parent object so the current sig_id can be accessed for validation
         self.interlocking = interlocking_route_frame(parent_tab, parent_object)
         self.interlocking.frame.pack(padx=2, pady=2, fill='x')
         self.conflicting_sigs = conflicting_signals_frame(parent_tab, parent_object)
         self.conflicting_sigs.frame.pack(padx=2, pady=2, fill='x')
+        self.interlock_ahead = interlock_with_signals_ahead(parent_tab)
+        self.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
 
 #############################################################################################
