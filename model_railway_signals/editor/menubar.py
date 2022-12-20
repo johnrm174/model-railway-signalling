@@ -557,11 +557,11 @@ class main_menubar:
             self.file_has_been_saved = True
         return()
 
-    def load_schematic(self):
+    def load_schematic(self, filename=None):
         global logging
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
-        file_loaded, layout_state = file_interface.load_schematic()
+        file_loaded, layout_state = file_interface.load_schematic(filename)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
             if "settings" in layout_state.keys() and "objects" in layout_state.keys():
