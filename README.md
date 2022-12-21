@@ -74,7 +74,11 @@ To run the editor application:
 
 The python package should be run as a module (note underscores):
 <pre>
-$ python3 -m model_railway_signals 
+$ python3 -m model_railway_signals
+</pre>
+or to load a layout schematic at startup
+<pre>
+$ python3 -m model_railway_signals -f <layout_file>.sig
 </pre>
 
 ## Using the library functions
