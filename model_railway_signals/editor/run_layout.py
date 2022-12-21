@@ -739,6 +739,8 @@ def schematic_callback(item_id,callback_type):
     # We also need to process signal interlocking on any event which may have changed the
     # displayed aspect of a signal (when interlocking signals against home signals ahead)
     if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
+         callback_type == points.point_callback_type.point_switched or
+         callback_type == points.point_callback_type.fpl_switched or
               signal_aspects_updated ):
         logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
