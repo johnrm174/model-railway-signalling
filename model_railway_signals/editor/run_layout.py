@@ -680,10 +680,12 @@ def schematic_callback(item_id,callback_type):
          callback_type == points.point_callback_type.fpl_switched ):
         logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
-        logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
-        update_all_signal_overrides()
-        # Note that approach control and signal overrides will have been set/cleared
-        signal_overrides_updated = True
+        # Note that Track sections (the library objects) only "exist" in run mode
+        if not editing_enabled:   
+            logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
+            update_all_signal_overrides()
+            # Note that approach control and signal overrides will have been set/cleared
+            signal_overrides_updated = True
         
     # Timed sequences or changes in track occupancy are triggered by 'signal_passed' events
     if callback_type == signals_common.sig_callback_type.sig_passed:
