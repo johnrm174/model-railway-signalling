@@ -14,6 +14,7 @@
 #    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
 #    run_layout.initialise_layout() - Initialise everything following a load
+#    run_layout.reset_layout() - Reset the schematic back to its default state
 #    settings.get_canvas() - Get the current canvas settings (for editing)
 #    settings.set_canvas(width,height,grid)) - Call following update/resizing/load
 #    settings.get_all() - Get all settings (for save)
@@ -417,6 +418,7 @@ class main_menubar:
         self.mode_menu = Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
+        self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
         # Create the various menubar items for the SPROG Connection Dropdown
         self.sprog_label = "SPROG:DISCONNECTED "
@@ -491,6 +493,12 @@ class main_menubar:
         self.mode_label = new_label
         settings.set_general(editmode=False)
         schematic.disable_editing()
+
+    def reset_layout(self, ask_for_confirm:bool=True):
+        if ask_for_confirm:
+            if messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
+                    "signals, points and track occupancy sections back to their default state"):
+                run_layout.reset_layout()
 
     def sprog_connect(self):
         port, baud, debug, startup, power = settings.get_sprog()

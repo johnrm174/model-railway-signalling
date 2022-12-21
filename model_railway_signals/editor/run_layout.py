@@ -14,6 +14,7 @@
 #    <MORE COMING>
 #    
 # Accesses the following external editor objects directly:
+#    objects_sections.default_section_object - for resetting the state of the section
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
 #    objects.signal_index - To iterate through all the signal objects
@@ -37,15 +38,20 @@
 #    signals.update_signal(sig_id, sig_ahead_id) - To update the signal aspect
 #    signals.signal_clear(sig_id, sig_route) - To test if a signal is clear
 #    signals.subsidary_clear(sig_id) - to test if a subsidary is clear
+#    signals.lock_signal(sig_id) - To lock a signal
 #    signals.unlock_signal(sig_id) - To unlock a signal
-#    signals.lock_signal(sig_id) - To interlocklock a signal
-#    signals.unlock_subsidary(sig_id) - To unlock a subsidary signal
 #    signals.lock_subsidary(sig_id) - To lock a subsidary signal
+#    signals.unlock_subsidary(sig_id) - To unlock a subsidary signal
+#    signals.toggle_signal(sig_id) - To toggle a signal state
+#    signals.toggle_subsidary(sig_id) - To toggle a subsidary signal state
 #    signals.set_route(sig_id, sig_route, theatre) - To set the route for the signal
 #    signals.trigger_timed_signal(sig_id, T1, T2) - Trigger timed signal sequence
 #    points.fpl_active(point_id) - To test if a facing point lock is active
+#    points.toggle_fpl(point_id) - To toggle the state of the point FPL
 #    points.point_switched(point_id) - To test if a point is switched
+#    points.toggle_point(point_id) - To toggle the state of the point
 #    points.lock_point(point_id) - To intelock a point
+#    points.unlock_point(point_id) - To intelock a point
 #    track_sections.set_section_occupied (section_id) - Set "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Clear "Occupied"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
@@ -66,6 +72,7 @@ from ..library import track_sections
 
 from . import objects
 from . import objects_common
+from . import objects_sections
 
 #------------------------------------------------------------------------------------
 # Internal helper Function to find if a signal has a subsidary
@@ -775,6 +782,50 @@ def initialise_layout():
     logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
     logging.info("**************************************************************************************")
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to "reset" the layout to its default state (all sections unoccupied, all
+# signals ON and all points set to their default state (not-switched and FPL active)
+#------------------------------------------------------------------------------------
+
+def reset_layout():
+    global editing_enabled
+    global logging
+    logging.info("RUN LAYOUT - Resetting Schematic *****************************************************")
+    # Reset all sections to unoccupied (note that sections only exist in run mode)
+    for section_id in objects.section_index:
+        if editing_enabled:
+            object_id = objects.section(section_id)
+            objects.schematic_objects[object_id]["state"] = objects_sections.default_section_object["state"]
+            objects.schematic_objects[object_id]["label"] = objects_sections.default_section_object["label"]
+        else:
+            default_label = objects_sections.default_section_object["label"]
+            track_sections.clear_section_occupied(section_id, label=default_label)
+    # Reset all signals back to their default states
+    for signal_id in objects.signal_index:
+        if signals.signal_clear(signal_id):
+            signals.unlock_signal(signal_id)
+            signals.toggle_signal(signal_id)
+        if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
+            signals.unlock_subsidary(signal_id)
+            signals.toggle_subsidary(signal_id)
+    # Reset all points back to their default states
+    for point_id in objects.point_index:
+        # Establish if the point has a FPL and/or whether it is automatic
+        # We use these to avoid generating errors when we reset the state
+        object_id = objects.point(point_id)
+        has_fpl = objects.schematic_objects[object_id]["hasfpl"]
+        automatic = objects.schematic_objects[object_id]["automatic"] 
+        if not automatic and points.point_switched(point_id):
+            points.unlock_point(point_id)
+            if has_fpl and points.fpl_active(point_id):
+                points.toggle_fpl(point_id)
+            points.toggle_point(point_id)
+        if has_fpl and not points.fpl_active(point_id):
+            points.toggle_fpl(point_id)
+    # Re-initialise the layout in its default state
+    initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
