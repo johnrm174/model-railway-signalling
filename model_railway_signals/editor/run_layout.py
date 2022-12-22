@@ -808,7 +808,9 @@ def reset_layout():
             track_sections.clear_section_occupied(section_id, label=default_label)
     # Reset all signals back to their default states
     for signal_id in objects.signal_index:
-        if signals.signal_clear(signal_id):
+        object_id = objects.signal(signal_id)
+        automatic = objects.schematic_objects[object_id]["fullyautomatic"]
+        if not automatic and signals.signal_clear(signal_id):
             signals.unlock_signal(signal_id)
             signals.toggle_signal(signal_id)
         if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
