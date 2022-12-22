@@ -3,6 +3,9 @@
 # layout configurations (and by implication test the main application features)
 # ------------------------------------------------------------------------------
 
+from inspect import getframeinfo
+from inspect import stack
+from os.path import basename
 import logging
 import tkinter
 import time
@@ -20,6 +23,7 @@ from model_railway_signals.editor import schematic
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
 from model_railway_signals.library import signals_common
+from model_railway_signals.library import track_sections
 
 root = None
 main_menubar = None
@@ -32,6 +36,23 @@ tests_executed = 0
 test_failures = 0
 
 # ------------------------------------------------------------------------------
+# Global variables to track the 'one up' train idenntifier for every time
+# we set a section to 'occupied' during a test
+# ------------------------------------------------------------------------------
+
+train_identifier = 1
+
+# ------------------------------------------------------------------------------
+# Function to log out a test failure with the filename and line number of the
+# parent test file that called the test assert functions in this module
+# ------------------------------------------------------------------------------
+
+def raise_test_error(message):
+    global logging
+    caller = getframeinfo(stack()[2][0])
+    logging.error("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
+
+# ------------------------------------------------------------------------------
 # Function to initialise the test harness and load a schematic file (to test)
 # Note that if a filename is not specified then it will open a dialogue to
 # load a layout schematic file before running the tests. Also note that it
@@ -42,6 +63,8 @@ def initialise_test_harness(filename=None):
     global main_menubar, root
     global test_failures, tests_executed
     root = tkinter.Tk()
+    logging.basicConfig(format='%(levelname)s: %(message)s')
+    logging.getLogger().setLevel(logging.WARNING)
     main_menubar = menubar.main_menubar(root)
     schematic.create_canvas(root, main_menubar.handle_canvas_event)
     main_menubar.initialise_editor()
@@ -54,7 +77,8 @@ def initialise_test_harness(filename=None):
     root.update()
 
 # ------------------------------------------------------------------------------
-# Function to finish the tests and report on any failures
+# Function to finish the tests and report on any failures. Then drops straight
+# back into the tkinter main loop to allow the schematic to be edited if required
 # ------------------------------------------------------------------------------
 
 def complete_tests():
@@ -100,22 +124,39 @@ def set_points_normal(*pointids):
         if points.point_switched(pointid):
             points.change_button_event(pointid)
 
-def set_fpl_on(*pointids):
+def set_fpls_on(*pointids):
     for pointid in pointids:
         if not points.fpl_active(pointid):
             points.fpl_button_event(pointid)
     root.update()
 
-def set_fpl_off(*pointids):
+def set_fpls_off(*pointids):
     for pointid in pointids:
         if points.fpl_active(pointid):
             points.fpl_button_event(pointid)
     root.update()
 
-############################################################
-### TO DO - signal Approach / Passed events ################
-### TO DO - Section updated events #########################
-############################################################
+def set_sections_occupied(*sectionids):
+    global train_identifier
+    for sectionid in sectionids:
+        track_sections.set_section_occupied(sectionid,str(train_identifier))
+        train_identifier=train_identifier+1
+    root.update()
+    
+def set_sections_clear(*sectionids):
+    for sectionid in sectionids:
+        track_sections.clear_section_occupied(sectionid)
+    root.update()
+    
+def trigger_signals_passed(*sigids):
+    for sigid in sigids:
+        signals_common.sig_passed_button_event(sigid)
+    root.update()
+
+def trigger_signals_released(*sigids):
+    for sigid in sigids:
+        signals_common.approach_release_button_event(sigid)
+    root.update()
     
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
@@ -125,7 +166,7 @@ def assert_points_locked(*pointids):
     global test_failures, tests_executed
     for pointid in pointids:
         if not points.points[str(pointid)]["locked"]:
-            logging.error ("Point:"+str(pointid)+" - Failed assert_points_locked test")
+            raise_test_error ("Point:"+str(pointid)+" - Failed assert_points_locked test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
     
@@ -133,7 +174,7 @@ def assert_points_unlocked(*pointids):
     global test_failures, tests_executed
     for pointid in pointids:
         if points.points[str(pointid)]["locked"]:
-            logging.error ("Point:"+str(pointid)+" - Failed assert_points_unlocked test")
+            raise_test_error ("Point:"+str(pointid)+" - Failed assert_points_unlocked test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -141,7 +182,7 @@ def assert_signals_locked(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if not signals_common.signals[str(sigid)]["siglocked"]:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_locked test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_locked test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
             
@@ -149,15 +190,35 @@ def assert_signals_unlocked(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["siglocked"]:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_unlocked test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_unlocked test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
+def assert_subsidaries_locked(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if not signals_common.signals[str(sigid)]["hassubsidary"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_locked test (not supported)")
+        elif not signals_common.signals[str(sigid)]["sublocked"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_locked test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+            
+def assert_subsidaries_unlocked(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if not signals_common.signals[str(sigid)]["hassubsidary"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_unlocked test (not supported)")
+        if signals_common.signals[str(sigid)]["sublocked"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_unlocked test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+        
 def assert_signals_override_set(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if not signals_common.signals[str(sigid)]["override"]:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_override_set test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_set test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
         
@@ -165,7 +226,7 @@ def assert_signals_override_clear(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["override"]:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_override_clear test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_clear test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -173,13 +234,13 @@ def assert_signals_app_cntl_set(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         # Check that the signal supports approach control to prevent an exception
-        if ( "releaseonred" not in signals_common.signals[str(sigid)].keys or
-             "releaseonyel" not in signals_common.signals[str(sigid)].keys ):
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test (not supported)")
+        if ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
+             "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test (not supported)")
             test_failures = test_failures+1
         elif ( not signals_common.signals[str(sigid)]["releaseonred"] and
                not signals_common.signals[str(sigid)]["releaseonyel"] ):
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
         
@@ -187,13 +248,13 @@ def assert_signals_app_cntl_clear(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         # Check that the signal supports approach control to prevent an exception
-        if ( "releaseonred" not in signals_common.signals[str(sigid)].keys or
-             "releaseonyel" not in signals_common.signals[str(sigid)].keys ):
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test (not supported)")
+        if ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
+             "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test (not supported)")
             test_failures = test_failures+1
         elif ( signals_common.signals[str(sigid)]["releaseonred"] or
                signals_common.signals[str(sigid)]["releaseonyel"] ):
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -201,7 +262,7 @@ def assert_signals_DANGER(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.DANGER:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_DANGER test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_DANGER test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
             
@@ -209,7 +270,7 @@ def assert_signals_PROCEED(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.PROCEED:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_PROCEED test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_PROCEED test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
             
@@ -217,7 +278,7 @@ def assert_signals_CAUTION(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.CAUTION:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -225,7 +286,7 @@ def assert_signals_CAUTION_APP_CNTL(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.CAUTION_APP_CNTL:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION_APP_CNTL test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION_APP_CNTL test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -233,7 +294,7 @@ def assert_signals_PRELIM_CAUTION(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.PRELIM_CAUTION:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_PRELIM_CAUTION test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_PRELIM_CAUTION test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -241,7 +302,7 @@ def assert_signals_FLASH_CAUTION(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.FLASH_CAUTION:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_CAUTION test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_CAUTION test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
@@ -249,14 +310,65 @@ def assert_signals_FLASH_PRELIM_CAUTION(*sigids):
     global test_failures, tests_executed
     for sigid in sigids:
         if signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-            logging.error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_PRELIM_CAUTION test")
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_PRELIM_CAUTION test")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
         
-############################################################
-### TO DO - Section Asserts ################################
-############################################################
+def assert_signals_route_MAIN(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.MAIN:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_MAIN test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+
+def assert_signals_route_LH1(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.LH1:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_LH1 test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+
+def assert_signals_route_LH2(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.LH2:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_LH2 test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+
+def assert_signals_route_RH1(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.RH1:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_RH1 test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+
+def assert_signals_route_RH2(*sigids):
+    global test_failures, tests_executed
+    for sigid in sigids:
+        if signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.RH2:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_RH2 test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
         
+def assert_sections_occupied(*secids):
+    global test_failures, tests_executed
+    for secid in secids:
+        if not track_sections.sections[str(secid)]["occupied"]:
+            raise_test_error ("Section:"+str(secid)+" - Failed assert_sections_occupied test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+
+def assert_sections_clear(*secids):
+    global test_failures, tests_executed
+    for secid in secids:
+        if track_sections.sections[str(secid)]["occupied"]:
+            raise_test_error ("Section:"+str(secid)+" - Failed assert_sections_clear test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
 
 #############################################################################################
 
