@@ -499,6 +499,8 @@ class main_menubar:
             if messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
                     "signals, points and track occupancy sections back to their default state"):
                 run_layout.reset_layout()
+        else:
+            run_layout.reset_layout()
 
     def sprog_connect(self):
         port, baud, debug, startup, power = settings.get_sprog()

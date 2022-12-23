@@ -741,6 +741,7 @@ def schematic_callback(item_id,callback_type):
     if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
+         callback_type == signals_common.sig_callback_type.sub_switched or
               signal_aspects_updated ):
         logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
