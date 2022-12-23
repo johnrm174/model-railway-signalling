@@ -450,21 +450,9 @@ assert_signals_override_clear(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19)
 
 #-----------------------------------------------------------------------------------
 
-
-complete_tests()
-
 print("Main line tests 1")
-
-sleep(30)
-
-
-
-
-
-
 
 # This clears all the signals and sends a train from Left to right along the main line
-print("Main line tests 1")
 sleep(1)
 set_signals_off(8,1,3,4)
 set_sections_occupied(10)
