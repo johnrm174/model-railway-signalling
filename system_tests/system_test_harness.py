@@ -113,6 +113,22 @@ def set_signals_off(*sigids):
             signals_common.signal_button_event(sigid)
     root.update()
 
+def set_subsidaries_on(*sigids):
+    for sigid in sigids:
+        if not signals_common.signals[str(sigid)]["hassubsidary"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed set_subsidaries_on (not supported)")
+        elif signals.subsidary_clear(sigid):
+            signals_common.subsidary_button_event(sigid)
+    root.update()
+
+def set_subsidaries_off(*sigids):
+    for sigid in sigids:
+        if not signals_common.signals[str(sigid)]["hassubsidary"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed set_subsidaries_on (not supported)")
+        elif not signals.subsidary_clear(sigid):
+            signals_common.subsidary_button_event(sigid)
+    root.update()
+
 def set_points_switched(*pointids):
     for pointid in pointids:
         if not points.point_switched(pointid):
@@ -139,13 +155,18 @@ def set_fpls_off(*pointids):
 def set_sections_occupied(*sectionids):
     global train_identifier
     for sectionid in sectionids:
-        track_sections.set_section_occupied(sectionid,str(train_identifier))
+        if not track_sections.section_occupied(sectionid):
+            track_sections.clear_section_occupied(sectionid,str(train_identifier))
+            track_sections.section_button_event(sectionid)
+        else:
+            track_sections.set_section_occupied(sectionid,str(train_identifier))
         train_identifier=train_identifier+1
     root.update()
     
 def set_sections_clear(*sectionids):
     for sectionid in sectionids:
-        track_sections.clear_section_occupied(sectionid)
+        if track_sections.section_occupied(sectionid):
+            track_sections.section_button_event(sectionid)
     root.update()
     
 def trigger_signals_passed(*sigids):
