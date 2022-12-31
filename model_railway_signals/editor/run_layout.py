@@ -535,16 +535,17 @@ def update_all_signal_overrides():
 # Function to override any distant signals that have been configured to be overridden
 # to CAUTION if any of the home signals on the route ahead are at DANGER. If this
 # results in an aspect change then we also work back to update any dependent signals
-# The 'track_occupancy_updated' flag is used to determine if the override has already
-# been set/cleared due to possible changes in track occupancy (where any override that
-# has been set needs to be maintained. If the flag is False then this function needs
-# to explicitly set or clear the override based soley on the home signals ahead
+# The editing_enabled flag is used by the function to determine whether all signal
+# overrides have already been explicitly SET/CLEARED by the update_all_signal_overrides
+# function (see above). If so, then the function will only additionally SET an override
+# (any existing overrides will remain SET). If  not, then the function will either SET
+# or CLEAR the override based solely on the state of the Home signals ahead.
 #####################################################################################
 # TODO - Update function in light of the move to using IDs rather than objects
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def update_all_distant_overrides(track_occupancy_updated):
+def update_all_distant_overrides(editing_enabled):
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         signal_should_be_overridden = False
@@ -563,7 +564,7 @@ def update_all_distant_overrides(track_occupancy_updated):
                     signals.set_signal_override(int(signal_id)+100)
                 else:
                     signals.set_signal_override(int(signal_id))
-            elif not track_occupancy_updated:
+            elif editing_enabled:
                 if has_distant_arms(signal_object):
                     signals.clear_signal_override(int(signal_id)+100)
                 else:
@@ -669,51 +670,36 @@ def schematic_callback(item_id,callback_type):
     global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
-    # The following flags are used to control what gets processed during the callback
-    track_occupancy_updated = False
-    signal_overrides_updated = False
-    signal_aspects_updated = False
+    # Timed signal sequences can be triggered by 'signal_passed' events
+    if callback_type == signals_common.sig_callback_type.sig_passed:
+        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
+        trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
+            
+    # 'signal_passed' events can trigger changes in track occupancy but only in RUN mode
+    # This is because Track section library objects only 'exist' in Run mode
+    if callback_type == signals_common.sig_callback_type.sig_passed and not editing_enabled:
+        logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
+        update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
 
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
-    # Signal overrides are also updated as the 'section ahead' may have changed
     if ( callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched ):
         logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
-        # Note that Track sections (the library objects) only "exist" in run mode
-        if not editing_enabled:   
-            logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
-            update_all_signal_overrides()
-            # Note that approach control and signal overrides will have been set/cleared
-            signal_overrides_updated = True
         
-    # Timed sequences or changes in track occupancy are triggered by 'signal_passed' events
-    if callback_type == signals_common.sig_callback_type.sig_passed:
-        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
-        trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
-        # Note that Track sections (the library objects) only "exist" in run mode
-        if not editing_enabled:
-            logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
-            update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
-            # Set the flag to note that all track sections will have been set or cleared
-            track_occupancy_updated = True
-
-    # 'Mirrored' track sections and signal overrides (i.e. overrides based on track
-    # occupancy) only need to be updated when a track section is manually changed
-    # (which implies we are in RUN Mode) or if the track section occupancy has been
-    # updated in RUN Mode (signified by the track_occupancy_updated flag) - this is
-    # important as Track sections (the library objects) only "exist" in run mode
-    if ( callback_type == track_sections.section_callback_type.section_updated or
-                track_occupancy_updated ):
+    # 'Mirrored' track sections only need to be updated when a track section is manually
+    # changed (which implies we are in RUN Mode) or if track section occupancy has been
+    # updated in RUN Mode (i.e. following a signal passed event in RUN Mode) - this
+    # is important as Track sections (the library objects) only "exist" in run mode
+    if ( (callback_type == signals_common.sig_callback_type.sig_passed and not editing_enabled) or
+          callback_type == track_sections.section_callback_type.section_updated ):
         logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
         update_all_mirrored_sections()
-        logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
-        update_all_signal_overrides()
-        # Set the flag to note that the overrides for all signals will have been explicitly
-        # set or cleared to reflect the occupancy state of the track section ahead
-        signal_overrides_updated = True
-            
-    # Signal aspects can change as a result of 'sig_switched' or 'sig_updated' event or if
+
+    # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
+    # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
+    # changes to signal overides (see above for events) or changes to the approach control state
+    # of a signal ('sig_passed' or 'sig_released' events - or any changes to the signal routes)
     # any signal overrides have been SET or CLEARED (as a result of track sections ahead
     # being occupied/cleared following a signal passed event) or if any signal junction
     # approach control states have been SET or CLEARED - including the case of the signal
@@ -723,26 +709,39 @@ def schematic_callback(item_id,callback_type):
          callback_type == signals_common.sig_callback_type.sig_released or
          callback_type == signals_common.sig_callback_type.sig_passed or
          callback_type == signals_common.sig_callback_type.sig_switched or
-         signal_overrides_updated):
+         callback_type == points.point_callback_type.point_switched or
+         callback_type == points.point_callback_type.fpl_switched or
+         callback_type == track_sections.section_callback_type.section_updated ):
+        # First we update all signal overrides based on track occupancy
+        # But only in RUN mode (as track sections only exist in RUN Mode)
+        logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
+        if not editing_enabled: update_all_signal_overrides()
         # Approach control is made complex by the need to support the case of setting approach
         # control on the state of home signals ahead (for layout automation). We therefore have
         # to process these changes here (which also updates the aspects of all signals)
         logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
         update_all_signal_approach_control()
-        # If the 'track_occupancy_updated' flag is set we only need to 'set' any affected sections
+        # Finally process any distant signal overrides on home signals ahead
+        # The editing_enabled flag is used by the function to determine whether all signal
+        # overrides have already been explicitly SET/CLEARED by the update_all_signal_overrides
+        # function (see above). If so, then the function will only additionally SET an override
+        # (any existing overrides will remain SET). If  not, then the function will either SET or
+        # CLEAR the override based solely on the state of the Home signals ahead
         logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect Home Signals ahead:")
-        update_all_distant_overrides(track_occupancy_updated)
-        # Set the flag to note that the signal aspects may have been changed
-        signal_aspects_updated = True
+        update_all_distant_overrides(editing_enabled)
 
     # Signal interlocking is updated on point, signal or block instrument switched events
     # We also need to process signal interlocking on any event which may have changed the
     # displayed aspect of a signal (when interlocking signals against home signals ahead)
     if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
+         callback_type == signals_common.sig_callback_type.sub_switched or
+         callback_type == signals_common.sig_callback_type.sig_updated or
+         callback_type == signals_common.sig_callback_type.sig_released or
+         callback_type == signals_common.sig_callback_type.sig_passed or
+         callback_type == signals_common.sig_callback_type.sig_switched or
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
-         callback_type == signals_common.sig_callback_type.sub_switched or
-              signal_aspects_updated ):
+         callback_type == track_sections.section_callback_type.section_updated  ):
         logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
         
