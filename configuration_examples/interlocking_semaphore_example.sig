@@ -533,11 +533,11 @@
                 [
                     [
                         [
-                            4,
+                            3,
                             true
                         ],
                         [
-                            0,
+                            5,
                             false
                         ],
                         [
@@ -563,7 +563,7 @@
                 [
                     [
                         [
-                            4,
+                            3,
                             false
                         ],
                         [
@@ -1560,7 +1560,7 @@
             "fullyautomatic": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 11,
+            "itemid": 12,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -1598,7 +1598,7 @@
                             false
                         ]
                     ],
-                    "12",
+                    "10",
                     0
                 ],
                 [
@@ -2026,7 +2026,7 @@
                 false,
                 0
             ],
-            "tags": "signal11",
+            "tags": "signal12",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -2588,7 +2588,7 @@
             "fullyautomatic": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 15,
+            "itemid": 8,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -2847,7 +2847,7 @@
                         ]
                     ],
                     [
-                        16,
+                        15,
                         [
                             true,
                             false,
@@ -3054,7 +3054,7 @@
                 false,
                 0
             ],
-            "tags": "signal15",
+            "tags": "signal8",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -3616,7 +3616,7 @@
             "fullyautomatic": false,
             "interlockahead": true,
             "item": "signal",
-            "itemid": 10,
+            "itemid": 9,
             "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 180,
@@ -3654,7 +3654,7 @@
                             false
                         ]
                     ],
-                    "11",
+                    "12",
                     0
                 ],
                 [
@@ -4082,7 +4082,7 @@
                 false,
                 0
             ],
-            "tags": "signal10",
+            "tags": "signal9",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -4958,7 +4958,7 @@
                         ]
                     ],
                     [
-                        15,
+                        8,
                         [
                             true,
                             false,
@@ -5699,7 +5699,7 @@
                 [
                     [
                         [
-                            4,
+                            3,
                             false
                         ],
                         [
@@ -6726,7 +6726,7 @@
             "fullyautomatic": false,
             "interlockahead": true,
             "item": "signal",
-            "itemid": 8,
+            "itemid": 16,
             "itemsubtype": 2,
             "itemtype": 3,
             "orientation": 0,
@@ -6764,7 +6764,7 @@
                             false
                         ]
                     ],
-                    "15",
+                    "8",
                     0
                 ],
                 [
@@ -7192,7 +7192,7 @@
                 false,
                 0
             ],
-            "tags": "signal8",
+            "tags": "signal16",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -7754,7 +7754,7 @@
             "fullyautomatic": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 16,
+            "itemid": 15,
             "itemsubtype": 1,
             "itemtype": 4,
             "orientation": 180,
@@ -8013,7 +8013,7 @@
                         ]
                     ],
                     [
-                        15,
+                        8,
                         [
                             true,
                             false,
@@ -8220,7 +8220,7 @@
                 false,
                 0
             ],
-            "tags": "signal16",
+            "tags": "signal15",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -8266,7 +8266,7 @@
             ]
         },
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
-            "alsoswitch": 3,
+            "alsoswitch": 4,
             "automatic": false,
             "bbox": 752,
             "colour": "black",
@@ -8274,23 +8274,13 @@
             "dccreversed": false,
             "hasfpl": true,
             "item": "point",
-            "itemid": 4,
+            "itemid": 3,
             "itemtype": 1,
             "orientation": 0,
             "posx": 1000,
             "posy": 175,
             "reverse": false,
             "siginterlock": [
-                [
-                    2,
-                    [
-                        true,
-                        true,
-                        false,
-                        false,
-                        false
-                    ]
-                ],
                 [
                     3,
                     [
@@ -8320,9 +8310,19 @@
                         true,
                         false
                     ]
+                ],
+                [
+                    2,
+                    [
+                        true,
+                        true,
+                        false,
+                        false,
+                        false
+                    ]
                 ]
             ],
-            "tags": "point4"
+            "tags": "point3"
         },
         "71e6fad1-a16e-4a4a-be41-a40a63a0f006": {
             "approachcontrol": [
@@ -8879,7 +8879,7 @@
                             false
                         ]
                     ],
-                    "9",
+                    "80",
                     0
                 ],
                 [
@@ -10738,7 +10738,7 @@
             ],
             "dcctheatre": [
                 [
-                    "#",
+                    "",
                     [
                         [
                             0,
@@ -10923,7 +10923,7 @@
             "fullyautomatic": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 9,
+            "itemid": 80,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 0,
@@ -10959,10 +10959,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -10970,44 +10966,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -11061,10 +11019,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -11076,6 +11030,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -11399,7 +11379,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -11409,7 +11389,7 @@
                 false,
                 0
             ],
-            "tags": "signal9",
+            "tags": "signal80",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -11476,14 +11456,14 @@
             "dccreversed": false,
             "hasfpl": false,
             "item": "point",
-            "itemid": 3,
+            "itemid": 4,
             "itemtype": 1,
             "orientation": 180,
             "posx": 1000,
             "posy": 225,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point3"
+            "tags": "point4"
         },
         "bef3b222-f3c5-427d-b34c-cd5d283a00fa": {
             "approachcontrol": [
@@ -11817,7 +11797,7 @@
             ],
             "dcctheatre": [
                 [
-                    "#",
+                    "",
                     [
                         [
                             0,
@@ -12002,7 +11982,7 @@
             "fullyautomatic": false,
             "interlockahead": false,
             "item": "signal",
-            "itemid": 12,
+            "itemid": 10,
             "itemsubtype": 1,
             "itemtype": 3,
             "orientation": 180,
@@ -12038,10 +12018,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -12049,44 +12025,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -12140,10 +12078,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -12155,6 +12089,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -12478,7 +12438,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -12488,7 +12448,7 @@
                 false,
                 0
             ],
-            "tags": "signal12",
+            "tags": "signal10",
             "theatreroute": false,
             "timedsequences": [
                 [
@@ -12573,7 +12533,7 @@
                     ]
                 ],
                 [
-                    16,
+                    15,
                     [
                         true,
                         false,
@@ -13663,7 +13623,7 @@
             "reverse": false,
             "siginterlock": [
                 [
-                    11,
+                    12,
                     [
                         true,
                         false,
@@ -13699,6 +13659,16 @@
                         true,
                         false,
                         true,
+                        false
+                    ]
+                ],
+                [
+                    2,
+                    [
+                        true,
+                        false,
+                        false,
+                        false,
                         false
                     ]
                 ]
@@ -14254,7 +14224,7 @@
                 [
                     [
                         [
-                            4,
+                            3,
                             false
                         ],
                         [
@@ -15304,7 +15274,7 @@
                             false
                         ],
                         [
-                            4,
+                            3,
                             false
                         ],
                         [
@@ -15394,7 +15364,7 @@
                             false
                         ],
                         [
-                            4,
+                            3,
                             true
                         ],
                         [
@@ -16485,7 +16455,7 @@
                         10
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -16499,7 +16469,7 @@
                         11
                     ],
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -16553,7 +16523,7 @@
             "siginterlock": [
                 [
                     [
-                        16,
+                        15,
                         [
                             true,
                             false,
@@ -16770,8 +16740,8 @@
                 false
             ],
             "subroutes": [
-                false,
-                false,
+                true,
+                true,
                 false,
                 false,
                 false
@@ -16843,7 +16813,7 @@
             "switched": false
         },
         "4": {
-            "fpllock": true,
+            "fpllock": false,
             "locked": false,
             "switched": false
         },
@@ -16866,8 +16836,8 @@
             "width": 1650
         },
         "general": {
-            "editmode": false,
-            "filename": "/home/pi/model-railway-signalling/configuration_examples/interlocking_semaphore_example.sig",
+            "editmode": true,
+            "filename": "../configuration_examples/interlocking_semaphore_example.sig",
             "version": "Version 3.1.0"
         },
         "logging": {
@@ -16899,7 +16869,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -16911,17 +16881,6 @@
             "routeset": 1,
             "sigclear": false,
             "siglocked": true,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": "NONE"
-        },
-        "11": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -16943,7 +16902,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -16961,17 +16920,6 @@
         },
         "15": {
             "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": "NONE"
-        },
-        "16": {
-            "override": false,
             "releaseonred": null,
             "releaseonyel": null,
             "routeset": 1,
@@ -16981,15 +16929,26 @@
             "sublocked": false,
             "theatretext": null
         },
-        "2": {
+        "16": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": true,
             "subclear": false,
             "sublocked": false,
+            "theatretext": "NONE"
+        },
+        "2": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": true,
+            "subclear": false,
+            "sublocked": true,
             "theatretext": "NONE"
         },
         "3": {
@@ -16998,9 +16957,9 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
-            "sublocked": false,
+            "sublocked": true,
             "theatretext": "NONE"
         },
         "4": {
@@ -17042,7 +17001,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -17053,7 +17012,18 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
+            "subclear": false,
+            "sublocked": false,
+            "theatretext": "NONE"
+        },
+        "80": {
+            "override": false,
+            "releaseonred": false,
+            "releaseonyel": false,
+            "routeset": 1,
+            "sigclear": false,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -17064,7 +17034,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
