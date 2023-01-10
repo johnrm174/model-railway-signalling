@@ -529,9 +529,12 @@ class main_menubar:
             self.mainmenubar.entryconfigure(self.power_label, label=new_label)
             self.power_label = new_label
 
-    def quit_schematic(self):
-        if messagebox.askokcancel("Quit Schematic", "Are you sure you want to "+
-                             "discard all changes and quit the application"):
+    def quit_schematic(self, confirmation:bool=True):
+        # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the confirmation dialog. If
+        # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
+        if not confirmation or messagebox.askokcancel("Quit Schematic",
+                "Are you sure you want to discard all changes and quit the application"):
             library_common.on_closing(ask_to_save_state=False)
         return()
                 
@@ -568,6 +571,9 @@ class main_menubar:
         return()
 
     def load_schematic(self, filename=None):
+        # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the file selection dialog. If
+        # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         global logging
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
