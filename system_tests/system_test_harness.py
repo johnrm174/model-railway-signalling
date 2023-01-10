@@ -86,10 +86,11 @@ def initialise_test_harness(filename=None):
 # back into the tkinter main loop to allow the schematic to be edited if required
 # ------------------------------------------------------------------------------
 
-def complete_tests():
+def complete_tests(shutdown:bool=False):
     print ("Tests Run:",tests_executed,"  Tests Passed:",
               tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
-    root.mainloop()
+    if shutdown: main_menubar.quit_schematic(confirmation=False)
+    else: root.mainloop()
 
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
