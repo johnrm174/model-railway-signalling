@@ -1049,7 +1049,7 @@
             "editable": true,
             "item": "section",
             "itemid": 10,
-            "label": "XXXXX",
+            "label": "27",
             "mirror": "",
             "posx": 50,
             "posy": 225,
@@ -2185,7 +2185,7 @@
             "editable": true,
             "item": "section",
             "itemid": 4,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 1425,
             "posy": 225,
@@ -6266,7 +6266,7 @@
                     true,
                     11,
                     0,
-                    5
+                    2
                 ],
                 [
                     false,
@@ -8384,7 +8384,7 @@
             "editable": true,
             "item": "section",
             "itemid": 14,
-            "label": "XXXXX",
+            "label": "26",
             "mirror": "",
             "posx": 450,
             "posy": 275,
@@ -8397,7 +8397,7 @@
             "editable": true,
             "item": "section",
             "itemid": 9,
-            "label": "XXXXX",
+            "label": "26",
             "mirror": "",
             "posx": 650,
             "posy": 275,
@@ -9464,7 +9464,7 @@
             "editable": true,
             "item": "section",
             "itemid": 6,
-            "label": "XXXXX",
+            "label": "26",
             "mirror": "",
             "posx": 1625,
             "posy": 275,
@@ -12530,7 +12530,7 @@
                     true,
                     4,
                     0,
-                    5
+                    2
                 ],
                 [
                     false,
@@ -13602,7 +13602,7 @@
             "editable": true,
             "item": "section",
             "itemid": 3,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 975,
             "posy": 225,
@@ -13615,7 +13615,7 @@
             "editable": true,
             "item": "section",
             "itemid": 13,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 1425,
             "posy": 175,
@@ -13659,22 +13659,22 @@
                     ]
                 ],
                 [
-                    13,
-                    [
-                        true,
-                        false,
-                        false,
-                        true,
-                        false
-                    ]
-                ],
-                [
                     7,
                     [
                         true,
                         false,
                         false,
                         false,
+                        false
+                    ]
+                ],
+                [
+                    13,
+                    [
+                        true,
+                        false,
+                        false,
+                        true,
                         false
                     ]
                 ]
@@ -14800,7 +14800,7 @@
             "editable": true,
             "item": "section",
             "itemid": 7,
-            "label": "XXXXX",
+            "label": "26",
             "mirror": "",
             "posx": 1425,
             "posy": 275,
@@ -14813,7 +14813,7 @@
             "editable": true,
             "item": "section",
             "itemid": 1,
-            "label": "XXXXX",
+            "label": "27",
             "mirror": "",
             "posx": 450,
             "posy": 225,
@@ -14826,7 +14826,7 @@
             "editable": true,
             "item": "section",
             "itemid": 5,
-            "label": "XXXXX",
+            "label": "27",
             "mirror": "",
             "posx": 250,
             "posy": 225,
@@ -14839,7 +14839,7 @@
             "editable": true,
             "item": "section",
             "itemid": 12,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 975,
             "posy": 175,
@@ -15898,7 +15898,7 @@
             "editable": true,
             "item": "section",
             "itemid": 11,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 650,
             "posy": 175,
@@ -16939,7 +16939,7 @@
             "editable": true,
             "item": "section",
             "itemid": 15,
-            "label": "XXXXX",
+            "label": "26",
             "mirror": "",
             "posx": 250,
             "posy": 275,
@@ -17980,7 +17980,7 @@
             "editable": true,
             "item": "section",
             "itemid": 8,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 975,
             "posy": 275,
@@ -18011,7 +18011,7 @@
             "editable": true,
             "item": "section",
             "itemid": 2,
-            "label": "XXXXX",
+            "label": "28",
             "mirror": "",
             "posx": 650,
             "posy": 225,
@@ -20099,12 +20099,12 @@
         "5": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "6": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
     "sections": {},
@@ -20170,7 +20170,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -20179,7 +20179,7 @@
             "override": false,
             "releaseonred": null,
             "releaseonyel": null,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -20192,7 +20192,7 @@
             "releaseonyel": null,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -20269,9 +20269,9 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": true,
+            "siglocked": false,
             "subclear": false,
-            "sublocked": true,
+            "sublocked": false,
             "theatretext": "NONE"
         },
         "4": {
