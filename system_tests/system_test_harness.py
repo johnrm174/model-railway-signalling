@@ -455,7 +455,6 @@ def assert_signals_route_MAIN(*sigids):
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.MAIN:
             raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_MAIN test")
             test_failures = test_failures+1
-        
         tests_executed = tests_executed+1
 
 def assert_signals_route_LH1(*sigids):
