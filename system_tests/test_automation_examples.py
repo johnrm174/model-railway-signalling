@@ -2,7 +2,7 @@
 # System tests covering interlocking, automation and approach control functions
 #
 # When run as 'main' it uses the following example schematic files:
-#     "../configuration_examples/approach_control_colour_light_example.sig"
+#     "../configuration_examples/automation_colour_light_example.sig"
 #
 # Re-uses the common interlocking and route setting system tests
 #-----------------------------------------------------------------------------------
@@ -12,21 +12,28 @@ import test_interlocking_examples
 
 #-----------------------------------------------------------------------------------
 
-def run_initial_state_tests():
+def run_initial_state_tests(semaphore=False):
     print("Initial state tests")
     assert_signals_route_MAIN(1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19)
     assert_signals_route_LH1(2)
     assert_signals_DANGER(1,2,3,4,5,6,7,8,12,13,14,15)
     assert_signals_CAUTION(9,16)
-    assert_signals_PRELIM_CAUTION(17)
     assert_signals_PROCEED(10,11,18,19)
     assert_points_unlocked(2,3,5)
     assert_signals_unlocked(1,3,4,5,6,7,8,12,13,15)
     assert_subsidaries_unlocked(1,2,3)
     assert_signals_locked(2,14)
     assert_sections_clear(1,2,3,4,5,6,7,8,9,10,11,12,13)
-    assert_signals_override_clear(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19)
-    assert_signals_app_cntl_clear(1,2,3,4,8,9,10,11,12,16,17,18,19)
+    assert_signals_override_clear(1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19)
+    assert_signals_app_cntl_clear(17,16,2,4,9,12,10,18,19,11)
+    if semaphore:
+        assert_signals_PROCEED(17)
+        assert_signals_override_set(9)
+        assert_signals_app_cntl_set(1,3,8)
+    else:
+        assert_signals_PRELIM_CAUTION(17)
+        assert_signals_override_clear(9)
+        assert_signals_app_cntl_clear(1,3,8)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -85,6 +92,16 @@ def run_colour_light_aspect_tests():
     assert_signals_DANGER(8)
     assert_signals_CAUTION(16)
     assert_signals_PRELIM_CAUTION(17)
+    # Test 'signal released' aspects
+    set_signals_off(8,1,2,4)
+    assert_signals_PROCEED(2,4)
+    assert_signals_CAUTION_APP_CNTL(1)
+    assert_signals_FLASH_CAUTION(8)
+    assert_signals_FLASH_PRELIM_CAUTION(16)
+    assert_signals_PROCEED(17)
+    trigger_signals_released(1)
+    assert_signals_PROCEED(8,1,2,4)
+    set_signals_on(8,1,2,4)
     # Switch points back to main line
     set_fpls_off(2,3)
     set_points_normal(2,3)
@@ -105,9 +122,14 @@ def run_colour_light_aspect_tests():
 
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests():
+def run_track_occupancy_tests(semaphore=False):
     print("Track Occupancy Tests")
-    ########## TO DO - test default state and returned to default state #############
+    # test the default state
+    # Semaphore Signal and 9 and 18 are overridden on home signals ahead
+    # But as Signals 11 and 19 are auto (clear) then sig 18 is not overridden
+    assert_signals_override_clear(1,2,3,4,8,10,12,16,17,18,19)
+    if semaphore:assert_signals_override_set(9)
+    else:assert_signals_override_clear(9)
     # Signal 17
     assert_signals_override_clear(17)
     set_sections_occupied(5)
@@ -161,12 +183,12 @@ def run_track_occupancy_tests():
     set_fpls_off(3)
     set_points_normal(3)
     set_fpls_on(3)
-    # Signal 9
-    assert_signals_override_clear(9)
+    # Signal 9 (Semaphore Signal 9 is overridden on home signals ahead)
     set_sections_occupied(7)
     assert_signals_override_set(9)
     set_sections_clear(7)
-    assert_signals_override_clear(9)
+    if semaphore:assert_signals_override_set(9)
+    else:assert_signals_override_clear(9)
     # Signal 12
     assert_signals_override_clear(12)
     set_sections_occupied(8)
@@ -174,13 +196,12 @@ def run_track_occupancy_tests():
     set_sections_clear(8)
     assert_signals_override_clear(12)
     # Signal 10
-    assert_signals_override_clear(10)
     set_sections_occupied(9)
     assert_signals_override_set(10)
     set_sections_clear(9)
     assert_signals_override_clear(10)
-    # Signal 18
-    assert_signals_override_clear(18)
+    # Signal 18 (Semaphore Signal 18 is overridden on home signals ahead)
+    # But signals 11 and 19 are automatic so Signal 18 override will be clear)
     set_sections_occupied(14)
     assert_signals_override_set(18)
     set_sections_clear(14)
@@ -191,43 +212,45 @@ def run_track_occupancy_tests():
     assert_signals_override_set(19)
     set_sections_clear(15)
     assert_signals_override_clear(19)
+    # test everything has been set back to the default state
+    # Semaphore Signal and 9 and 18 are overridden on home signals ahead
+    # But as Signals 11 and 19 are auto (clear) then sig 18 is not overridden
+    assert_signals_override_clear(1,2,3,4,8,10,12,16,17,18,19)
+    if semaphore:assert_signals_override_set(9)
+    else:assert_signals_override_clear(9)
     return()
 
 #-----------------------------------------------------------------------------------
 
-def run_main_line_tests_1(delay=0):
+def run_main_line_tests_1(delay=0, semaphore=False):
     print("Main line tests 1")
     # This clears all the signals and sends a train from Left to right along the main line
     sleep(delay)
     set_signals_off(8,1,3,4)
+    if semaphore: set_signals_off(16,17)
     set_sections_occupied(10)
     sleep(delay)
     trigger_signals_passed(17)
-    assert_signals_override_set(17)
     assert_sections_occupied(5)
     assert_sections_clear(10)
     sleep(delay)
     trigger_signals_passed(16)
-    assert_signals_override_set(16)
     assert_sections_occupied(1)
     assert_sections_clear(5)
     sleep(delay)
     trigger_signals_passed(8)
-    assert_signals_override_set(8)
     assert_sections_occupied(2)
     assert_sections_clear(1)
     sleep(delay/2)
     trigger_signals_released(1)
     sleep(delay/2)
     trigger_signals_passed(1)
-    assert_signals_override_set(1)
     assert_sections_occupied(3)
     assert_sections_clear(2)
     sleep(delay/2)
     trigger_signals_passed(15)
     sleep(delay/2)
     trigger_signals_passed(3)
-    assert_signals_override_set(3)
     assert_sections_occupied(4)
     assert_sections_clear(3)
     sleep(delay/2)
@@ -235,14 +258,15 @@ def run_main_line_tests_1(delay=0):
     sleep(delay/2)
     trigger_signals_passed(4)
     assert_sections_clear(4)
-    sleep(delay)
+    # Wait for the timed signal sequences to finish
+    sleep(5.0)
     # Revert the signals to danger
     set_signals_on(8,1,3,4)
     return()
 
 #-----------------------------------------------------------------------------------
 
-def run_main_line_tests_2(delay=0):
+def run_main_line_tests_2(delay=0, semaphore=False):
     print("Main line tests 2")
     # This clears all the signals and sends a train from right to left along the main line
     sleep(delay)
@@ -250,35 +274,31 @@ def run_main_line_tests_2(delay=0):
     set_sections_occupied(6)
     sleep(delay)
     trigger_signals_passed(9)
-    assert_signals_override_set(9)
     assert_sections_occupied(7)
     assert_sections_clear(6)
     sleep(delay)
     trigger_signals_passed(12)
-    assert_signals_override_set(12)
     assert_sections_occupied(8)
     assert_sections_clear(7)
     sleep(delay/2)
     trigger_signals_passed(14)
     sleep(delay/2)
     trigger_signals_passed(10)
-    assert_signals_override_set(10)
     assert_sections_occupied(9)
     assert_sections_clear(8)
     sleep(delay)
     trigger_signals_passed(18)
-    assert_signals_override_set(18)
     assert_sections_occupied(14)
     assert_sections_clear(15)
     sleep(delay)
     trigger_signals_passed(19)
-    assert_signals_override_set(19)
     assert_sections_occupied(15)
     assert_sections_clear(14)
     sleep(delay)
     trigger_signals_passed(11)
     assert_sections_clear(15)
-    sleep(delay)
+    # Wait for the timed signal sequences to finish
+    sleep(5.0)
     # revert the signal to danger
     set_signals_on(12)
     return()
@@ -302,61 +322,38 @@ def run_loop_line_tests(delay=0):
     set_sections_occupied(10)
     sleep(delay)
     trigger_signals_passed(17)
-    assert_signals_override_set(17)
     assert_sections_occupied(5)
     assert_sections_clear(10)
     sleep(delay)
     trigger_signals_passed(16)
-    assert_signals_override_set(16)
     assert_sections_occupied(1)
     assert_sections_clear(5)
     sleep(delay)
     trigger_signals_passed(8)
-    assert_signals_override_set(8)
     assert_sections_occupied(2)
     assert_sections_clear(1)
     sleep(delay/2)
-    assert_signals_CAUTION_APP_CNTL(1)
     assert_signals_app_cntl_set(1)
     trigger_signals_released(1)
     assert_signals_app_cntl_clear(1)
-    assert_signals_PROCEED(1)
-    assert_signals_DANGER(8)
-    assert_signals_CAUTION(16)
-    assert_signals_PRELIM_CAUTION(17)
     sleep(delay/2)
     trigger_signals_passed(1)
     assert_signals_app_cntl_set(1)
-    assert_signals_override_set(1)
     assert_sections_occupied(12)
     assert_sections_clear(2)
-    assert_signals_DANGER(1)
-    assert_signals_CAUTION(8)
-    assert_signals_PRELIM_CAUTION(16)
-    assert_signals_PROCEED(17)
     sleep(delay/2)
     trigger_signals_passed(6)
     sleep(delay/2)
     trigger_signals_passed(2)
-    assert_signals_override_set(2)
     assert_sections_occupied(4)
     assert_sections_clear(12)
-    assert_signals_DANGER(2)
-    assert_signals_CAUTION_APP_CNTL(1)
-    assert_signals_FLASH_CAUTION(8)
-    assert_signals_FLASH_PRELIM_CAUTION(16)
-    assert_signals_PROCEED(17)
     sleep(delay/2)
     trigger_signals_passed(13)
     sleep(delay/2)
     trigger_signals_passed(4)
     assert_sections_clear(4)
-    assert_signals_DANGER(4)
-    assert_signals_CAUTION(2)
-    assert_signals_CAUTION_APP_CNTL(1)
-    assert_signals_FLASH_CAUTION(8)
-    assert_signals_FLASH_PRELIM_CAUTION(16)
-    sleep(delay)
+    # Wait for the timed signal sequences to finish
+    sleep(5.0)
     # Revert the signals to danger
     set_signals_on(8,1,2,4)
     # Revert the points
@@ -537,10 +534,63 @@ def run_shunting_tests(delay=0):
     set_sections_clear(4)
     return()
 
+#-----------------------------------------------------------------------------------
+
+def run_semaphore_signal_interlock_ahead_tests():
+    print("Signal Interlock on signals ahead Tests")
+    # Test the default state
+    # Signal 116 is the diustant arm associuated with signal 16
+    assert_signals_locked(116)
+    # Main line 1
+    assert_signals_locked(116)
+    set_signals_off(8)
+    assert_signals_locked(116)
+    set_signals_off(1)
+    assert_signals_locked(116)
+    set_signals_off(3)
+    assert_signals_locked(116)
+    set_signals_off(4)
+    assert_signals_unlocked(116)
+    set_signals_off(116)
+    set_signals_on(8,1,3,4)
+    assert_signals_unlocked(116)
+    set_signals_on(116)
+    assert_signals_locked(116)
+    # Main Line Loop
+    set_fpls_off(2,3)
+    set_points_switched(2,3)
+    set_fpls_on(2,3)
+    assert_signals_locked(116)
+    set_signals_off(8)
+    assert_signals_locked(116)
+    set_signals_off(1)
+    assert_signals_locked(116)
+    set_signals_off(2)
+    assert_signals_locked(116)
+    set_signals_off(4)
+    # Signal 1 is subject to approach control for the LH1 route so signal 116
+    # will remain locked on home sign ahead until signal 1 has been released
+    assert_signals_locked(116)
+    trigger_signals_released(1)
+    assert_signals_unlocked(116)
+    set_signals_off(116)
+    set_signals_on(8,1,2,4)
+    assert_signals_unlocked(116)
+    set_signals_on(116)
+    assert_signals_locked(116)
+    set_fpls_off(2,3)
+    set_points_normal(2,3)
+    set_fpls_on(2,3)  
+    # Test the default state
+    assert_signals_locked(116)
+    return()
+
+######################################################################################################
+#################### TODO - Break out approach control tests #########################################
 ######################################################################################################
 
-def run_all_approach_control_tests(delay=0):
-    initialise_test_harness(filename="../configuration_examples/approach_control_colour_light_example.sig")
+def run_all_automation_example_tests(delay=0):
+    initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
     run_initial_state_tests()
     run_colour_light_aspect_tests()
     test_interlocking_examples.run_signal_route_tests()
@@ -549,13 +599,23 @@ def run_all_approach_control_tests(delay=0):
     run_track_occupancy_tests()
     run_main_line_tests_1(delay)
     run_main_line_tests_2(delay)
-    # Sleep to allow the timed signal sequences to complete
-    if delay==0: sleep(5.0)
+    run_loop_line_tests(delay)
+    run_shunting_tests(delay)
+    initialise_test_harness(filename="../configuration_examples/automation_semaphore_example.sig")
+    run_initial_state_tests(semaphore=True)
+#    run_semaphore_aspect_tests()
+    test_interlocking_examples.run_signal_route_tests()
+    test_interlocking_examples.run_point_interlocking_tests()
+    test_interlocking_examples.run_signal_interlocking_tests()
+    run_semaphore_signal_interlock_ahead_tests()
+    run_track_occupancy_tests(semaphore=True)
+    run_main_line_tests_1(delay)
+    run_main_line_tests_2(delay)
     run_loop_line_tests(delay)
     run_shunting_tests(delay)
 
 if __name__ == "__main__":
-    run_all_approach_control_tests(delay=1)
+    run_all_automation_example_tests(delay=1)
     complete_tests(shutdown=False)
 
 ######################################################################################################

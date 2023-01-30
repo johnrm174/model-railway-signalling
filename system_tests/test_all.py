@@ -2,10 +2,10 @@
 # Test script to run all system tests
 #-----------------------------------------------------------------------------------
 
-import test_interlocking
-import test_approach_control
+import test_interlocking_examples
+import test_automation_examples
 import system_test_harness
 
-test_interlocking.run_all_interlocking_tests()
-test_approach_control.run_all_approach_control_tests()
+test_interlocking_examples.run_all_interlocking_example_tests()
+test_automation_examples.run_all_automation_example_tests()
 system_test_harness.complete_tests(shutdown=True)

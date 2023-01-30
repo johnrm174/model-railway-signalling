@@ -12,29 +12,27 @@ from system_test_harness import *
 
 #-----------------------------------------------------------------------------------
 
-def run_initial_colour_light_state_tests():
+def run_initial_state_tests(semaphore=False):
     print("Colour Light Initial state tests")
-    assert_signals_route_MAIN(1,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    # Signal 14 has no valid route available
+    assert_signals_route_MAIN(1,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19)
     assert_signals_route_LH1(2)
-    assert_signals_DANGER(1,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    assert_signals_DANGER(1,2,3,4,5,6,7,8,10,11,12,13,14,15,17,19)
+    assert_signals_CAUTION(9,18)
+    # Differences are due to semaphore associated signals
+    if semaphore:
+        assert_signals_DANGER(16)
+        assert_signals_locked(116)
+        assert_signals_unlocked(16)
+    else:
+        assert_signals_CAUTION(16)
+        assert_signals_locked(16)
     assert_points_unlocked(2,3,5)
-    assert_signals_unlocked(1,3,4,5,6,7,8,9,10,11,12,13,15)
+    assert_signals_unlocked(1,3,4,5,6,7,8,10,11,12,13,15,17,19)
+    assert_subsidaries_unlocked(1,2,3)
     assert_signals_locked(2,14)
-    assert_subsidaries_unlocked(1,2,3)
-    return()
-
-#-----------------------------------------------------------------------------------
-
-def run_initial_semaphore_state_tests():
-    print("Semaphore Initial state tests")
-    assert_signals_route_MAIN(1,3,4,5,6,7,8,9,10,12,13,14,15,16)
-    assert_signals_route_LH1(2)
-    assert_signals_DANGER(1,3,4,5,6,7,8,10,12,13,14,15)
-    assert_signals_CAUTION(9,16)
-    assert_points_unlocked(2,3,5)
-    assert_signals_unlocked(1,3,4,5,6,7,8,10,12,13,15)
-    assert_signals_locked(2,14,9,16)
-    assert_subsidaries_unlocked(1,2,3)
+    # distant signals 9,16 and 18 are locked on the home signals ahead
+    assert_signals_locked(9,18)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -48,13 +46,12 @@ def run_signal_route_tests():
     # Signals 1 and 6
     set_fpls_off(2)
     set_points_switched(2)
-    set_fpls_on(2)
+    set_fpls_on(2) 
     assert_signals_route_LH1(1,6)
     set_fpls_off(2)
     set_points_normal(2)
     set_fpls_on(2)
     assert_signals_route_MAIN(1,6)
-    assert_signals_app_cntl_clear(1)
     # Signal 2, Signal 13 and Signal 14
     # Note that for Signal 2, MAIN is for the main line and LH1 is the siding
     # Note that for Signal 14, MAIN is for the crossover (no route back along main line)
@@ -85,118 +82,67 @@ def run_signal_route_tests():
 
 #-----------------------------------------------------------------------------------
 
-def run_colour_light_aspect_tests():
-    print("Colour Light Aspect tests")
-    # Test the default state
-    assert_signals_DANGER(8,1,2,3,4,9,12,10,11)
-    # Main Route 1
-    set_signals_off(8,1,3,4)
-    assert_signals_PROCEED(8,1,3,4)
-    set_signals_on(4)
-    assert_signals_DANGER(4)
-    assert_signals_CAUTION(3)
-    assert_signals_PRELIM_CAUTION(1)
-    assert_signals_PROCEED(8)
-    set_signals_on(3)
-    assert_signals_DANGER(3)
-    assert_signals_CAUTION(1)
-    assert_signals_PRELIM_CAUTION(8)
-    set_signals_on(1)
-    assert_signals_DANGER(1)
-    assert_signals_CAUTION(8)
-    set_signals_on(8)
-    assert_signals_DANGER(8,1,3,4)
-    # Main Route Loop
-    set_fpls_off(2,3)
-    set_points_switched(2,3)
-    set_fpls_on(2,3)
-    assert_signals_DANGER(8,1,3,4)
-    set_signals_off(8,1,2,4)
-    assert_signals_PROCEED(8,1,2,4)
-    set_signals_on(4)
-    assert_signals_DANGER(4)
-    assert_signals_CAUTION(2)
-    assert_signals_PRELIM_CAUTION(1)
-    assert_signals_PROCEED(8)
-    set_signals_on(2)
-    assert_signals_DANGER(2)
-    assert_signals_CAUTION(1)
-    assert_signals_PRELIM_CAUTION(8)
-    set_signals_on(1)
-    assert_signals_DANGER(1)
-    assert_signals_CAUTION(8)
-    set_signals_on(8)
-    assert_signals_DANGER(8,1,3,4)
-    # Switch points back to main line
-    set_fpls_off(2,3)
-    set_points_normal(2,3)
-    set_fpls_on(2,3)
+def run_signal_aspect_tests(semaphore=False):
+    print("Signal Aspect tests")
+    # The main route tests are different because of associated distants
+    # Set the home signals 'off' first, followed by the distant signals
+    if semaphore:
+        # Test the default state
+        assert_signals_DANGER(17,16,8,1,2,3,4)
+        # Main Route 1
+        set_signals_off(17,16)
+        assert_signals_PROCEED(17)
+        assert_signals_CAUTION(16)
+        set_signals_off(8,1,3,4,116)
+        assert_signals_PROCEED(8,1,3,4,16)
+        set_signals_on(16,17,8,1,3,4,116)
+        # Main Route 2 - loop
+        set_fpls_off(2,3)
+        set_points_switched(2,3)
+        set_fpls_on(2,3)
+        set_signals_off(17,16)
+        assert_signals_PROCEED(17)
+        assert_signals_CAUTION(16)
+        set_signals_off(8,1,2,4,116)
+        assert_signals_PROCEED(8,1,2,4,16)
+        set_signals_on(16,17,8,1,2,4,116)
+        set_fpls_off(2,3)
+        set_points_normal(2,3)
+        set_fpls_on(2,3)
+        # Test everything has returned to the default state
+        assert_signals_DANGER(17,16,8,1,2,3,4)
+    else:
+        # Test the default state
+        assert_signals_DANGER(17,8,1,2,3,4)
+        assert_signals_CAUTION(16)
+        # Main Route 1 - block 1
+        set_signals_off(8,1,3,4,16,17)
+        assert_signals_PROCEED(8,1,3,4,16,17)
+        set_signals_on(8,1,3,4,16,17)
+        # Main Route 2 - loop
+        set_fpls_off(2,3)
+        set_points_switched(2,3)
+        set_fpls_on(2,3)
+        set_signals_off(8,1,2,4,16,17)
+        assert_signals_PROCEED(8,1,2,4,16,17)
+        set_signals_on(8,1,2,4,16,17)
+        set_fpls_off(2,3)
+        set_points_normal(2,3)
+        set_fpls_on(2,3)
+        # Test everything has returned to the default state
+        assert_signals_DANGER(17,8,1,2,3,4)
+        assert_signals_CAUTION(16)
     # Main Route 2
-    assert_signals_DANGER(9,12,10,11)
-    set_signals_off(9,12,10,11)
-    assert_signals_PROCEED(9,12,10,11)
-    set_signals_on(11)
-    assert_signals_DANGER(11)
-    assert_signals_CAUTION(10)
-    assert_signals_PRELIM_CAUTION(12)
-    assert_signals_PROCEED(9)
-    set_signals_on(10)
-    assert_signals_DANGER(10)
-    assert_signals_CAUTION(12)
-    assert_signals_PRELIM_CAUTION(9)
-    set_signals_on(12)
-    assert_signals_DANGER(12)
-    assert_signals_CAUTION(9)
-    set_signals_on(9)
-    # Test everything has returned to the default state
-    assert_signals_DANGER(8,1,2,3,4,9,12,10,11)
-    return()
-
-#-----------------------------------------------------------------------------------
-
-def run_semaphore_aspect_tests():
-    print("Semaphore Aspect tests")
     # Test the default state
-    assert_signals_DANGER(8,1,2,3,4,80,12,10)
-    assert_signals_CAUTION(16,104,9)
-    # Main Route 1
+    assert_signals_DANGER(12,10,19,11)
+    assert_signals_CAUTION(9,18)
     # Set the home signals 'off' first, followed by the distant signals
-    set_signals_off(8,1,3,4,80)
-    # Signal 104 is the distant associated with signal 4)
-    set_signals_off(16,104)
-    assert_signals_PROCEED(16,8,1,3,4,80)
-    set_signals_on(104)
-    assert_signals_CAUTION(4)
-    set_signals_on(16,8,1,3,4,104,80)
-    assert_signals_DANGER(8,1,3,4,80)
-    assert_signals_CAUTION(16)
-    # Main Route Loop
-    set_fpls_off(2,3)
-    set_points_switched(2,3)
-    set_fpls_on(2,3)
-    # Set the home signals 'off' first, followed by the distant signals
-    set_signals_off(8,1,2,4,80)
-    #Signal 104 is the distant associated with signal 4)
-    set_signals_off(16,104)
-    assert_signals_PROCEED(16,8,1,2,4,80)
-    set_signals_on(104)
-    assert_signals_CAUTION(4)
-    set_signals_on(16,8,1,2,4,104,80)
-    assert_signals_DANGER(8,1,2,4,80)
-    assert_signals_CAUTION(16)
-    # Switch points back to main line
-    set_fpls_off(2,3)
-    set_points_normal(2,3)
-    set_fpls_on(2,3)
-    # Main Route 2
-    # Set the home signals 'off' first, followed by the distant signals
-    set_signals_off(10,12)
-    set_signals_off(9)
-    assert_signals_PROCEED(9,12,10)
-    set_signals_on(9,12,10)
+    set_signals_off(11,19,18,10,12,9)
+    assert_signals_PROCEED(11,19,18,10,12,9)
+    set_signals_on(11,19,18,10,12,9)
     # Test everything has returned to the default state
-    assert_signals_DANGER(8,1,2,3,4,80,12,10)
-    assert_signals_CAUTION(16,104,9)
+    assert_signals_DANGER(12,10,19,11)
+    assert_signals_CAUTION(9,18)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -578,58 +524,52 @@ def run_signal_interlocking_tests():
 
 #-----------------------------------------------------------------------------------
 
-def run_semaphore_interlock_ahead_tests():
-    print("Semaphore Interlock on signals ahead Tests")
+def run_signal_interlock_ahead_tests(semaphore=False):
+    print("Signal Interlock on signals ahead Tests")
+    if semaphore: sig_id = 116
+    else: sig_id = 16
     # Test the default state
-    assert_signals_locked(16,104,9)
+    assert_signals_locked(9,18,sig_id)
     # Main line 1
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(8)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(1)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(3)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(4)
-    assert_signals_unlocked(16)
-    set_signals_off(16)
-    assert_signals_locked(104)
-    set_signals_off(80)
-    assert_signals_unlocked(104)
-    set_signals_off(104)
-    set_signals_on(8,1,3,4,80)
-    assert_signals_unlocked(16,104)
-    set_signals_on(16,104)
-    assert_signals_locked(16,104)
+    assert_signals_unlocked(sig_id)
+    set_signals_off(sig_id)
+    set_signals_on(8,1,3,4)
+    assert_signals_unlocked(sig_id)
+    set_signals_on(sig_id)
+    assert_signals_locked(sig_id)
     # Main Line Loop
     set_fpls_off(2,3)
     set_points_switched(2,3)
     set_fpls_on(2,3)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(8)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(1)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(2)
-    assert_signals_locked(16)
+    assert_signals_locked(sig_id)
     set_signals_off(4)
-    assert_signals_unlocked(16)
-    set_signals_off(16)
-    assert_signals_locked(104)
-    set_signals_off(80)
-    assert_signals_unlocked(104)
-    set_signals_off(104)
-    set_signals_on(8,1,2,4,80)
-    assert_signals_unlocked(16,104)
-    set_signals_on(16,104)
-    assert_signals_locked(16,104)
+    assert_signals_unlocked(sig_id)
+    set_signals_off(sig_id)
+    set_signals_on(8,1,2,4)
+    assert_signals_unlocked(sig_id)
+    set_signals_on(sig_id)
+    assert_signals_locked()
     set_fpls_off(2,3)
     set_points_normal(2,3)
     set_fpls_on(2,3)
-    # Main Line 2
+    # Main Line 2 - first section
     assert_signals_locked(9)
     set_signals_off(10)
-    assert_signals_locked(16)
+    assert_signals_locked(9)
     set_signals_off(12)
     assert_signals_unlocked(9)
     set_signals_off(9)
@@ -637,29 +577,41 @@ def run_semaphore_interlock_ahead_tests():
     assert_signals_unlocked(9)
     set_signals_on(9)
     assert_signals_locked(9)    
+    # Main Line 2 - second section
+    assert_signals_locked(18)
+    set_signals_off(19)
+    assert_signals_locked(18)
+    set_signals_off(11)
+    assert_signals_unlocked(18)
+    set_signals_off(18)
+    set_signals_on(19,11)
+    assert_signals_unlocked(18)
+    set_signals_on(18)
+    assert_signals_locked(18)    
     # Test the default state
-    assert_signals_locked(16,104,9)
+    assert_signals_locked(9,18,sig_id)
     return()
 
 ######################################################################################################
 
-def run_all_interlocking_tests():
+def run_all_interlocking_example_tests():
     initialise_test_harness(filename="../configuration_examples/interlocking_colour_light_example.sig")
-    run_initial_colour_light_state_tests()
+    run_initial_state_tests()
     run_signal_route_tests()
-    run_colour_light_aspect_tests()
+    run_signal_aspect_tests()
     run_point_interlocking_tests()
     run_signal_interlocking_tests()
+    run_signal_interlock_ahead_tests()
     initialise_test_harness(filename="../configuration_examples/interlocking_semaphore_example.sig")
-    run_initial_semaphore_state_tests()
+    run_initial_state_tests(semaphore=True)
     run_signal_route_tests()
-    run_semaphore_aspect_tests()
+    run_signal_aspect_tests(semaphore=True)
     run_point_interlocking_tests()
     run_signal_interlocking_tests()
-    run_semaphore_interlock_ahead_tests()
+    run_signal_interlock_ahead_tests(semaphore=True)
     
 if __name__ == "__main__":
-    run_all_interlocking_tests()
+    run_all_interlocking_example_tests()
     complete_tests(shutdown=False)
 
 ######################################################################################################
