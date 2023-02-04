@@ -91,6 +91,7 @@ Summary of features supported by each signal type:
            - lock_subsidary / unlock_subsidary
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
+           - set_signal_override_caution / clear_signal_override_caution (not Home)
            - set_approach_control (Release on Red or Yellow) / clear_approach_control
            - trigger_timed_signal
            - query signal state (signal_clear, signal_state, subsidary_clear)
@@ -101,6 +102,7 @@ Summary of features supported by each signal type:
            - lock_subsidary / unlock_subsidary
            - lock_signal / unlock_signal
            - set_signal_override / clear_signal_override
+           - set_signal_override_caution / clear_signal_override_caution (not Home)
            - set_approach_control (Release on Red only) / clear_approach_control
            - trigger_timed_signal
            - query signal state (signal_clear, signal_state, subsidary_clear)
@@ -302,9 +304,16 @@ signal_state(sig_id:int/str) - returns the DISPLAYED state of the signal. This c
                       integer (representing the ID of a signal on the local schematic), or a 
                       string (representing the identifier of an signal on an external MQTT node)
 
-set_signal_override (sig_id*:int) - Overrides the signal to DANGER (can specify multiple sig_ids)
+set_signal_override (sig_id*:int) - Overrides the signal to display the most restrictive aspect
+                      (Distant signals will display CAUTION - all other types will display DANGER)
 
-clear_signal_override (sig_id*:int) - Clears the siganl Override (can specify multiple sig_ids)
+clear_signal_override (sig_id*:int) - Clears the signal Override (can specify multiple sig_ids)
+
+set_signal_override_caution (sig_id*:int) - Overrides the signal to display CAUTION
+                      (Applicable to all main signal types apart from home signals)
+
+clear_signal_override_caution (sig_id*:int) - Clears the signal Override
+                      (Applicable to all main signal types apart from home signals)
 
 trigger_timed_signal - Sets the signal to DANGER and cycles through the aspects back to PROCEED.
                       If start delay > 0 then a 'sig_passed' callback event is generated when
