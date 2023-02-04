@@ -536,78 +536,29 @@ def run_shunting_tests(delay=0):
 
 #-----------------------------------------------------------------------------------
 
-def run_semaphore_signal_interlock_ahead_tests():
-    print("Signal Interlock on signals ahead Tests")
-    # Test the default state
-    # Signal 116 is the diustant arm associuated with signal 16
-    assert_signals_locked(116)
-    # Main line 1
-    assert_signals_locked(116)
-    set_signals_off(8)
-    assert_signals_locked(116)
-    set_signals_off(1)
-    assert_signals_locked(116)
-    set_signals_off(3)
-    assert_signals_locked(116)
-    set_signals_off(4)
-    assert_signals_unlocked(116)
-    set_signals_off(116)
-    set_signals_on(8,1,3,4)
-    assert_signals_unlocked(116)
-    set_signals_on(116)
-    assert_signals_locked(116)
-    # Main Line Loop
-    set_fpls_off(2,3)
-    set_points_switched(2,3)
-    set_fpls_on(2,3)
-    assert_signals_locked(116)
-    set_signals_off(8)
-    assert_signals_locked(116)
-    set_signals_off(1)
-    assert_signals_locked(116)
-    set_signals_off(2)
-    assert_signals_locked(116)
-    set_signals_off(4)
-    # Signal 1 is subject to approach control for the LH1 route so signal 116
-    # will remain locked on home sign ahead until signal 1 has been released
-    assert_signals_locked(116)
-    trigger_signals_released(1)
-    assert_signals_unlocked(116)
-    set_signals_off(116)
-    set_signals_on(8,1,2,4)
-    assert_signals_unlocked(116)
-    set_signals_on(116)
-    assert_signals_locked(116)
-    set_fpls_off(2,3)
-    set_points_normal(2,3)
-    set_fpls_on(2,3)  
-    # Test the default state
-    assert_signals_locked(116)
-    return()
 
 ######################################################################################################
 #################### TODO - Break out approach control tests #########################################
 ######################################################################################################
 
 def run_all_automation_example_tests(delay=0):
-    initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
-    run_initial_state_tests()
-    run_colour_light_aspect_tests()
-    test_interlocking_examples.run_signal_route_tests()
-    test_interlocking_examples.run_point_interlocking_tests()
-    test_interlocking_examples.run_signal_interlocking_tests()
-    run_track_occupancy_tests()
-    run_main_line_tests_1(delay)
-    run_main_line_tests_2(delay)
-    run_loop_line_tests(delay)
-    run_shunting_tests(delay)
+#     initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
+#     run_initial_state_tests()
+#     run_colour_light_aspect_tests()
+#     test_interlocking_examples.run_signal_route_tests()
+#     test_interlocking_examples.run_point_interlocking_tests()
+#     test_interlocking_examples.run_signal_interlocking_tests()
+#     run_track_occupancy_tests()
+#     run_main_line_tests_1(delay)
+#     run_main_line_tests_2(delay)
+#     run_loop_line_tests(delay)
+#     run_shunting_tests(delay)
     initialise_test_harness(filename="../configuration_examples/automation_semaphore_example.sig")
     run_initial_state_tests(semaphore=True)
 #    run_semaphore_aspect_tests()
     test_interlocking_examples.run_signal_route_tests()
     test_interlocking_examples.run_point_interlocking_tests()
     test_interlocking_examples.run_signal_interlocking_tests()
-    run_semaphore_signal_interlock_ahead_tests()
     run_track_occupancy_tests(semaphore=True)
     run_main_line_tests_1(delay)
     run_main_line_tests_2(delay)

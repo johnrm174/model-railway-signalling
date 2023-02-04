@@ -50,7 +50,7 @@ def has_subsidary(signal):
              (signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
                 signal.config.aspects.get_subsidary()[0] ) )
 
-def has_distant(signal):
+def has_distant_arms(signal):
     return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
              ( signal.config.semaphores.main.dist.get_element()[0] or
                signal.config.semaphores.lh1.dist.get_element()[0] or
@@ -186,9 +186,10 @@ def load_state(signal):
     signal.automation.track_sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
     signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
     override = objects.schematic_objects[object_id]["overridesignal"]
-    fully_automatic = objects.schematic_objects[object_id]["fullyautomatic"]
+    main_auto = objects.schematic_objects[object_id]["fullyautomatic"]
+    dist_auto = objects.schematic_objects[object_id]["distautomatic"]
     override_ahead = objects.schematic_objects[object_id]["overrideahead"]
-    signal.automation.general_settings.set_values(override, fully_automatic, override_ahead)
+    signal.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
     signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
     signal.automation.approach_control.set_values(objects.schematic_objects[object_id]["approachcontrol"])
     # Configure the initial Route indication selection
@@ -273,9 +274,9 @@ def save_state(signal, close_window):
         new_object_configuration["approachsensor"][0] = signal.automation.approach_control.is_selected()
         new_object_configuration["approachsensor"][1] = signal.automation.track_sensors.approach.get_value()
         new_object_configuration["tracksections"] = signal.automation.track_occupancy.get_values()
-        override, fully_automatic, override_ahead = signal.automation.general_settings.get_values()
-        new_object_configuration["fullyautomatic"] = fully_automatic
-        new_object_configuration["distautomatic"] = False
+        override, main_auto, override_ahead, dist_auto = signal.automation.general_settings.get_values()
+        new_object_configuration["fullyautomatic"] = main_auto
+        new_object_configuration["distautomatic"] = dist_auto
         new_object_configuration["overridesignal"] = override
         new_object_configuration["overrideahead"] = override_ahead
         new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
@@ -645,7 +646,7 @@ def update_tab2_interlock_ahead_selection(signal):
            signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
-           has_distant(signal) ) ):
+           has_distant_arms(signal) ) ):
         signal.locking.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.interlock_ahead.enable()
     else:
@@ -690,14 +691,19 @@ def update_tab3_general_settings_selections(signal):
     else:
         signal.automation.general_settings.automatic.disable()
         signal.automation.general_settings.override.disable()
+    # Enable/disable the "Dustant Automatic"(no distant button) selection
+    if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+         has_distant_arms(signal) ):
+        signal.automation.general_settings.distant_automatic.enable()
+    else:
+        signal.automation.general_settings.distant_automatic.disable()
     # Enable/disable the "Override Ahead"(no signal button) and "Override" selections
     if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
            signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value ) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
-           has_distant(signal) ) ):
+           has_distant_arms(signal) ) ):
         signal.automation.general_settings.override_ahead.enable()
     else:
         signal.automation.general_settings.override_ahead.disable()
