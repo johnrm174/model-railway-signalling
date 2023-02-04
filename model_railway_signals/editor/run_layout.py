@@ -203,6 +203,27 @@ def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
     return (home_signal_at_danger)
 
 #------------------------------------------------------------------------------------
+# Internal Function to test if the signal ahead of the specified signal is a
+# distant signal and if that distant signal is displaying a caution aspect
+#####################################################################################
+# TODO - Update function to the modified signal_ahead function and then test to
+# see if the signal is local or remote (sigID is integer or string). If the signal
+# is a remote signal then we should stop processing (as we have no idea of the
+# signal type) and return home_signal_at_danger=False
+#####################################################################################
+#------------------------------------------------------------------------------------
+
+def distant_signal_ahead_at_caution(signal_object):
+    sig_ahead = find_signal_ahead(signal_object)
+    sig_ahead_id = sig_ahead["itemid"]
+    is_distant = ( ( sig_ahead["itemtype"] == signals_common.sig_type.colour_light.value and
+                     sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
+                   ( sig_ahead["itemtype"] == signals_common.sig_type.semaphore.value and
+                     sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
+    signal_at_caution = (signals.signal_state(sig_ahead_id) == signals_common.signal_state_type.CAUTION)
+    return(is_distant and signal_at_caution)
+
+#------------------------------------------------------------------------------------
 # Internal function to find any colour light signals which are configured to update aspects
 # based on the aspect of the signal that has changed (i.e. signals "behind"). The function
 # is recursive and keeps working back along the route until there are no further changes
@@ -547,7 +568,14 @@ def update_all_distant_overrides():
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
         # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
         if signal_object["overrideahead"]:
-            if home_signal_ahead_at_danger(signal_object):
+            # The Override on signals ahead function is designed for two use cases
+            # 1) Override signal to CAUTION if ANY home signals in the block section are at danger
+            # 2) Override signal to CAUTION if a distant signal is ahead and at CAUTION - this is to
+            #    allow distant signals controlled by one block section to be 'mirrored' on another block
+            #    section - e.g. A home signal with an secondary distant arm. In this case the distant
+            #    arm would be under the control of the next block section (on that block section schematic)
+            #    but you might still want to show the signal (and its state) on your own block schematic
+            if distant_signal_ahead_at_caution(signal_object) or home_signal_ahead_at_danger(signal_object):
                 if has_distant_arms(signal_object):
                     signals.set_signal_override_caution(int(signal_id)+100)
                 else:
