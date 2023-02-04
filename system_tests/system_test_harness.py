@@ -337,6 +337,28 @@ def assert_signals_override_clear(*sigids):
             test_failures = test_failures+1
         tests_executed = tests_executed+1
 
+def assert_signals_override_caution_set(*sigids):
+    global test_warnings, test_failures, tests_executed
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
+            test_warnings = test_warnings+1
+        elif not signals_common.signals[str(sigid)]["overcaution"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_caution_set test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+        
+def assert_signals_override_caution_clear(*sigids):
+    global test_warnings, test_failures, tests_executed
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
+            test_warnings = test_warnings+1
+        elif signals_common.signals[str(sigid)]["overcaution"]:
+            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_caution_clear test")
+            test_failures = test_failures+1
+        tests_executed = tests_executed+1
+        
 def assert_signals_app_cntl_set(*sigids):
     global test_warnings, test_failures, tests_executed
     for sigid in sigids:

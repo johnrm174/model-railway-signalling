@@ -24,15 +24,14 @@ def run_initial_state_tests(semaphore=False):
     assert_subsidaries_unlocked(1,2,3)
     assert_signals_locked(2,14)
     assert_sections_clear(1,2,3,4,5,6,7,8,9,10,11,12,13)
-    assert_signals_override_clear(1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19)
+    assert_signals_override_clear(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19)
     assert_signals_app_cntl_clear(17,16,2,4,9,12,10,18,19,11)
     if semaphore:
         assert_signals_PROCEED(17)
-        assert_signals_override_set(9)
+        assert_signals_override_caution_set(9,116)
         assert_signals_app_cntl_set(1,3,8)
     else:
         assert_signals_PRELIM_CAUTION(17)
-        assert_signals_override_clear(9)
         assert_signals_app_cntl_clear(1,3,8)
     return()
 
@@ -122,14 +121,10 @@ def run_colour_light_aspect_tests():
 
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests(semaphore=False):
-    print("Track Occupancy Tests")
+def run_signal_override_tests(semaphore=False):
+    print("Signal Override Tests")
     # test the default state
-    # Semaphore Signal and 9 and 18 are overridden on home signals ahead
-    # But as Signals 11 and 19 are auto (clear) then sig 18 is not overridden
-    assert_signals_override_clear(1,2,3,4,8,10,12,16,17,18,19)
-    if semaphore:assert_signals_override_set(9)
-    else:assert_signals_override_clear(9)
+    assert_signals_override_clear(1,2,3,4,8,9,10,12,16,17,18,19)
     # Signal 17
     assert_signals_override_clear(17)
     set_sections_occupied(5)
@@ -187,8 +182,6 @@ def run_track_occupancy_tests(semaphore=False):
     set_sections_occupied(7)
     assert_signals_override_set(9)
     set_sections_clear(7)
-    if semaphore:assert_signals_override_set(9)
-    else:assert_signals_override_clear(9)
     # Signal 12
     assert_signals_override_clear(12)
     set_sections_occupied(8)
@@ -213,11 +206,64 @@ def run_track_occupancy_tests(semaphore=False):
     set_sections_clear(15)
     assert_signals_override_clear(19)
     # test everything has been set back to the default state
-    # Semaphore Signal and 9 and 18 are overridden on home signals ahead
-    # But as Signals 11 and 19 are auto (clear) then sig 18 is not overridden
-    assert_signals_override_clear(1,2,3,4,8,10,12,16,17,18,19)
-    if semaphore:assert_signals_override_set(9)
-    else:assert_signals_override_clear(9)
+    assert_signals_override_clear(1,2,3,4,8,9,10,12,16,17,18,19)
+    return()
+
+#-----------------------------------------------------------------------------------
+
+def run_semaphore_override_ahead_tests():
+    print("Semaphore override ahead Tests")
+    # test the default state
+    assert_signals_override_caution_set(9,116)
+    # bottom main line
+    set_signals_off(12)
+    assert_signals_override_caution_clear(9)
+    set_signals_on(12)
+    # top main line - route 1
+    set_signals_off(8)
+    assert_signals_override_caution_set(116)
+    set_signals_off(1)
+    assert_signals_override_caution_set(116)
+    set_signals_off(3)
+    assert_signals_override_caution_set(116)
+    set_signals_off(4)
+    assert_signals_override_caution_clear(116)
+    set_signals_on(8)
+    assert_signals_override_caution_set(116)
+    set_signals_on(1)
+    assert_signals_override_caution_set(116)
+    set_signals_on(3)
+    assert_signals_override_caution_set(116)
+    set_signals_on(4)
+    assert_signals_override_caution_set(116)
+    # top main line - loop
+    set_fpls_off(2,3)
+    set_points_switched(2,3)
+    set_fpls_on(2,3)
+    set_signals_off(8)
+    assert_signals_override_caution_set(116)
+    set_signals_off(1)
+    assert_signals_override_caution_set(116)
+    set_signals_off(2)
+    assert_signals_override_caution_set(116)
+    set_signals_off(4)
+    assert_signals_override_caution_set(116)
+    # Now release signal 1 approach control
+    trigger_signals_released(1)
+    assert_signals_override_caution_clear(116)
+    set_signals_on(8)
+    assert_signals_override_caution_set(116)
+    set_signals_on(1)
+    assert_signals_override_caution_set(116)
+    set_signals_on(2)
+    assert_signals_override_caution_set(116)
+    set_signals_on(4)
+    assert_signals_override_caution_set(116)
+    set_fpls_off(2,3)
+    set_points_normal(2,3)
+    set_fpls_on(2,3)
+    # test everything has returned to the default state
+    assert_signals_override_caution_set(9,116)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -538,32 +584,34 @@ def run_shunting_tests(delay=0):
 
 
 ######################################################################################################
-#################### TODO - Break out approach control tests #########################################
+#################### TODO - Semaphore aspect tests and semaphore approach control Tests        #######
 ######################################################################################################
 
 def run_all_automation_example_tests(delay=0):
-#     initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
-#     run_initial_state_tests()
-#     run_colour_light_aspect_tests()
-#     test_interlocking_examples.run_signal_route_tests()
-#     test_interlocking_examples.run_point_interlocking_tests()
-#     test_interlocking_examples.run_signal_interlocking_tests()
-#     run_track_occupancy_tests()
-#     run_main_line_tests_1(delay)
-#     run_main_line_tests_2(delay)
-#     run_loop_line_tests(delay)
-#     run_shunting_tests(delay)
+    initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
+    run_initial_state_tests()
+    run_colour_light_aspect_tests()
+    test_interlocking_examples.run_signal_route_tests()
+    test_interlocking_examples.run_point_interlocking_tests()
+    test_interlocking_examples.run_signal_interlocking_tests()
+    run_signal_override_tests()
+    run_main_line_tests_1(delay)
+    run_main_line_tests_2(delay)
+    run_loop_line_tests(delay)
+    run_shunting_tests(delay)
     initialise_test_harness(filename="../configuration_examples/automation_semaphore_example.sig")
     run_initial_state_tests(semaphore=True)
 #    run_semaphore_aspect_tests()
     test_interlocking_examples.run_signal_route_tests()
     test_interlocking_examples.run_point_interlocking_tests()
     test_interlocking_examples.run_signal_interlocking_tests()
-    run_track_occupancy_tests(semaphore=True)
+    run_signal_override_tests(semaphore=True)
+    run_semaphore_override_ahead_tests()
     run_main_line_tests_1(delay)
     run_main_line_tests_2(delay)
     run_loop_line_tests(delay)
     run_shunting_tests(delay)
+#    Approach control semaphore tests go in here    
 
 if __name__ == "__main__":
     run_all_automation_example_tests(delay=1)
