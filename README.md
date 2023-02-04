@@ -14,7 +14,7 @@ active development so any comments and suggestions for future features are welco
 
 What's supported in Release 3.1.0:
 * Draw your layout schematic with lines, points, signals and track occupancy sections
-* Define the DCC acommand sequences to drive the signals and points out on the layout
+* Define the DCC command sequences to drive the signals and points out on the layout
 * Configure the signals and points to implement protototypical interlocking schemes
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
 * Save and load your layout schematic and state between running sessions
@@ -78,7 +78,7 @@ $ python3 -m model_railway_signals
 </pre>
 or to load a layout schematic at startup
 <pre>
-$ python3 -m model_railway_signals -f <layout_file>.sig
+$ python3 -m model_railway_signals -f layout_file.sig
 </pre>
 
 ## Using the library functions
