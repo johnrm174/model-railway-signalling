@@ -274,6 +274,13 @@ def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
         new_aspect = signals_common.signals[str(sig_id)]["overriddenaspect"]
         log_message = " (signal is OVERRIDEN)"
 
+    # If signal is Overriden to CAUTION set the signal to display CAUTION
+    # Note we are relying on the public API function to only allow this to
+    # be set for signal types apart from 2 aspect home signals
+    elif signals_common.signals[str(sig_id)]["overcaution"]:
+        new_aspect = signals_common.signal_state_type.CAUTION
+        log_message = " (signal is OVERRIDDEN to CAUTION)"
+
     # If signal is triggered on a timed sequence then set to the sequence aspect
     elif signals_common.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
         new_aspect = signals_common.signals[str(sig_id)]["timedsequence"][route.value].aspect

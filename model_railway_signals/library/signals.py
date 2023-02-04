@@ -34,6 +34,7 @@
 #            - lock_subsidary / unlock_subsidary
 #            - lock_signal / unlock_signal
 #            - set_signal_override / clear_signal_override
+#            - set_signal_override_caution / clear_signal_override_caution (not Home)
 #            - set_approach_control (Release on Red or Yellow) / clear_approach_control
 #            - trigger_timed_signal
 #            - query signal state (signal_clear, signal_state, subsidary_clear)
@@ -44,6 +45,7 @@
 #            - lock_subsidary / unlock_subsidary
 #            - lock_signal / unlock_signal
 #            - set_signal_override / clear_signal_override
+#            - set_signal_override_caution / clear_signal_override_caution (not Home)
 #            - set_approach_control (Release on Red only) / clear_approach_control
 #            - trigger_timed_signal
 #            - query signal state (signal_clear, signal_state, subsidary_clear)
@@ -245,10 +247,17 @@
 #                       integer (representing the ID of a signal on the local schematic), or a 
 #                       string (representing the identifier of an signal on an external MQTT node)
 # 
-# set_signal_override (sig_id*:int) - Overrides the signal to DANGER (can specify multiple sig_ids)
+# set_signal_override (sig_id*:int) - Overrides the signal to display the most restrictive aspect
+#                       (Distant signals will display CAUTION - all other types will display DANGER)
 # 
-# clear_signal_override (sig_id*:int) - Clears the siganl Override (can specify multiple sig_ids)
+# clear_signal_override (sig_id*:int) - Clears the signal Override (can specify multiple sig_ids)
+#
+# set_signal_override_caution (sig_id*:int) - Overrides the signal to display CAUTION
+#                       (Applicable to all main signal types apart from home signals)
 # 
+# clear_signal_override_caution (sig_id*:int) - Clears the signal Override
+#                       (Applicable to all main signal types apart from home signals)
+#
 # trigger_timed_signal - Sets the signal to DANGER and cycles through the aspects back to PROCEED.
 #                       If start delay > 0 then a 'sig_passed' callback event is generated when
 #                       the signal is changed to DANGER - For each subsequent aspect change 
@@ -504,6 +513,58 @@ def clear_signal_override (*sig_ids:int):
             signals_common.clear_signal_override(sig_id)
             signals_common.auto_refresh_signal(sig_id)
     return() 
+
+# -------------------------------------------------------------------------
+# Externally called function to Override a signal to CAUTION. The signal will
+# display CAUTION irrespective of its current setting. Used to support automation
+# e.g. set a signal to CAUTION if any Home signals ahead are at DANGER.
+# Multiple signal IDs can be specified in the call
+# Function applicable to all signal types apart from HOME signals
+# Function does not support REMOTE Signals (with a compound Sig-ID)
+# -------------------------------------------------------------------------
+
+def set_signal_override_caution (*sig_ids:int):
+    global logging
+    for sig_id in sig_ids:
+        # Validate the signal exists
+        if not signals_common.sig_exists(sig_id):
+            logging.error ("Signal "+str(sig_id)+": set_signal_override_caution - Signal does not exist")
+        elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light and
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
+               ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore and
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) ):
+            # Set the override and refresh the signal following the change in state
+            signals_common.set_signal_override_caution(sig_id)
+            signals_common.auto_refresh_signal(sig_id)
+        else:
+            logging.error("Signal "+str(sig_id)+": - set_signal_override_caution - Function not supported by signal type")
+        return()
+
+# -------------------------------------------------------------------------
+# Externally called function to Clear a Signal Override 
+# Signal will revert to its current manual setting (on/off) and aspect
+# Multiple signal IDs can be specified in the call
+# Function applicable to ALL signal types created on the local schematic
+# Function does not support REMOTE Signals (with a compound Sig-ID)
+# -------------------------------------------------------------------------
+
+def clear_signal_override_caution (*sig_ids:int):
+    global logging
+    for sig_id in sig_ids:
+        # Validate the signal exists
+        if not signals_common.sig_exists(sig_id):
+            logging.error ("Signal "+str(sig_id)+": clear_signal_override_caution - Signal does not exist")
+        elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light and
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
+               ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore and
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) ):
+            # Set the override and refresh the signal following the change in state
+            signals_common.clear_signal_override_caution(sig_id)
+            signals_common.auto_refresh_signal(sig_id)
+        else:
+            logging.error("Signal "+str(sig_id)+": - clear_signal_override_caution - Function not supported by signal type")
+        return()
+    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Toggle the state of a main signal
