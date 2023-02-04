@@ -532,7 +532,7 @@ def set_signal_override_caution (*sig_ids:int):
         elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light and
                  signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
                ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore and
-                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) ):
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_semaphores.semaphore_sub_type.home ) ):
             # Set the override and refresh the signal following the change in state
             signals_common.set_signal_override_caution(sig_id)
             signals_common.auto_refresh_signal(sig_id)
@@ -557,7 +557,7 @@ def clear_signal_override_caution (*sig_ids:int):
         elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.colour_light and
                  signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
                ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.sig_type.semaphore and
-                 signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) ):
+                 signals_common.signals[str(sig_id)]["subtype"] != signals_semaphores.semaphore_sub_type.home ) ):
             # Set the override and refresh the signal following the change in state
             signals_common.clear_signal_override_caution(sig_id)
             signals_common.auto_refresh_signal(sig_id)
