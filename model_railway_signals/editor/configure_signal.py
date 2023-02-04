@@ -697,11 +697,12 @@ def update_tab3_general_settings_selections(signal):
         signal.automation.general_settings.distant_automatic.enable()
     else:
         signal.automation.general_settings.distant_automatic.disable()
-    # Enable/disable the "Override Ahead"(no signal button) and "Override" selections
+    # Enable/disable the "Override Ahead" selection (can be selected for all main signal types
+    # apart from colour light Home signals and Semnaphore Home signals without secondary distant arms
     if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
-           signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
+           signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.home.value) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value ) or
+           signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.home.value ) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            has_distant_arms(signal) ) ):
         signal.automation.general_settings.override_ahead.enable()

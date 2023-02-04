@@ -217,12 +217,12 @@ class general_settings_frame():
                         "overridden to ON via the selections below)")
         self.distant_automatic.pack(padx=2, pady=2)
         self.override = common.check_box(self.frame, width=40,
-                    label="  Override signal to ON if section ahead occupied",
+                    label="  Override signal to ON if section ahead is occupied",
                     tool_tip="Select to override the signal to ON if "+
                     "the track section ahead of the signal is occupied")
         self.override.pack(padx=2, pady=2)
         self.override_ahead = common.check_box(self.frame, width=40,
-                    label="  Override if signals ahead are at DANGER",
+                    label="  Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to ON if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack(padx=2, pady=2)

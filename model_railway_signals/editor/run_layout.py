@@ -535,40 +535,28 @@ def update_all_signal_overrides():
 # Function to override any distant signals that have been configured to be overridden
 # to CAUTION if any of the home signals on the route ahead are at DANGER. If this
 # results in an aspect change then we also work back to update any dependent signals
-# The editing_enabled flag is used by the function to determine whether all signal
-# overrides have already been explicitly SET/CLEARED by the update_all_signal_overrides
-# function (see above). If so, then the function will only additionally SET an override
-# (any existing overrides will remain SET). If  not, then the function will either SET
-# or CLEAR the override based solely on the state of the Home signals ahead.
 #####################################################################################
 # TODO - Update function in light of the move to using IDs rather than objects
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def update_all_distant_overrides(editing_enabled):
+def update_all_distant_overrides():
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
-        signal_should_be_overridden = False
-        distant_should_be_overridden = False
         # The "overrideahead" flag will only be True if selected and it can only be selected for
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
         # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
         if signal_object["overrideahead"]:
-            # In 'run' mode, all Signal Overrides will already have been SET or CLEARED based on the state
-            # of the track section ahead of the signal so we need to additional SET the override if any home
-            # signals ahead are at DANGER (we don't want to CLEAR any existing Track Occupancy overrides)
-            # In 'edit' mode the state will be unknown when this function is called so we need to SET or
-            # CLEAR the signal override based solely on the state of any home signals ahead
             if home_signal_ahead_at_danger(signal_object):
                 if has_distant_arms(signal_object):
-                    signals.set_signal_override(int(signal_id)+100)
+                    signals.set_signal_override_caution(int(signal_id)+100)
                 else:
-                    signals.set_signal_override(int(signal_id))
-            elif editing_enabled:
+                    signals.set_signal_override_caution(int(signal_id))
+            else:
                 if has_distant_arms(signal_object):
-                    signals.clear_signal_override(int(signal_id)+100)
+                    signals.clear_signal_override_caution(int(signal_id)+100)
                 else:
-                    signals.clear_signal_override(int(signal_id))
+                    signals.clear_signal_override_caution(int(signal_id))
             # Update the signal aspect and propogate any aspect updates back along the route
             process_aspect_updates(signal_object)
     return()
@@ -727,8 +715,8 @@ def schematic_callback(item_id,callback_type):
         # function (see above). If so, then the function will only additionally SET an override
         # (any existing overrides will remain SET). If  not, then the function will either SET or
         # CLEAR the override based solely on the state of the Home signals ahead
-        logging.info("RUN LAYOUT - Updating Distant Signal Overrides to reflect Home Signals ahead:")
-        update_all_distant_overrides(editing_enabled)
+        logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
+        update_all_distant_overrides()
 
     # Signal interlocking is updated on point, signal or block instrument switched events
     # We also need to process signal interlocking on any event which may have changed the
@@ -780,7 +768,7 @@ def initialise_layout():
     logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
     update_all_signal_approach_control()
     logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
-    update_all_distant_overrides(editing_enabled)    
+    update_all_distant_overrides()    
     logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
     logging.info("RUN LAYOUT - Updating Point Interlocking:")
