@@ -20,9 +20,11 @@ import sys
 sys.path.append("..")
 from model_railway_signals.editor import menubar
 from model_railway_signals.editor import schematic
+from model_railway_signals.editor import objects
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
 from model_railway_signals.library import signals_common
+from model_railway_signals.library import signals_colour_lights
 from model_railway_signals.library import track_sections
 
 root = None
@@ -38,7 +40,7 @@ test_warnings = 0
 
 # ------------------------------------------------------------------------------
 # Global variables to track the 'one up' train idenntifier for every time
-# we set a section to 'occupied' during a test
+# we set a section to 'occupied' or clear the section during a test
 # ------------------------------------------------------------------------------
 
 train_identifier = 1
@@ -50,13 +52,17 @@ train_identifier = 1
 
 def raise_test_error(message):
     global logging
+    global test_failures
     caller = getframeinfo(stack()[2][0])
     logging.error("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
+    test_failures = test_failures+1
 
 def raise_test_warning(message):
     global logging
+    global test_warnings
     caller = getframeinfo(stack()[2][0])
     logging.warning("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
+    test_warnings = test_warnings+1
 
 # ------------------------------------------------------------------------------
 # Function to initialise the test harness and load a schematic file (to test)
@@ -73,12 +79,15 @@ def initialise_test_harness(filename=None):
         root = tkinter.Tk()
         main_menubar = menubar.main_menubar(root)
         schematic.create_canvas(root, main_menubar.handle_canvas_event)
-    print ("System Tests: Load File: '",filename,"'")
-    main_menubar.load_schematic(filename)
-    print ("System Tests: Setting Default Layout State")
-    main_menubar.reset_layout(ask_for_confirm=False)
-    print ("System Tests: Ensuring Editor is in 'Run' mode")
-    main_menubar.run_mode()
+    if filename is None:
+        main_menubar.edit_mode()
+    else:
+        print ("System Tests: Load File: '",filename,"'")
+        main_menubar.load_schematic(filename)
+        print ("System Tests: Setting Default Layout State")
+        main_menubar.reset_layout(ask_for_confirm=False)
+        print ("System Tests: Ensuring Editor is in 'Run' mode")
+        main_menubar.run_mode()
     root.update()
 
 # ------------------------------------------------------------------------------
@@ -100,143 +109,142 @@ def complete_tests(shutdown:bool=False):
 def sleep(sleep_time):
     sleep_end_time = time.time() + sleep_time
     while time.time() < sleep_end_time:
-        time.sleep(0.001)
-        root.update()
+        time.sleep(0.0001)
+        root.update() 
 
 # ------------------------------------------------------------------------------
 # Functions to mimic layout 'events' - in terms of button pushes or other events
 # ------------------------------------------------------------------------------
 
 def set_signals_on(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif signals.signal_clear(sigid):
+            raise_test_warning ("set_signals_on - Signal:"+str(sigid)+" does not exist")
+        elif not signals.signal_clear(sigid):
+            raise_test_warning ("set_signals_on - Signal:"+str(sigid)+" is already ON")
+        else:
             signals_common.signal_button_event(sigid)
     root.update()
 
 def set_signals_off(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif not signals.signal_clear(sigid):
+            raise_test_warning ("set_signals_off - Signal:"+str(sigid)+" does not exist")
+        elif signals.signal_clear(sigid):
+            raise_test_warning ("set_signals_off - Signal:"+str(sigid)+" is already OFF")
+        else:
             signals_common.signal_button_event(sigid)
     root.update()
 
 def set_subsidaries_on(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("set_subsidaries_on - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["hassubsidary"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed set_subsidaries_on (not supported)")
-        elif signals.subsidary_clear(sigid):
+            raise_test_warning ("set_subsidaries_on - Signal:"+str(sigid)+" does not have a subsidary")
+        elif not signals.subsidary_clear(sigid):
+            raise_test_warning ("set_subsidaries_on - Signal:"+str(sigid)+" - subsidary is already ON")
+        else:
             signals_common.subsidary_button_event(sigid)
     root.update()
 
 def set_subsidaries_off(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("set_subsidaries_off - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["hassubsidary"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed set_subsidaries_on (not supported)")
-        elif not signals.subsidary_clear(sigid):
+            raise_test_warning ("set_subsidaries_off - Signal:"+str(sigid)+" does not have a subsidary")
+        elif signals.subsidary_clear(sigid):
+            raise_test_warning ("set_subsidaries_off - Signal:"+str(sigid)+" - subsidary is already OFF")
+        else:
             signals_common.subsidary_button_event(sigid)
     root.update()
 
 def trigger_signals_passed(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("trigger_signals_passed - Signal:"+str(sigid)+" does not exist")
         else:
             signals_common.sig_passed_button_event(sigid)
     root.update()
 
 def trigger_signals_released(*sigids):
-    global test_warnings
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("trigger_signals_released - Signal:"+str(sigid)+" does not exist")
         else:
             signals_common.approach_release_button_event(sigid)
     root.update()
     
 def set_points_switched(*pointids):
-    global test_warnings
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
-            raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif not points.point_switched(pointid):
+            raise_test_warning ("set_points_switched - Point:"+str(pointid)+" does not exist")
+        elif points.point_switched(pointid):
+            raise_test_warning ("set_points_switched - Point:"+str(pointid)+" is already switched")
+        else:
             points.change_button_event(pointid)
     root.update()
 
 def set_points_normal(*pointids):
-    global test_warnings
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
-            raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif points.point_switched(pointid):
+            raise_test_warning ("set_points_switched - Point:"+str(pointid)+" does not exist")
+        elif not points.point_switched(pointid):
+            raise_test_warning ("set_points_switched - Point:"+str(pointid)+" is already normal")
+        else:
             points.change_button_event(pointid)
+    root.update()
 
 def set_fpls_on(*pointids):
-    global test_warnings
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
-            raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif not points.fpl_active(pointid):
+            raise_test_warning ("set_fpls_on - Point:"+str(pointid)+" does not exist")
+        elif not points.points[str(pointid)]["hasfpl"]:
+            raise_test_warning ("set_fpls_on - Point:"+str(pointid)+" does not have a FPL")
+        elif points.fpl_active(pointid):
+            raise_test_warning ("set_fpls_on - Point:"+str(pointid)+" - FPL is already ON")
+        else:
             points.fpl_button_event(pointid)
     root.update()
 
 def set_fpls_off(*pointids):
-    global test_warnings
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
             raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
-        elif points.fpl_active(pointid):
+        elif not points.points[str(pointid)]["hasfpl"]:
+            raise_test_warning ("set_fpls_off - Point:"+str(pointid)+" does not have a FPL")
+        elif not points.fpl_active(pointid):
+            raise_test_warning ("set_fpls_off - Point:"+str(pointid)+" - FPL is already OFF")
+        else:
             points.fpl_button_event(pointid)
     root.update()
 
 def set_sections_occupied(*sectionids):
-    global test_warnings, train_identifier
+    global train_identifier
     for secid in sectionids:
         if str(secid) not in track_sections.sections.keys():
-            raise_test_warning ("Section:"+str(secid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("set_sections_occupied - Section:"+str(secid)+" does not exist")
         else:
-            if not track_sections.section_occupied(secid):
+            if track_sections.section_occupied(secid):
+                raise_test_warning ("set_sections_occupied - Section:"+str(secid)+" is already OCCUPIED")
+            else:
+                # Two calls are needed - we first clear the section to set the section label
+                # then we call the section callback library function to simulate the 'click'
                 track_sections.clear_section_occupied(secid,str(train_identifier))
                 track_sections.section_button_event(secid)
-            else:
-                track_sections.set_section_occupied(secid,str(train_identifier))
             train_identifier=train_identifier+1
     root.update()
     
 def set_sections_clear(*sectionids):
-    global test_warnings, train_identifier
     for secid in sectionids:
         if str(secid) not in track_sections.sections.keys():
-            raise_test_warning ("Section:"+str(secid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("set_sections_clear - Section:"+str(secid)+" does not exist")
         else:
-            if track_sections.section_occupied(secid):
-                track_sections.section_button_event(secid)
+            if not track_sections.section_occupied(secid):
+                raise_test_warning ("set_sections_clear - Section:"+str(secid)+" is already CLEAR")
             else:
-                track_sections.clear_section_occupied(secid,str(train_identifier))
-            train_identifier=train_identifier+1
+                track_sections.section_button_event(secid)
     root.update()
     
 # ------------------------------------------------------------------------------
@@ -244,305 +252,252 @@ def set_sections_clear(*sectionids):
 # ------------------------------------------------------------------------------
 
 def assert_points_locked(*pointids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
-            raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_points_locked - Point:"+str(pointid)+" does not exist")
         elif not points.points[str(pointid)]["locked"]:
-            raise_test_error ("Point:"+str(pointid)+" - Failed assert_points_locked test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_points_locked - Point:"+str(pointid)+" - Test Fail")
         tests_executed = tests_executed+1
     
 def assert_points_unlocked(*pointids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
-            raise_test_warning ("Point:"+str(pointid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_points_unlocked - Point:"+str(pointid)+" does not exist")
         elif points.points[str(pointid)]["locked"]:
-            raise_test_error ("Point:"+str(pointid)+" - Failed assert_points_unlocked test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_points_unlocked - Point:"+str(pointid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_locked(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_locked - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["siglocked"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_locked test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_locked - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
             
 def assert_signals_unlocked(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_unlocked - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["siglocked"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_unlocked test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_unlocked - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_subsidaries_locked(*sigids):
     global test_warnings, test_failures, tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
+            raise_test_warning ("assert_subsidaries_locked - Signal:"+str(sigid)+" does not exist")
             test_warnings = test_warnings+1
         elif not signals_common.signals[str(sigid)]["hassubsidary"]:
-            raise_test_warning ("Signal:"+str(sigid)+" - Failed assert_subsidaries_locked test (not supported)")
+            raise_test_warning ("assert_subsidaries_locked - Signal:"+str(sigid)+" does not have a subsidary")
             test_warnings = test_warnings+1
         elif not signals_common.signals[str(sigid)]["sublocked"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_locked test")
+            raise_test_error ("assert_subsidaries_locked - Signal:"+str(sigid)+" - Test Fail")
             test_failures = test_failures+1
         tests_executed = tests_executed+1
             
 def assert_subsidaries_unlocked(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_subsidaries_unlocked - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["hassubsidary"]:
-            raise_test_warning ("Signal:"+str(sigid)+" - Failed assert_subsidaries_unlocked test (not supported)")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_subsidaries_unlocked - Signal:"+str(sigid)+" does not have a subsidary")
         elif signals_common.signals[str(sigid)]["sublocked"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_subsidaries_unlocked test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_subsidaries_unlocked - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_override_set(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_override_set - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["override"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_set test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_override_set - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_override_clear(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_override_clear - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["override"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_clear test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_override_clear - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_override_caution_set(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_override_caution_set - Signal:"+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["overcaution"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_caution_set test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_override_caution_set - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_override_caution_clear(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_override_caution_clear - Signal:"+str(sigid)+" - does not exist")
         elif signals_common.signals[str(sigid)]["overcaution"]:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_override_caution_clear test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_override_caution_clear - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_app_cntl_set(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_app_cntl_set - Signal:"+str(sigid)+" does not exist")
         elif ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
              "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
-            raise_test_warning ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test (not supported)")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_app_cntl_set - Signal:"+str(sigid)+" does not support approach control")
         elif ( not signals_common.signals[str(sigid)]["releaseonred"] and
                not signals_common.signals[str(sigid)]["releaseonyel"] ):
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_set test")
-            test_failures = test_failures+1
+            raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_app_cntl_clear(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_app_cntl_clear - Signal:"+str(sigid)+" does not exist")
         elif ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
              "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
-            raise_test_warning ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test (not supported)")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_app_cntl_clear - Signal:"+str(sigid)+" does not support approach control")
         elif ( signals_common.signals[str(sigid)]["releaseonred"] or
                signals_common.signals[str(sigid)]["releaseonyel"] ):
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_app_cntl_clear test")
-            test_failures = test_failures+1
+            raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_DANGER(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_DANGER - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.DANGER:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_DANGER test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_DANGER - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
             
 def assert_signals_PROCEED(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_PROCEED - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.PROCEED:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_PROCEED test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_PROCEED - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
             
 def assert_signals_CAUTION(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_CAUTION - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.CAUTION:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_CAUTION - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_CAUTION_APP_CNTL(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_CAUTION_APP_CNTL - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.CAUTION_APP_CNTL:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_CAUTION_APP_CNTL test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_CAUTION_APP_CNTL - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_PRELIM_CAUTION(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_PRELIM_CAUTION - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.PRELIM_CAUTION:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_PRELIM_CAUTION test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_PRELIM_CAUTION - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_FLASH_CAUTION(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_FLASH_CAUTION - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.FLASH_CAUTION:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_CAUTION test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_FLASH_CAUTION - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_FLASH_PRELIM_CAUTION(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_FLASH_PRELIM_CAUTION - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["sigstate"]!=signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_FLASH_PRELIM_CAUTION test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_FLASH_PRELIM_CAUTION - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_signals_route_MAIN(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_route_MAIN - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.MAIN:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_MAIN test")
-            test_failures = test_failures+1
+            raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_route_LH1(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_route_LH1 - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.LH1:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_LH1 test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_route_LH1 - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_route_LH2(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_route_LH2 - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.LH2:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_LH2 test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_route_LH2 - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_route_RH1(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_route_RH1 - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.RH1:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_RH1 test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_route_RH1 - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_signals_route_RH2(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
-            raise_test_warning ("Signal:"+str(sigid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_signals_route_RH2 - Signal:"+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["routeset"]!=signals_common.route_type.RH2:
-            raise_test_error ("Signal:"+str(sigid)+" - Failed assert_signals_route_RH2 test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_signals_route_RH2 - Signal:"+str(sigid)+" - Test Fail")
         tests_executed = tests_executed+1
         
 def assert_sections_occupied(*secids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for secid in secids:
         if str(secid) not in track_sections.sections.keys():
-            raise_test_warning ("Section:"+str(secid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_sections_occupied - Section:"+str(secid)+" does not exist")
         elif not track_sections.sections[str(secid)]["occupied"]:
-            raise_test_error ("Section:"+str(secid)+" - Failed assert_sections_occupied test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_sections_occupied - Section:"+str(secid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 def assert_sections_clear(*secids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for secid in secids:
         if str(secid) not in track_sections.sections.keys():
-            raise_test_warning ("Section:"+str(secid)+" - does not exist on the schematic")
-            test_warnings = test_warnings+1
+            raise_test_warning ("assert_sections_clear - Section:"+str(secid)+" does not exist")
         elif track_sections.sections[str(secid)]["occupied"]:
-            raise_test_error ("Section:"+str(secid)+" - Failed assert_sections_clear test")
-            test_failures = test_failures+1
+            raise_test_error ("assert_sections_clear - Section:"+str(secid)+" - Test Fail")
         tests_executed = tests_executed+1
 
 #############################################################################################
