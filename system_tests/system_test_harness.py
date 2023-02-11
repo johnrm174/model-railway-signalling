@@ -9,6 +9,7 @@ from os.path import basename
 import logging
 import tkinter
 import time
+import copy
 
 # ------------------------------------------------------------------------------
 # The following enables this module to correctly import the model_railway_signals
@@ -80,6 +81,7 @@ def initialise_test_harness(filename=None):
         main_menubar = menubar.main_menubar(root)
         schematic.create_canvas(root, main_menubar.handle_canvas_event)
     if filename is None:
+        main_menubar.new_schematic(ask_for_confirm=False)
         main_menubar.edit_mode()
     else:
         print ("System Tests: Load File: '",filename,"'")
@@ -95,10 +97,10 @@ def initialise_test_harness(filename=None):
 # back into the tkinter main loop to allow the schematic to be edited if required
 # ------------------------------------------------------------------------------
 
-def complete_tests(shutdown:bool=False):
+def complete_tests(shutdown=False):
     print ("Tests Run:",tests_executed,"  Tests Passed:",
               tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
-    if shutdown: main_menubar.quit_schematic(confirmation=False)
+    if shutdown: main_menubar.quit_schematic(ask_for_confirm=False)
     else: root.mainloop()
 
 # ------------------------------------------------------------------------------
@@ -500,6 +502,200 @@ def assert_sections_clear(*secids):
             raise_test_error ("assert_sections_clear - Section:"+str(secid)+" - Test Fail")
         tests_executed = tests_executed+1
 
+# ------------------------------------------------------------------------------
+# Dummy event class for generating mouse events (for the schematic tests)
+# ------------------------------------------------------------------------------
+
+class dummy_event():
+    def __init__(self, x=0, y=0, x_root=0, y_root=0):
+        self.x = x
+        self.y = y
+        self.x_root = x_root
+        self.y_root = y_root
+
+# ------------------------------------------------------------------------------
+# Functions to excersise the schematic Editor - Create Functions
+# ------------------------------------------------------------------------------
+
+def create_line():
+    objects.create_object(objects.object_type.line)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+    
+def create_colour_light_signal():
+    objects.create_object(objects.object_type.signal,
+                        signals_common.sig_type.colour_light.value,
+                        signals_colour_lights.signal_sub_type.four_aspect.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_semaphore_signal():
+    objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.semaphore.value,
+                           signals_semaphores.semaphore_sub_type.home.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_ground_position_signal():
+    objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.ground_position.value,
+                           signals_ground_position.ground_pos_sub_type.standard.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_ground_disc_signal():
+    objects.create_object(objects.object_type.signal,
+                           signals_common.sig_type.ground_disc.value,
+                           signals_ground_disc.ground_disc_sub_type.standard.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_track_section():
+    objects.create_object(objects.object_type.section)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_block_instrument():
+    objects.create_object(objects.object_type.instrument)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_left_hand_point():
+    objects.create_object(objects.object_type.point,points.point_type.LH.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+def create_right_hand_point():
+    objects.create_object(objects.object_type.point,points.point_type.LH.value)
+    object_id = list(objects.schematic_objects)[-1]
+    root.update()
+    return(object_id)
+
+# ------------------------------------------------------------------------------
+# Internal functions to get the selection position and simulate a move
+# ------------------------------------------------------------------------------
+
+def get_selection_position (object_id):
+    if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+        x1 = objects.schematic_objects[object_id]["posx"]
+        y1 = objects.schematic_objects[object_id]["posy"]
+        x2 = objects.schematic_objects[object_id]["endx"]
+        y2 = objects.schematic_objects[object_id]["endy"]
+        xpos = (x1+x2) / 2
+        ypos = (y1+y2) / 2
+    else:
+        xpos = objects.schematic_objects[object_id]["posx"]
+        ypos = objects.schematic_objects[object_id]["posy"]
+    return(xpos, ypos)
+
+def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, delay:int):
+    xdiff = xfinish - xstart
+    ydiff = yfinish - ystart
+    event = dummy_event(x=xstart, y=ystart)
+    schematic.left_button_click(event)
+    root.update()
+    sleep_delay = delay/steps
+    for step in range(steps):
+        event = dummy_event(x=xstart+step*(xdiff/steps),y=ystart+step*(ydiff/steps))
+        schematic.track_cursor(event)
+        sleep(sleep_delay)
+    schematic.left_button_release(event)
+    root.update()
+
+# ------------------------------------------------------------------------------
+# Functions to excersise the schematic Editor - Move, update and edit
+# ------------------------------------------------------------------------------
+
+def update_object(object_id, new_values:dict):
+    if object_id not in objects.schematic_objects.keys():
+        raise_test_warning ("update_object - object:"+str(object_id)+" does not exist")
+    else:
+        new_object = copy.deepcopy(objects.schematic_objects[object_id])        
+        for element in new_values.keys():
+            if element not in new_object.keys():
+                raise_test_warning ("update_object - element:"+element+" is not valid")
+            else:
+                new_object[element] = new_values[element]
+        objects.update_object(object_id, new_object)                
+        root.update()
+
+def select_or_deselect_objects(*object_ids):
+    for object_id in object_ids:
+        if object_id not in objects.schematic_objects.keys():
+            raise_test_warning ("select_or_deselect_objects - object:"+str(object_id)+" does not exist")
+        else:
+            xpos, ypos = get_selection_position(object_id)
+            event = dummy_event(x=xpos, y=ypos)
+            schematic.left_shift_click(event)
+            root.update()
+            schematic.left_button_release(event)
+            root.update()
+        
+def select_single_object(object_id):
+    if object_id not in objects.schematic_objects.keys():
+        raise_test_warning ("select_or_deselect_objects - object:"+str(object_id)+" does not exist")
+    else:
+        xpos, ypos = get_selection_position(object_id)
+        event = dummy_event(x=xpos, y=ypos)
+        schematic.left_button_click(event)
+        root.update()
+        schematic.left_button_release(event)
+        root.update()
+    
+def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1):
+    if object_id not in objects.schematic_objects.keys():
+        raise_test_warning ("select_or_deselect_objects - object:"+str(object_id)+" does not exist")
+    else:
+        xstart, ystart = get_selection_position(object_id)
+        move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+
+def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1):
+    if object_id not in objects.schematic_objects.keys():
+        raise_test_warning ("select_or_deselect_objects - object:"+str(object_id)+" does not exist")
+    elif line_end != 1 and line_end != 2:
+        raise_test_warning ("select_or_deselect_objects - Line end must be specified as '1' or '2'")
+    else:
+        if line_end == 1:
+            xstart = objects.schematic_objects[object_id]["posx"]
+            ystart = objects.schematic_objects[object_id]["posy"]
+        elif line_end == 2:
+            xstart = objects.schematic_objects[object_id]["endx"]
+            ystart = objects.schematic_objects[object_id]["endy"]
+        move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+        
+def select_all_objects():
+    schematic.select_all_objects()
+    root.update()
+
+def deselect_all_objects():
+    schematic.deselect_all_objects()
+    root.update()
+
+def rotate_selected_objects():
+    schematic.rotate_selected_objects()
+    root.update()
+
+def delete_selected_objects():
+    schematic.delete_selected_objects()
+    root.update()
+    
+def copy_selected_objects():
+    schematic.copy_selected_objects()
+    root.update()
+    
+def paste_clipboard_objects():
+    schematic.paste_clipboard_objects()
+    root.update()
+    return(schematic.schematic_state["selectedobjects"])
+    
 #############################################################################################
 
  
