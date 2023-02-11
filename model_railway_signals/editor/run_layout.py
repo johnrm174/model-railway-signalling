@@ -593,12 +593,14 @@ def update_all_distant_overrides():
 # Function to SET or CLEAR a signal's approach control state and refresh the displayed
 # aspect. The function then recursively calls itself to work backwards along the route
 # updating the approach control state (and displayed aspect)of preceding signals
+# Note that Approach control won't be set in the period between signal released and
+# signal passed events unless the 'force_set' flag is set
 #####################################################################################
 # TODO - Update function in light of the move to using IDs rather than objects
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def update_signal_approach_control(signal_object, recursion_level:int=0):
+def update_signal_approach_control(signal_object, force_set:bool, recursion_level:int=0):
     if recursion_level < 50:
         if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
                  signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
@@ -608,12 +610,15 @@ def update_signal_approach_control(signal_object, recursion_level:int=0):
                 # Each element represents the approach control mode that has been set
                 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
                 if signal_object["approachcontrol"][signal_route.value-1] == 1:
-                    signals.set_approach_control(signal_object["itemid"],release_on_yellow=False,force_set=False)
+                    signals.set_approach_control(signal_object["itemid"],
+                                  release_on_yellow=False, force_set=force_set)
                 elif signal_object["approachcontrol"][signal_route.value-1] == 2:
-                    signals.set_approach_control(signal_object["itemid"],release_on_yellow=True,force_set=False)
+                    signals.set_approach_control(signal_object["itemid"],
+                                release_on_yellow=True, force_set=force_set)
                 elif (signal_object["approachcontrol"][signal_route.value-1] == 3 and
                                     home_signal_ahead_at_danger(signal_object) ):
-                    signals.set_approach_control(signal_object["itemid"], release_on_yellow=False, force_set=False)
+                    signals.set_approach_control(signal_object["itemid"],
+                                release_on_yellow=False, force_set=force_set)
                 else:
                     signals.clear_approach_control(signal_object["itemid"])
             else:
@@ -623,22 +628,28 @@ def update_signal_approach_control(signal_object, recursion_level:int=0):
         process_aspect_updates(signal_object)    
         signal_behind_object = find_signal_behind(signal_object)
         if signal_behind_object is not None:
-            update_signal_approach_control(signal_behind_object,recursion_level+1)
+            update_signal_approach_control(signal_behind_object, False, recursion_level+1)
     else:
         logging.error("RUN LAYOUT - Update Approach Control on signals ahead - Maximum recursion level reached")
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Update the approach control state of all signals
+# Note that the 'force_set' flag is set for the signal that has been switched
+# (this is passed in on a signal switched event only) to enforce a "reset" of
+# the Approach control mode in the period between signal released and signal passed events
 #####################################################################################
 # TODO - Update function in light of the move to using IDs rather than objects
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def update_all_signal_approach_control():
+def update_all_signal_approach_control(item_id=None, callback_type=None):
     for signal_id in objects.signal_index:
+        if (callback_type == signals_common.sig_callback_type.sig_switched and
+            signal_id == str(item_id) ): force_set = True
+        else: force_set = False
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
-        update_signal_approach_control(signal_object)
+        update_signal_approach_control(signal_object, force_set)
     return()
 
 #------------------------------------------------------------------------------------
@@ -736,7 +747,7 @@ def schematic_callback(item_id,callback_type):
         # control on the state of home signals ahead (for layout automation). We therefore have
         # to process these changes here (which also updates the aspects of all signals)
         logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
-        update_all_signal_approach_control()
+        update_all_signal_approach_control(item_id, callback_type)
         # Finally process any distant signal overrides on home signals ahead
         # The editing_enabled flag is used by the function to determine whether all signal
         # overrides have already been explicitly SET/CLEARED by the update_all_signal_overrides
