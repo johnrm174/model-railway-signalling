@@ -529,18 +529,20 @@ class main_menubar:
             self.mainmenubar.entryconfigure(self.power_label, label=new_label)
             self.power_label = new_label
 
-    def quit_schematic(self, confirmation:bool=True):
+    def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
-        if not confirmation or messagebox.askokcancel("Quit Schematic",
+        if not ask_for_confirm or messagebox.askokcancel("Quit Schematic",
                 "Are you sure you want to discard all changes and quit the application"):
             library_common.on_closing(ask_to_save_state=False)
         return()
                 
-    def new_schematic(self):
-        if messagebox.askokcancel("New Schematic", "Are you sure you want to "+
-                         "discard all changes and create a new blank schematic"):
+    def new_schematic(self, ask_for_confirm:bool=True):
+        # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the confirmation dialog. If
+        if not ask_for_confirm or messagebox.askokcancel("New Schematic", "Are you sure you "+
+                         "want to discard all changes and create a new blank schematic"):
             # We use the schematic functions to delete all existing objects to
             # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
