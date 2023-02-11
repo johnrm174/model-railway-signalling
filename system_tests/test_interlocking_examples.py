@@ -5,7 +5,7 @@
 #     "../configuration_examples/interlocking_colour_light_example.sig"
 #     "../configuration_examples/interlocking_semaphore_example.sig"
 #
-# Individual modules are also reused for the automation and approach control tests
+# common functions are also reused for the automation and approach control tests
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
