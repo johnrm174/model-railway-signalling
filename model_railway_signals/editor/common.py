@@ -732,7 +732,7 @@ class signal_route_selections(route_selections):
                 super().enable()
     
     def validate(self):
-        return(EB.validate())
+        return(self.EB.validate())
     
     def enable(self):
         self.EB.enable()
