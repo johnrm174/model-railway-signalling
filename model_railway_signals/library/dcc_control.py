@@ -249,7 +249,7 @@ def map_dcc_signal (sig_id:int,
                 logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry[0])+" - must be between 1 and 2047")
                 addresses_valid = False
         if (subsidary < 0 or subsidary > 2047):
-            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for subsidary"+str(address)+" - must be between 1 and 2047")
+            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for subsidary "+str(subsidary)+" - must be between 1 and 2047")
             addresses_valid = False
         if addresses_valid:
             # Create the DCC Mapping entry for the signal
@@ -293,9 +293,9 @@ def map_traintech_signal (sig_id:int,
     elif sig_id < 1:
         logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
     elif base_address < 0 or base_address > 2047:
-        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for signal"+str(address)+" - must be between 1 and 2047")
+        logging.error ("Signal "+str(sig_id)+": Invalid DCC Base Address for signal "+str(base_address)+" - must be between 1 and 2047")
     elif route_address < 0 or route_address > 2047:
-        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(address)+" - must be between 1 and 2047")
+        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(route_address)+" - must be between 1 and 2047")
     elif theatre_route != "NONE" and feather_route != signals_common.route_type.NONE:
         logging.error ("Signal "+str(sig_id)+": Signal can only support Feather or Theatre - not both")
     else:
