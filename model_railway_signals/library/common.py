@@ -113,7 +113,7 @@ def handle_callback_in_tkinter_thread(*args):
     
 def execute_function_in_tkinter_thread(callback_function):
     global logging
-    callback = event_queue.put(callback_function)
+    event_queue.put(callback_function)
     if root_window is not None:
         root_window.event_generate("<<ExtCallback>>", when="tail")
     else:
