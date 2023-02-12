@@ -101,6 +101,9 @@ from model_railway_signals.library import points
 from model_railway_signals.library import signals
 from model_railway_signals.library import signals_common
 from model_railway_signals.library import signals_colour_lights
+from model_railway_signals.library import signals_semaphores
+from model_railway_signals.library import signals_ground_position
+from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 
 root = None
@@ -148,7 +151,7 @@ def raise_test_warning(message):
 # ------------------------------------------------------------------------------
 
 def initialise_test_harness(filename=None):
-    global main_menubar, root
+    global main_menubar, root, logging
     logging.basicConfig(format='%(levelname)s: %(message)s')
     logging.getLogger().setLevel(logging.WARNING)
     if root is None:
@@ -185,7 +188,7 @@ def complete_tests(shutdown=False):
 # the tests to be 'slowed down' so progress can be viewed on the schematic
 # ------------------------------------------------------------------------------
 
-def sleep(sleep_time):
+def sleep(sleep_time:float):
     sleep_end_time = time.time() + sleep_time
     while time.time() < sleep_end_time:
         time.sleep(0.0001)
@@ -367,7 +370,7 @@ def assert_signals_unlocked(*sigids):
         tests_executed = tests_executed+1
 
 def assert_subsidaries_locked(*sigids):
-    global test_warnings, test_failures, tests_executed
+    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_subsidaries_locked - Signal: "+str(sigid)+" does not exist")
@@ -706,7 +709,7 @@ def get_selection_position (object_id):
         ypos = objects.schematic_objects[object_id]["posy"]
     return(xpos, ypos)
 
-def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, delay:int):
+def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, delay:float):
     xdiff = xfinish - xstart
     ydiff = yfinish - ystart
     event = dummy_event(x=xstart, y=ystart)
@@ -772,14 +775,14 @@ def select_single_object(object_id):
         schematic.left_button_release(event)
         root.update()
     
-def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1):
+def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
     else:
         xstart, ystart = get_selection_position(object_id)
         move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
 
-def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1):
+def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_line_end - object: "+str(object_id)+" does not exist")
     elif line_end != 1 and line_end != 2:
