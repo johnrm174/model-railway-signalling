@@ -1,11 +1,17 @@
+#-----------------------------------------------------------------------------------
+# System tests for the schematic editor functions (nn development)
+#-----------------------------------------------------------------------------------
+
 from system_test_harness import *
 
-#################################################################################################
+#-----------------------------------------------------------------------------------
         
 initialise_test_harness()
 delay = 0.1
 s1 = create_colour_light_signal()
 sleep(delay)
+assert_signals_DANGER(get_item_id(s1))
+assert_object_configuration(s1, {"itemid": 1} )
 s2 = create_colour_light_signal()
 sleep(delay)
 s3 = create_colour_light_signal()
@@ -13,6 +19,7 @@ sleep(delay)
 select_or_deselect_objects (s1,s2)
 sleep(delay)
 select_and_move_objects(s1,500,100,delay=delay/10)
+assert_object_position(s1,500,100)
 sleep(delay)
 select_and_move_objects(s3,300,100,delay=delay/10)
 sleep(delay)
@@ -34,9 +41,10 @@ l1 = create_line()
 sleep(delay)
 select_and_move_objects(l1,200,200,delay=delay/10)
 sleep(delay)
-select_and_move_line_end(l1, 1, 150,100,delay=delay/10)
+select_and_move_line_end(l1,1,150,100,delay=delay/10)
 sleep(delay)
-select_and_move_line_end(l1, 2, 400,100,delay=delay/10)
+select_and_move_line_end(l1,2,400,100,delay=delay/10)
+assert_object_position(l1,150,100,400,100)
 sleep(delay)
 select_all_objects()
 sleep(delay)
