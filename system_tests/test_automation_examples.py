@@ -790,6 +790,8 @@ def run_shunting_tests(delay=0):
 
 def run_all_automation_example_tests(delay=0):
     initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
+    set_run_mode()
+    reset_layout()
     run_initial_state_tests()
     run_colour_light_aspect_tests()
     test_interlocking_examples.run_signal_route_tests()
@@ -801,6 +803,8 @@ def run_all_automation_example_tests(delay=0):
     run_loop_line_tests(delay)
     run_shunting_tests(delay)
     initialise_test_harness(filename="../configuration_examples/automation_semaphore_example.sig")
+    set_run_mode()
+    reset_layout()
     run_initial_state_tests(semaphore=True)
     run_semaphore_aspect_tests()
     test_interlocking_examples.run_signal_route_tests()
