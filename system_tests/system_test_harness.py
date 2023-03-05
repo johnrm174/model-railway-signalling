@@ -50,7 +50,10 @@
 #    assert_sections_clear(*secids)
 #
 # Supported Editor test invocations:
-#    create_line():
+#    set_edit_mode()
+#    set_run_mode()
+#    reset_layout()
+#    create_line()
 #    create_colour_light_signal()
 #    create_semaphore_signal()
 #    create_ground_position_signal()
@@ -64,6 +67,7 @@
 #    select_single_object(object_id)
 #    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1)
 #    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1)
+#    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
 #    select_all_objects()
 #    deselect_all_objects()
 #    rotate_selected_objects()
@@ -75,7 +79,10 @@
 # Supported Editor test assertions:
 #    assert_object_configuration(object_id, test_values:dict)
 #    assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None)
-#
+#    assert_objects_selected(*object_ids)
+#    assert_objects_deselected(*object_ids)
+#    assert_objects_exists(*object_ids)
+#    assert_objects_do_not_exist(*object_ids)
 # ------------------------------------------------------------------------------
 
 from inspect import getframeinfo
@@ -119,14 +126,14 @@ test_warnings = 0
 
 # ------------------------------------------------------------------------------
 # Global variables to track the 'one up' train idenntifier for every time
-# we set a section to 'occupied' or clear the section during a test
+# we set a section to 'occupied' during a test
 # ------------------------------------------------------------------------------
 
 train_identifier = 1
 
 # ------------------------------------------------------------------------------
-# Function to log out a test failure with the filename and line number of the
-# parent test file that called the test assert functions in this module
+# Functions to log out test error/warning messages with the filename and line number 
+# of the parent test file that called the test assert functions in this module
 # ------------------------------------------------------------------------------
 
 def raise_test_error(message):
@@ -143,6 +150,10 @@ def raise_test_warning(message):
     logging.warning("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
     test_warnings = test_warnings+1
 
+def increment_tests_executed():
+    global tests_executed
+    tests_executed = tests_executed+1
+    
 # ------------------------------------------------------------------------------
 # Function to initialise the test harness and load a schematic file (to test)
 # Note that if a filename is not specified then it will open a dialogue to
@@ -162,14 +173,9 @@ def initialise_test_harness(filename=None):
     if filename is None:
         print ("System Tests: Create new Schematic")
         main_menubar.new_schematic(ask_for_confirm=False)
-        main_menubar.edit_mode()
     else:
         print ("System Tests: Load Scematic: '",filename,"'")
         main_menubar.load_schematic(filename)
-        print ("System Tests: Setting Default Layout State")
-        main_menubar.reset_layout(ask_for_confirm=False)
-        print ("System Tests: Ensuring Editor is in 'Run' mode")
-        main_menubar.run_mode()
     root.update()
 
 # ------------------------------------------------------------------------------
@@ -334,43 +340,38 @@ def set_sections_clear(*sectionids):
 # ------------------------------------------------------------------------------
 
 def assert_points_locked(*pointids):
-    global tests_executed
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
             raise_test_warning ("assert_points_locked - Point: "+str(pointid)+" does not exist")
         elif not points.points[str(pointid)]["locked"]:
             raise_test_error ("assert_points_locked - Point: "+str(pointid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
     
 def assert_points_unlocked(*pointids):
-    global tests_executed
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
             raise_test_warning ("assert_points_unlocked - Point: "+str(pointid)+" does not exist")
         elif points.points[str(pointid)]["locked"]:
             raise_test_error ("assert_points_unlocked - Point: "+str(pointid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_locked(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_locked - Signal: "+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["siglocked"]:
             raise_test_error ("assert_signals_locked - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
             
 def assert_signals_unlocked(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_unlocked - Signal: "+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["siglocked"]:
             raise_test_error ("assert_signals_unlocked - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_subsidaries_locked(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_subsidaries_locked - Signal: "+str(sigid)+" does not exist")
@@ -378,10 +379,9 @@ def assert_subsidaries_locked(*sigids):
             raise_test_warning ("assert_subsidaries_locked - Signal: "+str(sigid)+" does not have a subsidary")
         elif not signals_common.signals[str(sigid)]["sublocked"]:
             raise_test_error ("assert_subsidaries_locked - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
             
 def assert_subsidaries_unlocked(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" does not exist")
@@ -389,46 +389,41 @@ def assert_subsidaries_unlocked(*sigids):
             raise_test_warning ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" does not have a subsidary")
         elif signals_common.signals[str(sigid)]["sublocked"]:
             raise_test_error ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_override_set(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_override_set - Signal: "+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["override"]:
             raise_test_error ("assert_signals_override_set - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_override_clear(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_override_clear - Signal: "+str(sigid)+" does not exist")
         elif signals_common.signals[str(sigid)]["override"]:
             raise_test_error ("assert_signals_override_clear - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_override_caution_set(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_override_caution_set - Signal: "+str(sigid)+" does not exist")
         elif not signals_common.signals[str(sigid)]["overcaution"]:
             raise_test_error ("assert_signals_override_caution_set - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_override_caution_clear(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_override_caution_clear - Signal: "+str(sigid)+" - does not exist")
         elif signals_common.signals[str(sigid)]["overcaution"]:
             raise_test_error ("assert_signals_override_caution_clear - Signal: "+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_app_cntl_set(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_app_cntl_set - Signal: "+str(sigid)+" does not exist")
@@ -438,10 +433,9 @@ def assert_signals_app_cntl_set(*sigids):
         elif ( not signals_common.signals[str(sigid)]["releaseonred"] and
                not signals_common.signals[str(sigid)]["releaseonyel"] ):
             raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_app_cntl_clear(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_app_cntl_clear - Signal: "+str(sigid)+" does not exist")
@@ -451,10 +445,9 @@ def assert_signals_app_cntl_clear(*sigids):
         elif ( signals_common.signals[str(sigid)]["releaseonred"] or
                signals_common.signals[str(sigid)]["releaseonyel"] ):
             raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_DANGER(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_DANGER - Signal: "+str(sigid)+" does not exist")
@@ -463,10 +456,9 @@ def assert_signals_DANGER(*sigids):
             if signal_state != signals_common.signal_state_type.DANGER:
                 raise_test_error ("assert_signals_DANGER - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
             
 def assert_signals_PROCEED(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_PROCEED - Signal: "+str(sigid)+" does not exist")
@@ -475,10 +467,9 @@ def assert_signals_PROCEED(*sigids):
             if signal_state != signals_common.signal_state_type.PROCEED:
                 raise_test_error ("assert_signals_PROCEED - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
             
 def assert_signals_CAUTION(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_CAUTION - Signal: "+str(sigid)+" does not exist")
@@ -487,10 +478,9 @@ def assert_signals_CAUTION(*sigids):
             if signal_state != signals_common.signal_state_type.CAUTION:
                 raise_test_error ("assert_signals_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_CAUTION_APP_CNTL(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_CAUTION_APP_CNTL - Signal: "+str(sigid)+" does not exist")
@@ -499,10 +489,9 @@ def assert_signals_CAUTION_APP_CNTL(*sigids):
             if signal_state != signals_common.signal_state_type.CAUTION_APP_CNTL:
                 raise_test_error ("assert_signals_CAUTION_APP_CNTL - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_PRELIM_CAUTION(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_PRELIM_CAUTION - Signal: "+str(sigid)+" does not exist")
@@ -511,10 +500,9 @@ def assert_signals_PRELIM_CAUTION(*sigids):
             if signal_state != signals_common.signal_state_type.PRELIM_CAUTION:
                 raise_test_error ("assert_signals_PRELIM_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_FLASH_CAUTION(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_FLASH_CAUTION - Signal: "+str(sigid)+" does not exist")
@@ -523,10 +511,9 @@ def assert_signals_FLASH_CAUTION(*sigids):
             if signal_state != signals_common.signal_state_type.FLASH_CAUTION:
                 raise_test_error ("assert_signals_FLASH_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_FLASH_PRELIM_CAUTION(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_FLASH_PRELIM_CAUTION - Signal: "+str(sigid)+" does not exist")
@@ -535,10 +522,9 @@ def assert_signals_FLASH_PRELIM_CAUTION(*sigids):
             if signal_state != signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
                 raise_test_error ("assert_signals_FLASH_PRELIM_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_signals_route_MAIN(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_route_MAIN - Signal: "+str(sigid)+" does not exist")
@@ -547,10 +533,9 @@ def assert_signals_route_MAIN(*sigids):
             if signal_route != signals_common.route_type.MAIN:
                 raise_test_error ("assert_signals_route_MAIN - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_route_LH1(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_route_LH1 - Signal: "+str(sigid)+" does not exist")
@@ -559,10 +544,9 @@ def assert_signals_route_LH1(*sigids):
             if signal_route != signals_common.route_type.LH1:
                 raise_test_error ("assert_signals_route_LH1 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_route_LH2(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_route_LH2 - Signal: "+str(sigid)+" does not exist")
@@ -571,10 +555,9 @@ def assert_signals_route_LH2(*sigids):
             if signal_route != signals_common.route_type.LH2:
                 raise_test_error ("assert_signals_route_LH2 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_route_RH1(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_route_RH1 - Signal: "+str(sigid)+" does not exist")
@@ -583,10 +566,9 @@ def assert_signals_route_RH1(*sigids):
             if signal_route != signals_common.route_type.RH1:
                 raise_test_error ("assert_signals_route_RH1 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_signals_route_RH2(*sigids):
-    global tests_executed
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("assert_signals_route_RH2 - Signal: "+str(sigid)+" does not exist")
@@ -595,25 +577,23 @@ def assert_signals_route_RH2(*sigids):
             if signal_route != signals_common.route_type.RH2:
                 raise_test_error ("assert_signals_route_RH2 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         
 def assert_sections_occupied(*secids):
-    global tests_executed
     for secid in secids:
         if str(secid) not in track_sections.sections.keys():
             raise_test_warning ("assert_sections_occupied - Section: "+str(secid)+" does not exist")
         elif not track_sections.sections[str(secid)]["occupied"]:
             raise_test_error ("assert_sections_occupied - Section: "+str(secid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 def assert_sections_clear(*secids):
-    global tests_executed
     for secid in secids:
         if str(secid) not in track_sections.sections.keys():
             raise_test_warning ("assert_sections_clear - Section: "+str(secid)+" does not exist")
         elif track_sections.sections[str(secid)]["occupied"]:
             raise_test_error ("assert_sections_clear - Section: "+str(secid)+" - Test Fail")
-        tests_executed = tests_executed+1
+        increment_tests_executed()
 
 # ------------------------------------------------------------------------------
 # Dummy event class for generating mouse events (for the schematic tests)
@@ -712,16 +692,11 @@ def get_selection_position (object_id):
 def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, delay:float):
     xdiff = xfinish - xstart
     ydiff = yfinish - ystart
-    event = dummy_event(x=xstart, y=ystart)
-    schematic.left_button_click(event)
-    root.update()
     sleep_delay = delay/steps
-    for step in range(steps):
+    for step in range(steps+1):
         event = dummy_event(x=xstart+step*(xdiff/steps),y=ystart+step*(ydiff/steps))
         schematic.track_cursor(event)
         sleep(sleep_delay)
-    schematic.left_button_release(event)
-    root.update()
 
 # ------------------------------------------------------------------------------
 # Helper function to get the D of an item from the Object ID
@@ -737,6 +712,17 @@ def get_item_id(object_id):
 # ------------------------------------------------------------------------------
 # Functions to excersise the schematic Editor - Move, update and edit
 # ------------------------------------------------------------------------------
+
+def set_edit_mode():
+    main_menubar.edit_mode()
+    root.update()
+    
+def set_run_mode():
+    main_menubar.run_mode()
+
+def reset_layout():
+    main_menubar.reset_layout(ask_for_confirm=False)
+    root.update()
 
 def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
@@ -780,7 +766,28 @@ def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, d
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
     else:
         xstart, ystart = get_selection_position(object_id)
+        event = dummy_event(x=xstart, y=ystart)
+        schematic.left_button_click(event)
+        root.update()
+        if object_id in schematic.schematic_state["selectedobjects"]: 
+            move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+            root.update()
+        else:
+            raise_test_warning("select_and_move_objects - move aborted - object: "+str(object_id)+" was not selected")
+        schematic.left_button_release(event)
+        root.update()
+
+def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
+    event = dummy_event(x=xstart, y=ystart)
+    schematic.left_button_click(event)
+    root.update()
+    if schematic.schematic_state["selectedobjects"] != []:
+        raise_test_warning ("select_area - area selection aborted - cursor was over an object")
+    else:
         move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+        root.update()
+    schematic.left_button_release(event)
+    root.update()
 
 def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
     if object_id not in objects.schematic_objects.keys():
@@ -788,6 +795,8 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
     elif line_end != 1 and line_end != 2:
         raise_test_warning ("select_and_move_line_end - object:"+str(object_id)+
                                " - Line end must be specified as '1' or '2'")
+    elif object_id not in schematic.schematic_state["selectedobjects"]:
+        raise_test_warning ("select_and_move_line_end - move aborted - object: "+str(object_id)+" must be selected first")
     else:
         if line_end == 1:
             xstart = objects.schematic_objects[object_id]["posx"]
@@ -795,7 +804,16 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
         elif line_end == 2:
             xstart = objects.schematic_objects[object_id]["endx"]
             ystart = objects.schematic_objects[object_id]["endy"]
-        move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+        event = dummy_event(x=xstart, y=ystart)
+        schematic.left_button_click(event)
+        root.update()
+        if not schematic.schematic_state["editlineend1"] and not schematic.schematic_state["editlineend2"]:
+            raise_test_warning ("select_and_move_line_end - move aborted - Line end was not selected")
+        else:
+            move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+            root.update()
+        schematic.left_button_release(event)
+        root.update()
         
 def select_all_objects():
     schematic.select_all_objects()
@@ -827,7 +845,6 @@ def paste_clipboard_objects():
 # ------------------------------------------------------------------------------
 
 def assert_object_configuration(object_id, test_values:dict):
-    global tests_executed
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("assert_object_configuration - object: "+str(object_id)+" does not exist")
     else:
@@ -839,11 +856,9 @@ def assert_object_configuration(object_id, test_values:dict):
             elif object_to_test[element] != test_values[element]:
                 raise_test_error ("assert_object_configuration - object:" +str(object_id)+
                             " - element: "+element+" - Test Fail - State : "+str(object_to_test[element]))
-            tests_executed = tests_executed+1
-    root.update()
+            increment_tests_executed()
 
 def assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None):
-    global tests_executed
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("assert_object_position - object: "+str(object_id)+" does not exist")
     else:
@@ -851,11 +866,11 @@ def assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None):
         if object_to_test["posx"] != x1:
             raise_test_error ("assert_object_position - object:" +str(object_id)+
                      " - x1 - Test Fail - value : "+str(object_to_test["posx"]))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         if object_to_test["posy"] != y1:
             raise_test_error ("assert_object_position - object:" +str(object_id)+
                      " - y1 - Test Fail - value : "+str(object_to_test["posy"]))
-        tests_executed = tests_executed+1
+        increment_tests_executed()
         if x2 is not None and y2 is not None:
             if object_to_test["item"] is not objects.object_type.line:
                 raise_test_warning ("assert_object_position - object:" +str(object_id)+
@@ -864,12 +879,42 @@ def assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None):
                 if object_to_test["endx"] != x2:
                     raise_test_error ("assert_object_position - object:" +str(object_id)+
                          " - x2 - Test Fail - value : "+str(object_to_test["endx"]))
-                tests_executed = tests_executed+1
+                increment_tests_executed()
                 if object_to_test["endy"] != y2:
                     raise_test_error ("assert_object_position - object:" +str(object_id)+
                          " - y2 - Test Fail - value : "+str(object_to_test["endy"]))
-                tests_executed = tests_executed+1
-    root.update()
+                increment_tests_executed()
+    
+def assert_objects_selected(*object_ids):
+    for object_id in object_ids:
+        if object_id not in objects.schematic_objects.keys():
+            raise_test_warning ("assert_objects_selected - object: "+str(object_id)+" does not exist")
+        else:
+            if object_id not in schematic.schematic_state["selectedobjects"]:
+                raise_test_error ("assert_objects_selected - object:" +str(object_id)+" is not selected")
+            increment_tests_executed()
+        
+def assert_objects_deselected(*object_ids):
+    for object_id in object_ids:
+        if object_id not in objects.schematic_objects.keys():
+            raise_test_warning ("assert_objects_deselected - object: "+str(object_id)+" does not exist")
+        else:
+            if object_id in schematic.schematic_state["selectedobjects"]:
+                raise_test_error ("assert_objects_deselected - object:" +str(object_id)+" is selected")
+            increment_tests_executed()
+        
+def assert_objects_exists(*object_ids):
+    for object_id in object_ids:
+        if object_id not in objects.schematic_objects.keys():
+            raise_test_error ("assert_objects_exists - object: "+str(object_id)+" does not exist")
+        increment_tests_executed()
+
+def assert_objects_do_not_exist(*object_ids):
+    for object_id in object_ids:
+        if object_id in objects.schematic_objects.keys():
+            raise_test_error ("assert_objects_does_not_exist - object: "+str(object_id)+" exists")
+        increment_tests_executed()
+
 
 #############################################################################################
 
