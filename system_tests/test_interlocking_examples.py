@@ -596,6 +596,8 @@ def run_signal_interlock_ahead_tests(semaphore=False):
 
 def run_all_interlocking_example_tests():
     initialise_test_harness(filename="../configuration_examples/interlocking_colour_light_example.sig")
+    set_run_mode()
+    reset_layout()
     run_initial_state_tests()
     run_signal_route_tests()
     run_signal_aspect_tests()
@@ -603,6 +605,8 @@ def run_all_interlocking_example_tests():
     run_signal_interlocking_tests()
     run_signal_interlock_ahead_tests()
     initialise_test_harness(filename="../configuration_examples/interlocking_semaphore_example.sig")
+    set_run_mode()
+    reset_layout()
     run_initial_state_tests(semaphore=True)
     run_signal_route_tests()
     run_signal_aspect_tests(semaphore=True)
