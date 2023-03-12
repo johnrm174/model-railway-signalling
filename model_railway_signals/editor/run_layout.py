@@ -14,7 +14,7 @@
 #    <MORE COMING>
 #    
 # Accesses the following external editor objects directly:
-#    objects_sections.default_section_object - for resetting the state of the section
+#    objects.default_section_object - for resetting the state of the section
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
 #    objects.signal_index - To iterate through all the signal objects
@@ -71,8 +71,18 @@ from ..library import signals_colour_lights
 from ..library import track_sections
 
 from . import objects
-from . import objects_common
-from . import objects_sections
+
+#------------------------------------------------------------------------------------
+# The Tkinter Canvas Object is saved as a global variable for easy referencing
+# The set_canvas function is called at application startup (on canvas creation)
+#------------------------------------------------------------------------------------
+
+canvas = None
+
+def set_canvas (canvas_object):
+    global canvas
+    canvas = canvas_object
+    return()
 
 #------------------------------------------------------------------------------------
 # Internal helper Function to find if a signal has a subsidary
@@ -781,7 +791,7 @@ def schematic_callback(item_id,callback_type):
     logging.info("**************************************************************************************")
     
     # Refocus back on the canvas to ensure that any keypress events function
-    objects_common.canvas.focus_set()
+    canvas.focus_set()
     return()
 
 #------------------------------------------------------------------------------------
@@ -828,10 +838,10 @@ def reset_layout():
     for section_id in objects.section_index:
         if editing_enabled:
             object_id = objects.section(section_id)
-            objects.schematic_objects[object_id]["state"] = objects_sections.default_section_object["state"]
-            objects.schematic_objects[object_id]["label"] = objects_sections.default_section_object["label"]
+            objects.schematic_objects[object_id]["state"] = objects.default_section_object["state"]
+            objects.schematic_objects[object_id]["label"] = objects.default_section_object["label"]
         else:
-            default_label = objects_sections.default_section_object["label"]
+            default_label = objects.default_section_object["label"]
             track_sections.clear_section_occupied(section_id, label=default_label)
     # Reset all signals back to their default states
     for signal_id in objects.signal_index:

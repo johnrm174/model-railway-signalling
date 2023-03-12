@@ -5,8 +5,8 @@
 # External API functions intended for use by other editor modules:
 #    set_canvas(canvas,callback) called on start up to set a local canvas object reference
 #    set_bbox - Common function to create boundary box for a schematic object
-#    find_initial_canvas_position - common function to find the next 'free' position 
-#    new_item_id - Common function - Find the next 'free' item ID hen creating objects
+#    find_initial_canvas_position - common function to find the next 'free' position
+#    new_item_id - Common function - Find the next 'free' item ID when creating objects
 #    signal_exists (item_id) - Common function to see if a given item exists
 #    point_exists (item_id) - Common function to see if a given item exists
 #    section_exists (item_id) - Common function to see if a given item exists
@@ -25,16 +25,16 @@
 #    section_index - for iterating through all the section objects
 #
 # Makes the following external API calls to other editor modules:
-#    settings.get_canvas() - To get the canvas parameters when creating objects 
+#    settings.get_canvas() - To get the canvas parameters when creating objects
 #
 #------------------------------------------------------------------------------------
 
 from typing import Union
-from . import settings
+from .. import settings
 
 #------------------------------------------------------------------------------------
-# Global class used for the Object Type - we use normal strings rather than enumeration
-# types so we can easily serialise/deserialise to/from json forsave and load
+# Global class used for the object_type - we use normal strings rather than enumeration
+# types so we can easily serialise/deserialise to/from json for save and load
 #------------------------------------------------------------------------------------
 
 class object_type():
@@ -47,12 +47,14 @@ class object_type():
 
 #------------------------------------------------------------------------------------
 # All Objects we create (and their configuration) are stored in a global dictionary
+# and are indexed by their UUID (object_id) - which is assigned at creation time
 #------------------------------------------------------------------------------------
 
 schematic_objects:dict={}
 
 #------------------------------------------------------------------------------------
-# We also maintain seperate indexes for each of the complex object types
+# We also maintain seperate indexes for each of the object types to enable the unique
+# object_id to be indexed by the item_id (unique only for each object_type)
 #------------------------------------------------------------------------------------
 
 signal_index:dict={}
@@ -61,8 +63,8 @@ instrument_index:dict={}
 section_index:dict={}
 
 #------------------------------------------------------------------------------------
-# Simple functions to get the main dictionary index
-# Note that signal and instrument IDs can be local or remote
+# Helper functions to get the main dictionary index (the object_id) from the item_id
+# Note that signal and instrument item_id's can be local or remote (integers or strings)
 #------------------------------------------------------------------------------------
 
 def signal(ID:Union[int,str]): return (signal_index[str(ID)])
@@ -71,8 +73,8 @@ def instrument(ID:Union[int,str]): return (instrument_index[str(ID)])
 def section(ID:int): return (section_index[str(ID)])
 
 #------------------------------------------------------------------------------------
-# simple functions to test if a particular object ID already exists
-# Note that signal and instrument IDs can be local or remote
+# Simple functions to test if a particular item_id already exists (for an item_type)
+# Note that signal and instrument item_id's can be local or remote (integers or strings)
 #------------------------------------------------------------------------------------
 
 def signal_exists(ID:Union[int,str]): return (str(ID) in signal_index.keys())
@@ -82,11 +84,12 @@ def section_exists(ID:int): return (str(ID) in section_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
-# These elements are common to all schematic layout objects
+# These elements are common to all schematic layout objects and are primarily
+# used to support the schematic editor functions (common to all item types)
 #------------------------------------------------------------------------------------
 
 default_object = {}
-default_object["item"] = object_type.none  
+default_object["item"] = object_type.none
 default_object["posx"] = 0
 default_object["posy"] = 0
 default_object["itemid"] = 0
@@ -94,7 +97,8 @@ default_object["bbox"] = None   # Tkinter canvas object for the boundary box
 default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 
 #------------------------------------------------------------------------------------
-# The Canvas Object is saved as a global variable for subsequent use
+# The Tkinter Canvas Object is saved as a global variable for easy referencing
+# The set_canvas function is called at application startup (on canvas creation)
 #------------------------------------------------------------------------------------
 
 canvas = None
@@ -107,53 +111,61 @@ def set_canvas (canvas_object):
 #------------------------------------------------------------------------------------
 # Internal function to create/update the boundary box rectangle for an object.
 # Note that we create the boundary box slightly bigger than the object itself
-# This is primarily to cater for horizontal and vertical lines.
 #------------------------------------------------------------------------------------
 
 def set_bbox(object_id:str,bbox:[int,int,int,int]):
     global schematic_objects
     x1, y1 = bbox[0] - 2, bbox[1] - 2
     x2, y2 = bbox[2] + 2, bbox[3] + 2
-    # If we are moving it we leave it in its current selected/unselected state
-    # If we are creating it for the first time - we hide it (object unselected)
+    # If the tkinter object exists we leave it in its current selected/unselected state
+    # If it doesn't exist then we create it (in the default object unselected state)
     if schematic_objects[object_id]["bbox"]:
         canvas.coords(schematic_objects[object_id]["bbox"],x1,y1,x2,y2)
     else:
-        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')        
+        schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
     return()
 
 #------------------------------------------------------------------------------------
 # Internal function to find an initial canvas position for the created object.
 # This is used by all the object type-specific creation functions (below).
 #------------------------------------------------------------------------------------
-        
+
 def find_initial_canvas_position():
     global schematic_objects
+    # Default position (top left) to try first
     x, y = 50, 50
+    # Deltas to use for object spacing
+    width, height, canvas_grid = settings.get_canvas()
+    deltax, deltay = canvas_grid*2, canvas_grid*2
     # Find an intial position not taken up with an existing object
     while True:
         posfree = True
         for object_id in schematic_objects:
             if (schematic_objects[object_id]["posx"] == x and
                  schematic_objects[object_id]["posx"] == x):
+                # Another object already exists at this position
+                # No point trying the other schematic objects
                 posfree = False
+                break
+        # If the current x/y position is "free" now have iterated through all other
+        # schematic objects then we can use this position to create the new object
         if posfree: break
-        width, height, canvas_grid = settings.get_canvas()
-        x, y = x + canvas_grid*2, y + canvas_grid*2
+        # Else, apply the deltas and try again
+        x, y = x + deltax, y + deltay
     return(x, y)
 
 #------------------------------------------------------------------------------------
 # Internal function to assign a unique type-specific id for a newly created object
 # This function is called on object creation or object copy/paste and takes in the
 # function to call to see if the Item_ID already exists for a specific item type
-# This is used by all the object type-specific creation functions (below).
+# This is used by all the object type-specific creation functions.
 #------------------------------------------------------------------------------------
 
 def new_item_id(exists_function):
     item_id = 1
     while True:
         if not exists_function(item_id): break
-        else: item_id += 1
+        item_id += 1
     return(item_id)
 
 ####################################################################################

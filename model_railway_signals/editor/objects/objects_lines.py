@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules: 
-#    create_line(type) - Create a default object on the schematic
+#    create_line() - Create a default object on the schematic
 #    delete_line(object_id) - Hard Delete an object when deleted from the schematic
 #    paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
@@ -11,7 +11,6 @@
 #    default_line_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
-#    settings.get_canvas() - To get the canvas parameters when creating objects
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
 #    objects_common.new_item_id - Common function - when creating objects
@@ -22,22 +21,12 @@
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
-# Makes the following external API calls to library modules:
-#    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
-#    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
-#    block_instruments.get_boundary_box(id) - get the boundary box for the section (i.e. selection area)
-#
 #------------------------------------------------------------------------------------
 
-from tkinter import *
-
 import uuid
-import copy 
+import copy
 
-from . import settings
 from . import objects_common
-
-from .objects_common import schematic_objects as schematic_objects
 
 #------------------------------------------------------------------------------------
 # Default Line Objects (i.e. state at creation)
@@ -57,18 +46,17 @@ default_line_object["end2"] = None     # Tkinter canvas object
 #------------------------------------------------------------------------------------
         
 def redraw_line_object(object_id):
-    global schematic_objects
     # Create new drawing objects
-    x1 = schematic_objects[object_id]["posx"]
-    y1 = schematic_objects[object_id]["posy"]
-    x2 = schematic_objects[object_id]["endx"]
-    y2 = schematic_objects[object_id]["endy"]
-    schematic_objects[object_id]["line"] = objects_common.canvas.create_line(x1,y1,x2,y2,fill="black",width=3,tags=object_id)
-    schematic_objects[object_id]["end1"] = objects_common.canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden',tags=object_id)
-    schematic_objects[object_id]["end2"] = objects_common.canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden',tags=object_id)
+    x1 = objects_common.schematic_objects[object_id]["posx"]
+    y1 = objects_common.schematic_objects[object_id]["posy"]
+    x2 = objects_common.schematic_objects[object_id]["endx"]
+    y2 = objects_common.schematic_objects[object_id]["endy"]
+    objects_common.schematic_objects[object_id]["line"] = objects_common.canvas.create_line(x1,y1,x2,y2,fill="black",width=3,tags=object_id)
+    objects_common.schematic_objects[object_id]["end1"] = objects_common.canvas.create_oval(x1-5,y1-5,x1+5,y1+5,state='hidden',tags=object_id)
+    objects_common.schematic_objects[object_id]["end2"] = objects_common.canvas.create_oval(x2-5,y2-5,x2+5,y2+5,state='hidden',tags=object_id)
     # Create/update the canvas "tags" and selection rectangle for the point
-    schematic_objects[object_id]["tags"] = object_id
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(schematic_objects[object_id]["tags"]))         
+    objects_common.schematic_objects[object_id]["tags"] = object_id
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
     return()
 
 #------------------------------------------------------------------------------------
@@ -76,17 +64,16 @@ def redraw_line_object(object_id):
 #------------------------------------------------------------------------------------
         
 def create_line():
-    global schematic_objects
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
-    schematic_objects[object_id] = copy.deepcopy(default_line_object)
+    objects_common.schematic_objects[object_id] = copy.deepcopy(default_line_object)
     # Find the initial canvas position for the new object 
     x, y = objects_common.find_initial_canvas_position()
     # Add the specific elements for this particular instance of the object
-    schematic_objects[object_id]["posx"] = x
-    schematic_objects[object_id]["posy"] = y
-    schematic_objects[object_id]["endx"] = x + 50
-    schematic_objects[object_id]["endy"] = y
+    objects_common.schematic_objects[object_id]["posx"] = x
+    objects_common.schematic_objects[object_id]["posy"] = y
+    objects_common.schematic_objects[object_id]["endx"] = x + 50
+    objects_common.schematic_objects[object_id]["endy"] = y
     # Draw the Line on the canvas
     redraw_line_object(object_id)
     return()
@@ -95,20 +82,17 @@ def create_line():
 # Function to paste a copy of an existing line - returns the new Object ID
 #------------------------------------------------------------------------------------
 
-def paste_line(object_to_paste):
-    global schematic_objects
+def paste_line(object_to_paste, deltax, deltay):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
-    schematic_objects[new_object_id] = object_to_paste
-    # New objects are "pasted" at a slightly offset position on the canvas
-    # The other end of the line also needs to be shifted
-    width, height, position_offset = settings.get_canvas()
-    schematic_objects[new_object_id]["posx"] += position_offset
-    schematic_objects[new_object_id]["posy"] += position_offset
-    schematic_objects[new_object_id]["endx"] += position_offset
-    schematic_objects[new_object_id]["endy"] += position_offset
+    objects_common.schematic_objects[new_object_id] = object_to_paste
+    # Set the position for the "pasted" object (offset from the original position)
+    objects_common.schematic_objects[new_object_id]["posx"] += deltax
+    objects_common.schematic_objects[new_object_id]["posy"] += deltay
+    objects_common.schematic_objects[new_object_id]["endx"] += deltax
+    objects_common.schematic_objects[new_object_id]["endy"] += deltay
     # Set the Boundary box for the new object to None so it gets created on re-draw
-    schematic_objects[new_object_id]["bbox"] = None
+    objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
     redraw_line_object(new_object_id)
     return(new_object_id)
@@ -121,9 +105,9 @@ def paste_line(object_to_paste):
 
 def delete_line_object(object_id):
     # Delete the tkinter drawing objects assoviated with the line object
-    objects_common.canvas.delete(schematic_objects[object_id]["line"])
-    objects_common.canvas.delete(schematic_objects[object_id]["end1"])
-    objects_common.canvas.delete(schematic_objects[object_id]["end2"])
+    objects_common.canvas.delete(objects_common.schematic_objects[object_id]["line"])
+    objects_common.canvas.delete(objects_common.schematic_objects[object_id]["end1"])
+    objects_common.canvas.delete(objects_common.schematic_objects[object_id]["end2"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -132,13 +116,12 @@ def delete_line_object(object_id):
 #------------------------------------------------------------------------------------
 
 def delete_line(object_id):
-    global schematic_objects
     # Delete the associated library objects from the canvas
     delete_line_object(object_id)
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
-    objects_common.canvas.delete(schematic_objects[object_id]["bbox"])
-    del schematic_objects[object_id]
+    objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
+    del objects_common.schematic_objects[object_id]
     return()
 
 ####################################################################################

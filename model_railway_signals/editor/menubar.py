@@ -6,6 +6,7 @@
 #    main_menubar.initialise_editor() - call once on initialisation
 #
 # Makes the following external API calls to other editor modules:
+#    objects.save_schematic_state() - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    schematic.select_all_objects() - For selecting all objects prior to deletion
@@ -451,7 +452,7 @@ class main_menubar:
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         
-    # Common initialisation function (called on editor start or layout load)
+    # Common initialisation function (called on editor start or layout load or new layout)
     def initialise_editor(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
@@ -472,6 +473,8 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
+        # save the initial editor state for undo/redo
+        objects.save_schematic_state(reset_pointer=True)
         
     def handle_canvas_event(self, event=None):
         # Handle the Toggle Mode Event ('m' key)

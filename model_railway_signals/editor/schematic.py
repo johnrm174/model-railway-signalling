@@ -13,6 +13,9 @@
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas(object_id) - Get canvas settings (for resize, snap to grid etc)
+#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
+#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
+#    run_layout.set_canvas(canvas) - Initialise the run_layout module with the canvas reference
 #    objects.set_canvas(canvas) - Initialise the objects module with the canvas reference
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
@@ -49,6 +52,7 @@ from ..library import signals_ground_disc
 from ..library import points
 
 from . import settings
+from . import run_layout
 from . import objects
 from . import configure_signal
 from . import configure_point
@@ -533,6 +537,20 @@ def resize_canvas():
     return()
 
 #------------------------------------------------------------------------------------
+# Undo and re-do functions (to deselect all objects first)
+#------------------------------------------------------------------------------------
+
+def schematic_undo(event=None):
+    deselect_all_objects()
+    objects.undo()
+    return()
+
+def schematic_redo(event=None):
+    deselect_all_objects()
+    objects.redo()
+    return()
+
+#------------------------------------------------------------------------------------
 # Internal Functions to enable/disable all canvas keypress events during an object
 # move, line edit or area selection function (to ensure deterministic behavior)
 #------------------------------------------------------------------------------------
@@ -558,6 +576,8 @@ def enable_edit_keypress_events():
     canvas.bind('<Escape>', deselect_all_objects)
     canvas.bind('<Control-Key-c>', copy_selected_objects)
     canvas.bind('<Control-Key-v>', paste_clipboard_objects)
+    canvas.bind('<Control-Key-z>', schematic_undo)
+    canvas.bind('<Control-Key-y>', schematic_redo)
     canvas.bind('r', rotate_selected_objects)
     return()
 
@@ -567,6 +587,8 @@ def disable_edit_keypress_events():
     canvas.unbind('<Escape>')
     canvas.unbind('<Control-Key-c>')
     canvas.unbind('<Control-Key-v>')
+    canvas.unbind('<Control-Key-z>')
+    canvas.unbind('<Control-Key-y>')
     canvas.unbind('r')
     return()
 
@@ -581,6 +603,7 @@ def enable_editing():
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
+    run_layout.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
     # Bind the Canvas mouse and button events to the various callback functions
@@ -604,6 +627,7 @@ def disable_editing():
     deselect_all_objects()
     # Disable editing of the schematic objects
     objects.disable_editing()
+    run_layout.disable_editing()
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
     # Unbind the Canvas mouse and button events in Run Mode
@@ -719,8 +743,9 @@ def create_canvas (root_window, event_callback):
 #     button9 = Button (button_frame, image=button_images['block_instrument'],
 #                       command=lambda:objects.create_object(objects.object_type.instrument))
 #     button9.pack (padx=2, pady=2)
-    # Initialise the Objects Module with the Canvas reference
+    # Initialise the Other Modules with the Canvas reference
     objects.set_canvas(canvas)
+    run_layout.set_canvas(canvas)
     return()
 
 ####################################################################################
