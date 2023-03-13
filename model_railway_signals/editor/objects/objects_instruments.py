@@ -12,7 +12,7 @@
 #    default_instrument_object - The dictionary of default values for the object
 #
 # API Functions called from the objects_signals module
-#       ######### TODO - remove/update references to signal ?? #############
+#    reset_instrument_interlocking_tables() - recalculates interlocking tables from scratch
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - Common function to create boundary box
@@ -60,6 +60,26 @@ default_instrument_object["keysound"] = "telegraph-key-01.wav"
 default_instrument_object["linkedto"] = None
 
 #------------------------------------------------------------------------------------
+# Internal function Update references from instruments linked to this one
+#------------------------------------------------------------------------------------
+
+def update_references_to_instrument(old_inst_id, new_inst_id):
+    ######################################################################
+    ######################## TODO ########################################
+    ######################################################################
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to Remove references from instruments linked to this one
+#------------------------------------------------------------------------------------
+
+def remove_references_to_instrument(deleted_inst_id):
+    ######################################################################
+    ######################## TODO ########################################
+    ######################################################################
+    return()
+    
+#------------------------------------------------------------------------------------
 # Function to to update (delete and re-draw) an Instrument object on the schematic. Called
 # when the object is first created or after the object attributes have been updated
 #------------------------------------------------------------------------------------
@@ -79,9 +99,7 @@ def update_instrument(object_id, new_object_configuration):
         objects_common.instrument_index[str(new_item_id)] = object_id
         # Update any signal 'block ahead' references when the instID is changed
         objects_signals.update_references_to_instrument(old_item_id, new_item_id)
-        ###########################################################################
-        ## TO DO - update any "linkedto" references for other block insttruments ##
-        ###########################################################################
+        update_references_to_instrument(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -137,7 +155,7 @@ def create_instrument():
 def paste_instrument(object_to_paste, deltax, deltay):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
-    objects_common.schematic_objects[new_object_id] = object_to_paste
+    objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
@@ -169,8 +187,10 @@ def delete_instrument_object(object_id):
 #------------------------------------------------------------------------------------
 
 def delete_instrument(object_id):
-    # Delete the associated library objects from the canvas
+    # Soft delete the associated library objects from the canvas
     delete_instrument_object(object_id)
+    # Remove any references to the instrument from other (linked) instruments
+    remove_references_to_instrument(objects_common.schematic_objects[object_id]["itemid"])
     # Remove any references to the block instrument from the signal interlocking tables
     objects_signals.remove_references_to_instrument(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting

@@ -37,7 +37,7 @@ from ..library import signals_colour_lights
 from ..library import signals_semaphores
 
 #------------------------------------------------------------------------------------
-# Helper functions to find out if the signal has a subsidary or a distant
+# Helper function to find out if the signal has a subsidary (colour light or semaphore)
 #------------------------------------------------------------------------------------
 
 def has_subsidary(signal):
@@ -50,6 +50,10 @@ def has_subsidary(signal):
              (signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
                 signal.config.aspects.get_subsidary()[0] ) )
 
+#------------------------------------------------------------------------------------
+# Helper functions to find out if the signal has distant arms (semaphore
+#------------------------------------------------------------------------------------
+
 def has_distant_arms(signal):
     return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
              ( signal.config.semaphores.main.dist.get_element()[0] or
@@ -57,6 +61,17 @@ def has_distant_arms(signal):
                signal.config.semaphores.lh2.dist.get_element()[0] or
                signal.config.semaphores.rh1.dist.get_element()[0] or
                signal.config.semaphores.rh2.dist.get_element()[0] ) )
+
+#------------------------------------------------------------------------------------
+# Helper functions to find out if the signal has route arms (semaphore)
+#------------------------------------------------------------------------------------
+
+def has_route_arms(signal):
+    return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+             (signal.config.semaphores.lh1.sig.get_element()[0] or
+               signal.config.semaphores.lh2.sig.get_element()[0] or
+               signal.config.semaphores.rh1.sig.get_element()[0] or
+               signal.config.semaphores.rh2.sig.get_element()[0] ) )
 
 #------------------------------------------------------------------------------------
 # Helper functions to return a list of the selected signal, distant and subsidary
@@ -157,69 +172,76 @@ def get_dist_routes(signal):
  
 def load_state(signal):
     object_id = signal.object_id
-    # Label the edit window with the Signal ID
-    signal.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
-    # Set the Initial UI state from the current object settings
-    signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
-    signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
-    signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"])
-    signal.config.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
-    signal.config.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
-    signal.config.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
-    signal.config.feathers.set_addresses(objects.schematic_objects[object_id]["dccfeathers"])
-    signal.config.theatre.set_theatre(objects.schematic_objects[object_id]["dcctheatre"])
-    signal.config.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-    signal.config.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-    signal.config.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
-    signal.config.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
-    signal.config.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
-    # These are the general settings for the signal
-    if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
-    else:rot = False
-    signal.config.settings.set_value(rot)
-    # These elements are for the signal intelocking tab
-    signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
-    signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
-    signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
-    # These elements are for the Automation tab
-    signal.automation.track_sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"][1])
-    signal.automation.track_sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
-    signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
-    override = objects.schematic_objects[object_id]["overridesignal"]
-    main_auto = objects.schematic_objects[object_id]["fullyautomatic"]
-    dist_auto = objects.schematic_objects[object_id]["distautomatic"]
-    override_ahead = objects.schematic_objects[object_id]["overrideahead"]
-    signal.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
-    signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
-    signal.automation.approach_control.set_values(objects.schematic_objects[object_id]["approachcontrol"])
-    # Configure the initial Route indication selection
-    feathers = objects.schematic_objects[object_id]["feathers"]
-    if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
-        if objects.schematic_objects[object_id]["theatreroute"]:
-            signal.config.routetype.set_value(3)
-        elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
-            signal.config.routetype.set_value(2)
+    # Check the object we are editing still exists (hasn't been deleted from the schematic)
+    # If it no longer exists then we just destroy the window and exit without saving
+    if object_id not in objects.schematic_objects.keys():
+        signal.window.destroy()
+    else:
+        # Label the edit window with the Signal ID
+        signal.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
+        # Set the Initial UI state from the current object settings
+        signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
+        signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
+        signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"])
+        signal.config.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
+        signal.config.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
+        signal.config.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
+        signal.config.feathers.set_addresses(objects.schematic_objects[object_id]["dccfeathers"])
+        signal.config.theatre.set_theatre(objects.schematic_objects[object_id]["dcctheatre"])
+        signal.config.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
+        signal.config.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
+        signal.config.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
+        signal.config.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
+        signal.config.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
+        # These are the general settings for the signal
+        if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
+        else:rot = False
+        signal.config.settings.set_value(rot)
+        # These elements are for the signal intelocking tab
+        signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
+        signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
+        signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
+        # These elements are for the Automation tab
+        signal.automation.track_sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"][1])
+        signal.automation.track_sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
+        signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
+        override = objects.schematic_objects[object_id]["overridesignal"]
+        main_auto = objects.schematic_objects[object_id]["fullyautomatic"]
+        dist_auto = objects.schematic_objects[object_id]["distautomatic"]
+        override_ahead = objects.schematic_objects[object_id]["overrideahead"]
+        signal.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
+        signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
+        signal.automation.approach_control.set_values(objects.schematic_objects[object_id]["approachcontrol"])
+        # Configure the initial Route indication selection
+        feathers = objects.schematic_objects[object_id]["feathers"]
+        if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
+            if objects.schematic_objects[object_id]["theatreroute"]:
+                signal.config.routetype.set_value(3)
+            elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
+                signal.config.routetype.set_value(2)
+            else:
+                signal.config.routetype.set_value(1)      
+        elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
+            if objects.schematic_objects[object_id]["theatreroute"]:
+                signal.config.routetype.set_value(3)
+            elif has_route_arms(signal):
+                signal.config.routetype.set_value(4)
+            else:
+                signal.config.routetype.set_value(1)      
         else:
             signal.config.routetype.set_value(1)      
-    elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
-        if objects.schematic_objects[object_id]["theatreroute"]:
-            signal.config.routetype.set_value(3)
-        else: 
-            signal.config.routetype.set_value(4)      
-    else:
-        signal.config.routetype.set_value(1)      
-    # Set the initial UI selections
-    update_tab1_signal_subtype_selections(signal)
-    update_tab1_signal_aspect_selections(signal)
-    update_tab1_route_selection_elements(signal)
-    update_tab1_signal_ui_elements(signal)
-    update_tab2_available_signal_routes(signal)
-    update_tab2_interlock_ahead_selection(signal)
-    update_tab3_track_section_ahead_routes(signal)
-    update_tab3_general_settings_selections(signal)
-    update_tab3_timed_signal_selections(signal)
-    update_tab3_approach_control_selections(signal)
-    update_tab3_signal_ui_elements(signal)
+        # Set the initial UI selections
+        update_tab1_signal_subtype_selections(signal)
+        update_tab1_signal_aspect_selections(signal)
+        update_tab1_route_selection_elements(signal)
+        update_tab1_signal_ui_elements(signal)
+        update_tab2_available_signal_routes(signal)
+        update_tab2_interlock_ahead_selection(signal)
+        update_tab3_track_section_ahead_routes(signal)
+        update_tab3_general_settings_selections(signal)
+        update_tab3_timed_signal_selections(signal)
+        update_tab3_approach_control_selections(signal)
+        update_tab3_signal_ui_elements(signal)
     return()
 
 #------------------------------------------------------------------------------------

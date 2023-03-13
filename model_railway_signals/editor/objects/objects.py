@@ -5,9 +5,9 @@
 #
 # External API functions / objects intended for use by other editor modules:
 #    save_schematic_state(reset=False) - save the current snapshot ('load' or 'new')
+#    undo() / redo() - Undo and re-do functions as you would expect
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
-#    undo() / redo() - Undo and re-do functions as you would expect
 #    create_object(obj_type, item_type, item_subtype) - create a new object on the canvas
 #    delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
@@ -15,9 +15,12 @@
 #    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
+#    reset_objects() - resets all points, signals, instruments and sections to default state
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
+#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
+#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
 #    objects_instruments.create_instrument(type) - Create a default object on the schematic
 #    objects_instruments.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_instruments.update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
@@ -86,9 +89,10 @@ def bring_track_sections_to_the_front():
 # Called following a file load or re-drawing for undo/redo
 #------------------------------------------------------------------------------------
 
-def redraw_all_objects_with_new_bbox():
+def redraw_all_objects(create_new_bbox:bool):
     for object_id in objects_common.schematic_objects:
-        objects_common.schematic_objects[object_id]["bbox"] = None
+        # Set the bbox reference to none so it will be created on redraw
+        if create_new_bbox: objects_common.schematic_objects[object_id]["bbox"] = None
         this_object_type = objects_common.schematic_objects[object_id]["item"]
         if this_object_type == objects_common.object_type.line:
             objects_lines.redraw_line_object(object_id)
@@ -103,7 +107,7 @@ def redraw_all_objects_with_new_bbox():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to set all item-specific indexes from the main objects_common.schematic_objects
+# Internal function to reset all item-specific indexes from the main schematic_objects
 # dictionary - called following item load and as part of undo/redo
 #------------------------------------------------------------------------------------
 
@@ -121,59 +125,111 @@ def set_all_schematic_indexes():
     return()
 
 #------------------------------------------------------------------------------------
-# Undo and redo functions
+# Undo and redo functions - the 'save_schematic_state' function should be called after
+# every change the schematic or a change to any object on the schematic to take a snapshot
+# and add this to the undo buffer. 'undo' and 'redo' then work as you'd expect
+# 'restore_schematic_state' is the internal function used by 'undo' and 'redo'
 #------------------------------------------------------------------------------------
 
 undo_buffer = [{}]
 undo_pointer = 0
 
-def restore_schematic_state(undo_pointer):
-    # Delete all current objects gracefully first
-    objects_to_delete = []
-    for object_id in objects_common.schematic_objects:
-        objects_to_delete.append(object_id)
-    for object_id in objects_to_delete:
-        delete_object(object_id)
-    # Now restore from the snapshot
-    print("Restoring state from undo_buffer(",undo_pointer,")") ###################################
-    snapshot_objects = undo_buffer[undo_pointer]
-    for object_id in snapshot_objects:
-        objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
-    # Ensure all track sections are in front of any lines
-    bring_track_sections_to_the_front()
-    return()
-
 def save_schematic_state(reset_pointer=False):
     global undo_buffer
     global undo_pointer
+    # The undo buffer is reset following 'layout load' or 'new layout'
     if reset_pointer: undo_pointer = 0
-    else: undo_pointer = undo_pointer + 1
-    if len(undo_buffer) > undo_pointer: undo_buffer = undo_buffer[:undo_pointer]
+    else:undo_pointer = undo_pointer + 1
+    # If the undo pointer isn't at the end of the undo buffer when a change is made
+    # then we need to clear everything from the undo buffer forward of this point
+    if len(undo_buffer) > undo_pointer:
+        undo_buffer = undo_buffer[:undo_pointer]
     undo_buffer.append({})
-    print("Saving state to undo_buffer(",undo_pointer,")") ############################################
+    # Save a snapshot of all schematic objects - I had a few issues with copy and
+    # deepcopy not working as I was expecting but copying one object at a time works
     snapshot_objects = objects_common.schematic_objects
     for object_id in snapshot_objects:
         undo_buffer[undo_pointer][object_id] = copy.deepcopy(snapshot_objects[object_id])
     return()
 
 def undo():
-    global undo_buffer
     global undo_pointer
     if undo_pointer > 0:
         undo_pointer = undo_pointer - 1
         restore_schematic_state(undo_pointer)
-        set_all_schematic_indexes()
-        redraw_all_objects_with_new_bbox()
     return() 
         
 def redo():
-    global undo_buffer
     global undo_pointer
     if undo_pointer < len(undo_buffer)-1:
         undo_pointer = undo_pointer + 1
         restore_schematic_state(undo_pointer)
-        set_all_schematic_indexes()
-        redraw_all_objects_with_new_bbox()
+    return()
+
+def restore_schematic_state(undo_pointer):
+    # Delete all current objects gracefully. We create a list of objects to delete rather than
+    # just iterating through the main dictionary otherwise the dict would disappear from underneath
+    objects_to_delete = []
+    for object_id in objects_common.schematic_objects:
+        objects_to_delete.append(object_id)
+    for object_id in objects_to_delete:
+        delete_object(object_id)
+    # Restore the main schematic object dictionary from the snapshot - I had a few issues with
+    # copy and deepcopy not working as I was expecting but copying one object at a time works
+    snapshot_objects = undo_buffer[undo_pointer]
+    for object_id in snapshot_objects:
+        objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
+    # Set the seperate schematic dictionary indexes from the restored schematic objects dict
+    set_all_schematic_indexes()
+    # Re-draw all objects, ensuring a new bbox is created for each object
+    redraw_all_objects(create_new_bbox=True)
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
+    # Recalculate instrument interlocking tables as a 'belt and braces' measure (on the 
+    # basis they would have successfully been restored with the rest of the snapshot)
+    objects_points.reset_point_interlocking_tables()
+    return()
+
+#------------------------------------------------------------------------------------
+# Functions to Enable and disable editing 
+#------------------------------------------------------------------------------------
+
+def enable_editing():
+    objects_sections.enable_editing()
+    run_layout.enable_editing()
+    return()
+
+def disable_editing():
+    objects_sections.disable_editing()
+    run_layout.disable_editing()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to reset the schematic back to its default state with all signals 'on',
+# all points 'unswitched', all track sections 'unoccupied' and all block instruments
+# showing 'line blocked' (by soft deleting all objects and redrawing them)
+#------------------------------------------------------------------------------------
+
+def reset_objects():
+    # Soft delete all point, section, instrument and signal objects (keeping the bbox)
+    for object_id in objects_common.schematic_objects:
+        type_of_object = objects_common.schematic_objects[object_id]["item"]
+        if type_of_object == objects_common.object_type.signal:
+            objects_signals.delete_signal_object(object_id)
+        elif type_of_object == objects_common.object_type.point:
+             objects_points.delete_point_object(object_id)
+        elif type_of_object == objects_common.object_type.section:
+            objects_sections.delete_section_object(object_id)
+        elif type_of_object == objects_common.object_type.instrument:
+            objects_instruments.delete_instrument_object(object_id)
+    # Redraw all point, section, instrument and signal objects in their default state
+    # We don't need to create a new bbox as soft_delete keeps the tkinter object
+    redraw_all_objects(create_new_bbox=False)
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
+    # Process any layout changes (interlocking, signal ahead etc)
+    # that might be dependent on the object configuration change
+    run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -370,6 +426,8 @@ def paste_objects():
 
 #------------------------------------------------------------------------------------
 # Function to set (re-create) all schematic objects (following a file load)
+# Note that there is a dependancy that the main schematic objects dict is empty
+# i.e. any legacy objects existing prior to the load will have been deleted first
 #------------------------------------------------------------------------------------
 
 def set_all(new_objects):
@@ -408,13 +466,12 @@ def set_all(new_objects):
                     logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")
     # Reset the signal/point/section/instrument indexes
     set_all_schematic_indexes()
-    # Redraw (re-create) all items on the schematic
-    redraw_all_objects_with_new_bbox()
+    # Redraw (re-create) all items on the schematic with a new bbox
+    redraw_all_objects(create_new_bbox=True)
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
-    # Refresh the point interlocking tables to reflect the signal interlocking
-    # selections - this is a belt and braces thing as the loaded point interlocking
-    # tables should exactly match the loaded signal interlocking tables
+    # Recalculate point interlocking tables as a 'belt and braces' measure (on the 
+    # basis they would have successfully been loaded with the rest of the configuration)
     objects_points.reset_point_interlocking_tables()
     # Initialise the layout (interlocking changes, signal aspects etc)
     run_layout.initialise_layout()    

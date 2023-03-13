@@ -12,9 +12,6 @@
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
 # Makes the following external API calls to other editor modules:
-#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
-#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
-#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
 #    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
 #    objects.update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
@@ -55,7 +52,6 @@ from ..library import signals_ground_disc
 from ..library import points
 
 from . import objects
-from . import run_layout
 from . import configure_signal
 from . import configure_point
 from . import configure_section
@@ -113,7 +109,6 @@ def draw_grid():
     # As the 'state' is set (normal or hidden) when enabling/disabling editing
     grid_state = canvas.itemcget("grid",'state')
     canvas.delete("grid")
-    if grid_state =="" : state = "normal"
     canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline='#999', fill="", tags="grid", state=grid_state)
     for i in range(0, canvas_height, canvas_grid):
         canvas.create_line(0,i,canvas_width,i,fill='#999',tags="grid",state=grid_state)
@@ -480,7 +475,6 @@ def left_button_release(event):
     if schematic_state["moveobjects"]:
         # Finish the move by snapping all objects to the grid - we only need to work
         # out the xdiff and xdiff for one of the selected objects to get the diff
-        obj = schematic_state["selectedobjects"][0]
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
         move_selected_objects(xdiff,ydiff)
@@ -494,7 +488,6 @@ def left_button_release(event):
         schematic_state["moveobjects"] = False
     elif schematic_state["editlineend1"]:
         # Finish the move by snapping the line end to the grid
-        obj = schematic_state["selectedobjects"][0]
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
         move_line_end(xdiff,ydiff)
@@ -507,7 +500,6 @@ def left_button_release(event):
         schematic_state["editlineend1"] = False
     elif schematic_state["editlineend2"]:
         # Finish the move by snapping the line end to the grid
-        obj = schematic_state["selectedobjects"][0]
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
         move_line_end(xdiff,ydiff)
@@ -618,7 +610,6 @@ def enable_editing():
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
-    run_layout.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it        
     button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
     # Bind the Canvas mouse and button events to the various callback functions
@@ -642,7 +633,6 @@ def disable_editing():
     deselect_all_objects()
     # Disable editing of the schematic objects
     objects.disable_editing()
-    run_layout.disable_editing()
     # Forget the subframe containing the "add object" buttons to hide it
     button_frame.forget()
     # Unbind the Canvas mouse and button events in Run Mode
@@ -756,12 +746,11 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     button8 = Button (button_frame, image=button_images['track_section'],
                       command=lambda:objects.create_object(objects.object_type.section))
     button8.pack (padx=2, pady=2)
-#     button9 = Button (button_frame, image=button_images['block_instrument'],
-#                       command=lambda:objects.create_object(objects.object_type.instrument))
-#     button9.pack (padx=2, pady=2)
-    # Initialise the Other Modules with the Canvas reference
+    button9 = Button (button_frame, image=button_images['block_instrument'],
+                      command=lambda:objects.create_object(objects.object_type.instrument))
+    button9.pack (padx=2, pady=2)
+    # Initialise the Objects package with the required parameters
     objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
-    run_layout.initialise(canvas)
     return()
 
 ####################################################################################

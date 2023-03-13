@@ -25,6 +25,7 @@
 #    update_object(object ID, new_object) - update the config of an existing object
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
+#    reset_objects() - resets all points, signals, instruments and sections to default state
 #
 # Objects intended to be accessed directly by other editor modules:
 #    object_type - Enumeration type for the supported objects
@@ -33,7 +34,13 @@
 #    point_index - for iterating through all the point objects
 #    instrument_index - for iterating through all the instrument objects
 #    section_index - for iterating through all the section objects
-#    default_section_object - for toggling the section at run time
+#
+# Makes the following external API calls to other editor modules:
+#    run_layout.initialise() - Initialise the module with the canvas reference on startup
+#    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
+#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
+#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
+#    run_layout.schematic_callback - the callback reference to use when creating library objects
 #
 #------------------------------------------------------------------------------------
 
@@ -49,6 +56,9 @@ from .objects import copy_objects
 from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
+from .objects import enable_editing
+from .objects import disable_editing
+from .objects import reset_objects
 from .objects_common import initialise
 from .objects_common import update_canvas
 from .objects_common import signal 
@@ -59,8 +69,6 @@ from .objects_common import signal_exists
 from .objects_common import point_exists
 from .objects_common import section_exists
 from .objects_common import instrument_exists
-from .objects_sections import enable_editing
-from .objects_sections import disable_editing
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -68,7 +76,40 @@ from .objects_common import signal_index
 from .objects_common import point_index 
 from .objects_common import section_index 
 from .objects_common import instrument_index
-from .objects_sections import default_section_object
 
+# The following code does nothing apart from suppressing the
+# pyflackes warnings for unused imports
+
+assert set_all
+assert get_all
+assert undo
+assert redo
+assert create_object
+assert delete_objects
+assert rotate_objects
+assert move_objects
+assert copy_objects
+assert paste_objects
+assert update_object
+assert save_schematic_state
+assert enable_editing
+assert disable_editing
+assert reset_objects
+assert initialise
+assert update_canvas
+assert signal 
+assert point 
+assert section
+assert instrument
+assert signal_exists
+assert point_exists
+assert section_exists
+assert instrument_exists
+assert object_type
+assert type(schematic_objects) 
+assert type(signal_index)
+assert type(point_index)
+assert type(section_index)
+assert type(instrument_index)
 
 

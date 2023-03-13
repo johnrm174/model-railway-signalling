@@ -38,6 +38,8 @@ from .library.signals import subsidary_clear
 from .library.signals import signal_state
 from .library.signals import set_signal_override
 from .library.signals import clear_signal_override
+from .library.signals import set_signal_override_caution
+from .library.signals import clear_signal_override_caution
 from .library.signals import set_approach_control
 from .library.signals import clear_approach_control
 from .library.signals import trigger_timed_signal
@@ -67,7 +69,6 @@ from .library.pi_sprog_interface import request_dcc_power_off
 from .library.dcc_control import map_dcc_signal
 from .library.dcc_control import map_semaphore_signal
 from .library.dcc_control import map_traintech_signal
-from .library.dcc_control import map_semaphore_signal
 from .library.dcc_control import map_dcc_point
 from .library.dcc_control import subscribe_to_dcc_command_feed
 from .library.dcc_control import set_node_to_publish_dcc_commands
@@ -120,6 +121,8 @@ __all__ = [
         'signal_state',
         'set_signal_override',
         'clear_signal_override',
+        'set_signal_override_caution',
+        'clear_signal_override_caution',
         'set_approach_control',
         'clear_approach_control',
         'trigger_timed_signal',
@@ -161,6 +164,8 @@ __all__ = [
         'block_callback_type',
       # Public block instrument functions
         'create_block_instrument',
-        'block_section_ahead_clear'
+        'block_section_ahead_clear',
+      # Public function to run editor
+        'run_editor'
            ]
 

@@ -71,13 +71,13 @@ editing_enabled = True
 # Functions to delete/re-draw the track section objects on schematic mode change.
 #------------------------------------------------------------------------------------
 
-def redraw_all_section_objects():
+def redraw_all_section_objects(reset_state=False):
     for section_id in objects_common.section_index:
         object_id = objects_common.section(section_id)
         delete_section_object(object_id)
     for section_id in objects_common.section_index:
         object_id = objects_common.section(section_id)
-        redraw_section_object(object_id)
+        redraw_section_object(object_id, reset_state=False)
     return()
 
 def enable_editing():
@@ -112,6 +112,32 @@ def disable_editing():
     return()
 
 #------------------------------------------------------------------------------------
+# Internal function to Update any references from other Track Sections (mirrored section)
+#------------------------------------------------------------------------------------
+
+def update_references_to_section(old_section_id, new_section_id):
+    # Iterate through all the sections on the schematic
+    for section_id in objects_common.section_index:
+        object_id = objects_common.section(section_id)
+        # We use strings as the IDs support local or remote sections
+        if objects_common.schematic_objects[object_id]["mirror"] == str(old_section_id):
+            objects_common.schematic_objects[object_id]["mirror"] = str(new_section_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to Remove any references from other Track Sections (mirrored section)
+#------------------------------------------------------------------------------------
+
+def remove_references_to_section(deleted_sec_id):
+    # Iterate through all the sections on the schematic
+    for section_id in objects_common.section_index:
+        section_object = objects_common.section(section_id)
+        # We use string comparison as the IDs support local or remote sections
+        if objects_common.schematic_objects[section_object]["mirror"] == str(deleted_sec_id):
+            objects_common.schematic_objects[section_object]["mirror"] = ""
+    return()
+
+#------------------------------------------------------------------------------------
 # Function to update (delete and re-draw) a Track Section object on the schematic. Called
 # when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
@@ -132,20 +158,21 @@ def update_section(object_id, new_object_configuration):
         # Update any references to the section from the Signal automation tables
         objects_signals.update_references_to_section(old_item_id, new_item_id)
         # Update any references from other Track Sections (mirrored section)
-        # We use strings as the IDs support local or remote sections
-        for section_id in objects_common.section_index:
-            object_id = objects_common.section(section_id)
-            if objects_common.schematic_objects[object_id]["mirror"] == str(old_item_id):
-                objects_common.schematic_objects[object_id]["mirror"] = str(new_item_id)
+        update_references_to_section(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to redraw a Section object on the schematic. Called when the object is first
-# created or after the object configuration has been updated.
+# created or after the object configuration has been updated. The 'reset_state' flag
+# is False when the objects are being re-drawn after a mode toggle between edit and run
+# so the state is maintained to improve the user experience (when configuring/testing)
 #------------------------------------------------------------------------------------
 
-def redraw_section_object(object_id):
+def redraw_section_object(object_id, reset_state:bool=True):
     global editing_enabled
+    if reset_state:
+        objects_common.schematic_objects[object_id]["state"] = default_section_object["state"]
+        objects_common.schematic_objects[object_id]["label"] = objects_common.schematic_objects[object_id]["defaultlabel"]
     # If we are in edit mode then we draw a "dummy" Tracck Section using canvas objects
     # so we can use the mouse events for selecting and moving them (normal Track section
     # objects are selectable buttons which makes selection/moving overly complicated)
@@ -217,7 +244,7 @@ def create_section():
 def paste_section(object_to_paste, deltax, deltay):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
-    objects_common.schematic_objects[new_object_id] = object_to_paste
+    objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
     new_id = objects_common.new_item_id(exists_function=objects_common.section_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
@@ -253,23 +280,17 @@ def delete_section_object(object_id):
 #------------------------------------------------------------------------------------
     
 def delete_section(object_id):
-    # Delete the associated library objects from the canvas
+    # Soft delete the associated library objects from the canvas
     delete_section_object(object_id)
     # Remove any references to the section from the signal track occupancy tables
     objects_signals.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # Remove any references from other Track Sections (mirrored section)
-    # We use string comparison as the IDs support local or remote sections
-    item_id_str = str(objects_common.schematic_objects[object_id]["itemid"])
-    for section_id in objects_common.section_index:
-        section_object = objects_common.section(section_id)
-        if objects_common.schematic_objects[section_object]["mirror"] == item_id_str:
-            objects_common.schematic_objects[section_object]["mirror"] = ""
+    remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
     del objects_common.section_index[str(objects_common.schematic_objects[object_id]["itemid"])]
     del objects_common.schematic_objects[object_id]
-    
     return()
 
 ####################################################################################

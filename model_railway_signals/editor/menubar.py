@@ -9,13 +9,12 @@
 #    objects.save_schematic_state() - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
+#    objects.reset_objects() - Reset the schematic back to its default state
 #    schematic.select_all_objects() - For selecting all objects prior to deletion
 #    schematic.delete_selected_objects() - For deleting all objects (on new/load)
 #    schematic.resize_canvas() - For updating the canvas following reload/resizing
 #    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
-#    run_layout.initialise_layout() - Initialise everything following a load
-#    run_layout.reset_layout() - Reset the schematic back to its default state
 #    settings.get_canvas() - Get the current canvas settings (for editing)
 #    settings.set_canvas(width,height,grid)) - Call following update/resizing/load
 #    settings.get_all() - Get all settings (for save)
@@ -51,7 +50,6 @@ from . import common
 from . import objects
 from . import settings
 from . import schematic
-from . import run_layout
 
 from ..library import file_interface
 from ..library import pi_sprog_interface
@@ -89,6 +87,7 @@ Schematic functions:
 9) <backspace> will permanently delete all selected object from the schematic
 10) <cntl-c> will copy all currently selected objects to a copy/paste buffer
 11) <cntl-v> will paste the selected objects at a slightly offset position
+11) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
 12) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
@@ -502,9 +501,9 @@ class main_menubar:
         if ask_for_confirm:
             if messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
                     "signals, points and track occupancy sections back to their default state"):
-                run_layout.reset_layout()
+                objects.reset_objects()
         else:
-            run_layout.reset_layout()
+            objects.reset_objects()
 
     def sprog_connect(self):
         port, baud, debug, startup, power = settings.get_sprog()

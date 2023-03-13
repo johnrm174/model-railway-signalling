@@ -37,7 +37,6 @@ class signal_sensor(common.integer_entry_box):
                 valid = False
             else:
                 # Test to see if the gpio channel is alreay assigned to another signal
-                current_channel = self.initial_value
                 for signal_id in objects.signal_index:
                     signal_object = objects.schematic_objects[objects.signal(signal_id)]
                     if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and

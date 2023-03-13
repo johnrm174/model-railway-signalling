@@ -54,26 +54,31 @@ def switched_with_point(object_id):
  
 def load_state(point):
     object_id = point.object_id
-    # Label the edit window with the Point ID
-    point.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
-    # Set the Initial UI state from the current object settings
-    point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
-    point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
-    point.config.alsoswitch.set_switched_with(switched_with_point(object_id))
-    point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
-    # These are the general settings for the point
-    auto = objects.schematic_objects[object_id]["automatic"]
-    rev = objects.schematic_objects[object_id]["reverse"]
-    fpl = objects.schematic_objects[object_id]["hasfpl"]
-    if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
-    else:rot = False
-    point.config.settings.set_values(rot, rev, auto, fpl)
-    # Set the initial DCC address values
-    add = objects.schematic_objects[object_id]["dccaddress"]
-    rev = objects.schematic_objects[object_id]["dccreversed"]
-    point.config.dccsettings.set_values (add, rev)
-    # Set the read only list of Interlocked signals
-    point.locking.signals.set_values(objects.schematic_objects[object_id]["siginterlock"])
+    # Check the point we are editing still exists (hasn't been deleted from the schematic)
+    # If it no longer exists then we just destroy the window and exit without saving
+    if object_id not in objects.schematic_objects.keys():
+        point.window.destroy()
+    else:
+        # Label the edit window with the Point ID
+        point.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
+        # Set the Initial UI state from the current object settings
+        point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
+        point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
+        point.config.alsoswitch.set_switched_with(switched_with_point(object_id))
+        point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
+        # These are the general settings for the point
+        auto = objects.schematic_objects[object_id]["automatic"]
+        rev = objects.schematic_objects[object_id]["reverse"]
+        fpl = objects.schematic_objects[object_id]["hasfpl"]
+        if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
+        else:rot = False
+        point.config.settings.set_values(rot, rev, auto, fpl)
+        # Set the initial DCC address values
+        add = objects.schematic_objects[object_id]["dccaddress"]
+        rev = objects.schematic_objects[object_id]["dccreversed"]
+        point.config.dccsettings.set_values (add, rev)
+        # Set the read only list of Interlocked signals
+        point.locking.signals.set_values(objects.schematic_objects[object_id]["siginterlock"])
     return()
     
 #------------------------------------------------------------------------------------

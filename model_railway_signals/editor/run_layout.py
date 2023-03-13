@@ -4,7 +4,6 @@
 # External API functions intended for use by other editor modules:
 #    initialise(canvas) - sets a global reference to the tkinter canvas object
 #    initialise_layout() - call after object changes/deletions or load of a new schematic
-#    reset_layout() - call to reset the layout to its default state
 #    schematic_callback(item_id,callback_type) - the callback for all schematic objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
@@ -16,7 +15,6 @@
 #    <MORE COMING>
 #    
 # Accesses the following external editor objects directly:
-#    objects.default_section_object - for resetting the state of the section
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
 #    objects.signal_index - To iterate through all the signal objects
@@ -61,7 +59,6 @@
 #
 #------------------------------------------------------------------------------------
 
-from typing import Union
 import logging
 
 from ..library import signals
@@ -197,7 +194,7 @@ def find_signal_behind(signal_object):
 def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
     global logging
     home_signal_at_danger = False
-    if recursion_level < 50:
+    if recursion_level < 20:
         signal_ahead_object = find_signal_ahead(signal_object)
         if signal_ahead_object is not None:
             signal_id = signal_ahead_object["itemid"]
@@ -246,7 +243,7 @@ def distant_signal_ahead_at_caution(signal_object):
 #------------------------------------------------------------------------------------
 
 def update_signal_behind(signal_object, recursion_level:int=0):
-    if recursion_level < 50:
+    if recursion_level < 20:
         signal_behind_object = find_signal_behind(signal_object)
         if signal_behind_object is not None:
             if signal_behind_object["itemtype"] == signals_common.sig_type.colour_light.value:
@@ -420,17 +417,29 @@ def update_track_occupancy(signal_object):
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def update_mirrored_section(section_object):
-    section_id = str(section_object["itemid"])
-    for other_section_id in objects.section_index:
-        mirrored_section = objects.schematic_objects[objects.section(other_section_id)]["mirror"]
-        if mirrored_section == section_id:
-            label_to_set = track_sections.section_label(section_id)
-            state_to_set = track_sections.section_occupied(section_id)
-            if state_to_set:
-                track_sections.set_section_occupied(other_section_id, label_to_set, publish=False)
-            else:
-                track_sections.clear_section_occupied(other_section_id, label_to_set, publish=False)
+def update_mirrored_section(section_object, section_id_just_set:str="0", recursion_level:int=0):
+    if recursion_level < 20:
+        changed_section_id = str(section_object["itemid"])
+       # Iterate through the other sections to see if any are set to mirror this section
+        for section_id_to_test in objects.section_index:
+            section_object_to_test = objects.schematic_objects[objects.section(section_id_to_test)]
+            mirrored_section_id_of_object_to_test = section_object_to_test["mirror"]
+            # Note that the use case of trwo sections set to mirror each other is valid
+            # For this, we just update the first mirrored section and then exit
+            if changed_section_id == mirrored_section_id_of_object_to_test:
+                label_to_set = track_sections.section_label(changed_section_id)
+                state_to_set = track_sections.section_occupied(changed_section_id)
+                if state_to_set:
+                    track_sections.set_section_occupied(section_id_to_test,label_to_set,publish=False)
+                else:
+                    track_sections.clear_section_occupied(section_id_to_test,label_to_set,publish=False)
+                # See if there are any other sections set to mirror this section
+                if section_id_to_test != section_id_just_set:
+                    update_mirrored_section(section_object=section_object_to_test,
+                                section_id_just_set=mirrored_section_id_of_object_to_test,
+                                recursion_level= recursion_level+1)
+    else:
+        logging.error("RUN LAYOUT - Update Mirrored Section - Maximum recursion level reached")
     return()
 
 #-------------------------------------------------------------------------------------
@@ -613,7 +622,7 @@ def update_all_distant_overrides():
 #------------------------------------------------------------------------------------
 
 def update_signal_approach_control(signal_object, force_set:bool, recursion_level:int=0):
-    if recursion_level < 50:
+    if recursion_level < 20:
         if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
                  signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
             signal_route = find_signal_route(signal_object)
@@ -730,10 +739,9 @@ def schematic_callback(item_id,callback_type):
     # changed (which implies we are in RUN Mode) or if track section occupancy has been
     # updated in RUN Mode (i.e. following a signal passed event in RUN Mode) - this
     # is important as Track sections (the library objects) only "exist" in run mode
-    if ( (callback_type == signals_common.sig_callback_type.sig_passed and not editing_enabled) or
-          callback_type == track_sections.section_callback_type.section_updated ):
-        logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
-        update_all_mirrored_sections()
+    if callback_type == track_sections.section_callback_type.section_updated:
+        logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
+        update_mirrored_section(objects.schematic_objects[objects.section(item_id)])
 
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
@@ -825,52 +833,6 @@ def initialise_layout():
     logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
     logging.info("**************************************************************************************")
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to "reset" the layout to its default state (all sections unoccupied, all
-# signals ON and all points set to their default state (not-switched and FPL active)
-#------------------------------------------------------------------------------------
-
-def reset_layout():
-    global editing_enabled
-    global logging
-    logging.info("RUN LAYOUT - Resetting Schematic *****************************************************")
-    # Reset all sections to unoccupied (note that sections only exist in run mode)
-    for section_id in objects.section_index:
-        if editing_enabled:
-            object_id = objects.section(section_id)
-            objects.schematic_objects[object_id]["state"] = objects.default_section_object["state"]
-            objects.schematic_objects[object_id]["label"] = objects.default_section_object["label"]
-        else:
-            default_label = objects.default_section_object["label"]
-            track_sections.clear_section_occupied(section_id, label=default_label)
-    # Reset all signals back to their default states
-    for signal_id in objects.signal_index:
-        object_id = objects.signal(signal_id)
-        automatic = objects.schematic_objects[object_id]["fullyautomatic"]
-        if not automatic and signals.signal_clear(signal_id):
-            signals.unlock_signal(signal_id)
-            signals.toggle_signal(signal_id)
-        if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
-            signals.unlock_subsidary(signal_id)
-            signals.toggle_subsidary(signal_id)
-    # Reset all points back to their default states
-    for point_id in objects.point_index:
-        # Establish if the point has a FPL and/or whether it is automatic
-        # We use these to avoid generating errors when we reset the state
-        object_id = objects.point(point_id)
-        has_fpl = objects.schematic_objects[object_id]["hasfpl"]
-        automatic = objects.schematic_objects[object_id]["automatic"] 
-        if not automatic and points.point_switched(point_id):
-            points.unlock_point(point_id)
-            if has_fpl and points.fpl_active(point_id):
-                points.toggle_fpl(point_id)
-            points.toggle_point(point_id)
-        if has_fpl and not points.fpl_active(point_id):
-            points.toggle_fpl(point_id)
-    # Re-initialise the layout in its default state
-    initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------

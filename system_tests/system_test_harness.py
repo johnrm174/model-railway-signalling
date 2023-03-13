@@ -24,6 +24,8 @@
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
 #    assert_points_unlocked(*pointids)
+#    assert_points_switched(*pointids)
+#    assert_points_normal(*pointids)
 #    assert_signals_locked(*sigids)
 #    assert_signals_unlocked(*sigids)
 #    assert_subsidaries_locked(*sigids)
@@ -355,6 +357,22 @@ def assert_points_unlocked(*pointids):
             raise_test_warning ("assert_points_unlocked - Point: "+str(pointid)+" does not exist")
         elif points.points[str(pointid)]["locked"]:
             raise_test_error ("assert_points_unlocked - Point: "+str(pointid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_points_switched(*pointids):
+    for pointid in pointids:
+        if str(pointid) not in points.points.keys():
+            raise_test_warning ("assert_points_switched - Point: "+str(pointid)+" does not exist")
+        elif not points.points[str(pointid)]["switched"]:
+            raise_test_error ("assert_points_switched - Point: "+str(pointid)+" - Test Fail")
+        increment_tests_executed()
+    
+def assert_points_normal(*pointids):
+    for pointid in pointids:
+        if str(pointid) not in points.points.keys():
+            raise_test_warning ("assert_points_normal - Point: "+str(pointid)+" does not exist")
+        elif points.points[str(pointid)]["switched"]:
+            raise_test_error ("assert_points_normal - Point: "+str(pointid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_signals_locked(*sigids):

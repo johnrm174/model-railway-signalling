@@ -13,7 +13,6 @@
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - Common function to create boundary box
 #    objects_common.find_initial_canvas_position - common function 
-#    objects_common.new_item_id - Common function - when creating objects
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -85,7 +84,7 @@ def create_line():
 def paste_line(object_to_paste, deltax, deltay):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
-    objects_common.schematic_objects[new_object_id] = object_to_paste
+    objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
@@ -116,7 +115,7 @@ def delete_line_object(object_id):
 #------------------------------------------------------------------------------------
 
 def delete_line(object_id):
-    # Delete the associated library objects from the canvas
+    # Soft delete the associated library objects from the canvas
     delete_line_object(object_id)
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
