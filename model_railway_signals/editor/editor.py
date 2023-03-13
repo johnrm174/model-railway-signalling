@@ -19,11 +19,13 @@ from ..library import common as library_common
 
 def run_editor():
     global logging
+    # Get the initial defaults for creating the canvas
+    width, height, grid = settings.get_canvas()
     # Create the Main Root Window
     root = tkinter.Tk()
     # Create the menubar and editor canvas (canvas size will be set on creation)
     main_window_menubar = menubar.main_menubar(root)
-    schematic.create_canvas(root, main_window_menubar.handle_canvas_event)
+    schematic.initialise(root, main_window_menubar.handle_canvas_event, width, height, grid)
     # Initialise the editor (using the default config)
     main_window_menubar.initialise_editor()
     # Parse the command line arguments to get the filename (and load it)

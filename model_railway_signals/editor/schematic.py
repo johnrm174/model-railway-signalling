@@ -4,24 +4,27 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_canvas(root) - Call once on startup - returns canvas object
+#    initialise(root, callback, width, height, grid) - Call once on startup
+#    update_canvas() - Call following a size update (or layout load/canvas resize)
 #    select_all_objects() - For selecting all objects prior to a "safe" delete
 #    delete_selected_objects() - To delete all objects (once all are selected)
-#    resize_canvas() - Call following a size update (or layout load/canvas resize)
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
 # Makes the following external API calls to other editor modules:
-#    settings.get_canvas(object_id) - Get canvas settings (for resize, snap to grid etc)
 #    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
 #    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
-#    run_layout.set_canvas(canvas) - Initialise the run_layout module with the canvas reference
-#    objects.set_canvas(canvas) - Initialise the objects module with the canvas reference
+#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
+#    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
+#    objects.update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    objects.create_object(obj, type, subtype) - Create a default object on the schematic
 #    objects.delete_objects(list of obj IDs) - Delete the selected objects from the canvas
 #    objects.rotate_objects(list of obj IDs) - Rotate the selected objects on the canvas
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
+#    objects.undo() / objects.redo() - Undo and re-do functions as you would expect
+#    objects.enable_editing() - Call when 'Edit' Mode is selected 
+#    objects.disable_editing() - Call when 'Run' Mode is selected
 #    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
@@ -51,9 +54,8 @@ from ..library import signals_ground_position
 from ..library import signals_ground_disc
 from ..library import points
 
-from . import settings
-from . import run_layout
 from . import objects
+from . import run_layout
 from . import configure_signal
 from . import configure_point
 from . import configure_section
@@ -81,8 +83,13 @@ schematic_state["selectareabox"] = None      # Tkinter drawing object
 schematic_state["selectedobjects"] = []
 # The Root reference is used when calling a "configure object" module (to open a popup window)
 # The Canvas reference is used for configuring and moving canvas widgets for schematic editing
+# canvas_width / canvas_height / canvas_grid are used for positioning of objects
 canvas = None
 root = None
+canvas = None
+canvas_width = 0
+canvas_height = 0
+canvas_grid = 0
 # The callback to make (for selected canvas events). Currently only the mode change keypress
 # event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
@@ -98,20 +105,20 @@ button_images = {}
 
 #------------------------------------------------------------------------------------
 # Internal Function to draw (or redraw) the grid on the screen (after re-sizing)
+# Uses the global canvas_width, canvas_height, canvas_grid variables
 #------------------------------------------------------------------------------------
 
 def draw_grid():
-    width, height, canvas_grid = settings.get_canvas()
     # Note we leave the 'state' of the grid  unchanged when re-drawing
     # As the 'state' is set (normal or hidden) when enabling/disabling editing
     grid_state = canvas.itemcget("grid",'state')
     canvas.delete("grid")
     if grid_state =="" : state = "normal"
-    canvas.create_rectangle(0, 0, width, height, outline='#999', fill="", tags="grid", state=grid_state)
-    for i in range(0, height, canvas_grid):
-        canvas.create_line(0,i,width,i,fill='#999',tags="grid",state=grid_state)
-    for i in range(0, width, canvas_grid):
-        canvas.create_line(i,0,i,height,fill='#999',tags="grid",state=grid_state)
+    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline='#999', fill="", tags="grid", state=grid_state)
+    for i in range(0, canvas_height, canvas_grid):
+        canvas.create_line(0,i,canvas_width,i,fill='#999',tags="grid",state=grid_state)
+    for i in range(0, canvas_width, canvas_grid):
+        canvas.create_line(i,0,i,canvas_height,fill='#999',tags="grid",state=grid_state)
     # Push the grid to the back (behind any drawing objects)
     canvas.tag_lower("grid")
     return()
@@ -318,17 +325,17 @@ def find_highlighted_line_end(xpos:int,ypos:int):
     return(None)
 
 #------------------------------------------------------------------------------------
-# Internal function to Snap the given coordinates to a grid (by rewturning the deltas)
+# Internal function to Snap the given coordinates to a grid (by returning the deltas)
+# Uses the global canvas_grid variable
 #------------------------------------------------------------------------------------
 
 def snap_to_grid(xpos:int,ypos:int):
-    width, height, grid_size = settings.get_canvas()
-    remainderx = xpos%grid_size
-    remaindery = ypos%grid_size
-    if remainderx < grid_size/2: remainderx = 0 - remainderx
-    else: remainderx = grid_size - remainderx
-    if remaindery < grid_size/2: remaindery = 0 - remaindery
-    else: remaindery = grid_size - remaindery
+    remainderx = xpos%canvas_grid
+    remaindery = ypos%canvas_grid
+    if remainderx < canvas_grid/2: remainderx = 0 - remainderx
+    else: remainderx = canvas_grid - remainderx
+    if remaindery < canvas_grid/2: remaindery = 0 - remaindery
+    else: remaindery = canvas_grid - remaindery
     return(remainderx,remaindery)
 
 #------------------------------------------------------------------------------------
@@ -526,14 +533,22 @@ def left_button_release(event):
     return()
 
 #------------------------------------------------------------------------------------
-# Externally called Function to resize the canvas (called from menubar module)
+# Externally called Function to resize the canvas (called from menubar module on load
+# of new schematic or re-size of canvas via menubar). Updates the global variables
 #------------------------------------------------------------------------------------
 
-def resize_canvas():
-    width, height, canvas_grid = settings.get_canvas()
-    canvas.config (width=width, height=height, scrollregion=(0,0,width,height))
+def update_canvas(width:int, height:int, grid:int):
+    global canvas_width, canvas_height, canvas_grid
+    # Update the tkinter canvas object
+    canvas.config (width=width, height=height, scrollregion=(0,0,width, height))
     canvas.pack()
+    # Set the global variables (used in the 'draw_grid' function)
+    canvas_width = width
+    canvas_height = height
+    canvas_grid = grid
     draw_grid()
+    # Also update the objects module with the new settings
+    objects.update_canvas(width, height, grid)
     return()
 
 #------------------------------------------------------------------------------------
@@ -649,8 +664,9 @@ def disable_editing():
 # Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
-def create_canvas (root_window, event_callback):
+def initialise (root_window, event_callback, width:int, height:int, grid:int):
     global root, canvas, popup1, popup2
+    global canvas_width, canvas_height, canvas_grid
     global button_frame
     global button_images
     global canvas_event_callback
@@ -666,8 +682,8 @@ def create_canvas (root_window, event_callback):
     # Create a subframe to hold the "add" buttons
     button_frame = Frame(frame, borderwidth=1)
     button_frame.pack(side=RIGHT, expand=True, fill=BOTH)
-    # Default values for the canvas
-    canvas_width, canvas_height, canvas_grid = settings.get_canvas()
+    # Save the Default values for the canvas as global variables
+    canvas_width, canvas_height, canvas_grid = width, height, grid
     # Create the canvas and scrollbars inside the parentframe
     # We also set focus on the canvas so the keypress events will take effect
     canvas = Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
@@ -744,8 +760,8 @@ def create_canvas (root_window, event_callback):
 #                       command=lambda:objects.create_object(objects.object_type.instrument))
 #     button9.pack (padx=2, pady=2)
     # Initialise the Other Modules with the Canvas reference
-    objects.set_canvas(canvas)
-    run_layout.set_canvas(canvas)
+    objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
+    run_layout.initialise(canvas)
     return()
 
 ####################################################################################

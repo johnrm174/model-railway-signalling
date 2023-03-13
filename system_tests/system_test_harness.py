@@ -101,6 +101,7 @@ import copy
 
 import sys
 sys.path.append("..")
+from model_railway_signals.editor import settings
 from model_railway_signals.editor import menubar
 from model_railway_signals.editor import schematic
 from model_railway_signals.editor import objects
@@ -169,7 +170,8 @@ def initialise_test_harness(filename=None):
         print ("System Tests: Initialise application")
         root = tkinter.Tk()
         main_menubar = menubar.main_menubar(root)
-        schematic.create_canvas(root, main_menubar.handle_canvas_event)
+        width, height, grid = settings.get_canvas()
+        schematic.initialise(root, main_menubar.handle_canvas_event, width, height, grid)
     if filename is None:
         print ("System Tests: Create new Schematic")
         main_menubar.new_schematic(ask_for_confirm=False)

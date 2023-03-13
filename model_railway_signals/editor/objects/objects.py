@@ -15,28 +15,8 @@
 #    copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
-#    objects_common.set_canvas(canvas) called on start up to set a local canvas object reference
-#    objects_common.signal(item_id) - helper function to find the object Id by Item ID
-#    objects_common.point(item_id) - helper function to find the object Id by Item ID
-#    objects_common.section(Id:int) - helper function to find the object Id by Item ID
-#    objects_common.instrument(item_id) - helper function to find the object Id by Item ID
-#    objects_common.signal_exists (item_id) - Common function to see if a given item exists
-#    objects_common.point_exists (item_id) - Common function to see if a given item exists
-#    objects_common.section_exists (item_id) - Common function to see if a given item exists
-#    objects_common.instrument_exists (item_id) - Common function to see if a given item exists
-#    objects_sections.enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
-#    objects_sections.disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
-#
-# Objects intended to be accessed directly by other editor modules:
-#    objects_common.object_type - Enumeration type for the supported objects
-#    objects_common.schematic_objects - For accessing/editing the configuration of an object
-#    objects_common.signal_index - for iterating through all the signal objects
-#    objects_common.point_index - for iterating through all the point objects
-#    objects_common.instrument_index - for iterating through all the instrument objects
-#    objects_common.section_index - for iterating through all the section objects
 #
 # Makes the following external API calls to other editor modules:
-#    settings.get_canvas() - To get the canvas parameters when "pasting" objects
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
 #    objects_instruments.create_instrument(type) - Create a default object on the schematic
 #    objects_instruments.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
@@ -89,7 +69,6 @@ from . import objects_sections
 from . import objects_instruments
 
 from .. import run_layout
-from .. import settings
 
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections to the front of the canvas
@@ -365,8 +344,7 @@ def copy_objects(list_of_object_ids):
 def paste_objects():
     list_of_new_object_ids=[]
     # New objects are "pasted" at a slightly offset position on the canvas
-    width, height, grid = settings.get_canvas()
-    deltax, deltay = grid, grid
+    deltax, deltay = objects_common.canvas_grid, objects_common.canvas_grid
     # Create a copy of each object in the clipboard (depending on type)
     for object_to_paste in clipboard:
         type_of_object = object_to_paste["item"]

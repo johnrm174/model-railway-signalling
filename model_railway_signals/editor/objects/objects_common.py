@@ -3,7 +3,8 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    set_canvas(canvas,callback) called on start up to set a local canvas object reference
+#    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
+#    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    set_bbox - Common function to create boundary box for a schematic object
 #    find_initial_canvas_position - common function to find the next 'free' position
 #    new_item_id - Common function - Find the next 'free' item ID when creating objects
@@ -23,14 +24,12 @@
 #    point_index - for iterating through all the point objects
 #    instrument_index - for iterating through all the instrument objects
 #    section_index - for iterating through all the section objects
-#
-# Makes the following external API calls to other editor modules:
-#    settings.get_canvas() - To get the canvas parameters when creating objects
+#    canvas_width, canvas_height, canvas_grid - for creating/pasting objects
+#    canvas - global reference to the Tkinter drawing object
 #
 #------------------------------------------------------------------------------------
 
 from typing import Union
-from .. import settings
 
 #------------------------------------------------------------------------------------
 # Global class used for the object_type - we use normal strings rather than enumeration
@@ -97,17 +96,34 @@ default_object["bbox"] = None   # Tkinter canvas object for the boundary box
 default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 
 #------------------------------------------------------------------------------------
-# The Tkinter Canvas Object is saved as a global variable for easy referencing
-# The set_canvas function is called at application startup (on canvas creation)
+# Function to set the required defaults for the Objects package at application start
+# The Tkinter Canvas Object and default canvas attributes (dimentions and grid size)
+# are saved as global variables for easy referencing. The Canvas width, height and grid
+# are used for optimising the positioning of objects on creation or 'paste'
 #------------------------------------------------------------------------------------
 
 canvas = None
+canvas_width = 0
+canvas_height = 0
+canvas_grid = 0
 
-def set_canvas (canvas_object):
+def initialise (canvas_object, width:int, height:int, grid:int):
     global canvas
     canvas = canvas_object
+    update_canvas(canvas_width, canvas_height, grid)
     return()
 
+#------------------------------------------------------------------------------------
+# Function to update the Canvas Attributes (following layout load or canvas resize)
+#------------------------------------------------------------------------------------
+
+def update_canvas(width:int, height:int, grid:int):
+    global canvas_width, canvas_height, canvas_grid
+    canvas_width = width
+    canvas_height = height
+    canvas_grid = grid
+    return()
+    
 #------------------------------------------------------------------------------------
 # Internal function to create/update the boundary box rectangle for an object.
 # Note that we create the boundary box slightly bigger than the object itself
@@ -135,7 +151,6 @@ def find_initial_canvas_position():
     # Default position (top left) to try first
     x, y = 50, 50
     # Deltas to use for object spacing
-    width, height, canvas_grid = settings.get_canvas()
     deltax, deltay = canvas_grid*2, canvas_grid*2
     # Find an intial position not taken up with an existing object
     while True:

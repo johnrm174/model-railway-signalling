@@ -2,7 +2,9 @@
 # This module contains all the functions to "run" the layout
 #
 # External API functions intended for use by other editor modules:
+#    initialise(canvas) - sets a global reference to the tkinter canvas object
 #    initialise_layout() - call after object changes/deletions or load of a new schematic
+#    reset_layout() - call to reset the layout to its default state
 #    schematic_callback(item_id,callback_type) - the callback for all schematic objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
@@ -79,7 +81,7 @@ from . import objects
 
 canvas = None
 
-def set_canvas (canvas_object):
+def initialise (canvas_object):
     global canvas
     canvas = canvas_object
     return()

@@ -391,7 +391,8 @@ class edit_canvas_settings():
             width = self.width.get_value()
             height = self.height.get_value()
             settings.set_canvas(width=width, height=height)
-            schematic.resize_canvas()
+            grid = settings.get_canvas()[2]
+            schematic.update_canvas(width, height, grid)
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
 
@@ -552,7 +553,8 @@ class main_menubar:
             schematic.delete_selected_objects()
             # Restore the default settings and update the editor config
             settings.restore_defaults()
-            schematic.resize_canvas()
+            width, height, grid = settings.get_canvas()
+            schematic.update_canvas(width, height, grid)
             self.initialise_editor()
         return()
 
@@ -595,7 +597,8 @@ class main_menubar:
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
                 # Re-size the canvas to reflect the new schematic size
-                schematic.resize_canvas()
+                width, height, grid = settings.get_canvas()
+                schematic.update_canvas(width, height, grid)
                 # Re-initailise the editor with the new configuration
                 self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information
