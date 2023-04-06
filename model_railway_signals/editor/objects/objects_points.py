@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_point(type) - Create a default object on the schematic
+#    create_point(type) - Create a default point object on the schematic
 #    delete_point(obj_id) - Hard Delete an object when deleted from the schematic
 #    update_point(obj_id,new_obj) - Update the configuration of an existing point object
 #    paste_point(object) - Paste a copy of an object to create a new one (returns new object_id)
@@ -12,18 +12,15 @@
 #    default_point_object - The dictionary of default values for the object
 #    reset_point_interlocking_tables() - recalculates interlocking tables from scratch
 #
-# API Functions called from the objects_signals module
-#    reset_point_interlocking_tables() - recalculates interlocking tables from scratch
-#
 # Makes the following external API calls to other editor modules:
+#    objects_common.set_bbox - to create/update the boundary box for the schematic object
+#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
+#    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.point - To get The Object_ID for a given Item_ID
 #    objects_common.signal - To get The Object_ID for a given Item_ID
-#    objects_common.set_bbox - Common function to create boundary box
-#    objects_common.find_initial_canvas_position - common function 
-#    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.point_exists - Common function to see if a given item exists
-#    objects_signals.update_references_to_point - called when point ID changes
-#    objects_signals.remove_references_to_point - called when Point is deleted
+#    objects_signals.update_references_to_point - called when the point ID is changed
+#    objects_signals.remove_references_to_point - called when the point is deleted
 #
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - to set the callbacks when creating/recreating
@@ -120,10 +117,10 @@ def reset_point_interlocking_tables():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function Update references from points that "also switch" this point
+# Internal function to update references from points that "also switch" this point
 #------------------------------------------------------------------------------------
 
-def update_references_to_point(old_point_id, new_point_id):
+def update_references_to_point(old_point_id:int, new_point_id:int):
     # Iterate through all the points on the schematic
     for point_id in objects_common.point_index:
         point_object = objects_common.point(point_id)
@@ -144,7 +141,7 @@ def update_references_to_point(old_point_id, new_point_id):
 # Internal function to Remove references from points that "also switch" this point.
 #------------------------------------------------------------------------------------
 
-def remove_references_to_point(deleted_point_id):
+def remove_references_to_point(deleted_point_id:int):
     for point_id in objects_common.point_index:
         point_object = objects_common.point(point_id)
         if objects_common.schematic_objects[point_object]["alsoswitch"] == deleted_point_id:
@@ -277,7 +274,7 @@ def create_point(item_type):
 # values as it will need to be configured specific to the new point
 #------------------------------------------------------------------------------------
 
-def paste_point(object_to_paste, deltax, deltay):
+def paste_point(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)

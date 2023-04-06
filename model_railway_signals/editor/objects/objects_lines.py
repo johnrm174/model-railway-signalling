@@ -3,16 +3,16 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules: 
-#    create_line() - Create a default object on the schematic
+#    create_line() - Create a default line object on the schematic
 #    delete_line(object_id) - Hard Delete an object when deleted from the schematic
 #    paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)
-#    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    delete_line_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_line_object(object_id) - Redraw the object on the canvas following an update
 #    default_line_object - The dictionary of default values for the object
 #
 # Makes the following external API calls to other editor modules:
-#    objects_common.set_bbox - Common function to create boundary box
-#    objects_common.find_initial_canvas_position - common function 
+#    objects_common.set_bbox - to create/update the boundary box for the schematic object
+#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -45,7 +45,8 @@ default_line_object["end2"] = None     # Tkinter canvas object
 #------------------------------------------------------------------------------------
         
 def redraw_line_object(object_id):
-    # Create new drawing objects
+    # Create new drawing objects - note that the ovals at each end are for schematic editing
+    # normally hidden, but displayed when the line is selected so they can be selected/moved
     x1 = objects_common.schematic_objects[object_id]["posx"]
     y1 = objects_common.schematic_objects[object_id]["posy"]
     x2 = objects_common.schematic_objects[object_id]["endx"]
@@ -81,7 +82,7 @@ def create_line():
 # Function to paste a copy of an existing line - returns the new Object ID
 #------------------------------------------------------------------------------------
 
-def paste_line(object_to_paste, deltax, deltay):
+def paste_line(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)

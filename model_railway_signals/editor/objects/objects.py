@@ -4,7 +4,7 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
-#    save_schematic_state(reset=False) - save the current snapshot ('load' or 'new')
+#    save_schematic_state(reset_pointer=False) - save the current snapshot ('load' or 'new')
 #    undo() / redo() - Undo and re-do functions as you would expect
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
@@ -108,20 +108,23 @@ def redraw_all_objects(create_new_bbox:bool):
 
 #------------------------------------------------------------------------------------
 # Internal function to reset all item-specific indexes from the main schematic_objects
-# dictionary - called following item load and as part of undo/redo
+# dictionary - called following item load and as part of undo/redo. Note that for
+# both of these cases, all existing entries will have been deleted when all schematic
+# objects were selected then deleted as part of the undo/redo or load layout
 #------------------------------------------------------------------------------------
 
-def set_all_schematic_indexes():
+def reset_all_schematic_indexes():
     for object_id in objects_common.schematic_objects:
         this_object_type = objects_common.schematic_objects[object_id]["item"]
+        this_object_id = objects_common.schematic_objects[object_id]["itemid"]
         if this_object_type == objects_common.object_type.signal:                
-            objects_common.signal_index[str(objects_common.schematic_objects[object_id]["itemid"])] = object_id
+            objects_common.signal_index[str(this_object_id)] = object_id
         elif this_object_type == objects_common.object_type.point:
-            objects_common.point_index[str(objects_common.schematic_objects[object_id]["itemid"])] = object_id
+            objects_common.point_index[str(this_object_id)] = object_id
         elif this_object_type == objects_common.object_type.section:
-            objects_common.section_index[str(objects_common.schematic_objects[object_id]["itemid"])] = object_id
+            objects_common.section_index[str(this_object_id)] = object_id
         elif this_object_type == objects_common.object_type.instrument:
-            objects_common.instrument_index[str(objects_common.schematic_objects[object_id]["itemid"])] = object_id
+            objects_common.instrument_index[str(this_object_id)] = object_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -134,7 +137,7 @@ def set_all_schematic_indexes():
 undo_buffer = [{}]
 undo_pointer = 0
 
-def save_schematic_state(reset_pointer=False):
+def save_schematic_state(reset_pointer:bool=False):
     global undo_buffer
     global undo_pointer
     # The undo buffer is reset following 'layout load' or 'new layout'
@@ -156,17 +159,18 @@ def undo():
     global undo_pointer
     if undo_pointer > 0:
         undo_pointer = undo_pointer - 1
-        restore_schematic_state(undo_pointer)
+        restore_schematic_state()
     return() 
         
 def redo():
     global undo_pointer
     if undo_pointer < len(undo_buffer)-1:
         undo_pointer = undo_pointer + 1
-        restore_schematic_state(undo_pointer)
+        restore_schematic_state()
     return()
 
-def restore_schematic_state(undo_pointer):
+def restore_schematic_state():
+    global undo_pointer
     # Delete all current objects gracefully. We create a list of objects to delete rather than
     # just iterating through the main dictionary otherwise the dict would disappear from underneath
     objects_to_delete = []
@@ -180,7 +184,7 @@ def restore_schematic_state(undo_pointer):
     for object_id in snapshot_objects:
         objects_common.schematic_objects[object_id] = copy.deepcopy(snapshot_objects[object_id])
     # Set the seperate schematic dictionary indexes from the restored schematic objects dict
-    set_all_schematic_indexes()
+    reset_all_schematic_indexes()
     # Re-draw all objects, ensuring a new bbox is created for each object
     redraw_all_objects(create_new_bbox=True)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
@@ -465,7 +469,7 @@ def set_all(new_objects):
                 if element not in new_objects[object_id].keys():
                     logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")
     # Reset the signal/point/section/instrument indexes
-    set_all_schematic_indexes()
+    reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
     redraw_all_objects(create_new_bbox=True)
     # Ensure all track sections are in front of any lines

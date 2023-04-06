@@ -3,24 +3,24 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_section(type) - Create a default object on the schematic
+#    create_section(type) - Create a default track section object on the schematic
 #    delete_section(object_id) - Hard Delete an object when deleted from the schematic
 #    update_section(obj_id,new_obj) - Update the configuration of an existing section object
 #    paste_section(object) - Paste a copy of an object to create a new one (returns new object_id)
-#    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
 #    enable_editing() - Called when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Called when 'Run' Mode is selected (from Schematic Module)
 #
 # Makes the following external API calls to other editor modules:
+#    objects_common.set_bbox - to create/update the boundary box for the schematic object
+#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
+#    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.section - To get The Object_ID for a given Item_ID
-#    objects_common.set_bbox - Common function to create boundary box
-#    objects_common.find_initial_canvas_position - common function 
-#    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.section_exists - Common function to see if a given item exists
-#    objects_signals.update_references_to_section - called when section_id changes
-#    objects_signals.remove_references_to_section - called when a section is deleted
+#    objects_signals.update_references_to_instrument - when the instrument ID is changed
+#    objects_signals.remove_references_to_instrument - when the instrument is deleted
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
@@ -68,10 +68,15 @@ default_section_object["mirror"] = ""
 editing_enabled = True
 
 #------------------------------------------------------------------------------------
-# Functions to delete/re-draw the track section objects on schematic mode change.
+# Internal function to delete/re-draw the track section objects following a mode change.
+# We delete everything first before re-drawing to keep Tkinter happy (otherwise it breaks)
+# The 'reset_state' flag is False when the objects are being re-drawn after a mode toggle
+# between edit and run mode to maintain state (improved the user experience). For all other
+# cases, the track section will be set to its default state on re-drawing (i.e. exactly
+# the same behavior as all other library objects (signals, points, instruments)
 #------------------------------------------------------------------------------------
 
-def redraw_all_section_objects(reset_state=False):
+def redraw_all_section_objects(reset_state:bool=False):
     for section_id in objects_common.section_index:
         object_id = objects_common.section(section_id)
         delete_section_object(object_id)
@@ -79,6 +84,12 @@ def redraw_all_section_objects(reset_state=False):
         object_id = objects_common.section(section_id)
         redraw_section_object(object_id, reset_state=False)
     return()
+
+#------------------------------------------------------------------------------------
+# Functions to set run/edit mode - We care about this for track sections as we can
+# only use library objects in run mode. In edit mode we have to use a 'fake' track
+# section object that is selectable/moveable via canvas mouse/keyboard events
+#------------------------------------------------------------------------------------
 
 def enable_editing():
     global editing_enabled
@@ -115,7 +126,7 @@ def disable_editing():
 # Internal function to Update any references from other Track Sections (mirrored section)
 #------------------------------------------------------------------------------------
 
-def update_references_to_section(old_section_id, new_section_id):
+def update_references_to_section(old_section_id:int, new_section_id:int):
     # Iterate through all the sections on the schematic
     for section_id in objects_common.section_index:
         object_id = objects_common.section(section_id)
@@ -128,7 +139,7 @@ def update_references_to_section(old_section_id, new_section_id):
 # Internal function to Remove any references from other Track Sections (mirrored section)
 #------------------------------------------------------------------------------------
 
-def remove_references_to_section(deleted_sec_id):
+def remove_references_to_section(deleted_sec_id:int):
     # Iterate through all the sections on the schematic
     for section_id in objects_common.section_index:
         section_object = objects_common.section(section_id)
@@ -157,7 +168,7 @@ def update_section(object_id, new_object_configuration):
         objects_common.section_index[str(new_item_id)] = object_id
         # Update any references to the section from the Signal automation tables
         objects_signals.update_references_to_section(old_item_id, new_item_id)
-        # Update any references from other Track Sections (mirrored section)
+        # Update any references from other Track Sections (mirrored sections)
         update_references_to_section(old_item_id, new_item_id)
     return()
 
@@ -165,7 +176,9 @@ def update_section(object_id, new_object_configuration):
 # Function to redraw a Section object on the schematic. Called when the object is first
 # created or after the object configuration has been updated. The 'reset_state' flag
 # is False when the objects are being re-drawn after a mode toggle between edit and run
-# so the state is maintained to improve the user experience (when configuring/testing)
+# so the state is maintained to improve the user experience (when configuring/testing).
+# For all other cases, the track section will be set to its default state on re-drawing
+# (i.e. exactly the same behavior as all other library objects (signals, points etc)
 #------------------------------------------------------------------------------------
 
 def redraw_section_object(object_id, reset_state:bool=True):
@@ -224,7 +237,7 @@ def create_section():
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
     item_id = objects_common.new_item_id(exists_function=objects_common.section_exists)
-    # Add the specific elements for this particular instance of the signal
+    # Add the specific elements for this particular instance of the section
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x
     objects_common.schematic_objects[object_id]["posy"] = y
@@ -241,7 +254,7 @@ def create_section():
 # to the defaults as it will need to be configured specific to the new section
 #------------------------------------------------------------------------------------
 
-def paste_section(object_to_paste, deltax, deltay):
+def paste_section(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
@@ -284,7 +297,7 @@ def delete_section(object_id):
     delete_section_object(object_id)
     # Remove any references to the section from the signal track occupancy tables
     objects_signals.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
-    # Remove any references from other Track Sections (mirrored section)
+    # Remove any references from other Track Sections (mirrored sections)
     remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)

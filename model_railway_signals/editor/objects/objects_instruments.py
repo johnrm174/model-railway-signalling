@@ -3,21 +3,18 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    create_instrument(type) - Create a default object on the schematic
+#    create_instrument() - Create a default block instrument object on the schematic
 #    delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
 #    update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
 #    paste_instrument(object) - Paste a copy of an object to create a new one (returns new object_id)
-#    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_instrument_object(object_id) - Redraw the object on the canvas following an update
 #    default_instrument_object - The dictionary of default values for the object
 #
-# API Functions called from the objects_signals module
-#    reset_instrument_interlocking_tables() - recalculates interlocking tables from scratch
-#
 # Makes the following external API calls to other editor modules:
-#    objects_common.set_bbox - Common function to create boundary box
-#    objects_common.find_initial_canvas_position - common function 
-#    objects_common.new_item_id - Common function - when creating objects
+#    objects_common.set_bbox - to create/update the boundary box for the schematic object
+#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
+#    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.instrument_exists - Common function to see if a given item exists
 #    objects_signals.update_references_to_instrument - when the instrument ID is changed
 #    objects_signals.remove_references_to_instrument - when the instrument is deleted
@@ -26,7 +23,6 @@
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.objects_common.instrument_index - The index of Instrument Objects (for iterating)
-#    objects_common.signal_index - The index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -63,7 +59,7 @@ default_instrument_object["linkedto"] = None
 # Internal function Update references from instruments linked to this one
 #------------------------------------------------------------------------------------
 
-def update_references_to_instrument(old_inst_id, new_inst_id):
+def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
     ######################################################################
     ######################## TODO ########################################
     ######################################################################
@@ -73,7 +69,7 @@ def update_references_to_instrument(old_inst_id, new_inst_id):
 # Internal function to Remove references from instruments linked to this one
 #------------------------------------------------------------------------------------
 
-def remove_references_to_instrument(deleted_inst_id):
+def remove_references_to_instrument(deleted_inst_id:int):
     ######################################################################
     ######################## TODO ########################################
     ######################################################################
@@ -97,14 +93,15 @@ def update_instrument(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.instrument_index[str(old_item_id)]
         objects_common.instrument_index[str(new_item_id)] = object_id
-        # Update any signal 'block ahead' references when the instID is changed
+        # Update any signal 'block ahead' references when the ID is changed
         objects_signals.update_references_to_instrument(old_item_id, new_item_id)
+        # Update any references from linked instruments when the ID is changed
         update_references_to_instrument(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to redraw an Instrument object on the schematic. Called when the object is first
-# created or after the object configuration has been updated.
+# Function to redraw an Instrument object on the schematic. Called when the object
+# is first reated or after the object configuration has been updated.
 #------------------------------------------------------------------------------------
 
 def redraw_instrument_object(object_id):
@@ -119,7 +116,7 @@ def redraw_instrument_object(object_id):
                 bell_sound_file = objects_common.schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = objects_common.schematic_objects[object_id]["keysound"],
                 linked_to = objects_common.schematic_objects[object_id]["linkedto"])
-    # Create/update the canvas "tags" and selection rectangle for the signal
+    # Create/update the canvas "tags" and selection rectangle for the instrument
     objects_common.schematic_objects[object_id]["tags"] = block_instruments.get_tags(objects_common.schematic_objects[object_id]["itemid"])
     objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
     return()
@@ -135,11 +132,11 @@ def create_instrument():
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
     item_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
-    # Add the specific elements for this particular instance of the signal
+    # Add the specific elements for this particular instance of the instrument
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x
     objects_common.schematic_objects[object_id]["posy"] = y
-    # Add the new object to the index of sections
+    # Add the new object to the index of instruments
     objects_common.instrument_index[str(item_id)] = object_id 
     # Draw the object on the canvas
     redraw_instrument_object(object_id)
@@ -152,7 +149,7 @@ def create_instrument():
 # configured specific to the new instrument
 #------------------------------------------------------------------------------------
 
-def paste_instrument(object_to_paste, deltax, deltay):
+def paste_instrument(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)

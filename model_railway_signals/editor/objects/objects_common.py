@@ -5,21 +5,21 @@
 # External API functions intended for use by other editor modules:
 #    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
 #    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
-#    set_bbox - Common function to create boundary box for a schematic object
-#    find_initial_canvas_position - common function to find the next 'free' position
-#    new_item_id - Common function - Find the next 'free' item ID when creating objects
-#    signal_exists (item_id) - Common function to see if a given item exists
-#    point_exists (item_id) - Common function to see if a given item exists
-#    section_exists (item_id) - Common function to see if a given item exists
-#    instrument_exists (item_id) - Common function to see if a given item exists
-#    signal(item_id) - helper function to find the object Id by Item ID
-#    point(item_id) - helper function to find the object Id by Item ID
-#    section(Id:int) - helper function to find the object Id by Item ID
-#    instrument(item_id) - helper function to find the object Id by Item ID
+#    set_bbox - Common function to create/update the boundary box for a schematic object
+#    find_initial_canvas_position - common function to return the next 'free' position (x,y)
+#    new_item_id - Common function - common function to return the next 'free' item ID
+#    signal_exists (item_id:int) - Common function to see if a given item exists
+#    point_exists (item_id:int) - Common function to see if a given item exists
+#    section_exists (item_id:int) - Common function to see if a given item exists
+#    instrument_exists (item_id:int) - Common function to see if a given item exists
+#    signal(item_id:int) - helper function to find the object Id by Item ID
+#    point(item_id:int) - helper function to find the object Id by Item ID
+#    section(item_id:int) - helper function to find the object Id by Item ID
+#    instrument(item_id:int) - helper function to find the object Id by Item ID
 #
 # Objects intended to be accessed directly by other editor modules:
 #    object_type - Enumeration type for the supported objects
-#    schematic_objects - For accessing/editing the configuration of an object
+#    schematic_objects - for accessing/editing the configuration of an object
 #    signal_index - for iterating through all the signal objects
 #    point_index - for iterating through all the point objects
 #    instrument_index - for iterating through all the instrument objects
@@ -31,8 +31,6 @@
 #    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
 #
 #------------------------------------------------------------------------------------
-
-from typing import Union
 
 from .. import run_layout
 
@@ -68,28 +66,26 @@ section_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
-# Note that signal and instrument item_id's can be local or remote (integers or strings)
 #------------------------------------------------------------------------------------
 
-def signal(ID:Union[int,str]): return (signal_index[str(ID)])
+def signal(ID:int): return (signal_index[str(ID)])
 def point(ID:int): return (point_index[str(ID)])
-def instrument(ID:Union[int,str]): return (instrument_index[str(ID)])
+def instrument(ID:int): return (instrument_index[str(ID)])
 def section(ID:int): return (section_index[str(ID)])
 
 #------------------------------------------------------------------------------------
 # Simple functions to test if a particular item_id already exists (for an item_type)
-# Note that signal and instrument item_id's can be local or remote (integers or strings)
 #------------------------------------------------------------------------------------
 
-def signal_exists(ID:Union[int,str]): return (str(ID) in signal_index.keys())
+def signal_exists(ID:int): return (str(ID) in signal_index.keys())
 def point_exists(ID:int): return (str(ID) in point_index.keys())
-def instrument_exists(ID:Union[int,str]): return (str(ID) in instrument_index.keys())
+def instrument_exists(ID:int): return (str(ID) in instrument_index.keys())
 def section_exists(ID:int): return (str(ID) in section_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
 # These elements are common to all schematic layout objects and are primarily
-# used to support the schematic editor functions (common to all item types)
+# used to support the schematic editor functions (move, select, etc)
 #------------------------------------------------------------------------------------
 
 default_object = {}
@@ -105,6 +101,7 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 # The Tkinter Canvas Object and default canvas attributes (dimentions and grid size)
 # are saved as global variables for easy referencing. The Canvas width, height and grid
 # are used for optimising the positioning of objects on creation or 'paste'
+# Also calls the run_layout.initialise function to set the tkinter canvas object
 #------------------------------------------------------------------------------------
 
 canvas = None

@@ -3,15 +3,13 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
-#    create_signal(type,subtype) - Create a default object on the schematic
+#    create_signal(type,subtype) - Create a default signal object on the schematic
 #    delete_signal(object_id) - Hard Delete an object when deleted from the schematic
 #    update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
 #    paste_signal(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    default_signal_object - The dictionary of default values for the object
-#
-# API Functions called from other objects modules
 #    remove_references_to_point (point_id) - remove point references from the interlocking tables
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
@@ -20,11 +18,10 @@
 #    update_references_to_instrument(old_id, new_id) - update inst_id in the interlocking tables
 #
 # Makes the following external API calls to other editor modules:
-#    objects_common.point - To get The Object_ID for a given Item_ID
+#    objects_common.set_bbox - to create/update the boundary box for the schematic object
+#    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
+#    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.signal - To get The Object_ID for a given Item_ID
-#    objects_common.set_bbox - Common function to create boundary box
-#    objects_common.find_initial_canvas_position - common function 
-#    objects_common.new_item_id - Common function - when creating objects
 #    objects_common.signal_exists - Common function to see if a given item exists
 #    objects_points.reset_point_interlocking_tables() - recalculate interlocking tables 
 #
@@ -222,7 +219,7 @@ def has_associated_distant(object_id):
 # Where each route element is a boolean value (True or False)
 #------------------------------------------------------------------------------------
 
-def remove_references_to_signal(deleted_sig_id):
+def remove_references_to_signal(deleted_sig_id:int):
     for signal_id in objects_common.signal_index:
         # Get the Object ID for the signal
         sig_object = objects_common.signal(signal_id)
@@ -268,7 +265,7 @@ def remove_references_to_signal(deleted_sig_id):
 # Where each route element is a boolean value (True or False)
 #------------------------------------------------------------------------------------
 
-def update_references_to_signal(old_sig_id, new_sig_id):
+def update_references_to_signal(old_sig_id:int, new_sig_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID for the signal
@@ -301,7 +298,7 @@ def update_references_to_signal(old_sig_id, new_sig_id):
 # Where sig_id in this case is a string (for local or remote signals)
 #------------------------------------------------------------------------------------
 
-def remove_references_to_point(point_id):
+def remove_references_to_point(point_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -328,7 +325,7 @@ def remove_references_to_point(point_id):
 # Function to update any references to a Point in the signal interlocking tables
 #------------------------------------------------------------------------------------
 
-def update_references_to_point(old_point_id, new_point_id):
+def update_references_to_point(old_point_id:int, new_point_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -348,7 +345,7 @@ def update_references_to_point(old_point_id, new_point_id):
 # where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
 #------------------------------------------------------------------------------------
 
-def remove_references_to_section(section_id):
+def remove_references_to_section(section_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -368,7 +365,7 @@ def remove_references_to_section(section_id):
 # Function to update any references to a Track Section in the signal automation tables
 #------------------------------------------------------------------------------------
 
-def update_references_to_section(old_section_id, new_section_id):
+def update_references_to_section(old_section_id:int, new_section_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -390,7 +387,7 @@ def update_references_to_section(old_section_id, new_section_id):
 # Where sig_id in this case is a string (for local or remote signals)
 #------------------------------------------------------------------------------------
 
-def remove_references_to_instrument(inst_id):
+def remove_references_to_instrument(inst_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -406,7 +403,7 @@ def remove_references_to_instrument(inst_id):
 # Function to update any references to a Block Instrument in the signal interlocking tables
 #------------------------------------------------------------------------------------
 
-def update_references_to_instrument(old_inst_id, new_inst_id):
+def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
     # Iterate through all the signals on the schematic
     for signal_id in objects_common.signal_index:
         # Get the Object ID of the signal
@@ -638,7 +635,7 @@ def create_signal(item_type, item_subtype):
 # default values as it will need to be configured specific to the new signal
 #------------------------------------------------------------------------------------
 
-def paste_signal(object_to_paste, deltax, deltay):
+def paste_signal(object_to_paste, deltax:int, deltay:int):
     # Create a new UUID for the pasted object
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
@@ -681,6 +678,8 @@ def paste_signal(object_to_paste, deltax, deltay):
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create/draw the new object on the canvas
     redraw_signal_object(new_object_id)
+    # No need to update the point interlocking tables as the pasted signal is
+    # created without any interlocking configuration - so nothing has changed
     return(new_object_id)            
 
 #------------------------------------------------------------------------------------
