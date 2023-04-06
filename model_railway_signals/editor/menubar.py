@@ -64,8 +64,7 @@ Application documentation is still on the 'ToDo' list, but in the meantime here 
 basic guidance and top tips for creating your layout signalling system:
 
 1) Save your progress - The editor is still in active development so may still contain
-   latent bugs (any you find please do report back to me so I can fix them). Its also
-   worth mentioning that there is no 'undo' function as yet - that's coming soon.
+   latent bugs (any you find please do report back to me so I can fix them).
 2) Draw the track layout (points and lines) before adding any signals or the schematic may
    get cluttered (making it difficult to select the thing you want to move or edit).
 3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
@@ -74,7 +73,7 @@ basic guidance and top tips for creating your layout signalling system:
    provide an insight as to what information needs to be entered (if they don't then please
    let me know and I will try and make them clearer in a future release)
 
-Schematic functions:
+Schematic functions (in edit mode):
  
 1) Use the photoimage buttons on the left to add objects to the schematic.
 2) Left-click to select objects (shift-left-click will 'add' to the selection).
