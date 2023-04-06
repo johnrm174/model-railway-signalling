@@ -7,7 +7,6 @@ from . import dcc_control
 from . import file_interface
 from . import common
 
-from tkinter import *
 import logging
 import enum
 
@@ -50,7 +49,7 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         canvas.create_line (line_coords,width=2,tags=sig_id_tag)
         # Draw the White disc of the signal
         oval_coords = common.rotate_line (x,y,+5,-21,+21,-5,orientation)
-        posroot = canvas.create_oval(oval_coords,fill="white",outline="black",tags=sig_id_tag)
+        canvas.create_oval(oval_coords,fill="white",outline="black",tags=sig_id_tag)
         # Draw the banner arms for the signal
         if signal_subtype == ground_disc_sub_type.shunt_ahead: arm_colour="yellow3"
         else: arm_colour = "red"

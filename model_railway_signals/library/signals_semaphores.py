@@ -8,7 +8,6 @@ from . import dcc_control
 from . import file_interface
 
 from typing import Union
-from tkinter import *
 import logging
 import enum
 

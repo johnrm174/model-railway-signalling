@@ -41,7 +41,7 @@
 #------------------------------------------------------------------------------------
 
 import os
-from tkinter import *
+import tkinter as Tk
 import tkinter.messagebox as messagebox
 import logging
 import webbrowser
@@ -111,11 +111,11 @@ class display_help():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 250
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Help")
         self.window.attributes('-topmost',True)
-        self.label1 = Label(self.window, text=help_text, justify=LEFT)
+        self.label1 = Tk.Label(self.window, text=help_text, justify=Tk.LEFT)
         self.label1.pack(padx=5, pady=5)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         common.window_controls(self.window, self, self.load_state, self.save_state)
@@ -151,13 +151,13 @@ class display_about():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 250
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Info")
         self.window.attributes('-topmost',True)
-        self.label1 = Label(self.window, text=about_text)
+        self.label1 = Tk.Label(self.window, text=about_text)
         self.label1.pack(padx=5, pady=5)
-        self.label2 = Label(self.window, text=text2, fg="blue", cursor="hand2")
+        self.label2 = Tk.Label(self.window, text=text2, fg="blue", cursor="hand2")
         self.label2.pack(padx=5, pady=5)
         self.label2.bind("<Button-1>", lambda e:self.callback())
         # Create the common Apply/OK/Reset/Cancel buttons for the window
@@ -185,11 +185,11 @@ class edit_mqtt_settings():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 250
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("MQTT")
         self.window.attributes('-topmost',True)
-        self.label1 = Label(self.window, text=text1, wraplength=400)
+        self.label1 = Tk.Label(self.window, text=text1, wraplength=400)
         self.label1.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         common.window_controls(self.window, self, self.load_state, self.save_state)
@@ -214,25 +214,25 @@ class edit_sprog_settings():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 200
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("SPROG DCC")
         self.window.attributes('-topmost',True)
         # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Frame(self.window)
+        self.frame1 = Tk.Frame(self.window)
         self.frame1.pack()
-        self.label1 = Label(self.frame1, text="Port:")
-        self.label1.pack(side=LEFT, padx=2, pady=2)
+        self.label1 = Tk.Label(self.frame1, text="Port:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
                         "the serial port to use for communicating with the SPROG")
-        self.port.pack(side=LEFT, padx=2, pady=2)
-        self.label2 = Label(self.frame1, text="Baud:")
-        self.label2.pack(side=LEFT, padx=2, pady=2)
+        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label2 = Tk.Label(self.frame1, text="Baud:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
-        self.baud_selection = StringVar(self.window, "")
-        self.baud = OptionMenu(self.frame1, self.baud_selection, *self.options)
+        self.baud_selection = Tk.StringVar(self.window, "")
+        self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
         common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
-        self.baud.pack(side=LEFT, padx=2, pady=2)
+        self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
         self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
             tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
@@ -245,12 +245,12 @@ class edit_sprog_settings():
             tool_tip="Select to enable DCC accessory bus power following layout load")
         self.power.pack(padx=2, pady=2)
         # Create the Button to test connectivity
-        self.B1 = Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
+        self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
         self.B1.pack(padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
                         "the command station status to confirm a connection to the SPROG has been established")
         # Create the Status Label
-        self.status = Label(self.window, text="")
+        self.status = Tk.Label(self.window, text="")
         self.status.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         common.window_controls(self.window, self, self.load_state, self.save_state)
@@ -312,7 +312,7 @@ class edit_logging_settings():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 200
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Logging")
         self.window.attributes('-topmost',True)
@@ -351,22 +351,22 @@ class edit_canvas_settings():
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 150
         winy = self.root_window.winfo_rooty() + 50
-        self.window = Toplevel(self.root_window)
+        self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Canvas")
         self.window.attributes('-topmost',True)
         # Create the entry box elements for the width and height
         # Pack the elements as a grid to get an aligned layout
-        self.frame = Frame(self.window)
+        self.frame = Tk.Frame(self.window)
         self.frame.pack()
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=1)
-        self.label1 = Label(self.frame, text="Canvas width:")
+        self.label1 = Tk.Label(self.frame, text="Canvas width:")
         self.label1.grid(row=0, column=0)
         self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=4000,
                         allow_empty=False, tool_tip="Enter width in pixels (400-4000)")
         self.width.grid(row=0, column=1)
-        self.label2 = Label(self.frame, text="Canvas height:")
+        self.label2 = Tk.Label(self.frame, text="Canvas height:")
         self.label2.grid(row=1, column=0)
         self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=2000,
                         allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
@@ -402,10 +402,10 @@ class main_menubar:
     def __init__(self, root):
         self.root = root
         # Create the menu bar
-        self.mainmenubar = Menu(self.root)
+        self.mainmenubar = Tk.Menu(self.root)
         self.root.configure(menu=self.mainmenubar)    
         # Create the various menubar items for the File Dropdown
-        self.file_menu = Menu(self.mainmenubar, tearoff=False)
+        self.file_menu = Tk.Menu(self.mainmenubar, tearoff=False)
         self.file_menu.add_command(label=" New", command=self.new_schematic)
         self.file_menu.add_command(label=" Open...", command=self.load_schematic)
         self.file_menu.add_command(label=" Save", command=lambda:self.save_schematic(False))
@@ -415,31 +415,31 @@ class main_menubar:
         self.mainmenubar.add_cascade(label="File  ", menu=self.file_menu)
         # Create the various menubar items for the Mode Dropdown
         self.mode_label = "Mode:Edit  "
-        self.mode_menu = Menu(self.mainmenubar,tearoff=False)
+        self.mode_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
         self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
         # Create the various menubar items for the SPROG Connection Dropdown
         self.sprog_label = "SPROG:DISCONNECTED "
-        self.sprog_menu = Menu(self.mainmenubar,tearoff=False)
+        self.sprog_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.sprog_menu.add_command(label=" Connect ", command=self.sprog_connect)
         self.mainmenubar.add_cascade(label=self.sprog_label, menu=self.sprog_menu)
         # Create the various menubar items for the DCC Power Dropdown
         self.power_label = "DCC Power:??? "
-        self.power_menu = Menu(self.mainmenubar,tearoff=False)
+        self.power_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
         # Create the various menubar items for the Settings Dropdown
-        self.settings_menu = Menu(self.mainmenubar,tearoff=False)
+        self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...", command=lambda:edit_canvas_settings(self.root))
         self.settings_menu.add_command(label =" MQTT...", command=lambda:edit_mqtt_settings(self.root))
         self.settings_menu.add_command(label =" SPROG...", command=lambda:edit_sprog_settings(self.root, self))
         self.settings_menu.add_command(label =" Logging...", command=lambda:edit_logging_settings(self.root))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
-        self.help_menu = Menu(self.mainmenubar,tearoff=False)
+        self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:display_help(self.root))
         self.help_menu.add_command(label =" About...", command=lambda:display_about(self.root))
         self.mainmenubar.add_cascade(label = "Help  ", menu=self.help_menu)

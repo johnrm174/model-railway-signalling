@@ -42,7 +42,7 @@
 #
 #------------------------------------------------------------------------------------
 
-from tkinter import *
+import tkinter as Tk
 
 from ..library import signals_common
 from ..library import signals_colour_lights
@@ -91,7 +91,7 @@ canvas_grid = 0
 canvas_event_callback = None
 # The following Tkinter objects are also treated as global variables as they need to remain
 # "in scope" for the schematic editor functions (i.e. so they don't get garbage collected)
-# The two popup menus (for right click on the canvas or a schematic object)
+# The two popup menus (for RIGHT click on the canvas or a schematic object)
 popup1 = None
 popup2 = None
 # The Frame holding the "add object" buttons (for pack/forget on enable/disable editing)
@@ -334,7 +334,7 @@ def snap_to_grid(xpos:int,ypos:int):
     return(remainderx,remaindery)
 
 #------------------------------------------------------------------------------------
-# Right Button Click - Bring Up Context specific Popup menu
+# RIGHT Button Click - Bring Up Context specific Popup menu
 # The event will only be bound to the canvas in "Edit" Mode
 #------------------------------------------------------------------------------------
 
@@ -607,11 +607,12 @@ def disable_edit_keypress_events():
 def enable_editing():
     global schematic_state
     global canvas_event_callback
+    global button_frame
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it        
-    button_frame.pack(side=RIGHT, expand=False, fill=BOTH)
+    button_frame.pack(side=Tk.RIGHT, expand=False, fill=Tk.BOTH)
     # Bind the Canvas mouse and button events to the various callback functions
     canvas.bind("<Motion>", track_cursor)
     canvas.bind('<Button-1>', left_button_click)
@@ -622,7 +623,7 @@ def enable_editing():
     canvas.bind('<Double-Button-1>', left_double_click)
     # Bind the canvas keypresses to the associated functions
     enable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
+    # Bind the Toggle Mode keypress event (this is active in BOTH edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
     canvas.bind('m', canvas_event_callback)
     return()
@@ -645,7 +646,7 @@ def disable_editing():
     canvas.unbind('<Double-Button-1>')
     # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
     disable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
+    # Bind the Toggle Mode keypress event (this is active in BOTH edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
     canvas.bind('m', canvas_event_callback)
     return()
@@ -663,38 +664,38 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     global logging
     root = root_window
     canvas_event_callback = event_callback
-    # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
-    frame = Frame(root_window)
-    frame.pack (expand=True, fill=BOTH)    
+    # Create a Frame to hold the two subframes ("add" buttons and drawing canvas)
+    frame = Tk.Frame(root_window)
+    frame.pack (expand=True, fill=Tk.BOTH)    
     # Create a subframe to hold the canvas and scrollbars
-    canvas_frame = Frame(frame, borderwidth=1)
-    canvas_frame.pack(side=RIGHT, expand=True, fill=BOTH)
+    canvas_frame = Tk.Frame(frame, borderwidth=1)
+    canvas_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
     # Create a subframe to hold the "add" buttons
-    button_frame = Frame(frame, borderwidth=1)
-    button_frame.pack(side=RIGHT, expand=True, fill=BOTH)
+    button_frame = Tk.Frame(frame, borderwidth=1)
+    button_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
     canvas_width, canvas_height, canvas_grid = width, height, grid
-    # Create the canvas and scrollbars inside the parentframe
+    # Create the canvas and Scrollbars inside the parentFrame
     # We also set focus on the canvas so the keypress events will take effect
-    canvas = Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
+    canvas = Tk.Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
     canvas.focus_set()
-    hbar = Scrollbar(canvas_frame, orient=HORIZONTAL)
-    hbar.pack(side=BOTTOM, fill=X)
+    hbar = Tk.Scrollbar(canvas_frame, orient=Tk.HORIZONTAL)
+    hbar.pack(side=Tk.BOTTOM, fill=Tk.X)
     hbar.config(command=canvas.xview)
-    vbar = Scrollbar(canvas_frame, orient=VERTICAL)
-    vbar.pack(side=RIGHT, fill=Y)
+    vbar = Tk.Scrollbar(canvas_frame, orient=Tk.VERTICAL)
+    vbar.pack(side=Tk.RIGHT, fill=Tk.Y)
     vbar.config(command=canvas.yview)
     canvas.config(width=canvas_width, height=canvas_height)
     canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
-    canvas.pack(side=LEFT, expand=True, fill=BOTH)
-    # Define the Object Popup menu for Right Click (something selected)
-    popup1 = Menu(tearoff=0)
+    canvas.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+    # Define the Object Popup menu for RIGHT Click (something selected)
+    popup1 = Tk.Menu(tearoff=0)
     popup1.add_command(label="Copy", command=copy_selected_objects)
     popup1.add_command(label="Edit", command=edit_selected_object)
     popup1.add_command(label="Rotate", command=rotate_selected_objects)
     popup1.add_command(label="Delete", command=delete_selected_objects)
-    # Define the Canvas Popup menu for Right Click (nothing selected)
-    popup2 = Menu(tearoff=0)
+    # Define the Canvas Popup menu for RIGHT Click (nothing selected)
+    popup2 = Tk.Menu(tearoff=0)
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)
     # Now draw the initial grid
@@ -706,47 +707,47 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     for file_name in file_names:
         try:
             with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                button_images[file_name] = PhotoImage(file=file_path)
+                button_images[file_name] = Tk.PhotoImage(file=file_path)
         except:
             logging.error ("SCHEMATIC EDITOR - Error loading image file '"+file_name+".png'")
             button_images[file_name]=None
     # Add The Buttons for creating new objects and adding to the schematic
     # Note that for enumeration types we pass the "value"
-    button1 = Button (button_frame, image=button_images['line'],
+    button1 = Tk.Button (button_frame, image=button_images['line'],
                       command=lambda:objects.create_object(objects.object_type.line))
     button1.pack (padx=2 ,pady=2)
-    button2 = Button (button_frame, image=button_images['colour_light'],
+    button2 = Tk.Button (button_frame, image=button_images['colour_light'],
                       command=lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.colour_light.value,
                            signals_colour_lights.signal_sub_type.four_aspect.value) )
     button2.pack (padx=2, pady=2)
-    button3 = Button (button_frame, image=button_images['semaphore'],
+    button3 = Tk.Button (button_frame, image=button_images['semaphore'],
                       command=lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.semaphore.value,
                            signals_semaphores.semaphore_sub_type.home.value))
     button3.pack (padx=2, pady=2)
-    button4 = Button (button_frame, image=button_images['ground_position'],
+    button4 = Tk.Button (button_frame, image=button_images['ground_position'],
                       command=lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_position.value,
                            signals_ground_position.ground_pos_sub_type.standard.value))
     button4.pack (padx=2, pady=2)
-    button5 = Button (button_frame, image=button_images['ground_disc'],
+    button5 = Tk.Button (button_frame, image=button_images['ground_disc'],
                       command=lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_disc.value,
                            signals_ground_disc.ground_disc_sub_type.standard.value))
     button5.pack (padx=2, pady=2)
-    button6 = Button (button_frame, image=button_images['left_hand_point'],
+    button6 = Tk.Button (button_frame, image=button_images['left_hand_point'],
                       command=lambda:objects.create_object(objects.object_type.point,
                            points.point_type.LH.value))
     button6.pack (padx=2, pady=2)
-    button7 = Button (button_frame, image=button_images['right_hand_point'],
+    button7 = Tk.Button (button_frame, image=button_images['right_hand_point'],
                       command=lambda:objects.create_object(objects.object_type.point,
                             points.point_type.RH.value))
     button7.pack (padx=2, pady=2)
-    button8 = Button (button_frame, image=button_images['track_section'],
+    button8 = Tk.Button (button_frame, image=button_images['track_section'],
                       command=lambda:objects.create_object(objects.object_type.section))
     button8.pack (padx=2, pady=2)
-    button9 = Button (button_frame, image=button_images['block_instrument'],
+    button9 = Tk.Button (button_frame, image=button_images['block_instrument'],
                       command=lambda:objects.create_object(objects.object_type.instrument))
     button9.pack (padx=2, pady=2)
     # Initialise the Objects package with the required parameters

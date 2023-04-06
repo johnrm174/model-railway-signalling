@@ -7,7 +7,6 @@ from . import dcc_control
 from . import file_interface
 from . import common
 
-from tkinter import *
 import logging
 import enum
 

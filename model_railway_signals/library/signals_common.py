@@ -11,8 +11,8 @@ from . import signals_semaphores
 from . import signals_ground_position
 from . import signals_ground_disc
 
-from tkinter import *
 from typing import Union
+import tkinter as Tk
 import logging
 import enum
 
@@ -413,14 +413,14 @@ def create_common_signal_elements (canvas,
     elif sig_id < 10: main_button_text = "0" + str(sig_id)
     else: main_button_text = str(sig_id)
     # Create the Signal and Subsidary Button objects and their callbacks
-    sig_button = Button (canvas, text=main_button_text, padx=common.xpadding, pady=common.ypadding,
+    sig_button = Tk.Button (canvas, text=main_button_text, padx=common.xpadding, pady=common.ypadding,
                 state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                 bg=common.bgraised, command=lambda:signal_button_event(sig_id))
-    sub_button = Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
+    sub_button = Tk.Button (canvas, text="S", padx=common.xpadding, pady=common.ypadding,
                 state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                 bg=common.bgraised, command=lambda:subsidary_button_event(sig_id))
     # Signal Passed Button - We only want a small button - hence a small font size
-    passed_button = Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
+    passed_button = Tk.Button (canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                 command=lambda:sig_passed_button_event(sig_id))
     # Create the 'windows' in which the buttons are displayed. The Subsidary Button is "hidden"
     # if the signal doesn't have an associated subsidary. The Button positions are adjusted
@@ -436,8 +436,8 @@ def create_common_signal_elements (canvas,
     elif subsidary:
         if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
         else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
-        canvas.create_window(button_position,anchor=E,window=sig_button,tags=tag)
-        canvas.create_window(button_position,anchor=W,window=sub_button,tags=tag)          
+        canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=tag)
+        canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=tag)          
     else:
         button_position = common.rotate_point (x,y,-20,-25,orientation) 
         canvas.create_window(button_position,window=sig_button,tags=tag)
@@ -482,13 +482,13 @@ def create_approach_control_elements (canvas,sig_id:int,
     # Define the "Tag" for all drawing objects for this signal instance
     tag = "signal"+str(sig_id)
     # Create the approach release button - We only want a small button - hence a small font size
-    approach_release_button = Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
+    approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                                         command=lambda:approach_release_button_event (sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
     if approach_button:
-        window = canvas.create_window(button_position,window=approach_release_button,tags=tag)
+        canvas.create_window(button_position,window=approach_release_button,tags=tag)
     else:
-        window = canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
+        canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
@@ -515,7 +515,7 @@ def create_theatre_route_elements (canvas,sig_id:int,
     tag = "signal"+str(sig_id)
     if has_theatre:
         rectangle_coords = common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation)
-        theatre_object = canvas.create_rectangle(rectangle_coords,fill="black",tags=tag)
+        canvas.create_rectangle(rectangle_coords,fill="black",tags=tag)
         theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal',tags=tag)
     else:
         theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden',tags=tag)

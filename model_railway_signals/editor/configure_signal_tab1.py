@@ -2,7 +2,7 @@
 # Functions and sub Classes for the Edit Signal "Configuration" Tab 
 #------------------------------------------------------------------------------------
 
-from tkinter import *
+import tkinter as Tk
 
 from . import common
 from . import objects
@@ -16,9 +16,9 @@ from . import objects
 
 class general_settings(common.check_box):
     def __init__(self, parent_frame):
-        # Create a Label frame to hold the general settings UI element
+        # Create a Tk.Label frame to hold the general settings UI element
         # Packed onto the parent frame by the creating function/class
-        self.frame = LabelFrame(parent_frame,text="General Config")
+        self.frame = Tk.LabelFrame(parent_frame,text="General Config")
         # Create the "rotate" checkbutton and tool Tip
         super().__init__(self.frame, label="Rotated",
                     tool_tip = "Select to rotate signal by 180 degrees")
@@ -39,14 +39,14 @@ class semaphore_route_element():
         # Callback for select/deselect of the checkbox
         self.callback = callback
         # Create a frame for the UI element (always packed into the parent frame)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Create the checkbox and DCC entry Box (default tool tip for DCC Entry Box)
         self.CB = common.check_box(parent_frame, label=label,
                         tool_tip=tool_tip, callback=self.cb_updated)
-        self.CB.pack(side=LEFT)
+        self.CB.pack(side=Tk.LEFT)
         self.EB = common.dcc_entry_box(parent_frame)
-        self.EB.pack(side=LEFT)
+        self.EB.pack(side=Tk.LEFT)
                 
     def cb_updated(self):
         self.update_eb_state()
@@ -115,11 +115,11 @@ class semaphore_route_group():
         self.sub_arms_callback = sub_arms_updated_callback
         self.dist_arms_callback = dist_arms_updated_callback
         # Create a frame for the UI element (always packed into the parent frame)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Create the lable and route elements (these are packed by the class instances)
-        self.label = Label(self.frame, anchor='w', width=5, text=label)
-        self.label.pack(side=LEFT)
+        self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
+        self.label.pack(side=Tk.LEFT)
         self.sig = semaphore_route_element(self.frame, label="Main (home) arm ",
                       tool_tip= "Select to add a home signal arm for this route",
                       callback=self.sig_arms_updated)
@@ -212,7 +212,7 @@ class semaphore_route_group():
 class semaphore_signal_arms():
     def __init__(self, parent_frame, sig_arms_updated, subs_arms_updated, dist_arms_updated):
         # Create a frame for this UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Semaphore Signal Arms and DCC Addresses")
+        self.frame = Tk.LabelFrame(parent_frame, text="Semaphore Signal Arms and DCC Addresses")
         # Create the route group for each route (packed into the frame by the class instances)
         self.main = semaphore_route_group(self.frame, label="Main",
                                 sig_arms_updated_callback=sig_arms_updated,
@@ -329,17 +329,17 @@ class dcc_entry_boxes:
     def __init__(self, parent_frame):
         # Create the DCC command entry elements (packed directly into parent frame)
         self.dcc1 = common.dcc_command_entry(parent_frame)
-        self.dcc1.frame.pack(side=LEFT)
+        self.dcc1.frame.pack(side=Tk.LEFT)
         self.dcc2 = common.dcc_command_entry(parent_frame)
-        self.dcc2.frame.pack(side=LEFT)
+        self.dcc2.frame.pack(side=Tk.LEFT)
         self.dcc3 = common.dcc_command_entry(parent_frame)
-        self.dcc3.frame.pack(side=LEFT)
+        self.dcc3.frame.pack(side=Tk.LEFT)
         self.dcc4 = common.dcc_command_entry(parent_frame)
-        self.dcc4.frame.pack(side=LEFT)
+        self.dcc4.frame.pack(side=Tk.LEFT)
         self.dcc5 = common.dcc_command_entry(parent_frame)
-        self.dcc5.frame.pack(side=LEFT)
+        self.dcc5.frame.pack(side=Tk.LEFT)
         self.dcc6 = common.dcc_command_entry(parent_frame)
-        self.dcc6.frame.pack(side=LEFT)
+        self.dcc6.frame.pack(side=Tk.LEFT)
         
     def validate_addresses(self):
         return ( self.dcc1.validate() and
@@ -399,11 +399,11 @@ class dcc_entry_boxes:
 class colour_light_aspect(dcc_entry_boxes):
     def __init__(self, parent_frame, label:str):
         # Create a frame for this UI element (always packed)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Create the label for the DCC command sequence
-        self.label = Label(self.frame, width=12, text=label, anchor='w')
-        self.label.pack(side=LEFT)
+        self.label = Tk.Label(self.frame, width=12, text=label, anchor='w')
+        self.label.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
         super().__init__(self.frame)
@@ -428,7 +428,7 @@ class colour_light_aspects():
         # Callback for select/deselect of the subsidary signal
         self.callback = callback
         # Create a label frame (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame,
+        self.frame = Tk.LabelFrame(parent_frame,
                 text="DCC command sequences for Colour Light signal aspects")
         # Create the DCC Entry Elements (packed into the frame by the parent class)
         self.red = colour_light_aspect(self.frame, label="Danger")
@@ -438,13 +438,13 @@ class colour_light_aspects():
         self.fylw = colour_light_aspect(self.frame, label="Flash Caution")
         self.fdylw = colour_light_aspect(self.frame, label="Flash Prelim")
         # Create a subframe to hold the subsidary signal entry box (always packed)
-        self.subframe = Frame(self.frame)
+        self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
         self.CB = common.check_box(self.subframe, label="Subsidary signal",   
                     tool_tip="Select to add a seperate calling on aspect",callback=self.sub_updated)
-        self.CB.pack(side=LEFT, padx=2, pady=2)
+        self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
         self.EB = common.dcc_entry_box(self.subframe)
-        self.EB.pack(side=LEFT, padx=2, pady=2)
+        self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def sub_updated(self):
         self.update_eb_state()
@@ -564,7 +564,7 @@ class theatre_route_element(dcc_entry_boxes):
     def __init__(self, parent_frame, label:str, width:int, callback=None,
                                 enable_addresses_on_selection:bool=False):
         # Create a frame for this UI element (always packed in the parent frame)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Callback to make when the route selections change (Theatre Char EB changes)
         self.callback = callback
@@ -574,10 +574,10 @@ class theatre_route_element(dcc_entry_boxes):
         # route which will always need a DCC address sequence even if there is no Theartre character
         self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create the label and entry box for the theatre character
-        self.label = Label(self.frame, width=width, text=label, anchor='w')
-        self.label.pack(side=LEFT)
+        self.label = Tk.Label(self.frame, width=width, text=label, anchor='w')
+        self.label.pack(side=Tk.LEFT)
         self.EB = theatre_route_entry_box(self.frame, callback=self.selection_updated)
-        self.EB.pack(side=LEFT)
+        self.EB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
         super().__init__(self.frame)
@@ -635,7 +635,7 @@ class theatre_route_indications:
     def __init__(self, parent_frame, callback=None):
         # Create a label frame for the route selections. We don't pack this element
         # as the frame gets packed/unpacked depending on UI selections
-        self.frame = LabelFrame(parent_frame, text="Theatre route indications "+
+        self.frame = Tk.LabelFrame(parent_frame, text="Theatre route indications "+
                                         "and associated DCC command sequences")
         # Create the individual route selection elements.
         # The MAIN route DCC address EBs remain enabled even if there is no theatre route
@@ -754,7 +754,7 @@ class feather_route_element(dcc_entry_boxes):
     def __init__(self, parent_frame, label:str, width:int, callback=None,
                           enable_addresses_on_selection=False):
         # Create a frame for this UI element (always packed in the parent frame)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Callback to make when the route selections change (enabled/disabled)
         self.callback = callback
@@ -764,11 +764,11 @@ class feather_route_element(dcc_entry_boxes):
         # route which will always need a DCC address sequence even if there is no feather
         self.enable_addresses_on_selection = enable_addresses_on_selection
         # Create the label and checkbox for the feather route selection
-        self.label = Label(self.frame, width=width, text=label, anchor='w')
-        self.label.pack(side=LEFT)
+        self.label = Tk.Label(self.frame, width=width, text=label, anchor='w')
+        self.label.pack(side=Tk.LEFT)
         self.CB = common.check_box(self.frame, callback=self.selection_updated, label="",
                         tool_tip="Select to add a feather indication for this route")
-        self.CB.pack(side=LEFT)
+        self.CB.pack(side=Tk.LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
         super().__init__(self.frame)
@@ -820,7 +820,7 @@ class feather_route_indications:
     def __init__(self, parent_frame, callback):
         # Create a label frame for the route selections. We don't pack this element
         # as the frame gets packed/unpacked depending on UI selections
-        self.frame = LabelFrame(parent_frame, text="Feather Route Indications "+
+        self.frame = Tk.LabelFrame(parent_frame, text="Feather Route Indications "+
                                         "and associated DCC command sequences")
         # Create the individual route selection elements.
         # The MAIN route DCC address EBs remain enabled even if there is no route feather
@@ -953,21 +953,21 @@ class route_selections():
     def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, main_signal=False):
         self.main_signal = main_signal
         # Create a label frame for the selections (packed by the calling function/class
-        self.frame = LabelFrame(parent_frame, text=label)
+        self.frame = Tk.LabelFrame(parent_frame, text=label)
         # We use a subframe to center the selections boxes
-        self.subframe = Frame(self.frame)
+        self.subframe = Tk.Frame(self.frame)
         self.subframe.pack(padx=2, pady=2)
         # Create the required selection elements (always packed in the subframe)
         self.main = common.check_box(self.subframe, label="MAIN", tool_tip=tool_tip, callback=callback)
-        self.main.pack(side=LEFT)
+        self.main.pack(side=Tk.LEFT)
         self.lh1 = common.check_box(self.subframe, label="LH1", tool_tip=tool_tip, callback=callback)
-        self.lh1.pack(side=LEFT)
+        self.lh1.pack(side=Tk.LEFT)
         self.lh2 = common.check_box(self.subframe, label="LH2", tool_tip=tool_tip, callback=callback)
-        self.lh2.pack(side=LEFT)
+        self.lh2.pack(side=Tk.LEFT)
         self.rh1 = common.check_box(self.subframe, label="RH1", tool_tip=tool_tip, callback=callback)
-        self.rh1.pack(side=LEFT)
+        self.rh1.pack(side=Tk.LEFT)
         self.rh2 = common.check_box(self.subframe, label="RH2", tool_tip=tool_tip, callback=callback)        
-        self.rh2.pack(side=LEFT)
+        self.rh2.pack(side=Tk.LEFT)
         if self.main_signal: self.main.config(state="disabled")
 
     def enable_selection(self):
@@ -1013,28 +1013,28 @@ class signal_configuration_tab:
                 route_type_updated, route_selections_updated, sig_routes_updated,
                 sub_routes_updated, dist_routes_updated):
         # Create a Frame for the Sig ID and Signal Type Selections (always packed)
-        self.frame1 = Frame(parent_tab)
+        self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",
                                 exists_function = objects.signal_exists)
-        self.sigid.frame.pack(side=LEFT, padx=2, pady=2, fill='both')
+        self.sigid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
         self.sigtype = common.selection_buttons(self.frame1,"Signal Type",
                     "Select signal type",sig_type_updated,"Colour Light",
                         "Ground Pos","Semaphore","Ground Disc")
-        self.sigtype.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.sigtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the UI Element for Signal subtype selection (always packed)
         self.subtype = common.selection_buttons(parent_tab,"Signal Subtype",
                     "Select signal subtype",sub_type_updated,"-","-","-","-","-")
         self.subtype.frame.pack(padx=2, pady=2, fill='x')
         # Create a Frame to hold the Gen settings and Route type Selections (always packed)
-        self.frame2 = Frame(parent_tab)
+        self.frame2 = Tk.Frame(parent_tab)
         self.frame2.pack(padx=2, pady=2, fill='x')
         self.settings = general_settings(self.frame2)
-        self.settings.frame.pack(side=LEFT, padx=2, pady=2, fill='both')
+        self.settings.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
         self.routetype = common.selection_buttons(self.frame2, "Route Indications",
                     "Select the route indications for the main signal", route_type_updated,
                     "None", "Route feathers", "Theatre indicator", "Route arms")
-        self.routetype.frame.pack(side=LEFT, padx=2, pady=2, fill='x', expand=True)
+        self.routetype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='x', expand=True)
         # Create the Checkboxes and DCC Entry Box frames for the type-specific selections
         # These frames are packed / hidden depending on the signal type and route 
         # indication type selections by the callback functions in "configure_signal.py"

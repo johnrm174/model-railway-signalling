@@ -27,7 +27,7 @@
 
 import copy
 
-from tkinter import *
+import tkinter as Tk
 from tkinter import ttk
 
 from . import common
@@ -146,21 +146,21 @@ class also_switch_selection(common.int_item_id_entry_box):
         exists_function = objects.point_exists
         current_id_function = parent_object.pointid.get_value
         # Create the Label Frame for the "also switch" entry box
-        self.frame = LabelFrame(parent_frame, text="Automatic switching")
+        self.frame = Tk.LabelFrame(parent_frame, text="Automatic switching")
         # Call the common base class init function to create the EB
-        self.label1 = Label(self.frame,text="Switch point:")
-        self.label1.pack(side=LEFT, padx=2, pady=2)
+        self.label1 = Tk.Label(self.frame,text="Switch point:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         super().__init__(self.frame, tool_tip = "Enter the ID of another (fully "+
                 "automatic) point to be switched with this point (or leave blank)",
                 exists_function=exists_function, current_id_function=current_id_function)
-        self.pack(side=LEFT, padx=2, pady=2)
+        self.pack(side=Tk.LEFT, padx=2, pady=2)
         # This is the read-only element for the point this point is switched with
-        self.switched_with = StringVar(parent_frame, "")
-        self.label2 = Label(self.frame,text="Switched with:")
-        self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.switched_eb = Entry(self.frame, width=3, textvariable=self.switched_with,
+        self.switched_with = Tk.StringVar(parent_frame, "")
+        self.label2 = Tk.Label(self.frame,text="Switched with:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.switched_eb = Tk.Entry(self.frame, width=3, textvariable=self.switched_with,
                                             justify='center',state="disabled")
-        self.switched_eb.pack(side=LEFT, padx=2, pady=2)
+        self.switched_eb.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.switched_eb, "ID of the point that "+
                                        "will automatically switch this point")
     def validate(self):
@@ -205,26 +205,26 @@ class general_settings():
         # class method to get the current value of the Point ID for validation
         self.parent_object = parent_object
         # Create a Label frame to hold the general settings
-        self.frame = LabelFrame(parent_frame,text="General configuration")
+        self.frame = Tk.LabelFrame(parent_frame,text="General configuration")
         # Create a subframe to hold the first 2 buttons
-        self.subframe1 = Frame(self.frame)
+        self.subframe1 = Tk.Frame(self.frame)
         self.subframe1.pack()
         self.CB1 = common.check_box(self.subframe1, label="Rotated",width=9,
                         tool_tip="Select to rotate point by 180 degrees")
-        self.CB1.pack(side=LEFT, padx=2, pady=2)
+        self.CB1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB2 = common.check_box(self.subframe1, label="Facing point lock", width=16,
                 tool_tip="Select to include a Facing Point Lock (manually switched points only)")
-        self.CB2.pack(side=LEFT, padx=2, pady=2)
+        self.CB2.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create a subframe to hold the second 2 buttons
-        self.subframe2 = Frame(self.frame)
+        self.subframe2 = Tk.Frame(self.frame)
         self.subframe2.pack()
         self.CB3 = common.check_box(self.subframe2, label="Reversed", width=9,
                         tool_tip="Select to reverse the switching logic of the point blades")
-        self.CB3.pack(side=LEFT, padx=2, pady=2)
+        self.CB3.pack(side=Tk.LEFT, padx=2, pady=2)
         self.CB4 = common.check_box(self.subframe2, label="Fully automatic", width=16,
             tool_tip="Select to create the point without manual controls (to be switched "+
                         "with another point)", callback= self.automatic_updated)
-        self.CB4.pack(side=LEFT, padx=2, pady=2)
+        self.CB4.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def automatic_updated(self):
         self.validate()
@@ -272,20 +272,20 @@ class general_settings():
 class dcc_address_settings(common.dcc_entry_box):
     def __init__(self, parent_frame):
         # Create a Label frame to hold the DCC Address settings
-        self.frame = LabelFrame(parent_frame,text="DCC Address and command logic")
+        self.frame = Tk.LabelFrame(parent_frame,text="DCC Address and command logic")
         # Create the Tkinter Boolean vars to hold the DCC reversed selection
-        self.dccreversed = BooleanVar(self.frame,False)
+        self.dccreversed = Tk.BooleanVar(self.frame,False)
         # Create a DCC Address element and checkbox for the "reversed" selection
         # Call the common base class init function to create the EB. These are
         # created in a seperate subframe so they are centered
-        self.subframe = Frame(self.frame)
+        self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
         self.EB = common.dcc_entry_box(self.subframe, callback=self.entry_updated)
-        self.EB.pack(side=LEFT, padx=2, pady=2)
+        self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the checkbox for the DCC reversed selection
         self.CB = common.check_box(self.subframe, label="Reversed",
                     tool_tip="Select to reverse the DCC command logic")
-        self.CB.pack(side=LEFT, padx=2, pady=2)
+        self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
         
     def entry_updated(self):
         if self.EB.entry.get()=="": self.CB.disable()
@@ -309,12 +309,12 @@ class dcc_address_settings(common.dcc_entry_box):
 class point_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Point ID and Point Type Selections
-        self.frame = Frame(parent_tab)
+        self.frame = Tk.Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Point ID selection
         self.pointid = common.object_id_selection(self.frame, "Point ID",
                                 exists_function = objects.point_exists) 
-        self.pointid.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
+        self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
                                       "Select Point Type", None, "RH", "LH")
@@ -345,7 +345,7 @@ class point_configuration_tab():
 class signal_route_interlocking_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = LabelFrame(parent_frame, text="Interlocking with signals")
+        self.frame = Tk.LabelFrame(parent_frame, text="Interlocking with signals")
         self.frame.pack(padx=2, pady=2, fill='x')
         # These are the lists that hold the references to the subframes and subclasses
         self.sigelements = []
@@ -355,7 +355,7 @@ class signal_route_interlocking_frame():
         # If the lists are not empty (case of "reloading" the config) then destroy
         # all the UI elements and create them again (the list may have changed)
         if self.subframe: self.subframe.destroy()
-        self.subframe = Frame(self.frame)
+        self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
         self.sigelements = []
         # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
@@ -368,7 +368,7 @@ class signal_route_interlocking_frame():
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text="No interlocked signals")
+            self.label = Tk.Label(self.subframe, text="No interlocked signals")
             self.label.pack()
 
 #------------------------------------------------------------------------------------
@@ -388,7 +388,7 @@ class edit_point():
         # This is the UUID for the object being edited
         self.object_id = object_id
         # Creatre the basic Top Level window
-        self.window = Toplevel(root)
+        self.window = Tk.Toplevel(root)
         self.window.attributes('-topmost',True)
         # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
@@ -396,9 +396,9 @@ class edit_point():
         # So we bind the tab changed event to a function which will focus on something else 
         self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
         # Create the Window tabs
-        self.tab1 = Frame(self.tabs)
+        self.tab1 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
-        self.tab2 = Frame(self.tabs)
+        self.tab2 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab2, text="Interlocking")
         self.tabs.pack()
         self.config = point_configuration_tab(self.tab1)
@@ -406,7 +406,7 @@ class edit_point():
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 

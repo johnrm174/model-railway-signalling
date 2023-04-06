@@ -52,8 +52,8 @@
 from . import common
 from . import mqtt_interface
 from . import file_interface
-from tkinter import *
 from typing import Union
+import tkinter as Tk
 import enum
 import logging
 import importlib.resources
@@ -131,19 +131,19 @@ def open_bell_code_hints():
         bell_codes.append ([" 4 - 1"," Is line clear for mineral or empty waggon train"])
         bell_codes.append ([" 2 - 1"," Train arrived"])
         bell_codes.append ([" 6"," Obstruction danger"])
-        hints_window = Toplevel(common.root_window)
+        hints_window = Tk.Toplevel(common.root_window)
         hints_window.attributes('-topmost',True)
         hints_window.title("Common signal box bell codes")
         hints_window.protocol("WM_DELETE_WINDOW", lambda:close_bell_code_hints(hints_window))
         bell_code_hints_open = True
         for row, item1 in enumerate (bell_codes, start=1):
-            text_entry_box1 = Entry(hints_window,width=8)
+            text_entry_box1 = Tk.Entry(hints_window,width=8)
             text_entry_box1.insert(0,item1[0])
             text_entry_box1.grid(row=row,column=1)
             text_entry_box1.config(state='disabled')
             text_entry_box1.config({'disabledbackground':'white'}) 
             text_entry_box1.config({'disabledforeground':'black'}) 
-            text_entry_box2 = Entry(hints_window,width=40)
+            text_entry_box2 = Tk.Entry(hints_window,width=40)
             text_entry_box2.insert(0,item1[1])
             text_entry_box2.grid(row=row,column=2)
             text_entry_box2.config(state='disabled')
@@ -487,16 +487,16 @@ def create_block_instrument (canvas,
         if single_line: canvas.create_rectangle (x-60, y-20, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
         else: canvas.create_rectangle (x-60, y-80, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
         # Create the button objects and their callbacks
-        occup_button = Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
+        occup_button = Tk.Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgraised, command = lambda:occup_button_event(block_id))
-        clear_button = Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
+        clear_button = Tk.Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgraised, command = lambda:clear_button_event(block_id))
-        block_button = Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
+        block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="sunken", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgsunken, command = lambda:blocked_button_event(block_id))
-        bell_button = Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
+        bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg="black", fg="white", activebackground="black", activeforeground="white",
                     command = lambda:telegraph_key_button(block_id))
@@ -504,10 +504,10 @@ def create_block_instrument (canvas,
         bell_button.bind('<Button-2>', lambda event:open_bell_code_hints())
         bell_button.bind('<Button-3>', lambda event:open_bell_code_hints())
         # Create the windows (on the canvas) for the buttons
-        canvas.create_window(x, y+80, window=occup_button, anchor=SE, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=clear_button, anchor=SW, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=block_button, anchor=N, tags=block_id_tag)
-        canvas.create_window(x, y+115, window=bell_button, anchor=N, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=occup_button, anchor=Tk.SE, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=clear_button, anchor=Tk.SW, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=block_button, anchor=Tk.N, tags=block_id_tag)
+        canvas.create_window(x, y+115, window=bell_button, anchor=Tk.N, tags=block_id_tag)
         # Create the main block section indicator for our instrument
         my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y, block_id_tag)
         # If this is a double line indicator then create the repeater indicator
