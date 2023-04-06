@@ -473,8 +473,9 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
-        # save the initial editor state for undo/redo
-        objects.save_schematic_state(reset_pointer=True)
+        # Re-size the canvas to reflect the new schematic size
+        width, height, grid = settings.get_canvas()
+        schematic.update_canvas(width, height, grid)
         
     def handle_canvas_event(self, event=None):
         # Handle the Toggle Mode Event ('m' key)
@@ -552,9 +553,10 @@ class main_menubar:
             schematic.delete_selected_objects()
             # Restore the default settings and update the editor config
             settings.restore_defaults()
-            width, height, grid = settings.get_canvas()
-            schematic.update_canvas(width, height, grid)
+            # Re-initialise the editor for the new settings to take effect
             self.initialise_editor()
+            # save the current state (for undo/redo) - deleting all previous history
+            objects.save_schematic_state(reset_pointer=True)
         return()
 
     def save_schematic(self, save_as:bool=False):
@@ -595,9 +597,6 @@ class main_menubar:
                 settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
-                # Re-size the canvas to reflect the new schematic size
-                width, height, grid = settings.get_canvas()
-                schematic.update_canvas(width, height, grid)
                 # Re-initailise the editor with the new configuration
                 self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information

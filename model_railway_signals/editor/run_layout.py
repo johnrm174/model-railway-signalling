@@ -78,7 +78,7 @@ from . import objects
 
 canvas = None
 
-def initialise (canvas_object):
+def initialise(canvas_object):
     global canvas
     canvas = canvas_object
     return()
@@ -87,7 +87,7 @@ def initialise (canvas_object):
 # Internal helper Function to find if a signal has a subsidary
 #------------------------------------------------------------------------------------
 
-def has_subsidary(signal_id):    
+def has_subsidary(signal_id:int):    
     signal_object = objects.schematic_objects[objects.signal(signal_id)]
     return (signal_object["subsidary"][0] or
             signal_object["sigarms"][0][1][0] or
