@@ -6,14 +6,15 @@
 #    main_menubar.initialise_editor() - call once on initialisation
 #
 # Makes the following external API calls to other editor modules:
+#    objects.save_schematic_state() - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
+#    objects.reset_objects() - Reset the schematic back to its default state
 #    schematic.select_all_objects() - For selecting all objects prior to deletion
 #    schematic.delete_selected_objects() - For deleting all objects (on new/load)
 #    schematic.resize_canvas() - For updating the canvas following reload/resizing
 #    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
-#    run_layout.initialise_layout() - Initialise everything following a load
 #    settings.get_canvas() - Get the current canvas settings (for editing)
 #    settings.set_canvas(width,height,grid)) - Call following update/resizing/load
 #    settings.get_all() - Get all settings (for save)
@@ -49,7 +50,6 @@ from . import common
 from . import objects
 from . import settings
 from . import schematic
-from . import run_layout
 
 from ..library import file_interface
 from ..library import pi_sprog_interface
@@ -64,8 +64,7 @@ Application documentation is still on the 'ToDo' list, but in the meantime here 
 basic guidance and top tips for creating your layout signalling system:
 
 1) Save your progress - The editor is still in active development so may still contain
-   latent bugs (any you find please do report back to me so I can fix them). Its also
-   worth mentioning that there is no 'undo' function as yet - that's coming soon.
+   latent bugs (any you find please do report back to me so I can fix them).
 2) Draw the track layout (points and lines) before adding any signals or the schematic may
    get cluttered (making it difficult to select the thing you want to move or edit).
 3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
@@ -74,7 +73,7 @@ basic guidance and top tips for creating your layout signalling system:
    provide an insight as to what information needs to be entered (if they don't then please
    let me know and I will try and make them clearer in a future release)
 
-Schematic functions:
+Schematic functions (in edit mode):
  
 1) Use the photoimage buttons on the left to add objects to the schematic.
 2) Left-click to select objects (shift-left-click will 'add' to the selection).
@@ -87,6 +86,7 @@ Schematic functions:
 9) <backspace> will permanently delete all selected object from the schematic
 10) <cntl-c> will copy all currently selected objects to a copy/paste buffer
 11) <cntl-v> will paste the selected objects at a slightly offset position
+11) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
 12) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
@@ -389,7 +389,8 @@ class edit_canvas_settings():
             width = self.width.get_value()
             height = self.height.get_value()
             settings.set_canvas(width=width, height=height)
-            schematic.resize_canvas()
+            grid = settings.get_canvas()[2]
+            schematic.update_canvas(width, height, grid)
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
 
@@ -417,6 +418,7 @@ class main_menubar:
         self.mode_menu = Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
+        self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
         # Create the various menubar items for the SPROG Connection Dropdown
         self.sprog_label = "SPROG:DISCONNECTED "
@@ -449,7 +451,7 @@ class main_menubar:
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         
-    # Common initialisation function (called on editor start or layout load)
+    # Common initialisation function (called on editor start or layout load or new layout)
     def initialise_editor(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
@@ -470,6 +472,9 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
+        # Re-size the canvas to reflect the new schematic size
+        width, height, grid = settings.get_canvas()
+        schematic.update_canvas(width, height, grid)
         
     def handle_canvas_event(self, event=None):
         # Handle the Toggle Mode Event ('m' key)
@@ -491,6 +496,14 @@ class main_menubar:
         self.mode_label = new_label
         settings.set_general(editmode=False)
         schematic.disable_editing()
+
+    def reset_layout(self, ask_for_confirm:bool=True):
+        if ask_for_confirm:
+            if messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
+                    "signals, points and track occupancy sections back to their default state"):
+                objects.reset_objects()
+        else:
+            objects.reset_objects()
 
     def sprog_connect(self):
         port, baud, debug, startup, power = settings.get_sprog()
@@ -519,23 +532,30 @@ class main_menubar:
             self.mainmenubar.entryconfigure(self.power_label, label=new_label)
             self.power_label = new_label
 
-    def quit_schematic(self):
-        if messagebox.askokcancel("Quit Schematic", "Are you sure you want to "+
-                             "discard all changes and quit the application"):
+    def quit_schematic(self, ask_for_confirm:bool=True):
+        # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the confirmation dialog. If
+        # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
+        if not ask_for_confirm or messagebox.askokcancel("Quit Schematic",
+                "Are you sure you want to discard all changes and quit the application"):
             library_common.on_closing(ask_to_save_state=False)
         return()
                 
-    def new_schematic(self):
-        if messagebox.askokcancel("New Schematic", "Are you sure you want to "+
-                         "discard all changes and create a new blank schematic"):
+    def new_schematic(self, ask_for_confirm:bool=True):
+        # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the confirmation dialog. If
+        if not ask_for_confirm or messagebox.askokcancel("New Schematic", "Are you sure you "+
+                         "want to discard all changes and create a new blank schematic"):
             # We use the schematic functions to delete all existing objects to
             # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
             schematic.delete_selected_objects()
             # Restore the default settings and update the editor config
             settings.restore_defaults()
-            schematic.resize_canvas()
+            # Re-initialise the editor for the new settings to take effect
             self.initialise_editor()
+            # save the current state (for undo/redo) - deleting all previous history
+            objects.save_schematic_state(reset_pointer=True)
         return()
 
     def save_schematic(self, save_as:bool=False):
@@ -557,11 +577,14 @@ class main_menubar:
             self.file_has_been_saved = True
         return()
 
-    def load_schematic(self):
+    def load_schematic(self, filename=None):
+        # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
+        # is called as a result of a menubar selection) to enforce the file selection dialog. If
+        # a filename is specified (system_test_harness use case) then the dialogue is surpressed
         global logging
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
-        file_loaded, layout_state = file_interface.load_schematic()
+        file_loaded, layout_state = file_interface.load_schematic(filename)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
             if "settings" in layout_state.keys() and "objects" in layout_state.keys():
@@ -573,8 +596,6 @@ class main_menubar:
                 settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
-                # Re-size the canvas to reflect the new schematic size
-                schematic.resize_canvas()
                 # Re-initailise the editor with the new configuration
                 self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information

@@ -266,7 +266,7 @@ def clear_approach_control (sig_id:int):
 def set_signal_override (sig_id:int):
     global logging
     global signals
-    # Only set the override if signal is not already overridden
+    # Only set the override if the signal is not already overridden
     if not signals[str(sig_id)]["override"]:
         logging.info ("Signal "+str(sig_id)+": Setting override")
         # Set the override state and change the button text to indicate override
@@ -281,12 +281,38 @@ def set_signal_override (sig_id:int):
 def clear_signal_override (sig_id:int):
     global logging
     global signals
-    # Only set the override if signal is not already overridden
+    # Only clear the override if the signal is already overridden
     if signals[str(sig_id)]["override"]:
         logging.info ("Signal "+str(sig_id)+": Clearing override")
         # Clear the override and change the button colour
         signals[str(sig_id)]["override"] = False
         signals[str(sig_id)]["sigbutton"].config(fg="black",disabledforeground="grey50")
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to set a signal override
+# -------------------------------------------------------------------------
+
+def set_signal_override_caution (sig_id:int):
+    global logging
+    global signals
+    # Only set the override if the signal is not already overridden
+    if not signals[str(sig_id)]["overcaution"]:
+        logging.info ("Signal "+str(sig_id)+": Setting override CAUTION")
+        signals[str(sig_id)]["overcaution"] = True
+    return()
+
+# -------------------------------------------------------------------------
+# Common Function to clear a signal override
+# -------------------------------------------------------------------------
+
+def clear_signal_override_caution (sig_id:int):
+    global logging
+    global signals
+    # Only clear the override if the signal is already overridden
+    if signals[str(sig_id)]["overcaution"]:
+        logging.info ("Signal "+str(sig_id)+": Clearing override CAUTION")
+        signals[str(sig_id)]["overcaution"] = False
     return()
 
 # -------------------------------------------------------------------------
@@ -431,7 +457,8 @@ def create_common_signal_elements (canvas,
     signals[str(sig_id)]["extcallback"]  = ext_callback         # MANDATORY - The External Callback to use for the signal
     signals[str(sig_id)]["routeset"]     = route_type.MAIN      # MANDATORY - Route setting for signal (MAIN at creation)
     signals[str(sig_id)]["sigclear"]     = False                # MANDATORY - State of the main signal control (ON/OFF)
-    signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" (overrides main signal control)
+    signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" to most restrictive aspect
+    signals[str(sig_id)]["overcaution"]  = False                # MANDATORY - Signal is "Overridden" to CAUTION
     signals[str(sig_id)]["sigstate"]     = None                 # MANDATORY - Displayed 'aspect' of the signal (None on creation)
     signals[str(sig_id)]["hassubsidary"] = subsidary            # MANDATORY - Whether the signal has a subsidary aspect or arms
     signals[str(sig_id)]["subclear"]     = False                # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)

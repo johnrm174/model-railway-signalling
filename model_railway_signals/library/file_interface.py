@@ -347,9 +347,12 @@ def save_schematic(settings:dict, objects:dict, filename:str, save_as:bool=False
     save_state_and_quit(quit_application=False)
     return(filename_used_for_save)
 
-def load_schematic():
+def load_schematic(filename=None):
     global layout_state
-    file_loaded = load_layout_state(file_name=None,load_file_dialog=True,ask_to_load_state=False)
+    if filename==None:
+        file_loaded = load_layout_state(file_name=None,load_file_dialog=True,ask_to_load_state=False)
+    else:
+        file_loaded = load_layout_state(file_name=filename,load_file_dialog=False,ask_to_load_state=False)
     return(file_loaded, layout_state)    
 
 def purge_loaded_state_information():

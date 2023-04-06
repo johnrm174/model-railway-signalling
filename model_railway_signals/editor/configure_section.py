@@ -102,16 +102,21 @@ def signals_behind(object_id):
  
 def load_state(section):
     object_id = section.object_id
-    # Label the edit window with the Section ID
-    section.window.title("Track Section "+str(objects.schematic_objects[object_id]["itemid"]))
-    # Set the Initial UI state from the current object settings
-    section.config.sectionid.set_value(objects.schematic_objects[object_id]["itemid"])
-    section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
-    section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
-    section.config.mirror.set_mirrored_by(mirrored_by_section(object_id))
-    section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
-    section.automation.ahead.set_values(signals_ahead(object_id))
-    section.automation.behind.set_values(signals_behind(object_id))
+    # Check the section we are editing still exists (hasn't been deleted from the schematic)
+    # If it no longer exists then we just destroy the window and exit without saving
+    if object_id not in objects.schematic_objects.keys():
+        section.window.destroy()
+    else:
+        # Label the edit window with the Section ID
+        section.window.title("Track Section "+str(objects.schematic_objects[object_id]["itemid"]))
+        # Set the Initial UI state from the current object settings
+        section.config.sectionid.set_value(objects.schematic_objects[object_id]["itemid"])
+        section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
+        section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
+        section.config.mirror.set_mirrored_by(mirrored_by_section(object_id))
+        section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
+        section.automation.ahead.set_values(signals_ahead(object_id))
+        section.automation.behind.set_values(signals_behind(object_id))
     return()
     
 #------------------------------------------------------------------------------------

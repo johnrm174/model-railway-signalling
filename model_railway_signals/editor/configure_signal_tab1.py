@@ -120,13 +120,13 @@ class semaphore_route_group():
         # Create the lable and route elements (these are packed by the class instances)
         self.label = Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side=LEFT)
-        self.sig = semaphore_route_element(self.frame, label="Main signal",
-                      tool_tip= "Select to add a main signal arm for this route",
+        self.sig = semaphore_route_element(self.frame, label="Main (home) arm ",
+                      tool_tip= "Select to add a home signal arm for this route",
                       callback=self.sig_arms_updated)
-        self.sub = semaphore_route_element(self.frame, label="Subsidary arm",
+        self.sub = semaphore_route_element(self.frame, label="Subsidary arm ",
                     tool_tip="Select to add a subsidary signal arm for this route",
                     callback=self.sub_arms_updated)
-        self.dist = semaphore_route_element(self.frame, label="Distant arm",
+        self.dist = semaphore_route_element(self.frame, label="Distant arm ",
                         tool_tip="Select to add a distant signal arm for this route",
                         callback=self.dist_arms_updated)
         
@@ -441,7 +441,7 @@ class colour_light_aspects():
         self.subframe = Frame(self.frame)
         self.subframe.pack()
         self.CB = common.check_box(self.subframe, label="Subsidary signal",   
-                    tool_tip="Select to include a seperate subsidary signal",callback=self.sub_updated)
+                    tool_tip="Select to add a seperate calling on aspect",callback=self.sub_updated)
         self.CB.pack(side=LEFT, padx=2, pady=2)
         self.EB = common.dcc_entry_box(self.subframe)
         self.EB.pack(side=LEFT, padx=2, pady=2)
@@ -767,7 +767,7 @@ class feather_route_element(dcc_entry_boxes):
         self.label = Label(self.frame, width=width, text=label, anchor='w')
         self.label.pack(side=LEFT)
         self.CB = common.check_box(self.frame, callback=self.selection_updated, label="",
-                        tool_tip="Select to create a feather indication for this route")
+                        tool_tip="Select to add a feather indication for this route")
         self.CB.pack(side=LEFT)
         # Call the init function of the class we are inheriting from
         # The DCC entry boxes get packed into the frame by the parent class
@@ -1045,11 +1045,11 @@ class signal_configuration_tab:
                                         sub_routes_updated, dist_routes_updated)
         self.sig_routes = route_selections(parent_tab, 
                         "Routes to be controlled by the Main Signal",
-                        "Select the routes to be controlled by the main signal",
+                        "Select one or more routes to be controlled by the main signal",
                         callback=route_selections_updated, main_signal=True)
         self.sub_routes = route_selections(parent_tab,
                         "Routes to be controlled by the Subsidary Signal",
-                        "Select the routes to be controlled by the subsidary signal",
+                        "Select one or more routes to be controlled by the subsidary signal",
                         callback=route_selections_updated, main_signal=False)
         
 #############################################################################################

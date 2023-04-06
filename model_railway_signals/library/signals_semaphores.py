@@ -559,6 +559,9 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         elif signals_common.signals[str(sig_id)]["override"]:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is OVERRIDDEN"
+        elif signals_common.signals[str(sig_id)]["overcaution"]:
+            new_aspect = signals_common.signal_state_type.CAUTION
+            log_message = " (CAUTION) - signal is OVERRIDDEN to CAUTION"
         elif signals_common.signals[str(sig_id)]["timedsequence"][route.value].sequence_in_progress:
             new_aspect = signals_common.signal_state_type.CAUTION
             log_message = " (CAUTION) - signal is on a timed sequence"

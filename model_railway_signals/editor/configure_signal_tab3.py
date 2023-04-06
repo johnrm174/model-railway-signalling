@@ -37,7 +37,6 @@ class signal_sensor(common.integer_entry_box):
                 valid = False
             else:
                 # Test to see if the gpio channel is alreay assigned to another signal
-                current_channel = self.initial_value
                 for signal_id in objects.signal_index:
                     signal_object = objects.schematic_objects[objects.signal(signal_id)]
                     if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
@@ -107,7 +106,7 @@ class section_behind_element(common.int_item_id_entry_box):
         self.frame.pack()
         self.label1 = Label(self.frame, width=1)
         self.label1.pack(side=LEFT)
-        tool_tip = "Sepecify the track section before the signal (to be cleared when the signal is passed)"
+        tool_tip = "Sepecify the track section 'behind' this signal (to be cleared when the signal is passed)"
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=LEFT)
         self.label = Label(self.frame, text=" ==>")
@@ -119,7 +118,7 @@ class section_ahead_element(common.int_item_id_entry_box):
         self.frame.pack()
         self.label1 = Label(self.frame, text=label, width=10)
         self.label1.pack(side=LEFT)
-        tool_tip = ("Specify the track section on the route after the signal "+
+        tool_tip = ("Specify the track section on the route 'ahead of' the signal "+
                              "(to be occupied when the signal is passed)")
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=LEFT)
@@ -190,8 +189,10 @@ class track_occupancy_frame():
 # Public Class instance methods provided by this class:
 #     "override.enable" - enable the override checkbox
 #     "override.disable"- disable the override checkbox
-#     "automatic.enable" - enable the automatic checkbox
-#     "automatic.disable"- disable the automatic checkbox
+#     "automatic.enable" - enable the main auto checkbox
+#     "automatic.disable"- disable the main auto checkbox
+#     "distant_automatic.enable" - enable the distant auto checkbox
+#     "distant_automatic.disable"- disable the distant auto checkbox
 #     "override_ahead.enable" - enable the override ahead checkbox
 #     "override_ahead.disable"- disable the override ahead checkbox
 #     "set_values" - will set the current values (override, auto)
@@ -203,30 +204,39 @@ class general_settings_frame():
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = LabelFrame(parent_frame, text="General settings")
         self.automatic = common.check_box(self.frame, width=40,
-                    label="  Fully automatic signal (no signal button)",
+                    label="  Fully automatic signal (no control button)",
                     tool_tip="Select to create without a main signal button "+
-                    "(signal will have a default signal state of OFF)")
+                    "(signal will have a default signal state of OFF, but can be "+
+                        "overridden to ON via the selections below)")
         self.automatic.pack(padx=2, pady=2)
+        self.distant_automatic = common.check_box(self.frame, width=40,
+                    label="  Fully automatic distant arms (no control button)",
+                    tool_tip="Select to create without a distant signal control "+
+                    "(signal will have a default signal state of OFF, but can be "+
+                        "overridden to ON via the selections below)")
+        self.distant_automatic.pack(padx=2, pady=2)
         self.override = common.check_box(self.frame, width=40,
-                    label="  Override signal to ON if section ahead occupied",
+                    label="  Override signal to ON if section ahead is occupied",
                     tool_tip="Select to override the signal to ON if "+
                     "the track section ahead of the signal is occupied")
         self.override.pack(padx=2, pady=2)
         self.override_ahead = common.check_box(self.frame, width=40,
-                    label="  Override if home signals ahead are at DANGER",
+                    label="  Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to ON if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack(padx=2, pady=2)
                         
-    def set_values(self, override_sig:bool, fully_automatic:bool, override_ahead:bool):
-        self.override.set_value(override_sig)
-        self.automatic.set_value(fully_automatic)
+    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
+        self.override.set_value(override)
+        self.automatic.set_value(main_auto)
         self.override_ahead.set_value(override_ahead)
-        
+        self.distant_automatic.set_value(dist_auto)
+
     def get_values(self):
         return ( self.override.get_value(),
                  self.automatic.get_value(),
-                 self.override_ahead.get_value() )
+                 self.override_ahead.get_value(),
+                 self.distant_automatic.get_value() )
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route element comprising a route selection checkbox, a
@@ -269,7 +279,8 @@ class timed_signal_route_element():
         self.label3.pack(side=LEFT)
         self.start = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
                             allow_empty=False, tool_tip="Specify the time delay (in seconds) "+
-                            "before triggering the signal (set to zero for triggering the current signal)")
+                            "before triggering the timed sequence (if triggering the current signal " +
+                            " then this should be set to zero to trigger when the signal is passed)")
         self.start.pack(side=LEFT)
         self.label4 = Label(self.frame, text="  Time delay:")
         self.label4.pack(side=LEFT)
@@ -287,6 +298,9 @@ class timed_signal_route_element():
             # So we start off with a valid configuration for the user to edit
             if self.sig.get_value() == 0:
                 self.sig.set_value(self.parent_object.config.sigid.get_initial_value())
+            # Start delays of zero are OK but timed delays of zero just aren't sensible
+            # We therefore always set a default of 5 seconds to provide a starting point
+            if self.delay.get_value() == 0: self.delay.set_value(5)
         else:
             self.sig.disable1()
             self.start.disable1()
