@@ -12,15 +12,15 @@ From Release 3.0.0, the schematic editor application enables automated and inter
 schemes to be designed and configured without the need to write any code. Note that the editor is in
 active development so any comments and suggestions for future features are welcome.
 
-What's supported in Release 3.1.0:
+What's supported in Release 3.2.0:
 * Draw your layout schematic with lines, points, signals and track occupancy sections
 * Define the DCC command sequences to drive the signals and points out on the layout
 * Configure the signals and points to implement protototypical interlocking schemes
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
+* Automation of signals as trains traverse the routes that have been configured
 * Save and load your layout schematic and state between running sessions
 
 What's coming soon:
-* Undo/redo for layout editing functions
 * Support for block section instruments
 * MQTT networking (for linking layouts)
 * Application documentation
