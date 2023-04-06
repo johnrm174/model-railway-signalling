@@ -76,6 +76,7 @@
 #    delete_selected_objects()
 #    copy_selected_objects()
 #    paste_clipboard_objects()
+#    undo() and redo()
 #    get_item_id(object_id) - This is a helper function
 #
 # Supported Editor test assertions:
@@ -83,7 +84,7 @@
 #    assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None)
 #    assert_objects_selected(*object_ids)
 #    assert_objects_deselected(*object_ids)
-#    assert_objects_exists(*object_ids)
+#    assert_objects_exist(*object_ids)
 #    assert_objects_do_not_exist(*object_ids)
 # ------------------------------------------------------------------------------
 
@@ -860,6 +861,16 @@ def paste_clipboard_objects():
     root.update()
     return(schematic.schematic_state["selectedobjects"])
 
+def undo():
+    schematic.schematic_undo()
+    root.update()
+    return()
+
+def redo():
+    schematic.schematic_redo()
+    root.update()
+    return()
+
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
@@ -923,10 +934,10 @@ def assert_objects_deselected(*object_ids):
                 raise_test_error ("assert_objects_deselected - object:" +str(object_id)+" is selected")
             increment_tests_executed()
         
-def assert_objects_exists(*object_ids):
+def assert_objects_exist(*object_ids):
     for object_id in object_ids:
         if object_id not in objects.schematic_objects.keys():
-            raise_test_error ("assert_objects_exists - object: "+str(object_id)+" does not exist")
+            raise_test_error ("assert_objects_exist - object: "+str(object_id)+" does not exist")
         increment_tests_executed()
 
 def assert_objects_do_not_exist(*object_ids):
