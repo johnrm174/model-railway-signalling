@@ -468,6 +468,9 @@ def set_all(new_objects):
             for element in default_object:
                 if element not in new_objects[object_id].keys():
                     logging.warning("LOAD LAYOUT - Missing "+new_object_type+" element '"+element+"'")
+                    # Set any mandatory elements - to prevent the application from breaking
+                    # When loading files saved by old versions of the application
+                    if element == "itemtype": objects_common.schematic_objects[object_id][element] = 1
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
