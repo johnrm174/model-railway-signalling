@@ -116,6 +116,7 @@ from model_railway_signals.library import signals_semaphores
 from model_railway_signals.library import signals_ground_position
 from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
+from model_railway_signals.library import block_instruments
 
 root = None
 main_menubar = None
@@ -674,7 +675,8 @@ def create_track_section():
     return(object_id)
 
 def create_block_instrument():
-    objects.create_object(objects.object_type.instrument)
+    objects.create_object(objects.object_type.instrument,
+                    block_instruments.instrument_type.single_line.value)
     object_id = list(objects.schematic_objects)[-1]
     root.update()
     return(object_id)
