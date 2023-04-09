@@ -8,17 +8,20 @@
 # block_callback_type (tells the calling program what has triggered the callback)
 #     block_section_ahead_updated - The block section AHEAD of our block section has been updated
 #                             (i.e. the block section state represented by the Repeater indicator)
+#
+# instrument_type - enumeration type - single_line or double_line
 # 
 # create_block_instrument - Creates a Block Section Instrument on the schematic
 #   Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
 #       block_id:int - The local identifier to be used for the Block Instrument 
 #       x:int, y:int - Position of the instrument on the canvas (in pixels)
+#       inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
 #   Optional Parameters:
 #       block_callback - The function to call when the repeater indicator on our instrument has been
 #                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
-#       single_line:bool - for a single line instrument(created without a repeater) - default: False
+#       single_line:bool - DEPRECATED - use inst_type
 #       bell_sound_file:str - The filename of the soundfile (in the local package resources
 #                           folder) to use for the bell sound (default "bell-ring-01.wav")
 #       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
@@ -40,7 +43,6 @@
 #           This can be used to implement full interlocking of the Starter signal in our section
 #           (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
 #           Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
-#
 #
 # If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
 # then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
@@ -77,6 +79,10 @@ audio_enabled = is_simpleaudio_installed()
 # Classes used by external functions when calling the create_point function
 # -------------------------------------------------------------------------
     
+class instrument_type(enum.Enum):
+    single_line = 1   # Right Hand point
+    double_line = 2   # Left Hand point
+
 class block_callback_type(enum.Enum):
     block_section_ahead_updated = 51   # The instrument has been updated
 
@@ -460,8 +466,9 @@ def create_block_indicator(canvas:int, x:int, y:int, block_id_tag):
 def create_block_instrument (canvas,
                              block_id:int,
                              x:int, y:int,
+                             inst_type:instrument_type = instrument_type.double_line,
                              block_callback = null_callback,
-                             single_line:bool = False,
+                             single_line:bool = False, ############################################################
                              bell_sound_file:str = "bell-ring-01.wav",
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
@@ -481,6 +488,14 @@ def create_block_instrument (canvas,
     elif isinstance(linked_to,str) and mqtt_interface.split_remote_item_identifier(linked_to) is None:
         logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")   
     else:
+        ####################################################################################################################
+        if single_line:
+            logging.warning ("###########################################################################################")
+            logging.warning ("Block Instrument "+str(block_id)+": single_line flag is DEPRECATED - use inst_type")
+            logging.warning ("###########################################################################################")
+        else:
+            single_line = (instrument_type == instrument_type.double_line)
+        ####################################################################################################################
         # Define the "Tag" for all drawing objects for this instrument instance
         block_id_tag = "instrument"+str(block_id)
         # Create the Instrument background - this will vary in size depending on single or double line
