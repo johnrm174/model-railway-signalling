@@ -91,7 +91,7 @@ canvas_grid = 0
 canvas_event_callback = None
 # The following Tkinter objects are also treated as global variables as they need to remain
 # "in scope" for the schematic editor functions (i.e. so they don't get garbage collected)
-# The two popup menus (for RIGHT click on the canvas or a schematic object)
+# The two popup menus (for right click on the canvas or a schematic object)
 popup1 = None
 popup2 = None
 # The Frame holding the "add object" buttons (for pack/forget on enable/disable editing)
@@ -334,7 +334,7 @@ def snap_to_grid(xpos:int,ypos:int):
     return(remainderx,remaindery)
 
 #------------------------------------------------------------------------------------
-# RIGHT Button Click - Bring Up Context specific Popup menu
+# Right Button Click - Bring Up Context specific Popup menu
 # The event will only be bound to the canvas in "Edit" Mode
 #------------------------------------------------------------------------------------
 
@@ -623,7 +623,7 @@ def enable_editing():
     canvas.bind('<Double-Button-1>', left_double_click)
     # Bind the canvas keypresses to the associated functions
     enable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in BOTH edit and run modes)
+    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
     canvas.bind('m', canvas_event_callback)
     return()
@@ -646,7 +646,7 @@ def disable_editing():
     canvas.unbind('<Double-Button-1>')
     # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
     disable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in BOTH edit and run modes)
+    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
     canvas.bind('m', canvas_event_callback)
     return()
@@ -664,7 +664,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     global logging
     root = root_window
     canvas_event_callback = event_callback
-    # Create a Frame to hold the two subframes ("add" buttons and drawing canvas)
+    # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
     frame = Tk.Frame(root_window)
     frame.pack (expand=True, fill=Tk.BOTH)    
     # Create a subframe to hold the canvas and scrollbars
@@ -675,7 +675,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     button_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
     canvas_width, canvas_height, canvas_grid = width, height, grid
-    # Create the canvas and Scrollbars inside the parentFrame
+    # Create the canvas and scrollbars inside the parent frame
     # We also set focus on the canvas so the keypress events will take effect
     canvas = Tk.Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
     canvas.focus_set()
@@ -688,13 +688,13 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     canvas.config(width=canvas_width, height=canvas_height)
     canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
     canvas.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
-    # Define the Object Popup menu for RIGHT Click (something selected)
+    # Define the Object Popup menu for Right Click (something selected)
     popup1 = Tk.Menu(tearoff=0)
     popup1.add_command(label="Copy", command=copy_selected_objects)
     popup1.add_command(label="Edit", command=edit_selected_object)
     popup1.add_command(label="Rotate", command=rotate_selected_objects)
     popup1.add_command(label="Delete", command=delete_selected_objects)
-    # Define the Canvas Popup menu for RIGHT Click (nothing selected)
+    # Define the Canvas Popup menu for Right Click (nothing selected)
     popup2 = Tk.Menu(tearoff=0)
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)

@@ -16,7 +16,7 @@ from . import objects
 
 class general_settings(common.check_box):
     def __init__(self, parent_frame):
-        # Create a Tk.Label frame to hold the general settings UI element
+        # Create a Label frame to hold the general settings UI element
         # Packed onto the parent frame by the creating function/class
         self.frame = Tk.LabelFrame(parent_frame,text="General Config")
         # Create the "rotate" checkbutton and tool Tip

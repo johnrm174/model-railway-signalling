@@ -13,7 +13,7 @@
 #    object_id_selection(integer_entry_box)
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
-#    selection_Buttons() - combines 5 RadioButtons
+#    selection_buttons() - combines 5 RadioButtons
 #    window_controls() - apply/ok/reset/cancel
 #------------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ class CreateToolTip():
         x, y, cx, cy = self.widget.bbox("insert")
         x += self.widget.winfo_rootx() + 25
         y += self.widget.winfo_rooty() + 20
-        # creates a Toplevel window
+        # creates a toplevel window
         self.tw = Tk.Toplevel(self.widget)
         self.tw.attributes('-topmost',True)
         # Leaves only the label and removes the app window
@@ -83,7 +83,7 @@ class CreateToolTip():
 #    "disable" - disables/blanks the CB (i.e. sets it to False)
 #    "enable"  enables/loads the CB (with the last state)
 #    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where BOTH flags need to be set to enable the CB
+#        AND function where both flags need to be set to enable the CB
 #------------------------------------------------------------------------------------
 
 class check_box(Tk.Checkbutton):
@@ -163,7 +163,7 @@ class check_box(Tk.Checkbutton):
 #    "disable" - disables/blanks the CB (i.e. sets it to False)
 #    "enable"  enables/loads the CB (with the last state)
 #    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where BOTH flags need to be set to enable the CB
+#        AND function where both flags need to be set to enable the CB
 #------------------------------------------------------------------------------------
 
 class state_box(Tk.Checkbutton):
@@ -258,7 +258,7 @@ class state_box(Tk.Checkbutton):
 #    "disable" - disables/blanks the entry box
 #    "enable"  enables/loads the entry box (with the last value)
 #    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where Both flags need to be set to enable the EB
+#        AND function where both flags need to be set to enable the EB
 # Class methods/objects intended for use by child classes that inherit:
 #    "set_validation_status" - to be called following external validation
 #    "TT.text" - The tooltip for the entry box (to change the tooltip text)
@@ -570,7 +570,7 @@ class object_id_selection(integer_entry_box):
                     "to this object will be updated in other objects")
         super().__init__(self.frame, width=3, min_value=1, max_value=99,
                          tool_tip=tool_tip, allow_empty=False)
-        # Pack the Entry box centrally in the label Frame
+        # Pack the Entry box centrally in the label frame
         self.pack()
         
     def validate(self):
@@ -593,13 +593,13 @@ class object_id_selection(integer_entry_box):
 #    "validate" - validate the current entry box value and return True/false
 #    "set_value" - will set the current value [address:int, state:bool]
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
-#    "disable" - disables/blanks the entry box (and associated state Button)
-#    "enable"  enables/loads the entry box (and associated state Button)
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
 #------------------------------------------------------------------------------------
 
 class dcc_command_entry():
     def __init__(self, parent_frame):
-        # create a Frame to pack the two elements into
+        # create a frame to pack the two elements into
         self.frame = Tk.Frame(parent_frame)
         # Create the address entry box and the associated dcc state box
         self.EB = dcc_entry_box(parent_frame, callback=self.eb_updated)
@@ -712,7 +712,7 @@ class signal_route_selections(route_selections):
     def __init__(self, parent_frame, tool_tip:str, exists_function=None,
                   current_id_function=None, read_only:bool=False):
         self.read_only = read_only
-        # Create a Frame to hold all the elements
+        # Create a fFrame to hold all the elements
         self.frame = Tk.Frame(parent_frame)
         # Call the common base class init function to create the EB
         self.EB = int_item_id_entry_box(self.frame, tool_tip=tool_tip, callback=self.eb_updated,
@@ -755,9 +755,9 @@ class signal_route_selections(route_selections):
         return ( [ self.EB.get_value(), super().get_values() ])
    
 #------------------------------------------------------------------------------------
-# Class for a Frame containing up to 5 radio Buttons
+# Class for a frame containing up to 5 radio buttons
 # Class instance elements to use externally are:
-#    "B1" to "B5 - to access the Button widgets (i.e. for reconfiguration)
+#    "B1" to "B5 - to access the button widgets (i.e. for reconfiguration)
 # Class instance functions to use externally are:
 #    "set_value" - will set the current value (integer 1-5)
 #    "get_value" - will return the last "valid" value (integer 1-5)
@@ -766,15 +766,15 @@ class signal_route_selections(route_selections):
 class selection_buttons():
     def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, 
                         b1=None, b2=None, b3=None, b4=None, b5=None):
-        # Create a labelFrame to hold the Buttons
+        # Create a labelframe to hold the buttons
         self.frame = Tk.LabelFrame(parent_frame, text=label)
         self.value = Tk.IntVar(self.frame, 0)
         # This is the external callback to make when a selection is made
         self.callback = callback
-        # Create a subframe (so the Buttons are centered)
+        # Create a subframe (so the buttons are centered)
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        # Only create as many Buttons as we need
+        # Only create as many buttons as we need
         if b1 is not None:
             self.B1 = Tk.Radiobutton(self.subframe, text=b1, anchor='w',
                 command=self.updated, variable=self.value, value=1)
@@ -825,7 +825,7 @@ class window_controls():
         self.parent_object = parent_object
         self.frame = Tk.Frame(self.window)
         self.frame.pack(padx=2, pady=2)
-        # Create the Buttons and tooltips
+        # Create the buttons and tooltips
         self.B1 = Tk.Button (self.frame, text = "Ok",command=self.ok)
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = CreateToolTip(self.B1, "Apply selections and close window")
