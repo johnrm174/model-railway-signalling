@@ -251,7 +251,7 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
     elif new_object_type == objects_common.object_type.section:
         objects_sections.create_section()
     elif new_object_type == objects_common.object_type.instrument:
-        objects_instruments.create_instrument()
+        objects_instruments.create_instrument(item_type)
     # save the current state (for undo/redo)
     save_schematic_state()
     # As we are creating 'new' objects we don't need to process layout changes

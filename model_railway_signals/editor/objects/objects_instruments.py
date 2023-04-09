@@ -50,7 +50,7 @@ from .. import run_layout
 default_instrument_object = copy.deepcopy(objects_common.default_object)
 default_instrument_object["item"] = objects_common.object_type.instrument
 default_instrument_object["itemid"] = 0
-default_instrument_object["singleline"] = False
+default_instrument_object["itemtype"] = None
 default_instrument_object["bellsound"] = "bell-ring-01.wav"
 default_instrument_object["keysound"] = "telegraph-key-01.wav"
 default_instrument_object["linkedto"] = None
@@ -105,6 +105,8 @@ def update_instrument(object_id, new_object_configuration):
 #------------------------------------------------------------------------------------
 
 def redraw_instrument_object(object_id):
+    # Turn the instrument type value back into the required enumeration type
+    instrument_type = block_instruments.instrument_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the new Block Instrument object
     block_instruments.create_block_instrument (
                 canvas = objects_common.canvas,
@@ -112,7 +114,7 @@ def redraw_instrument_object(object_id):
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 block_callback = run_layout.schematic_callback,
-                single_line = objects_common.schematic_objects[object_id]["singleline"],
+                inst_type = instrument_type,
                 bell_sound_file = objects_common.schematic_objects[object_id]["bellsound"],
                 telegraph_sound_file = objects_common.schematic_objects[object_id]["keysound"],
                 linked_to = objects_common.schematic_objects[object_id]["linkedto"])
@@ -125,7 +127,7 @@ def redraw_instrument_object(object_id):
 # Function to Create a new default Block Instrument (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_instrument():
+def create_instrument(item_type):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_instrument_object)
@@ -134,6 +136,7 @@ def create_instrument():
     item_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
     # Add the specific elements for this particular instance of the instrument
     objects_common.schematic_objects[object_id]["itemid"] = item_id
+    objects_common.schematic_objects[object_id]["itemtype"] = item_type
     objects_common.schematic_objects[object_id]["posx"] = x
     objects_common.schematic_objects[object_id]["posy"] = y
     # Add the new object to the index of instruments

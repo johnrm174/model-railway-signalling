@@ -432,16 +432,19 @@ block_callback_type (tells the calling program what has triggered the callback)
     block_section_ahead_updated - The block section AHEAD of our block section has been updated
                             (i.e. the block section state represented by the Repeater indicator)
 
+instrument_type - enumeration type - single_line or double_line
+
 create_block_instrument - Creates a Block Section Instrument on the schematic
   Mandatory Parameters:
       Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
       block_id:int - The local identifier to be used for the Block Instrument 
       x:int, y:int - Position of the instrument on the canvas (in pixels)
   Optional Parameters:
+      inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
       block_callback - The function to call when the repeater indicator on our instrument has been
                        updated (i.e. the block changed on the linked instrument) - default: null
                        Note that the callback function returns (item_id, callback type)
-      single_line:bool - for a single line instrument(created without a repeater) - default: False
+      single_line:bool - DEPRECATED - use inst_type instead
       bell_sound_file:str - The filename of the soundfile (in the local package resources
                           folder) to use for the bell sound (default "bell-ring-01.wav" - other
               options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")

@@ -37,6 +37,7 @@
 #    signals_semaphores.semaphore_sub_type - Used to access the signal subtype
 #    signals_ground_position.ground_pos_sub_type - Used to access the signal subtype
 #    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
+#    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
 #    ########################## More to be added ########################################
 #
@@ -49,6 +50,7 @@ from ..library import signals_colour_lights
 from ..library import signals_semaphores
 from ..library import signals_ground_position
 from ..library import signals_ground_disc
+from ..library import block_instruments
 from ..library import points
 
 from . import objects
@@ -748,7 +750,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
                       command=lambda:objects.create_object(objects.object_type.section))
     button8.pack (padx=2, pady=2)
     button9 = Tk.Button (button_frame, image=button_images['block_instrument'],
-                      command=lambda:objects.create_object(objects.object_type.instrument))
+                      command=lambda:objects.create_object(objects.object_type.instrument,
+                            block_instruments.instrument_type.single_line.value))
     button9.pack (padx=2, pady=2)
     # Initialise the Objects package with the required parameters
     objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)

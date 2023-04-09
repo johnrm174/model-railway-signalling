@@ -16,12 +16,12 @@
 #       Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
 #       block_id:int - The local identifier to be used for the Block Instrument 
 #       x:int, y:int - Position of the instrument on the canvas (in pixels)
-#       inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
 #   Optional Parameters:
+#       inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
 #       block_callback - The function to call when the repeater indicator on our instrument has been
 #                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
-#       single_line:bool - DEPRECATED - use inst_type
+#       single_line:bool - DEPRECATED - use inst_type instead
 #       bell_sound_file:str - The filename of the soundfile (in the local package resources
 #                           folder) to use for the bell sound (default "bell-ring-01.wav")
 #       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
@@ -494,7 +494,7 @@ def create_block_instrument (canvas,
             logging.warning ("Block Instrument "+str(block_id)+": single_line flag is DEPRECATED - use inst_type")
             logging.warning ("###########################################################################################")
         else:
-            single_line = (instrument_type == instrument_type.double_line)
+            single_line = (inst_type == instrument_type.single_line)
         ####################################################################################################################
         # Define the "Tag" for all drawing objects for this instrument instance
         block_id_tag = "instrument"+str(block_id)
