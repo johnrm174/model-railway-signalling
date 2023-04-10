@@ -25,6 +25,7 @@
 #    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
+#    configure_instrument.edit_instrument(root,object_id) - Open inst edit window (on double click)
 #    ########################## More to be added ########################################
 #
 # Accesses the following external editor objects directly:
@@ -57,6 +58,7 @@ from . import objects
 from . import configure_signal
 from . import configure_point
 from . import configure_section
+from . import configure_instrument
 
 import importlib.resources
 import logging
@@ -189,7 +191,7 @@ def edit_selected_object():
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
         configure_section.edit_section(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-        pass; #################### TODO #############################
+        configure_instrument.edit_instrument(root,object_id)
     return()
 
 #------------------------------------------------------------------------------------
