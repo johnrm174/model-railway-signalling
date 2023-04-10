@@ -22,7 +22,7 @@
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.objects_common.instrument_index - The index of Instrument Objects (for iterating)
+#    objects_common.instrument_index - The index of Instrument Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -53,16 +53,22 @@ default_instrument_object["itemid"] = 0
 default_instrument_object["itemtype"] = None
 default_instrument_object["bellsound"] = "bell-ring-01.wav"
 default_instrument_object["keysound"] = "telegraph-key-01.wav"
-default_instrument_object["linkedto"] = None
+default_instrument_object["linkedto"] = ""
 
 #------------------------------------------------------------------------------------
 # Internal function Update references from instruments linked to this one
 #------------------------------------------------------------------------------------
 
 def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
-    ######################################################################
-    ######################## TODO ########################################
-    ######################################################################
+    # Iterate through all the instruments on the schematic
+    for instrument_id in objects_common.instrument_index:
+        # get the instrument object (so we can query the ID of the linked instrument)
+        instrument_object = objects_common.instrument(instrument_id)
+        if objects_common.schematic_objects[instrument_object]["linkedto"] == str(old_inst_id):
+            objects_common.schematic_objects[instrument_object]["linkedto"] = str(new_inst_id)
+            # We have to delete and re-create the 'linked' instrument for changes to take effect
+            delete_instrument_object(instrument_object)
+            redraw_instrument_object(instrument_object)
     return()
 
 #------------------------------------------------------------------------------------
@@ -70,9 +76,15 @@ def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
 #------------------------------------------------------------------------------------
 
 def remove_references_to_instrument(deleted_inst_id:int):
-    ######################################################################
-    ######################## TODO ########################################
-    ######################################################################
+    # Iterate through all the instruments on the schematic
+    for instrument_id in objects_common.instrument_index:
+        # get the instrument object (so we can query the ID of the linked instrument)
+        instrument_object = objects_common.instrument(instrument_id)
+        if objects_common.schematic_objects[instrument_object]["linkedto"] == str(deleted_inst_id):
+            objects_common.schematic_objects[instrument_object]["linkedto"] = ""
+            # We have to delete and re-create the 'linked' instrument for changes to take effect
+            delete_instrument_object(instrument_object)
+            redraw_instrument_object(instrument_object)
     return()
     
 #------------------------------------------------------------------------------------
