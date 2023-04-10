@@ -57,6 +57,7 @@ from . import file_interface
 from typing import Union
 import tkinter as Tk
 import enum
+import os
 import logging
 import importlib.resources
 
@@ -478,14 +479,21 @@ def create_block_instrument (canvas,
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
     # Find and store the root window (when the first block instrument is created)
     if common.root_window is None: common.find_root_window(canvas)
+    # Establish whether the ID is a local or remote ID and set the type accordingly
+    # We need to do this for the editor as the editor will give us an int as a string
+    if linked_to is None or linked_to == "":
+        linked_to_id = None
+    else:
+        try: linked_to_id = int(linked_to)
+        except: linked_to_id = str(linked_to)
     # Do some basic validation on the parameters we have been given
     if instrument_exists(block_id):
         logging.error ("Block Instrument "+str(block_id)+": Instrument already exists")
     elif block_id < 1:
         logging.error ("Block Instrument "+str(block_id)+": Block ID must be greater than zero")
-    elif linked_to == block_id:
+    elif linked_to_id == block_id:
         logging.error ("Block Instrument "+str(block_id)+": ID for linked instrument is the same as the instrument to create")   
-    elif isinstance(linked_to,str) and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+    elif isinstance(linked_to_id,str) and mqtt_interface.split_remote_item_identifier(linked_to_id) is None:
         logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")   
     else:
         ####################################################################################################################
@@ -531,18 +539,38 @@ def create_block_instrument (canvas,
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
-            try:
-                with importlib.resources.path ('model_railway_signals.library.resources',bell_sound_file) as sound_file:
-                    bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-            except:
-                logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
-                bell_audio = None
-            try:
-                with importlib.resources.path ('model_railway_signals.library.resources',telegraph_sound_file) as sound_file:
-                    telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-            except:
-                logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")
-                telegraph_audio = None
+            # If the filename isn't fully qualified then it must be a local file in the resources folder
+            if os.path.split(bell_sound_file)[1] == bell_sound_file:
+                try:
+                    with importlib.resources.path ('model_railway_signals.library.resources',bell_sound_file) as sound_file:
+                        bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
+                except Exception as exception:
+                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(sound_file)+"'")
+                    logging.error ("Block Instruments - Error loading bell audio file '"+str(sound_file)+"'")       
+                    bell_audio = None
+            else:
+                try:
+                     bell_audio = simpleaudio.WaveObject.from_wave_file(str(bell_sound_file))
+                except Exception as exception:
+                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(bell_sound_file)+"'")
+                    logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
+                    bell_audio = None
+            # If the filename isn't fully qualified then it must be a local file in the resources folder
+            if os.path.split(telegraph_sound_file)[1] == telegraph_sound_file:
+                try:
+                    with importlib.resources.path ('model_railway_signals.library.resources',telegraph_sound_file) as sound_file:
+                        telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
+                except Exception as exception:
+                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(sound_file)+"'")
+                    logging.error ("Block Instruments - Error loading telegraph audio file '"+str(sound_file)+"'")
+                    telegraph_audio = None
+            else:
+                try:
+                     telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(telegraph_sound_file))
+                except Exception as exception:
+                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(telegraph_sound_file)+"'")
+                    logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")       
+                    telegraph_audio = None
         else:
             logging.warning ("Block Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
             bell_audio = None
@@ -552,7 +580,7 @@ def create_block_instrument (canvas,
         instruments[str(block_id)] = {}
         instruments[str(block_id)]["canvas"] = canvas                         # Tkinter drawing canvas
         instruments[str(block_id)]["extcallback"] = block_callback            # External callback to make
-        instruments[str(block_id)]["linkedto"] = linked_to                    # Id of the instrument this one is linked to
+        instruments[str(block_id)]["linkedto"] = linked_to_id                    # Id of the instrument this one is linked to
         instruments[str(block_id)]["singleline"] = single_line                # Single line (bi-directional) instrument
         instruments[str(block_id)]["sectionstate"] = None                     # State of this instrument (None = "BLOCKED")
         instruments[str(block_id)]["repeaterstate"] = None                    # State of repeater display (None = "BLOCKED")
@@ -586,8 +614,8 @@ def create_block_instrument (canvas,
         # compound identifier rather than an integer) then subscribe to updates from the remote node and
         # publish the initial state of the local instrument (to be picked up by the remote node). State
         # will only be published if the MQTT interface has been configured and we are connected to the broker
-        if isinstance(linked_to,str):
-            subscribe_to_remote_instrument(linked_to)
+        if isinstance(linked_to_id,str):
+            subscribe_to_remote_instrument(linked_to_id)
             send_mqtt_instrument_updated_event(block_id)
     return ()
 
