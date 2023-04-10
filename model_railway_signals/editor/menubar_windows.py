@@ -100,16 +100,13 @@ class display_help():
         self.window.attributes('-topmost',True)
         self.label1 = Tk.Label(self.window, text=help_text, justify=Tk.LEFT)
         self.label1.pack(padx=5, pady=5)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
-
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
-        pass
+        # Create the close button and tooltip
+        self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
+        self.B1.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Close window")
         
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
-        if close_window: self.window.destroy()
+    def ok(self):
+        self.window.destroy()
         
 #------------------------------------------------------------------------------------
 # Class for the "About" window
@@ -143,19 +140,16 @@ class display_about():
         self.label2 = Tk.Label(self.window, text=text2, fg="blue", cursor="hand2")
         self.label2.pack(padx=5, pady=5)
         self.label2.bind("<Button-1>", lambda e:self.callback())
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        # Create the close button and tooltip
+        self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
+        self.B1.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Close window")
+        
+    def ok(self):
+        self.window.destroy()
 
     def callback(self):
         webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
-
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
-        pass
-        
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
-        if close_window: self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the "About" window
@@ -258,7 +252,7 @@ class edit_sprog_settings():
         # Save the updated settings (retain the old settings in case the connect fails)
         s1, s2, s3, s4, s5 = settings.get_sprog()
         settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
-        if self.mb_object.sprog_connect():
+        if self.mb_object.sprog_connect(show_popup=False):
             self.status.config(text="SPROG successfully connected", fg="green")
         else:
             self.status.config(text="SPROG connection failure", fg="red")

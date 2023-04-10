@@ -44,7 +44,6 @@ import os
 import tkinter as Tk
 import logging
 from argparse import ArgumentParser
-import tkinter.messagebox as messagebox
 
 from . import objects
 from . import settings
@@ -84,6 +83,7 @@ class main_menubar:
         self.sprog_label = "SPROG:DISCONNECTED "
         self.sprog_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.sprog_menu.add_command(label=" Connect ", command=self.sprog_connect)
+        self.sprog_menu.add_command(label=" Disconnect ", command=self.sprog_disconnect)
         self.mainmenubar.add_cascade(label=self.sprog_label, menu=self.sprog_menu)
         # Create the various menubar items for the DCC Power Dropdown
         self.power_label = "DCC Power:??? "
@@ -162,44 +162,59 @@ class main_menubar:
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
-            if messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
+            if Tk.messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
                     "signals, points and track occupancy sections back to their default state"):
                 objects.reset_objects()
         else:
             objects.reset_objects()
 
-    def sprog_connect(self):
+    def sprog_connect(self, show_popup:bool=True):
         port, baud, debug, startup, power = settings.get_sprog()
         connected = pi_sprog_interface.initialise_pi_sprog(port, baud, debug)
         if connected:
             new_label = "SPROG:CONNECTED "
-            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
-            self.sprog_label = new_label
         else:
             new_label = "SPROG:DISCONNECTED "
-            self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
-            self.sprog_label = new_label
+            if show_popup:
+                Tk.messagebox.showerror(title="SPROG Error",
+                    message="SPROG connection failure\nCheck SPROG settings",parent=self.root)
+        self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
+        self.sprog_label = new_label
         return(connected)
+    
+    def sprog_disconnect(self):
+        pi_sprog_interface.sprog_shutdown()
+        new_label = "SPROG:DISCONNECTED "
+        self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
+        self.sprog_label = new_label
                     
     def dcc_power_off(self):
         # The power off request returns True if successful
         if pi_sprog_interface.request_dcc_power_off():
             new_label = "DCC Power:OFF "
-            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-            self.power_label = new_label
-        
+        else:
+            new_label = "DCC Power:??? "
+            Tk.messagebox.showerror(title="SPROG Error",
+                    message="DCC power off failed \nCheck SPROG settings",parent=self.root)
+        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+        self.power_label = new_label
+
     def dcc_power_on(self):
         # The power on request returns True if successful 
         if pi_sprog_interface.request_dcc_power_on():
             new_label = "DCC Power:ON  "
-            self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-            self.power_label = new_label
+        else:
+            new_label = "DCC Power:??? "
+            Tk.messagebox.showerror(title="SPROG Error",
+                    message="DCC power on failed \nCheck SPROG settings",parent=self.root)
+        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+        self.power_label = new_label
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
-        if not ask_for_confirm or messagebox.askokcancel("Quit Schematic",
+        if not ask_for_confirm or Tk.messagebox.askokcancel("Quit Schematic",
                 "Are you sure you want to discard all changes and quit the application"):
             library_common.on_closing(ask_to_save_state=False)
         return()
@@ -207,7 +222,7 @@ class main_menubar:
     def new_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
-        if not ask_for_confirm or messagebox.askokcancel("New Schematic", "Are you sure you "+
+        if not ask_for_confirm or Tk.messagebox.askokcancel("New Schematic", "Are you sure you "+
                          "want to discard all changes and create a new blank schematic"):
             # We use the schematic functions to delete all existing objects to
             # ensure they are also deselected and removed from the clibboard 
@@ -276,6 +291,8 @@ class main_menubar:
                 self.file_has_been_saved = True
             else:
                 logging.error("LOAD LAYOUT - Selected file does not contain all required elements")
+                Tk.messagebox.showerror(title="Load Error", parent=self.root,
+                    message="File does not contain\nall required elements")
         return()
 
 #------------------------------------------------------------------------------------
