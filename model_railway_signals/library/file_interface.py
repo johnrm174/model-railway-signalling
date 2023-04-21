@@ -116,10 +116,11 @@ def load_layout_state(file_name:str=None,
             if os.path.isfile (default_file_to_load):
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
                                     filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                    initialfile = default_file_to_load )
+                                    initialdir = '.', initialfile = default_file_to_load )
             else:
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
-                                    filetypes=(('sig files','*.sig'),('all files','*.*')) )
+                                    filetypes=(('sig files','*.sig'),('all files','*.*')),
+                                    initialdir = '.')
             # If dialogue is cancelled then Filename will remain as 'None' as nothing will be loaded
             if filename == () or filename == "": filename = None
         # If the 'load_file_dialog' hasn't been specified but a filename has been provided then we use that
