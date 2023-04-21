@@ -144,7 +144,7 @@ def load_layout_state(file_name:str=None,
             except Exception as exception:
                 logging.error("Load File - Error opening file - Layout will be created in its default state")
                 logging.error("Load File - Reported Exception: "+str(exception))
-                tkinter.messagebox.showerror(title="Load Error",message=str(exception))
+                tkinter.messagebox.showerror(title="File Load Error",message=str(exception))
                 filename = None
             else:
                 # The file has been successfuly opened and loaded - Now convert it from the json format back
@@ -154,7 +154,7 @@ def load_layout_state(file_name:str=None,
                 except Exception as exception:
                     logging.error("Load File - Couldn't read file - Layout will be created in its default state")
                     logging.error("Load File - Reported exception: "+str(exception))
-                    tkinter.messagebox.showerror(title="Load Error",message=str(exception))
+                    tkinter.messagebox.showerror(title="File Parse Error",message=str(exception))
                     filename = None
             # Store the filename that was loaded - to use on application quit
             filename_used_for_load = filename
@@ -266,7 +266,7 @@ def save_state_and_quit(quit_application:bool=True):
                 file.close
             except Exception as exception:
                 logging.error("Save File - Error saving file - Reported exception: "+str(exception))
-                tkinter.messagebox.showerror(title="Save Error",message=str(exception))
+                tkinter.messagebox.showerror(title="File Save Error",message=str(exception))
                 quit_application = False
     return (quit_application)
 
