@@ -29,6 +29,7 @@
 #    points.point_callback_type - for accessing the enum value
 #    track_sections.section_callback_type - for accessing the enum value
 #    block_instruments.block_callback_type - for accessing the enum value
+#    block_instruments.block_section_ahead_clear - for interlocking
 #    signals_colour_lights.signal_sub_type - for accessing the enum value
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
 #    <MORE COMING>
@@ -481,6 +482,14 @@ def process_all_signal_interlocking():
                                 signals.subsidary_clear(opposing_signal_id,signals_common.route_type(index+1)))):
                             subsidary_can_be_unlocked = False
                             signal_can_be_unlocked = False
+            # See if the signal is interlocked with a block instrument on the route ahead
+            # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
+            # The block instrument is the local block instrument - ID is an integer
+            block_instrument = signal_object["pointinterlock"][signal_route.value-1][2]
+            if block_instrument != 0:
+                block_clear = block_instruments.block_section_ahead_clear(block_instrument)
+                if not block_clear and not signals.signal_clear(signal_object["itemid"]):
+                    signal_can_be_unlocked = False
             # The "interlockedahead" flag will only be True if selected and it can only be selected for
             # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
             # In the latter case then a call to "has_distant_arms" will be true (false for all other types)

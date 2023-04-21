@@ -357,9 +357,14 @@ def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -398,9 +403,14 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_clear(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_clear(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -439,9 +449,14 @@ def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_occupied(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_occupied(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -472,15 +487,16 @@ def load_audio_file(audio_filename):
         try:
             with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
                 audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
-        except Exception as exception:
-            Tk.messagebox.showerror(title="Load Error",message="Error loading audio resource file '"+str(audio_filename)+"'")
+        except:
+            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
+                            message="Error loading audio resource file '"+str(audio_filename)+"'")
             logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'")       
     else:        
         try:
-            with open(audio_filename) as audio_file:
-                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
-        except Exception as exception:
-            Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(audio_filename)+"'")
+            audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
+        except:
+            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
+                            message="Error loading audio file '"+str(audio_filename)+"'")
             logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'")       
     return(audio_object)
 
