@@ -753,7 +753,43 @@ class signal_route_selections(route_selections):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
         return ( [ self.EB.get_value(), super().get_values() ])
-   
+
+#------------------------------------------------------------------------------------
+# Class for a signal route interlocking frame - uses multiple instances of the
+# signal_route_selection_element which are created when "set_values" is called
+# Public class instance methods provided by this class are:
+#    "set_values" - Populates the list of interlocked signals and their routes
+#------------------------------------------------------------------------------------
+
+class signal_route_interlocking_frame():
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the Signal Interlocking List 
+        self.frame = Tk.LabelFrame(parent_frame, text="Interlocking with signals")
+        self.frame.pack(padx=2, pady=2, fill='x')
+        # These are the lists that hold the references to the subframes and subclasses
+        self.sigelements = []
+        self.subframe = None
+
+    def set_values(self, sig_interlocking_frame:[[int,[bool,bool,bool,bool,bool]],]):
+        # If the lists are not empty (case of "reloading" the config) then destroy
+        # all the UI elements and create them again (the list may have changed)
+        if self.subframe: self.subframe.destroy()
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        self.sigelements = []
+        # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
+        if sig_interlocking_frame:
+            for sig_interlocking_routes in sig_interlocking_frame:
+                # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+                # Where each route element is a boolean value (True or False)            
+                self.sigelements.append(signal_route_selections(self.subframe,read_only=True,
+                        tool_tip="Edit the appropriate signals\nto configure interlocking"))
+                self.sigelements[-1].frame.pack()
+                self.sigelements[-1].set_values (sig_interlocking_routes)
+        else:
+            self.label = Tk.Label(self.subframe, text="No interlocked signals")
+            self.label.pack()
+
 #------------------------------------------------------------------------------------
 # Class for a frame containing up to 5 radio buttons
 # Class instance elements to use externally are:
