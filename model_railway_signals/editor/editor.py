@@ -162,8 +162,9 @@ class main_menubar:
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
-            if Tk.messagebox.askokcancel("Reset Schematic", "Are you sure you want to reset all "+
-                    "signals, points and track occupancy sections back to their default state"):
+            if Tk.messagebox.askokcancel(parent=self.root, title="Reset Schematic",
+                    message="Are you sure you want to reset all signals, points and "
+                            +"track occupancy sections back to their default state"):
                 objects.reset_objects()
         else:
             objects.reset_objects()
@@ -176,8 +177,8 @@ class main_menubar:
         else:
             new_label = "SPROG:DISCONNECTED "
             if show_popup:
-                Tk.messagebox.showerror(title="SPROG Error",
-                    message="SPROG connection failure\nCheck SPROG settings",parent=self.root)
+                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="SPROG connection failure\nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
         return(connected)
@@ -194,8 +195,8 @@ class main_menubar:
             new_label = "DCC Power:OFF "
         else:
             new_label = "DCC Power:??? "
-            Tk.messagebox.showerror(title="SPROG Error",
-                    message="DCC power off failed \nCheck SPROG settings",parent=self.root)
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="DCC power off failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
 
@@ -205,8 +206,8 @@ class main_menubar:
             new_label = "DCC Power:ON  "
         else:
             new_label = "DCC Power:??? "
-            Tk.messagebox.showerror(title="SPROG Error",
-                    message="DCC power on failed \nCheck SPROG settings",parent=self.root)
+            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
 
@@ -214,16 +215,16 @@ class main_menubar:
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
-        if not ask_for_confirm or Tk.messagebox.askokcancel("Quit Schematic",
-                "Are you sure you want to discard all changes and quit the application"):
+        if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="Quit Schematic",
+                message="Are you sure you want to discard all changes and quit the application"):
             library_common.on_closing(ask_to_save_state=False)
         return()
                 
     def new_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
-        if not ask_for_confirm or Tk.messagebox.askokcancel("New Schematic", "Are you sure you "+
-                         "want to discard all changes and create a new blank schematic"):
+        if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
+                message="Are you sure you want to discard all changes and create a new blank schematic"):
             # We use the schematic functions to delete all existing objects to
             # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
@@ -291,7 +292,7 @@ class main_menubar:
                 self.file_has_been_saved = True
             else:
                 logging.error("LOAD LAYOUT - Selected file does not contain all required elements")
-                Tk.messagebox.showerror(title="Load Error", parent=self.root,
+                Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                     message="File does not contain\nall required elements")
         return()
 
