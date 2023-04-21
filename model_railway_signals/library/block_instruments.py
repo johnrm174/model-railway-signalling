@@ -461,6 +461,30 @@ def create_block_indicator(canvas:int, x:int, y:int, block_id_tag):
     return (block, clear, occup)
 
 # --------------------------------------------------------------------------------
+# Internal function to load a specified audio file for the bell / telegraph key sounds.
+# If these fail to load for any reason then no sounds will be produced on these events
+# If the filename isn't fully qualified then it assume a file in the resources folder
+# --------------------------------------------------------------------------------
+
+def load_audio_file(audio_filename):
+    audio_object = None
+    if os.path.split(audio_filename)[1] == audio_filename:
+        try:
+            with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
+                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
+        except Exception as exception:
+            Tk.messagebox.showerror(title="Load Error",message="Error loading audio resource file '"+str(audio_filename)+"'")
+            logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'")       
+    else:        
+        try:
+            with open(audio_filename) as audio_file:
+                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
+        except Exception as exception:
+            Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(audio_filename)+"'")
+            logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'")       
+    return(audio_object)
+
+# --------------------------------------------------------------------------------
 # Public API function to create a Block  Instrument (drawing objects and internal state)
 # --------------------------------------------------------------------------------
 
@@ -539,43 +563,12 @@ def create_block_instrument (canvas,
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
-            # If the filename isn't fully qualified then it must be a local file in the resources folder
-            if os.path.split(bell_sound_file)[1] == bell_sound_file:
-                try:
-                    with importlib.resources.path ('model_railway_signals.library.resources',bell_sound_file) as sound_file:
-                        bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-                except Exception as exception:
-                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(sound_file)+"'")
-                    logging.error ("Block Instruments - Error loading bell audio file '"+str(sound_file)+"'")       
-                    bell_audio = None
-            else:
-                try:
-                     bell_audio = simpleaudio.WaveObject.from_wave_file(str(bell_sound_file))
-                except Exception as exception:
-                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(bell_sound_file)+"'")
-                    logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
-                    bell_audio = None
-            # If the filename isn't fully qualified then it must be a local file in the resources folder
-            if os.path.split(telegraph_sound_file)[1] == telegraph_sound_file:
-                try:
-                    with importlib.resources.path ('model_railway_signals.library.resources',telegraph_sound_file) as sound_file:
-                        telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-                except Exception as exception:
-                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(sound_file)+"'")
-                    logging.error ("Block Instruments - Error loading telegraph audio file '"+str(sound_file)+"'")
-                    telegraph_audio = None
-            else:
-                try:
-                     telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(telegraph_sound_file))
-                except Exception as exception:
-                    Tk.messagebox.showerror(title="Load Error",message="Error loading audio file '"+str(telegraph_sound_file)+"'")
-                    logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")       
-                    telegraph_audio = None
+            bell_audio = load_audio_file(bell_sound_file)
+            telegraph_audio = load_audio_file(telegraph_sound_file)
         else:
             logging.warning ("Block Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
             bell_audio = None
             telegraph_audio = None
-
         # Create the dictionary of elements that we need to track
         instruments[str(block_id)] = {}
         instruments[str(block_id)]["canvas"] = canvas                         # Tkinter drawing canvas
