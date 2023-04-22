@@ -20,6 +20,10 @@
 #    set_fpls_off(*pointids)
 #    set_sections_occupied(*sectionids)
 #    set_sections_clear(*sectionids)
+#    set_instrument_blocked(*instrumentids)
+#    set_instrument_occupied(*instrumentids)
+#    set_instrument_clear(*instrumentids)
+#    click_telegraph_key(*instrumentids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -50,6 +54,8 @@
 #    assert_signals_route_RH2(*sigids)
 #    assert_sections_occupied(*secids)
 #    assert_sections_clear(*secids)
+#    assert_block_section_ahead_clear(instids*)
+#    assert_block_section_ahead_not_clear(instids*)
 #
 # Supported Editor test invocations:
 #    set_edit_mode()
@@ -339,6 +345,38 @@ def set_sections_clear(*sectionids):
                 track_sections.section_button_event(secid)
     root.update()
     
+def set_instrument_blocked(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
+        else:
+            block_instruments.blocked_button_event(instid)
+    root.update()
+    
+def set_instrument_occupied(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
+        else:
+            block_instruments.occup_button_event(instid)
+    root.update()
+    
+def set_instrument_clear(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("set_instrument_clear - Instrument: "+str(instid)+" does not exist")
+        else:
+            block_instruments.clear_button_event(instid)
+    root.update()
+
+def click_telegraph_key(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
+        else:
+            block_instruments.telegraph_key_button(instid)
+    root.update()
+
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------
@@ -613,6 +651,22 @@ def assert_sections_clear(*secids):
             raise_test_warning ("assert_sections_clear - Section: "+str(secid)+" does not exist")
         elif track_sections.sections[str(secid)]["occupied"]:
             raise_test_error ("assert_sections_clear - Section: "+str(secid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_block_section_ahead_clear(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("assert_block_section_ahead_clear - Instrument: "+str(instid)+" does not exist")
+        elif not block_instruments.block_section_ahead_clear(instid):
+            raise_test_error ("assert_block_section_ahead_clear - Section: "+str(instid)+" - Test Fail")
+        increment_tests_executed()
+
+def assert_block_section_ahead_not_clear(*instrumentids):
+    for instid in instrumentids:
+        if str(instid) not in block_instruments.instruments.keys():
+            raise_test_warning ("assert_block_section_ahead_clear - Instrument: "+str(instid)+" does not exist")
+        elif block_instruments.block_section_ahead_clear(instid):
+            raise_test_error ("assert_block_section_ahead_not_clear - Section: "+str(instid)+" - Test Fail")
         increment_tests_executed()
 
 # ------------------------------------------------------------------------------
