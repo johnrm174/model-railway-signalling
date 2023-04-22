@@ -225,13 +225,17 @@ def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
 
 def distant_signal_ahead_at_caution(signal_object):
     sig_ahead = find_signal_ahead(signal_object)
-    sig_ahead_id = sig_ahead["itemid"]
-    is_distant = ( ( sig_ahead["itemtype"] == signals_common.sig_type.colour_light.value and
-                     sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
-                   ( sig_ahead["itemtype"] == signals_common.sig_type.semaphore.value and
-                     sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
-    signal_at_caution = (signals.signal_state(sig_ahead_id) == signals_common.signal_state_type.CAUTION)
-    return(is_distant and signal_at_caution)
+    if sig_ahead is not None:
+        sig_ahead_id = sig_ahead["itemid"]
+        is_distant = ( ( sig_ahead["itemtype"] == signals_common.sig_type.colour_light.value and
+                         sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
+                       ( sig_ahead["itemtype"] == signals_common.sig_type.semaphore.value and
+                         sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
+        signal_at_caution = (signals.signal_state(sig_ahead_id) == signals_common.signal_state_type.CAUTION)
+        distant_signal_at_caution = is_distant and signal_at_caution
+    else:
+        distant_signal_at_caution = False
+    return(distant_signal_at_caution)        
 
 #------------------------------------------------------------------------------------
 # Internal function to find any colour light signals which are configured to update aspects
