@@ -212,7 +212,6 @@ class sound_file_element(common.entry_box):
                     filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
         # Try loading/playing the selected file - with an error popup if it fails
         if filename != () and filename != "":
-            print(filename)
             try:
                 simpleaudio.WaveObject.from_wave_file(filename).play()
             except:
