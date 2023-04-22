@@ -229,6 +229,9 @@ class main_menubar:
             # ensure they are also deselected and removed from the clibboard 
             schematic.select_all_objects()
             schematic.delete_selected_objects()
+            # Belt and braces delete of all canvas objects as I've seen issues when
+            # running the system tests (probably because I'm not using the mainloop)
+            schematic.canvas.delete("all")
             # Restore the default settings and update the editor config
             settings.restore_defaults()
             # Re-initialise the editor for the new settings to take effect
@@ -274,6 +277,9 @@ class main_menubar:
                 # ensure they are also deselected and removed from the clibboard 
                 schematic.select_all_objects()
                 schematic.delete_selected_objects()
+                # Belt and braces delete of all canvas objects as I've seen issues when
+                # running the system tests (probably because I'm not using the mainloop)
+                schematic.canvas.delete("all")
                 # Store the newly loaded settings
                 settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
