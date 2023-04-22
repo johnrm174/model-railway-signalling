@@ -47,12 +47,13 @@ def run_instrument_linking_tests(delay:float=0.0):
     # Test the telegraph key / bell of linked instrument - we can't really
     # make any meaningful assertions other than it doesn't throw an exception
     sleep(delay)
+    sleep(0.3)
     click_telegraph_key(1)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(2)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(3)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(4)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(1,2,3,4)
@@ -109,12 +110,13 @@ def run_instrument_linking_tests(delay:float=0.0):
     # Test the telegraph key / bell of linked instrument - we can't really
     # make any meaningful assertions other than it doesn't throw an exception
     sleep(delay)
+    sleep(0.3)
     click_telegraph_key(11)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(12)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(13)
-    sleep(delay)
+    sleep(0.3)
     click_telegraph_key(14)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(11,12,13,14)
