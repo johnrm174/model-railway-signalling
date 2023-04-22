@@ -8,6 +8,8 @@
 # block_callback_type (tells the calling program what has triggered the callback)
 #     block_section_ahead_updated - The block section AHEAD of our block section has been updated
 #                             (i.e. the block section state represented by the Repeater indicator)
+#
+# instrument_type - enumeration type - single_line or double_line
 # 
 # create_block_instrument - Creates a Block Section Instrument on the schematic
 #   Mandatory Parameters:
@@ -15,10 +17,11 @@
 #       block_id:int - The local identifier to be used for the Block Instrument 
 #       x:int, y:int - Position of the instrument on the canvas (in pixels)
 #   Optional Parameters:
+#       inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
 #       block_callback - The function to call when the repeater indicator on our instrument has been
 #                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
-#       single_line:bool - for a single line instrument(created without a repeater) - default: False
+#       single_line:bool - DEPRECATED - use inst_type instead
 #       bell_sound_file:str - The filename of the soundfile (in the local package resources
 #                           folder) to use for the bell sound (default "bell-ring-01.wav")
 #       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
@@ -41,7 +44,6 @@
 #           (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
 #           Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
 #
-#
 # If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
 # then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
 # on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first)
@@ -52,9 +54,10 @@
 from . import common
 from . import mqtt_interface
 from . import file_interface
-from tkinter import *
 from typing import Union
+import tkinter as Tk
 import enum
+import os
 import logging
 import importlib.resources
 
@@ -77,6 +80,10 @@ audio_enabled = is_simpleaudio_installed()
 # Classes used by external functions when calling the create_point function
 # -------------------------------------------------------------------------
     
+class instrument_type(enum.Enum):
+    single_line = 1   # Right Hand point
+    double_line = 2   # Left Hand point
+
 class block_callback_type(enum.Enum):
     block_section_ahead_updated = 51   # The instrument has been updated
 
@@ -131,19 +138,19 @@ def open_bell_code_hints():
         bell_codes.append ([" 4 - 1"," Is line clear for mineral or empty waggon train"])
         bell_codes.append ([" 2 - 1"," Train arrived"])
         bell_codes.append ([" 6"," Obstruction danger"])
-        hints_window = Toplevel(common.root_window)
+        hints_window = Tk.Toplevel(common.root_window)
         hints_window.attributes('-topmost',True)
         hints_window.title("Common signal box bell codes")
         hints_window.protocol("WM_DELETE_WINDOW", lambda:close_bell_code_hints(hints_window))
         bell_code_hints_open = True
         for row, item1 in enumerate (bell_codes, start=1):
-            text_entry_box1 = Entry(hints_window,width=8)
+            text_entry_box1 = Tk.Entry(hints_window,width=8)
             text_entry_box1.insert(0,item1[0])
             text_entry_box1.grid(row=row,column=1)
             text_entry_box1.config(state='disabled')
             text_entry_box1.config({'disabledbackground':'white'}) 
             text_entry_box1.config({'disabledforeground':'black'}) 
-            text_entry_box2 = Entry(hints_window,width=40)
+            text_entry_box2 = Tk.Entry(hints_window,width=40)
             text_entry_box2.insert(0,item1[1])
             text_entry_box2.grid(row=row,column=2)
             text_entry_box2.config(state='disabled')
@@ -350,9 +357,14 @@ def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_blocked(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -391,9 +403,14 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_clear(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_clear(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -432,9 +449,14 @@ def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
             # If linked to another instrument then update the repeater indicator on the other instrument or
             # Publish the initial state to the broker (for other nodes to consume). Note that state will only
             # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-                if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
-                else: set_repeater_occupied(instruments[str(block_id)]["linkedto"])
+            if update_remote_instrument:
+                if instruments[str(block_id)]["linkedto"] is not None:
+                    if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_instrument_updated_event(block_id)
+                    else: set_repeater_occupied(instruments[str(block_id)]["linkedto"])
+                # Handle the case of a single line instrument with no linked instrument - in this case we
+                # want to make a callback on block state change to allow interlocking to be processed
+                elif instruments[str(block_id)]["singleline"]:
+                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
     return ()
 
 # --------------------------------------------------------------------------------
@@ -454,14 +476,40 @@ def create_block_indicator(canvas:int, x:int, y:int, block_id_tag):
     return (block, clear, occup)
 
 # --------------------------------------------------------------------------------
+# Internal function to load a specified audio file for the bell / telegraph key sounds.
+# If these fail to load for any reason then no sounds will be produced on these events
+# If the filename isn't fully qualified then it assume a file in the resources folder
+# --------------------------------------------------------------------------------
+
+def load_audio_file(audio_filename):
+    audio_object = None
+    if os.path.split(audio_filename)[1] == audio_filename:
+        try:
+            with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
+                audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
+        except:
+            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
+                            message="Error loading audio resource file '"+str(audio_filename)+"'")
+            logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'")       
+    else:        
+        try:
+            audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
+        except:
+            Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
+                            message="Error loading audio file '"+str(audio_filename)+"'")
+            logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'")       
+    return(audio_object)
+
+# --------------------------------------------------------------------------------
 # Public API function to create a Block  Instrument (drawing objects and internal state)
 # --------------------------------------------------------------------------------
 
 def create_block_instrument (canvas,
                              block_id:int,
                              x:int, y:int,
+                             inst_type:instrument_type = instrument_type.double_line,
                              block_callback = null_callback,
-                             single_line:bool = False,
+                             single_line:bool = False, ############################################################
                              bell_sound_file:str = "bell-ring-01.wav",
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
@@ -471,32 +519,47 @@ def create_block_instrument (canvas,
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
     # Find and store the root window (when the first block instrument is created)
     if common.root_window is None: common.find_root_window(canvas)
+    # Establish whether the ID is a local or remote ID and set the type accordingly
+    # We need to do this for the editor as the editor will give us an int as a string
+    if linked_to is None or linked_to == "":
+        linked_to_id = None
+    else:
+        try: linked_to_id = int(linked_to)
+        except: linked_to_id = str(linked_to)
     # Do some basic validation on the parameters we have been given
     if instrument_exists(block_id):
         logging.error ("Block Instrument "+str(block_id)+": Instrument already exists")
     elif block_id < 1:
         logging.error ("Block Instrument "+str(block_id)+": Block ID must be greater than zero")
-    elif linked_to == block_id:
+    elif linked_to_id == block_id:
         logging.error ("Block Instrument "+str(block_id)+": ID for linked instrument is the same as the instrument to create")   
-    elif isinstance(linked_to,str) and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+    elif isinstance(linked_to_id,str) and mqtt_interface.split_remote_item_identifier(linked_to_id) is None:
         logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")   
     else:
+        ####################################################################################################################
+        if single_line:
+            logging.warning ("###########################################################################################")
+            logging.warning ("Block Instrument "+str(block_id)+": single_line flag is DEPRECATED - use inst_type")
+            logging.warning ("###########################################################################################")
+        else:
+            single_line = (inst_type == instrument_type.single_line)
+        ####################################################################################################################
         # Define the "Tag" for all drawing objects for this instrument instance
         block_id_tag = "instrument"+str(block_id)
         # Create the Instrument background - this will vary in size depending on single or double line
         if single_line: canvas.create_rectangle (x-60, y-20, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
         else: canvas.create_rectangle (x-60, y-80, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
         # Create the button objects and their callbacks
-        occup_button = Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
+        occup_button = Tk.Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgraised, command = lambda:occup_button_event(block_id))
-        clear_button = Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
+        clear_button = Tk.Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgraised, command = lambda:clear_button_event(block_id))
-        block_button = Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
+        block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="sunken", font=('Courier',common.fontsize,"normal"),
                     bg=common.bgsunken, command = lambda:blocked_button_event(block_id))
-        bell_button = Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
+        bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg="black", fg="white", activebackground="black", activeforeground="white",
                     command = lambda:telegraph_key_button(block_id))
@@ -504,10 +567,10 @@ def create_block_instrument (canvas,
         bell_button.bind('<Button-2>', lambda event:open_bell_code_hints())
         bell_button.bind('<Button-3>', lambda event:open_bell_code_hints())
         # Create the windows (on the canvas) for the buttons
-        canvas.create_window(x, y+80, window=occup_button, anchor=SE, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=clear_button, anchor=SW, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=block_button, anchor=N, tags=block_id_tag)
-        canvas.create_window(x, y+115, window=bell_button, anchor=N, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=occup_button, anchor=Tk.SE, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=clear_button, anchor=Tk.SW, tags=block_id_tag)
+        canvas.create_window(x, y+80, window=block_button, anchor=Tk.N, tags=block_id_tag)
+        canvas.create_window(x, y+115, window=bell_button, anchor=Tk.N, tags=block_id_tag)
         # Create the main block section indicator for our instrument
         my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y, block_id_tag)
         # If this is a double line indicator then create the repeater indicator
@@ -516,28 +579,17 @@ def create_block_instrument (canvas,
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
-            try:
-                with importlib.resources.path ('model_railway_signals.library.resources',bell_sound_file) as sound_file:
-                    bell_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-            except:
-                logging.error ("Block Instruments - Error loading bell audio file '"+str(bell_sound_file)+"'")       
-                bell_audio = None
-            try:
-                with importlib.resources.path ('model_railway_signals.library.resources',telegraph_sound_file) as sound_file:
-                    telegraph_audio = simpleaudio.WaveObject.from_wave_file(str(sound_file))
-            except:
-                logging.error ("Block Instruments - Error loading telegraph audio file '"+str(telegraph_sound_file)+"'")
-                telegraph_audio = None
+            bell_audio = load_audio_file(bell_sound_file)
+            telegraph_audio = load_audio_file(telegraph_sound_file)
         else:
             logging.warning ("Block Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
             bell_audio = None
             telegraph_audio = None
-
         # Create the dictionary of elements that we need to track
         instruments[str(block_id)] = {}
         instruments[str(block_id)]["canvas"] = canvas                         # Tkinter drawing canvas
         instruments[str(block_id)]["extcallback"] = block_callback            # External callback to make
-        instruments[str(block_id)]["linkedto"] = linked_to                    # Id of the instrument this one is linked to
+        instruments[str(block_id)]["linkedto"] = linked_to_id                    # Id of the instrument this one is linked to
         instruments[str(block_id)]["singleline"] = single_line                # Single line (bi-directional) instrument
         instruments[str(block_id)]["sectionstate"] = None                     # State of this instrument (None = "BLOCKED")
         instruments[str(block_id)]["repeaterstate"] = None                    # State of repeater display (None = "BLOCKED")
@@ -571,8 +623,8 @@ def create_block_instrument (canvas,
         # compound identifier rather than an integer) then subscribe to updates from the remote node and
         # publish the initial state of the local instrument (to be picked up by the remote node). State
         # will only be published if the MQTT interface has been configured and we are connected to the broker
-        if isinstance(linked_to,str):
-            subscribe_to_remote_instrument(linked_to)
+        if isinstance(linked_to_id,str):
+            subscribe_to_remote_instrument(linked_to_id)
             send_mqtt_instrument_updated_event(block_id)
     return ()
 

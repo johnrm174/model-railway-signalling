@@ -2,7 +2,7 @@
 # Functions and sub Classes for the Edit Signal "Interlocking" Tab 
 #------------------------------------------------------------------------------------
 
-from tkinter import *
+import tkinter as Tk
 
 from . import common
 from . import objects
@@ -24,10 +24,10 @@ class point_interlocking_entry():
         self.EB = common.int_item_id_entry_box(parent_frame, exists_function=point_exists_function,
                     tool_tip = "Specify the points that need to be set and locked before the "+
                         "signal can be cleared for the route", callback=self.eb_updated)
-        self.EB.pack(side=LEFT)
+        self.EB.pack(side=Tk.LEFT)
         self.CB = common.state_box(parent_frame, label_off=u"\u2192", label_on="\u2191", width=2,
                     tool_tip="Select the required state for the point (normal or switched)")
-        self.CB.pack(side=LEFT)
+        self.CB.pack(side=Tk.LEFT)
                             
     def eb_updated(self):
         if self.EB.entry.get() == "":
@@ -87,12 +87,12 @@ class interlocking_route_group:
         instrument_exists_function = objects.instrument_exists
         point_exists_function = objects.point_exists
         # Create a frame for this UI element (always packed into the parent frame)
-        self.frame = Frame(parent_frame)
+        self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         # Create the lable and the point interlocking entry elements (these are
         # packed LEFT in the frame by the parent class when created)
-        self.label = Label(self.frame, anchor='w', width=5, text=label)
-        self.label.pack(side = LEFT)
+        self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
+        self.label.pack(side = Tk.LEFT)
         self.p1 = point_interlocking_entry(self.frame, point_exists_function)
         self.p2 = point_interlocking_entry(self.frame, point_exists_function)
         self.p3 = point_interlocking_entry(self.frame, point_exists_function)
@@ -100,19 +100,19 @@ class interlocking_route_group:
         self.p5 = point_interlocking_entry(self.frame, point_exists_function)
         self.p6 = point_interlocking_entry(self.frame, point_exists_function)
         # Create the signal ahead and instrument ahead elements (always packed)
-        self.label1 = Label(self.frame, text=" Sig:")
-        self.label1.pack(side=LEFT)
+        self.label1 = Tk.Label(self.frame, text=" Sig:")
+        self.label1.pack(side=Tk.LEFT)
         self.sig = common.str_item_id_entry_box(self.frame, exists_function=signal_exists_function,
                         tool_tip = "Enter the ID of the next signal along the specified route - This "+
                         "can be a local signal or a remote signal (subscribed to via MQTT networking)",
                           current_id_function = current_id_function)
-        self.sig.pack(side=LEFT)
-        self.label2 = Label(self.frame, text=" Blk:")
-        self.label2.pack(side=LEFT)
+        self.sig.pack(side=Tk.LEFT)
+        self.label2 = Tk.Label(self.frame, text=" Blk:")
+        self.label2.pack(side=Tk.LEFT)
         self.block = common.int_item_id_entry_box(self.frame, exists_function=instrument_exists_function,
                                 tool_tip="Enter the ID of the local block instrument controlling "+
                                     "access to the next block section along the specified route") 
-        self.block.pack(side=LEFT)
+        self.block.pack(side=Tk.LEFT)
     
     def validate(self):
         # Validates all point, signal and block instrument entries
@@ -195,7 +195,7 @@ class interlocking_route_group:
 class interlocking_route_frame:
     def __init__(self, parent_window, parent_object):
         # Create a Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_window, text= "Signal routes and point interlocking")
+        self.frame = Tk.LabelFrame(parent_window, text= "Signal routes and point interlocking")
         # Create the route elements (sign, sub, dist) - these are packed in class instancees
         self.main = interlocking_route_group(self.frame, parent_object, "Main")
         self.lh1 = interlocking_route_group(self.frame, parent_object, "LH1")
@@ -276,7 +276,7 @@ class conflicting_signals_element():
         exists_function = objects.signal_exists
         current_id_function = parent_object.config.sigid.get_value
         # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
-        self.frame = LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
+        self.frame = Tk.LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=1)
@@ -343,7 +343,7 @@ class conflicting_signals_element():
 class conflicting_signals_frame():
     def __init__(self, parent_frame, parent_object):
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Conflicting signals not locked by the above point selections")
+        self.frame = Tk.LabelFrame(parent_frame, text="Conflicting signals not locked by the above point selections")
         self.main = conflicting_signals_element(self.frame, parent_object, "MAIN Route")
         self.lh1 = conflicting_signals_element(self.frame, parent_object, "LH1 Route")
         self.lh2 = conflicting_signals_element(self.frame, parent_object, "LH2 Route")
@@ -387,7 +387,7 @@ class conflicting_signals_frame():
 class interlock_with_signals_ahead(common.check_box):
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
-        self.frame = LabelFrame(parent_frame, text="Distant signal interlocking")
+        self.frame = Tk.LabelFrame(parent_frame, text="Distant signal interlocking")
         super().__init__(self.frame, label="Interlock distant with all home signals ahead",
                         tool_tip="Select to lock the distant signal at CAUTION if any home signals "+
                         "on the route ahead are at DANGER (if the distant signal is CLEAR it "+

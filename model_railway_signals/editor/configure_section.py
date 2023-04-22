@@ -25,7 +25,7 @@
 
 import copy
 
-from tkinter import *
+import tkinter as Tk
 from tkinter import ttk
 
 from . import common
@@ -189,26 +189,26 @@ class mirrored_section(common.str_item_id_entry_box):
         exists_function = objects.section_exists
         current_id_function = parent_object.sectionid.get_value
         # Create the Label Frame for the "mirrored section" entry box
-        self.frame = LabelFrame(parent_frame, text="Link to other track section")
+        self.frame = Tk.LabelFrame(parent_frame, text="Link to other track section")
         # Create a frame for the "Section to mirror" elements
-        self.subframe1 = Frame(self.frame)
+        self.subframe1 = Tk.Frame(self.frame)
         self.subframe1.pack()
         # Call the common base class init function to create the EB
-        self.label1 = Label(self.subframe1,text="Section to mirror:")
-        self.label1.pack(side=LEFT, padx=2, pady=2)
+        self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - This can "+
                     "be a local section or a remote section (subscribed to via MQTT networking)",
                     exists_function=exists_function, current_id_function=current_id_function)
-        self.pack(side=LEFT, padx=2, pady=2)
+        self.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create a frame for the "Mirrored by" elements
-        self.subframe2 = Frame(self.frame)
+        self.subframe2 = Tk.Frame(self.frame)
         self.subframe2.pack()
-        self.mirrored_by = StringVar(parent_frame, "")
-        self.label2 = Label(self.subframe2,text="Mirrored by section:")
-        self.label2.pack(side=LEFT, padx=2, pady=2)
-        self.mirrored_by_eb = Entry(self.subframe2, width=3, textvariable=self.mirrored_by,
+        self.mirrored_by = Tk.StringVar(parent_frame, "")
+        self.label2 = Tk.Label(self.subframe2,text="Mirrored by section:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.mirrored_by_eb = Tk.Entry(self.subframe2, width=3, textvariable=self.mirrored_by,
                                             justify='center',state="disabled")
-        self.mirrored_by_eb.pack(side=LEFT, padx=2, pady=2)
+        self.mirrored_by_eb.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.mirrored_by_eb, "ID of the track "+
                             "section that that will be mirrored by this section")
 
@@ -247,7 +247,7 @@ class mirrored_section(common.str_item_id_entry_box):
 class default_label_entry(common.entry_box):
     def __init__(self, parent_frame):
         # Create the Label Frame for the "mirrored section" entry box
-        self.frame = LabelFrame(parent_frame, text="Default section label")
+        self.frame = Tk.LabelFrame(parent_frame, text="Default section label")
         super().__init__(self.frame, width=16, tool_tip = "Enter the default label to "+
                          "display when the section is occupied (this defines the default "+
                          "width of the Track Section object on the schematic). The default "+
@@ -273,14 +273,14 @@ class default_label_entry(common.entry_box):
 class section_configuration_tab():
     def __init__(self, parent_tab):
         # Create a Frame to hold the Section ID and General Settings
-        self.frame1 = Frame(parent_tab)
+        self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Section ID selection
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = objects.section_exists) 
-        self.sectionid.frame.pack(side=LEFT, padx=2, pady=2, fill='y')
+        self.sectionid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create a labelframe for the General settings
-        self.subframe1 = LabelFrame(self.frame1, text="General Settings")
+        self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
         self.subframe1.pack(padx=2, pady=2, fill='x')
         self.readonly = common.check_box(self.subframe1, label="Read only",
                      tool_tip= "Select to make the Track Section non-editable")
@@ -306,7 +306,7 @@ class section_configuration_tab():
 class signal_route_frame():
     def __init__(self, parent_frame, label:str):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = LabelFrame(parent_frame, text=label)
+        self.frame = Tk.LabelFrame(parent_frame, text=label)
         self.frame.pack(padx=2, pady=2, fill='x')
         # These are the lists that hold the references to the subframes and subclasses
         self.sigelements = []
@@ -316,7 +316,7 @@ class signal_route_frame():
         # If the lists are not empty (case of "reloading" the config) then destroy
         # all the UI elements and create them again (the list may have changed)
         if self.subframe: self.subframe.destroy()
-        self.subframe = Frame(self.frame)
+        self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
         self.sigelements = []
         # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
@@ -329,7 +329,7 @@ class signal_route_frame():
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Label(self.subframe, text="No automation configured")
+            self.label = Tk.Label(self.subframe, text="No automation configured")
             self.label.pack()
             
 #------------------------------------------------------------------------------------
@@ -350,7 +350,7 @@ class edit_section():
         # This is the UUID for the object being edited
         self.object_id = object_id
         # Creatre the basic Top Level window
-        self.window = Toplevel(root)
+        self.window = Tk.Toplevel(root)
         self.window.attributes('-topmost',True)
         # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
@@ -358,9 +358,9 @@ class edit_section():
         # So we bind the tab changed event to a function which will focus on something else 
         self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
         # Create the Window tabs
-        self.tab1 = Frame(self.tabs)
+        self.tab1 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
-        self.tab2 = Frame(self.tabs)
+        self.tab2 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab2, text="Automation")
         self.tabs.pack(fill='x')
         self.config = section_configuration_tab(self.tab1)
@@ -368,7 +368,7 @@ class edit_section():
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 

@@ -71,7 +71,6 @@ from ...library import track_sensors
 
 from . import objects_common
 from . import objects_points
-from . import objects_instruments
 from .. import run_layout
 
 #------------------------------------------------------------------------------------

@@ -322,13 +322,10 @@
    
 from . import signals_common
 from . import signals_colour_lights
-from . import signals_ground_position
-from . import signals_ground_disc
 from . import signals_semaphores
 from . import mqtt_interface
 
 from typing import Union
-from tkinter import *
 import logging
 
 # -------------------------------------------------------------------------

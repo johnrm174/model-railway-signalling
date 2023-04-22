@@ -23,7 +23,7 @@
 
 import copy
 
-from tkinter import *
+import tkinter as Tk
 from tkinter import ttk
 
 from . import common
@@ -363,9 +363,9 @@ def update_tab1_signal_subtype_selections(signal):
         signal.config.subtype.B3.configure(text="2 Asp Y/R")
         signal.config.subtype.B4.configure(text="3 Aspect")
         signal.config.subtype.B5.configure(text="4 Aspect")
-        signal.config.subtype.B3.pack(side=LEFT)
-        signal.config.subtype.B4.pack(side=LEFT)
-        signal.config.subtype.B5.pack(side=LEFT)
+        signal.config.subtype.B3.pack(side=Tk.LEFT)
+        signal.config.subtype.B4.pack(side=Tk.LEFT)
+        signal.config.subtype.B5.pack(side=Tk.LEFT)
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
         signal.config.subtype.B1.configure(text="Home")
         signal.config.subtype.B2.configure(text="Distant")
@@ -377,8 +377,8 @@ def update_tab1_signal_subtype_selections(signal):
         signal.config.subtype.B2.configure(text="Shunt (post'96)")
         signal.config.subtype.B3.configure(text="Norm (early)")
         signal.config.subtype.B4.configure(text="Shunt (early)")
-        signal.config.subtype.B3.pack(side=LEFT)
-        signal.config.subtype.B4.pack(side=LEFT)
+        signal.config.subtype.B3.pack(side=Tk.LEFT)
+        signal.config.subtype.B4.pack(side=Tk.LEFT)
         signal.config.subtype.B5.pack_forget()
     elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
         signal.config.subtype.B1.configure(text="Normal")
@@ -858,7 +858,7 @@ class edit_signal:
         # This is the UUID for the object being edited
         self.object_id = object_id
         # Creatre the basic Top Level window
-        self.window = Toplevel(root)
+        self.window = Tk.Toplevel(root)
         self.window.attributes('-topmost',True)
         # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
@@ -866,12 +866,12 @@ class edit_signal:
         # So we bind the tab changed event to a function which will focus on something else 
         self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
         # Create the Window tabs
-        self.tab1 = Frame(self.tabs)
+        self.tab1 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
-        self.tab2 = Frame(self.tabs)
+        self.tab2 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab2, text="Interlocking")
         self.tabs.pack()
-        self.tab3 = Frame(self.tabs)
+        self.tab3 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab3, text="Automation")
         self.tabs.pack()
         # The config tab needs references to all the 'config changed' callback functions
@@ -886,7 +886,7 @@ class edit_signal:
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Label(self.window, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
         

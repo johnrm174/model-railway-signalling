@@ -52,7 +52,7 @@ from . import dcc_control
 from . import common
 from . import file_interface
 
-from tkinter import *
+import tkinter as Tk
 import enum
 import logging
 
@@ -245,11 +245,11 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # Define the "Tag" for all drawing objects for this point instance
         point_id_tag = "point"+str(point_id)
         # Create the button objects and their callbacks
-        point_button = Button (canvas, text=str(point_id), state="normal", relief="raised",
+        point_button = Tk.Button (canvas, text=str(point_id), state="normal", relief="raised",
                     font=('Courier',common.fontsize,"normal"),bg= "grey85",
                     padx=common.xpadding, pady=common.ypadding,
                     command = lambda:change_button_event(point_id))
-        fpl_button = Button (canvas,text="L",state="normal", relief="sunken",
+        fpl_button = Tk.Button (canvas,text="L",state="normal", relief="sunken",
                     font=('Courier',common.fontsize,"normal"), bg = "white",
                     padx=common.xpadding, pady=common.ypadding, 
                     command = lambda:fpl_button_event(point_id))
@@ -275,8 +275,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
                 point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,anchor=W,window=point_button,tags=point_id_tag) 
-                canvas.create_window (point_coords,anchor=E,window=fpl_button,tags=point_id_tag)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
                 point_coords = common.rotate_point (x,y,-10,-20,orientation)
@@ -302,8 +302,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
                 point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,anchor=W,window=point_button,tags=point_id_tag) 
-                canvas.create_window (point_coords,anchor=E,window=fpl_button,tags=point_id_tag)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
                 point_coords = common.rotate_point (x,y,-10,+20,orientation)

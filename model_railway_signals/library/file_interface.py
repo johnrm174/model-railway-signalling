@@ -116,10 +116,11 @@ def load_layout_state(file_name:str=None,
             if os.path.isfile (default_file_to_load):
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
                                     filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                    initialfile = default_file_to_load )
+                                    initialdir = '.', initialfile = default_file_to_load )
             else:
                 filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
-                                    filetypes=(('sig files','*.sig'),('all files','*.*')) )
+                                    filetypes=(('sig files','*.sig'),('all files','*.*')),
+                                    initialdir = '.')
             # If dialogue is cancelled then Filename will remain as 'None' as nothing will be loaded
             if filename == () or filename == "": filename = None
         # If the 'load_file_dialog' hasn't been specified but a filename has been provided then we use that
@@ -143,6 +144,8 @@ def load_layout_state(file_name:str=None,
             except Exception as exception:
                 logging.error("Load File - Error opening file - Layout will be created in its default state")
                 logging.error("Load File - Reported Exception: "+str(exception))
+                tkinter.messagebox.showerror(title="File Load Error",message=str(exception))
+                filename = None
             else:
                 # The file has been successfuly opened and loaded - Now convert it from the json format back
                 # into the dictionary of signals, points and sections - with exception handling in case it fails
@@ -151,6 +154,8 @@ def load_layout_state(file_name:str=None,
                 except Exception as exception:
                     logging.error("Load File - Couldn't read file - Layout will be created in its default state")
                     logging.error("Load File - Reported exception: "+str(exception))
+                    tkinter.messagebox.showerror(title="File Parse Error",message=str(exception))
+                    filename = None
             # Store the filename that was loaded - to use on application quit
             filename_used_for_load = filename
     return(filename)
@@ -261,6 +266,8 @@ def save_state_and_quit(quit_application:bool=True):
                 file.close
             except Exception as exception:
                 logging.error("Save File - Error saving file - Reported exception: "+str(exception))
+                tkinter.messagebox.showerror(title="File Save Error",message=str(exception))
+                quit_application = False
     return (quit_application)
 
 #-------------------------------------------------------------------------------------------------

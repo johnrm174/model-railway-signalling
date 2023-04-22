@@ -66,8 +66,8 @@
 from . import common
 from . import mqtt_interface
 from . import file_interface
-from tkinter import *
 from typing import Union
+import tkinter as Tk
 import enum
 import logging
 
@@ -206,7 +206,7 @@ def open_entry_box(section_id):
     font_size = common.fontsize
     label_length = sections[str(section_id)]["labellength"]
     # Create the entry box and bind the RETURN and ESCAPE events to it
-    text_entry_box = Entry(canvas,width=label_length,font=('Ariel',font_size,"normal"))
+    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Ariel',font_size,"normal"))
     text_entry_box.bind('<Return>', lambda event:update_identifier(section_id))
     text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
     # if the section button is already showing occupied then we EDIT the value
@@ -242,7 +242,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
     else:
         # Create the button objects and their callbacks
         font_size = common.fontsize
-        section_button = Button (canvas, text=label, state="normal", relief="raised",
+        section_button = Tk.Button (canvas, text=label, state="normal", relief="raised",
                     padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id), width = len(label))
