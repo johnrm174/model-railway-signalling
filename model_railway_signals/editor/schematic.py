@@ -84,7 +84,6 @@ schematic_state["selectedobjects"] = []
 # The Root reference is used when calling a "configure object" module (to open a popup window)
 # The Canvas reference is used for configuring and moving canvas widgets for schematic editing
 # canvas_width / canvas_height / canvas_grid are used for positioning of objects
-canvas = None
 root = None
 canvas = None
 canvas_width = 0
