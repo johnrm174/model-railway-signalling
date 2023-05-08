@@ -119,6 +119,7 @@ class main_menubar:
         
     # Common initialisation function (called on editor start or layout load or new layout)
     def initialise_editor(self):
+        global logging
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
         path, name = os.path.split(settings.get_general()[0])

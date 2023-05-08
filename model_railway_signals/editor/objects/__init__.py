@@ -2,17 +2,19 @@
 # These are the Public API functions for the Objects sub-package
 #------------------------------------------------------------------------------------
 #
-#    Externalised API functions intended for use by other editor modules:
+# Externalised API functions intended for use by other editor modules:
 #    initialise (canvas,x,y,grid) - Initialise the objects package and set defaults
 #    update_canvas(x,y,grid) - update the attributes (on load and re-size)
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
+#    line(item_id:int) - helper function to find the object Id by Item ID
 #    signal_exists(item_id:int) - Common function to see if a given item exists
 #    point_exists(item_id:int) - Common function to see if a given item exists
 #    section_exists(item_id:int) - Common function to see if a given item exists
 #    instrument_exists(item_id:int) - Common function to see if a given item exists
+#    line_exists (item_id:int) - Common function to see if a given item exists
 #    save_schematic_state(reset_pointer:bool) - save a snapshot of the schematic objects
 #         (reset_pointer=True will clear the undo buffer (deleting the undo history)
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
@@ -28,6 +30,8 @@
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
 #    reset_objects() - resets all points, signals, instruments and sections to default state
+#    get_endstop_offsets(x1,y1,x2,y2)- used by the schematics module to get the offsets
+#        for line 'end stops' so they can be moved with the line ends during editing
 #
 # Objects intended to be accessed directly by other editor modules:
 #    object_type - Enumeration type for the supported objects
@@ -67,10 +71,12 @@ from .objects_common import signal
 from .objects_common import point 
 from .objects_common import section
 from .objects_common import instrument
+from .objects_common import line
 from .objects_common import signal_exists
 from .objects_common import point_exists
 from .objects_common import section_exists
 from .objects_common import instrument_exists
+from .objects_common import line_exists
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -78,6 +84,9 @@ from .objects_common import signal_index
 from .objects_common import point_index 
 from .objects_common import section_index 
 from .objects_common import instrument_index
+from .objects_common import line_index
+
+from .objects_lines import get_endstop_offsets
 
 # The following code does nothing apart from suppressing
 # the spurious pyflakes warnings for unused imports
@@ -103,15 +112,19 @@ assert signal
 assert point 
 assert section
 assert instrument
+assert line
 assert signal_exists
 assert point_exists
 assert section_exists
 assert instrument_exists
+assert line_exists
 assert object_type
+assert get_endstop_offsets
 assert type(schematic_objects) 
 assert type(signal_index)
 assert type(point_index)
 assert type(section_index)
 assert type(instrument_index)
+assert type(line_index)
 
 ##########################################################################################################################

@@ -208,6 +208,8 @@ class edit_sprog_settings():
         self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
         self.baud_selection = Tk.StringVar(self.window, "")
         self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
+        menu_width = len(max(self.options, key=len))
+        self.baud.config(width=menu_width)
         common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
         self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements

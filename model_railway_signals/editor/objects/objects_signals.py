@@ -80,9 +80,8 @@ from .. import run_layout
 # This is the default signal object definition
 default_signal_object = copy.deepcopy(objects_common.default_object)
 default_signal_object["item"] = objects_common.object_type.signal
-default_signal_object["itemid"] = 0
-default_signal_object["itemtype"] = None
-default_signal_object["itemsubtype"] = None
+default_signal_object["itemtype"] = signals_common.sig_type.colour_light.value
+default_signal_object["itemsubtype"] = signals_colour_lights.signal_sub_type.four_aspect.value
 default_signal_object["orientation"] = 0 
 default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
@@ -415,8 +414,7 @@ def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update (delete and re-draw) a Signal object on the schematic. Called
-# when the object is first created or after the object attributes have been updated.
+# Function to to update a signal object after a configuration change
 #------------------------------------------------------------------------------------
 
 def update_signal(object_id, new_object_configuration):
