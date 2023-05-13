@@ -487,19 +487,17 @@ def load_audio_file(audio_filename):
         try:
             with importlib.resources.path ('model_railway_signals.library.resources',audio_filename) as audio_file:
                 audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_file))
-        except Exception as exception:
+        except:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio resource file '"+str(audio_filename)+"'")
-            logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
+            logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'")       
     else:        
         try:
             audio_object = simpleaudio.WaveObject.from_wave_file(str(audio_filename))
-        except Exception as exception:
+        except:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio file '"+str(audio_filename)+"'")
-            logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'"+
-                           " \nReported Exception: "+str(exception))       
+            logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'")       
     return(audio_object)
 
 # --------------------------------------------------------------------------------

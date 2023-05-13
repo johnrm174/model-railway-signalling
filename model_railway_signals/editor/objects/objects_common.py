@@ -12,12 +12,10 @@
 #    point_exists (item_id:int) - Common function to see if a given item exists
 #    section_exists (item_id:int) - Common function to see if a given item exists
 #    instrument_exists (item_id:int) - Common function to see if a given item exists
-#    line_exists (item_id:int) - Common function to see if a given item exists
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
-#    line(item_id:int) - helper function to find the object Id by Item ID
 #
 # Objects intended to be accessed directly by other editor modules:
 #    object_type - Enumeration type for the supported objects
@@ -26,7 +24,6 @@
 #    point_index - for iterating through all the point objects
 #    instrument_index - for iterating through all the instrument objects
 #    section_index - for iterating through all the section objects
-#    line_index - for iterating through all the line objects
 #    canvas_width, canvas_height, canvas_grid - for creating/pasting objects
 #    canvas - global reference to the Tkinter drawing object
 #
@@ -66,7 +63,6 @@ signal_index:dict={}
 point_index:dict={}
 instrument_index:dict={}
 section_index:dict={}
-line_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
@@ -76,7 +72,6 @@ def signal(ID:int): return (signal_index[str(ID)])
 def point(ID:int): return (point_index[str(ID)])
 def instrument(ID:int): return (instrument_index[str(ID)])
 def section(ID:int): return (section_index[str(ID)])
-def line(ID:int): return (line_index[str(ID)])
 
 #------------------------------------------------------------------------------------
 # Simple functions to test if a particular item_id already exists (for an item_type)
@@ -86,7 +81,6 @@ def signal_exists(ID:int): return (str(ID) in signal_index.keys())
 def point_exists(ID:int): return (str(ID) in point_index.keys())
 def instrument_exists(ID:int): return (str(ID) in instrument_index.keys())
 def section_exists(ID:int): return (str(ID) in section_index.keys())
-def line_exists(ID:int): return (str(ID) in line_index.keys())
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
@@ -110,15 +104,13 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 # Also calls the run_layout.initialise function to set the tkinter canvas object
 #------------------------------------------------------------------------------------
 
-root = None
 canvas = None
 canvas_width = 0
 canvas_height = 0
 canvas_grid = 0
 
-def initialise (root_object,canvas_object, width:int, height:int, grid:int):
-    global canvas, root
-    root = root_object
+def initialise (canvas_object, width:int, height:int, grid:int):
+    global canvas
     canvas = canvas_object
     update_canvas(canvas_width, canvas_height, grid)
     run_layout.initialise(canvas)

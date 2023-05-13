@@ -53,6 +53,7 @@ from .. import run_layout
 
 default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
+default_section_object["itemid"] = 0
 default_section_object["defaultlabel"] = "XXXXX"
 default_section_object["label"] = default_section_object["defaultlabel"]
 default_section_object["state"] = False
@@ -148,7 +149,8 @@ def remove_references_to_section(deleted_sec_id:int):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to to update asection object after a configuration change
+# Function to update (delete and re-draw) a Track Section object on the schematic. Called
+# when the object is first created or after the object attributes have been updated.
 #------------------------------------------------------------------------------------
 
 def update_section(object_id, new_object_configuration):

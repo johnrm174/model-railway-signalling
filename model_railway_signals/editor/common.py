@@ -14,12 +14,10 @@
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
 #    selection_buttons() - combines 5 RadioButtons
-#    colour_selection() - Allows the colour of an item to be changed
 #    window_controls() - apply/ok/reset/cancel
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
-from tkinter import colorchooser
 
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
@@ -848,42 +846,6 @@ class selection_buttons():
 
     def get_value(self):
         return(self.value.get())
-
-#------------------------------------------------------------------------------------
-# Class for a common Colour selection UI element
-# Class instance functions to use externally are:
-#    "set_value" - will set the current value (integer 1-5)
-#    "get_value" - will return the last "valid" value (integer 1-5)
-#------------------------------------------------------------------------------------
-
-class colour_selection():
-    def __init__(self, parent_frame):
-        # Variable to hold the currently selected colour:
-        self.colour='black'
-        # Create a frame to hold the tkinter widgets
-        # The parent class is responsible for packing the frame
-        self.frame= Tk.LabelFrame(parent_frame,text="Colour")
-        # Create a sub frame for the UI elements to centre them
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
-        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour)
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.label2, "Currently selected colour")
-        self.B1 = Tk.Button(self.subframe, text="Change", command=self.update)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
-        
-    def update(self):
-        colour_code = colorchooser.askcolor(parent=self.frame, title ="Select Colour")
-        self.colour = colour_code[1]
-        self.label2.config(bg=self.colour)
-        
-    def get_value(self):
-        return(self.colour)
-        
-    def set_value(self,colour:str):
-        self.colour = colour
-        self.label2.config(bg=self.colour)
 
 #------------------------------------------------------------------------------------
 # Class for the common Apply/OK/Reset/Cancel Buttons - will make external callbacks
