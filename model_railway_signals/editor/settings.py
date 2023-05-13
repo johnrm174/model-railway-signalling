@@ -25,6 +25,7 @@ default_settings["general"] = {}
 default_settings["general"]["filename"] = "new_layout.sig"
 default_settings["general"]["editmode"] = True
 default_settings["general"]["version"] = "Version 3.3.0"
+default_settings["general"]["info"] = ""
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -66,30 +67,47 @@ def get_all():
 
 def set_all(new_settings):
     global settings, logging
+    # List of warning messages to report
+    warning_messages = []
     # Defensive programming to populate the settings gracefully
     restore_defaults()
     # Populate an element at a time - and report any elements we don't recognise
     for group in new_settings:
         if group not in settings.keys():
-            logging.error("LOAD LAYOUT - Unexpected settings group '"+group+"'")
+            warning_message = "Unexpected settings group '"+group+"' - DISCARDED"
+            logging.warning("LOAD LAYOUT - "+warning_message)
+            warning_messages.append(warning_message)
         else:
             for element in new_settings[group]:
                 if element not in settings[group].keys():
-                    logging.error("LOAD LAYOUT - Unexpected settings element '"+group+":"+element+"'")
+                    warning_message = "Unexpected settings element '"+group+":"+element+"' - DISCARDED"
+                    logging.warning("LOAD LAYOUT - "+warning_message)
+                    warning_messages.append(warning_message)
                 else:
                     settings[group][element] = new_settings[group][element]
     # Now report any elements missing from the new configuration - intended to provide a
     # level of backward capability (able to load old config files into an extended config
     for group in settings:
         if group not in new_settings.keys():
-            logging.warning("LOAD LAYOUT - Missing settings group '"+group+"'")
+            warning_message = ("Missing settings group: '"+group+"' - Asigning default values:")
+            logging.warning("LOAD LAYOUT - "+warning_message)
+            warning_messages.append(warning_message)
+            for element in default_settings[group]:
+                warning_message = ("Missing settings element '"+group+":"+element+
+                    "' - Asigning default value '"+ str(default_settings[group][element])+"'")
+                logging.warning("LOAD LAYOUT - "+warning_message)
+                warning_messages.append(warning_message)
         else:
             for element in settings[group]:
                 if element not in new_settings[group].keys():
-                    logging.warning("LOAD LAYOUT - Missing settings element '"+group+":"+element+"'")
+                    warning_message= ("Missing settings element '"+group+":"+element+
+                        "' - Assigning Default Value '"+ default_settings[group][element]+"'")
+                    logging.warning("LOAD LAYOUT - "+warning_message)
+                    warning_messages.append(warning_message)
     # We always maintain the current version of the application
     settings["general"]["version"] = default_settings["general"]["version"]
-    return()
+    # Return the list of warning messages (for display to the user)
+    return(warning_messages)
     
 #------------------------------------------------------------------------------------
 # Functions to set/get the general settings
