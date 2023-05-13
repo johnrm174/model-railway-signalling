@@ -30,6 +30,7 @@
 #    objects_instruments.default_instrument_object - The dictionary of default values for the object
 #    objects_lines.create_line() - Create a default object on the schematic
 #    objects_lines.delete_line(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_lines.update_line(obj_id,new_obj) - Update the configuration of an existing line object
 #    objects_lines.paste_line(object) - Paste a copy of an object to create a new one (returns new object_id)
 #    objects_lines.delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_lines.redraw_line_object(object_id) - Redraw the object on the canvas following an update
@@ -106,6 +107,8 @@ def redraw_all_objects(create_new_bbox:bool):
             objects_sections.redraw_section_object(object_id)
         elif this_object_type == objects_common.object_type.instrument:
             objects_instruments.redraw_instrument_object(object_id)
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
     return()
 
 #------------------------------------------------------------------------------------
@@ -118,15 +121,17 @@ def redraw_all_objects(create_new_bbox:bool):
 def reset_all_schematic_indexes():
     for object_id in objects_common.schematic_objects:
         this_object_type = objects_common.schematic_objects[object_id]["item"]
-        this_object_id = objects_common.schematic_objects[object_id]["itemid"]
+        this_object_item_id = objects_common.schematic_objects[object_id]["itemid"]
         if this_object_type == objects_common.object_type.signal:                
-            objects_common.signal_index[str(this_object_id)] = object_id
+            objects_common.signal_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.point:
-            objects_common.point_index[str(this_object_id)] = object_id
+            objects_common.point_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.section:
-            objects_common.section_index[str(this_object_id)] = object_id
+            objects_common.section_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.instrument:
-            objects_common.instrument_index[str(this_object_id)] = object_id
+            objects_common.instrument_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.line:
+            objects_common.line_index[str(this_object_item_id)] = object_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -189,8 +194,6 @@ def restore_schematic_state():
     reset_all_schematic_indexes()
     # Re-draw all objects, ensuring a new bbox is created for each object
     redraw_all_objects(create_new_bbox=True)
-    # Ensure all track sections are brought forward on the schematic (in front of any lines)
-    bring_track_sections_to_the_front()
     # Recalculate instrument interlocking tables as a 'belt and braces' measure (on the 
     # basis they would have successfully been restored with the rest of the snapshot)
     objects_points.reset_point_interlocking_tables()
@@ -267,7 +270,7 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
 def update_object(object_id, new_object):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
-        pass
+        objects_lines.update_line(object_id, new_object)
     elif type_of_object == objects_common.object_type.signal:
         objects_signals.update_signal(object_id, new_object)
     elif type_of_object == objects_common.object_type.point:
@@ -276,6 +279,8 @@ def update_object(object_id, new_object):
         objects_sections.update_section(object_id, new_object)
     elif type_of_object == objects_common.object_type.instrument:
         objects_instruments.update_instrument(object_id, new_object)
+    # Ensure all track sections are brought forward on the schematic (in front of any lines)
+    bring_track_sections_to_the_front()
     # save the current state (for undo/redo)
     save_schematic_state()
     # Process any layout changes (interlocking, signal ahead etc)
@@ -438,8 +443,13 @@ def paste_objects():
 
 def set_all(new_objects):
     global logging
-    # List of error messages to report
-    warning_messages = ""
+    ##################################################################################
+    ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+    one_up_line_id = 1
+    ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+    ##################################################################################
+    # List of warning messages to report
+    warning_messages = []
     # For each loaded object, create a new default object of the same type
     # and then copy across each element in turn. This is defensive programming
     # to populate the objects gracefully whilst handling changes to an object
@@ -462,31 +472,44 @@ def set_all(new_objects):
             default_object = objects_instruments.default_instrument_object
         else:
             default_object = {}
-            logging.warning("LOAD LAYOUT - "+new_object_type+" "+item_id+" - Unrecognised object type: '"+new_object_type+"'")
-            warning_messages += (new_object_type+" "+item_id+" - Unrecognised object type - DISCARDED\n")
+            warning_message = (new_object_type+" "+str(item_id)+
+                            " - Unrecognised object type - DISCARDED")
+            logging.warning("LOAD LAYOUT - "+warning_message)
+            warning_messages.append(warning_message)
         # Populate each element at a time and report any elements not recognised
         if default_object != {}:
             objects_common.schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
                 if element not in default_object.keys():
-                    logging.warning("LOAD LAYOUT - "+new_object_type+" "+item_id+" - Unexpected element: '"+element+"'")
-                    warning_messages += (new_object_type+" "+item_id+" - Unexpected element: '"+element+"'\n")
+                    warning_message = (new_object_type+" "+str(item_id)+
+                            " - Unexpected element: '"+element+"' - DISCARDED")
+                    logging.warning("LOAD LAYOUT - "+warning_message)
+                    warning_messages.append(warning_message)
+                ##################################################################################
+                ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+                elif new_object_type == objects_common.object_type.line and element == "itemid":                    
+                    item_id = one_up_line_id
+                    objects_common.schematic_objects[object_id][element] = one_up_line_id
+                    warning_message = (new_object_type+
+                            " ? - Missing Item ID - assigning default ID '"+str(item_id)+"'")
+                    logging.warning("LOAD LAYOUT - "+warning_message)
+                    warning_messages.append(warning_message)
+                    one_up_line_id = one_up_line_id + 1
+                ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+                ##################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]        
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
                 if element not in new_objects[object_id].keys():
-                    logging.warning("LOAD LAYOUT - "+new_object_type+" "+item_id+" - Missing element: '"+element+"'")
-                    warning_messages += (new_object_type+" "+item_id+" - Missing element: '"+element+"'\n")
-                    #############################################################################################
-                    # Set any mandatory elements - to prevent the application from breaking
-                    # When loading files saved by old versions of the application (this specifically
-                    # for the block instrument type breaking change from Release 3.2.0 to 3.3.0
-                    if element == "itemtype": objects_common.schematic_objects[object_id][element] = 1
-                    #############################################################################################
+                    default_value = objects_common.schematic_objects[object_id][element]
+                    warning_message = (new_object_type+" "+str(item_id)+" - Missing element: '"
+                            +element+"' - Asigning default values: "+str(default_value))
+                    logging.warning("LOAD LAYOUT - "+warning_message)
+                    warning_messages.append(warning_message)
     # Report the error messages
-    if warning_messages != "": display_warnings(warning_messages)
+    if warning_messages != []: display_warnings(warning_messages)
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
@@ -514,20 +537,27 @@ def get_all():
 #------------------------------------------------------------------------------------
 
 class display_warnings():
-    def __init__(self, warnings:str):
-        # Create the top level window for the canvas settings
-        winx = objects_common.canvas.winfo_rootx() + 250
-        winy = objects_common.canvas.winfo_rooty() + 50
-        self.window = Tk.Toplevel(objects_common.canvas)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Load Warnings")
-        self.window.attributes('-topmost',True)
+    def __init__(self, warnings):
+        # Create the top level window for the Warning Popup window
+        self.window = Tk.Toplevel(objects_common.root)
+        self.window.title("File Load Warnings")
         self.label1 = Tk.Label(self.window, font="Helvetica 12 bold", text=
-                    "WARNING - Layout file generated by a different\n"+
-                    "version of the application - Check configuration")
+                "Layout file generated by a different version of the application\n"+
+                "Check reported warnings and re-save the layout file")
         self.label1.pack(padx=2, pady=2)
-        self.label2 = Tk.Label(self.window, text=warnings, justify=Tk.LEFT)
-        self.label2.pack(padx=2, pady=2)
+        # Concatenate the warning messages together for display
+        warning_messages=""
+        for warning in warnings: warning_messages = warning_messages + warning + "\n"
+        # Create a frame for the error messages and the scrollbar
+        self.frame = Tk.Frame(self.window)
+        self.frame.pack()
+        self.text = Tk.Text(self.frame,height=20)
+        self.text.insert(Tk.END,warning_messages)
+        self.text.pack(side=Tk.LEFT,padx=2, pady=2)
+        self.vbar = Tk.Scrollbar(self.frame,orient=Tk.VERTICAL,command=self.text.yview)
+        self.vbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+        self.text['yscrollcommand'] =self.vbar.set
+        self.text.config(state="disabled")
         # Create the close button 
         self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
         self.B1.pack(padx=2, pady=2)
