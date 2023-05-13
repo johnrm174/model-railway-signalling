@@ -61,8 +61,7 @@ from .. import run_layout
 
 default_point_object = copy.deepcopy(objects_common.default_object)
 default_point_object["item"] = objects_common.object_type.point
-default_point_object["itemid"] = 0
-default_point_object["itemtype"] = None
+default_point_object["itemtype"] = points.point_type.LH.value
 default_point_object["orientation"] = 0
 default_point_object["colour"] = "black"
 default_point_object["alsoswitch"] = 0
@@ -177,8 +176,7 @@ def update_downstream_points(object_id):
 
 
 #------------------------------------------------------------------------------------
-# Function to update (delete and re-draw) a Point object on the schematic. Called
-# when the object is first created or after the object attributes have been updated.
+# Function to to update a point object after a configuration change
 #------------------------------------------------------------------------------------
 
 def update_point(object_id, new_object_configuration):
