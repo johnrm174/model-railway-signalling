@@ -7,6 +7,7 @@
 #    state_box(entry)
 #    entry_box(entry)
 #    integer_entry_box(entry_box)
+#    scrollable_text_box
 #    dcc_entry_box(integer_entry_box)
 #    int_item_id_entry_box (integer_entry_box)
 #    str_item_id_entry_box(entry_box)
@@ -859,10 +860,10 @@ class selection_buttons():
 class colour_selection():
     def __init__(self, parent_frame):
         # Variable to hold the currently selected colour:
-        self.colour='black'
+        self.colour ='black'
         # Create a frame to hold the tkinter widgets
         # The parent class is responsible for packing the frame
-        self.frame= Tk.LabelFrame(parent_frame,text="Colour")
+        self.frame = Tk.LabelFrame(parent_frame,text="Colour")
         # Create a sub frame for the UI elements to centre them
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
@@ -927,5 +928,80 @@ class window_controls():
         
     def cancel(self):
         self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for a scrollable text box - can be editable (e.g. entering layout info)
+# or non-editable (e.g. displaying a list of warnings)- can also be configured
+# to re-size automatically (within the specified limits) as text is entered.
+# The text box will 'fit' to the content unless max or min dimentions are
+# specified for the width and/or height - then the scrollbars can be used.
+#------------------------------------------------------------------------------------
+
+class scrollable_text_box():
+    def __init__(self, parent_window, max_height:int=None, min_height:int=None, editable:bool=False,
+                 max_width:int=None, min_width:int=None, auto_resize:bool=False):
+        # Store the parameters we need
+        self.min_height = min_height
+        self.max_height = max_height
+        self.min_width = min_width
+        self.max_width = max_width
+        self.editable = editable
+        self.auto_resize = auto_resize
+        self.text=""
+        # Create a frame for the text widget and scrollbars
+        # Packing the frame is the responsibility of the calling function
+        self.frame = Tk.Frame(parent_window)
+        # Create a subframe for the text and scrollbars
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack(fill=Tk.BOTH, expand=True)
+        # Create the text widget and vertical scrollbars in the subframe
+        self.text_box = Tk.Text(self.subframe, wrap=Tk.NONE)
+        self.text_box.insert(Tk.END,self.text)
+        hbar = Tk.Scrollbar(self.subframe, orient=Tk.HORIZONTAL)
+        hbar.pack(side=Tk.BOTTOM, fill=Tk.X)
+        hbar.config(command=self.text_box.xview)
+        vbar = Tk.Scrollbar(self.subframe, orient=Tk.VERTICAL)
+        vbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+        vbar.config(command=self.text_box.yview)
+        self.text_box.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+        self.text_box.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+        # configure the window for editable or non-editable
+        if not self.editable: self.text_box.config(state="disabled")
+        # Set up the callback for auto re-size (if specified)
+        if self.auto_resize: self.text_box.bind("<Key>", self.resize_text_box)
+        # Set the initial size for the text box
+        self.resize_text_box()
+
+    def resize_text_box(self, event=None):
+        # Calculate the height and width of the text
+        self.text = self.text_box.get("1.0",Tk.END)
+        list_of_lines = self.text.splitlines()
+        number_of_lines = len(list_of_lines)
+        max_line_length = 0
+        for line in list_of_lines:
+            if len(line) > max_line_length: max_line_length = len(line)
+        # Apply the specified size constraints
+        if self.min_height is not None and number_of_lines < self.min_height:
+            number_of_lines = self.min_height
+        if self.max_height is not None and number_of_lines > self.max_height:
+            number_of_lines = self.max_height
+        if self.min_width is not None and max_line_length < self.min_width:
+            max_line_length = self.min_width
+        if self.max_width is not None and max_line_length > self.max_width:
+            max_line_length = self.max_width
+        # re-size the text box
+        self.text_box.config(height=number_of_lines+1, width=max_line_length+1)
+        
+    def set_value(self, text:str):
+        self.text = text
+        if not self.editable: self.text_box.config(state="normal")
+        self.text_box.delete("1.0",Tk.END)
+        self.text_box.insert(Tk.INSERT, self.text)
+        if not self.editable: self.text_box.config(state="disabled")
+        self.resize_text_box()
+    
+    def get_value(self):
+        self.text = self.text_box.get("1.0",Tk.END)
+        return(self.text)
 
 ###########################################################################################
