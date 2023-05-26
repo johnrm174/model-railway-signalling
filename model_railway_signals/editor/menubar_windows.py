@@ -4,6 +4,7 @@
 # Classes (pop up windows) called from the main editor module menubar selections
 #    display_help(root)
 #    display_about(root)
+#    edit_layout_info()
 #    edit_mqtt_settings(root)
 #    edit_sprog_settings(root)
 #    edit_logging_settings(root)
@@ -16,9 +17,10 @@
 #    settings.set_canvas(width,height,grid) - Save the new settings
 #    settings.get_logging() - Get the current settings (for editing)
 #    settings.set_logging(level) - Save the new settings
+#    settings.get_general() - Get the current settings (for info/editing)
+#    settings.set_general() - Save the new settings (layout info)
 #    settings.get_sprog() - Get the current settings (for editing)
 #    settings.set_sprog(params) - Save the new settings
-#    settings_get_version() - For the 'About' Window
 #
 # Uses the following common editor UI elements:
 #    common.selection_buttons
@@ -118,8 +120,9 @@ class display_help():
 # Class for the "About" window- uses a hyperlink to go to the github repo
 #------------------------------------------------------------------------------------
 
+# The version is the third parameter provided by 'get_general'
 about_text = """
-Model Railway Signals ("""+settings.get_version()+""")
+Model Railway Signals ("""+settings.get_general()[2]+""")
 
 An application for designing and developing fully interlocked and automated model railway
 signalling systems with DCC control of signals and points via the SPROG Command Station.
@@ -156,6 +159,45 @@ class display_about():
 
     def callback(self,event):
         webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
+
+#------------------------------------------------------------------------------------
+# Class for the Edit Layout Information window
+#------------------------------------------------------------------------------------
+
+class edit_layout_info():
+    def __init__(self, root_window):
+        self.root_window = root_window
+        # Create the top level window for application help
+        winx = self.root_window.winfo_rootx() + 250
+        winy = self.root_window.winfo_rooty() + 20
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("Layout Information")
+        self.window.attributes('-topmost',True)
+        # Create the srollable textbox to display the text. We specify
+        # the max height/width (in case the text grows in the future) and also
+        # the min height/width (to give the user something to start with)
+        self.text = common.scrollable_text_box(self.window, max_height=30,max_width=100,
+                min_height=10, min_width=40, editable=True, auto_resize=True)
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self,
+                                self.load_state, self.save_state)
+        # Weneed to re-pack the window buttons at thebottom and then pack the text
+        # frame - so the buttons remain visible if the user re-sizes the window
+        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+        self.text.frame.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+        # Load the initial UI state
+        self.load_state()
+        
+    def load_state(self, parent_object=None):
+        # Parent object is passed by the callback - not used here
+        # The version is the forth parameter provided by 'get_general'
+        self.text.set_value(settings.get_general()[3])
+        
+    def save_state(self, parent_object, close_window:bool):
+        # Parent object is passed by the callback - not used here
+        settings.set_general(info=self.text.get_value())
+        if close_window: self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT configuration window

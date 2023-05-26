@@ -104,6 +104,7 @@ class main_menubar:
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar_windows.display_help(self.root))
         self.help_menu.add_command(label =" About...", command=lambda:menubar_windows.display_about(self.root))
+        self.help_menu.add_command(label =" Info...", command=lambda:menubar_windows.edit_layout_info(self.root))
         self.mainmenubar.add_cascade(label = "Help  ", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
@@ -114,7 +115,8 @@ class main_menubar:
         # Initialise the editor configuration at startup
         self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
-        parser = ArgumentParser(description =  "Model railway signalling "+settings.get_version())
+        # The version is the third parameter provided by 'get_general'
+        parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
         parser.add_argument("-f","--file",dest="filename",help="schematic file to load on startup",metavar="FILE")
         args = parser.parse_args()
         if args.filename is not None: self.load_schematic(args.filename)
