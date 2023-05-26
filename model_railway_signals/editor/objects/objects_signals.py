@@ -707,7 +707,6 @@ def delete_signal(object_id):
     # Soft delete the associated library objects from the canvas
     delete_signal_object(object_id)
     # Remove any references to the signal from other signals
-    # Interlocking tables, signal ahead, timed signal sequences
     remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
