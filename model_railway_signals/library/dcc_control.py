@@ -227,9 +227,6 @@ def map_dcc_signal (sig_id:int,
                     NONE = [[0,False],],
                     THEATRE = [["#", [[0,False],]],],
                     subsidary:int=0):
-    
-    global logging
-    
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a colour light signal")
     if sig_mapped(sig_id):
@@ -272,7 +269,6 @@ def map_dcc_signal (sig_id:int,
                 str(signals_common.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
                 str(signals_common.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-        
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -285,7 +281,6 @@ def map_traintech_signal (sig_id:int,
                           route_address:int = 0,
                           theatre_route = "NONE",
                           feather_route = signals_common.route_type.NONE):
-
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Train Tech Signal")
     if sig_mapped(sig_id):
@@ -324,13 +319,10 @@ def map_traintech_signal (sig_id:int,
                 str(signals_common.route_type.RH2) : [[route_address,False]],                          # Specific to Colour_Light Mappingss
                 str(signals_common.route_type.MAIN) : [[route_address,False]],                         # Specific to Colour_Light Mappings 
                 str(signals_common.route_type.NONE) : [[route_address,False]] }                        # Specific to Colour_Light Mappings
-        
         # Configure the DCC Command  for the feather route indicator that we want to configured
         new_dcc_mapping[str(feather_route)] = [[route_address,True]]
-        
         # Finally save the DCC mapping into the dictionary of mappings 
         dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-        
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -360,7 +352,6 @@ def map_semaphore_signal (sig_id:int,
                           rh1_subsidary:int = 0,
                           rh2_subsidary:int = 0,
                           THEATRE = [["#", [[0,False],]],]):
-
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
     if sig_mapped(sig_id):
@@ -378,7 +369,6 @@ def map_semaphore_signal (sig_id:int,
             if entry < 0 or entry > 2047:
                 logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry)+" - must be between 1 and 2047")
                 addresses_valid = False
-        
         if addresses_valid:
             # Create the DCC Mapping entry for the signal.
             new_dcc_mapping = {
@@ -396,7 +386,6 @@ def map_semaphore_signal (sig_id:int,
                 "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
                 "rh2_subsidary" : rh2_subsidary }            # Finally save the DCC mapping into the dictionary of mappings 
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -406,9 +395,6 @@ def map_semaphore_signal (sig_id:int,
 #-----------------------------------------------------------------------------------------
 
 def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
-    
-    global logging
-    
     logging.info ("Point "+str(point_id)+": Creating DCC Address mapping")
     # Do some basic validation on the parameters we have been given
     if point_mapped(point_id):
@@ -423,17 +409,13 @@ def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
             "address"  : address,
             "reversed" : state_reversed }
         dcc_point_mappings[str(point_id)] = new_dcc_mapping
-        
     return ()
 
 #-----------------------------------------------------------------------------------------
 # Function to send the appropriate DCC command to set the state of a DCC Point
 #------------------------------------------------------------------------------------------
 
-def update_dcc_point(point_id:int, state:bool):
-    
-    global logging
-    
+def update_dcc_point(point_id:int, state:bool):    
     if point_mapped(point_id):
         logging.debug ("Point "+str(point_id)+": Generating DCC Bus commands to switch point")
         # Retrieve the DCC mappings for our point
@@ -449,9 +431,6 @@ def update_dcc_point(point_id:int, state:bool):
 #------------------------------------------------------------------------------------------
 
 def update_dcc_signal_aspects(sig_id: int):
-    
-    global logging
-    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for Colour Light Signal Types
@@ -479,10 +458,7 @@ def update_dcc_signal_aspects(sig_id: int):
 # signals where this subsidary aspect is normally mapped to a single DCC Address
 #------------------------------------------------------------------------------------------
             
-def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidary"):
-        
-    global logging
-    
+def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidary"):    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for anything other than the "main_subsidary" for Semaphore Signal Types
@@ -515,8 +491,6 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
             
 def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
                               signal_change:bool=False,sig_at_danger:bool=False):
-    global logging
-    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for Colour Light Signal Types
@@ -556,9 +530,7 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
 #------------------------------------------------------------------------------------------
             
 def update_dcc_signal_theatre (sig_id:int, character_to_display, 
-                               signal_change:bool=False,sig_at_danger:bool=False):
-    global logging
-    
+                               signal_change:bool=False,sig_at_danger:bool=False):    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal. We don't need to validate the mapping type
         # as Theatre route displays are supported by both Colour Light and Semaphore signal types 
@@ -613,7 +585,6 @@ def subscribe_to_dcc_command_feed (*nodes:str):
 #-----------------------------------------------------------------------------------------------
 
 def handle_mqtt_dcc_accessory_short_event (message):    
-    global logging
     if "sourceidentifier" in message.keys() and "dccaddress" in message.keys() and "dccstate" in message.keys():
         source_node = message["sourceidentifier"]
         dcc_address = message["dccaddress"]
@@ -649,7 +620,6 @@ def publish_accessory_short_event(address:int,active:bool):
 # --------------------------------------------------------------------------------
 
 def delete_point_mapping(point_id:int):
-    global points
     if point_mapped(point_id):
         del dcc_point_mappings[str(point_id)]
     return()
@@ -660,7 +630,6 @@ def delete_point_mapping(point_id:int):
 # --------------------------------------------------------------------------------
 
 def delete_signal_mapping(sig_id:int):
-    global points
     if sig_mapped(sig_id):
         del dcc_signal_mappings[str(sig_id)]
     return()

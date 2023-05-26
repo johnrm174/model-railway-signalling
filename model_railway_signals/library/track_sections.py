@@ -115,7 +115,6 @@ def section_exists(section_id:int):
 # -------------------------------------------------------------------------
 
 def section_button_event (section_id:int):
-    global logging
     logging.info ("Section "+str(section_id)+": Track Section Toggled *****************************************************")
     toggle_section(section_id)
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
@@ -131,7 +130,6 @@ def section_button_event (section_id:int):
 
 def toggle_section (section_id:int):
     global sections
-    global logging
     if sections[str(section_id)]["occupied"]:
         # section is on
         logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label \'"
@@ -230,7 +228,6 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     label:str = "OCCUPIED",
                     editable:bool = True):
     global sections
-    global logging
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
@@ -276,7 +273,6 @@ def create_section (canvas, section_id:int, x:int, y:int,
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
         # be published if the MQTT interface has been configured for publishing updates for this track section
         send_mqtt_section_updated_event(section_id) 
-
     return()
 
 # -------------------------------------------------------------------------
@@ -284,7 +280,6 @@ def create_section (canvas, section_id:int, x:int, y:int,
 # -------------------------------------------------------------------------
 
 def section_occupied (section_id:Union[int,str]):
-    global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_occupied - Section does not exist")
@@ -300,7 +295,6 @@ def section_occupied (section_id:Union[int,str]):
 # -------------------------------------------------------------------------
 
 def section_label (section_id:Union[int,str]):
-    global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_label - Section does not exist")
@@ -314,7 +308,6 @@ def section_label (section_id:Union[int,str]):
 # -------------------------------------------------------------------------
 
 def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
-    global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": set_section_occupied - Section does not exist")
@@ -342,7 +335,6 @@ def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
 # -------------------------------------------------------------------------
 
 def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
-    global logging
     # Validate the section exists
     if not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section does not exist")
@@ -389,7 +381,6 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_sections_to_publish_state(*sec_ids:int):    
-    global logging
     global list_of_sections_to_publish
     for sec_id in sec_ids:
         logging.info("MQTT-Client: Configuring section "+str(sec_id)+" to publish state changes via MQTT broker")
@@ -404,7 +395,6 @@ def set_sections_to_publish_state(*sec_ids:int):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_section_updated_event(message):
-    global logging
     global sections
     if "sourceidentifier" in message.keys() and "occupied" in message.keys() and "labeltext" in message.keys():
         section_identifier = message["sourceidentifier"]

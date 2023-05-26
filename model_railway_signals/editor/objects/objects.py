@@ -440,7 +440,6 @@ def paste_objects():
 #------------------------------------------------------------------------------------
 
 def set_all(new_objects):
-    global logging
     ##################################################################################
     ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
     one_up_line_id = 1

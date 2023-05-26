@@ -171,25 +171,21 @@ def instrument_exists(block_id:int):
 # --------------------------------------------------------------------------------
 
 def occup_button_event (block_id:int):
-    global logging
     logging.info ("Block Instrument "+str(block_id)+": Occup button event ***********************************************")
     set_section_occupied(block_id)
     return()
 
 def clear_button_event (block_id:int):
-    global logging
     logging.info ("Block Instrument "+str(block_id)+": Clear button event ***********************************************")
     set_section_clear(block_id)
     return()
 
 def blocked_button_event (block_id:int):
-    global logging
     logging.info ("Block Instrument "+str(block_id)+": Blocked button event *********************************************")
     set_section_blocked(block_id)
     return()
 
 def telegraph_key_button (block_id:int):
-    global logging
     logging.debug ("Block Instrument "+str(block_id)+": Telegraph key operated ************************************")
     # Provide a visual indication of the key being pressed
     instruments[str(block_id)]["bellbutton"].config(relief="sunken")
@@ -213,7 +209,6 @@ def telegraph_key_button (block_id:int):
 # --------------------------------------------------------------------------------
 
 def ring_section_bell (block_id:int):
-    global logging
     logging.debug ("Block Instrument "+str(block_id)+": Ringing Bell")
     # Provide a visual indication of an incoming bell
     instruments[str(block_id)]["bellbutton"].config(bg="yellow")
@@ -232,7 +227,6 @@ def ring_section_bell (block_id:int):
 
 def set_repeater_blocked (block_id:int,make_callback:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists(block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE BLOCKED - Block instrument doesn't exist")
@@ -264,7 +258,6 @@ def set_repeater_blocked (block_id:int,make_callback:bool=True):
 
 def set_repeater_clear (block_id:int,make_callback:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE CLEAR - Block instrument doesn't exist")
@@ -296,7 +289,6 @@ def set_repeater_clear (block_id:int,make_callback:bool=True):
 
 def set_repeater_occupied (block_id:int,make_callback:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to TRAIN ON LINE - Block instrument doesn't exist")
@@ -330,7 +322,6 @@ def set_repeater_occupied (block_id:int,make_callback:bool=True):
 
 def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE BLOCKED - Block instrument doesn't exist")
@@ -376,7 +367,6 @@ def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
 
 def set_section_clear (block_id:int,update_remote_instrument:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE CLEAR - Block instrument doesn't exist")
@@ -422,7 +412,6 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
 
 def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
     global instruments
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to TRAIN ON LINE - Block instrument doesn't exist")
@@ -516,8 +505,6 @@ def create_block_instrument (canvas,
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
     global instruments
-    global audio_enabled
-    global logging
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
     # Find and store the root window (when the first block instrument is created)
     if common.root_window is None: common.find_root_window(canvas)
@@ -636,7 +623,6 @@ def create_block_instrument (canvas,
 # --------------------------------------------------------------------------------
 
 def block_section_ahead_clear(block_id:int):
-    global logging
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": block_section_ahead_clear - Block instrument doesn't exist")
@@ -664,7 +650,6 @@ def subscribe_to_remote_instrument(block_identifier:str):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_instrument_updated_event(message):
-    global logging
     if "instrumentid" in message.keys() and "sectionstate" in message.keys():
         block_identifier = message["instrumentid"]
         section_state = message["sectionstate"]
@@ -676,7 +661,6 @@ def handle_mqtt_instrument_updated_event(message):
     return()
 
 def handle_mqtt_ring_section_bell_event(message):
-    global logging
     if "instrumentid" in message.keys():
         block_identifier = message["instrumentid"]
         node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)

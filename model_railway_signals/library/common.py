@@ -40,9 +40,7 @@ shutdown_initiated = False
 #-------------------------------------------------------------------------
 
 def on_closing(ask_to_save_state=True):
-    global logging
     global shutdown_initiated
-    global root_window
     if ask_to_save_state: confirm_quit = file_interface.save_state_and_quit()
     else: confirm_quit = True 
     if confirm_quit:       
@@ -112,7 +110,6 @@ def handle_callback_in_tkinter_thread(*args):
     return()
     
 def execute_function_in_tkinter_thread(callback_function):
-    global logging
     event_queue.put(callback_function)
     if root_window is not None:
         root_window.event_generate("<<ExtCallback>>", when="tail")

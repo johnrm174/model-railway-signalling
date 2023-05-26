@@ -193,7 +193,6 @@ def find_signal_behind(signal_object):
 #------------------------------------------------------------------------------------
 
 def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
-    global logging
     home_signal_at_danger = False
     if recursion_level < 20:
         signal_ahead_object = find_signal_ahead(signal_object)
@@ -727,7 +726,6 @@ def update_all_mirrored_sections():
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id,callback_type):
-    global logging
     global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
@@ -824,7 +822,6 @@ def schematic_callback(item_id,callback_type):
 
 def initialise_layout():
     global editing_enabled
-    global logging
     logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
     logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()

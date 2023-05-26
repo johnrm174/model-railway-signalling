@@ -96,7 +96,6 @@ output_buffer = queue.Queue()
 
 def thread_to_send_buffered_data ():
     global transmit_delay
-    global logging
     global debug
     while True:
         command_string = output_buffer.get()
@@ -119,7 +118,6 @@ def thread_to_send_buffered_data ():
 def thread_to_read_received_data ():
     global track_power_on
     global service_mode_status
-    global logging
     global rstat_response
     global qnn_response
     global debug
@@ -229,7 +227,6 @@ def thread_to_read_received_data ():
 #------------------------------------------------------------------------------
 
 def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
-    global logging
     global can_bus_id
     if (mj_pri < 0 or mj_pri > 2):
         logging.error("CBUS Command - Invalid Major Priority "+str(mj_pri))
@@ -263,7 +260,6 @@ def send_cbus_command (mj_pri:int, min_pri:int, op_code:int, *data_bytes:int):
 def initialise_pi_sprog (port_name:str="/dev/serial0",
                          baud_rate:int = 115200,
                          dcc_debug_mode:bool = False):
-    global logging
     global debug
     global threads_started
     # Assign the global "enhanced debugging" flag
@@ -353,7 +349,6 @@ def query_node_number():
 #------------------------------------------------------------------------------
 
 def sprog_shutdown():
-    global logging
     # First switch off the DCC bus supply
     if track_power_on: request_dcc_power_off()
     # Now close the comms port
@@ -372,7 +367,6 @@ def sprog_shutdown():
 
 def request_dcc_power_on():
     global track_power_on
-    global logging
     track_power_on = None    
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
@@ -397,7 +391,6 @@ def request_dcc_power_on():
 
 def request_dcc_power_off():
     global track_power_on
-    global logging
     track_power_on = None
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
@@ -422,7 +415,6 @@ def request_dcc_power_off():
 def send_accessory_short_event (address:int, active:bool):
     global pi_cbus_node
     global track_power_on
-    global logging
     if (address < 1 or address > 2047):
         logging.error ("Pi-SPROG: Invalid DCC short event accessory address: "+ str(address))
     # Only try to send the command if the PI-SPROG-3 has initialised correctly
@@ -448,7 +440,6 @@ def send_accessory_short_event (address:int, active:bool):
 def service_mode_write_cv (cv:int, value:int):
     global track_power_on
     global service_mode_status
-    global logging
     if (cv < 0 or cv > 1023):
         logging.error("Pi-SPROG: WCVS (Write CV in Service Mode) - Invalid CV "+str(cv))
     elif (value < 0 or value > 255):
@@ -513,7 +504,6 @@ def service_mode_write_cv (cv:int, value:int):
 
 def send_DCC_accessory_decoder_packet (address:int, active:bool, output_channel:int = 0, repeat:int = 3):
     global track_power_on
-    global logging
     if (address < 1 or address > 511):
         logging.info("Error: send_accessory_decoder_packet - Invalid address "+str(address))
     elif (output_channel < 0 or output_channel > 7):
@@ -557,7 +547,6 @@ def send_DCC_accessory_decoder_packet (address:int, active:bool, output_channel:
 
 def send_extended_DCC_accessory_decoder_packet (address:int, aspect:int, repeat:int = 3, alt_address = False):
     global track_power_on
-    global logging
     if (address < 1 or address > 2044):
         logging.info("Error: send_extended_DCC_accessory_decoder_packet - Invalid address "+str(address))
     elif (aspect < 0 or aspect > 31):

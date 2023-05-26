@@ -123,7 +123,6 @@ class main_menubar:
         
     # Common initialisation function (called on editor start or layout load or new layout)
     def initialise_editor(self):
-        global logging
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
         path, name = os.path.split(settings.get_general()[0])
@@ -271,7 +270,7 @@ class main_menubar:
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
-        global logging
+
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         file_loaded, layout_state = file_interface.load_schematic(filename)
@@ -355,7 +354,6 @@ class main_menubar:
 #------------------------------------------------------------------------------------
 
 def run_editor():
-    global logging
     # Create the Main Root Window
     root = Tk.Tk()
     # Create the menubar and editor canvas (canvas size will be set on creation)

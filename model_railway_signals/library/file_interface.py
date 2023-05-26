@@ -83,7 +83,6 @@ def load_layout_state(file_name:str=None,
                       load_file_dialog:bool=False,
                       save_file_dialog:bool=False,
                       ask_to_load_state:bool=True):
-    global logging
     global filename_used_for_load
     global save_as_option_enabled
     global layout_state
@@ -179,7 +178,6 @@ def load_layout_state(file_name:str=None,
 #-------------------------------------------------------------------------------------------------
 
 def save_state_and_quit(quit_application:bool=True):
-    global logging
     global filename_used_for_load
     global save_as_option_enabled
     global filename_used_for_save
@@ -284,7 +282,6 @@ def save_state_and_quit(quit_application:bool=True):
 #-------------------------------------------------------------------------------------------------
 
 def get_initial_item_state(layout_element:str,item_id:int):
-    global logging
     # Retrieve the DEFINITION of all the data items that are available
     sig_file_config = get_sig_file_config()
     # Check if the requested LAYOUT ELEMENT is a supported

@@ -338,7 +338,6 @@ import logging
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int,route:signals_common.route_type = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
@@ -360,7 +359,6 @@ def signal_clear (sig_id:int,route:signals_common.route_type = None):
 # -------------------------------------------------------------------------
 
 def signal_state (sig_id:Union[int,str]):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_state - Signal does not exist")
@@ -377,7 +375,6 @@ def signal_state (sig_id:Union[int,str]):
 # -------------------------------------------------------------------------
 
 def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": subsidary_clear - Signal does not exist")
@@ -401,7 +398,6 @@ def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -418,7 +414,6 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -437,7 +432,6 @@ def unlock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def lock_subsidary (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -458,7 +452,6 @@ def lock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -480,7 +473,6 @@ def unlock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -500,7 +492,6 @@ def set_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -521,7 +512,6 @@ def clear_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override_caution (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -546,7 +536,6 @@ def set_signal_override_caution (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override_caution (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -572,7 +561,6 @@ def clear_signal_override_caution (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal does not exist")
@@ -594,7 +582,6 @@ def toggle_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_subsidary - Signal does not exist")
@@ -622,7 +609,6 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_approach_control - Signal does not exist")
@@ -664,7 +650,6 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": clear_approach_control - Signal does not exist")  
@@ -691,7 +676,6 @@ def clear_approach_control (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
-    global logging
     # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
@@ -718,7 +702,6 @@ def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
 # -------------------------------------------------------------------------
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
@@ -757,7 +740,6 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
@@ -816,7 +798,6 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_state(*sig_ids:int):    
-    global logging
     for sig_id in sig_ids:
         logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish state changes via MQTT broker")
         # Add the signal ID to the list of signals to publish
@@ -831,7 +812,6 @@ def set_signals_to_publish_state(*sig_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_passed_events(*sig_ids:int):    
-    global logging
     for sig_id in sig_ids:
         logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish passed events via MQTT broker")
         # Add the signal ID to the list of signals to publish

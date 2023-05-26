@@ -69,7 +69,7 @@ def get_all():
     return(settings)
 
 def set_all(new_settings):
-    global settings, logging
+    global settings
     # List of warning messages to report
     warning_messages = []
     # Defensive programming to populate the settings gracefully

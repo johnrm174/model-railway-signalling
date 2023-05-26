@@ -44,8 +44,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
                                 theatre_route_indicator:bool=False,
                                 refresh_immediately = True,
                                 fully_automatic:bool=False):
-    global logging
-
     logging.info ("Signal "+str(sig_id)+": Creating Colour Light Signal")
     # Do some basic validation on the parameters we have been given
     signal_has_feathers = mainfeather or lhfeather45 or lhfeather90 or rhfeather45 or rhfeather90
@@ -226,8 +224,6 @@ def create_colour_light_signal (canvas, sig_id: int, x:int, y:int,
 #------------------------------------------------------------------
     
 def update_colour_light_subsidary (sig_id:int):
-    
-    global logging
     if signals_common.signals[str(sig_id)]["subclear"]:
         logging.info ("Signal "+str(sig_id)+": Changing subsidary aspect to PROCEED")
         signals_common.signals[str(sig_id)]["canvas"].itemconfig (signals_common.signals[str(sig_id)]["pos1"],fill="white")
@@ -249,9 +245,7 @@ def update_colour_light_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_colour_light_signal (sig_id:int, sig_ahead_id:Union[str,int]=None):
-
-    global logging
-
+    
     route = signals_common.signals[str(sig_id)]["routeset"]
     
     # ---------------------------------------------------------------------------------
@@ -472,7 +466,6 @@ def refresh_signal_aspects (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_feather_route_indication (sig_id:int,route_to_set):
-    global logging
     # Only Change the route indication if the signal has feathers
     if signals_common.signals[str(sig_id)]["hasfeathers"]:
         # Deal with route changes - but only if the Route has actually been changed
@@ -501,7 +494,6 @@ def update_feather_route_indication (sig_id:int,route_to_set):
 # -------------------------------------------------------------------------
 
 def enable_disable_feather_route_indication (sig_id:int):
-    global logging
     # Only Enable/Disable the route indication if the signal has feathers
     if signals_common.signals[str(sig_id)]["hasfeathers"]:
         # We test for !True and !False to support the initial state when the signal is created (state = None)
@@ -568,7 +560,6 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        global logging
         if self.sequence_abort_flag:
             self.sequence_in_progress = False
         else:
@@ -595,7 +586,6 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 
     def timed_signal_sequence_yellow(self):
-        global logging
         if self.sequence_abort_flag:
             self.sequence_in_progress = False
         else:
@@ -613,7 +603,6 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
     
     def timed_signal_sequence_double_yellow(self):
-        global logging
         if self.sequence_abort_flag:
             self.sequence_in_progress = False
         else:
@@ -628,7 +617,6 @@ class timed_sequence():
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
     
     def timed_signal_sequence_end(self): 
-        global logging
         # We've finished - Set the signal back to its "normal" condition
         self.sequence_in_progress = False
         if not self.sequence_abort_flag:
@@ -650,7 +638,6 @@ class timed_sequence():
 # -------------------------------------------------------------------------
 
 def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    global logging
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")

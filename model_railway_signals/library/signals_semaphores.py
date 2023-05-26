@@ -48,7 +48,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                 theatre_route_indicator:bool=False,
                                 refresh_immediately:bool = True,
                                 fully_automatic:bool=False):
-    global logging
     
     # Do some basic validation on the parameters we have been given
     logging.info ("Signal "+str(sig_id)+": Creating Semaphore Signal")
@@ -392,7 +391,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
 #------------------------------------------------------------------
 
 def update_signal_arm (sig_id, signal_arm, off_element, on_element, set_to_clear, log_message = ""):
-    global logging
     # We explicitly test for True or False as "None" signifies the signal arm does not exist
     if set_to_clear and signals_common.signals[str(sig_id)][signal_arm]==False:
         logging.info ("Signal "+str(sig_id)+": Changing \'"+signal_arm+"\' arm to OFF"+log_message)
@@ -417,7 +415,6 @@ def update_signal_arm (sig_id, signal_arm, off_element, on_element, set_to_clear
 #------------------------------------------------------------------
 
 def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
-    global logging
     # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
     if signals_common.signals[str(sig_id)]["subclear"] == True:
         # If the route has been set to signals_common.route_type.NONE then we assume the MAIN Route
@@ -477,7 +474,6 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
 # -------------------------------------------------------------------------
 
 def update_main_signal_arms(sig_id:int, log_message:str=""):
-    global logging
     # When Home/Distant signal is set to PROCEED - the main signal arms will reflect the route
     # Also the case of a home signal associated with a distant signal (i.e on the same post). In
     # this case if the home signal is at DANGER and the distant signal is at CAUTION then the state
@@ -544,8 +540,6 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 
 def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updating_associated_signal:bool=False):
     
-    global logging
-
     route = signals_common.signals[str(sig_id)]["routeset"]
     
     # Get the ID of the associated signal (to make the following code more readable)
@@ -627,9 +621,6 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
 # -------------------------------------------------------------------------
 
 def update_semaphore_route_indication (sig_id,route_to_set = None):
-
-    global logging
-    
     # Only update the respective route indication if the route has been changed and has actively
     # been set (a route of 'NONE' signifies that the particular route indication isn't used) 
     if route_to_set is not None and signals_common.signals[str(sig_id)]["routeset"] != route_to_set:
@@ -671,7 +662,6 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        global logging
         if self.sequence_abort_flag:
             self.sequence_in_progress = False
         else:
@@ -694,7 +684,6 @@ class timed_sequence():
             common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 
     def timed_signal_sequence_end(self):
-        global logging
         # We've finished - Set the signal back to its "normal" condition
         self.sequence_in_progress = False
         if not self.sequence_abort_flag:

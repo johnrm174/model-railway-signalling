@@ -31,8 +31,6 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                     sig_callback = None,
                                     orientation:int = 0,
                                     sig_passed_button: bool = False):
-    global logging
-    
     logging.info ("Signal "+str(sig_id)+": Creating Ground Position Signal")
     # Do some basic validation on the parameters we have been given
     if signals_common.sig_exists(sig_id):
@@ -115,8 +113,6 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 
 def update_ground_position_signal (sig_id:int):
 
-    global logging
-    
     # Establish what the signal should be displaying based on the state
     if not signals_common.signals[str(sig_id)]["sigclear"]:   
         aspect_to_set = signals_common.signal_state_type.DANGER

@@ -90,9 +90,7 @@ def sensor_mapped(sensor_id:int):
 # -------------------------------------------------------------------------
 
 def track_sensor_triggered (gpio_channel:int):
-    
     global channels
-    global logging
     
     # Thread to "lock" the sensor for the specified timeout period
     def thread_to_timeout_sensor (channel):
@@ -102,7 +100,7 @@ def track_sensor_triggered (gpio_channel:int):
             time.sleep(0.001)
         channels[str(channel)]["timeout_active"] = False
         return()
-
+    
     # This is where the main code begins
     if not channel_mapped (gpio_channel):
         logging.error ("Sensor "+str(gpio_channel)+": Triggered sensor not mapped")
@@ -166,11 +164,8 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
                          signal_approach:int = 0,
                          sensor_timeout:float = 3.0,
                          trigger_period:float = 0.001):
-    
     global channels 
-    global logging
     global raspberry_pi
-
     # Validate the parameters we have been given
     logging.info ("Sensor "+str(sensor_id)+": Creating track sensor mapping")
     if sensor_id < 1:
@@ -212,10 +207,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
 # -------------------------------------------------------------------------
 
 def track_sensor_active (sensor_id:int):
-
-    global logging
     global raspberry_pi
-    
     # A quick and dirty way of getting the code to run on Windows for development
     # As the Windows version of python doesn't include the RPi specific GPIO package
     if raspberry_pi:
@@ -232,7 +224,6 @@ def track_sensor_active (sensor_id:int):
 # -------------------------------------------------------------------------
 
 def gpio_shutdown():
-    global logging
     if raspberry_pi:
         logging.info ("GPIO: Restoring default settings")
         GPIO.setwarnings(False)

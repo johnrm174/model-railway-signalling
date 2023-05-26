@@ -87,7 +87,6 @@ def split_remote_item_identifier(item_identifier:str):
 #-----------------------------------------------------------------------------------------------
 
 def on_log(mqtt_client, obj, level, mqtt_log_message):
-    global logging
     logging.debug("MQTT-Client: "+mqtt_log_message)
     return()
 
@@ -96,7 +95,6 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 #-----------------------------------------------------------------------------------------------
 
 def on_disconnect(mqtt_client, userdata, rc):
-    global logging
     global node_config
     if rc==0: logging.info("MQTT-Client: Broker connection terminated")
     else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
@@ -108,7 +106,6 @@ def on_disconnect(mqtt_client, userdata, rc):
 #-----------------------------------------------------------------------------------------------
 
 def on_connect(mqtt_client, userdata, flags, rc):
-    global logging
     global node_config
     if rc == 0:
         logging.info("MQTT-Client: Successfully connected to MQTT Broker")
@@ -140,7 +137,6 @@ def on_connect(mqtt_client, userdata, flags, rc):
 #--------------------------------------------------------------------------------------------------------
 
 def process_message(msg):
-    global logging
     # Unpack the json message so we can extract the contents (with exception handling)
     try:
         unpacked_json = json.loads(msg.payload)
@@ -167,7 +163,6 @@ def process_message(msg):
 #--------------------------------------------------------------------------------------------------------
 
 def on_message(mqtt_client,obj,msg):
-    global logging
     global node_config
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
@@ -189,7 +184,6 @@ def configure_networking (broker_host:str,
                           broker_username:str = None,
                           broker_password:str = None,
                           mqtt_enhanced_debugging:bool = False):
-    global logging
     global node_config
     global mqtt_client
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
@@ -227,7 +221,6 @@ def configure_networking (broker_host:str,
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
-    global logging
     # Only shut down the mqtt networking if we configured it in the first place
     if node_config["network_configured"]:
         logging.info("MQTT-Client: Clearing message queues and shutting down")
@@ -258,7 +251,6 @@ def mqtt_shutdown():
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callback,subtopics:bool=False):
-    global logging
     global node_config
     global mqtt_client
     if not node_config["network_configured"]:
@@ -300,7 +292,6 @@ def send_mqtt_message (message_type:str,item_id,data:dict,log_message:str=None,r
 #-----------------------------------------------------------------------------------------------
 
 def publish_message (topic:str,payload:str,log_message:str=None,retain:bool=False):
-    global logging
     global mqtt_client
     global node_config
     if log_message is not None: logging.info(log_message)
