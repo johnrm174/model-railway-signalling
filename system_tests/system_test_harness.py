@@ -84,6 +84,7 @@
 #    paste_clipboard_objects()
 #    undo() and redo()
 #    get_item_id(object_id) - This is a helper function
+#    get_object_id(item_type, item_id) - This is a helper function
 #
 # Supported Editor test assertions:
 #    assert_object_configuration(object_id, test_values:dict)
@@ -774,7 +775,7 @@ def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, de
         sleep(sleep_delay)
 
 # ------------------------------------------------------------------------------
-# Helper function to get the D of an item from the Object ID
+# Helper functions to get the ID of an item from the Object ID and vice-versa
 # ------------------------------------------------------------------------------
 
 def get_item_id(object_id):
@@ -784,6 +785,14 @@ def get_item_id(object_id):
     else:
         return(objects.schematic_objects[object_id]["itemid"])
     
+def get_object_id(item_type:str, item_id:int):
+    for object_id in objects.schematic_objects.keys():
+        object_to_test = objects.schematic_objects[object_id]
+        if object_to_test["item"] == item_type and object_to_test["itemid"] == item_id:
+            return(object_id)
+    raise_test_warning ("get_object_id - item: "+item_type+" "+str(item_id)+" does not exist")
+    return(0)
+
 # ------------------------------------------------------------------------------
 # Functions to excersise the schematic Editor - Move, update and edit
 # ------------------------------------------------------------------------------
