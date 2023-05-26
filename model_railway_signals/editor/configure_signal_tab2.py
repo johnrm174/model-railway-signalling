@@ -278,21 +278,24 @@ class conflicting_signals_element():
         # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
         self.frame = Tk.LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(1, weight=1)
+        # create two frames - each frame will hold two conflicting signals
+        self.subframe1 = Tk.Frame(self.frame)
+        self.subframe1.pack()
+        self.subframe2 = Tk.Frame(self.frame)
+        self.subframe2.pack()
         tool_tip = "Specify any signals/routes that would conflict with this signal route"
-        self.sig1 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+        self.sig1 = common.signal_route_selections(self.subframe1, read_only=False, tool_tip = tool_tip,
                     exists_function=exists_function, current_id_function=current_id_function)
-        self.sig1.frame.grid(row=0, column=0)
-        self.sig2 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+        self.sig1.frame.pack(side=Tk.LEFT, padx=5)
+        self.sig2 = common.signal_route_selections(self.subframe1, read_only=False, tool_tip = tool_tip,
                     exists_function=exists_function, current_id_function=current_id_function)
-        self.sig2.frame.grid(row=0, column=1)
-        self.sig3 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+        self.sig2.frame.pack(side=Tk.LEFT, padx=5)
+        self.sig3 = common.signal_route_selections(self.subframe2, read_only=False, tool_tip = tool_tip,
                     exists_function=exists_function, current_id_function=current_id_function)
-        self.sig3.frame.grid(row=1, column=0)
-        self.sig4 = common.signal_route_selections(self.frame, read_only=False, tool_tip = tool_tip,
+        self.sig3.frame.pack(side=Tk.LEFT, padx=5)
+        self.sig4 = common.signal_route_selections(self.subframe2, read_only=False, tool_tip = tool_tip,
                     exists_function=exists_function, current_id_function=current_id_function)
-        self.sig4.frame.grid(row=1, column=1)
+        self.sig4.frame.pack(side=Tk.LEFT, padx=5)
 
     def validate(self):
         # Validate all conflicting signal entries

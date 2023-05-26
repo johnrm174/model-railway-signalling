@@ -193,6 +193,7 @@ class edit_line():
         self.attributes.frame.pack(padx=2, pady=2, fill='x')
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state

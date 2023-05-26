@@ -309,7 +309,7 @@ class main_menubar:
                     warning_text=""
                     for warning_message in warning_messages:
                         warning_text = warning_text + warning_message + "\n"
-                    load_warnings = self.load_warnings_window(self.root,warning_text)
+                    self.load_warnings_window(self.root,warning_text)
             else:
                 logging.error("LOAD LAYOUT - Selected file does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 
@@ -337,7 +337,7 @@ class main_menubar:
             # Create the srollable textbox to display the warnings. We only specify
             # the max height (in case the list of warnings is extremely long) leaving
             # the width to auto-scale to the maximum width of the warnings
-            self.text = common.scrollable_text_box(self.window, max_height=25)
+            self.text = common.scrollable_text_frame(self.window, max_height=25)
             self.text.set_value(warning_text)
             # Create the ok/close button and tooltip
             self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
@@ -345,7 +345,7 @@ class main_menubar:
             # Pack the OK button and labels First - so they remain visible on re-sizing
             self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
             self.label.pack(padx=2, pady=2, side=Tk.TOP)
-            self.text.frame.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+            self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
             
         def ok(self):
             self.window.destroy()

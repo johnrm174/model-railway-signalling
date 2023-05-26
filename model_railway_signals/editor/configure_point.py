@@ -345,6 +345,7 @@ class point_configuration_tab():
 class point_interlocking_tab():
     def __init__(self, parent_tab):
         self.signals = common.signal_route_interlocking_frame(parent_tab)
+        self.signals.frame.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Top level Class for the Edit Point window
@@ -372,6 +373,7 @@ class edit_point():
         self.locking = point_interlocking_tab(self.tab2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state

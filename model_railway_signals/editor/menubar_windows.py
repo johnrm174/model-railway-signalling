@@ -104,14 +104,14 @@ class display_help():
         # Create the srollable textbox to display the help text. We only specify
         # the max height (in case the help text grows in the future) leaving
         # the width to auto-scale to the maximum width of the help text
-        self.text = common.scrollable_text_box(self.window, max_height=25)
+        self.text = common.scrollable_text_frame(self.window, max_height=25)
         self.text.set_value(help_text)
         # Create the ok/close button and tooltip
         self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
         self.TT1 = common.CreateToolTip(self.B1, "Close window")
         # Pack the OK button First - so it remains visible on re-sizing
         self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
-        self.text.frame.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         
     def ok(self):
         self.window.destroy()
@@ -177,15 +177,15 @@ class edit_layout_info():
         # Create the srollable textbox to display the text. We specify
         # the max height/width (in case the text grows in the future) and also
         # the min height/width (to give the user something to start with)
-        self.text = common.scrollable_text_box(self.window, max_height=30,max_width=100,
+        self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=100,
                 min_height=10, min_width=40, editable=True, auto_resize=True)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self,
                                 self.load_state, self.save_state)
-        # Weneed to re-pack the window buttons at thebottom and then pack the text
+        # We need to pack the window buttons at the bottom and then pack the text
         # frame - so the buttons remain visible if the user re-sizes the window
         self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
-        self.text.frame.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         # Load the initial UI state
         self.load_state()
         
@@ -217,7 +217,8 @@ class edit_mqtt_settings():
         self.label1 = Tk.Label(self.window, text=text1, wraplength=400)
         self.label1.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
 
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
@@ -280,7 +281,8 @@ class edit_sprog_settings():
         self.status = Tk.Label(self.window, text="")
         self.status.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 
@@ -351,7 +353,8 @@ class edit_logging_settings():
                                             tool_tip="Set the logging level for running the layout")
         self.log_level.frame.pack()
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 
@@ -401,7 +404,8 @@ class edit_canvas_settings():
                         allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
         self.height.grid(row=1, column=1)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 

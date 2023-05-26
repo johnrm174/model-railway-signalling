@@ -339,7 +339,9 @@ class signal_route_frame():
 class section_automation_tab():
     def __init__(self, parent_tab):
         self.behind = signal_route_frame (parent_tab, label="Signals behind section")
+        self.behind.frame.pack(padx=2, pady=2, fill='x')
         self.ahead = signal_route_frame (parent_tab, label="Signals ahead of section")
+        self.ahead.frame.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Top level Class for the Edit Section window
@@ -367,6 +369,7 @@ class edit_section():
         self.automation = section_automation_tab(self.tab2)        
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
