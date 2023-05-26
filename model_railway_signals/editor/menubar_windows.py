@@ -27,7 +27,7 @@
 #    common.integer_entry_box
 #    common.window_controls
 #    common.CreateToolTip
-#
+#    common.scrollable_text_box
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -39,7 +39,8 @@ from . import settings
 from . import schematic
 
 #------------------------------------------------------------------------------------
-# Class for the "Help" window
+# Class for the "Help" window - Uses the common.scrollable_text_box
+# Note the packing order to keep the button visible during window re-sizing
 #------------------------------------------------------------------------------------
 
 help_text = """
@@ -91,25 +92,30 @@ Schematic object configuration
 class display_help():
     def __init__(self, root_window):
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for application help
         winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Help")
         self.window.attributes('-topmost',True)
-        self.label1 = Tk.Label(self.window, text=help_text, justify=Tk.LEFT)
-        self.label1.pack(padx=5, pady=5)
-        # Create the close button and tooltip
-        self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
-        self.B1.pack(padx=2, pady=2)
+        # Create the srollable textbox to display the help text. We only specify
+        # the max height (in case the help text grows in the future) leaving
+        # the width to auto-scale to the maximum width of the help text
+        self.text = common.scrollable_text_box(self.window, max_height=25)
+        self.text.set_value(help_text)
+        # Create the ok/close button and tooltip
+        self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
         self.TT1 = common.CreateToolTip(self.B1, "Close window")
+        # Pack the OK button First - so it remains visible on re-sizing
+        self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+        self.text.frame.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         
     def ok(self):
         self.window.destroy()
-        
+
 #------------------------------------------------------------------------------------
-# Class for the "About" window
+# Class for the "About" window- uses a hyperlink to go to the github repo
 #------------------------------------------------------------------------------------
 
 about_text = """
@@ -126,20 +132,20 @@ For more information visit: """
 
 class display_about():
     def __init__(self, root_window):
-        text2 = "https://github.com/johnrm174/model-railway-signalling"
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for application about
         winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Info")
         self.window.attributes('-topmost',True)
         self.label1 = Tk.Label(self.window, text=about_text)
         self.label1.pack(padx=5, pady=5)
-        self.label2 = Tk.Label(self.window, text=text2, fg="blue", cursor="hand2")
+        hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+        self.label2 = Tk.Label(self.window, text=hyperlink, fg="blue", cursor="hand2")
         self.label2.pack(padx=5, pady=5)
-        self.label2.bind("<Button-1>", lambda e:self.callback())
+        self.label2.bind("<Button-1>", self.callback)
         # Create the close button and tooltip
         self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
         self.B1.pack(padx=2, pady=2)
@@ -148,20 +154,20 @@ class display_about():
     def ok(self):
         self.window.destroy()
 
-    def callback(self):
+    def callback(self,event):
         webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
 
 #------------------------------------------------------------------------------------
-# Class for the "About" window
+# Class for the MQTT configuration window
 #------------------------------------------------------------------------------------
 
 class edit_mqtt_settings():
     def __init__(self, root_window):
         text1 = ("Coming Soon")
         self.root_window = root_window
-        # Create the top level window for the canvas settings
-        winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        # Create the top level window for the MQTT Settings
+        winx = self.root_window.winfo_rootx() + 200
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("MQTT")
@@ -180,17 +186,17 @@ class edit_mqtt_settings():
         if close_window: self.window.destroy()
 
 #------------------------------------------------------------------------------------
-# Class for the SPROG settings selection toolbar window. Note the function also takee
-# in the menubar object so it can call the function to update the menubar sprog status
+# Class for the SPROG settings selection toolbar window. Note the function also takes
+# in a callback object so it can call the function to update the menubar sprog status
 #------------------------------------------------------------------------------------
 
 class edit_sprog_settings():
     def __init__(self, root_window, mb_object):
         self.root_window = root_window
         self.mb_object = mb_object
-        # Create the top level window for the canvas settings
+        # Create the top level window for the SPROG configuration
         winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("SPROG DCC")
@@ -237,6 +243,7 @@ class edit_sprog_settings():
         self.load_state()
 
     def selection_changed(self):
+        # If connect on startup is selected then enable the DCC power on startup selection
         if self.startup.get_value(): self.power.enable()
         else: self.power.disable()
 
@@ -269,6 +276,7 @@ class edit_sprog_settings():
         self.debug.set_value(debug)
         self.startup.set_value(startup)
         self.power.set_value(power)
+        self.selection_changed()
         
     def save_state(self, parent_object, close_window:bool):
         # Parent object is passed by the callback - not used here
@@ -288,9 +296,9 @@ class edit_sprog_settings():
 class edit_logging_settings():
     def __init__(self, root_window):
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for the Logging Configuration
         winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Logging")
@@ -328,8 +336,8 @@ class edit_canvas_settings():
     def __init__(self, root_window):
         self.root_window = root_window
         # Create the top level window for the canvas settings
-        winx = self.root_window.winfo_rootx() + 150
-        winy = self.root_window.winfo_rooty() + 50
+        winx = self.root_window.winfo_rootx() + 200
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Canvas")
