@@ -399,8 +399,11 @@ def left_button_click(event):
             # just clearing the current selection - In either case we deselect all objects
             deselect_all_objects()
             schematic_state["selectarea"] = True
-            #  Make the "select area" box visible (create it if necessary)
-            if not schematic_state["selectareabox"]:
+            # Make the 'selectareabox' visible. This will create the box on first use (when
+            # the box is set to 'None'. Note that the box is deleted every time we load a
+            # new layout so we also need to check if it is in the list of canvas objects 
+            if ( schematic_state["selectareabox"] is None or not
+                 schematic_state["selectareabox"] in canvas.find_all() ):
                 schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
             canvas.coords(schematic_state["selectareabox"],event.x,event.y,event.x,event.y)
             canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
@@ -617,12 +620,16 @@ def disable_edit_keypress_events():
 def enable_editing():
     global schematic_state
     global canvas_event_callback
-    global button_frame
+    global button_frame, canvas_frame
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
-    # Re-pack the subframe containing the "add object" buttons to display it        
-    button_frame.pack(side=Tk.RIGHT, expand=False, fill=Tk.BOTH)
+    # Re-pack the subframe containing the "add object" buttons to display it. Note that we
+    # first 'forget' the canvas_frame and then re-pack the button_frame first, followed by
+    # the canvas_frame - this ensures that the buttons don't dissapear on window re-size
+    canvas_frame.forget()
+    button_frame.pack(side=Tk.LEFT, expand=False, fill=Tk.BOTH)
+    canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Bind the Canvas mouse and button events to the various callback functions
     canvas.bind("<Motion>", track_cursor)
     canvas.bind('<Button-1>', left_button_click)
@@ -668,19 +675,21 @@ def disable_editing():
 def initialise (root_window, event_callback, width:int, height:int, grid:int):
     global root, canvas, popup1, popup2
     global canvas_width, canvas_height, canvas_grid
-    global button_frame, buttons, images
+    global button_frame, canvas_frame, buttons, images
     global canvas_event_callback
     root = root_window
     canvas_event_callback = event_callback
     # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
     frame = Tk.Frame(root_window)
-    frame.pack (expand=True, fill=Tk.BOTH)    
-    # Create a subframe to hold the canvas and scrollbars
-    canvas_frame = Tk.Frame(frame, borderwidth=1)
-    canvas_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
+    frame.pack (expand=True, fill=Tk.BOTH)
+    # Note that we pack the button_frame first, followed by the canvas_frame
+    # This ensures that the buttons don't dissapear on window re-size (shrink)
     # Create a subframe to hold the "add" buttons
     button_frame = Tk.Frame(frame, borderwidth=1)
-    button_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
+    button_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+    # Create a subframe to hold the canvas and scrollbars
+    canvas_frame = Tk.Frame(frame, borderwidth=1)
+    canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
     canvas_width, canvas_height, canvas_grid = width, height, grid
     # Create the canvas and scrollbars inside the parent frame
