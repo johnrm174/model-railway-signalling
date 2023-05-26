@@ -487,7 +487,8 @@ def set_all(new_objects):
                     warning_messages.append(warning_message)
                 ##################################################################################
                 ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
-                elif new_object_type == objects_common.object_type.line and element == "itemid":                    
+                elif (new_object_type == objects_common.object_type.line and
+                          element == "itemid" and new_objects[object_id][element] is None):                    
                     item_id = one_up_line_id
                     objects_common.schematic_objects[object_id][element] = one_up_line_id
                     warning_message = (new_object_type+
