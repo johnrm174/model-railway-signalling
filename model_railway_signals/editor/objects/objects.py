@@ -65,8 +65,6 @@
 import copy 
 import logging
 
-import tkinter as Tk
-
 from . import objects_common
 from . import objects_signals
 from . import objects_points
