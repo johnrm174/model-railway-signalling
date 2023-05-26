@@ -74,7 +74,7 @@ def interlocked_signals(instrument_id:int):
                 signal_interlocked_by_instrument = True
                 interlocked_routes[route_index] = True
         if signal_interlocked_by_instrument:
-            list_of_interlocked_signals.append([instrument_id,interlocked_routes])
+            list_of_interlocked_signals.append([signal_id,interlocked_routes])
     return(list_of_interlocked_signals)
 
 #------------------------------------------------------------------------------------
