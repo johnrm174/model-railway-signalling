@@ -62,7 +62,7 @@ def update_line(object_id, new_object_configuration):
     delete_line_object(object_id)
     objects_common.schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     # The line remains selected after a configuration, so we need to re-draw
-    # the selection circles at each end by passin in state='normal'
+    # the selection circles at each end by passing in state='normal'
     redraw_line_object(object_id, state="normal")
     # Check to see if the Type-specific ID has been changed
     if old_item_id != new_item_id:
@@ -139,7 +139,7 @@ def redraw_line_object(object_id,state:str="hidden"):
     objects_common.schematic_objects[object_id]["end2"] = end2_object
     objects_common.schematic_objects[object_id]["stop1"] = stop1_object
     objects_common.schematic_objects[object_id]["stop2"] = stop2_object
-    # Create/update the canvas "tags" and selection rectangle for the point
+    # Create/update the canvas "tags" and selection rectangle for the line
     objects_common.schematic_objects[object_id]["tags"] = tags
     objects_common.set_bbox (object_id, objects_common.canvas.bbox(tags))         
     return()
