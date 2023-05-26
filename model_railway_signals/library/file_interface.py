@@ -26,6 +26,7 @@ from . import signals_common
 from . import track_sections
 from . import block_instruments
 from . import points
+from . import common
 
 #-------------------------------------------------------------------------------------------------
 # Global variables to define what options are presented to the user on application quit
@@ -94,7 +95,8 @@ def load_layout_state(file_name:str=None,
     save_as_option_enabled = save_file_dialog
     # We always prompt for load state on startup unless this is inhibited
     if ask_to_load_state:
-        load_state = tkinter.messagebox.askokcancel("Load State","Do you want to load the last layout state?")
+        load_state = tkinter.messagebox.askokcancel(parent=common.root_window,
+                title="Load State", message="Do you want to load the last layout state?")
     else:
         load_state = True
     if not load_state:
@@ -131,20 +133,21 @@ def load_layout_state(file_name:str=None,
         # to save the layout state on application quit - either using the filename passed to us or the
         # default filename derived from the name of the main python script (with a '.sig' extension)
         if filename is None:
-            logging.info("Load File - No file selected - Layout will be created in its default state")
+            logging.info("Load File - No file selected - Layout will remain in its default state")
             if file_name: filename_used_for_load = file_name
             else: filename_used_for_load = default_file_name
         else:
             # We have a valid filename so can proceed to try and open the file
-            logging.info("Load File - Loading layout state information from '"+filename+"'")
+            logging.info("Load File - Loading layout configuration from '"+filename+"'")
             try:
                 with open (filename,'r') as file:
                     file_contents=file.read()
                 file.close
             except Exception as exception:
-                logging.error("Load File - Error opening file - Layout will be created in its default state")
+                logging.error("Load File - Error opening file - Layout will remain in its default state")
                 logging.error("Load File - Reported Exception: "+str(exception))
-                tkinter.messagebox.showerror(title="File Load Error",message=str(exception))
+                tkinter.messagebox.showerror(parent=common.root_window,
+                                title="File Load Error", message=str(exception))
                 filename = None
             else:
                 # The file has been successfuly opened and loaded - Now convert it from the json format back
@@ -154,7 +157,8 @@ def load_layout_state(file_name:str=None,
                 except Exception as exception:
                     logging.error("Load File - Couldn't read file - Layout will be created in its default state")
                     logging.error("Load File - Reported exception: "+str(exception))
-                    tkinter.messagebox.showerror(title="File Parse Error",message=str(exception))
+                    tkinter.messagebox.showerror(parent=common.root_window,
+                                title="File Parse Error", message=str(exception))
                     filename = None
             # Store the filename that was loaded - to use on application quit
             filename_used_for_load = filename
@@ -189,12 +193,14 @@ def save_state_and_quit(quit_application:bool=True):
         # if the global variable 'filename' is "None" then file loading/saving hasn't been configured by
         # the signalling application - we therefore just give the option to quit the application or cancel
         if filename is None:
-            quit_application = tkinter.messagebox.askokcancel("Quit","Do you want to quit the application?")
+            quit_application = tkinter.messagebox.askokcancel(parent=common.root_window,
+                            title="Quit", message="Do you want to quit the application?")
             # the value of quit_application will be True for YES and False for NO
             save_application = save_as_option_enabled
         else:
             # A filename has been configured - we need to give the option to save the current state
-            save_application = tkinter.messagebox.askyesnocancel("Quit","Do you want to save the current layout state")
+            save_application = tkinter.messagebox.askyesnocancel(parent=common.root_window,
+                            title="Quit", message="Do you want to save the current layout state")
             # the value of save_application will be True for YES, False for NO and None for CANCEL
             if save_application == True or save_application == False:
                 quit_application = True
@@ -223,7 +229,7 @@ def save_state_and_quit(quit_application:bool=True):
             # This also makes it clearer to see the default filename in the file save dialog
             path,name = os.path.split(filename)
             filename_used_for_save = filename            
-            logging.info("Saving Layout State Information as '"+name+"'")
+            logging.info("Saving Layout Configuration as '"+name+"'")
             dictionary_to_save["information"] = "Model Railway Signalling Configuration File"
             # Retrieve the DEFINITION of all the data items we need to save to maintain state
             # These are defined in a single function at the top of this source file. We also
@@ -266,7 +272,8 @@ def save_state_and_quit(quit_application:bool=True):
                 file.close
             except Exception as exception:
                 logging.error("Save File - Error saving file - Reported exception: "+str(exception))
-                tkinter.messagebox.showerror(title="File Save Error",message=str(exception))
+                tkinter.messagebox.showerror(parent=common.root_window,
+                            title="File Save Error",message=str(exception))
                 quit_application = False
     return (quit_application)
 
