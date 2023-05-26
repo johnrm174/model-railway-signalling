@@ -20,7 +20,6 @@
 #------------------------------------------------------------------------------------
 
 import copy
-import logging
 import importlib.resources
 
 import tkinter as Tk
