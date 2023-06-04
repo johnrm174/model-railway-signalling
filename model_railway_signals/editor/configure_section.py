@@ -354,8 +354,12 @@ class edit_section():
         # Creatre the basic Top Level window
         self.window = Tk.Toplevel(root)
         self.window.attributes('-topmost',True)
+        # Create a frame to hold all UI elements (so they don't expand on window resize
+        # to provide consistent behavior with the other configure object popup windows)
+        self.main_frame = Tk.Frame(self.window)
+        self.main_frame.pack()
         # Create the Notebook (for the tabs) 
-        self.tabs = ttk.Notebook(self.window)
+        self.tabs = ttk.Notebook(self.main_frame)
         # When you change tabs tkinter focuses on the first entry box - we don't want this
         # So we bind the tab changed event to a function which will focus on something else 
         self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
@@ -368,10 +372,10 @@ class edit_section():
         self.config = section_configuration_tab(self.tab1)
         self.automation = section_automation_tab(self.tab2)        
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.main_frame, self, load_state, save_state)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.main_frame, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 

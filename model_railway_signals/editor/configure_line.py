@@ -177,8 +177,12 @@ class edit_line():
         # Creatre the basic Top Level window
         self.window = Tk.Toplevel(root)
         self.window.attributes('-topmost',True)
+        # Create a frame to hold all UI elements (so they don't expand on window resize
+        # to provide consistent behavior with the other configure object popup windows)
+        self.main_frame = Tk.Frame(self.window)
+        self.main_frame.pack()
         # Create a Frame to hold the Line ID and Line Colour Selections
-        self.frame = Tk.Frame(self.window)
+        self.frame = Tk.Frame(self.main_frame)
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Line ID selection
         self.lineid = common.object_id_selection(self.frame, "Line ID",
@@ -188,13 +192,13 @@ class edit_line():
         self.colour = common.colour_selection(self.frame)
         self.colour.frame.pack(padx=2, pady=2, fill='x')
         # Create the line Attributes UI Element
-        self.attributes = line_attributes(self.window)
-        self.attributes.frame.pack(padx=2, pady=2, fill='x')
+        self.attributes = line_attributes(self.main_frame)
+        self.attributes.frame.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.main_frame, self, load_state, save_state)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.main_frame, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 
