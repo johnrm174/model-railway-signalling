@@ -6,8 +6,7 @@
 # External API functions intended for use by other editor modules:
 #    initialise(root, callback, width, height, grid) - Call once on startup
 #    update_canvas() - Call following a size update (or layout load/canvas resize)
-#    select_all_objects() - For selecting all objects prior to a "safe" delete
-#    delete_selected_objects() - To delete all objects (once all are selected)
+#    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
@@ -184,6 +183,22 @@ def deselect_all_objects(event=None):
     selections = copy.deepcopy(schematic_state["selectedobjects"])
     for object_id in selections:
         deselect_object(object_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to delete all objects (for layout 'load' and layout 'new'
+#------------------------------------------------------------------------------------
+
+def delete_all_objects():
+    global schematic_state
+    # Select and delete all objects (also clear the selected objects list)
+    select_all_objects()
+    delete_selected_objects()
+    # Belt and braces delete of all canvas objects as I've seen issues when
+    # running the system tests (probably because I'm not using the mainloop)
+    canvas.delete("all")
+    # Set the select area box to 'None' so it gets created on first use
+    schematic_state["selectareabox"] = None
     return()
 
 #------------------------------------------------------------------------------------
@@ -415,11 +430,9 @@ def left_button_click(event):
             # just clearing the current selection - In either case we deselect all objects
             deselect_all_objects()
             schematic_state["selectarea"] = True
-            # Make the 'selectareabox' visible. This will create the box on first use (when
-            # the box is set to 'None'. Note that the box is deleted every time we load a
-            # new layout so we also need to check if it is in the list of canvas objects 
-            if ( schematic_state["selectareabox"] is None or not
-                 schematic_state["selectareabox"] in canvas.find_all() ):
+            # Make the 'selectareabox' visible. This will create the box on first use
+            # or after a 'delete_all_objects (when the box is set to 'None')
+            if schematic_state["selectareabox"] is None:
                 schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
             canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
             canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
@@ -545,7 +558,8 @@ def left_button_release(event):
         objects.move_objects(schematic_state["selectedobjects"], xdiff2=finalx, ydiff2=finaly)
         # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend2"] = False
-    elif schematic_state["selectarea"]:
+        # Note the defensive programming - to ensure the bbox exists
+    elif schematic_state["selectarea"] and schematic_state["selectareabox"] is not None:
         # Select all Objects that are fully within the Area Selection Box
         abox = canvas.coords(schematic_state["selectareabox"])
         for object_id in objects.schematic_objects:
