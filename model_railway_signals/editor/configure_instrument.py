@@ -210,17 +210,21 @@ class sound_file_element(common.entry_box):
         with importlib.resources.path ('model_railway_signals.library', 'resources') as initial_path:
             filename = Tk.filedialog.askopenfilename(title='Select Audio File', initialdir = initial_path,
                     filetypes=(('audio files','*.wav'),('all files','*.*')), parent=self.frame)
-        # Try loading/playing the selected file - with an error popup if it fails
-        if filename != () and filename != "":
-            try:
-                simpleaudio.WaveObject.from_wave_file(filename).play()
-            except:
-                Tk.messagebox.showerror(parent=self.frame, title="Load Error",
-                            message="Error loading audio file '"+str(filename)+"'")
-            else:
-                # Set the filename entry to the name of the current file (split from the dir path)
-                self.set_value(os.path.split(filename)[1])
-                self.full_filename = filename
+            # Try loading/playing the selected file - with an error popup if it fails
+            if filename != () and filename != "":
+                try:
+                    simpleaudio.WaveObject.from_wave_file(filename).play()
+                except:
+                    Tk.messagebox.showerror(parent=self.frame, title="Load Error",
+                                message="Error loading audio file '"+str(filename)+"'")
+                else:
+                    # Set the filename entry to the name of the current file (split from the dir path)
+                    self.set_value(os.path.split(filename)[1])
+                    # If a resources file has been chosen then strip off the path to aid cross-platform
+                    # transfer of layout files (where the path to the resource folder may be different)
+                    if os.path.split(filename)[0] == str(initial_path):
+                        filename = os.path.split(filename)[1]
+                    self.full_filename = filename
 
 #------------------------------------------------------------------------------------
 # Class for the Sound file selections element - uses 2 instances of the element above)
