@@ -582,7 +582,8 @@ def update_canvas(width:int, height:int, grid:int):
     global canvas_width, canvas_height, canvas_grid
     # Update the tkinter canvas object
     canvas.config (width=width, height=height, scrollregion=(0,0,width, height))
-    canvas.pack()
+    # reset the root window size (this will fit to contents)
+    root.geometry("")
     # Set the global variables (used in the 'draw_grid' function)
     canvas_width = width
     canvas_height = height
