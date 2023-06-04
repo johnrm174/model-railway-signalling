@@ -84,6 +84,7 @@ Menubar Options
 5) Settings-Canvas - Change the display size of the schematic
 6) Settings-Logging - Set the log level for running the layout
 7) Settings-SPROG - Configure the serial port and SPROG behavior
+8) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 
