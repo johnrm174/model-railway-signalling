@@ -104,6 +104,17 @@ button_frame = None
 button_images = {}
 
 #------------------------------------------------------------------------------------
+# Internal Function to return the absolute canvas coordinates for an event
+# (which take into account any canvas scroll bar offsets)
+#------------------------------------------------------------------------------------
+
+def canvas_coordinates(event):
+    canvas = event.widget
+    x = canvas.canvasx(event.x)
+    y = canvas.canvasy(event.y)
+    return(x, y)
+
+#------------------------------------------------------------------------------------
 # Internal Function to draw (or redraw) the grid on the screen (after re-sizing)
 # Uses the global canvas_width, canvas_height, canvas_grid variables
 #------------------------------------------------------------------------------------
@@ -351,7 +362,11 @@ def snap_to_grid(xpos:int,ypos:int):
 def right_button_click(event):
     global schematic_state
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    # Note that we use the the canvas coordinates to see if the cursor
+    # is over the object (as these take into account the current scroll
+    # bar positions) and the event root coordinates for the popup 
+    canvas_x, canvas_y = canvas_coordinates(event)
+    highlighted_object = find_highlighted_object(canvas_x, canvas_y)
     if highlighted_object:
         # Clear any current selections and select the highlighted item
         deselect_all_objects()
@@ -373,13 +388,14 @@ def left_button_click(event):
     global schematic_state
     # set keyboard focus for the canvas (so that any key bindings will work)
     canvas.focus_set()
-    # For canvas events we can use the canvas coordinates
-    schematic_state["startx"] = event.x 
-    schematic_state["starty"] = event.y
-    schematic_state["lastx"] = event.x 
-    schematic_state["lasty"] = event.y
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
+    schematic_state["startx"] = canvas_x 
+    schematic_state["starty"] = canvas_y
+    schematic_state["lastx"] = canvas_x 
+    schematic_state["lasty"] = canvas_y
     # See if the cursor is over the "end" of an already selected line 
-    highlighted_object = find_highlighted_line_end(event.x,event.y)
+    highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
     if highlighted_object:
         # Clear selections and select the highlighted line. Note that the edit line
         # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
@@ -387,7 +403,7 @@ def left_button_click(event):
         select_object(highlighted_object)
     else:
         # See if the cursor is over any other canvas object
-        highlighted_object = find_highlighted_object(event.x,event.y)
+        highlighted_object = find_highlighted_object(canvas_x,canvas_y)
         if highlighted_object:
             schematic_state["moveobjects"] = True
             if highlighted_object not in schematic_state["selectedobjects"]:
@@ -405,7 +421,7 @@ def left_button_click(event):
             if ( schematic_state["selectareabox"] is None or not
                  schematic_state["selectareabox"] in canvas.find_all() ):
                 schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-            canvas.coords(schematic_state["selectareabox"],event.x,event.y,event.x,event.y)
+            canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
             canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
@@ -419,8 +435,10 @@ def left_button_click(event):
 
 def left_shift_click(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    highlighted_object = find_highlighted_object(canvas_x,canvas_y)
     if highlighted_object and highlighted_object in schematic_state["selectedobjects"]:
         # Deselect just the highlighted object (leave everything else selected)
         deselect_object(highlighted_object)
@@ -436,8 +454,10 @@ def left_shift_click(event):
 
 def left_double_click(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    highlighted_object = find_highlighted_object(canvas_x,canvas_y)
     if highlighted_object:
         # Clear any current selections and select the highlighted item
         deselect_all_objects()
@@ -453,18 +473,20 @@ def left_double_click(event):
 
 def track_cursor(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     if schematic_state["moveobjects"]:
         # Work out the delta movement since the last re-draw
-        deltax = event.x - schematic_state["lastx"]
-        deltay = event.y - schematic_state["lasty"]
+        deltax = canvas_x - schematic_state["lastx"]
+        deltay = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
         move_selected_objects(deltax,deltay)
         # Set the 'last' position for the next move event
         schematic_state["lastx"] += deltax
         schematic_state["lasty"] += deltay
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
-        deltax = event.x - schematic_state["lastx"]
-        deltay = event.y - schematic_state["lasty"]
+        deltax = canvas_x - schematic_state["lastx"]
+        deltay = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
         move_line_end(deltax,deltay)
         # Reset the "start" position for the next move
@@ -474,7 +496,7 @@ def track_cursor(event):
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
         y1 = schematic_state["starty"]
-        canvas.coords(schematic_state["selectareabox"],x1,y1,event.x,event.y)
+        canvas.coords(schematic_state["selectareabox"],x1,y1,canvas_x,canvas_y)
     return()
 
 #------------------------------------------------------------------------------------
