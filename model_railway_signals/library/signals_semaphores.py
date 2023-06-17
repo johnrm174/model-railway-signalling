@@ -379,6 +379,11 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
             
+        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
+        # only be published if the MQTT interface has been configured for publishing updates for this 
+        # signal. This allows publish/subscribe to be configured prior to signal creation
+        signals_common.publish_signal_state(sig_id)
+
     return ()
 
 #-------------------------------------------------------------------

@@ -271,7 +271,8 @@ def create_section (canvas, section_id:int, x:int, y:int,
         # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
         if loaded_state["occupied"]: toggle_section(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
-        # be published if the MQTT interface has been configured for publishing updates for this track section
+        # only be published if the MQTT interface has been configured for publishing updates for this track
+        # section. This allows publish/subscribe to be configured prior to track section creation
         send_mqtt_section_updated_event(section_id) 
     return()
 
@@ -364,8 +365,6 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
 def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
     global sections
     for sec_id in sec_ids:
-        mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node,sec_id,
-                                                  handle_mqtt_section_updated_event)
         # Create a dummy section object to hold the state of the remote track occupancy section
         # The Identifier for a remote Section is a string combining the the Node-ID and Section-ID
         section_identifier = mqtt_interface.create_remote_item_identifier(sec_id,node)
@@ -374,6 +373,9 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
             sections[section_identifier]["occupied"] = False
             sections[section_identifier]["labeltext"] = "OCCUPIED"
             sections[section_identifier]["extcallback"] = sec_callback
+            # Subscribe to updates from the remote section
+            mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node,sec_id,
+                                                  handle_mqtt_section_updated_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -388,6 +390,9 @@ def set_sections_to_publish_state(*sec_ids:int):
             logging.warning("MQTT-Client: Section "+str(sec_id)+" - is already configured to publish state changes")
         else:
             list_of_sections_to_publish.append(sec_id)
+            # Publish the initial state now this has been added to the list of sections to publish
+            # This allows the publish/subscribe functions to be configured after section creation
+            if str(sec_id) in sections.keys(): send_mqtt_section_updated_event(sec_id) 
     return()
 
 # --------------------------------------------------------------------------------
@@ -429,6 +434,7 @@ def send_mqtt_section_updated_event(section_id:int):
 def delete_section(section_id:int):
     global sections
     global entry_box_window
+    global list_of_sections_to_publish
     if section_exists(section_id):
         # If a text entry box is open then we need to destroy it
         if entry_box_window is not None:
@@ -438,6 +444,9 @@ def delete_section(section_id:int):
         sections[str(section_id)]["canvas"].delete("section"+str(section_id))
         # Delete all the tkinter button objects created for the section
         sections[str(section_id)]["button1"].destroy()
+        # Delete the section from the list_of_sections_to_publish (if required)
+        if section_id in list_of_sections_to_publish:
+            list_of_sections_to_publish.remove(section_id)
         # Finally, delete the entry from the dictionary of sections
         del sections[str(section_id)]
     return()
@@ -448,6 +457,29 @@ def delete_section(section_id:int):
 
 def get_tags(section_id:int):
     return("section"+str(section_id))
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of published/subscribed sections. Used by
+# the schematic editor for re-setting the MQTT configuration prior to re-configuring
+# via the set_sections_to_publish_state and subscribe_to_section_updates functions
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    global sections
+    global list_of_sections_to_publish
+    # We only need to clear the list to stop any further section events being published
+    list_of_sections_to_publish.clear()
+    # For subscriptions we unsubscribe from all topics associated with the message_type
+    mqtt_interface.unsubscribe_from_message_type("section_updated_event")
+    # Finally remove all "remote" sections from the dictionary of sections - these
+    # will be re-created if they are subsequently re-subscribed to. Note we don't iterate 
+    # through the dictionary of sections to remove items as it will change under us
+    new_sections = {}
+    for key in sections:
+        if mqtt_interface.split_remote_item_identifier(key) is not None:
+            new_sections[key] = sections[key]
+    sections = new_sections
+    return()
 
 ###############################################################################
 

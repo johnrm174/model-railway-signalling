@@ -7,11 +7,13 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.instrument_exists(item_id) - To see if a specified instrument ID exists
 #
 # Accesses the following external editor objects directly:
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.schematic_objects - To load/save the object configuration
+#
+# Makes the following external API calls to library modules:
+#    block_instruments.instrument_exists(id) - To see if the instrument exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.str_item_id_entry_box
@@ -35,11 +37,13 @@ from tkinter import ttk
 from . import common
 from . import objects
 
+from ..library import block_instruments
+
 # We can only use audio for the block instruments if 'simpleaudio' is installed
 # Although this package is supported across different platforms, for Windows
 # it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
 # haven't made audio a hard and fast dependency for the 'model_railway_signals'
-# pack age as a whole - its up to the user to install if required
+# package as a whole - its up to the user to install if required
 
 def is_simpleaudio_installed():
     global simpleaudio
@@ -157,10 +161,7 @@ class linked_to_selection(common.str_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
         # These are the functions used to validate that the entered ID
         # exists on the schematic and is different to the current ID
-        ######################################################################################################
-        ## Note that the exists function will need to change when the application supports remote instruments
-        ######################################################################################################
-        exists_function = objects.instrument_exists
+        exists_function = block_instruments.instrument_exists
         current_id_function = parent_object.instid.get_value
         # Create the Label Frame for the "also switch" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Block section")
@@ -262,11 +263,11 @@ class instrument_configuration_tab():
         # Create a Frame to hold the Inst ID and Inst Type Selections
         self.frame = Tk.Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
-        # Create the UI Element for Point ID selection
+        # Create the UI Element for Inst ID selection
         self.instid = common.object_id_selection(self.frame, "Inst ID",
-                                exists_function = objects.instrument_exists) 
+                        exists_function = block_instruments.instrument_exists) 
         self.instid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-        # Create the UI Element for Point Type selection
+        # Create the UI Element for Inst Type selection
         self.insttype = common.selection_buttons(self.frame, "Point type",
                     "Select block Instrument Type", None, "Single line", "Double Line")
         self.insttype.frame.pack(padx=2, pady=2, fill='x')

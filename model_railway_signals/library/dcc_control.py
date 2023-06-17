@@ -558,7 +558,7 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to the published DCC commands from another "Node"
+# Public API Function to set this node to publish all DCC commands to the broker
 #-----------------------------------------------------------------------------------------------
 
 def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
@@ -612,6 +612,17 @@ def publish_accessory_short_event(address:int,active:bool):
         # Publish as "retained" messages so remote nodes that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("dcc_accessory_short_events",0,data=data,
                             log_message=log_message,subtopic = str(address),retain=True)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of subscribed Topics. Used by the schematic editor
+# for re-setting the MQTT configuration prior to re-configuring
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    global publish_dcc_commands_to_mqtt_broker
+    publish_dcc_commands_to_mqtt_broker = False
+    mqtt_interface.unsubscribe_from_message_type("dcc_accessory_short_events")
     return()
 
 # --------------------------------------------------------------------------------

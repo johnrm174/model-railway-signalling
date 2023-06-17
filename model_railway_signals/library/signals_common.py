@@ -585,12 +585,15 @@ def handle_mqtt_signal_passed_event(message):
     return()
 
 # --------------------------------------------------------------------------------
-# Common functions for building and sending MQTT messages - but only if the
-# Signal has been configured to publish the specified updates via the mqtt broker
+# Common functions for building and sending MQTT messages - but only if the Signal
+# has been configured to publish the specified updates via the mqtt broker. As this
+# function is called on signal creation, we also need to handle the case of a signal
+# configured to NOT to refresh on creation (i.e. it gets set when 'update_signal' is
+# called for the first time - in this case (sigstate = None) we don't publish
 # --------------------------------------------------------------------------------
 
 def publish_signal_state(sig_id:int):
-    if sig_id in list_of_signals_to_publish_state_changes:
+    if sig_id in list_of_signals_to_publish_state_changes and signals[str(sig_id)]["sigstate"] is not None:
         data = {}
         # The sig state is an enumeration type - so its the VALUE that gets passed in the message
         data["sigstate"] = signals[str(sig_id)]["sigstate"].value
@@ -615,6 +618,8 @@ def publish_signal_passed_event(sig_id:int):
 
 def delete_signal(sig_id:int):
     global signals
+    global list_of_signals_to_publish_state_changes
+    global list_of_signals_to_publish_passed_events
     if sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
         signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
@@ -625,8 +630,46 @@ def delete_signal(sig_id:int):
         # This buttons is only common to colour light and semaphore types
         if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
             signals[str(sig_id)]["releasebutton"].destroy()
+        # Delete the signal from the list_of_signals_to_publish (if required)
+        if sig_id in list_of_signals_to_publish_passed_events:
+            list_of_signals_to_publish_passed_events.remove(sig_id)
+        if sig_id in list_of_signals_to_publish_state_changes:
+            list_of_signals_to_publish_state_changes.remove(sig_id)
         # Finally, delete the signal entry from the dictionary of signals
         del signals[str(sig_id)]
     return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of published/subscribed signals. Used
+# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
+# via the signal-specific publish and subscribe configuration functions
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    global signals
+    global list_of_signals_to_publish_state_changes
+    global list_of_signals_to_publish_passed_events
+    # We only need to clear the list to stop any further signal events being published
+    list_of_signals_to_publish_state_changes.clear()
+    list_of_signals_to_publish_passed_events.clear()
+    # For subscriptions we unsubscribe from all topics associated with the message_type
+    mqtt_interface.unsubscribe_from_message_type("signal_updated_event")
+    mqtt_interface.unsubscribe_from_message_type("signal_passed_event")
+    # Finally remove all "remote" signals from the dictionary of signals - these will
+    # be re-created if they are subsequently re-subscribed to. Note we don't iterate 
+    # through the dictionary of signals to remove items as it will change under us
+    new_signals = {}
+    for key in signals:
+        if mqtt_interface.split_remote_item_identifier(key) is not None:
+            new_signals[key] = signals[key]
+    signals = new_signals
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to return the tkinter canvas 'tags' for the signal
+# ------------------------------------------------------------------------------------------
+
+def get_tags(sig_id:int):
+    return("signal"+str(sig_id))
 
 #################################################################################################

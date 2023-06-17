@@ -761,8 +761,6 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
 
 def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):    
     for sig_id in sig_ids:
-        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node,sig_id,
-                                                signals_common.handle_mqtt_signal_updated_event)
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
         sig_identifier = mqtt_interface.create_remote_item_identifier(sig_id,node)
@@ -772,6 +770,9 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
             signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
+        # Subscribe to updates from the remote signal (even if we have already subscribed)
+        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node,sig_id,
+                                    signals_common.handle_mqtt_signal_updated_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -780,8 +781,6 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
 
 def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):    
     for sig_id in sig_ids:
-        mqtt_interface.subscribe_to_mqtt_messages("signal_passed_event",node,sig_id,
-                                                signals_common.handle_mqtt_signal_passed_event)
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
         sig_identifier = mqtt_interface.create_remote_item_identifier(sig_id,node)
@@ -791,6 +790,9 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
             signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
+        # Subscribe to updates from the remote signal (even if we have already subscribed)
+        mqtt_interface.subscribe_to_mqtt_messages("signal_passed_event",node,sig_id,
+                                    signals_common.handle_mqtt_signal_passed_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -805,6 +807,9 @@ def set_signals_to_publish_state(*sig_ids:int):
             logging.warning("MQTT-Client: Signal "+str(sig_id)+" - is already configured to publish state changes")
         else:
             signals_common.list_of_signals_to_publish_state_changes.append(sig_id)
+            # Publish the initial state now this has been added to the list of signals to publish
+            # This allows the publish/subscribe functions to be configured after signal creation
+            if str(sig_id) in signals_common.signals.keys(): signals_common.publish_signal_state(sig_id) 
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -821,36 +826,5 @@ def set_signals_to_publish_passed_events(*sig_ids:int):
             signals_common.list_of_signals_to_publish_passed_events.append(sig_id)
     return()
 
-# ------------------------------------------------------------------------------------------
-# Non public API function for deleting a signal object (including all the drawing objects)
-# This is used by the schematic editor for changing signal types where we delete the existing
-# signal with all its data and then recreate it (with the same ID) in its new configuration
-# ------------------------------------------------------------------------------------------
-
-def delete_signal(sig_id:int):
-    if signals_common.sig_exists(sig_id):
-        # Delete all the tkinter canvas drawing objects associated with the signal
-        signals_common.signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
-        # Delete all the tkinter button objects created for the signal
-        signals_common.signals[str(sig_id)]["sigbutton"].destroy()
-        signals_common.signals[str(sig_id)]["subbutton"].destroy()
-        signals_common.signals[str(sig_id)]["passedbutton"].destroy()
-        if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
-                                                              signals_common.sig_type.semaphore):
-            # This buttons is only common to colour light and semaphore types
-            signals_common.signals[str(sig_id)]["releasebutton"].destroy()
-            # Abort any timed signal sequences already in progess
-            route = signals_common.signals[str(sig_id)]["routeset"]
-            signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
-        # Finally, delete the signal entry from the dictionary of signals
-        del signals_common.signals[str(sig_id)]
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to return the tkinter canvas 'tags' for the signal
-# ------------------------------------------------------------------------------------------
-
-def get_tags(sig_id:int):
-    return("signal"+str(sig_id))
 
 ##########################################################################################

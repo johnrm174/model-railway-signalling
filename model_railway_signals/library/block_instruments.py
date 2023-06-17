@@ -31,12 +31,10 @@
 #                           the local schematic), or a string representing a Block Instrument 
 #                           running on a remote node - see MQTT networking (default = None)
 # 
-# Note that the Block Instruments feature is primarily intended to provide a prototypical means of
-# communication between signallers working their respective signal boxes. As such, MQTT networking
-# is "built in" - If a remote instrument identifier is specified for the "linked_to" instrument
-# and the MQTT network has been configured then this function will automatically configured the
-# block instrument to publish its state and telegraph key clicks to the remote instrument and
-# will also subscribe to state updates and telegraph clicks from the remote instrument.
+# Note that automatic MQTT networking publish/subscribe on instrument creation is now DEPRECATED.
+# The 'set_instruments_to_publish_state' and 'subscribe_to_instrument_updates' functions should
+# be called to configure networking prior to creating Block Instruments on the local schematic.
+# This is to provide a level of consistency between other MQTT publish/subscribe functions.
 # 
 # block_section_ahead_clear(block_id:int) - Returns the state of the ASSOCIATED block instrument
 #           (i.e. the linked instrument controlling the state of the block section ahead of ours)
@@ -48,6 +46,20 @@
 # then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
 # on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first)
 # If 'simpleaudio' is not installed then the software will still function correctly (just without sound)
+#
+# ------------------------------------------------------------------------------------------
+#
+# The following functions are associated with the MQTT networking Feature:
+#
+# subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network
+#   Mandatory Parameters:
+#       node:str - The name of the node publishing the block instrument update feed
+#       *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
+#
+# set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
+#                All subsequent changes will be automatically published to remote subscribers
+#   Mandatory Parameters:
+#       *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
 #
 # -----------------------------------------------------------------------------------------------
 
@@ -77,12 +89,12 @@ def is_simpleaudio_installed():
 audio_enabled = is_simpleaudio_installed()
 
 # -------------------------------------------------------------------------
-# Classes used by external functions when calling the create_point function
+# Classes used by external functions when calling create_instrument
 # -------------------------------------------------------------------------
     
 class instrument_type(enum.Enum):
-    single_line = 1   # Right Hand point
-    double_line = 2   # Left Hand point
+    single_line = 1
+    double_line = 2
 
 class block_callback_type(enum.Enum):
     block_section_ahead_updated = 51   # The instrument has been updated
@@ -98,6 +110,12 @@ instruments = {}
 # --------------------------------------------------------------------------------
 
 bell_code_hints_open = False
+
+# --------------------------------------------------------------------------------
+# Global list of block instruments to publish to the MQTT Broker
+# --------------------------------------------------------------------------------
+
+list_of_instruments_to_publish = []
 
 # -------------------------------------------------------------------------
 # The default "External" callback for Block Instruments if one isn't specified
@@ -161,9 +179,10 @@ def open_bell_code_hints():
 # --------------------------------------------------------------------------------
 # Internal Function to check if a Block Instrument exists in the list of Instruments
 # Used in most externally-called functions to validate the Block instrument ID
+# Note the function will take in either local or (subscribed to) remote IDs
 # --------------------------------------------------------------------------------
 
-def instrument_exists(block_id:int):
+def instrument_exists(block_id:Union[int,str]):
     return (str(block_id) in instruments.keys() )
 
 # --------------------------------------------------------------------------------
@@ -505,6 +524,7 @@ def create_block_instrument (canvas,
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
     global instruments
+    global list_of_instruments_to_publish
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
     # Find and store the root window (when the first block instrument is created)
     if common.root_window is None: common.find_root_window(canvas)
@@ -521,11 +541,12 @@ def create_block_instrument (canvas,
     elif block_id < 1:
         logging.error ("Block Instrument "+str(block_id)+": Block ID must be greater than zero")
     elif linked_to_id == block_id:
-        logging.error ("Block Instrument "+str(block_id)+": ID for linked instrument is the same as the instrument to create")   
+        logging.error ("Block Instrument "+str(block_id)+": ID for linked instrument is the same as the instrument to create")
     elif isinstance(linked_to_id,str) and mqtt_interface.split_remote_item_identifier(linked_to_id) is None:
-        logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")   
+        logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")
     else:
         ####################################################################################################################
+        # DEPRECATED code to remove at a future release ####################################################################
         if single_line:
             logging.warning ("###########################################################################################")
             logging.warning ("Block Instrument "+str(block_id)+": single_line flag is DEPRECATED - use inst_type")
@@ -608,14 +629,74 @@ def create_block_instrument (canvas,
             if loaded_state["repeaterstate"] == True: set_repeater_clear(block_id,make_callback=False)
             elif loaded_state["repeaterstate"] == False: set_repeater_occupied(block_id,make_callback=False)
             else: set_repeater_blocked(block_id,make_callback=False)
+
+        ####################################################################################################################
+        # DEPRECATED code to remove at a future release ####################################################################
         # If the associated block instrument is associated with an external node (i.e. has a string-type
         # compound identifier rather than an integer) then subscribe to updates from the remote node and
         # publish the initial state of the local instrument (to be picked up by the remote node). State
         # will only be published if the MQTT interface has been configured and we are connected to the broker
-        if isinstance(linked_to_id,str):
-            subscribe_to_remote_instrument(linked_to_id)
-            send_mqtt_instrument_updated_event(block_id)
+        # Note that this function is DEPRECATED - you should always 'subscribe' to remote instruments beforehand
+        if isinstance(linked_to_id,str) and not instrument_exists(linked_to_id):
+            remote_node,remote_id = mqtt_interface.split_remote_item_identifier(linked_to_id)
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",remote_node,
+                                            remote_id,handle_mqtt_instrument_updated_event)
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",remote_node,
+                                            remote_id,handle_mqtt_ring_section_bell_event)
+            list_of_instruments_to_publish.append(block_id)
+            logging.warning ("###########################################################################################")
+            logging.warning ("Block Instrument "+str(block_id)+": Auto publish and subscribe is DEPRECATED - call the")
+            logging.warning ("'subscribe_to_instrument_updates'and 'set_instruments_to_publish_state' functions to")
+            logging.warning ("configure networking before creating the block instruments on the local schematic")
+            logging.warning ("###########################################################################################")
+        ####################################################################################################################
+
+        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
+        # only be published if the MQTT interface has been configured for publishing updates for this
+        # instrument. This allows publish/subscribe to be configured prior to instrument creation
+        send_mqtt_instrument_updated_event(block_id)
     return ()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to configure instruments to publish state changes to remote MQTT nodes
+# (i.e. effectively publish state changes to the local SECTION indicator)
+# Note that this function should be called BEFORE creating block instruments
+#-----------------------------------------------------------------------------------------------
+
+def set_instruments_to_publish_state(*inst_ids:int):
+    global list_of_instruments_to_publish
+    for inst_id in inst_ids:
+        logging.info("MQTT-Client: Configuring instrument "+str(inst_id)+" to publish state changes via MQTT broker")
+        if inst_id in list_of_instruments_to_publish:
+            logging.warning("MQTT-Client: Instrument "+str(inst_id)+" - is already configured to publish state changes")
+        else:
+            list_of_instruments_to_publish.append(inst_id)
+            # Publish the initial state now this has been added to the list of instruments to publish
+            # This allows the publish/subscribe functions to be configured after instrument creation
+            if str(inst_id) in instruments.keys(): send_mqtt_instrument_updated_event(inst_id)
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to instrument updates published by remote MQTT "Node"
+# Note that no callback is specified in the function call - the default internal one is used
+# to set the repeater display on the local instrument (to mirror the remote instrument)
+#-----------------------------------------------------------------------------------------------
+
+def subscribe_to_instrument_updates (node:str,*inst_ids:int):
+    global instruments
+    for inst_id in inst_ids:
+        instrument_identifier = mqtt_interface.create_remote_item_identifier(inst_id,node)
+        if not instrument_exists(instrument_identifier):
+            # Create a dummy instrument object to enable 'instrument_exists' validation checks
+            # Note that this does not hold state - as state is reflected on the local repeater indicator
+            # The Identifier for a remote instrument is a string combining the the Node-ID and Section-ID
+            instruments[instrument_identifier] = {}
+            # Subscribe to updates from the remote block instrument
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",node,
+                                    inst_id,handle_mqtt_instrument_updated_event)
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",node,
+                                    inst_id,handle_mqtt_ring_section_bell_event)
+    return()
 
 # --------------------------------------------------------------------------------
 # Public API function to find out if the block section ahead is clear.
@@ -632,18 +713,6 @@ def block_section_ahead_clear(block_id:int):
     else:
         section_ahead_clear = False
     return(section_ahead_clear)
-
-# --------------------------------------------------------------------------------
-# Internal function to subscribe to the required MQTT messages from a remote instrument
-# --------------------------------------------------------------------------------
-
-def subscribe_to_remote_instrument(block_identifier:str):
-    remote_node,remote_id = mqtt_interface.split_remote_item_identifier(block_identifier) 
-    mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",remote_node,
-                                            remote_id,handle_mqtt_instrument_updated_event)   
-    mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",remote_node,
-                                            remote_id,handle_mqtt_ring_section_bell_event)  
-    return()
 
 # --------------------------------------------------------------------------------
 # Callbacks for handling received MQTT messages (from a remote Instrument)
@@ -673,20 +742,22 @@ def handle_mqtt_ring_section_bell_event(message):
 # --------------------------------------------------------------------------------
 
 def send_mqtt_instrument_updated_event(block_id:int):
-    data = {}
-    data["instrumentid"] = instruments[str(block_id)]["linkedto"]
-    data["sectionstate"] = instruments[str(block_id)]["sectionstate"]
-    log_message = "Block Instrument "+str(block_id)+": Publishing instrument state to MQTT Broker"
-    # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
-    mqtt_interface.send_mqtt_message("instrument_updated_event",block_id,data=data,log_message=log_message,retain=True)
+    if block_id in list_of_instruments_to_publish:
+        data = {}
+        data["instrumentid"] = instruments[str(block_id)]["linkedto"]
+        data["sectionstate"] = instruments[str(block_id)]["sectionstate"]
+        log_message = "Block Instrument "+str(block_id)+": Publishing instrument state to MQTT Broker"
+        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("instrument_updated_event",block_id,data=data,log_message=log_message,retain=True)
     return()
 
 def send_mqtt_ring_section_bell_event(block_id:int):
-    data = {}
-    data["instrumentid"] = instruments[str(block_id)]["linkedto"]
-    log_message = "Block Instrument "+str(block_id)+": Publishing telegraph key event to MQTT Broker"
-    # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
-    mqtt_interface.send_mqtt_message("instrument_telegraph_event",block_id,data=data,log_message=log_message,retain=False)
+    if block_id in list_of_instruments_to_publish:
+        data = {}
+        data["instrumentid"] = instruments[str(block_id)]["linkedto"]
+        log_message = "Block Instrument "+str(block_id)+": Publishing telegraph key event to MQTT Broker"
+        # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
+        mqtt_interface.send_mqtt_message("instrument_telegraph_event",block_id,data=data,log_message=log_message,retain=False)
     return()
 
 # ------------------------------------------------------------------------------------------
@@ -696,6 +767,8 @@ def send_mqtt_ring_section_bell_event(block_id:int):
 # ------------------------------------------------------------------------------------------
 
 def delete_instrument(block_id:int):
+    global instruments
+    global list_of_instruments_to_publish
     if instrument_exists(block_id):
         # Delete all the tkinter canvas drawing objects associated with the signal
         instruments[str(block_id)]["canvas"].delete("instrument"+str(block_id))
@@ -704,6 +777,9 @@ def delete_instrument(block_id:int):
         instruments[str(block_id)]["clearbutton"].destroy()
         instruments[str(block_id)]["occupbutton"].destroy()
         instruments[str(block_id)]["bellbutton"].destroy()
+        # Delete the instrument from the list_of_instruments_to_publish (if required)
+        if block_id in list_of_instruments_to_publish:
+            list_of_instruments_to_publish.remove(block_id)
         # Finally, delete the entry from the dictionary of instruments
         del instruments[str(block_id)]
     return()
@@ -714,5 +790,29 @@ def delete_instrument(block_id:int):
 
 def get_tags(block_id:int):
     return("instrument"+str(block_id))
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of published/subscribed instruments. Used
+# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
+# via the subscribe_to_instrument_updates and subscribe_to_instrument_updates functions
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    global instruments
+    global list_of_instruments_to_publish
+    # We only need to clear the list to stop any further instrument events being published
+    list_of_instruments_to_publish.clear()
+    # For subscriptions we unsubscribe from all topics associated with the message_type
+    mqtt_interface.unsubscribe_from_message_type("instrument_updated_event")
+    mqtt_interface.unsubscribe_from_message_type("instrument_telegraph_event")
+    # Finally remove all "remote" instruments from the dictionary of instruments - these
+    # will be re-created if they are subsequently re-subscribed to. Note we don't iterate
+    # through the dictionary of instruments to remove items as it will change under us
+    new_instruments = {}
+    for key in instruments:
+        if mqtt_interface.split_remote_item_identifier(key) is not None:
+            new_instruments[key] = instruments[key]
+    instruments = new_instruments
+    return()
 
 ###############################################################################

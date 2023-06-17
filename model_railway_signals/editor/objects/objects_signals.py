@@ -41,14 +41,14 @@
 #    signals_ground_disc.ground_disc_sub_type - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
-#    signals.delete_signal(id) - delete library drawing object (part of soft delete)
-#    signals.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals.update_signal(id) - To set the initial colour light signal aspect following creation
 #    signals.set_route(id,route) - To set the initial route for a signal following creation
 #    signals_colour_lights.create_colour_light_signal - To create the library object (create or redraw)
 #    signals_semaphores.create_semaphore_signal - To create the library object (create or redraw)
 #    signals_ground_position.create_ground_position_signal - To create the library object (create or redraw)
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
+#    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
+#    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
@@ -598,7 +598,7 @@ def redraw_signal_object(object_id):
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the canvas "tags" and selection rectangle for the signal
-    objects_common.schematic_objects[object_id]["tags"] = signals.get_tags(objects_common.schematic_objects[object_id]["itemid"])
+    objects_common.schematic_objects[object_id]["tags"] = signals_common.get_tags(objects_common.schematic_objects[object_id]["itemid"])
     objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
     return()
 
@@ -688,13 +688,13 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
 
 def delete_signal_object(object_id):
     # Delete the signal drawing objects and associated DCC mapping
-    signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
+    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
     track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10)
     track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10+1)
     # Delete the associated distant signal (if there is one)
-    signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
+    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
     return()
 
