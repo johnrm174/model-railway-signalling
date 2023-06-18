@@ -128,8 +128,8 @@ Model Railway Signals ("""+settings.get_general()[2]+""")
 An application for designing and developing fully interlocked and automated model railway
 signalling systems with DCC control of signals and points via the SPROG Command Station.
 
-From release 3.0.0 this software is released under the GNU General Public License
-Version 2, June 1991 meaning you are free to use, share or adapt the software as you like
+This software is released under the GNU General Public License Version 2, June 1991 
+meaning you are free to use, share or adapt the software as you like
 but must ensure those same rights are passed on to all recipients.
 
 For more information visit: """
