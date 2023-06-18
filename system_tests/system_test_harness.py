@@ -680,6 +680,7 @@ class dummy_event():
         self.y = y
         self.x_root = x_root
         self.y_root = y_root
+        self.widget = schematic.canvas
 
 # ------------------------------------------------------------------------------
 # Functions to excersise the schematic Editor - Create Functions
