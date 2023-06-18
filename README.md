@@ -2,29 +2,37 @@
 
 A DCC model railway signalling system written in Python. Primarily intended for the Raspberry Pi, but 
 will also run on other platforms (albeit without some of the Raspberry-Pi specific interfacing functions). 
-Most types of colour light signals, semaphore signals, and ground signals are supported.
+* Enables schematics to be created with signals, points, track occupancy sections and block instruments
+* Most types of colour light signals, semaphore signals, and ground signals are supported.
 * Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout
 * Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation
+* Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts
 
 ## Layout editor
 
-From Release 3.0.0, the schematic editor application enables automated and interlocked layout signalling 
-schemes to be designed and configured without the need to write any code. Note that the editor is in
+The schematic editor application enables automated and interlocked layout signalling schemes to be
+designed and configured via the UI without the need to write any code. Note that the editor is in
 active development so any comments and suggestions for future features are welcome.
 
-What's supported in Release 3.3.0:
-* Draw your layout schematic with lines, points, signals and track occupancy sections
-* Define the DCC command sequences to drive the signals and points out on the layout
-* Configure the signals and points to implement protototypical interlocking schemes
+What's currently supported by the Editor:
+* Draw your schematic with lines, points, signals, track occupancy sections and block instruments
+* Define the DCC command sequences needed to drive the signals and points out on the layout
+* Configure the signals, points and block instruments for protototypical interlocking
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
-* Automation of signals as trains traverse the routes that have been configured
-* Save and load your layout schematic and state between running sessions
-* Block instruments - with interlocking of starting signals
-* Popup error messages when things go wrong (reduced reliance on logs)
+* Configure a level of automation for the signals as trains traverse the layout
+
+What's New in Release 3.4.0:
+* Point and line colour selections - to enable colour coding of routes
+* Line end-style selections - end-stops and arrow styles can now be specified
+* Enhanced error/warning reporting via popups - reduced reliance on logs
+* Layout 'info' function (under Help) allows you to add notes for your layout
+* Fixed issue when selecting objects if Canvas is scrolled within the main window
+* Various window geometry improvements to keep key UI elements visible on resizing
+* Track section occupancy logic corrected for passing shunt-ahead ground signals
 
 What's coming soon:
 * MQTT networking (for linking layouts)
-* Application documentation
+* Better pplication documentation
 
 Any bug reports and feedback you may have would be gratefully appreciated - specifically:
 * What aspects are intuitive? What aspects aren't?
