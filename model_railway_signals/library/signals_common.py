@@ -100,7 +100,6 @@ def null_callback (sig_id:int,callback_type):
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
-    global logging
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
     # toggle the signal state and refresh the signal
     toggle_signal(sig_id)
@@ -110,7 +109,6 @@ def signal_button_event (sig_id:int):
     return ()
 
 def subsidary_button_event (sig_id:int):
-    global logging
     logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event **********************************************")
     toggle_subsidary(sig_id)
     #  call the signal type-specific functions to update the signal
@@ -123,7 +121,6 @@ def subsidary_button_event (sig_id:int):
     return ()
 
 def sig_passed_button_event (sig_id:int):
-    global logging
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
     if not common.shutdown_initiated:
@@ -141,7 +138,6 @@ def sig_passed_button_event (sig_id:int):
     return ()
 
 def approach_release_button_event (sig_id:int):
-    global logging
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
     # Pulse the approach release button to provide a visual indication
     if not common.shutdown_initiated:
@@ -180,7 +176,6 @@ def auto_refresh_signal(sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
-    global logging
     global signals
     # Update the state of the signal button - Common to ALL signal types
     # The Signal Clear boolean value will always be either True or False
@@ -203,7 +198,6 @@ def toggle_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
-    global logging
     global signals
     # Update the state of the subsidary button - Common to ALL signal types.
     # The subsidary clear boolean value will always be either True or False
@@ -223,7 +217,6 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
-    global logging
     global signals
     # Only set approach control if the signal is not in the period between 
     # 'released' and 'passed' events (unless the force_reset flag is set)
@@ -249,7 +242,6 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
-    global logging
     global signals
     # Only Clear approach control if it is currently set for the signal
     if signals[str(sig_id)]["releaseonred"] or signals[str(sig_id)]["releaseonyel"]:
@@ -264,7 +256,6 @@ def clear_approach_control (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override (sig_id:int):
-    global logging
     global signals
     # Only set the override if the signal is not already overridden
     if not signals[str(sig_id)]["override"]:
@@ -279,7 +270,6 @@ def set_signal_override (sig_id:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override (sig_id:int):
-    global logging
     global signals
     # Only clear the override if the signal is already overridden
     if signals[str(sig_id)]["override"]:
@@ -294,7 +284,6 @@ def clear_signal_override (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override_caution (sig_id:int):
-    global logging
     global signals
     # Only set the override if the signal is not already overridden
     if not signals[str(sig_id)]["overcaution"]:
@@ -307,7 +296,6 @@ def set_signal_override_caution (sig_id:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override_caution (sig_id:int):
-    global logging
     global signals
     # Only clear the override if the signal is already overridden
     if signals[str(sig_id)]["overcaution"]:
@@ -320,7 +308,6 @@ def clear_signal_override_caution (sig_id:int):
 # -------------------------------------------------------------------------
 
 def lock_signal (sig_id:int):
-    global logging
     global signals
     # Only lock if it is currently unlocked
     if not signals[str(sig_id)]["siglocked"]:
@@ -339,7 +326,6 @@ def lock_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def unlock_signal (sig_id:int):
-    global logging
     global signals
     # Only unlock if it is currently locked
     if signals[str(sig_id)]["siglocked"]:
@@ -355,7 +341,6 @@ def unlock_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def lock_subsidary (sig_id:int):
-    global logging
     global signals
     # Only lock if it is currently unlocked
     if not signals[str(sig_id)]["sublocked"]:
@@ -374,7 +359,6 @@ def lock_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (sig_id:int):
-    global logging
     global signals
     # Only unlock if it is currently locked
     if signals[str(sig_id)]["sublocked"]:
@@ -532,7 +516,6 @@ def create_theatre_route_elements (canvas,sig_id:int,
 # -------------------------------------------------------------------------
 
 def update_theatre_route_indication (sig_id,theatre_text:str):
-    global logging
     global signals
     # Only update the Theatre route indication if one exists for the signal
     if signals[str(sig_id)]["hastheatre"]:
@@ -557,7 +540,6 @@ def update_theatre_route_indication (sig_id,theatre_text:str):
 # -------------------------------------------------------------------------
 
 def enable_disable_theatre_route_indication (sig_id):
-    global logging
     global signals
     # Only update the Theatre route indication if one exists for the signal
     if signals[str(sig_id)]["hastheatre"]:
@@ -582,7 +564,6 @@ def enable_disable_theatre_route_indication (sig_id):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_signal_updated_event(message):
-    global logging
     global signals
     if "sourceidentifier" in message.keys() and "sigstate" in message.keys():
         signal_identifier = message["sourceidentifier"]
@@ -596,7 +577,6 @@ def handle_mqtt_signal_updated_event(message):
     return()
 
 def handle_mqtt_signal_passed_event(message):
-    global logging
     if "sourceidentifier" in message.keys():
         signal_identifier = message["sourceidentifier"]
         logging.info("Signal "+signal_identifier+": Remote Signal Passed Event ***********************************")
@@ -605,12 +585,15 @@ def handle_mqtt_signal_passed_event(message):
     return()
 
 # --------------------------------------------------------------------------------
-# Common functions for building and sending MQTT messages - but only if the
-# Signal has been configured to publish the specified updates via the mqtt broker
+# Common functions for building and sending MQTT messages - but only if the Signal
+# has been configured to publish the specified updates via the mqtt broker. As this
+# function is called on signal creation, we also need to handle the case of a signal
+# configured to NOT to refresh on creation (i.e. it gets set when 'update_signal' is
+# called for the first time - in this case (sigstate = None) we don't publish
 # --------------------------------------------------------------------------------
 
 def publish_signal_state(sig_id:int):
-    if sig_id in list_of_signals_to_publish_state_changes:
+    if sig_id in list_of_signals_to_publish_state_changes and signals[str(sig_id)]["sigstate"] is not None:
         data = {}
         # The sig state is an enumeration type - so its the VALUE that gets passed in the message
         data["sigstate"] = signals[str(sig_id)]["sigstate"].value
@@ -635,6 +618,8 @@ def publish_signal_passed_event(sig_id:int):
 
 def delete_signal(sig_id:int):
     global signals
+    global list_of_signals_to_publish_state_changes
+    global list_of_signals_to_publish_passed_events
     if sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
         signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
@@ -645,8 +630,46 @@ def delete_signal(sig_id:int):
         # This buttons is only common to colour light and semaphore types
         if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
             signals[str(sig_id)]["releasebutton"].destroy()
+        # Delete the signal from the list_of_signals_to_publish (if required)
+        if sig_id in list_of_signals_to_publish_passed_events:
+            list_of_signals_to_publish_passed_events.remove(sig_id)
+        if sig_id in list_of_signals_to_publish_state_changes:
+            list_of_signals_to_publish_state_changes.remove(sig_id)
         # Finally, delete the signal entry from the dictionary of signals
         del signals[str(sig_id)]
     return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of published/subscribed signals. Used
+# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
+# via the signal-specific publish and subscribe configuration functions
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    global signals
+    global list_of_signals_to_publish_state_changes
+    global list_of_signals_to_publish_passed_events
+    # We only need to clear the list to stop any further signal events being published
+    list_of_signals_to_publish_state_changes.clear()
+    list_of_signals_to_publish_passed_events.clear()
+    # For subscriptions we unsubscribe from all topics associated with the message_type
+    mqtt_interface.unsubscribe_from_message_type("signal_updated_event")
+    mqtt_interface.unsubscribe_from_message_type("signal_passed_event")
+    # Finally remove all "remote" signals from the dictionary of signals - these will
+    # be re-created if they are subsequently re-subscribed to. Note we don't iterate 
+    # through the dictionary of signals to remove items as it will change under us
+    new_signals = {}
+    for key in signals:
+        if mqtt_interface.split_remote_item_identifier(key) is not None:
+            new_signals[key] = signals[key]
+    signals = new_signals
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to return the tkinter canvas 'tags' for the signal
+# ------------------------------------------------------------------------------------------
+
+def get_tags(sig_id:int):
+    return("signal"+str(sig_id))
 
 #################################################################################################

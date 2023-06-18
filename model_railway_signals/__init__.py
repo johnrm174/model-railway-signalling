@@ -80,6 +80,8 @@ from .library.file_interface import load_layout_state
 from .library.block_instruments import block_callback_type
 from .library.block_instruments import create_block_instrument
 from .library.block_instruments import block_section_ahead_clear
+from .library.block_instruments import subscribe_to_instrument_updates
+from .library.block_instruments import set_instruments_to_publish_state
 
 from .editor.editor import run_editor
 
@@ -165,6 +167,8 @@ __all__ = [
       # Public block instrument functions
         'create_block_instrument',
         'block_section_ahead_clear',
+        'subscribe_to_instrument_updates',
+        'set_instruments_to_publish_state',
       # Public function to run editor
         'run_editor'
            ]

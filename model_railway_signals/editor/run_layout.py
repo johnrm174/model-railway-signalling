@@ -32,6 +32,8 @@
 #    block_instruments.block_section_ahead_clear - for interlocking
 #    signals_colour_lights.signal_sub_type - for accessing the enum value
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
+#    signals_ground_position.ground_pos_sub_type - for accessing the enum value
+#    signals_ground_disc.ground_disc_sub_type - for accessing the enum value
 #    <MORE COMING>
 #
 # Makes the following external API calls to library modules:
@@ -68,6 +70,8 @@ from ..library import block_instruments
 from ..library import signals_common
 from ..library import signals_semaphores
 from ..library import signals_colour_lights
+from ..library import signals_ground_position
+from ..library import signals_ground_disc
 from ..library import track_sections
 
 from . import objects
@@ -193,7 +197,6 @@ def find_signal_behind(signal_object):
 #------------------------------------------------------------------------------------
 
 def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
-    global logging
     home_signal_at_danger = False
     if recursion_level < 20:
         signal_ahead_object = find_signal_ahead(signal_object)
@@ -363,49 +366,68 @@ def update_track_occupancy(signal_object):
     else:
         section_ahead = 0
     section_behind = signal_object["tracksections"][0]
-    # Distant signals can be Passed even when ON and we have to cater for distants on a
-    # bi-directional running line so we need to assume the direction of travel depending
-    # on which section each side of the signal is CLEAR and which is OCCUPIED
-    if ( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
-           signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
-         ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
-           signal_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.distant.value ) ):
+    # Distant signals and shunt-ahead signals can be passed when ON so we need
+    # to assume the direction of travel depending on which section on each side
+    # of the signal is CLEAR and which is OCCUPIED. If both sections are CLEAR
+    # or both sections are OCCUPIED when the signal passed event is generated
+    # then we cannot infer or assume anything - and therefore take no action
+    item_type = signal_object["itemtype"]
+    item_sub_type = signal_object["itemsubtype"]
+    if ( ( item_type == signals_common.sig_type.colour_light.value and
+           item_sub_type == signals_colour_lights.signal_sub_type.distant.value ) or
+         ( item_type == signals_common.sig_type.semaphore.value and
+           item_sub_type == signals_semaphores.semaphore_sub_type.distant.value ) or
+         ( item_type == signals_common.sig_type.ground_position.value and
+           item_sub_type == signals_ground_position.ground_pos_sub_type.shunt_ahead.value ) or
+         ( item_type == signals_common.sig_type.ground_position.value and
+           item_sub_type == signals_ground_position.ground_pos_sub_type.early_shunt_ahead.value ) or
+         ( item_type == signals_common.sig_type.ground_disc.value and
+           item_sub_type == signals_ground_disc.ground_disc_sub_type.shunt_ahead.value ) ):
         if ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
              section_behind > 0 and not track_sections.section_occupied(section_behind) ):
-            # Assume Direction of travel 'against' the signal
+            # Section ahead of signal is OCCUPIED and section behind is CLEAR
+            # Assume Direction of travel 'against' the signal (and 'pass' the train)
             track_sections.set_section_occupied (section_behind,
                    track_sections.clear_section_occupied(section_ahead))
         elif ( section_ahead > 0 and not track_sections.section_occupied(section_ahead) and
              section_behind > 0 and track_sections.section_occupied(section_behind) ):
-            # Assume Direction of travel 'with' the signal
+            # Section behind signal is OCCUPIED and section ahead is CLEAR
+            # Assume Direction of travel 'with' the signal (and 'pass' the train)
             track_sections.set_section_occupied (section_ahead,
                    track_sections.clear_section_occupied(section_behind))
         elif section_ahead > 0 and not track_sections.section_occupied(section_ahead):
+            # Section ahead of signal is CLEAR - section behind doesn't exist
+            # Assume Direction of travel 'with' the signal - set section ahead to OCCUPIED
             track_sections.set_section_occupied(section_ahead)
         elif section_behind > 0 and not track_sections.section_occupied(section_behind):
-            track_sections.set_section_occupied(section_behind)
+            # Section behind signal is CLEAR - section ahead doesn't exist
+            # Assume Direction of travel 'against' the signal - set section behind to OCCUPIED
+           track_sections.set_section_occupied(section_behind)
         elif section_ahead > 0 and track_sections.section_occupied(section_ahead):
+            # Section ahead of signal is OCCUPIED - section behind doesn't exist
+            # Assume Direction of travel 'against' the signal - set section ahead to CLEAR
             track_sections.clear_section_occupied(section_ahead)
         elif section_behind > 0 and track_sections.section_occupied(section_behind):
+            # Section behind signal is OCCUPIED - section ahead doesn't exist
+            # Assume Direction of travel 'with' the signal - set section behind to CLEAR
             track_sections.clear_section_occupied(section_behind)
     # Non-distant signals can only be passed when CLEAR (as long as the driver is
-    # doing their job so we assume direction of travel from signal CLEAR
+    # doing their job properly) so we assume direction of travel is 'with' the signal
+    # This is also important to cater for the case of opposing signals protecting
+    # points (with no track sections in between) - in this case, both signals will
+    # generate 'passed' events but we only act on the route that has been cleared
     elif ( signals.signal_clear(signal_id) or ( has_subsidary(signal_id)
                     and signals.subsidary_clear(signal_id) ) ):
-        # Update the track occupancy sections behind and ahead of the signal
-        # Also set/clear any overrides for this signal and the signal behind
-        signal_route = find_signal_route(signal_object)
-        section_behind = signal_object["tracksections"][0]
-        if signal_route is not None:
-            section_ahead = signal_object["tracksections"][1][signal_route.value-1]
-        else:
-            section_ahead = 0
         if section_ahead > 0 and section_behind > 0:
+            # Sections ahead of and behind the signal both exist ('pass' the train)
             track_sections.set_section_occupied (section_ahead,
                    track_sections.clear_section_occupied(section_behind))
         elif section_ahead > 0:
+            # Only the section ahead of the signal exists - set to OCCUPIED
+            # Assume Direction of travel 'against' the signal (and 'pass' train)
             track_sections.set_section_occupied(section_ahead)
         elif section_behind > 0:
+            # Only the section behind the signal exists - set to CLEAR
             track_sections.clear_section_occupied(section_behind)
     # Propagate changes to any mirrored track sections
     if section_ahead > 0:
@@ -727,7 +749,6 @@ def update_all_mirrored_sections():
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id,callback_type):
-    global logging
     global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
@@ -824,7 +845,6 @@ def schematic_callback(item_id,callback_type):
 
 def initialise_layout():
     global editing_enabled
-    global logging
     logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
     logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()

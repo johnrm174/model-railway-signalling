@@ -447,7 +447,7 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
       single_line:bool - DEPRECATED - use inst_type instead
       bell_sound_file:str - The filename of the soundfile (in the local package resources
                           folder) to use for the bell sound (default "bell-ring-01.wav" - other
-              options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
+                          options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
       linked_to:int/str - the identifier for the "paired" block instrument - can be specified
@@ -455,12 +455,10 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
                           the local schematic), or a string representing a Block Instrument 
                           running on a remote node - see MQTT networking (default = None)
 
-Note that the Block Instruments feature is primarily intended to provide a prototypical means of
-communication between signallers working their respective signal boxes. As such, MQTT networking
-is "built in" - If a remote instrument identifier is specified for the "linked_to" instrument
-and the MQTT network has been configured then this function will automatically configured the
-block instrument to publish its state and telegraph key clicks to the remote instrument and
-will also subscribe to state updates and telegraph clicks from the remote instrument.
+Note that automatic MQTT networking publish/subscribe on instrument creation is now DEPRECATED.
+The 'set_instruments_to_publish_state' and 'subscribe_to_instrument_updates' functions should
+be called to configure networking prior to creating Block Instruments on the local schematic.
+This is to provide a level of consistency between other MQTT publish/subscribe functions.
 
 block_section_ahead_clear(block_id:int) - Returns the state of the ASSOCIATED block instrument
           (i.e. the linked instrument controlling the state of the block section ahead of ours)
@@ -664,7 +662,7 @@ You can also use these features to split larger layouts into multiple signal box
 still being able to implement a level of automation between them. Functions are provided for 
 publishing and subscribing to signals and track occupancy sections. This enables colour light 
 signal aspects to correctly reflect the aspect of the signal ahead and trains to be "passed" 
-from one signal box area to the next. MQTT networking is also at the heart of Block Instruments, 
+from one signal box area to the next. MQTT networking also supports the linking of Block Instruments, 
 allowing signal boxes to communicate prototypically via signalbox bell codes and block status.
 
 To use these networking functions, you can either set up a local MQTT broker on one of the host 
@@ -721,6 +719,11 @@ subscribe_to_signal_passed_events  - Subscribe to signal passed events from anot
                Item Identifier is a string in the following format "node_id-signal_id"
       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 
+subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network 
+  Mandatory Parameters:
+      node:str - The name of the node publishing the block instrument update feed
+      *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
+
 set_sections_to_publish_state - Enable the publication of state updates for track sections.
                All subsequent changes will be automatically published to remote subscribers
   Mandatory Parameters:
@@ -735,6 +738,12 @@ set_signals_to_publish_passed_events - Enable the publication of signal passed e
                All subsequent events will be automatically published to remote subscribers
   Mandatory Parameters:
       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+      
+set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
+               All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
+      
 </pre>
 
 ## Code examples

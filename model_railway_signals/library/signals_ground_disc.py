@@ -29,8 +29,6 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                sig_callback = None,
                                orientation:int = 0,
                                sig_passed_button: bool = False):
-    global logging
-
     logging.info ("Signal "+str(sig_id)+": Creating Ground Disc Signal")
     # Do some basic validation on the parameters we have been given
     if signals_common.sig_exists(sig_id):
@@ -81,7 +79,10 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
         update_ground_disc_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
-        
+        # Publish the initial state to the broker (for other nodes to consume). Note that changes will
+        # only be published if the MQTT interface has been configured for publishing updates for this 
+        # signal. This allows publish/subscribe to be configured prior to signal creation
+        signals_common.publish_signal_state(sig_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -91,7 +92,6 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
 # -------------------------------------------------------------------------
 
 def update_ground_disc_signal (sig_id:int):
-    global logging
     
     # Establish what the signal should be displaying based on the state
     if not signals_common.signals[str(sig_id)]["sigclear"]:   

@@ -4,6 +4,7 @@
 # Classes (pop up windows) called from the main editor module menubar selections
 #    display_help(root)
 #    display_about(root)
+#    edit_layout_info()
 #    edit_mqtt_settings(root)
 #    edit_sprog_settings(root)
 #    edit_logging_settings(root)
@@ -16,9 +17,10 @@
 #    settings.set_canvas(width,height,grid) - Save the new settings
 #    settings.get_logging() - Get the current settings (for editing)
 #    settings.set_logging(level) - Save the new settings
+#    settings.get_general() - Get the current settings (for info/editing)
+#    settings.set_general() - Save the new settings (layout info)
 #    settings.get_sprog() - Get the current settings (for editing)
 #    settings.set_sprog(params) - Save the new settings
-#    settings_get_version() - For the 'About' Window
 #
 # Uses the following common editor UI elements:
 #    common.selection_buttons
@@ -27,7 +29,7 @@
 #    common.integer_entry_box
 #    common.window_controls
 #    common.CreateToolTip
-#
+#    common.scrollable_text_box
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -39,7 +41,8 @@ from . import settings
 from . import schematic
 
 #------------------------------------------------------------------------------------
-# Class for the "Help" window
+# Class for the "Help" window - Uses the common.scrollable_text_box
+# Note the packing order to keep the button visible during window re-sizing
 #------------------------------------------------------------------------------------
 
 help_text = """
@@ -81,6 +84,7 @@ Menubar Options
 5) Settings-Canvas - Change the display size of the schematic
 6) Settings-Logging - Set the log level for running the layout
 7) Settings-SPROG - Configure the serial port and SPROG behavior
+8) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 
@@ -91,55 +95,61 @@ Schematic object configuration
 class display_help():
     def __init__(self, root_window):
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for application help
         winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Help")
         self.window.attributes('-topmost',True)
-        self.label1 = Tk.Label(self.window, text=help_text, justify=Tk.LEFT)
-        self.label1.pack(padx=5, pady=5)
-        # Create the close button and tooltip
-        self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
-        self.B1.pack(padx=2, pady=2)
+        # Create the srollable textbox to display the help text. We only specify
+        # the max height (in case the help text grows in the future) leaving
+        # the width to auto-scale to the maximum width of the help text
+        self.text = common.scrollable_text_frame(self.window, max_height=25)
+        self.text.set_value(help_text)
+        # Create the ok/close button and tooltip
+        self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
         self.TT1 = common.CreateToolTip(self.B1, "Close window")
+        # Pack the OK button First - so it remains visible on re-sizing
+        self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         
     def ok(self):
         self.window.destroy()
-        
+
 #------------------------------------------------------------------------------------
-# Class for the "About" window
+# Class for the "About" window- uses a hyperlink to go to the github repo
 #------------------------------------------------------------------------------------
 
+# The version is the third parameter provided by 'get_general'
 about_text = """
-Model Railway Signals ("""+settings.get_version()+""")
+Model Railway Signals ("""+settings.get_general()[2]+""")
 
 An application for designing and developing fully interlocked and automated model railway
 signalling systems with DCC control of signals and points via the SPROG Command Station.
 
-From release 3.0.0 this software is released under the GNU General Public License
-Version 2, June 1991 meaning you are free to use, share or adapt the software as you like
+This software is released under the GNU General Public License Version 2, June 1991 
+meaning you are free to use, share or adapt the software as you like
 but must ensure those same rights are passed on to all recipients.
 
 For more information visit: """
 
 class display_about():
     def __init__(self, root_window):
-        text2 = "https://github.com/johnrm174/model-railway-signalling"
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for application about
         winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Info")
         self.window.attributes('-topmost',True)
         self.label1 = Tk.Label(self.window, text=about_text)
         self.label1.pack(padx=5, pady=5)
-        self.label2 = Tk.Label(self.window, text=text2, fg="blue", cursor="hand2")
+        hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+        self.label2 = Tk.Label(self.window, text=hyperlink, fg="blue", cursor="hand2")
         self.label2.pack(padx=5, pady=5)
-        self.label2.bind("<Button-1>", lambda e:self.callback())
+        self.label2.bind("<Button-1>", self.callback)
         # Create the close button and tooltip
         self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
         self.B1.pack(padx=2, pady=2)
@@ -148,20 +158,59 @@ class display_about():
     def ok(self):
         self.window.destroy()
 
-    def callback(self):
+    def callback(self,event):
         webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
 
 #------------------------------------------------------------------------------------
-# Class for the "About" window
+# Class for the Edit Layout Information window
+#------------------------------------------------------------------------------------
+
+class edit_layout_info():
+    def __init__(self, root_window):
+        self.root_window = root_window
+        # Create the top level window for application help
+        winx = self.root_window.winfo_rootx() + 250
+        winy = self.root_window.winfo_rooty() + 20
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("Layout Information")
+        self.window.attributes('-topmost',True)
+        # Create the srollable textbox to display the text. We specify
+        # the max height/width (in case the text grows in the future) and also
+        # the min height/width (to give the user something to start with)
+        self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=100,
+                min_height=10, min_width=40, editable=True, auto_resize=True)
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self,
+                                self.load_state, self.save_state)
+        # We need to pack the window buttons at the bottom and then pack the text
+        # frame - so the buttons remain visible if the user re-sizes the window
+        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+        # Load the initial UI state
+        self.load_state()
+        
+    def load_state(self, parent_object=None):
+        # Parent object is passed by the callback - not used here
+        # The version is the forth parameter provided by 'get_general'
+        self.text.set_value(settings.get_general()[3])
+        
+    def save_state(self, parent_object, close_window:bool):
+        # Parent object is passed by the callback - not used here
+        settings.set_general(info=self.text.get_value())
+        if close_window: self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for the MQTT configuration window
 #------------------------------------------------------------------------------------
 
 class edit_mqtt_settings():
     def __init__(self, root_window):
         text1 = ("Coming Soon")
         self.root_window = root_window
-        # Create the top level window for the canvas settings
-        winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 50
+        # Create the top level window for the MQTT Settings
+        winx = self.root_window.winfo_rootx() + 200
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("MQTT")
@@ -169,7 +218,8 @@ class edit_mqtt_settings():
         self.label1 = Tk.Label(self.window, text=text1, wraplength=400)
         self.label1.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
 
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
@@ -180,17 +230,17 @@ class edit_mqtt_settings():
         if close_window: self.window.destroy()
 
 #------------------------------------------------------------------------------------
-# Class for the SPROG settings selection toolbar window. Note the function also takee
-# in the menubar object so it can call the function to update the menubar sprog status
+# Class for the SPROG settings selection toolbar window. Note the function also takes
+# in a callback object so it can call the function to update the menubar sprog status
 #------------------------------------------------------------------------------------
 
 class edit_sprog_settings():
     def __init__(self, root_window, mb_object):
         self.root_window = root_window
         self.mb_object = mb_object
-        # Create the top level window for the canvas settings
+        # Create the top level window for the SPROG configuration
         winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("SPROG DCC")
@@ -208,6 +258,8 @@ class edit_sprog_settings():
         self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
         self.baud_selection = Tk.StringVar(self.window, "")
         self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
+        menu_width = len(max(self.options, key=len))
+        self.baud.config(width=menu_width)
         common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
         self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
@@ -230,11 +282,13 @@ class edit_sprog_settings():
         self.status = Tk.Label(self.window, text="")
         self.status.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 
     def selection_changed(self):
+        # If connect on startup is selected then enable the DCC power on startup selection
         if self.startup.get_value(): self.power.enable()
         else: self.power.disable()
 
@@ -267,6 +321,7 @@ class edit_sprog_settings():
         self.debug.set_value(debug)
         self.startup.set_value(startup)
         self.power.set_value(power)
+        self.selection_changed()
         
     def save_state(self, parent_object, close_window:bool):
         # Parent object is passed by the callback - not used here
@@ -286,9 +341,9 @@ class edit_sprog_settings():
 class edit_logging_settings():
     def __init__(self, root_window):
         self.root_window = root_window
-        # Create the top level window for the canvas settings
+        # Create the top level window for the Logging Configuration
         winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 50
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Logging")
@@ -299,7 +354,8 @@ class edit_logging_settings():
                                             tool_tip="Set the logging level for running the layout")
         self.log_level.frame.pack()
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 
@@ -326,8 +382,8 @@ class edit_canvas_settings():
     def __init__(self, root_window):
         self.root_window = root_window
         # Create the top level window for the canvas settings
-        winx = self.root_window.winfo_rootx() + 150
-        winy = self.root_window.winfo_rooty() + 50
+        winx = self.root_window.winfo_rootx() + 200
+        winy = self.root_window.winfo_rooty() + 20
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Canvas")
@@ -349,7 +405,8 @@ class edit_canvas_settings():
                         allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
         self.height.grid(row=1, column=1)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Load the initial UI state
         self.load_state()
 

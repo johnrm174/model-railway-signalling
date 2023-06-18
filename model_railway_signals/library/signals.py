@@ -338,7 +338,6 @@ import logging
 # -------------------------------------------------------------------------
 
 def signal_clear (sig_id:int,route:signals_common.route_type = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
@@ -360,7 +359,6 @@ def signal_clear (sig_id:int,route:signals_common.route_type = None):
 # -------------------------------------------------------------------------
 
 def signal_state (sig_id:Union[int,str]):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_state - Signal does not exist")
@@ -377,7 +375,6 @@ def signal_state (sig_id:Union[int,str]):
 # -------------------------------------------------------------------------
 
 def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": subsidary_clear - Signal does not exist")
@@ -401,7 +398,6 @@ def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
 # -------------------------------------------------------------------------
 
 def lock_signal (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -418,7 +414,6 @@ def lock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_signal (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -437,7 +432,6 @@ def unlock_signal (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def lock_subsidary (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -458,7 +452,6 @@ def lock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def unlock_subsidary (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -480,7 +473,6 @@ def unlock_subsidary (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -500,7 +492,6 @@ def set_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -521,7 +512,6 @@ def clear_signal_override (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def set_signal_override_caution (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -546,7 +536,6 @@ def set_signal_override_caution (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def clear_signal_override_caution (*sig_ids:int):
-    global logging
     for sig_id in sig_ids:
         # Validate the signal exists
         if not signals_common.sig_exists(sig_id):
@@ -572,7 +561,6 @@ def clear_signal_override_caution (*sig_ids:int):
 # -------------------------------------------------------------------------
 
 def toggle_signal (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal does not exist")
@@ -594,7 +582,6 @@ def toggle_signal (sig_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_subsidary (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_subsidary - Signal does not exist")
@@ -622,7 +609,6 @@ def toggle_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_approach_control - Signal does not exist")
@@ -664,7 +650,6 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:
 # -------------------------------------------------------------------------
 
 def clear_approach_control (sig_id:int):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": clear_approach_control - Signal does not exist")  
@@ -691,7 +676,6 @@ def clear_approach_control (sig_id:int):
 # -------------------------------------------------------------------------
 
 def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
-    global logging
     # Validate the signal exists (and the one ahead if specified)
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
@@ -718,7 +702,6 @@ def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
 # -------------------------------------------------------------------------
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
@@ -757,7 +740,6 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 # -------------------------------------------------------------------------
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
-    global logging
     # Validate the signal exists
     if not signals_common.sig_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
@@ -779,8 +761,6 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
 
 def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):    
     for sig_id in sig_ids:
-        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node,sig_id,
-                                                signals_common.handle_mqtt_signal_updated_event)
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
         sig_identifier = mqtt_interface.create_remote_item_identifier(sig_id,node)
@@ -790,6 +770,9 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
             signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
+        # Subscribe to updates from the remote signal (even if we have already subscribed)
+        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node,sig_id,
+                                    signals_common.handle_mqtt_signal_updated_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -798,8 +781,6 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
 
 def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):    
     for sig_id in sig_ids:
-        mqtt_interface.subscribe_to_mqtt_messages("signal_passed_event",node,sig_id,
-                                                signals_common.handle_mqtt_signal_passed_event)
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
         sig_identifier = mqtt_interface.create_remote_item_identifier(sig_id,node)
@@ -809,6 +790,9 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
             signals_common.signals[sig_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
             signals_common.signals[sig_identifier]["routeset"] = signals_common.route_type.NONE
             signals_common.signals[sig_identifier]["extcallback"] = sig_callback
+        # Subscribe to updates from the remote signal (even if we have already subscribed)
+        mqtt_interface.subscribe_to_mqtt_messages("signal_passed_event",node,sig_id,
+                                    signals_common.handle_mqtt_signal_passed_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -816,7 +800,6 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_state(*sig_ids:int):    
-    global logging
     for sig_id in sig_ids:
         logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish state changes via MQTT broker")
         # Add the signal ID to the list of signals to publish
@@ -824,6 +807,9 @@ def set_signals_to_publish_state(*sig_ids:int):
             logging.warning("MQTT-Client: Signal "+str(sig_id)+" - is already configured to publish state changes")
         else:
             signals_common.list_of_signals_to_publish_state_changes.append(sig_id)
+            # Publish the initial state now this has been added to the list of signals to publish
+            # This allows the publish/subscribe functions to be configured after signal creation
+            if str(sig_id) in signals_common.signals.keys(): signals_common.publish_signal_state(sig_id) 
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -831,7 +817,6 @@ def set_signals_to_publish_state(*sig_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_passed_events(*sig_ids:int):    
-    global logging
     for sig_id in sig_ids:
         logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish passed events via MQTT broker")
         # Add the signal ID to the list of signals to publish
@@ -841,36 +826,5 @@ def set_signals_to_publish_passed_events(*sig_ids:int):
             signals_common.list_of_signals_to_publish_passed_events.append(sig_id)
     return()
 
-# ------------------------------------------------------------------------------------------
-# Non public API function for deleting a signal object (including all the drawing objects)
-# This is used by the schematic editor for changing signal types where we delete the existing
-# signal with all its data and then recreate it (with the same ID) in its new configuration
-# ------------------------------------------------------------------------------------------
-
-def delete_signal(sig_id:int):
-    if signals_common.sig_exists(sig_id):
-        # Delete all the tkinter canvas drawing objects associated with the signal
-        signals_common.signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
-        # Delete all the tkinter button objects created for the signal
-        signals_common.signals[str(sig_id)]["sigbutton"].destroy()
-        signals_common.signals[str(sig_id)]["subbutton"].destroy()
-        signals_common.signals[str(sig_id)]["passedbutton"].destroy()
-        if signals_common.signals[str(sig_id)]["sigtype"] in (signals_common.sig_type.colour_light,
-                                                              signals_common.sig_type.semaphore):
-            # This buttons is only common to colour light and semaphore types
-            signals_common.signals[str(sig_id)]["releasebutton"].destroy()
-            # Abort any timed signal sequences already in progess
-            route = signals_common.signals[str(sig_id)]["routeset"]
-            signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
-        # Finally, delete the signal entry from the dictionary of signals
-        del signals_common.signals[str(sig_id)]
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to return the tkinter canvas 'tags' for the signal
-# ------------------------------------------------------------------------------------------
-
-def get_tags(sig_id:int):
-    return("signal"+str(sig_id))
 
 ##########################################################################################

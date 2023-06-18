@@ -87,7 +87,6 @@ def split_remote_item_identifier(item_identifier:str):
 #-----------------------------------------------------------------------------------------------
 
 def on_log(mqtt_client, obj, level, mqtt_log_message):
-    global logging
     logging.debug("MQTT-Client: "+mqtt_log_message)
     return()
 
@@ -96,7 +95,6 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 #-----------------------------------------------------------------------------------------------
 
 def on_disconnect(mqtt_client, userdata, rc):
-    global logging
     global node_config
     if rc==0: logging.info("MQTT-Client: Broker connection terminated")
     else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
@@ -108,7 +106,6 @@ def on_disconnect(mqtt_client, userdata, rc):
 #-----------------------------------------------------------------------------------------------
 
 def on_connect(mqtt_client, userdata, flags, rc):
-    global logging
     global node_config
     if rc == 0:
         logging.info("MQTT-Client: Successfully connected to MQTT Broker")
@@ -117,7 +114,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
         # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
         # Note that this means we will immediately receive all retained messages for those topics
         if len(node_config["list_of_subscribed_topics"]) > 0:
-            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
+            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics:")
             for topic in node_config["list_of_subscribed_topics"]:
                 mqtt_client.subscribe(topic)
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
@@ -140,24 +137,23 @@ def on_connect(mqtt_client, userdata, flags, rc):
 #--------------------------------------------------------------------------------------------------------
 
 def process_message(msg):
-    global logging
     # Unpack the json message so we can extract the contents (with exception handling)
     try:
         unpacked_json = json.loads(msg.payload)
     except Exception as exception:
         logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
-        if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Successfully parsed message:"+str(unpacked_json))
         # Make the callback (that was registered when the calling programme subscribed to the feed)
         # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
         if msg.topic in node_config["callbacks"]:
+            logging.debug("MQTT-Client: Received: "+str(msg.topic)+"-"+str(unpacked_json))
             node_config["callbacks"][msg.topic] (unpacked_json)
         elif msg.topic.rpartition('/')[0]+"/+" in node_config["callbacks"]:
+            logging.debug("MQTT-Client: Received: "+str(msg.topic)+"-"+str(unpacked_json))
             node_config["callbacks"][msg.topic.rpartition('/')[0]+"/+"] (unpacked_json)
         else:
-             logging.warning("MQTT-Client: unhandled message topic:"+str(msg.topic))
+            logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
     return()
 
 #--------------------------------------------------------------------------------------------------------
@@ -167,7 +163,6 @@ def process_message(msg):
 #--------------------------------------------------------------------------------------------------------
 
 def on_message(mqtt_client,obj,msg):
-    global logging
     global node_config
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
@@ -189,7 +184,6 @@ def configure_networking (broker_host:str,
                           broker_username:str = None,
                           broker_password:str = None,
                           mqtt_enhanced_debugging:bool = False):
-    global logging
     global node_config
     global mqtt_client
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
@@ -227,7 +221,6 @@ def configure_networking (broker_host:str,
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
-    global logging
     # Only shut down the mqtt networking if we configured it in the first place
     if node_config["network_configured"]:
         logging.info("MQTT-Client: Clearing message queues and shutting down")
@@ -258,7 +251,6 @@ def mqtt_shutdown():
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callback,subtopics:bool=False):
-    global logging
     global node_config
     global mqtt_client
     if not node_config["network_configured"]:
@@ -266,10 +258,10 @@ def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callb
     else:
         # The Identifier for a remote object is a string combining the the Node-ID and Object-ID
         item_identifier = create_remote_item_identifier(item_id,item_node)
-        logging.info("MQTT-Client: Subscribing to '"+message_type+"' from '"+item_identifier+"'")
         # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
         topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
         if subtopics: topic = topic+"/+"
+        logging.info("MQTT-Client: Subscribing to topic' "+topic+"'")
         mqtt_client.subscribe(topic)
         # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
         node_config["list_of_subscribed_topics"].append(topic)
@@ -300,19 +292,41 @@ def send_mqtt_message (message_type:str,item_id,data:dict,log_message:str=None,r
 #-----------------------------------------------------------------------------------------------
 
 def publish_message (topic:str,payload:str,log_message:str=None,retain:bool=False):
-    global logging
     global mqtt_client
     global node_config
     if log_message is not None: logging.info(log_message)
-    if node_config["enhanced_debugging"]:
-        if payload is None: logging.debug("MQTT-Client: Publishing NULL message to MQTT broker")
-        else: logging.debug("MQTT-Client: Publishing JSON message to MQTT broker: "+payload)
+    if payload is None: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
+    else: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-"+str(payload))
     # Publish the message to the broker
     mqtt_client.publish(topic,payload,retain=retain,qos=1)
     # Add to the list of published topics if this is a retained message so we
     # can 'Clean up' the MQTT broker by publishing empty messages on shutdown
     if topic not in node_config["list_of_published_topics"]:
         node_config["list_of_published_topics"].append(topic)
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Non public  Function to unsubscribe to a particular message type from the broker. Called by
+# the higher-level 'reset_mqtt_configuration' functions for instruments, signals and sections to
+# clear out the relevant subscrptions in support of the editor - where a configuration change
+# to MQTT networking will trigger a reset of all subscriptions followed by a re-configuration
+#-----------------------------------------------------------------------------------------------
+
+def unsubscribe_from_message_type(message_type:str):
+    global node_config
+    # Only unsubscribe if networking has been configured
+    if node_config["network_configured"]:
+        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+        # Finally, remove all instances of the message type from the internal subscriptions list
+        # Note we don't iterate through the list to remove items as it will change under us
+        new_list_of_subscribed_topics = []
+        for subscribed_topic in node_config["list_of_subscribed_topics"]:
+            if subscribed_topic.startswith(message_type):
+                logging.info("MQTT-Client: Unsubscribing from topic '"+subscribed_topic+"'")
+                mqtt_client.unsubscribe(subscribed_topic)
+            else:
+                new_list_of_subscribed_topics.append(subscribed_topic)
+        node_config["list_of_subscribed_topics"] = new_list_of_subscribed_topics
     return()
 
 ##################################################################################################################

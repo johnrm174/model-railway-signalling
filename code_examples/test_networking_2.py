@@ -35,7 +35,6 @@ mqtt_debug = False
 #----------------------------------------------------------------------
 
 def upper_line_callback(item_id,callback_type):
-    print ("Callback for upper line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     # We want the local Section 100 to mirror any changes made to Box1 Section 3
     # So we get an indication of the "next Train" that is going to enter our section
     if callback_type == section_callback_type.section_updated:
@@ -67,7 +66,6 @@ def upper_line_callback(item_id,callback_type):
 #----------------------------------------------------------------------
 
 def middle_line_callback(item_id,callback_type):
-    print ("Callback for middle line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     # Deal with changes to the Track Occupancy (based on signal events)
     if callback_type == sig_callback_type.sig_passed:
         if item_id == 7: set_section_occupied(7,section_label("Box1-9"))
@@ -87,7 +85,6 @@ def middle_line_callback(item_id,callback_type):
 #----------------------------------------------------------------------
 
 def lower_line_callback(item_id,callback_type):
-    print ("Callback for lower line - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     # Deal with changes to the Track Occupancy (based on signal events)
     if callback_type == sig_callback_type.sig_passed:
         if item_id == 10: set_section_occupied(10,section_label("Box1-12"))
@@ -139,8 +136,10 @@ configure_networking(broker_host ="broker.emqx.io", network_identifier="network1
                                  node_identifier= "Box2", mqtt_enhanced_debugging=mqtt_debug)
 # Configure the events/updates we want to publish/subscribe to
 set_sections_to_publish_state(3,9,12)
+set_instruments_to_publish_state(1,2)
 set_signals_to_publish_passed_events(1,7,10)
 set_signals_to_publish_state(1)
+set_node_to_publish_dcc_commands(True)
 subscribe_to_section_updates("Box1",upper_line_callback,3)
 subscribe_to_signal_passed_events("Box1",upper_line_callback,1)
 subscribe_to_signal_updates("Box1",upper_line_callback,1)
@@ -148,8 +147,10 @@ subscribe_to_section_updates("Box1",middle_line_callback,9)
 subscribe_to_signal_passed_events("Box1",middle_line_callback,7)
 subscribe_to_section_updates("Box1",lower_line_callback,12)
 subscribe_to_signal_passed_events("Box1",lower_line_callback,10)
-set_node_to_publish_dcc_commands(True)
-                     
+# Note the lack ofr a callback when subscribing to instrument events
+subscribe_to_instrument_updates("Box1",2)
+subscribe_to_instrument_updates("Box1",1)
+
 print ("Drawing Layout Schematic")
 canvas.create_line(0,150,750,150,fill="black",width=3)
 canvas.create_line(0,210,750,210,fill="black",width=2,dash=(5,2))
@@ -235,6 +236,7 @@ create_block_instrument(canvas, 2, 650, 525,
 print ("Setting Initial Interlocking")
 # Set the initial interlocking conditions by running the main callback function
 upper_line_callback(None,None)
+middle_line_callback(None,None)
 lower_line_callback(None,None)
 
 print ("Entering Main Event Loop")

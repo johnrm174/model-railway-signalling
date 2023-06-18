@@ -13,8 +13,7 @@
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.reset_objects() - Reset the schematic back to its default state
 #    schematic.initialise(root, callback, width, height, grid) - Create the canvas
-#    schematic.select_all_objects() - For selecting all objects prior to deletion
-#    schematic.delete_selected_objects() - For deleting all objects (on new/load)
+#    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.update_canvas() - For updating the canvas following reload/resizing
 #    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
@@ -27,6 +26,7 @@
 #    settings.get_logging() - Set the default log level
 #    settings.get_sprog() - to get the initial SPROG settings
 #    settings.restore_defaults() - Following user selection of "new"
+#    common.scrollable_text_box - to display a list of warnings on file load
 #
 # Makes the following external API calls to library modules:
 #    library_common.find_root_window (widget) - To set the root window
@@ -45,6 +45,7 @@ import tkinter as Tk
 import logging
 from argparse import ArgumentParser
 
+from . import common
 from . import objects
 from . import settings
 from . import schematic
@@ -102,6 +103,7 @@ class main_menubar:
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar_windows.display_help(self.root))
         self.help_menu.add_command(label =" About...", command=lambda:menubar_windows.display_about(self.root))
+        self.help_menu.add_command(label =" Info...", command=lambda:menubar_windows.edit_layout_info(self.root))
         self.mainmenubar.add_cascade(label = "Help  ", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
@@ -112,7 +114,8 @@ class main_menubar:
         # Initialise the editor configuration at startup
         self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
-        parser = ArgumentParser(description =  "Model railway signalling "+settings.get_version())
+        # The version is the third parameter provided by 'get_general'
+        parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
         parser.add_argument("-f","--file",dest="filename",help="schematic file to load on startup",metavar="FILE")
         args = parser.parse_args()
         if args.filename is not None: self.load_schematic(args.filename)
@@ -225,13 +228,8 @@ class main_menubar:
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
                 message="Are you sure you want to discard all changes and create a new blank schematic"):
-            # We use the schematic functions to delete all existing objects to
-            # ensure they are also deselected and removed from the clibboard 
-            schematic.select_all_objects()
-            schematic.delete_selected_objects()
-            # Belt and braces delete of all canvas objects as I've seen issues when
-            # running the system tests (probably because I'm not using the mainloop)
-            schematic.canvas.delete("all")
+            # Delete all existing objects
+            schematic.delete_all_objects()
             # Restore the default settings and update the editor config
             settings.restore_defaults()
             # Re-initialise the editor for the new settings to take effect
@@ -266,22 +264,20 @@ class main_menubar:
         # Note that 'filename' is defaulted to 'None' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the file selection dialog. If
         # a filename is specified (system_test_harness use case) then the dialogue is surpressed
-        global logging
+
         # Call the library function to load the base configuration file
         # the 'file_loaded' will be the name of the file loaded or None (if not loaded)
         file_loaded, layout_state = file_interface.load_schematic(filename)
         if file_loaded is not None:
             # Do some basic validation that the file has the elements we need
             if "settings" in layout_state.keys() and "objects" in layout_state.keys():
-                # We use the schematic functions to delete all existing objects to
-                # ensure they are also deselected and removed from the clibboard 
-                schematic.select_all_objects()
-                schematic.delete_selected_objects()
-                # Belt and braces delete of all canvas objects as I've seen issues when
-                # running the system tests (probably because I'm not using the mainloop)
-                schematic.canvas.delete("all")
-                # Store the newly loaded settings
-                settings.set_all(layout_state["settings"])
+                # Delete all existing objects
+                schematic.delete_all_objects()
+                # Create an empty list for any warning messages generated by the load
+                # Messages could be generated by settings.set_all or objects.set_all
+                warning_messages = []
+                # Store the newly loaded settings (getting any warnings)
+                warning_messages = settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
                 # Re-size the canvas to reflect the new schematic size
@@ -290,24 +286,63 @@ class main_menubar:
                 # Re-initailise the editor with the new configuration
                 self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information
-                objects.set_all(layout_state["objects"])
+                warning_messages.extend(objects.set_all(layout_state["objects"]))
                 # Purge the loaded state (to stope it being erroneously inherited
                 # when items are deleted and then new items created with the same IDs)
                 file_interface.purge_loaded_state_information()
                 # Set the flag so we don't enforce a "save as" on next save
                 self.file_has_been_saved = True
+                # Generate a popup window to display any warning messages:
+                if warning_messages != []:
+                    warning_text=""
+                    for warning_message in warning_messages:
+                        warning_text = warning_text + warning_message + "\n"
+                    self.load_warnings_window(self.root,warning_text)
             else:
                 logging.error("LOAD LAYOUT - Selected file does not contain all required elements")
                 Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                     message="File does not contain\nall required elements")
         return()
+    
+#------------------------------------------------------------------------------------
+# Class for the window to display any file load warning messages  
+#------------------------------------------------------------------------------------
 
+    class load_warnings_window():
+        def __init__(self, root_window, warning_text):
+            self.root_window = root_window
+            # Create the top level window for the file load warnings
+            winx = self.root_window.winfo_rootx() + 250
+            winy = self.root_window.winfo_rooty() + 20
+            self.window = Tk.Toplevel(self.root_window)
+            self.window.geometry(f'+{winx}+{winy}')
+            self.window.title("Load Layout File")
+            self.window.attributes('-topmost',True)
+            # Create an overall warning label
+            label_text = ("Layout file generated by a different version of the application\n"+
+                            "Check reported warnings and re-save as a new layout file")
+            self.label = Tk.Label(self.window, font="Helvetica 12 bold", text=label_text)
+            # Create the srollable textbox to display the warnings. We only specify
+            # the max height (in case the list of warnings is extremely long) leaving
+            # the width to auto-scale to the maximum width of the warnings
+            self.text = common.scrollable_text_frame(self.window, max_height=25)
+            self.text.set_value(warning_text)
+            # Create the ok/close button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            # Pack the OK button and labels First - so they remain visible on re-sizing
+            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+            self.label.pack(padx=2, pady=2, side=Tk.TOP)
+            self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+            
+        def ok(self):
+            self.window.destroy()
+        
 #------------------------------------------------------------------------------------
 # This is where the code begins  
 #------------------------------------------------------------------------------------
 
 def run_editor():
-    global logging
     # Create the Main Root Window
     root = Tk.Tk()
     # Create the menubar and editor canvas (canvas size will be set on creation)

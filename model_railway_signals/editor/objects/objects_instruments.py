@@ -49,8 +49,7 @@ from .. import run_layout
 
 default_instrument_object = copy.deepcopy(objects_common.default_object)
 default_instrument_object["item"] = objects_common.object_type.instrument
-default_instrument_object["itemid"] = 0
-default_instrument_object["itemtype"] = None
+default_instrument_object["itemtype"] = block_instruments.instrument_type.single_line.value
 default_instrument_object["bellsound"] = "bell-ring-01.wav"
 default_instrument_object["keysound"] = "telegraph-key-01.wav"
 default_instrument_object["linkedto"] = ""
@@ -88,8 +87,7 @@ def remove_references_to_instrument(deleted_inst_id:int):
     return()
     
 #------------------------------------------------------------------------------------
-# Function to to update (delete and re-draw) an Instrument object on the schematic. Called
-# when the object is first created or after the object attributes have been updated
+# Function to to update an instrument object after a configuration change
 #------------------------------------------------------------------------------------
 
 def update_instrument(object_id, new_object_configuration):

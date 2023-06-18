@@ -97,14 +97,12 @@ def null_callback(point_id:int,callback_type):
 # -------------------------------------------------------------------------
 
 def fpl_button_event (point_id:int):
-    global logging
     logging.info("Point "+str(point_id)+": FPL Button Event ************************************************************")
     toggle_fpl(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.fpl_switched)
     return ()
 
 def change_button_event (point_id:int):
-    global logging
     logging.info("Point "+str(point_id)+": Change Button Event *********************************************************")
     toggle_point(point_id)
     points[str(point_id)]["extcallback"] (point_id,point_callback_type.point_switched)
@@ -116,9 +114,7 @@ def change_button_event (point_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_fpl (point_id:int):
-
     global points 
-    global logging
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle FPL - Point does not exist")
@@ -146,10 +142,7 @@ def toggle_fpl (point_id:int):
 # -------------------------------------------------------------------------
 
 def toggle_point_state (point_id:int, switched_by_another_point = False):
-
     global points
-    global logging
-
     if not points[str(point_id)]["switched"]:
         if switched_by_another_point:
             logging.info ("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
@@ -179,9 +172,7 @@ def toggle_point_state (point_id:int, switched_by_another_point = False):
 # -------------------------------------------------------------------------
 
 def toggle_point (point_id:int, switched_by_another_point = False):
-    
     global points
-    global logging
     # Validate the point ID as this can be called by external code
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": Toggle Point - Point does not exist")
@@ -219,9 +210,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                   x:int, y:int, colour:str="black", orientation:int = 0,
                   point_callback = null_callback, also_switch:int = 0,
                   reverse:bool=False,auto:bool=False,fpl:bool=False):
-    
     global points
-    global logging
     logging.info ("Point "+str(point_id)+": Creating Point")
     # Find and store the root window (when the first signal is created)
     if common.root_window is None: common.find_root_window(canvas)
@@ -366,7 +355,6 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 
 def lock_point (*point_ids:int):
     global points 
-    global logging
     for point_id in point_ids:
         # Validate the point exists 
         if not point_exists(point_id):
@@ -391,7 +379,6 @@ def lock_point (*point_ids:int):
 
 def unlock_point (*point_ids:int):
     global points 
-    global logging
     for point_id in point_ids:
         # Validate the point exists
         if not point_exists(point_id):
@@ -412,7 +399,6 @@ def unlock_point (*point_ids:int):
 # -------------------------------------------------------------------------
 
 def point_switched (point_id:int):
-    global logging
     # Validate the point exists
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": point_switched - Point does not exist")
@@ -427,7 +413,6 @@ def point_switched (point_id:int):
 # -------------------------------------------------------------------------
 
 def fpl_active(point_id:int):
-    global logging
     # Validate the point exists
     if not point_exists(point_id):
         logging.error ("Point "+str(point_id)+": fpl_active - Point does not exist")

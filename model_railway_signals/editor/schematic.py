@@ -6,8 +6,7 @@
 # External API functions intended for use by other editor modules:
 #    initialise(root, callback, width, height, grid) - Call once on startup
 #    update_canvas() - Call following a size update (or layout load/canvas resize)
-#    select_all_objects() - For selecting all objects prior to a "safe" delete
-#    delete_selected_objects() - To delete all objects (once all are selected)
+#    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
@@ -26,6 +25,7 @@
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
 #    configure_instrument.edit_instrument(root,object_id) - Open inst edit window (on double click)
+#    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
 #    ########################## More to be added ########################################
 #
 # Accesses the following external editor objects directly:
@@ -59,9 +59,9 @@ from . import configure_signal
 from . import configure_point
 from . import configure_section
 from . import configure_instrument
+from . import configure_line
 
 import importlib.resources
-import logging
 import math
 import copy
 
@@ -101,6 +101,17 @@ popup2 = None
 # and the Tkinter PhotoImage labels for the buttons
 button_frame = None
 button_images = {}
+
+#------------------------------------------------------------------------------------
+# Internal Function to return the absolute canvas coordinates for an event
+# (which take into account any canvas scroll bar offsets)
+#------------------------------------------------------------------------------------
+
+def canvas_coordinates(event):
+    canvas = event.widget
+    x = canvas.canvasx(event.x)
+    y = canvas.canvasy(event.y)
+    return(x, y)
 
 #------------------------------------------------------------------------------------
 # Internal Function to draw (or redraw) the grid on the screen (after re-sizing)
@@ -175,6 +186,22 @@ def deselect_all_objects(event=None):
     return()
 
 #------------------------------------------------------------------------------------
+# Internal function to delete all objects (for layout 'load' and layout 'new'
+#------------------------------------------------------------------------------------
+
+def delete_all_objects():
+    global schematic_state
+    # Select and delete all objects (also clear the selected objects list)
+    select_all_objects()
+    delete_selected_objects()
+    # Belt and braces delete of all canvas objects as I've seen issues when
+    # running the system tests (probably because I'm not using the mainloop)
+    canvas.delete("all")
+    # Set the select area box to 'None' so it gets created on first use
+    schematic_state["selectareabox"] = None
+    return()
+
+#------------------------------------------------------------------------------------
 # Internal function to edit an object configuration (double-click and popup menu)
 # Only a single Object will be selected when this function is called
 #------------------------------------------------------------------------------------
@@ -182,7 +209,7 @@ def deselect_all_objects(event=None):
 def edit_selected_object():
     object_id = schematic_state["selectedobjects"][0]
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        pass; #################### TODO #############################
+        configure_line.edit_line(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
         configure_signal.edit_signal(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
@@ -214,6 +241,12 @@ def move_line_end(xdiff:int,ydiff:int):
         canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
         x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end2"])
         canvas.coords(objects.schematic_objects[object_id]["line"],startx,starty,(x1+x2)/2,(y1+y2)/2)
+    # Update the coordinates for the line end stops using the 
+    # common function provided by the objects sub-package
+    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["line"])
+    dx,dy = objects.get_endstop_offsets(x1,y1,x2,y2)
+    canvas.coords(objects.schematic_objects[object_id]["stop1"],x1+dx,y1+dy,x1-dx,y1-dy)
+    canvas.coords(objects.schematic_objects[object_id]["stop2"],x2+dx,y2+dy,x2-dx,y2-dy)
     return()
 
 #------------------------------------------------------------------------------------
@@ -344,7 +377,11 @@ def snap_to_grid(xpos:int,ypos:int):
 def right_button_click(event):
     global schematic_state
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    # Note that we use the the canvas coordinates to see if the cursor
+    # is over the object (as these take into account the current scroll
+    # bar positions) and the event root coordinates for the popup 
+    canvas_x, canvas_y = canvas_coordinates(event)
+    highlighted_object = find_highlighted_object(canvas_x, canvas_y)
     if highlighted_object:
         # Clear any current selections and select the highlighted item
         deselect_all_objects()
@@ -366,13 +403,14 @@ def left_button_click(event):
     global schematic_state
     # set keyboard focus for the canvas (so that any key bindings will work)
     canvas.focus_set()
-    # For canvas events we can use the canvas coordinates
-    schematic_state["startx"] = event.x 
-    schematic_state["starty"] = event.y
-    schematic_state["lastx"] = event.x 
-    schematic_state["lasty"] = event.y
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
+    schematic_state["startx"] = canvas_x 
+    schematic_state["starty"] = canvas_y
+    schematic_state["lastx"] = canvas_x 
+    schematic_state["lasty"] = canvas_y
     # See if the cursor is over the "end" of an already selected line 
-    highlighted_object = find_highlighted_line_end(event.x,event.y)
+    highlighted_object = find_highlighted_line_end(canvas_x,canvas_y)
     if highlighted_object:
         # Clear selections and select the highlighted line. Note that the edit line
         # mode ("editline1" or "editline2") get set by "find_highlighted_line_end"
@@ -380,7 +418,7 @@ def left_button_click(event):
         select_object(highlighted_object)
     else:
         # See if the cursor is over any other canvas object
-        highlighted_object = find_highlighted_object(event.x,event.y)
+        highlighted_object = find_highlighted_object(canvas_x,canvas_y)
         if highlighted_object:
             schematic_state["moveobjects"] = True
             if highlighted_object not in schematic_state["selectedobjects"]:
@@ -392,10 +430,11 @@ def left_button_click(event):
             # just clearing the current selection - In either case we deselect all objects
             deselect_all_objects()
             schematic_state["selectarea"] = True
-            #  Make the "select area" box visible (create it if necessary)
-            if not schematic_state["selectareabox"]:
+            # Make the 'selectareabox' visible. This will create the box on first use
+            # or after a 'delete_all_objects (when the box is set to 'None')
+            if schematic_state["selectareabox"] is None:
                 schematic_state["selectareabox"] = canvas.create_rectangle(0,0,0,0,outline="orange")
-            canvas.coords(schematic_state["selectareabox"],event.x,event.y,event.x,event.y)
+            canvas.coords(schematic_state["selectareabox"],canvas_x,canvas_y,canvas_x,canvas_y)
             canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
@@ -409,8 +448,10 @@ def left_button_click(event):
 
 def left_shift_click(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    highlighted_object = find_highlighted_object(canvas_x,canvas_y)
     if highlighted_object and highlighted_object in schematic_state["selectedobjects"]:
         # Deselect just the highlighted object (leave everything else selected)
         deselect_object(highlighted_object)
@@ -426,8 +467,10 @@ def left_shift_click(event):
 
 def left_double_click(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
-    highlighted_object = find_highlighted_object(event.x,event.y)
+    highlighted_object = find_highlighted_object(canvas_x,canvas_y)
     if highlighted_object:
         # Clear any current selections and select the highlighted item
         deselect_all_objects()
@@ -443,18 +486,20 @@ def left_double_click(event):
 
 def track_cursor(event):
     global schematic_state
+    # Get the canvas coordinates (to take into account any scroll bar offsets) 
+    canvas_x, canvas_y = canvas_coordinates(event)
     if schematic_state["moveobjects"]:
         # Work out the delta movement since the last re-draw
-        deltax = event.x - schematic_state["lastx"]
-        deltay = event.y - schematic_state["lasty"]
+        deltax = canvas_x - schematic_state["lastx"]
+        deltay = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
         move_selected_objects(deltax,deltay)
         # Set the 'last' position for the next move event
         schematic_state["lastx"] += deltax
         schematic_state["lasty"] += deltay
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
-        deltax = event.x - schematic_state["lastx"]
-        deltay = event.y - schematic_state["lasty"]
+        deltax = canvas_x - schematic_state["lastx"]
+        deltay = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
         move_line_end(deltax,deltay)
         # Reset the "start" position for the next move
@@ -464,7 +509,7 @@ def track_cursor(event):
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
         y1 = schematic_state["starty"]
-        canvas.coords(schematic_state["selectareabox"],x1,y1,event.x,event.y)
+        canvas.coords(schematic_state["selectareabox"],x1,y1,canvas_x,canvas_y)
     return()
 
 #------------------------------------------------------------------------------------
@@ -513,7 +558,8 @@ def left_button_release(event):
         objects.move_objects(schematic_state["selectedobjects"], xdiff2=finalx, ydiff2=finaly)
         # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend2"] = False
-    elif schematic_state["selectarea"]:
+        # Note the defensive programming - to ensure the bbox exists
+    elif schematic_state["selectarea"] and schematic_state["selectareabox"] is not None:
         # Select all Objects that are fully within the Area Selection Box
         abox = canvas.coords(schematic_state["selectareabox"])
         for object_id in objects.schematic_objects:
@@ -536,7 +582,8 @@ def update_canvas(width:int, height:int, grid:int):
     global canvas_width, canvas_height, canvas_grid
     # Update the tkinter canvas object
     canvas.config (width=width, height=height, scrollregion=(0,0,width, height))
-    canvas.pack()
+    # reset the root window size (this will fit to contents)
+    root.geometry("")
     # Set the global variables (used in the 'draw_grid' function)
     canvas_width = width
     canvas_height = height
@@ -610,12 +657,16 @@ def disable_edit_keypress_events():
 def enable_editing():
     global schematic_state
     global canvas_event_callback
-    global button_frame
+    global button_frame, canvas_frame
     canvas.itemconfig("grid",state="normal")
     # Enable editing of the schematic objects
     objects.enable_editing()
-    # Re-pack the subframe containing the "add object" buttons to display it        
-    button_frame.pack(side=Tk.RIGHT, expand=False, fill=Tk.BOTH)
+    # Re-pack the subframe containing the "add object" buttons to display it. Note that we
+    # first 'forget' the canvas_frame and then re-pack the button_frame first, followed by
+    # the canvas_frame - this ensures that the buttons don't dissapear on window re-size
+    canvas_frame.forget()
+    button_frame.pack(side=Tk.LEFT, expand=False, fill=Tk.BOTH)
+    canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Bind the Canvas mouse and button events to the various callback functions
     canvas.bind("<Motion>", track_cursor)
     canvas.bind('<Button-1>', left_button_click)
@@ -661,21 +712,21 @@ def disable_editing():
 def initialise (root_window, event_callback, width:int, height:int, grid:int):
     global root, canvas, popup1, popup2
     global canvas_width, canvas_height, canvas_grid
-    global button_frame
-    global button_images
+    global button_frame, canvas_frame, buttons, images
     global canvas_event_callback
-    global logging
     root = root_window
     canvas_event_callback = event_callback
     # Create a frame to hold the two subframes ("add" buttons and drawing canvas)
     frame = Tk.Frame(root_window)
-    frame.pack (expand=True, fill=Tk.BOTH)    
-    # Create a subframe to hold the canvas and scrollbars
-    canvas_frame = Tk.Frame(frame, borderwidth=1)
-    canvas_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
+    frame.pack (expand=True, fill=Tk.BOTH)
+    # Note that we pack the button_frame first, followed by the canvas_frame
+    # This ensures that the buttons don't dissapear on window re-size (shrink)
     # Create a subframe to hold the "add" buttons
     button_frame = Tk.Frame(frame, borderwidth=1)
-    button_frame.pack(side=Tk.RIGHT, expand=True, fill=Tk.BOTH)
+    button_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+    # Create a subframe to hold the canvas and scrollbars
+    canvas_frame = Tk.Frame(frame, borderwidth=1)
+    canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
     canvas_width, canvas_height, canvas_grid = width, height, grid
     # Create the canvas and scrollbars inside the parent frame
@@ -703,59 +754,47 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     popup2.add_command(label="Select all", command=select_all_objects)
     # Now draw the initial grid
     draw_grid()
-    # Load the images for the for the "add object" buttons
+    # Define the object buttons [filename, function_to_call]
+    selections = [ ["line", lambda:objects.create_object(objects.object_type.line) ],
+                   ["colourlight", lambda:objects.create_object(objects.object_type.signal,
+                                            signals_common.sig_type.colour_light.value,
+                                            signals_colour_lights.signal_sub_type.four_aspect.value) ],
+                   ["semaphore", lambda:objects.create_object(objects.object_type.signal,
+                                            signals_common.sig_type.semaphore.value,
+                                            signals_semaphores.semaphore_sub_type.home.value) ],
+                   ["groundpos", lambda:objects.create_object(objects.object_type.signal,
+                                            signals_common.sig_type.ground_position.value,
+                                            signals_ground_position.ground_pos_sub_type.standard.value) ],
+                   ["grounddisc", lambda:objects.create_object(objects.object_type.signal,
+                                            signals_common.sig_type.ground_disc.value,
+                                            signals_ground_disc.ground_disc_sub_type.standard.value) ],
+                   ["lhpoint", lambda:objects.create_object(objects.object_type.point,
+                                            points.point_type.LH.value) ],
+                   ["rhpoint", lambda:objects.create_object(objects.object_type.point,
+                                            points.point_type.RH.value) ],
+                   ["section", lambda:objects.create_object(objects.object_type.section) ],
+                   ["instrument", lambda:objects.create_object(objects.object_type.instrument,
+                                            block_instruments.instrument_type.single_line.value) ] ]
+    # Create the buttons we need (adding the references to the buttons and images
+    # to a global list so they don't go out of scope and dont get garbage collected)
+    buttons = []
+    images = []
     resource_folder = 'model_railway_signals.editor.resources'
-    file_names = ['line','colour_light','semaphore','ground_position','ground_disc',
-                'left_hand_point','right_hand_point','track_section','block_instrument']
-    for file_name in file_names:
+    for index, button in enumerate (selections):
+        file_name = selections[index][0]
         try:
+            # Load the image file for the button if there is one
             with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                button_images[file_name] = Tk.PhotoImage(file=file_path)
+                images.append(Tk.PhotoImage(file=file_path))
+                buttons.append(Tk.Button (button_frame, image=images[-1],
+                       command=selections[index][1]))
         except:
-            logging.error ("SCHEMATIC EDITOR - Error loading image file '"+file_name+".png'")
-            button_images[file_name]=None
-    # Add The Buttons for creating new objects and adding to the schematic
-    # Note that for enumeration types we pass the "value"
-    button1 = Tk.Button (button_frame, image=button_images['line'],
-                      command=lambda:objects.create_object(objects.object_type.line))
-    button1.pack (padx=2 ,pady=2)
-    button2 = Tk.Button (button_frame, image=button_images['colour_light'],
-                      command=lambda:objects.create_object(objects.object_type.signal,
-                           signals_common.sig_type.colour_light.value,
-                           signals_colour_lights.signal_sub_type.four_aspect.value) )
-    button2.pack (padx=2, pady=2)
-    button3 = Tk.Button (button_frame, image=button_images['semaphore'],
-                      command=lambda:objects.create_object(objects.object_type.signal,
-                           signals_common.sig_type.semaphore.value,
-                           signals_semaphores.semaphore_sub_type.home.value))
-    button3.pack (padx=2, pady=2)
-    button4 = Tk.Button (button_frame, image=button_images['ground_position'],
-                      command=lambda:objects.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_position.value,
-                           signals_ground_position.ground_pos_sub_type.standard.value))
-    button4.pack (padx=2, pady=2)
-    button5 = Tk.Button (button_frame, image=button_images['ground_disc'],
-                      command=lambda:objects.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_disc.value,
-                           signals_ground_disc.ground_disc_sub_type.standard.value))
-    button5.pack (padx=2, pady=2)
-    button6 = Tk.Button (button_frame, image=button_images['left_hand_point'],
-                      command=lambda:objects.create_object(objects.object_type.point,
-                           points.point_type.LH.value))
-    button6.pack (padx=2, pady=2)
-    button7 = Tk.Button (button_frame, image=button_images['right_hand_point'],
-                      command=lambda:objects.create_object(objects.object_type.point,
-                            points.point_type.RH.value))
-    button7.pack (padx=2, pady=2)
-    button8 = Tk.Button (button_frame, image=button_images['track_section'],
-                      command=lambda:objects.create_object(objects.object_type.section))
-    button8.pack (padx=2, pady=2)
-    button9 = Tk.Button (button_frame, image=button_images['block_instrument'],
-                      command=lambda:objects.create_object(objects.object_type.instrument,
-                            block_instruments.instrument_type.single_line.value))
-    button9.pack (padx=2, pady=2)
+            # Else fall back to using a text label (filename) for the button
+            buttons.append(Tk.Button (button_frame, text=selections[index][0],
+                       command=selections[index][1]))
+        buttons[-1].pack(padx=2, pady=2)
     # Initialise the Objects package with the required parameters
-    objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
+    objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
     return()
 
 ####################################################################################

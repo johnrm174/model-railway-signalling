@@ -22,6 +22,7 @@
 #    common.selection_buttons
 #    common.signal_route_interlocking_frame
 #    common.signal_route_selections
+#    common.colour_selector
 #    common.window_controls
 #
 #------------------------------------------------------------------------------------
@@ -67,6 +68,7 @@ def load_state(point):
         point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
         point.config.alsoswitch.set_switched_with(switched_with_point(object_id))
         point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
+        point.config.colour.set_value(objects.schematic_objects[object_id]["colour"])
         # These are the general settings for the point
         auto = objects.schematic_objects[object_id]["automatic"]
         rev = objects.schematic_objects[object_id]["reverse"]
@@ -102,6 +104,7 @@ def save_state(point, close_window:bool):
         new_object_configuration["itemid"] = point.config.pointid.get_value()
         new_object_configuration["itemtype"] = point.config.pointtype.get_value()
         new_object_configuration["alsoswitch"] = point.config.alsoswitch.get_value()
+        new_object_configuration["colour"] = point.config.colour.get_value()
         # These are the general settings
         rot, rev, auto, fpl = point.config.settings.get_values()
         new_object_configuration["reverse"] = rev
@@ -309,7 +312,7 @@ class dcc_address_settings(common.dcc_entry_box):
 
 class point_configuration_tab():
     def __init__(self, parent_tab):
-        # Create a Frame to hold the Point ID and Point Type Selections
+        # Create a Frame to hold the Point ID, Point Type and point colour Selections
         self.frame = Tk.Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Point ID selection
@@ -319,7 +322,10 @@ class point_configuration_tab():
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
                                       "Select Point Type", None, "RH", "LH")
-        self.pointtype.frame.pack(padx=2, pady=2, fill='x')
+        self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        # Create the Point colour selection element
+        self.colour = common.colour_selection(self.frame)
+        self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
         # Create the UI element for the general settings
         # Note that the class needs the parent object (to reference siblings)
         self.settings = general_settings(parent_tab, self)
@@ -339,6 +345,7 @@ class point_configuration_tab():
 class point_interlocking_tab():
     def __init__(self, parent_tab):
         self.signals = common.signal_route_interlocking_frame(parent_tab)
+        self.signals.frame.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
 # Top level Class for the Edit Point window
@@ -366,6 +373,7 @@ class edit_point():
         self.locking = point_interlocking_tab(self.tab2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state

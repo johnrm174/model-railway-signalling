@@ -41,14 +41,14 @@
 #    signals_ground_disc.ground_disc_sub_type - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
-#    signals.delete_signal(id) - delete library drawing object (part of soft delete)
-#    signals.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals.update_signal(id) - To set the initial colour light signal aspect following creation
 #    signals.set_route(id,route) - To set the initial route for a signal following creation
 #    signals_colour_lights.create_colour_light_signal - To create the library object (create or redraw)
 #    signals_semaphores.create_semaphore_signal - To create the library object (create or redraw)
 #    signals_ground_position.create_ground_position_signal - To create the library object (create or redraw)
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
+#    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
+#    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
@@ -80,9 +80,8 @@ from .. import run_layout
 # This is the default signal object definition
 default_signal_object = copy.deepcopy(objects_common.default_object)
 default_signal_object["item"] = objects_common.object_type.signal
-default_signal_object["itemid"] = 0
-default_signal_object["itemtype"] = None
-default_signal_object["itemsubtype"] = None
+default_signal_object["itemtype"] = signals_common.sig_type.colour_light.value
+default_signal_object["itemsubtype"] = signals_colour_lights.signal_sub_type.four_aspect.value
 default_signal_object["orientation"] = 0 
 default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
@@ -415,8 +414,7 @@ def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update (delete and re-draw) a Signal object on the schematic. Called
-# when the object is first created or after the object attributes have been updated.
+# Function to to update a signal object after a configuration change
 #------------------------------------------------------------------------------------
 
 def update_signal(object_id, new_object_configuration):
@@ -600,7 +598,7 @@ def redraw_signal_object(object_id):
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the canvas "tags" and selection rectangle for the signal
-    objects_common.schematic_objects[object_id]["tags"] = signals.get_tags(objects_common.schematic_objects[object_id]["itemid"])
+    objects_common.schematic_objects[object_id]["tags"] = signals_common.get_tags(objects_common.schematic_objects[object_id]["itemid"])
     objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
     return()
 
@@ -690,13 +688,13 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
 
 def delete_signal_object(object_id):
     # Delete the signal drawing objects and associated DCC mapping
-    signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
+    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
     track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10)
     track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10+1)
     # Delete the associated distant signal (if there is one)
-    signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
+    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
     return()
 
@@ -709,7 +707,6 @@ def delete_signal(object_id):
     # Soft delete the associated library objects from the canvas
     delete_signal_object(object_id)
     # Remove any references to the signal from other signals
-    # Interlocking tables, signal ahead, timed signal sequences
     remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)

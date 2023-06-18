@@ -1,27 +1,33 @@
 #------------------------------------------------------------------------------------
 # These are common classes used across multiple UI Elements
 #
-# Provides the following base classes for use across the editor UI
+# Provides the following 'primitive' classes for use across the editor UI
 #    CreateToolTip(widget,tool_tip)
-#    check_box(entry)
-#    state_box(entry)
-#    entry_box(entry)
+#    check_box(Tk.Checkbutton)
+#    state_box(Tk.Checkbutton)
+#    entry_box(Tk.Entry)
 #    integer_entry_box(entry_box)
 #    dcc_entry_box(integer_entry_box)
 #    int_item_id_entry_box (integer_entry_box)
 #    str_item_id_entry_box(entry_box)
-#    object_id_selection(integer_entry_box)
+#    scrollable_text_frame(Tk.Frame)
+#
+# Provides the following 'compound' UI elements for the application
+#    object_id_selection(Tk.integer_entry_box)
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
 #    selection_buttons() - combines 5 RadioButtons
+#    colour_selection() - Allows the colour of an item to be changed
 #    window_controls() - apply/ok/reset/cancel
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
+from tkinter import colorchooser
 
 #------------------------------------------------------------------------------------
 # Class to create a tooltip for a tkinter widget - Acknowledgements to Stack Overflow
 # https://stackoverflow.com/questions/3221956/how-do-i-display-tooltips-in-tkinter
+#
 # Class instance elements intended for external use are:
 #     "text" - to change the tooltip text (e.g. to show error messages)
 #------------------------------------------------------------------------------------
@@ -76,14 +82,18 @@ class CreateToolTip():
         if tw: tw.destroy()
 
 #------------------------------------------------------------------------------------
-# Base class for a generic Checkbox - Builds on the tkinter checkbutton class.
+# Base class for a generic check_box - Builds on the tkinter checkbutton class.
+# Note the responsibility of the instantiating func/class to 'pack' the check_box.
+#
 # Additional class methods provided are:
-#    "set_value" - will set the CB state (bool)
+#    "set_value" - will set the check_box state (bool)
 #    "get_value" - will return the state (False if disabled) (bool)
-#    "disable" - disables/blanks the CB (i.e. sets it to False)
-#    "enable"  enables/loads the CB (with the last state)
-#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where both flags need to be set to enable the CB
+#    "disable/disable1/disable2" - disables/blanks the check_box
+#    "enable/enable1/enable2"  enables/loads the check_box (with the last state)
+#
+# Note that check_box is created as 'enabled' - the individual functions provide
+# an AND function where all three flags need to be 'enabled' to enable the 
+# check_box. Any of the 3 flags can be 'disabled' to disable the check_box.
 #------------------------------------------------------------------------------------
 
 class check_box(Tk.Checkbutton):
@@ -155,15 +165,19 @@ class check_box(Tk.Checkbutton):
         return (self.selection.get())
 
 #------------------------------------------------------------------------------------
-# Base class for a generic State Box (like a check box but with labels for off/on 
+# Base class for a generic state_box (like a check box but with labels for off/on 
 # and blank when disabled) - Builds on the tkinter checkbutton class.
+# Note the responsibility of the instantiating func/class to 'pack' the state_box.
+#
 # Additional class methods provided are:
-#    "set_value" - will set the CB state (bool)
+#    "set_value" - will set the state_box state (bool)
 #    "get_value" - will return the current state (False if disabled) (bool)
-#    "disable" - disables/blanks the CB (i.e. sets it to False)
-#    "enable"  enables/loads the CB (with the last state)
-#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where both flags need to be set to enable the CB
+#    "disable/disable1/disable2" - disables/blanks the state_box
+#    "enable/enable1/enable2"  enables/loads the state_box (with the last state)
+#
+# Note that state_box is created as 'enabled' - the individual functions provide
+# an AND function where all three flags need to be 'enabled' to enable the 
+# state_box. Any of the 3 flags can be 'disabled' to disable the state_box.
 #------------------------------------------------------------------------------------
 
 class state_box(Tk.Checkbutton):
@@ -249,21 +263,27 @@ class state_box(Tk.Checkbutton):
         return (self.selection.get())
 
 #------------------------------------------------------------------------------------
-# Common Base Class for a generic "Entry box" - Builds on the tkinter Entry class.
+# Common Base Class for a generic entry_box - Builds on the tkinter Entry class.
+# This will accept any string value to be entered/displayed with no validation.
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
 # Additional class methods provided are:
-#    "set_value" - set the initial value of the entry box (string) 
-#    "get_value" - get the last "validated" value of the entry box (string) 
-#    "get_initial_value" - get the initial value of the entry box (string)
+#    "set_value" - set the initial value of the entry_box (string) 
+#    "get_value" - get the last "validated" value of the entry_box (string) 
+#    "get_initial_value" - get the initial value of the entry_box (string)
 #    "validate" - This gets overridden by the child class function
-#    "disable" - disables/blanks the entry box
-#    "enable"  enables/loads the entry box (with the last value)
-#    "enable1"/"enable2"/"disable1"/"disable2" - as above but provides an
-#        AND function where both flags need to be set to enable the EB
+#    "disable/disable1/disable2" - disables/blanks the entry_box
+#    "enable/enable1/enable2"  enables/loads the entry_box (with the last state)
+#
+# Note that entry_box is created as 'enabled' - the individual functions provide
+# an AND function where all three flags need to be 'enabled' to enable the 
+# entry_box. Any of the 3 flags can be 'disabled' to disable the entry_box.
+#
 # Class methods/objects intended for use by child classes that inherit:
 #    "set_validation_status" - to be called following external validation
-#    "TT.text" - The tooltip for the entry box (to change the tooltip text)
-#    "entry" - is the current entry box value (may or may not be valid)
-#    "value" - is the last validated value of the entry box
+#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
+#    "entry" - is the current entry_box value (may or may not be valid)
+#    "value" - is the last validated value of the entry_box
 #------------------------------------------------------------------------------------
 
 class entry_box(Tk.Entry):
@@ -361,20 +381,29 @@ class entry_box(Tk.Entry):
         return(self.initial_value)
 
 #------------------------------------------------------------------------------------
-# Common Class for an "Integer Entry box" - builds on the Entry Box class (above)
+# Common Class for an integer_entry_box - builds on the entry_box class (above).
+# This will only allow valid integers (within the defined range) to be entered.
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
 # Public class instance methods inherited from the base Entry Box class are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box (with the last value)
+#    "disable/disable1/disable2" - disables/blanks the entry_box
+#    "enable/enable1/enable2"  enables/loads the entry_box (with the last state)
+#
+# Note that entry_box is created as 'enabled' - the individual functions provide
+# an AND function where all three flags need to be 'enabled' to enable the 
+# entry_box. Any of the 3 flags can be 'disabled' to disable the entry_box.
+#
 # Public class instance methods overridden by this class are
-#    "set_value" - set the initial value of the entry box (int) 
-#    "get_value" - get the last "validated" value of the entry box (int) 
-#    "get_initial_value" - get the initial value of the entry box (int) 
-#    "validate" - Validates an integer, within range and whether empty 
+#    "set_value" - set the initial value of the entry_box (int) 
+#    "get_value" - get the last "validated" value of the entry_box (int) 
+#    "get_initial_value" - get the initial value of the entry_box (int) 
+#    "validate" - Validates an integer, within range and whether empty
+#
 # Class methods/objects intended for use by child classes that inherit:
 #    "set_validation_status" - to be called following external validation
-#    "TT.text" - The tooltip for the entry box (to change the tooltip text)
-#    "entry" - is the current entry box value (may or may not be valid)
-#    "value" - is the last validated value of the entry box
+#    "TT.text" - The tooltip for the entry_box (to change the tooltip text)
+#    "entry" - is the current entry_box value (may or may not be valid)
+#    "value" - is the last validated value of the entry_box
 #------------------------------------------------------------------------------------
 
 class integer_entry_box(entry_box):
@@ -426,12 +455,15 @@ class integer_entry_box(entry_box):
         else: return(int(super().get_initial_value()))
 
 #------------------------------------------------------------------------------------
-# Common class for a DCC address entry box - builds on the Integer Entry Box class
-# Public class instance methods inherited from the base Entry Box class are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box (with the last value)
-#    "set_value" - set the initial value of the entry box (int) 
-#    "get_value" - get the last "validated" value of the entry box (int) 
+# Common class for a DCC address entry box - builds on the integer_entry_box class
+# Adds additional validation to ensure the DCC Address is within the valid range.
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
+# Public class instance methods inherited from the base entry_box class are:
+#    "disable" - disables/blanks the entry_box 
+#    "enable"  enables/loads the entry_box (with the last value)
+#    "set_value" - set the initial value of the entry_box (int) 
+#    "get_value" - get the last "validated" value of the entry_box (int) 
 #    "validate" - Validates an integer, within range and whether empty 
 #------------------------------------------------------------------------------------
 
@@ -443,17 +475,20 @@ class dcc_entry_box (integer_entry_box):
                             tool_tip=tool_tip, callback=callback)
 
 #------------------------------------------------------------------------------------
-# Common class for an Item-specific Integer entry box - builds on the Integer Entry Box
+# Common class for an int_item_id_entry_box - builds on the integer_entry_box
 # These classes are for entering local signal/point/instrument/section IDs (integers)
 # They do not accept remote Signal or Instrument IDs (where the ID can be an int or str)
 # The class uses the 'exists_function' to check that the item exists on the schematic
 # If a 'current_id_function' is specified then this function is also used to validate
 # that the entered ID is not the same as the current ID of the item.
-# Public class instance methods inherited from the base Integer Entry Box are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box (with the last value)
-#    "set_value" - set the initial value of the entry box (int) 
-#    "get_value" - get the last "validated" value of the entry box (int) 
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
+# Public class instance methods inherited from the base integer_entry_box are:
+#    "disable" - disables/blanks the entry_box 
+#    "enable"  enables/loads the entry_box (with the last value)
+#    "set_value" - set the initial value of the entry_box (int) 
+#    "get_value" - get the last "validated" value of the entry_box (int)
+#
 # Public class instance methods overridden by this class are
 #    "validate" - Validation as described above 
 #------------------------------------------------------------------------------------
@@ -485,16 +520,19 @@ class int_item_id_entry_box (integer_entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Common class for an Item-specific String entry box - builds on the common Entry Box
-# These classes are for entering LOCAL or REMOTE signal or instrument IDs (where the ID
-# can be an int or str). The class uses the 'exists_function' to check that the item exists
-# on the schematic. If a 'current_id_function' is specified then this function is also used
+# Common class for a str_item_id_entry_box - builds on the common entry_box class.
+# These classes are for entering LOCAL or REMOTE item IDs (where the ID can be an int
+# or str). The class uses the 'exists_function' to check that the item exists on the
+# schematic. If a 'current_id_function' is specified then this function is also used
 # to validate that the entered ID is not the same as the current ID of the item.
-# Public class instance methods inherited from the base Entry Box class are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box (with the last value)
-#    "set_value" - set the initial value of the entry box (str) 
-#    "get_value" - get the last "validated" value of the entry box (str) 
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
+# Public class instance methods inherited from the base entry_box class are:
+#    "disable" - disables/blanks the entry_box 
+#    "enable"  enables/loads the entry_box (with the last value)
+#    "set_value" - set the initial value of the entry_box (str) 
+#    "get_value" - get the last "validated" value of the entry_box (str)
+#
 # Public class instance methods overridden by this class are
 #    "validate" - Validation as described above 
 #------------------------------------------------------------------------------------
@@ -546,17 +584,100 @@ class str_item_id_entry_box (entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Common Class for an "Object ID" Entry Frame - builds on the Integer Entry Box class
-# This is used across all object edit windows for displaying / changing the item ID
-# Public class instance methods inherited from the base Integer Entry Box are:
-#    "disable" - disables/blanks the entry box 
-#    "enable"  enables/loads the entry box (with the last value)
-#    "set_value" - set the initial value of the entry box (int) 
-#    "get_value" - get the last "validated" value of the entry box (int) 
-#    "get_initial_value" - get the initial value of the entry box (int)
+# Class for a scrollable_text_frame - can be editable (e.g. entering layout info)
+# or non-editable (e.g. displaying a list of warnings)- can also be configured
+# to re-size automatically (within the specified limits) as text is entered.
+# The text box will 'fit' to the content unless max or min dimentions are
+# specified for the width and/or height - then the scrollbars can be used.
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
+# Public class instance methods provided by this class are
+#    "set_value" - will set the current value (str)
+#    "get_value" - will return the current value (str)
+#------------------------------------------------------------------------------------
+
+class scrollable_text_frame(Tk.Frame):
+    def __init__(self, parent_window, max_height:int=None, min_height:int=None, editable:bool=False,
+                 max_width:int=None, min_width:int=None, auto_resize:bool=False):
+        # Store the parameters we need
+        self.min_height = min_height
+        self.max_height = max_height
+        self.min_width = min_width
+        self.max_width = max_width
+        self.editable = editable
+        self.auto_resize = auto_resize
+        self.text=""
+        # Create a frame for the text widget and scrollbars
+        super().__init__(parent_window)
+        # Create a subframe for the text and scrollbars
+        self.subframe = Tk.Frame(self)
+        self.subframe.pack(fill=Tk.BOTH, expand=True)
+        # Create the text widget and vertical scrollbars in the subframe
+        self.text_box = Tk.Text(self.subframe, wrap=Tk.NONE)
+        self.text_box.insert(Tk.END,self.text)
+        hbar = Tk.Scrollbar(self.subframe, orient=Tk.HORIZONTAL)
+        hbar.pack(side=Tk.BOTTOM, fill=Tk.X)
+        hbar.config(command=self.text_box.xview)
+        vbar = Tk.Scrollbar(self.subframe, orient=Tk.VERTICAL)
+        vbar.pack(side=Tk.RIGHT, fill=Tk.Y)
+        vbar.config(command=self.text_box.yview)
+        self.text_box.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+        self.text_box.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+        # configure the window for editable or non-editable
+        if not self.editable: self.text_box.config(state="disabled")
+        # Set up the callback for auto re-size (if specified)
+        if self.auto_resize: self.text_box.bind("<Key>", self.resize_text_box)
+        # Set the initial size for the text box
+        self.resize_text_box()
+
+    def resize_text_box(self, event=None):
+        # Calculate the height and width of the text
+        self.text = self.text_box.get("1.0",Tk.END)
+        list_of_lines = self.text.splitlines()
+        number_of_lines = len(list_of_lines)
+        max_line_length = 0
+        for line in list_of_lines:
+            if len(line) > max_line_length: max_line_length = len(line)
+        # Apply the specified size constraints
+        if self.min_height is not None and number_of_lines < self.min_height:
+            number_of_lines = self.min_height
+        if self.max_height is not None and number_of_lines > self.max_height:
+            number_of_lines = self.max_height
+        if self.min_width is not None and max_line_length < self.min_width:
+            max_line_length = self.min_width
+        if self.max_width is not None and max_line_length > self.max_width:
+            max_line_length = self.max_width
+        # re-size the text box
+        self.text_box.config(height=number_of_lines+1, width=max_line_length+1)
+        
+    def set_value(self, text:str):
+        self.text = text
+        if not self.editable: self.text_box.config(state="normal")
+        self.text_box.delete("1.0",Tk.END)
+        self.text_box.insert(Tk.INSERT, self.text)
+        if not self.editable: self.text_box.config(state="disabled")
+        self.resize_text_box()
+    
+    def get_value(self):
+        self.text = self.text_box.get("1.0",Tk.END)
+        return(self.text)
+    
+#------------------------------------------------------------------------------------
+# Compound UI element for an object_id_selection LabelFrame - uses the integer_entry_box.
+# This is used across all object windows for displaying / changing the item ID.
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
+# Public class instance methods inherited from the base integer_entry_box are:
+#    "disable" - disables/blanks the entry_box 
+#    "enable"  enables/loads the entry_box (with the last value)
+#    "set_value" - set the initial value of the entry_box (int) 
+#    "get_value" - get the last "validated" value of the entry_box (int) 
+#    "get_initial_value" - get the initial value of the entry_box (int)
+#
 # Public class instance methods overridden by this class are
 #    "validate" - Validates that the entered Item ID is "free" (and can therefore be
-#               assigned to this item) or is being changed back to the initial value
+#               assigned to this item) or is being changed back to the initial value.
 #------------------------------------------------------------------------------------
 
 class object_id_selection(integer_entry_box):
@@ -587,14 +708,19 @@ class object_id_selection(integer_entry_box):
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Common class for a DCC command (address + command logic) entry element box
-# Uses the dcc_entry_box and state_box classes from above
+# Compound UI element for a dcc_command_entry (address + command logic).
+# Uses the common dcc_entry_box and state_box classes. Note that the state_box
+# is only enabled when a valid DCC address has been entered into the entry_box.
+# This is used across all object windows for displaying / changing the item ID.
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
 # Public class instance methods provided by this class are
-#    "validate" - validate the current entry box value and return True/false
+#    "validate" - validate the current entry_box value and return True/false
 #    "set_value" - will set the current value [address:int, state:bool]
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
+#    "disable" - disables/blanks the entry_box (and associated state button)
+#    "enable"  enables/loads the entry_box (and associated state button)
 #------------------------------------------------------------------------------------
 
 class dcc_command_entry():
@@ -602,9 +728,9 @@ class dcc_command_entry():
         # create a frame to pack the two elements into
         self.frame = Tk.Frame(parent_frame)
         # Create the address entry box and the associated dcc state box
-        self.EB = dcc_entry_box(parent_frame, callback=self.eb_updated)
+        self.EB = dcc_entry_box(self.frame, callback=self.eb_updated)
         self.EB.pack(side=Tk.LEFT)
-        self.CB = state_box(parent_frame, label_off="OFF", label_on="ON",
+        self.CB = state_box(self.frame, label_off="OFF", label_on="ON",
                     width=4, tool_tip="Set the DCC logic for the command")
         self.CB.pack(side=Tk.LEFT)
     
@@ -637,69 +763,10 @@ class dcc_command_entry():
         return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
-# Common class for a route selection element (route selection CBs)
-# Public class instance methods provided by this class are
-#    "set_values" - Sets the route selection CBs 
-#    "get_values" - Gets route selection CBs 
-#    "enable" - Enables/loads the route selection CBs 
-#    "disable" - Disables/blanks the route selection CBs 
-#------------------------------------------------------------------------------------
-
-class route_selections():
-    def __init__(self, parent_frame, tool_tip:str, read_only=False, callback=None):
-        # create the UI Elements for each of the possible route selections
-        self.main = state_box(parent_frame, label_off="MAIN", label_on="MAIN",
-                width=5, tool_tip=tool_tip, read_only=read_only, callback=callback)
-        self.main.pack(side=Tk.LEFT)
-        self.lh1 = state_box(parent_frame, label_off="LH1", label_on="LH1",
-                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
-        self.lh1.pack(side=Tk.LEFT)
-        self.lh2 = state_box(parent_frame, label_off="LH2", label_on="LH2",
-                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
-        self.lh2.pack(side=Tk.LEFT)
-        self.rh1 = state_box(parent_frame, label_off="RH1", label_on="RH1",
-                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
-        self.rh1.pack(side=Tk.LEFT)
-        self.rh2 = state_box(parent_frame, label_off="RH2", label_on="RH2",
-                width=4, tool_tip=tool_tip, read_only=read_only, callback=callback)
-        self.rh2.pack(side=Tk.LEFT)
-
-    def enable(self):
-        self.main.enable()
-        self.lh1.enable()
-        self.lh2.enable()
-        self.rh1.enable()
-        self.rh2.enable()
-
-    def disable(self):
-        self.main.disable()
-        self.lh1.disable()
-        self.lh2.disable()
-        self.rh1.disable()
-        self.rh2.disable()
-
-    def set_values(self, routes:[bool,bool,bool,bool,bool]):
-        # A 'Route' comprises a list of route selections [main, lh1, lh2, rh1, rh2]
-        # Where each route selection is a boolean value (True or False)
-        self.main.set_value(routes[0])
-        self.lh1.set_value(routes[1])
-        self.lh2.set_value(routes[2])
-        self.rh1.set_value(routes[3])
-        self.rh2.set_value(routes[4])
-
-    def get_values(self):
-        # A 'Route' comprises a list of route selections [main, lh1, lh2, rh1, rh2]
-        # Where each route selection is a boolean value (True or False)
-        return ( [ self.main.get_value(),
-                   self.lh1.get_value(),
-                   self.lh2.get_value(),
-                   self.rh1.get_value(),
-                   self.rh2.get_value() ])
-
-#------------------------------------------------------------------------------------
-# Class for a signal route selection element (Sig ID EB + route selection CBs)
-# Used by the signals and points interlocking tabs (read only for points tab)
-# Inherits from the common route_selections class (above)
+# Compound UI Element for a signal route selections (Sig ID EB + route selection CBs)
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
 # Public class instance methods provided by this class are
 #    "validate" - Checks whether the entry is a valid Item Id 
 #    "set_values" - Sets the EB value and all route selection CBs 
@@ -708,11 +775,11 @@ class route_selections():
 #    "disable" - Disables/blanks EB value and all route selection CBs 
 #------------------------------------------------------------------------------------
 
-class signal_route_selections(route_selections):
+class signal_route_selections():
     def __init__(self, parent_frame, tool_tip:str, exists_function=None,
                   current_id_function=None, read_only:bool=False):
         self.read_only = read_only
-        # Create a fFrame to hold all the elements
+        # Create a Frame to hold all the elements
         self.frame = Tk.Frame(parent_frame)
         # Call the common base class init function to create the EB
         self.EB = int_item_id_entry_box(self.frame, tool_tip=tool_tip, callback=self.eb_updated,
@@ -721,15 +788,37 @@ class signal_route_selections(route_selections):
         # Disable the EB (we don't use the disable method as we want to display the value_
         if self.read_only: self.EB.configure(state="disabled")
         # Create the UI Elements for each of the possible route selections
-        super().__init__(self.frame, tool_tip, read_only)
+        self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
+                width=5, tool_tip=tool_tip, read_only=read_only)
+        self.main.pack(side=Tk.LEFT)
+        self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh1.pack(side=Tk.LEFT)
+        self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.lh2.pack(side=Tk.LEFT)
+        self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh1.pack(side=Tk.LEFT)
+        self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
+                width=4, tool_tip=tool_tip, read_only=read_only)
+        self.rh2.pack(side=Tk.LEFT)
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
         if not self.read_only:
             if self.EB.entry.get() == "":
-                super().disable()
+                self.main.disable()
+                self.lh1.disable()
+                self.lh2.disable()
+                self.rh1.disable()
+                self.rh2.disable()
             else:
-                super().enable()
+                self.main.enable()
+                self.lh1.enable()
+                self.lh2.enable()
+                self.rh1.enable()
+                self.rh2.enable()
     
     def validate(self):
         return(self.EB.validate())
@@ -741,22 +830,34 @@ class signal_route_selections(route_selections):
     def disable(self):
         self.EB.disable()
         self.eb_updated()
-        
+
     def set_values(self, signal:[int,[bool,bool,bool,bool,bool]]):
         # Each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
         self.EB.set_value(signal[0])
-        super().set_values(signal[1])
+        self.main.set_value(signal[1][0])
+        self.lh1.set_value(signal[1][1])
+        self.lh2.set_value(signal[1][2])
+        self.rh1.set_value(signal[1][3])
+        self.rh2.set_value(signal[1][4])
         self.eb_updated()
 
     def get_values(self):
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
-        return ( [ self.EB.get_value(), super().get_values() ])
+        return ( [ self.EB.get_value(), [ self.main.get_value(),
+                                          self.lh1.get_value(),
+                                          self.lh2.get_value(),
+                                          self.rh1.get_value(),
+                                          self.rh2.get_value() ] ])
 
 #------------------------------------------------------------------------------------
-# Class for a signal route interlocking frame - uses multiple instances of the
-# signal_route_selection_element which are created when "set_values" is called
+# Compound UI Element for a signal route interlocking LabelFrame - creates a variable
+# number of instances of the signal_route_selection_element when "set_values" is called
+# (according to the length of the supplied list).Note that this is a 'read-only' element.
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes
 #------------------------------------------------------------------------------------
@@ -765,7 +866,6 @@ class signal_route_interlocking_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the Signal Interlocking List 
         self.frame = Tk.LabelFrame(parent_frame, text="Interlocking with signals")
-        self.frame.pack(padx=2, pady=2, fill='x')
         # These are the lists that hold the references to the subframes and subclasses
         self.sigelements = []
         self.subframe = None
@@ -791,9 +891,13 @@ class signal_route_interlocking_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Class for a frame containing up to 5 radio buttons
+# Compound UI Element for a LabelFrame containing up to 5 radio buttons
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
 # Class instance elements to use externally are:
 #    "B1" to "B5 - to access the button widgets (i.e. for reconfiguration)
+#
 # Class instance functions to use externally are:
 #    "set_value" - will set the current value (integer 1-5)
 #    "get_value" - will return the last "valid" value (integer 1-5)
@@ -848,8 +952,49 @@ class selection_buttons():
         return(self.value.get())
 
 #------------------------------------------------------------------------------------
-# Class for the common Apply/OK/Reset/Cancel Buttons - will make external callbacks
+# Compound UI Element for Colour selection
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
+#
+# Class instance functions to use externally are:
+#    "set_value" - will set the current value (colour code string)
+#    "get_value" - will return the last "valid" value (colour code string)
+#------------------------------------------------------------------------------------
+
+class colour_selection():
+    def __init__(self, parent_frame):
+        # Variable to hold the currently selected colour:
+        self.colour ='black'
+        # Create a frame to hold the tkinter widgets
+        # The parent class is responsible for packing the frame
+        self.frame = Tk.LabelFrame(parent_frame,text="Colour")
+        # Create a sub frame for the UI elements to centre them
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour)
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.label2, "Currently selected colour")
+        self.B1 = Tk.Button(self.subframe, text="Change", command=self.update)
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
+        
+    def update(self):
+        colour_code = colorchooser.askcolor(parent=self.frame, title ="Select Colour")
+        self.colour = colour_code[1]
+        self.label2.config(bg=self.colour)
+        
+    def get_value(self):
+        return(self.colour)
+        
+    def set_value(self,colour:str):
+        self.colour = colour
+        self.label2.config(bg=self.colour)
+
+#------------------------------------------------------------------------------------
+# Compound UI element for the Apply/OK/Reset/Cancel Buttons - will make callbacks
 # to the specified "load_callback" and "save_callback" functions as appropriate 
+# Note the responsibility of the instantiating func/class to 'pack' the Frame of
+# the UI element - i.e. '<class_instance>.frame.pack()'
 #------------------------------------------------------------------------------------
 
 class window_controls():
@@ -860,7 +1005,6 @@ class window_controls():
         self.load_callback = load_callback
         self.parent_object = parent_object
         self.frame = Tk.Frame(self.window)
-        self.frame.pack(padx=2, pady=2)
         # Create the buttons and tooltips
         self.B1 = Tk.Button (self.frame, text = "Ok",command=self.ok)
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
