@@ -55,6 +55,7 @@ def run_instrument_linking_tests(delay:float=0.0):
     click_telegraph_key(3)
     sleep(0.3)
     click_telegraph_key(4)
+    sleep(0.3)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(1,2,3,4)
     sleep(delay)
@@ -118,6 +119,7 @@ def run_instrument_linking_tests(delay:float=0.0):
     click_telegraph_key(13)
     sleep(0.3)
     click_telegraph_key(14)
+    sleep(0.3)
     # Test the basic connectivity for single line
     assert_block_section_ahead_not_clear(11,12,13,14)
     sleep(delay)
