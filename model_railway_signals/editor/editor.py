@@ -108,28 +108,29 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
-        # initialise the schematic editor
-        width, height, grid = settings.get_canvas()
-        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
         # Initialise the editor configuration at startup
-        self.initialise_editor()
+        self.initialise_editor(startup=True)
         # Parse the command line arguments to get the filename (and load it)
         # The version is the third parameter provided by 'get_general'
         parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
         parser.add_argument("-f","--file",dest="filename",help="schematic file to load on startup",metavar="FILE")
         args = parser.parse_args()
         if args.filename is not None: self.load_schematic(args.filename)
-        
-    # Common initialisation function (called on editor start or layout load or new layout)
-    def initialise_editor(self):
+    
+    # --------------------------------------------------------------------------------------
+    # Common initialisation functions (called on editor start or layout load or new layout)
+    # --------------------------------------------------------------------------------------
+    
+    def initialise_editor(self,startup:bool=False):
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
         path, name = os.path.split(settings.get_general()[0])
         self.root.title(name)
-        # Set the edit mode (2nd param in the returned tuple)
-        if settings.get_general()[1]: self.edit_mode()
-        else: self.run_mode()
-        # Set the log level before creating the new layout objects
+        # Re-size the canvas to reflect the new schematic size
+        width, height, grid = settings.get_canvas()
+        if startup: schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
+        else: schematic.update_canvas(width, height, grid)
+        # Set the logging level before we start doing stuff
         initial_log_level = settings.get_logging()
         logging.basicConfig(format='%(levelname)s: %(message)s')
         if initial_log_level == 1: logging.getLogger().setLevel(logging.ERROR)
@@ -141,13 +142,24 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
+        # Set the edit mode (2nd param in the returned tuple)
+        # Either of these calls will trigger a run layout update
+        if settings.get_general()[1]: self.edit_mode()
+        else: self.run_mode()
         
+    # --------------------------------------------------------------------------------------
+    # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
+    # --------------------------------------------------------------------------------------
+
     def handle_canvas_event(self, event=None):
-        # Handle the Toggle Mode Event ('m' key)
         if event.keysym == 'm':
             # the Edit mode flag is the second parameter returned
             if settings.get_general()[1]: self.run_mode()
             else: self.edit_mode()
+            
+    # --------------------------------------------------------------------------------------
+    # Callback functions to handle menubar selection events
+    # --------------------------------------------------------------------------------------
 
     def edit_mode(self):
         new_label = "Mode:Edit  "
@@ -234,9 +246,6 @@ class main_menubar:
             settings.restore_defaults()
             # Re-initialise the editor for the new settings to take effect
             self.initialise_editor()
-            # Re-size the canvas to reflect the new schematic size
-            width, height, grid = settings.get_canvas()
-            schematic.update_canvas(width, height, grid)
             # save the current state (for undo/redo) - deleting all previous history
             objects.save_schematic_state(reset_pointer=True)
         return()
@@ -280,10 +289,7 @@ class main_menubar:
                 warning_messages = settings.set_all(layout_state["settings"])
                 # Set the filename to reflect that actual name of the loaded file
                 settings.set_general(filename=file_loaded)
-                # Re-size the canvas to reflect the new schematic size
-                width, height, grid = settings.get_canvas()
-                schematic.update_canvas(width, height, grid)
-                # Re-initailise the editor with the new configuration
+                # Re-initialise the editor for the new settings to take effect
                 self.initialise_editor()
                 # Create the loaded layout objects then purge the loaded state information
                 warning_messages.extend(objects.set_all(layout_state["objects"]))
@@ -305,7 +311,7 @@ class main_menubar:
         return()
     
 #------------------------------------------------------------------------------------
-# Class for the window to display any file load warning messages  
+# Class for the pop-up window to display any file load warning messages  
 #------------------------------------------------------------------------------------
 
     class load_warnings_window():
@@ -339,7 +345,7 @@ class main_menubar:
             self.window.destroy()
         
 #------------------------------------------------------------------------------------
-# This is where the code begins  
+# This is the main function to run up the schematic editor application  
 #------------------------------------------------------------------------------------
 
 def run_editor():
