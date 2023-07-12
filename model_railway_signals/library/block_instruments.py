@@ -265,23 +265,21 @@ def set_repeater_blocked (block_id:int,make_callback:bool=True):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE BLOCKED - Block instrument doesn't exist")
     elif instruments[str(block_id)]["repeaterstate"] is not None:
         logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to LINE BLOCKED")
-        if instruments[str(block_id)]["singleline"]:
-            # If this is a single line instrument then we need to change the main instrument state
-            # We need to inhibit the update of the linked instrument in this call to prevent recursion
-            set_section_blocked(block_id,update_remote_instrument=False)
-            # As the change was initiated by a remote instrument we enable the local instrument
-            # buttons as the  remote instrument now been changed back to LINE BLOCKED
-            instruments[str(block_id)]["blockbutton"].config(state="normal")
-            instruments[str(block_id)]["clearbutton"].config(state="normal")
-            instruments[str(block_id)]["occupbutton"].config(state="normal")
         # Set the internal repeater state and the repeater indicator to BLOCKED
         instruments[str(block_id)]["repeaterstate"] = None
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "hidden")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "hidden")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "normal")
+        # For single line instruments we set the local instrument buttons to mirror the remote instrument
+        # and also enable the local buttons (as the remote instrument has been returned to LINE BLOCKED)
+        if instruments[str(block_id)]["singleline"]:
+            instruments[str(block_id)]["blockbutton"].config(state="normal",relief="sunken",bg=common.bgsunken)
+            instruments[str(block_id)]["clearbutton"].config(state="normal",relief="raised",bg=common.bgraised)
+            instruments[str(block_id)]["occupbutton"].config(state="normal",relief="raised",bg=common.bgraised)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
-        if make_callback: instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+        if make_callback:
+            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -296,23 +294,21 @@ def set_repeater_clear (block_id:int,make_callback:bool=True):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE CLEAR - Block instrument doesn't exist")
     elif instruments[str(block_id)]["repeaterstate"] != True:
         logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to LINE CLEAR")
-        if instruments[str(block_id)]["singleline"]:
-            # If this is a single line instrument then we need to change the main instrument state
-            # We need to inhibit the update of the linked instrument in this call to prevent recursion
-            set_section_clear(block_id,update_remote_instrument=False)
-            # As the change was initiated by a remote instrument we disable the local instrument
-            # buttons until the remote instrument has changed back to LINE BLOCKED
-            instruments[str(block_id)]["blockbutton"].config(state="disabled")
-            instruments[str(block_id)]["clearbutton"].config(state="disabled")
-            instruments[str(block_id)]["occupbutton"].config(state="disabled")
         # Set the internal repeater state and the repeater indicator to CLEAR
         instruments[str(block_id)]["repeaterstate"] = True
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "hidden")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "normal")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "hidden")
+        # For single line instruments we set the local instrument buttons to mirror the remote instrument
+        # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
+        if instruments[str(block_id)]["singleline"]:
+            instruments[str(block_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(block_id)]["clearbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
+            instruments[str(block_id)]["occupbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
-        if make_callback: instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+        if make_callback:
+            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -327,23 +323,21 @@ def set_repeater_occupied (block_id:int,make_callback:bool=True):
         logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to TRAIN ON LINE - Block instrument doesn't exist")
     elif instruments[str(block_id)]["repeaterstate"] != False:
         logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to TRAIN ON LINE")
-        if instruments[str(block_id)]["singleline"]:
-            # If this is a single line instrument then we need to change the main instrument state
-            # We need to inhibit the update of the linked instrument in this call to prevent recursion
-            set_section_occupied(block_id,update_remote_instrument=False)
-            # As the change was initiated by a remote instrument we disable the local instrument
-            # buttons until the remote instrument has changed back to LINE BLOCKED
-            instruments[str(block_id)]["blockbutton"].config(state="disabled")
-            instruments[str(block_id)]["clearbutton"].config(state="disabled")
-            instruments[str(block_id)]["occupbutton"].config(state="disabled")
         # Set the internal repeater state and the repeater indicator to OCCUPIED
         instruments[str(block_id)]["repeaterstate"] = False
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "normal")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "hidden")
         instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "hidden")
+        # For single line instruments we set the local instrument buttons to mirror the remote instrument
+        # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
+        if instruments[str(block_id)]["singleline"]:
+            instruments[str(block_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(block_id)]["clearbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(block_id)]["occupbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
-        if make_callback: instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+        if make_callback:
+            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -358,38 +352,24 @@ def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE BLOCKED - Block instrument doesn't exist")
-    else:
-        # Set the state of the buttons accordingly. We always do this (even if the state hasn't changed)
-        # to deal with single line instruments being updated by a state change of the linked instrument
-        instruments[str(block_id)]["blockbutton"].config(relief="sunken")
-        instruments[str(block_id)]["blockbutton"].config(bg=common.bgsunken)
-        instruments[str(block_id)]["clearbutton"].config(relief="raised")
-        instruments[str(block_id)]["clearbutton"].config(bg=common.bgraised)
-        instruments[str(block_id)]["occupbutton"].config(relief="raised")
-        instruments[str(block_id)]["occupbutton"].config(bg=common.bgraised)
-        # Everything else is only processed on a state change
-        if instruments[str(block_id)]["sectionstate"] is not None:
-            logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE BLOCKED")
-            # Set the internal state of the block instrument
-            instruments[str(block_id)]["sectionstate"] = None
-            # The repeater state is always the same as the main state for single line instruments
-            if instruments[str(block_id)]["singleline"]: instruments[str(block_id)]["repeaterstate"] = None
-            # Set the local block indication to reflect the state that has been set locally
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "normal")
-            # If linked to another instrument then update the repeater indicator on the other instrument or
-            # Publish the initial state to the broker (for other nodes to consume). Note that state will only
-            # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument:
-                linked_to_id = instruments[str(block_id)]["linkedto"]
-                if linked_to_id is not None:
-                    if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-                    elif instrument_exists(linked_to_id): set_repeater_blocked(linked_to_id)
-                # Handle the case of a single line instrument with no linked instrument - in this case we
-                # want to make a callback on block state change to allow interlocking to be processed
-                elif instruments[str(block_id)]["singleline"]:
-                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
+    elif instruments[str(block_id)]["sectionstate"] is not None:
+        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE BLOCKED")
+        # Set the state of the buttons accordingly
+        instruments[str(block_id)]["blockbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(block_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(block_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        # Set the internal state of the block instrument and the local indicator
+        instruments[str(block_id)]["sectionstate"] = None
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "normal")
+        # If linked to another instrument then update the repeater indicator on the other instrument or
+        # Publish the initial state to the broker (for other nodes to consume). Note that state will only
+        # be published if the MQTT interface has been configured and we are connected to the broker
+        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
+            linked_to_id = instruments[str(block_id)]["linkedto"]
+            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
+            elif instrument_exists(linked_to_id): set_repeater_blocked(linked_to_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -404,38 +384,24 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE CLEAR - Block instrument doesn't exist")
-    else:
-        # Set the state of the buttons accordingly. We always do this (even if the state hasn't changed)
-        # to deal with single line instruments being updated by a state change of the linked instrument
-        instruments[str(block_id)]["blockbutton"].config(relief="raised")
-        instruments[str(block_id)]["blockbutton"].config(bg=common.bgraised)
-        instruments[str(block_id)]["clearbutton"].config(relief="sunken")
-        instruments[str(block_id)]["clearbutton"].config(bg=common.bgsunken)
-        instruments[str(block_id)]["occupbutton"].config(relief="raised")
-        instruments[str(block_id)]["occupbutton"].config(bg=common.bgraised)
-        # Everything else is only processed on a state change
-        if instruments[str(block_id)]["sectionstate"] != True:
-            logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE CLEAR")
-            # Set the internal state of the block instrument
-            instruments[str(block_id)]["sectionstate"] = True
-            # The repeater state is always the same as the main state for single line instruments
-            if instruments[str(block_id)]["singleline"]: instruments[str(block_id)]["repeaterstate"] = True
-            # Set the local block indication to reflect the state that has been set locally
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "normal")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
-            # If linked to another instrument then update the repeater indicator on the other instrument or
-            # Publish the initial state to the broker (for other nodes to consume). Note that state will only
-            # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument:
-                linked_to_id = instruments[str(block_id)]["linkedto"]
-                if linked_to_id is not None:
-                    if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-                    elif instrument_exists(linked_to_id): set_repeater_clear(linked_to_id)
-                # Handle the case of a single line instrument with no linked instrument - in this case we
-                # want to make a callback on block state change to allow interlocking to be processed
-                elif instruments[str(block_id)]["singleline"]:
-                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+    elif instruments[str(block_id)]["sectionstate"] != True:
+        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE CLEAR")
+        # Set the state of the buttons accordingly
+        instruments[str(block_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(block_id)]["clearbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(block_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        # Set the internal state of the block instrument and the local indicator
+        instruments[str(block_id)]["sectionstate"] = True
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "normal")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
+        # If linked to another instrument then update the repeater indicator on the other instrument or
+        # Publish the initial state to the broker (for other nodes to consume). Note that state will only
+        # be published if the MQTT interface has been configured and we are connected to the broker
+        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
+            linked_to_id = instruments[str(block_id)]["linkedto"]
+            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
+            elif instrument_exists(linked_to_id): set_repeater_clear(linked_to_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -450,38 +416,24 @@ def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
     # do some basic validation on the block ID we've been given
     if not instrument_exists (block_id):
         logging.error ("Block Instrument "+str(block_id)+": Can't set section to TRAIN ON LINE - Block instrument doesn't exist")
-    else:
-        # Set the state of the buttons accordingly. We always do this (even if the state hasn't changed)
-        # to deal with single line instruments being updated by a state change of the linked instrument
-        instruments[str(block_id)]["blockbutton"].config(relief="raised")
-        instruments[str(block_id)]["blockbutton"].config(bg=common.bgraised)
-        instruments[str(block_id)]["clearbutton"].config(relief="raised")
-        instruments[str(block_id)]["clearbutton"].config(bg=common.bgraised)
-        instruments[str(block_id)]["occupbutton"].config(relief="sunken")
-        instruments[str(block_id)]["occupbutton"].config(bg=common.bgsunken)
-        # Everything else is only processed on a state change
-        if instruments[str(block_id)]["sectionstate"] != False:
-            logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to TRAIN ON LINE")
-            # Set the internal state of the block instrument
-            instruments[str(block_id)]["sectionstate"] = False
-            # The repeater state is always the same as the main state for single line instruments
-            if instruments[str(block_id)]["singleline"]: instruments[str(block_id)]["repeaterstate"] = False
-            # Set the local block indication to reflect the state that has been set locally
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "normal")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
-            instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
-            # If linked to another instrument then update the repeater indicator on the other instrument or
-            # Publish the initial state to the broker (for other nodes to consume). Note that state will only
-            # be published if the MQTT interface has been configured and we are connected to the broker
-            if update_remote_instrument:
-                linked_to_id = instruments[str(block_id)]["linkedto"]
-                if linked_to_id is not None:
-                    if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-                    elif instrument_exists(linked_to_id): set_repeater_occupied(linked_to_id)
-                # Handle the case of a single line instrument with no linked instrument - in this case we
-                # want to make a callback on block state change to allow interlocking to be processed
-                elif instruments[str(block_id)]["singleline"]:
-                    instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)            
+    elif instruments[str(block_id)]["sectionstate"] != False:
+        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to TRAIN ON LINE")
+        # Set the state of the buttons accordingly
+        instruments[str(block_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(block_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(block_id)]["occupbutton"].config(relief="sunken",bg=common.bgsunken)
+        # Set the internal state of the block instrument and the local indicator
+        instruments[str(block_id)]["sectionstate"] = False
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "normal")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
+        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
+        # If linked to another instrument then update the repeater indicator on the other instrument or
+        # Publish the initial state to the broker (for other nodes to consume). Note that state will only
+        # be published if the MQTT interface has been configured and we are connected to the broker
+        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
+            linked_to_id = instruments[str(block_id)]["linkedto"]
+            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
+            elif instrument_exists(linked_to_id): set_repeater_occupied(linked_to_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -613,7 +565,8 @@ def create_block_instrument (canvas,
         # Create the main block section indicator for our instrument
         my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y, block_id_tag)
         # If this is a double line indicator then create the repeater indicator
-        if single_line: rep_ind_block, rep_ind_clear, rep_ind_occup = None, None, None
+        # For a single line indicator, we use the main indicator as the repeater
+        if single_line: rep_ind_block, rep_ind_clear, rep_ind_occup = my_ind_block, my_ind_clear, my_ind_occup
         else: rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator (canvas, x, y-55, block_id_tag)
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
@@ -647,16 +600,14 @@ def create_block_instrument (canvas,
         # Get the initial state for the instrument (if layout state has been loaded)
         # if nothing has been loaded then the default state (of LINE BLOCKED) will be applied
         loaded_state = file_interface.get_initial_item_state("instruments",block_id)
-        # Set the initial block-state for the instrument (values will be 'None' for No state loaded).
+        # Set the initial block-state for the instrument (values will be 'None' for No state loaded)
         if loaded_state["sectionstate"] == True: set_section_clear(block_id, update_remote_instrument=False)
         elif loaded_state["sectionstate"] == False: set_section_occupied(block_id, update_remote_instrument=False)
         else: set_section_blocked(block_id, update_remote_instrument=False)
-        # Only set the initial repeater state if this instrument has a repeater (i.e. not single line)
-        # if nothing has been loaded then the default state (of LINE BLOCKED) will be applied
-        if not instruments[str(block_id)]["singleline"]:
-            if loaded_state["repeaterstate"] == True: set_repeater_clear(block_id,make_callback=False)
-            elif loaded_state["repeaterstate"] == False: set_repeater_occupied(block_id,make_callback=False)
-            else: set_repeater_blocked(block_id,make_callback=False)
+        # Set the initial repeater state (values will be 'None' for No state loaded)
+        if loaded_state["repeaterstate"] == True: set_repeater_clear(block_id,make_callback=False)
+        elif loaded_state["repeaterstate"] == False: set_repeater_occupied(block_id,make_callback=False)
+        else: set_repeater_blocked(block_id,make_callback=False)
         # Update the repeater display of the linked instrument (if one is specified). This will update
         # local instruments (block_id is an int) if they have already been created on the schematic or
         # send an MQTT event to update remote instruments (block_id is a str) if the current instrument
