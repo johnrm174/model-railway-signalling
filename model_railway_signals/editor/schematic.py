@@ -193,7 +193,10 @@ def delete_all_objects():
     global schematic_state
     # Select and delete all objects (also clear the selected objects list)
     select_all_objects()
-    delete_selected_objects()
+    # Delete the objects from the schematic
+    objects.delete_objects(schematic_state["selectedobjects"],initialise_layout_after_delete=False)
+    # Remove the objects from the list of selected objects
+    schematic_state["selectedobjects"]=[]
     # Belt and braces delete of all canvas objects as I've seen issues when
     # running the system tests (probably because I'm not using the mainloop)
     canvas.delete("all")
