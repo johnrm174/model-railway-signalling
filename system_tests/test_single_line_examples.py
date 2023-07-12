@@ -34,10 +34,10 @@ def run_interlocking_tests():
     assert_points_unlocked(1,2)
     assert_signals_unlocked(7,3)
     assert_signals_locked(1,2,4,5,6,8)
-    # Block instrument interlocking
+    # Block instrument interlocking #1
     set_instrument_clear(2)
-    assert_signals_unlocked(2,3,5,7)
-    assert_signals_locked(1,4,6,8)
+    assert_signals_unlocked(2,3,7)
+    assert_signals_locked(1,4,5,6,8)
     # Point interlocking with signals (LH)
     set_signals_off(2)
     assert_points_locked(2)
@@ -51,6 +51,11 @@ def run_interlocking_tests():
     set_signals_on(3)
     assert_points_unlocked(1,2)
     assert_signals_locked(4)
+    # Block instrument interlocking #1
+    set_instrument_blocked(2)
+    set_instrument_clear(1)
+    assert_signals_unlocked(5,3,7)
+    assert_signals_locked(1,2,4,6,8)
     # Point interlocking with signals (RH)
     set_signals_off(5)
     assert_points_locked(1)
@@ -65,7 +70,7 @@ def run_interlocking_tests():
     assert_points_unlocked(1,2)
     assert_signals_locked(8)
     # Block instrument interlocking
-    set_instrument_blocked(2)
+    set_instrument_blocked(1)
     assert_signals_unlocked(3,7)
     assert_signals_locked(1,2,4,5,6,8)
     # Change the points
@@ -81,8 +86,8 @@ def run_interlocking_tests():
     assert_signals_locked(1,2,4,5,6,8)
     # Block instrument interlocking
     set_instrument_clear(1)
-    assert_signals_unlocked(1,3,7,6)
-    assert_signals_locked(2,5,4,8)
+    assert_signals_unlocked(3,7,6)
+    assert_signals_locked(1,2,5,4,8)
     # Point interlocking with signals (LH)
     set_signals_off(1)
     assert_points_locked(2)
