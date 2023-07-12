@@ -7,11 +7,8 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration of the signal object
-#    objects.signal_exists(point_id) - To see if a specified signal ID exists
-#    objects.signal(point_id) - To get the object_id for a given signal_id
 #
 # Accesses the following external editor objects directly:
-#    objects.signal_index - To iterate through all the point objects
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Uses the classes from the following modules for each configuration tab:
