@@ -7,6 +7,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
+#    objects.instrument_exists(id) - To see if the instrument exists (local or remote)
 #
 # Accesses the following external editor objects directly:
 #    objects.signal_index - To iterate through all the signal objects
@@ -159,8 +160,8 @@ def save_state(instrument, close_window:bool):
 
 class linked_to_selection(common.str_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
-        # These are the functions used to validate that the entered ID
-        # exists on the schematic and is different to the current ID
+        # The exists_function from the block_instruments module is used to validate that the
+        # entered ID  exists on the schematic or has been subscribed to via mqtt networking
         exists_function = block_instruments.instrument_exists
         current_id_function = parent_object.instid.get_value
         # Create the Label Frame for the "also switch" entry box
@@ -263,9 +264,10 @@ class instrument_configuration_tab():
         # Create a Frame to hold the Inst ID and Inst Type Selections
         self.frame = Tk.Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
-        # Create the UI Element for Inst ID selection
+        # Create the UI Element for Inst ID selection - Note that we use the instrument_exists
+        # function from the objects module - as we are only interested in local instruments
         self.instid = common.object_id_selection(self.frame, "Inst ID",
-                        exists_function = block_instruments.instrument_exists) 
+                        exists_function = objects.instrument_exists) 
         self.instid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Inst Type selection
         self.insttype = common.selection_buttons(self.frame, "Point type",
