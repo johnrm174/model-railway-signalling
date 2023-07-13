@@ -1,11 +1,23 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Configuration" Tab 
+# Functions and sub Classes for the Edit Signal "Configuration" Tab
+#
+# Makes the following external API calls to other editor modules:
+#    objects.signal_exists(id) - To see if the signal exists (local)
+#
+# Inherits the following common editor base classes (from common):
+#    common.int_item_id_entry_box
+#    common.entry_box
+#    common.check_box
+#    common.dcc_entry_box
+#    common.dcc_command_entry
+#    common.object_id_selection
+#    common.selection_buttons
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 
-from . import common
 from . import objects
+from . import common
 
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element - Builds on the common checkbox class
@@ -1013,6 +1025,8 @@ class signal_configuration_tab:
                 route_type_updated, route_selections_updated, sig_routes_updated,
                 sub_routes_updated, dist_routes_updated):
         # Create a Frame for the Sig ID and Signal Type Selections (always packed)
+        # Note that for the Sig ID selection we use the signal_exists function 
+        # from the objects module - as we are only interested in local signals
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",

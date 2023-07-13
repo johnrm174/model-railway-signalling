@@ -37,6 +37,7 @@
 # Makes the following external API calls to library modules:
 #    points.delete_point(id) - delete library drawing object (part of soft delete)
 #    points.create_point(id) -  To create the library object (create or redraw)
+#    points.update_autoswitch(id,autoswitch_id) - to change the config of an existing point
 #    points.get_tags(id) - get the canvas 'tags' for the point drawing objects
 #    points.point_switched(id) - test if a point is switched (when updating dependent objects)
 #    points.toggle_point_state(id) - to toggle point (when updating dependent objects)
@@ -116,7 +117,9 @@ def reset_point_interlocking_tables():
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to update references from points that "also switch" this point
+# Internal function to update references from points that "also switch" this point.
+# Note that we use the non-public API function for updating the 'autoswitched' ID
+# rather than deleting the point and then re-creating it in its new state
 #------------------------------------------------------------------------------------
 
 def update_references_to_point(old_point_id:int, new_point_id:int):
@@ -125,19 +128,16 @@ def update_references_to_point(old_point_id:int, new_point_id:int):
         point_object = objects_common.point(point_id)
         if objects_common.schematic_objects[point_object]["alsoswitch"] == old_point_id:
             objects_common.schematic_objects[point_object]["alsoswitch"] = new_point_id
-            # We have to delete and re-create the 'parent' point for changes to take effect
-            # Note that when we delete and then re-draw the point it is created in its
-            # default state - so if it was switched before we need to switch it after
-            # Use the non-public-api call to bypass the validation for "toggle_point"
-            parent_point_switched = points.point_switched(point_id)
-            delete_point_object(point_object)
-            redraw_point_object(point_object)
-            if parent_point_switched:
-                points.toggle_point_state(point_id,True)
+            points.update_autoswitch(point_id=point_id, autoswitch_id=new_point_id)
     return()
 
 #------------------------------------------------------------------------------------
-# Internal function to Remove references from points that "also switch" this point.
+# Internal function to remove references to this point from points configured to "also
+# switch" the deleted point. Note that we use the non-public API function for updating
+# the 'autoswitched' ID rather than deleting the point and then re-creating it in its new
+# state. The main use case is when bulk deleting objects via the schematic editor, where
+# we want to avoid interleaving tkinter 'create' commands in amongst the 'delete' commands
+# outside of the main loop as this can result in with artefacts persisting on the canvas
 #------------------------------------------------------------------------------------
 
 def remove_references_to_point(deleted_point_id:int):
@@ -145,35 +145,8 @@ def remove_references_to_point(deleted_point_id:int):
         point_object = objects_common.point(point_id)
         if objects_common.schematic_objects[point_object]["alsoswitch"] == deleted_point_id:
             objects_common.schematic_objects[point_object]["alsoswitch"] = 0
-            # We have to delete and re-create the 'parent' point for changes to take effect
-            # Note that when we delete and then re-draw the point it is created in its
-            # default state - so if it was switched before we need to switch it after
-            # Use the non-public-api call to bypass the validation for "toggle_point"
-            point_switched = points.point_switched(point_id)
-            delete_point_object(point_object)
-            redraw_point_object(point_object)
-            if point_switched:
-                points.toggle_point_state(point_id,True)    
+            points.update_autoswitch(point_id=point_id, autoswitch_id=0)
     return()
-
-#------------------------------------------------------------------------------------
-# Internal Function to update an autoswitched point chain by recursively working
-# through the chain to set any downstream points.
-#------------------------------------------------------------------------------------
-
-def update_downstream_points(object_id):
-    # Test to see if the current point is configured to "auto switch" another
-    # point and, if so, toggle the other (downstream) point to the same setting
-    point_id = objects_common.schematic_objects[object_id]["itemid"]
-    also_switch_id = objects_common.schematic_objects[object_id]["alsoswitch"]
-    if  also_switch_id > 0:
-        if points.point_switched(also_switch_id) != points.point_switched(point_id):
-            # Use the non-public-api call to bypass validation (can't toggle "auto" points)
-            points.toggle_point_state(also_switch_id,True)
-            # Recursively call back into the function with the object ID for the other point
-            update_downstream_points(objects_common.point(str(also_switch_id)))
-    return()
-
 
 #------------------------------------------------------------------------------------
 # Function to to update a point object after a configuration change
@@ -197,18 +170,6 @@ def update_point(object_id, new_object_configuration):
         update_references_to_point(old_item_id,new_item_id)
         # Update any affected signal interlocking tables to reference the new point ID
         objects_signals.update_references_to_point(old_item_id, new_item_id)
-    # We need to ensure that all points in an 'auto switch' chain are set
-    # to the same switched/not-switched state so they switch together correctly
-    # First, test to see if the current point is configured to "auto switch" with 
-    # another point and, if so, toggle the current point to the same setting
-    for point_id in objects_common.point_index:
-        point_object = objects_common.point(point_id)
-        if objects_common.schematic_objects[point_object]["alsoswitch"] == new_item_id:
-            if points.point_switched(point_id):
-                # Use the non-public-api call to bypass the validation for "toggle_point"
-                points.toggle_point_state(new_item_id,True)
-    # Next, update any downstream points that are configured to autoswitch with this one
-    update_downstream_points(object_id)
     return()
 
 #------------------------------------------------------------------------------------

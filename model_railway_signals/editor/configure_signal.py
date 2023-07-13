@@ -3,16 +3,18 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    edit_signal - Open the edit point wtop level window
+#    edit_signal - Open the edit point top level window
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration of the signal object
-#    objects.signal_exists(point_id) - To see if a specified signal ID exists
-#    objects.signal(point_id) - To get the object_id for a given signal_id
 #
 # Accesses the following external editor objects directly:
-#    objects.signal_index - To iterate through all the point objects
 #    objects.schematic_objects - To load/save the object configuration
+#
+# Accesses the following types directly from the library modules:
+#    signals_common.sig_type - The sygnal type
+#    signals_colour_lights.signal_sub_type - colour light signal sub-type
+#    signals_semaphores.semaphore_sub_type - semaphore signal sub-type
 #
 # Uses the classes from the following modules for each configuration tab:
 #    configure_signal_tab1 - General signal configuration

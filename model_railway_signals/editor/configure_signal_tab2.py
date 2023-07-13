@@ -1,11 +1,29 @@
 #------------------------------------------------------------------------------------
-# Functions and sub Classes for the Edit Signal "Interlocking" Tab 
+# Functions and sub Classes for the Edit Signal "Interlocking" Tab
+#
+# Makes the following external API calls to other editor modules:
+#    objects.point_exists(id) - To see if the point exists (local)
+#    objects.signal_exists(id) - To see if the point exists (local)
+#
+# Makes the following external API calls to library modules:
+#    signals_common.sig_exists(id) - To see if the instrument exists (local or remote)
+#    block_instruments.instrument_exists(id) - To see if the instrument exists (local or remote)
+#
+# Inherits the following common editor base classes (from common):
+#    common.check_box
+#    common.state_box
+#    common.int_item_id_entry_box
+#    common.str_item_id_entry_box
+#    common.signal_route_selections
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 
 from . import common
 from . import objects
+
+from ..library import signals_common
+from ..library import block_instruments
 
 #------------------------------------------------------------------------------------
 # Class for a point interlocking entry element (point_id + point_state)
@@ -72,19 +90,13 @@ class point_interlocking_entry():
 
 class interlocking_route_group: 
     def __init__(self, parent_frame, parent_object, label:str):
-        # These are the functions used to validate that the entered IDs exist
-        # on the schematic (and the sig ID is different to the current sig ID) 
-        #################################################################################
-        ### TODO - when we eventually support remote signals we can't use the current ###
-        ### signal_exists function as that only checks if the signal exists in the    ###
-        ### dictionary of schematic objects so won't pick up any signals subscribed   ###
-        ### to via the MQTT networking - we'll therefore have to use the internal     ###
-        ### library function or validate also against a list of subscribed signals    ###                
-        #################################################################################
-        instrument_exists_function = objects.instrument_exists
-        signal_exists_function = objects.signal_exists
+        # Note that for the interlocked point selections we validate using the point_exists function 
+        # from the objects module - as we are only interested in local points. For the signal ahead
+        # and block instrument ahead selections, we use the exists function from the library modules
+        # as to validate the items exist on the schematic or have been subscribed to via MQTT networking
+        signal_exists_function = signals_common.sig_exists
         current_id_function = parent_object.config.sigid.get_value
-        instrument_exists_function = objects.instrument_exists
+        instrument_exists_function = block_instruments.instrument_exists
         point_exists_function = objects.point_exists
         # Create a frame for this UI element (always packed into the parent frame)
         self.frame = Tk.Frame(parent_frame)
@@ -271,8 +283,10 @@ class interlocking_route_frame:
 
 class conflicting_signals_element():
     def __init__(self, parent_frame, parent_object, label:str):
-        # These are the functions used to validate that the entered signal ID
-        # exists on the schematic and is different to the current signal ID
+        # These are the functions used to validate that the entered signal ID  exists on the
+        # schematic and is different to the current signal ID - note that we only allow
+        # interlocking with signals on the local schematic - so we use the signal_exists
+        # function from the objects module
         exists_function = objects.signal_exists
         current_id_function = parent_object.config.sigid.get_value
         # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 

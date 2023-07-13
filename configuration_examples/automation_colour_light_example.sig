@@ -20190,7 +20190,7 @@
             "editmode": true,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "Document your layout here",
-            "version": "Version 3.3.0"
+            "version": "Version 3.4.1"
         },
         "logging": {
             "level": 2

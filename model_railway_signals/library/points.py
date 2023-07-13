@@ -166,6 +166,26 @@ def toggle_point_state (point_id:int, switched_by_another_point = False):
     return
 
 # -------------------------------------------------------------------------
+# Internal Function to update any downstream points (i.e. points
+# 'autoswitched' by the current point) - called on point creation
+# (if a point exists) and when a point is toggled via the API
+# -------------------------------------------------------------------------
+
+def update_downstream_points(point_id:int):
+    if points[str(point_id)]["alsoswitch"] != 0:
+        if not point_exists(points[str(point_id)]["alsoswitch"]):
+            logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
+                    +str(points[str(point_id)]["alsoswitch"]) +" as that point does not exist")
+        elif not points[str(points[str(point_id)]["alsoswitch"])]["automatic"]:
+            logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
+                    +str(points[str(point_id)]["alsoswitch"]) +" as that point is not automatic")
+        elif point_switched(point_id) != point_switched(points[str(point_id)]["alsoswitch"]):
+            logging.info ("Point "+str(point_id)+": Also changing point "+str(points[str(point_id)]["alsoswitch"]))
+            # Recursively call back into the toggle_point function to change the point
+            toggle_point(points[str(point_id)]["alsoswitch"],switched_by_another_point=True)
+    return()
+
+# -------------------------------------------------------------------------
 # Public API Function to flip the route setting for the Point (to enable
 # route setting functions. Also called whenthe POINT button is pressed 
 # Will also recursivelly call itself to change any "also_switch" points
@@ -186,16 +206,7 @@ def toggle_point (point_id:int, switched_by_another_point = False):
         # Call the internal function to toggle the point state and update the drawing objects
         toggle_point_state (point_id,switched_by_another_point)
         # Now change any other points we need (i.e. points switched with this one)
-        if points[str(point_id)]["alsoswitch"] != 0:
-            if not point_exists(points[str(point_id)]["alsoswitch"]):
-                logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
-                        +str(points[str(point_id)]["alsoswitch"]) +" as that point does not exist")
-            elif not points[str(points[str(point_id)]["alsoswitch"])]["automatic"]:
-                logging.error ("Point "+str(point_id)+": Toggle Point - Can't \'also switch\' point "
-                        +str(points[str(point_id)]["alsoswitch"]) +" as that point is not automatic")
-            else:   
-                logging.info ("Point "+str(point_id)+": Also changing point "+str(points[str(point_id)]["alsoswitch"]))
-                toggle_point(points[str(point_id)]["alsoswitch"],switched_by_another_point=True)
+        update_downstream_points(point_id)
     return()
 
 # -------------------------------------------------------------------------
@@ -340,6 +351,18 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # Externally lock the point if required
         if loaded_state["locked"]: lock_point(point_id)
 
+        # We need to ensure that all points in an 'auto switch' chain are set to the same
+        # switched/not-switched state so they switch together correctly. First, we test to
+        # see if any existing points have already been configured to "autoswitch' the newly
+        # created point and, if so, toggle the newly created point to the same state
+        for other_point_id in points:
+            if (points[other_point_id]["alsoswitch"] == point_id and
+                   point_switched(other_point_id) != point_switched(point_id)):
+                points.toggle_point_state(point_id,True)
+        # Update any downstream points (configured to be 'autoswitched' by this point
+        # but only if they have been created (allows them to be created after this point)
+        if point_exists(points[str(point_id)]["alsoswitch"]): update_downstream_points(point_id)
+
         # We'll also return a list of identifiers for the drawing objects
         # so we can change the colour of them later if required
         # [blade straight, blade switched, route straight, route switched]
@@ -440,6 +463,19 @@ def delete_point(point_id:int):
         points[str(point_id)]["lockbutton"].destroy()
         # Finally, delete the entry from the dictionary of points
         del points[str(point_id)]
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function for updating the ID of the point to be 'autoswitched' by this
+# point without needing to delete the point and then create it in its new state. The main
+# use case is when bulk deleting objects via the schematic editor, where we want to avoid
+# interleaving tkinter 'create' commands in amongst the 'delete' commands outside of the
+# main tkinter loop as this can lead to problems with artefacts persisting on the canvas
+# ------------------------------------------------------------------------------------------
+
+def update_autoswitch(point_id:int, autoswitch_id:int):
+    points[str(point_id)]["alsoswitch"] = autoswitch_id
+    update_downstream_points(point_id)
     return()
 
 # ------------------------------------------------------------------------------------------

@@ -30,6 +30,7 @@
 # Makes the following external API calls to library modules:
 #    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
+#    block_instruments.update_linked_to(old_id, new_id) - update the linked instrument reference
 #    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
 #
 #------------------------------------------------------------------------------------
@@ -65,9 +66,7 @@ def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
         instrument_object = objects_common.instrument(instrument_id)
         if objects_common.schematic_objects[instrument_object]["linkedto"] == str(old_inst_id):
             objects_common.schematic_objects[instrument_object]["linkedto"] = str(new_inst_id)
-            # We have to delete and re-create the 'linked' instrument for changes to take effect
-            delete_instrument_object(instrument_object)
-            redraw_instrument_object(instrument_object)
+            block_instruments.update_linked_to(int(instrument_id), str(new_inst_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -81,9 +80,7 @@ def remove_references_to_instrument(deleted_inst_id:int):
         instrument_object = objects_common.instrument(instrument_id)
         if objects_common.schematic_objects[instrument_object]["linkedto"] == str(deleted_inst_id):
             objects_common.schematic_objects[instrument_object]["linkedto"] = ""
-            # We have to delete and re-create the 'linked' instrument for changes to take effect
-            delete_instrument_object(instrument_object)
-            redraw_instrument_object(instrument_object)
+            block_instruments.update_linked_to(int(instrument_id), None)
     return()
     
 #------------------------------------------------------------------------------------

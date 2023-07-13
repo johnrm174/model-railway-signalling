@@ -310,14 +310,14 @@ def delete_object(object_id):
 # Called from the Schematic Module when selected objects are deleted
 #------------------------------------------------------------------------------------
 
-def delete_objects(list_of_object_ids):
+def delete_objects(list_of_object_ids, initialise_layout_after_delete:bool=True):
     for object_id in list_of_object_ids:
         delete_object(object_id)
     # save the current state (for undo/redo)
     save_schematic_state()
     # Process any layout changes (interlocking, signal ahead etc)
     # that might need to change following objet deletion
-    run_layout.initialise_layout()
+    if initialise_layout_after_delete: run_layout.initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------

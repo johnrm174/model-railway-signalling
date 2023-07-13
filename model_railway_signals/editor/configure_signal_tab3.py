@@ -1,5 +1,21 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Automation" Tab
+#
+# Makes the following external API calls to other editor modules:
+#    objects.section_exists(id) - To see if the section exists (local)
+#    objects.signal_exists(id) - To see if the signal exists (local)
+#    objects.signal(id) - to get the object ID of a given item ID
+#
+# Accesses the following external editor objects directly:
+#    objects.signal_index - To iterate through all the signal objects
+#    objects.schematic_objects - To load/save the object configuration
+#
+# Inherits the following common editor base classes (from common):
+#    common.check_box
+#    common.integer_entry_box
+#    common.int_item_id_entry_box
+#    common.CreateToolTip
+#
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -98,6 +114,10 @@ class signal_passed_sensor_frame:
 #    "get_value" - will return the last "valid" value (integer)
 # Public Class instance methods provided by the section_ahead_frame class:
 #    "validate" - validate all 'section ahead' entry box values and return True/false
+#
+# Note that the software only supports automation of track sections on the local schematic
+# (local sections should be created to 'mirror' remote sections for networked layouts)
+# so we use the section_exists function from the objects module for entry validation
 #------------------------------------------------------------------------------------
 
 class section_behind_element(common.int_item_id_entry_box):
@@ -246,6 +266,9 @@ class general_settings_frame():
 #    "enable"  enables/loads all checkboxes and selection boxes
 #    "set_values" - set the initial values for the check box and entry boxes) 
 #    "get_values" - get the last "validated" values of the check box and entry boxes
+#
+# Note that the software only supports triggering of signals on the local schematic
+# so we use the signal_exists function from the objects module for entry validation
 #------------------------------------------------------------------------------------
 
 #####################################################################################
