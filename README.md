@@ -21,18 +21,14 @@ What's currently supported by the Editor:
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
 * Configure a level of automation for the signals as trains traverse the layout
 
-What's New in Release 3.4.0:
-* Point and line colour selections - to enable colour coding of routes
-* Line end-style selections - end-stops and arrow styles can now be specified
-* Enhanced error/warning reporting via popups - reduced reliance on logs
-* Layout 'info' function (under Help) allows you to add notes for your layout
-* Fixed issue when selecting objects if Canvas is scrolled within the main window
-* Various window geometry improvements to keep key UI elements visible on resizing
-* Track section occupancy logic corrected for passing shunt-ahead ground signals
+What's new in Release 3.4.1:
+* Minor bug fixes and enabling work for MQTT networking
+* Improvements to the operation of single line block instruments
+* Some block instrument library API functions have been DEPRECATED (see PUBLIC_API.md)
 
 What's coming soon:
 * MQTT networking (for linking layouts)
-* Better pplication documentation
+* Better application documentation
 
 Any bug reports and feedback you may have would be gratefully appreciated - specifically:
 * What aspects are intuitive? What aspects aren't?

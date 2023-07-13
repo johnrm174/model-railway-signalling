@@ -8673,9 +8673,9 @@
         },
         "general": {
             "editmode": false,
-            "filename": "/home/john/model-railway-signalling/configuration_examples/single_line_semaphore_example.sig",
+            "filename": "/home/pi/model-railway-signalling/configuration_examples/single_line_semaphore_example.sig",
             "info": "Document your layout here",
-            "version": "Version 3.4.0"
+            "version": "Version 3.4.1"
         },
         "logging": {
             "level": 2
