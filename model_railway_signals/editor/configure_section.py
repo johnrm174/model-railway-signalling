@@ -7,12 +7,15 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.section_exists(section_id) - To see if a specified section ID exists
+#    objects.section_exists(section_id) - To see if a specified section ID exists (local)
 #    objects.section(section_id) - To get the object_id for a given section ID
 #
 # Accesses the following external editor objects directly:
 #    objects.section_index - To iterate through all the section objects
 #    objects.schematic_objects - To load/save the object configuration
+#
+# Makes the following external API calls to library modules:
+#    track_sections.section_exists(id) - To see if the section exists (remote)
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -31,21 +34,7 @@ from tkinter import ttk
 from . import common
 from . import objects
 
-#------------------------------------------------------------------------------------
-# Function to return the read-only "mirrored by" parameter. This is the back-reference
-# to the section that is configured to mirror the current section (else zero). This
-# is only used within the UI so doesn't need to be tracked in the section object dict
-# Note that the mirrored element is a string to support local and remote sections
-#------------------------------------------------------------------------------------
-
-def mirrored_by_section(object_id):
-    mirrored_by_section_id = ""
-    for section_id in objects.section_index:
-        mirrored_section_id = objects.schematic_objects[objects.section(section_id)]["mirror"]
-        if mirrored_section_id == str(objects.schematic_objects[object_id]["itemid"]):
-            mirrored_by_section_id = section_id
-    return(mirrored_by_section_id)
-
+from ..library import track_sections
 
 #------------------------------------------------------------------------------------
 # Helper Function to return the list of available signal routes for the signal ahead
@@ -113,7 +102,6 @@ def load_state(section):
         section.config.sectionid.set_value(objects.schematic_objects[object_id]["itemid"])
         section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
         section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
-        section.config.mirror.set_mirrored_by(mirrored_by_section(object_id))
         section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
         section.automation.ahead.set_values(signals_ahead(object_id))
         section.automation.behind.set_values(signals_behind(object_id))
@@ -176,17 +164,9 @@ def save_state(section, close_window:bool):
 
 class mirrored_section(common.str_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
-        # These are the functions used to validate that the entered signal ID
-        # exists on the schematic and is different to the current signal ID
-        ##################################################################################
-        ### TODO - when we eventually support remote sections we can't use the current ###
-        ### section_exists function as that only checks if the section exists in the   ###
-        ### dictionary of schematic objects so won't pick up any sections subscribed   ###
-        ### to via the MQTT networking - we'll therefore have to use the internal      ###
-        ### library function or validate also against a list of subscribed sections    ###
-        ### Note that the validation function will also need to change                 ###
-        ##################################################################################
-        exists_function = objects.section_exists
+        # These are the functions used to validate that the entered section ID
+        # exists on the schematic and is different to the current section ID
+        exists_function = self.section_exists
         current_id_function = parent_object.sectionid.get_value
         # Create the Label Frame for the "mirrored section" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Link to other track section")
@@ -200,17 +180,6 @@ class mirrored_section(common.str_item_id_entry_box):
                     "be a local section or a remote section (subscribed to via MQTT networking)",
                     exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create a frame for the "Mirrored by" elements
-        self.subframe2 = Tk.Frame(self.frame)
-        self.subframe2.pack()
-        self.mirrored_by = Tk.StringVar(parent_frame, "")
-        self.label2 = Tk.Label(self.subframe2,text="Mirrored by section:")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.mirrored_by_eb = Tk.Entry(self.subframe2, width=3, textvariable=self.mirrored_by,
-                                            justify='center',state="disabled")
-        self.mirrored_by_eb.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.mirrored_by_eb, "ID of the track "+
-                            "section that that will be mirrored by this section")
 
     def validate(self):
         # Do the basic item validation first (exists and not current item ID)
@@ -230,10 +199,15 @@ class mirrored_section(common.str_item_id_entry_box):
                     valid = False       
         self.set_validation_status(valid)
         return(valid)
-
-    def set_mirrored_by(self, section_id:str):
-        # Strings are used as the mirrored element supports local or remote sections
-        self.mirrored_by.set(section_id)
+    
+    # We would normally use the library 'section_exists' function to determine if a track section
+    # either exists on the local schematic OR has been subscribed to via MQTT networking, but the
+    # local track section library objects don't exist when in edit mode (although the function
+    # will report that any remote sections subscribed to via MQTT networking do exist). We
+    # therefore need to create a hybrid 'exists' function using a combination of the exists
+    # functions from the objects module and the library modules
+    def section_exists(self, sec_id):
+        return (objects.section_exists(sec_id) or track_sections.section_exists(sec_id))
 
 #------------------------------------------------------------------------------------
 # Class for the Default lable entry box - builds on the common entry_box class
@@ -248,11 +222,15 @@ class default_label_entry(common.entry_box):
     def __init__(self, parent_frame):
         # Create the Label Frame for the "mirrored section" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Default section label")
+        self.packing1 = Tk.Label(self.frame, width=6)
+        self.packing1.pack(side=Tk.LEFT)
         super().__init__(self.frame, width=16, tool_tip = "Enter the default label to "+
                          "display when the section is occupied (this defines the default "+
                          "width of the Track Section object on the schematic). The default "+
                          "label should be between 4 and 10 characters")
-        self.pack(padx=2, pady=2)
+        self.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.packing2 = Tk.Label(self.frame, width=6)
+        self.packing2.pack(side=Tk.LEFT)
 
     def validate(self):
         label = self.entry.get()
@@ -372,10 +350,10 @@ class edit_section():
         self.config = section_configuration_tab(self.tab1)
         self.automation = section_automation_tab(self.tab2)        
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.main_frame, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self, load_state, save_state)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.main_frame, text="Errors on Form need correcting", fg="red")
+        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
         load_state(self)
 
