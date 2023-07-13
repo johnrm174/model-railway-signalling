@@ -7,7 +7,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.point_exists(point_id) - To see if a specified point ID exists
+#    objects.point_exists(point_id) - To see if a specified point ID exists (local)
 #    objects.point(point_id) - To get the object_id for a given point_id
 #
 # Accesses the following external editor objects directly:
