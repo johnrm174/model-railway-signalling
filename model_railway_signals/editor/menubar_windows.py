@@ -291,7 +291,8 @@ class edit_sprog_settings():
         self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
         self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
-            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
+                     "to 'debug'). Note that changes will only be effected on disconnect/reconnect")
         self.debug.pack(padx=2, pady=2)
         self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
             tool_tip="Select to configure serial port and initialise SPROG following layout load",
@@ -455,7 +456,8 @@ class mqtt_configuration_tab():
         self.password.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
         self.debug = common.check_box(parent_tab, label="Enhanced MQTT debug logging", width=28, 
-            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug'). "+
+                                      "Note that changes will only be effected on disconnect/reconnect")
         self.debug.pack(padx=2, pady=2)
         self.startup = common.check_box(parent_tab, label="Connect to Broker on layout load", width=28, 
             tool_tip="Select to configure MQTT networking and connect to the broker following layout load")
