@@ -685,6 +685,8 @@ configure_networking - Configures the local client and opens a connection to the
       broker_username:str - the username to log into the MQTT Broker (default = None)
       broker_password:str - the password to log into the MQTT Broker (default = None)
       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+          returns True - if we have acknowledgement that the broker connection has been successful
+          returns False - if the broker connection has failed or the request times out
 
 set_node_to_publish_dcc_commands - Enables publishing of DCC commands to other network nodes
   Optional Parameters:
