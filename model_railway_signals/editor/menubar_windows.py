@@ -37,7 +37,6 @@ import logging
 import webbrowser
 
 from tkinter import ttk
-from urllib.parse import urlparse
 
 from . import common
 from . import settings
