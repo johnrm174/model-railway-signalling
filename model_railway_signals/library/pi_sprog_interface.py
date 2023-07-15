@@ -14,7 +14,8 @@
 #       port_name:str - The serial port to use for the Pi-SPROG 3 - Default="/dev/serial0",
 #       baud_rate:int - The baud rate to use for the serial port - Default = 115200,
 #       dcc_debug_mode:bool - Set to 'True' to log the CBUS commands being sent to the Pi-SPROG
-#         returns True - if communications with the Pi-Sprog have been established (otherwise False) 
+#         returns True - if communications with the Pi-Sprog have been established (otherwise False)
+#
 # service_mode_write_cv - programmes a CV in direct bit mode and waits for response
 #                       (events are only sent if the track power is currently switched on)
 #                       (request times out after 5 secs if the request was unsuccessful)
