@@ -19,6 +19,7 @@
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
+#    common.entry_box
 #    common.str_item_id_entry_box
 #    common.object_id_selection
 #    common.signal_route_selections
