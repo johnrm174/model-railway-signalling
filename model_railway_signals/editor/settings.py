@@ -41,6 +41,15 @@ default_settings["sprog"]["baud"] = 115200
 default_settings["sprog"]["debug"] = False
 default_settings["sprog"]["startup"] = False
 default_settings["sprog"]["power"] = False
+default_settings["mqtt"] = {}
+default_settings["mqtt"]["url"] = ""
+default_settings["mqtt"]["port"] = 1883
+default_settings["mqtt"]["network"] = ""
+default_settings["mqtt"]["node"] = ""
+default_settings["mqtt"]["username"] = ""
+default_settings["mqtt"]["password"] = ""
+default_settings["mqtt"]["debug"] = False
+default_settings["mqtt"]["startup"] = False
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
@@ -185,6 +194,33 @@ def set_sprog(port:str=None, baud:int=None, debug:bool=None, startup:bool=None, 
     if debug is not None: settings["sprog"]["debug"] = debug
     if startup is not None: settings["sprog"]["startup"] = startup
     if power is not None: settings["sprog"]["power"] = power
+    return()
+
+#------------------------------------------------------------------------------------
+# Functions to set/get the MQTT settings
+#------------------------------------------------------------------------------------
+
+def get_mqtt():
+    url = settings["mqtt"]["url"]
+    port = settings["mqtt"]["port"]
+    network = settings["mqtt"]["network"]
+    node = settings["mqtt"]["node"]
+    username = settings["mqtt"]["username"]
+    password = settings["mqtt"]["password"]
+    debug = settings["mqtt"]["debug"]
+    startup = settings["mqtt"]["startup"]
+    return (url, port, network, node, username, password, debug, startup)
+
+def set_mqtt(url:str=None, port:int=None, network:str=None, node:str=None,
+        username:str=None, password:str=None, debug:bool=None, startup:bool=None):
+    if url is not None: settings["mqtt"]["url"] = url
+    if port is not None: settings["mqtt"]["port"] = port
+    if network is not None: settings["mqtt"]["network"] = network
+    if node is not None: settings["mqtt"]["node"] = node
+    if username is not None: settings["mqtt"]["username"] = username
+    if password is not None: settings["mqtt"]["password"] = password
+    if debug is not None: settings["mqtt"]["debug"] = debug
+    if startup is not None: settings["mqtt"]["startup"] = startup
     return()
 
 ######################################################################################

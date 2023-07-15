@@ -27,6 +27,13 @@
 #    settings.get_sprog() - to get the initial SPROG settings
 #    settings.restore_defaults() - Following user selection of "new"
 #    common.scrollable_text_box - to display a list of warnings on file load
+#    menubar_windows.edit_canvas_settings(parent_window) - opens the config window
+#    menubar_windows.edit_mqtt_settings(parent_window) - opens the config window
+#    menubar_windows.edit_sprog_settings(parent_window) - opens the config window
+#    menubar_windows.edit_logging_settings(parent_window) - opens the config window
+#    menubar_windows.display_help(parent_window) - opens the config window
+#    menubar_windows.display_about(parent_window) - opens the config window
+#    menubar_windows.edit_layout_info(parent_window) - opens the config window
 #
 # Makes the following external API calls to library modules:
 #    library_common.find_root_window (widget) - To set the root window
@@ -35,8 +42,11 @@
 #    file_interface.save_schematic - To save all settings and objects
 #    file_interface.purge_loaded_state_information - Called following a re-load
 #    pi_sprog_interface.initialise_pi_sprog - After update of Pi Sprog Settings
+#    pi_sprog_interface.sprog_shutdown - Disconnect from the Pi-SPROG
 #    pi_sprog_interface.request_dcc_power_off - To turn off the track power
 #    pi_sprog_interface.request_dcc_power_on - To turn on the track power
+#    mqtt_interface.configure_networking - After update of the MQTT Settings
+#    mqtt_interface.mqtt_shutdown - Disconnect from the MQTT Broker
 #
 #------------------------------------------------------------------------------------
 
@@ -52,6 +62,7 @@ from . import schematic
 from . import menubar_windows
 from ..library import file_interface
 from ..library import pi_sprog_interface
+from ..library import mqtt_interface
 from ..library import common as library_common
 
 #------------------------------------------------------------------------------------
@@ -92,11 +103,17 @@ class main_menubar:
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
+        # Create the various menubar items for the SPROG Connection Dropdown
+        self.mqtt_label = "MQTT:DISCONNECTED "
+        self.mqtt_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.mqtt_menu.add_command(label=" Connect ", command=self.mqtt_connect)
+        self.mqtt_menu.add_command(label=" Disconnect ", command=self.mqtt_disconnect)
+        self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...", command=lambda:menubar_windows.edit_canvas_settings(self.root))
-        self.settings_menu.add_command(label =" MQTT...", command=lambda:menubar_windows.edit_mqtt_settings(self.root))
-        self.settings_menu.add_command(label =" SPROG...", command=lambda:menubar_windows.edit_sprog_settings(self.root, self))
+        self.settings_menu.add_command(label =" MQTT...", command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect))
+        self.settings_menu.add_command(label =" SPROG...", command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect))
         self.settings_menu.add_command(label =" Logging...", command=lambda:menubar_windows.edit_logging_settings(self.root))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
@@ -142,6 +159,11 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         if startup: self.sprog_connect()
         if power: self.dcc_power_on()
+        # Initialise the MQTT networking (if configured). Note that we use the menubar 
+        # function for connection so the state is correctly reflected in the UI
+        # The "connect on startup" flag is the 7th parameter returned by get_mqtt
+        startup = settings.get_mqtt()[7]
+        if startup: self.mqtt_connect()
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -203,6 +225,26 @@ class main_menubar:
         new_label = "SPROG:DISCONNECTED "
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
+        
+    def mqtt_connect(self, show_popup:bool=True):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        connected = mqtt_interface.configure_networking(url, network, node, port, username, password, debug)
+        if connected:
+            new_label = "MQTT:CONNECTED "
+        else:
+            new_label = "MQTT:DISCONNECTED "
+            if show_popup:
+                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
+                    message="Broker connection failure\nCheck MQTT settings")
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
+        return(connected)
+    
+    def mqtt_disconnect(self):
+        mqtt_interface.mqtt_shutdown()
+        new_label = "MQTT:DISCONNECTED "
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
                     
     def dcc_power_off(self):
         # The power off request returns True if successful

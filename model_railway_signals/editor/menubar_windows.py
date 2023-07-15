@@ -36,6 +36,9 @@ import tkinter as Tk
 import logging
 import webbrowser
 
+from tkinter import ttk
+from urllib.parse import urlparse
+
 from . import common
 from . import settings
 from . import schematic
@@ -138,8 +141,8 @@ class display_about():
     def __init__(self, root_window):
         self.root_window = root_window
         # Create the top level window for application about
-        winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 20
+        winx = self.root_window.winfo_rootx() + 260
+        winy = self.root_window.winfo_rooty() + 30
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Application Info")
@@ -169,11 +172,11 @@ class edit_layout_info():
     def __init__(self, root_window):
         self.root_window = root_window
         # Create the top level window for application help
-        winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 20
+        winx = self.root_window.winfo_rootx() + 270
+        winy = self.root_window.winfo_rooty() + 40
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Layout Information")
+        self.window.title("Networking Settings")
         self.window.attributes('-topmost',True)
         # Create the srollable textbox to display the text. We specify
         # the max height/width (in case the text grows in the future) and also
@@ -198,180 +201,6 @@ class edit_layout_info():
     def save_state(self, parent_object, close_window:bool):
         # Parent object is passed by the callback - not used here
         settings.set_general(info=self.text.get_value())
-        if close_window: self.window.destroy()
-
-#------------------------------------------------------------------------------------
-# Class for the MQTT configuration window
-#------------------------------------------------------------------------------------
-
-class edit_mqtt_settings():
-    def __init__(self, root_window):
-        text1 = ("Coming Soon")
-        self.root_window = root_window
-        # Create the top level window for the MQTT Settings
-        winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 20
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("MQTT")
-        self.window.attributes('-topmost',True)
-        self.label1 = Tk.Label(self.window, text=text1, wraplength=400)
-        self.label1.pack(padx=2, pady=2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
-        pass
-        
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
-        if close_window: self.window.destroy()
-
-#------------------------------------------------------------------------------------
-# Class for the SPROG settings selection toolbar window. Note the function also takes
-# in a callback object so it can call the function to update the menubar sprog status
-#------------------------------------------------------------------------------------
-
-class edit_sprog_settings():
-    def __init__(self, root_window, mb_object):
-        self.root_window = root_window
-        self.mb_object = mb_object
-        # Create the top level window for the SPROG configuration
-        winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 20
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("SPROG DCC")
-        self.window.attributes('-topmost',True)
-        # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.Frame(self.window)
-        self.frame1.pack()
-        self.label1 = Tk.Label(self.frame1, text="Port:")
-        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
-                        "the serial port to use for communicating with the SPROG")
-        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.label2 = Tk.Label(self.frame1, text="Baud:")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
-        self.baud_selection = Tk.StringVar(self.window, "")
-        self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
-        menu_width = len(max(self.options, key=len))
-        self.baud.config(width=menu_width)
-        common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
-        self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create the remaining UI elements
-        self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
-            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
-        self.debug.pack(padx=2, pady=2)
-        self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
-            tool_tip="Select to configure serial port and initialise SPROG following layout load",
-            callback=self.selection_changed)
-        self.startup.pack(padx=2, pady=2)
-        self.power = common.check_box(self.window, label="Enable DCC power on layout load", width=28,
-            tool_tip="Select to enable DCC accessory bus power following layout load")
-        self.power.pack(padx=2, pady=2)
-        # Create the Button to test connectivity
-        self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
-        self.B1.pack(padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
-                        "the command station status to confirm a connection to the SPROG has been established")
-        # Create the Status Label
-        self.status = Tk.Label(self.window, text="")
-        self.status.pack(padx=2, pady=2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Load the initial UI state
-        self.load_state()
-
-    def selection_changed(self):
-        # If connect on startup is selected then enable the DCC power on startup selection
-        if self.startup.get_value(): self.power.enable()
-        else: self.power.disable()
-
-    def test_connectivity(self):
-        # Validate the port to "accept" the current value (by focusing out)
-        self.port.validate()
-        self.B1.focus()
-        # The Sprog Connect function will return True if successful
-        # It will also update the Menubar to reflect the SPROG connection status
-        baud = int(self.baud_selection.get())
-        port = self.port.get_value()
-        debug = self.debug.get_value()
-        startup = self.startup.get_value()
-        power = self.power.get_value()
-        # Save the updated settings (retain the old settings in case the connect fails)
-        s1, s2, s3, s4, s5 = settings.get_sprog()
-        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
-        if self.mb_object.sprog_connect(show_popup=False):
-            self.status.config(text="SPROG successfully connected", fg="green")
-        else:
-            self.status.config(text="SPROG connection failure", fg="red")
-        # Now restore the settings (as they haven't been "applied" yet)
-        settings.set_sprog(s1, s2, s3, s4, s5)
-        
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
-        port, baud, debug, startup, power = settings.get_sprog()
-        self.port.set_value(port)
-        self.baud_selection.set(str(baud))
-        self.debug.set_value(debug)
-        self.startup.set_value(startup)
-        self.power.set_value(power)
-        self.selection_changed()
-        
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
-        baud = int(self.baud_selection.get())
-        port = self.port.get_value()
-        debug = self.debug.get_value()
-        startup = self.startup.get_value()
-        power = self.power.get_value()
-        # Save the updated settings
-        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
-        if close_window: self.window.destroy()
-        
-#------------------------------------------------------------------------------------
-# Class for the Logging Level selection toolbar window
-#------------------------------------------------------------------------------------
-
-class edit_logging_settings():
-    def __init__(self, root_window):
-        self.root_window = root_window
-        # Create the top level window for the Logging Configuration
-        winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 20
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Logging")
-        self.window.attributes('-topmost',True)
-        # Create the logging Level selections element
-        self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
-                                            b1="Error", b2="Warning", b3="Info", b4="Debug",
-                                            tool_tip="Set the logging level for running the layout")
-        self.log_level.frame.pack()
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Load the initial UI state
-        self.load_state()
-
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
-        self.log_level.set_value(settings.get_logging())
-        
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
-        log_level = self.log_level.get_value()
-        settings.set_logging(log_level)
-        if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
-        elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
-        elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
-        elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
-        # close the window (on OK or cancel)
         if close_window: self.window.destroy()
 
 #------------------------------------------------------------------------------------
@@ -427,5 +256,324 @@ class edit_canvas_settings():
             schematic.update_canvas(width, height, grid)
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for the SPROG settings selection toolbar window. Note the function also takes
+# in a callback object so it can call the function to update the menubar sprog status
+#------------------------------------------------------------------------------------
+
+class edit_sprog_settings():
+    def __init__(self, root_window, connect_function):
+        self.root_window = root_window
+        self.connect_function = connect_function
+        # Create the top level window for the SPROG configuration
+        winx = self.root_window.winfo_rootx() + 220
+        winy = self.root_window.winfo_rooty() + 40
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("SPROG DCC")
+        self.window.attributes('-topmost',True)
+        # Create the Serial Port and baud rate UI elements 
+        self.frame1 = Tk.Frame(self.window)
+        self.frame1.pack()
+        self.label1 = Tk.Label(self.frame1, text="Port:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
+                        "the serial port to use for communicating with the SPROG")
+        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label2 = Tk.Label(self.frame1, text="Baud:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
+        self.baud_selection = Tk.StringVar(self.window, "")
+        self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
+        menu_width = len(max(self.options, key=len))
+        self.baud.config(width=menu_width)
+        common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
+        self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the remaining UI elements
+        self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
+        self.debug.pack(padx=2, pady=2)
+        self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
+            tool_tip="Select to configure serial port and initialise SPROG following layout load",
+            callback=self.selection_changed)
+        self.startup.pack(padx=2, pady=2)
+        self.power = common.check_box(self.window, label="Enable DCC power on layout load", width=28,
+            tool_tip="Select to enable DCC accessory bus power following layout load")
+        self.power.pack(padx=2, pady=2)
+        # Create the Button to test connectivity
+        self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
+        self.B1.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
+                        "the command station status to confirm a connection to the SPROG has been established")
+        # Create the Status Label
+        self.status = Tk.Label(self.window, text="")
+        self.status.pack(padx=2, pady=2)
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
+        # Load the initial UI state
+        self.load_state()
+
+    def selection_changed(self):
+        # If connect on startup is selected then enable the DCC power on startup selection
+        if self.startup.get_value(): self.power.enable()
+        else: self.power.disable()
+
+    def test_connectivity(self):
+        # Validate the port to "accept" the current value and focus out (onto the button)
+        self.port.validate()
+        self.B1.focus()
+        # Save the existing settings (as they haven't been "applied" yet)
+        s1, s2, s3, s4, s5 = settings.get_sprog()
+        # Apply the current settings (as thery currently appear in the UI)
+        baud = int(self.baud_selection.get())
+        port = self.port.get_value()
+        debug = self.debug.get_value()
+        startup = self.startup.get_value()
+        power = self.power.get_value()
+        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
+        # The Sprog Connect function will return True if successful
+        # It will also update the Menubar to reflect the SPROG connection status
+        if self.connect_function(show_popup=False):
+            self.status.config(text="SPROG successfully connected", fg="green")
+        else:
+            self.status.config(text="SPROG connection failure", fg="red")
+        # Now restore the existing settings (as they haven't been "applied" yet)
+        settings.set_sprog(s1, s2, s3, s4, s5)
+        
+    def load_state(self, parent_object=None):
+        # Parent object is passed by the callback - not used here
+        port, baud, debug, startup, power = settings.get_sprog()
+        self.port.set_value(port)
+        self.baud_selection.set(str(baud))
+        self.debug.set_value(debug)
+        self.startup.set_value(startup)
+        self.power.set_value(power)
+        self.selection_changed()
+        
+    def save_state(self, parent_object, close_window:bool):
+        # Validate the port to "accept" the current value
+        self.port.validate()
+        # Parent object is passed by the callback - not used here
+        baud = int(self.baud_selection.get())
+        port = self.port.get_value()
+        debug = self.debug.get_value()
+        startup = self.startup.get_value()
+        power = self.power.get_value()
+        # Save the updated settings
+        settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
+        if close_window: self.window.destroy()
+        
+#------------------------------------------------------------------------------------
+# Class for the Logging Level selection toolbar window
+#------------------------------------------------------------------------------------
+
+class edit_logging_settings():
+    def __init__(self, root_window):
+        self.root_window = root_window
+        # Create the top level window for the Logging Configuration
+        winx = self.root_window.winfo_rootx() + 230
+        winy = self.root_window.winfo_rooty() + 50
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("Logging")
+        self.window.attributes('-topmost',True)
+        # Create the logging Level selections element
+        self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
+                                            b1="Error", b2="Warning", b3="Info", b4="Debug",
+                                            tool_tip="Set the logging level for running the layout")
+        self.log_level.frame.pack()
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
+        self.controls.frame.pack(padx=2, pady=2)
+        # Load the initial UI state
+        self.load_state()
+
+    def load_state(self, parent_object=None):
+        # Parent object is passed by the callback - not used here
+        self.log_level.set_value(settings.get_logging())
+        
+    def save_state(self, parent_object, close_window:bool):
+        # Parent object is passed by the callback - not used here
+        log_level = self.log_level.get_value()
+        settings.set_logging(log_level)
+        if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
+        elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
+        elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
+        elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+        # close the window (on OK or cancel)
+        if close_window: self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Classes for the MQTT configuration window
+#------------------------------------------------------------------------------------
+
+class mqtt_configuration_tab():
+    def __init__(self, parent_tab, connect_function):
+        self.connect_function = connect_function
+        # Create the Serial Port and baud rate UI elements 
+        self.frame1 = Tk.Frame(parent_tab)
+        self.frame1.pack(padx=2, pady=2)
+        self.label1 = Tk.Label(self.frame1, text="Address:")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.url = common.entry_box(self.frame1, width=20,tool_tip="Specify the URL or IP address of "+
+                    "the MQTT broker (specify 'localhost' for a Broker running on the local machine)")
+        self.url.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label2 = Tk.Label(self.frame1, text="Port:")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.port = common.integer_entry_box(self.frame1, width=6, min_value=0, max_value=65535, tool_tip=
+                        "Specify the TCP/IP Port to use for the Broker (default is usually 1883)")
+        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the Network name and node name elements 
+        self.frame2 = Tk.Frame(parent_tab)
+        self.frame2.pack(padx=2, pady=2)
+        self.label3 = Tk.Label(self.frame2, text="Network:")
+        self.label3.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.network = common.entry_box(self.frame2, width=10,tool_tip=
+                    "Specify a name for this layout signalling network (common across all instances of the "+
+                    "application being used to control the different signalling areas on the layout)")
+        self.network.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.label4 = Tk.Label(self.frame2, text="Node:")
+        self.label4.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.node = common.entry_box(self.frame2, width=10, tool_tip=
+                    "Specify a unique name for this node (signalling area) on the network")
+        self.node.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the User Name and Password elements 
+        self.frame3 = Tk.Frame(parent_tab)
+        self.frame3.pack(padx=2, pady=2)
+        self.label5 = Tk.Label(self.frame3, text="Username:", width=11)
+        self.label5.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.username = common.entry_box(self.frame3, width=14,tool_tip=
+                        "Specify the username for connecting to the broker")
+        self.username.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.frame4 = Tk.Frame(parent_tab)
+        self.frame4.pack(padx=2, pady=2)
+        self.label6 = Tk.Label(self.frame4, text="Password:", width=11)
+        self.label6.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.password = common.entry_box(self.frame4, width=14,tool_tip="Specify the password (WARNING DO NOT "+
+                    "RE-USE AN EXISTING PASSWORD AS THIS IS SENT OVER THE NETWORK UNENCRYPTED)")
+        self.password.pack(side=Tk.LEFT, padx=2, pady=2)
+        # Create the remaining UI elements
+        self.debug = common.check_box(parent_tab, label="Enhanced MQTT debug logging", width=28, 
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
+        self.debug.pack(padx=2, pady=2)
+        self.startup = common.check_box(parent_tab, label="Connect to Broker on layout load", width=28, 
+            tool_tip="Select to configure MQTT networking and connect to the broker following layout load")
+        self.startup.pack(padx=2, pady=2)
+        # Create the Button to test connectivity
+        self.B1 = Tk.Button (parent_tab, text="Test Broker connectivity",command=self.test_connectivity)
+        self.B1.pack(padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Will attempt to establish a connection to the broker")
+        # Create the Status Label
+        self.status = Tk.Label(parent_tab, text="")
+        self.status.pack(padx=2, pady=2)
+
+    def accept_all_entries(self):
+        # Validate the entry_boxes to "accept" the current values
+        self.url.validate()
+        self.port.validate()
+        self.network.validate()
+        self.node.validate()
+        self.username.validate()
+        self.password.validate()
+
+    def test_connectivity(self):
+        # Validate the entry_boxes to "accept" the current values and focus onto the button
+        self. accept_all_entries()
+        self.B1.focus()
+        # Save the existing settings (as they haven't been "applied" yet)
+        s1, s2, s3, s4, s5, s6, s7, s8 = settings.get_mqtt()
+        # Apply the current settings (as they currently appear in the UI)
+        url = self.url.get_value()
+        port = self.port.get_value()
+        network = self.network.get_value()
+        node = self.node.get_value()
+        username = self.username.get_value()
+        password = self.password.get_value()
+        debug = self.debug.get_value()
+        startup = self.startup.get_value()
+        settings.set_mqtt(url=url, port=port, network=network, node=node,
+                username=username, password=password, debug=debug, startup=startup)
+        # The MQTT Connect function will return True if successful
+        # It will also update the Menubar to reflect the MQTT connection status
+        if self.connect_function(show_popup=False):
+            self.status.config(text="MQTT successfully connected", fg="green")
+        else:
+            self.status.config(text="MQTT connection failure", fg="red")
+        # Now restore the existing settings (as they haven't been "applied" yet)
+        settings.set_mqtt(s1, s2, s3, s4, s5, s6, s7, s8)
+        
+class edit_mqtt_settings():
+    def __init__(self, root_window, connect_function):
+        self.root_window = root_window
+        self.connect_function = connect_function
+        # Create the top level window for editing MQTT settings
+        winx = self.root_window.winfo_rootx() + 210
+        winy = self.root_window.winfo_rooty() + 30
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("MQTT Networking")
+        self.window.attributes('-topmost',True)
+        # Create the Notebook (for the tabs) 
+        self.tabs = ttk.Notebook(self.window)
+        # When you change tabs tkinter focuses on the first entry box - we don't want this
+        # So we bind the tab changed event to a function which will focus on something else 
+        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
+        # Create the Window tabs
+        self.tab1 = Tk.Frame(self.tabs)
+        self.tabs.add(self.tab1, text="Network")
+        self.tab2 = Tk.Frame(self.tabs)
+        self.tabs.add(self.tab2, text="Publish")
+        self.tabs.pack()
+        self.tab3 = Tk.Frame(self.tabs)
+        self.tabs.add(self.tab3, text="Subscribe")
+        self.tabs.pack()
+        # Create the tabs themselves:
+        self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
+        ######################################################################
+        ##### TO DO - other tabs #############################################
+        ######################################################################
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self,
+                                self.load_state, self.save_state)
+        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+        # Load the initial UI state
+        self.load_state()
+            
+    def load_state(self, parent_object=None):
+        # Parent object is passed by the callback - not used here
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        self.config.url.set_value(url)
+        self.config.port.set_value(port)
+        self.config.network.set_value(network)
+        self.config.node.set_value(node)
+        self.config.username.set_value(username)
+        self.config.password.set_value(password)
+        self.config.debug.set_value(debug)
+        self.config.startup.set_value(startup)
+        
+    def save_state(self, parent_object, close_window:bool):
+        # Parent object is passed by the callback - not used here
+        # Validate the entries to "accept" the current values before reading
+        self.config.accept_all_entries()
+        url = self.config.url.get_value()
+        port = self.config.port.get_value()
+        network = self.config.network.get_value()
+        node = self.config.node.get_value()
+        username = self.config.username.get_value()
+        password = self.config.password.get_value()
+        debug = self.config.debug.get_value()
+        startup = self.config.startup.get_value()
+        # Save the updated settings
+        settings.set_mqtt(url=url, port=port, network=network, node=node,
+                username=username, password=password, debug=debug, startup=startup)
+        if close_window: self.window.destroy()
+
+    def tab_changed(self,event):
+        # Focus on the top level window to remove focus from the first entry box
+        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
+        # self.window.focus()
+        pass
 
 #############################################################################################
