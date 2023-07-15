@@ -28,6 +28,7 @@
 #-----------------------------------------------------------------------------------------------
 #
 # configure_networking - Configures the local client and opens a connection to the MQTT broker
+#                    Returns whether the connec
 #   Mandatory Parameters:
 #       broker_host:str - The name/IP address of the MQTT broker host to be used
 #       network_identifier:str - The name to use for this signalling network (any string)
@@ -37,7 +38,8 @@
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
 #       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
-#
+#          returns True - if we have acknowledgement that the broker connection has been successful
+#          returns False - if the broker connection has failed or the request times out
 #-----------------------------------------------------------------------------------------------
 
 from . import common
@@ -59,6 +61,12 @@ node_config["connected_to_broker"] = False
 node_config["list_of_published_topics"] = []
 node_config["list_of_subscribed_topics"] = []
 node_config["callbacks"] = {}
+
+#-----------------------------------------------------------------------------------------------
+# The MQTT client is held globally:
+#-----------------------------------------------------------------------------------------------
+
+mqtt_client = None
 
 # ---------------------------------------------------------------------------------------------
 # Common Function to create a external item identifier from the Item_ID and the remote Node.
@@ -186,6 +194,10 @@ def configure_networking (broker_host:str,
                           mqtt_enhanced_debugging:bool = False):
     global node_config
     global mqtt_client
+    # Handle the case where we are already have a client instance - in this case we disconnect
+    # and kill off the current client before re-creating a client with the new configuration
+    mqtt_shutdown()
+    # Create a new instance of the MQTT client and configure / connect
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
     mqtt_client = paho.mqtt.client.Client(clean_session=True)
     mqtt_client.on_message = on_message    
@@ -213,7 +225,7 @@ def configure_networking (broker_host:str,
         if not node_config["connected_to_broker"]:
             logging.warning("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
             
-    return()
+    return(node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
 # Externally called function to perform a gracefull shutdown of the MQTT networking
@@ -221,6 +233,8 @@ def configure_networking (broker_host:str,
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
+    global mqtt_client
+    global node_config
     # Only shut down the mqtt networking if we configured it in the first place
     if node_config["network_configured"]:
         logging.info("MQTT-Client: Clearing message queues and shutting down")
@@ -238,7 +252,12 @@ def mqtt_shutdown():
                 break
         if node_config["connected_to_broker"]:
             logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
+    # Kill off any current instance of the MQTT client (if one exists)
+    if mqtt_client is not None: 
         mqtt_client.loop_stop()
+        mqtt_client = None
+        node_config["network_configured"] = False
+        node_config["connected_to_broker"] = False
     return()
 
 #-----------------------------------------------------------------------------------------------
