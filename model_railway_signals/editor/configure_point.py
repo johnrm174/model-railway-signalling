@@ -82,6 +82,8 @@ def load_state(point):
         point.config.dccsettings.set_values (add, rev)
         # Set the read only list of Interlocked signals
         point.locking.signals.set_values(objects.schematic_objects[object_id]["siginterlock"])
+        # Hide the validation error message
+        point.validation_error.pack_forget()
     return()
     
 #------------------------------------------------------------------------------------
@@ -121,8 +123,6 @@ def save_state(point, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: point.window.destroy()
         else: load_state(point)
-        # Hide the validation error message
-        point.validation_error.pack_forget()
     else:
         # Display the validation error message
         point.validation_error.pack()

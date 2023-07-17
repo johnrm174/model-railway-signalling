@@ -244,6 +244,8 @@ def load_state(signal):
         update_tab3_timed_signal_selections(signal)
         update_tab3_approach_control_selections(signal)
         update_tab3_signal_ui_elements(signal)
+        # Hide the validation error message
+        signal.validation_error.pack_forget()
     return()
 
 #------------------------------------------------------------------------------------
@@ -310,8 +312,6 @@ def save_state(signal, close_window):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: signal.window.destroy()
         else: load_state(signal)
-        # Hide the validation error message
-        signal.validation_error.pack_forget()
     else:
         # Display the validation error message
         signal.validation_error.pack()
