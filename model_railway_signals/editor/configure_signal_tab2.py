@@ -13,7 +13,7 @@
 #    common.check_box
 #    common.state_box
 #    common.int_item_id_entry_box
-#    common.str_item_id_entry_box
+#    common.str_int_item_id_entry_box
 #    common.signal_route_selections
 #------------------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ class interlocking_route_group:
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)
-        self.sig = common.str_item_id_entry_box(self.frame, exists_function=signal_exists_function,
+        self.sig = common.str_int_item_id_entry_box(self.frame, exists_function=signal_exists_function,
                         tool_tip = "Specify the next signal along the specified route - This "+
                         "can be a local signal ID or a remote signal ID (in the form 'Node-ID') "+
                         " which has been subscribed to via MQTT networking",
