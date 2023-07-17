@@ -40,7 +40,7 @@ class point_interlocking_entry():
     def __init__(self, parent_frame, point_exists_function):
         # Create the point ID entry box and associated state box (packed in the parent frame)
         self.EB = common.int_item_id_entry_box(parent_frame, exists_function=point_exists_function,
-                    tool_tip = "Specify the points that need to be set and locked before the "+
+                    tool_tip = "Specify any points that need to be set and locked before the "+
                         "signal can be cleared for the route", callback=self.eb_updated)
         self.EB.pack(side=Tk.LEFT)
         self.CB = common.state_box(parent_frame, label_off=u"\u2192", label_on="\u2191", width=2,
@@ -115,15 +115,16 @@ class interlocking_route_group:
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)
         self.sig = common.str_item_id_entry_box(self.frame, exists_function=signal_exists_function,
-                        tool_tip = "Enter the ID of the next signal along the specified route - This "+
-                        "can be a local signal or a remote signal (subscribed to via MQTT networking)",
-                          current_id_function = current_id_function)
+                        tool_tip = "Specify the next signal along the specified route - This "+
+                        "can be a local signal ID or a remote signal ID (in the form 'Node-ID') "+
+                        " which has been subscribed to via MQTT networking",
+                        current_id_function = current_id_function)
         self.sig.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self.frame, text=" Blk:")
         self.label2.pack(side=Tk.LEFT)
         self.block = common.int_item_id_entry_box(self.frame, exists_function=instrument_exists_function,
-                                tool_tip="Enter the ID of the local block instrument controlling "+
-                                    "access to the next block section along the specified route") 
+                                tool_tip="Specify the ID of the Block Instrument on the local schematic which "+
+                                    "controls access to the block section along the specified route") 
         self.block.pack(side=Tk.LEFT)
     
     def validate(self):
