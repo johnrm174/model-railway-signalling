@@ -20,7 +20,7 @@
 # Inherits the following common editor base classes (from common):
 #    common.check_box
 #    common.entry_box
-#    common.str_item_id_entry_box
+#    common.str_int_item_id_entry_box
 #    common.object_id_selection
 #    common.signal_route_selections
 #    common.window_controls
@@ -106,6 +106,8 @@ def load_state(section):
         section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
         section.automation.ahead.set_values(signals_ahead(object_id))
         section.automation.behind.set_values(signals_behind(object_id))
+        # Hide the validation error message
+        section.validation_error.pack_forget()
     return()
     
 #------------------------------------------------------------------------------------
@@ -141,8 +143,6 @@ def save_state(section, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: section.window.destroy()
         else: load_state(section)
-        # Hide the validation error message
-        section.validation_error.pack_forget()
     else:
         # Display the validation error message
         section.validation_error.pack()
@@ -163,7 +163,7 @@ def save_state(section, close_window:bool):
 #    "set_mirrored_by" - to set the read-only value for the "mirrored_by" section
 #------------------------------------------------------------------------------------
 
-class mirrored_section(common.str_item_id_entry_box):
+class mirrored_section(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
         # These are the functions used to validate that the entered section ID
         # exists on the schematic and is different to the current section ID
