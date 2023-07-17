@@ -50,6 +50,16 @@ default_settings["mqtt"]["username"] = ""
 default_settings["mqtt"]["password"] = ""
 default_settings["mqtt"]["debug"] = False
 default_settings["mqtt"]["startup"] = False
+default_settings["mqtt"]["subdccnodes"] = []
+default_settings["mqtt"]["subsignals"] = []
+default_settings["mqtt"]["subsections"] = []
+default_settings["mqtt"]["subinstruments"] = []
+default_settings["mqtt"]["subsensors"] = []
+default_settings["mqtt"]["pubdcc"] = False
+default_settings["mqtt"]["pubsignals"] = []
+default_settings["mqtt"]["pubsections"] = []
+default_settings["mqtt"]["pubinstruments"] = []
+default_settings["mqtt"]["pubsensors"] = []
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
@@ -222,6 +232,28 @@ def set_mqtt(url:str=None, port:int=None, network:str=None, node:str=None,
     if debug is not None: settings["mqtt"]["debug"] = debug
     if startup is not None: settings["mqtt"]["startup"] = startup
     return()
+
+def get_pub_dcc(): return (settings["mqtt"]["pubdcc"])
+def get_pub_signals(): return (settings["mqtt"]["pubsignals"])
+def get_pub_sections(): return (settings["mqtt"]["pubsections"])
+def get_pub_instruments(): return (settings["mqtt"]["pubinstruments"])
+def get_pub_sensors(): return (settings["mqtt"]["pubsensors"])
+def get_sub_dcc_nodes(): return (settings["mqtt"]["subdccnodes"])
+def get_sub_signals(): return (settings["mqtt"]["subsignals"])
+def get_sub_sections(): return (settings["mqtt"]["subsections"])
+def get_sub_instruments(): return (settings["mqtt"]["subinstruments"])
+def get_sub_sensors(): return (settings["mqtt"]["subsensors"])
+
+def set_pub_dcc(value:bool): settings["mqtt"]["pubdcc"] = value
+def set_pub_signals(values:list): settings["mqtt"]["pubsignals"] = values
+def set_pub_sections(values:list): settings["mqtt"]["pubsections"] = values
+def set_pub_instruments(values:list): settings["mqtt"]["pubinstruments"] = values
+def set_pub_sensors(values:list): settings["mqtt"]["pubsensors"] = values
+def set_sub_dcc_nodes(values:list): settings["mqtt"]["subdccnodes"] = values
+def set_sub_signals(values:list): settings["mqtt"]["subsignals"] = values
+def set_sub_sections(values:list): settings["mqtt"]["subsections"] = values
+def set_sub_instruments(values:list): settings["mqtt"]["subinstruments"] = values
+def set_sub_sensors(values:list): settings["mqtt"]["subsensors"] = values
 
 ######################################################################################
     
