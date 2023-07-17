@@ -169,8 +169,9 @@ class linked_to_selection(common.str_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.frame,text="Linked block instrument:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.frame, tool_tip = "Enter the ID of the linked instrument "+
-                "protecting the line from the next block section (or leave blank)",
+        super().__init__(self.frame, tool_tip = "Enter the ID of the linked block instrument - "+
+                "This can be a local instrument ID or a remote instrument ID (in the form 'Node-ID') "+
+                "which has been subscribed to via MQTT networking",
                 exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
     

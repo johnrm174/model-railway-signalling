@@ -177,8 +177,9 @@ class mirrored_section(common.str_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - This can "+
-                    "be a local section or a remote section (subscribed to via MQTT networking)",
+        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
+                         "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
+                         "which has been subscribed to via MQTT networking",
                     exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
 
