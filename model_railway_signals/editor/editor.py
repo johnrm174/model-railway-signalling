@@ -12,6 +12,9 @@
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.reset_objects() - Reset the schematic back to its default state
+#    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking)
+#    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking)
+#    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking)
 #    schematic.initialise(root, callback, width, height, grid) - Create the canvas
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.update_canvas() - For updating the canvas following reload/resizing
@@ -165,6 +168,7 @@ class main_menubar:
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
         if settings.get_mqtt()[7]: self.mqtt_connect()
+        self.mqtt_update(reset_connection=False)
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -274,23 +278,19 @@ class main_menubar:
         self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
         self.mqtt_label = new_label
 
-    def mqtt_update(self):
+    def mqtt_update(self,reset_connection=True):
         # Only update the configuration if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_connect()
+        if reset_connection and self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
         ######################################################################
         ######## TO DO - update publish/subscribe configuration ##############
         ######################################################################
 #         objects.mqtt_subscribe_to_dcc_nodes(settings.get_sub_dcc_nodes())
-#         objects.mqtt_subscribe_to_signals(settings.get_sub_signals())
-#         objects.mqtt_subscribe_to_sections(settings.get_sub_sections())
-#         objects.mqtt_subscribe_to_instruments(settings.get_sub_instruments())
-#         objects.mqtt_subscribe_to_sensors(settings.get_sub_sensors())
 #         objects.mqtt_publish_dcc_command_feed(settings.get_pub_dcc())
-#         objects.mqtt_publish_signals(settings.get_pub_signals())
-#         objects.mqtt_publish_sections(settings.get_pub_sections())
-#         objects.mqtt_publish_instruments(settings.get_pub_instruments())
-#         objects.mqtt_publish_sensors(settings.get_pub_sensors())
+        objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
+        objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
+        objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
+#        objects.mqtt_update_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
         
     def canvas_update(self):
         width, height, grid = settings.get_canvas()
