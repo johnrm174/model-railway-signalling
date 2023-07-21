@@ -122,7 +122,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
         # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
         # Note that this means we will immediately receive all retained messages for those topics
         if len(node_config["list_of_subscribed_topics"]) > 0:
-            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics:")
+            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["list_of_subscribed_topics"]:
                 mqtt_client.subscribe(topic)
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
@@ -272,21 +272,20 @@ def mqtt_shutdown():
 def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callback,subtopics:bool=False):
     global node_config
     global mqtt_client
-    if not node_config["network_configured"]:
-        logging.error("MQTT-Client: Networking Disabled - Cannot subscribe to MQTT messages")
-    else:
-        # The Identifier for a remote object is a string combining the the Node-ID and Object-ID
-        item_identifier = create_remote_item_identifier(item_id,item_node)
-        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
-        topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
-        if subtopics: topic = topic+"/+"
-        logging.info("MQTT-Client: Subscribing to topic' "+topic+"'")
-        mqtt_client.subscribe(topic)
-        # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-        node_config["list_of_subscribed_topics"].append(topic)
-        # Save the callback details for when we receive a message on the topic
-        node_config["callbacks"][topic] = callback
-        return()
+    # The Identifier for a remote object is a string combining the the Node-ID and Object-ID
+    item_identifier = create_remote_item_identifier(item_id,item_node)
+    # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+    topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
+    if subtopics: topic = topic+"/+"
+    logging.info("MQTT-Client: Subscribing to topic' "+topic+"'")
+    # Only subscribe if networking has been configured (if the network is not
+    # configured/connected then subscriptions will be made on-connect
+    if node_config["network_configured"]: mqtt_client.subscribe(topic)
+    # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+    node_config["list_of_subscribed_topics"].append(topic)
+    # Save the callback details for when we receive a message on the topic
+    node_config["callbacks"][topic] = callback
+    return()
 
 #-----------------------------------------------------------------------------------------------
 # Externally Called Function to Publish a message to the MQTT broker. This function takes
@@ -333,18 +332,18 @@ def publish_message (topic:str,payload:str,log_message:str=None,retain:bool=Fals
 
 def unsubscribe_from_message_type(message_type:str):
     global node_config
-    # Only unsubscribe if networking has been configured
-    if node_config["network_configured"]:
-        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
-        # Finally, remove all instances of the message type from the internal subscriptions list
-        # Note we don't iterate through the list to remove items as it will change under us
-        new_list_of_subscribed_topics = []
-        for subscribed_topic in node_config["list_of_subscribed_topics"]:
-            if subscribed_topic.startswith(message_type):
-                logging.info("MQTT-Client: Unsubscribing from topic '"+subscribed_topic+"'")
-                mqtt_client.unsubscribe(subscribed_topic)
-            else:
-                new_list_of_subscribed_topics.append(subscribed_topic)
+    # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+    # Finally, remove all instances of the message type from the internal subscriptions list
+    # Note we don't iterate through the list to remove items as it will change under us
+    new_list_of_subscribed_topics = []
+    for subscribed_topic in node_config["list_of_subscribed_topics"]:
+        if subscribed_topic.startswith(message_type):
+            logging.info("MQTT-Client: Unsubscribing from topic '"+subscribed_topic+"'")
+            # Only unsubscribe if networking has been configured (if the network is not
+            # configured/connected then all subscriptions will already have been terminated
+            if node_config["network_configured"]: mqtt_client.unsubscribe(subscribed_topic)
+        else:
+            new_list_of_subscribed_topics.append(subscribed_topic)
         node_config["list_of_subscribed_topics"] = new_list_of_subscribed_topics
     return()
 
