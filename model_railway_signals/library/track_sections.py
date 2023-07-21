@@ -476,8 +476,11 @@ def reset_mqtt_configuration():
     # through the dictionary of sections to remove items as it will change under us
     new_sections = {}
     for key in sections:
-        if mqtt_interface.split_remote_item_identifier(key) is not None:
+        try:
+            local_id = int(key)
             new_sections[key] = sections[key]
+        except:
+            pass
     sections = new_sections
     return()
 
