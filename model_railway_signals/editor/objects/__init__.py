@@ -15,6 +15,9 @@
 #    section_exists(item_id:int) - Common function to see if a given item exists
 #    instrument_exists(item_id:int) - Common function to see if a given item exists
 #    line_exists (item_id:int) - Common function to see if a given item exists
+#    mqtt_update_signals(pub_list, sub_list) - configure MQTT publish/subscribe
+#    mqtt_update_sections(pub_list, sub_list) - configure MQTT publish/subscribe
+#    mqtt_update_instruments(pub_list, sub_list) - configure MQTT publish/subscribe
 #    save_schematic_state(reset_pointer:bool) - save a snapshot of the schematic objects
 #         (reset_pointer=True will clear the undo buffer (deleting the undo history)
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
@@ -87,6 +90,9 @@ from .objects_common import instrument_index
 from .objects_common import line_index
 
 from .objects_lines import get_endstop_offsets
+from .objects_signals import mqtt_update_signals
+from .objects_sections import mqtt_update_sections
+from .objects_instruments import mqtt_update_instruments
 
 # The following code does nothing apart from suppressing
 # the spurious pyflakes warnings for unused imports
@@ -120,6 +126,9 @@ assert instrument_exists
 assert line_exists
 assert object_type
 assert get_endstop_offsets
+assert mqtt_update_signals
+assert mqtt_update_sections
+assert mqtt_update_instruments
 assert type(schematic_objects) 
 assert type(signal_index)
 assert type(point_index)

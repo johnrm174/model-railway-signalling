@@ -10,6 +10,7 @@
 #    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    default_signal_object - The dictionary of default values for the object
+#    mqtt_update_signals(pub_list, sub_list) - Configure MQTT publish/subscribe
 #    remove_references_to_point (point_id) - remove point references from the interlocking tables
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
@@ -49,6 +50,10 @@
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
 #    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
+#    signals.set_signals_to_publish_state(IDs) - configure MQTT networking
+#    signals.set_signals_to_publish_passed_events(IDs) - configure MQTT networking
+#    signals.subscribe_to_signal_updates(node,IDs) - configure MQTT networking
+#    signals.subscribe_to_signal_passed_events(node,IDs) - configure MQTT networking
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
@@ -715,6 +720,22 @@ def delete_signal(object_id):
     del objects_common.schematic_objects[object_id]
     # Recalculate point interlocking tables to remove references to the signal
     objects_points.reset_point_interlocking_tables()
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update the MQTT networking configuration for signals, namely
+# subscribing to remote signals and setting local signals to publish state
+#------------------------------------------------------------------------------------
+
+def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
+    signals_common.reset_mqtt_configuration()
+    for signal in signals_to_publish:
+        signals.set_signals_to_publish_state(signal)
+        signals.set_signals_to_publish_passed_events(signal)
+    for signal in signals_to_subscribe_to:
+        [node_str, item_id_str] = signal.rsplit('-')
+        signals.subscribe_to_signal_updates(node_str, run_layout.schematic_callback, int(item_id_str))
+        signals.subscribe_to_signal_passed_events(node_str, run_layout.schematic_callback, int(item_id_str))
     return()
 
 ####################################################################################
