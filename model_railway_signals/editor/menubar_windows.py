@@ -12,7 +12,6 @@
 #    ######### MORE COMING #####################
 #
 # Makes the following external API calls to other editor modules:
-#    schematic.update_canvas() - For updating the canvas following reload/resizing
 #    settings.get_canvas() - Get the current settings (for editing)
 #    settings.set_canvas(width,height,grid) - Save the new settings
 #    settings.get_logging() - Get the current settings (for editing)
@@ -40,7 +39,6 @@ from tkinter import ttk
 
 from . import common
 from . import settings
-from . import schematic
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_box
@@ -207,8 +205,9 @@ class edit_layout_info():
 #------------------------------------------------------------------------------------
 
 class edit_canvas_settings():
-    def __init__(self, root_window):
+    def __init__(self, root_window, apply_settings_function):
         self.root_window = root_window
+        self.apply_settings_function = apply_settings_function
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 200
         winy = self.root_window.winfo_rooty() + 20
@@ -252,7 +251,7 @@ class edit_canvas_settings():
             height = self.height.get_value()
             settings.set_canvas(width=width, height=height)
             grid = settings.get_canvas()[2]
-            schematic.update_canvas(width, height, grid)
+            self.apply_settings_function()
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
 

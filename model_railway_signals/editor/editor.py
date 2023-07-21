@@ -111,7 +111,7 @@ class main_menubar:
         self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.settings_menu.add_command(label =" Canvas...", command=lambda:menubar_windows.edit_canvas_settings(self.root))
+        self.settings_menu.add_command(label =" Canvas...", command=lambda:menubar_windows.edit_canvas_settings(self.root, self.update_canvas))
         self.settings_menu.add_command(label =" MQTT...", command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect))
         self.settings_menu.add_command(label =" SPROG...", command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect))
         self.settings_menu.add_command(label =" Logging...", command=lambda:menubar_windows.edit_logging_settings(self.root))
@@ -267,6 +267,10 @@ class main_menubar:
                     message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
+        
+    def update_canvas(self):
+        width, height, grid = settings.get_canvas()
+        schematic.update_canvas(width, height, grid)
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
