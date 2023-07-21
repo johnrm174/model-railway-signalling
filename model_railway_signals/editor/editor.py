@@ -72,6 +72,8 @@ from ..library import common as library_common
 class main_menubar:
     def __init__(self, root):
         self.root = root
+        # Configure the logger (log level gets set later)
+        logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
         self.mainmenubar = Tk.Menu(self.root)
         self.root.configure(menu=self.mainmenubar)    
@@ -111,10 +113,14 @@ class main_menubar:
         self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.settings_menu.add_command(label =" Canvas...", command=lambda:menubar_windows.edit_canvas_settings(self.root, self.update_canvas))
-        self.settings_menu.add_command(label =" MQTT...", command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect))
-        self.settings_menu.add_command(label =" SPROG...", command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect))
-        self.settings_menu.add_command(label =" Logging...", command=lambda:menubar_windows.edit_logging_settings(self.root))
+        self.settings_menu.add_command(label =" Canvas...",
+                command=lambda:menubar_windows.edit_canvas_settings(self.root, self.canvas_update))
+        self.settings_menu.add_command(label =" MQTT...",
+                command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
+        self.settings_menu.add_command(label =" SPROG...",
+                command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
+        self.settings_menu.add_command(label =" Logging...",
+                command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -125,8 +131,11 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
+        # Initialise the schematic canvas
+        width, height, grid = settings.get_canvas()
+        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
         # Initialise the editor configuration at startup
-        self.initialise_editor(startup=True)
+        self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
         # The version is the third parameter provided by 'get_general'
         parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
@@ -138,32 +147,24 @@ class main_menubar:
     # Common initialisation functions (called on editor start or layout load or new layout)
     # --------------------------------------------------------------------------------------
     
-    def initialise_editor(self,startup:bool=False):
+    def initialise_editor(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
         path, name = os.path.split(settings.get_general()[0])
         self.root.title(name)
         # Re-size the canvas to reflect the new schematic size
-        width, height, grid = settings.get_canvas()
-        if startup: schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
-        else: schematic.update_canvas(width, height, grid)
+        self.canvas_update()
         # Set the logging level before we start doing stuff
-        initial_log_level = settings.get_logging()
-        logging.basicConfig(format='%(levelname)s: %(message)s')
-        if initial_log_level == 1: logging.getLogger().setLevel(logging.ERROR)
-        elif initial_log_level == 2: logging.getLogger().setLevel(logging.WARNING)
-        elif initial_log_level == 3: logging.getLogger().setLevel(logging.INFO)
-        elif initial_log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+        self.logging_update()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
-        port, baud, debug, startup, power = settings.get_sprog()
-        if startup: self.sprog_connect()
-        if power: self.dcc_power_on()
+        # The "connect" and "power" flags are the 4th and 5th parameter returned
+        if settings.get_sprog()[3]: self.sprog_connect()
+        if settings.get_sprog()[4]: self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
         # function for connection so the state is correctly reflected in the UI
-        # The "connect on startup" flag is the 7th parameter returned by get_mqtt
-        startup = settings.get_mqtt()[7]
-        if startup: self.mqtt_connect()
+        # The "connect on startup" flag is the 8th parameter returned
+        if settings.get_mqtt()[7]: self.mqtt_connect()
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -225,27 +226,12 @@ class main_menubar:
         new_label = "SPROG:DISCONNECTED "
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
-        
-    def mqtt_connect(self, show_popup:bool=True):
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
-        connected = mqtt_interface.configure_networking(url, network, node, port, username, password, debug)
-        if connected:
-            new_label = "MQTT:CONNECTED "
-        else:
-            new_label = "MQTT:DISCONNECTED "
-            if show_popup:
-                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
-                    message="Broker connection failure\nCheck MQTT settings")
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
-        return(connected)
-    
-    def mqtt_disconnect(self):
-        mqtt_interface.mqtt_shutdown()
-        new_label = "MQTT:DISCONNECTED "
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
-                    
+
+    def sprog_update(self):
+        # Only update the configuration if we are already connected - otherwise 
+        # do nothing (wait until the next time the user attempts to connect)
+        if self.sprog_label == "SPROG:CONNECTED ": self.sprog_connect()
+
     def dcc_power_off(self):
         # The power off request returns True if successful
         if pi_sprog_interface.request_dcc_power_off():
@@ -267,10 +253,55 @@ class main_menubar:
                     message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
+
+    def mqtt_connect(self, show_popup:bool=True):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        connected = mqtt_interface.configure_networking(url, network, node, port, username, password, debug)
+        if connected:
+            new_label = "MQTT:CONNECTED "
+        else:
+            new_label = "MQTT:DISCONNECTED "
+            if show_popup:
+                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
+                    message="Broker connection failure\nCheck MQTT settings")
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
+        return(connected)
+    
+    def mqtt_disconnect(self):
+        mqtt_interface.mqtt_shutdown()
+        new_label = "MQTT:DISCONNECTED "
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
+
+    def mqtt_update(self):
+        # Only update the configuration if we are already connected - otherwise 
+        # do nothing (wait until the next time the user attempts to connect)
+        if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_connect()
+        ######################################################################
+        ######## TO DO - update publish/subscribe configuration ##############
+        ######################################################################
+#         objects.mqtt_subscribe_to_dcc_nodes(settings.get_sub_dcc_nodes())
+#         objects.mqtt_subscribe_to_signals(settings.get_sub_signals())
+#         objects.mqtt_subscribe_to_sections(settings.get_sub_sections())
+#         objects.mqtt_subscribe_to_instruments(settings.get_sub_instruments())
+#         objects.mqtt_subscribe_to_sensors(settings.get_sub_sensors())
+#         objects.mqtt_publish_dcc_command_feed(settings.get_pub_dcc())
+#         objects.mqtt_publish_signals(settings.get_pub_signals())
+#         objects.mqtt_publish_sections(settings.get_pub_sections())
+#         objects.mqtt_publish_instruments(settings.get_pub_instruments())
+#         objects.mqtt_publish_sensors(settings.get_pub_sensors())
         
-    def update_canvas(self):
+    def canvas_update(self):
         width, height, grid = settings.get_canvas()
         schematic.update_canvas(width, height, grid)
+        
+    def logging_update(self):
+        log_level = settings.get_logging()
+        if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
+        elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
+        elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
+        elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function

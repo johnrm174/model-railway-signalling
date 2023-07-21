@@ -32,7 +32,6 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
-import logging
 import webbrowser
 
 from tkinter import ttk
@@ -205,9 +204,9 @@ class edit_layout_info():
 #------------------------------------------------------------------------------------
 
 class edit_canvas_settings():
-    def __init__(self, root_window, apply_settings_function):
+    def __init__(self, root_window, update_function):
         self.root_window = root_window
-        self.apply_settings_function = apply_settings_function
+        self.update_function = update_function
         # Create the top level window for the canvas settings
         winx = self.root_window.winfo_rootx() + 200
         winy = self.root_window.winfo_rooty() + 20
@@ -251,7 +250,8 @@ class edit_canvas_settings():
             height = self.height.get_value()
             settings.set_canvas(width=width, height=height)
             grid = settings.get_canvas()[2]
-            self.apply_settings_function()
+            # Make the callback to apply the updated settings
+            self.update_function()
             # close the window (on OK or cancel)
             if close_window: self.window.destroy()
 
@@ -261,9 +261,10 @@ class edit_canvas_settings():
 #------------------------------------------------------------------------------------
 
 class edit_sprog_settings():
-    def __init__(self, root_window, connect_function):
+    def __init__(self, root_window, connect_function, update_function):
         self.root_window = root_window
         self.connect_function = connect_function
+        self.update_function = update_function
         # Create the top level window for the SPROG configuration
         winx = self.root_window.winfo_rootx() + 220
         winy = self.root_window.winfo_rooty() + 40
@@ -291,7 +292,7 @@ class edit_sprog_settings():
         # Create the remaining UI elements
         self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
             tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
-                     "to 'debug'). Note that changes will only be effected on disconnect/reconnect")
+                     "to 'debug')")
         self.debug.pack(padx=2, pady=2)
         self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
             tool_tip="Select to configure serial port and initialise SPROG following layout load",
@@ -364,6 +365,9 @@ class edit_sprog_settings():
         power = self.power.get_value()
         # Save the updated settings
         settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
+        # Make the callback to apply the updated settings
+        self.update_function()
+        # close the window (on OK or cancel)
         if close_window: self.window.destroy()
         else: self.load_state() 
         
@@ -372,8 +376,9 @@ class edit_sprog_settings():
 #------------------------------------------------------------------------------------
 
 class edit_logging_settings():
-    def __init__(self, root_window):
+    def __init__(self, root_window, update_function):
         self.root_window = root_window
+        self.update_function = update_function
         # Create the top level window for the Logging Configuration
         winx = self.root_window.winfo_rootx() + 230
         winy = self.root_window.winfo_rooty() + 50
@@ -400,10 +405,8 @@ class edit_logging_settings():
         # Parent object is passed by the callback - not used here
         log_level = self.log_level.get_value()
         settings.set_logging(log_level)
-        if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
-        elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
-        elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
-        elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+        # Make the callback to apply the updated settings
+        self.update_function()
         # close the window (on OK or cancel)
         if close_window: self.window.destroy()
 
@@ -466,8 +469,7 @@ class mqtt_configuration_tab():
         self.node.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
         self.debug = common.check_box(self.frame2, label="Enhanced MQTT debug logging", width=28, 
-            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug'). "+
-                                      "Note that changes will only be effected on disconnect/reconnect")
+            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
         self.debug.pack(padx=2, pady=2)
         self.startup = common.check_box(self.frame2, label="Connect to Broker on layout load", width=28, 
             tool_tip="Select to configure MQTT networking and connect to the broker following layout load")
@@ -663,9 +665,10 @@ class mqtt_publish_tab():
 #------------------------------------------------------------------------------------
 
 class edit_mqtt_settings():
-    def __init__(self, root_window, connect_function):
+    def __init__(self, root_window, connect_function, update_function):
         self.root_window = root_window
         self.connect_function = connect_function
+        self.update_function = update_function
         # Create the top level window for editing MQTT settings
         winx = self.root_window.winfo_rootx() + 210
         winy = self.root_window.winfo_rooty() + 30
@@ -756,13 +759,9 @@ class edit_mqtt_settings():
             settings.set_pub_sections(self.publish.sections.get_values())
             settings.set_pub_instruments(self.publish.instruments.get_values())
             settings.set_pub_sensors(self.publish.sensors.get_values())
-            
-            #############################################################################################
-            ######## TODO - Apply the state (reset mqtt config and set items to publish/subscribe) ######
-            ######## Will need to do this on OK/Apply and also on layout load - so common function) #####
-            #############################################################################################
-            
-            # Close window on "OK" or re-load UI for "apply"
+            # Make the callback to apply the updated settings
+            self.update_function()
+            # close the window (on OK or cancel)
             if close_window: self.window.destroy()
             else: self.load_state() 
         else:
