@@ -748,9 +748,6 @@ def delete_instrument(block_id:int):
         instruments[str(block_id)]["clearbutton"].destroy()
         instruments[str(block_id)]["occupbutton"].destroy()
         instruments[str(block_id)]["bellbutton"].destroy()
-        # Delete the instrument from the list_of_instruments_to_publish (if required)
-        if block_id in list_of_instruments_to_publish:
-            list_of_instruments_to_publish.remove(block_id)
         # Finally, delete the entry from the dictionary of instruments
         del instruments[str(block_id)]
     return()
@@ -806,8 +803,11 @@ def reset_mqtt_configuration():
     # through the dictionary of instruments to remove items as it will change under us
     new_instruments = {}
     for key in instruments:
-        if mqtt_interface.split_remote_item_identifier(key) is not None:
+        try:
+            local_id = int(key)
             new_instruments[key] = instruments[key]
+        except:
+            pass
     instruments = new_instruments
     return()
 
