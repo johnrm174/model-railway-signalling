@@ -572,7 +572,7 @@ def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
 # Public API Function to "subscribe" to the published DCC commands from another "Node"
 #-----------------------------------------------------------------------------------------------
 
-def subscribe_to_dcc_command_feed (*nodes:str):    
+def subscribe_to_dcc_command_feed (*nodes:str):
     for node in nodes:
         # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
         # as each DCC address will appear on a different topic from the remote MQTT node 

@@ -50,6 +50,9 @@
 #    pi_sprog_interface.request_dcc_power_on - To turn on the track power
 #    mqtt_interface.configure_networking - After update of the MQTT Settings
 #    mqtt_interface.mqtt_shutdown - Disconnect from the MQTT Broker
+#    dcc_control.reset_mqtt_configuration() - reset all publish/subscribe
+#    dcc_control.set_node_to_publish_dcc_commands(True/False)
+#    dcc_control.subscribe_to_dcc_command_feed(*nodes)
 #
 #------------------------------------------------------------------------------------
 
@@ -66,6 +69,7 @@ from . import menubar_windows
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
+from ..library import dcc_control
 from ..library import common as library_common
 
 #------------------------------------------------------------------------------------
@@ -283,10 +287,11 @@ class main_menubar:
         # do nothing (wait until the next time the user attempts to connect)
         if reset_connection and self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
         ######################################################################
-        ######## TO DO - update publish/subscribe configuration ##############
+        ######## TO DO - publish/subscribe for track sensors #################
         ######################################################################
-#         objects.mqtt_subscribe_to_dcc_nodes(settings.get_sub_dcc_nodes())
-#         objects.mqtt_publish_dcc_command_feed(settings.get_pub_dcc())
+        dcc_control.reset_mqtt_configuration()
+        dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
+        dcc_control.subscribe_to_dcc_command_feed(*tuple(settings.get_sub_dcc_nodes()))
         objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
         objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
