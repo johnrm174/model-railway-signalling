@@ -249,7 +249,6 @@ class edit_canvas_settings():
             width = self.width.get_value()
             height = self.height.get_value()
             settings.set_canvas(width=width, height=height)
-            grid = settings.get_canvas()[2]
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK or cancel)
