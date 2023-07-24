@@ -64,6 +64,8 @@
 
 import logging
 
+from typing import Union
+
 from ..library import signals
 from ..library import points
 from ..library import block_instruments
@@ -90,6 +92,7 @@ def initialise(canvas_object):
 
 #------------------------------------------------------------------------------------
 # Internal helper Function to find if a signal has a subsidary
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
 def has_subsidary(signal_id:int):    
@@ -103,9 +106,11 @@ def has_subsidary(signal_id:int):
 
 #------------------------------------------------------------------------------------
 # Internal helper Function to find if a signal has a distant arms
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def has_distant_arms(signal_object):    
+def has_distant_arms(signal_id:int):    
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
     return (signal_object["sigarms"][0][2][0] or
             signal_object["sigarms"][1][2][0] or
             signal_object["sigarms"][2][2][0] or
@@ -113,11 +118,50 @@ def has_distant_arms(signal_object):
             signal_object["sigarms"][4][2][0] )
 
 #------------------------------------------------------------------------------------
+# Internal helper Function to find if a signal is a home signal (semaphore or colour light)
+# Note the function should only be called for local signals (sig ID is an integer)
+#------------------------------------------------------------------------------------
+
+def is_home_signal(signal_id:int):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    return ( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
+               signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) or
+             ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
+               signal_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) )
+
+#------------------------------------------------------------------------------------
+# Internal helper Function to find if a signal is a distant signal (semaphore or colour light)
+# Note the function should only be called for local signals (sig ID is an integer)
+#------------------------------------------------------------------------------------
+
+def is_distant_signal(signal_id:int):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    return( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
+              signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
+            ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
+              signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
+
+#------------------------------------------------------------------------------------
+# Internal helper Function to find if a signal is a shunt-ahead ground signal
+# Note the function should only be called for local signals (sig ID is an integer)
+#------------------------------------------------------------------------------------
+
+def is_shunt_ahead_signal(signal_id:int):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    return( ( signal_object["itemtype"]  == signals_common.sig_type.ground_position.value and
+              signal_object["itemsubtype"] == signals_ground_position.ground_pos_sub_type.shunt_ahead.value ) or
+            ( signal_object["itemtype"] == signals_common.sig_type.ground_position.value and
+              signal_object["itemsubtype"] == signals_ground_position.ground_pos_sub_type.early_shunt_ahead.value ) or
+            ( signal_object["itemtype"] == signals_common.sig_type.ground_disc.value and
+              signal_object["itemsubtype"] == signals_ground_disc.ground_disc_sub_type.shunt_ahead.value ) )
+
+#------------------------------------------------------------------------------------
 # Internal common Function to find the first set/cleared route for a signal object
 # Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def find_signal_route(signal_object):
+def find_signal_route(signal_id:int):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
     signal_route = None
     # Iterate through all possible routes supported by the signal
     # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
@@ -139,48 +183,42 @@ def find_signal_route(signal_object):
         if (index == 0 and not route_has_points) or (route_has_points and route_set_and_locked):
             signal_route = signals_common.route_type(index+1)
             break
-    return (signal_route)
+    return(signal_route)
 
 #------------------------------------------------------------------------------------
 # Internal common Function to find the 'signal ahead' of a signal object (based on
 # the route that has been set (points correctly set and locked for the route)
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object for consistency
-# with the 'find_signal_behind' function when updated to handle local/remote signals
-# The function also needs to return the sig_ID rather than the signal object
-#####################################################################################
+# Note the function should only be called for local signals (sig ID is an integer)
+# but can return either local or remote IDs (int or str) - both returned as a str
+# If no route is set/locked or no sig ahead is specified then 'None' is returned
 #------------------------------------------------------------------------------------
 
-def find_signal_ahead(signal_object):
-    signal_ahead_object = None
-    signal_route = find_signal_route(signal_object)
+def find_signal_ahead(signal_id:int):
+    signal_ahead_id = None
+    signal_route = find_signal_route(signal_id)
     if signal_route is not None:
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
         signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
-        if signal_ahead_id != "":
-            signal_ahead_object = objects.schematic_objects[objects.signal(signal_ahead_id)]
-    return (signal_ahead_object)
+        if signal_ahead_id == "": signal_ahead_id = None
+    return(signal_ahead_id)
 
 #------------------------------------------------------------------------------------
 # Internal common Function to find the 'signal behind' a signal object by testing each
 # of the other signal objects in turn to find the route that has been set and then see
 # if the 'signal ahead' on the set route matches the signal passed into the function 
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object to handle local or
-# remote signals as there is a use case for updating signals (on this schematic)
-# behind a remote signal when the aspect of the remote signal have been updated
-# The function also needs to return the sig_ID rather than the signal object
-#####################################################################################
+# Note the function can be called for local or remote signal IDs (int or str).
 #------------------------------------------------------------------------------------
 
-def find_signal_behind(signal_object):
-    signal_behind_object = None
+def find_signal_behind(signal_id:Union[int,str]):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    signal_behind_id = None
     for signal_id_to_test in objects.signal_index:
         signal_object_to_test = objects.schematic_objects[objects.signal(signal_id_to_test)]
-        signal_ahead_object = find_signal_ahead(signal_object_to_test)
-        if signal_ahead_object == signal_object:
-            signal_behind_object = signal_object_to_test
+        signal_ahead_id = find_signal_ahead(signal_object_to_test["itemid"])
+        if signal_ahead_id == str(signal_id):
+            signal_behind_id = int(signal_id_to_test)
             break
-    return (signal_behind_object)
+    return(signal_behind_id)
 
 #------------------------------------------------------------------------------------
 # Internal Function to walk the route ahead of a distant signal to see if any
@@ -188,82 +226,55 @@ def find_signal_behind(signal_object):
 # forward search will be aborted as soon as a "non-home" signal type is found
 # (this includes the case where a home semaphore also has secondary distant arms)
 # A maximum recursion depth provides a level of protection from mis-configuration
-#####################################################################################
-# TODO - Update function to the modified signal_ahead function and then test to
-# see if the signal is local or remote (sigID is integer or string). If the signal
-# is a remote signal then we should stop processing (as we have no idea of the
-# signal type) and return home_signal_at_danger=False
-#####################################################################################
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def home_signal_ahead_at_danger(signal_object, recursion_level:int=0):
+def home_signal_ahead_at_danger(signal_id:int, recursion_level:int=0):
     home_signal_at_danger = False
     if recursion_level < 20:
-        signal_ahead_object = find_signal_ahead(signal_object)
-        if signal_ahead_object is not None:
-            signal_id = signal_ahead_object["itemid"]
-            is_home = ( ( signal_ahead_object["itemtype"] == signals_common.sig_type.colour_light.value and
-                          signal_ahead_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) or
-                        ( signal_ahead_object["itemtype"] == signals_common.sig_type.semaphore.value and
-                          signal_ahead_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) )
-            if is_home and signals.signal_state(signal_id) == signals_common.signal_state_type.DANGER:
+        signal_ahead_id = find_signal_ahead(signal_id)
+        if signal_ahead_id is not None:
+            if is_home_signal(signal_ahead_id) and signals.signal_state(signal_id) == signals_common.signal_state_type.DANGER:
                 home_signal_at_danger = True
-            elif is_home and not has_distant_arms(signal_ahead_object):
+            elif is_home_signal(signal_ahead_id) and not has_distant_arms(signal_ahead_id):
                 # Call the function recursively to find the next signal ahead
-                home_signal_at_danger = home_signal_ahead_at_danger(signal_ahead_object, recursion_level+1)
+                home_signal_at_danger = home_signal_ahead_at_danger(signal_ahead_id, recursion_level+1)
     else:
         logging.error("RUN LAYOUT - Interlock with Signal ahead - Maximum recursion level reached")
-    return (home_signal_at_danger)
+    return(home_signal_at_danger)
 
 #------------------------------------------------------------------------------------
 # Internal Function to test if the signal ahead of the specified signal is a
 # distant signal and if that distant signal is displaying a caution aspect
-#####################################################################################
-# TODO - Update function to the modified signal_ahead function and then test to
-# see if the signal is local or remote (sigID is integer or string). If the signal
-# is a remote signal then we should stop processing (as we have no idea of the
-# signal type) and return home_signal_at_danger=False
-#####################################################################################
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def distant_signal_ahead_at_caution(signal_object):
-    sig_ahead = find_signal_ahead(signal_object)
-    if sig_ahead is not None:
-        sig_ahead_id = sig_ahead["itemid"]
-        is_distant = ( ( sig_ahead["itemtype"] == signals_common.sig_type.colour_light.value and
-                         sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
-                       ( sig_ahead["itemtype"] == signals_common.sig_type.semaphore.value and
-                         sig_ahead["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
-        signal_at_caution = (signals.signal_state(sig_ahead_id) == signals_common.signal_state_type.CAUTION)
-        distant_signal_at_caution = is_distant and signal_at_caution
-    else:
-        distant_signal_at_caution = False
-    return(distant_signal_at_caution)        
+def distant_signal_ahead_at_caution(signal_id:int):
+    signal_ahead_id = find_signal_ahead(signal_id)
+    return ( signal_ahead_id is not None and is_distant_signal(signal_ahead_id) and
+             signals.signal_state(signal_ahead_id) == signals_common.signal_state_type.CAUTION )
 
 #------------------------------------------------------------------------------------
 # Internal function to find any colour light signals which are configured to update aspects
 # based on the aspect of the signal that has changed (i.e. signals "behind"). The function
 # is recursive and keeps working back along the route until there are no further changes
 # that need propagating backwards. A maximum recursion depth provides a level of protection.
-#####################################################################################
-# TODO - Update function to use the updated "find signal behind" function (using SigID)
-#####################################################################################
+# Note the function can be called for local or remote signal IDs (int or str).
 #------------------------------------------------------------------------------------
 
-def update_signal_behind(signal_object, recursion_level:int=0):
+def update_signal_behind(signal_id:Union[int,str], recursion_level:int=0):
     if recursion_level < 20:
-        signal_behind_object = find_signal_behind(signal_object)
-        if signal_behind_object is not None:
+        signal_behind_id = find_signal_behind(signal_id)
+        if signal_behind_id is not None:
+            signal_behind_object = objects.schematic_objects[objects.signal(signal_behind_id)]
             if signal_behind_object["itemtype"] == signals_common.sig_type.colour_light.value:
-                signal_id = signal_object["itemid"]
-                signal_behind_id = signal_behind_object["itemid"]
                 # Fnd the displayed aspect of the signal (before any changes)
                 initial_signal_aspect = signals.signal_state(signal_behind_id)
                 # Update the signal behind based on the signal we called into the function with
                 signals.update_signal(signal_behind_id, signal_id)
                 # If the aspect has changed then we need to continute working backwards 
                 if signals.signal_state(signal_behind_id) != initial_signal_aspect:
-                    update_signal_behind(signal_behind_object, recursion_level+1)
+                    update_signal_behind(signal_behind_id, recursion_level+1)
     else:
         logging.error("RUN LAYOUT - Update Signal Behind - Maximum recursion level reached")
     return()
@@ -273,77 +284,106 @@ def update_signal_behind(signal_object, recursion_level:int=0):
 # along the set route to update any other signals that need changing. Called on Called
 # on sig_switched or sig_updated events. The Signal that has changed could either be a
 # local signal (sig ID is an integer) or a remote signal (Signal ID is a string)
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object to handle local or
-# remote signals as there is a use case for updating signals (on this schematic)
-# behind a remote signal when the aspect of the remote signal have been updated
-# The function will therefore need to detect whether the signal ID is an integer
-# or a string - and only update the signal on the signal ahead if an integer
-#####################################################################################
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def process_aspect_updates(signal_object):
+def process_aspect_updates(signal_id:int):
     # First update on the signal ahead (only if its a colour light signal)
     # Other signal types are updated automatically when switched
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
     if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
-        signal_ahead_object = find_signal_ahead(signal_object)
-        if signal_ahead_object is not None:
-            signals.update_signal(signal_object["itemid"], signal_ahead_object["itemid"])
+        signal_ahead_id = find_signal_ahead(signal_id)
+        if signal_ahead_id is not None:
+            signals.update_signal(signal_id, signal_ahead_id)
         else:
-            signals.update_signal(signal_object["itemid"])
+            signals.update_signal(signal_id)
     # Now work back along the route to update signals behind. Note that we do this for
     # all signal types as there could be colour light signals behind this signal
-    update_signal_behind(signal_object)
+    update_signal_behind(signal_id)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to update the signal route based on the 'interlocking routes' configuration
 # of the signal and the current setting of the points (and FPL) on the schematic
 # Note the function should only be called for local signals (sig ID is an integer)
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object for consistency
-#####################################################################################
 #------------------------------------------------------------------------------------
 
-def set_signal_route(signal_object):
-    signal_route = find_signal_route(signal_object)
+def set_signal_route(signal_id:int):
+    signal_route = find_signal_route(signal_id)
     if signal_route is not None:
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
         # Set the Route (and any associated route indication) for the signal
         theatre_text = signal_object["dcctheatre"][signal_route.value-1][0]
-        signals.set_route(signal_object["itemid"],
-                   route=signal_route,theatre_text=theatre_text)
+        signals.set_route(signal_id, route=signal_route, theatre_text=theatre_text)
         # For Semaphore Signals with secondary distant arms we also need
         # to set the route for the associated semaphore distant signal
-        if has_distant_arms(signal_object):
-            associated_distant_sig_id = int(signal_object["itemid"])+100
+        if has_distant_arms(signal_id):
+            associated_distant_sig_id = signal_id + 100
             signals.set_route(associated_distant_sig_id, route=signal_route)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to trigger any timed signal sequences (from the signal 'passed' event)
 # Note the function should only be called for local signals (sig ID is an integer)
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object for consistency
-#####################################################################################
 #------------------------------------------------------------------------------------
 
-def trigger_timed_sequence(signal_object):
-    signal_route = find_signal_route(signal_object)
-    if signals.signal_clear(signal_object["itemid"]) and signal_route is not None:
-        if ( signal_object["timedsequences"][signal_route.value-1][0] and
-                signal_object["timedsequences"][signal_route.value-1][1] !=0 ):
-            # Get the details of the timed signal sequence to initiate
-            current_sig_id = signal_object["itemid"]
-            sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
-            start_delay = signal_object["timedsequences"][signal_route.value-1][2]
-            time_delay = signal_object["timedsequences"][signal_route.value-1][3]
-            # If the signal to trigger is the same as the current signal then we enforce
-            # a start delay of Zero - otherwise, every time the signal changes to RED
-            # (after the start delay) a "signal passed" event will be generated which
-            # would then trigger another timed signal sequence and so on and so on
-            if sig_id_to_trigger == current_sig_id: start_delay = 0
-            # Trigger the timed sequence
+def trigger_timed_sequence(signal_id:int):
+    signal_route = find_signal_route(signal_id)
+    if signals.signal_clear(signal_id) and signal_route is not None:
+        signal_object = objects.schematic_objects[objects.signal(signal_id)]
+        # Get the details of the timed signal sequence to initiate
+        # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
+        trigger_signal = signal_object["timedsequences"][signal_route.value-1][0] 
+        sig_id_to_trigger = signal_object["timedsequences"][signal_route.value-1][1]
+        start_delay = signal_object["timedsequences"][signal_route.value-1][2]
+        time_delay = signal_object["timedsequences"][signal_route.value-1][3]
+        # If the signal to trigger is the same as the current signal then we enforce
+        # a start delay of Zero - otherwise, every time the signal changes to RED
+        # (after the start delay) a "signal passed" event will be generated which
+        # would then trigger another timed signal sequence and so on and so on
+        if sig_id_to_trigger == signal_id: start_delay = 0
+        # Trigger the timed sequence
+        if trigger_signal and sig_id_to_trigger !=0:
             signals.trigger_timed_signal(sig_id_to_trigger, start_delay, time_delay)                
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to SET or CLEAR a signal's approach control state and refresh the displayed
+# aspect. The function then recursively calls itself to work backwards along the route
+# updating the approach control state (and displayed aspect)of preceding signals
+# Note that Approach control won't be set in the period between signal released and
+# signal passed events unless the 'force_set' flag is set
+# Note the function should only be called for local signals (sig ID is an integer)
+#------------------------------------------------------------------------------------
+
+def update_signal_approach_control(signal_id:int, force_set:bool, recursion_level:int=0):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    if recursion_level < 20:
+        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
+                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+            signal_route = find_signal_route(signal_id)
+            if signal_route is not None:
+                # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
+                # Each element represents the approach control mode that has been set
+                # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
+                if signal_object["approachcontrol"][signal_route.value-1] == 1:
+                    signals.set_approach_control(signal_id, release_on_yellow=False, force_set=force_set)
+                elif signal_object["approachcontrol"][signal_route.value-1] == 2:
+                    signals.set_approach_control(signal_id, release_on_yellow=True, force_set=force_set)
+                elif (signal_object["approachcontrol"][signal_route.value-1] == 3 and home_signal_ahead_at_danger(signal_id) ):
+                    signals.set_approach_control(signal_id, release_on_yellow=False, force_set=force_set)
+                else:
+                    signals.clear_approach_control(signal_id)
+            else:
+                signals.clear_approach_control(signal_id)
+        # Update the signal aspect and work back along the route to see if any other signals need
+        # approach control to be set/cleared depending on the updated aspect of this signal
+        process_aspect_updates(signal_id)    
+        signal_behind_id = find_signal_behind(signal_id)
+        if signal_behind_id is not None:
+            update_signal_approach_control(signal_behind_id, False, recursion_level+1)
+    else:
+        logging.error("RUN LAYOUT - Update Approach Control on signals ahead - Maximum recursion level reached")
     return()
 
 #------------------------------------------------------------------------------------
@@ -352,15 +392,13 @@ def trigger_timed_sequence(signal_object):
 # sensor is triggered and the signal is CLEAR we assume the direction of travel
 # is towards the signal. If the signal is NOT CLEAR then we assume the direction of
 # travel is in the other direction (e.g. bi-directional line) and so take no action
-#####################################################################################
-# TODO - Update function to use Sig ID rather than signal_object for consistency
-#####################################################################################
+# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
-def update_track_occupancy(signal_object):
-    signal_id = signal_object["itemid"]
+def update_track_occupancy(signal_id:int):
+    signal_object = objects.schematic_objects[objects.signal(signal_id)]
     # Find the section ahead and section behind the signal (0 = No section)
-    signal_route = find_signal_route(signal_object)
+    signal_route = find_signal_route(signal_id)
     if signal_route is not None:
         section_ahead = signal_object["tracksections"][1][signal_route.value-1]
     else:
@@ -371,18 +409,7 @@ def update_track_occupancy(signal_object):
     # of the signal is CLEAR and which is OCCUPIED. If both sections are CLEAR
     # or both sections are OCCUPIED when the signal passed event is generated
     # then we cannot infer or assume anything - and therefore take no action
-    item_type = signal_object["itemtype"]
-    item_sub_type = signal_object["itemsubtype"]
-    if ( ( item_type == signals_common.sig_type.colour_light.value and
-           item_sub_type == signals_colour_lights.signal_sub_type.distant.value ) or
-         ( item_type == signals_common.sig_type.semaphore.value and
-           item_sub_type == signals_semaphores.semaphore_sub_type.distant.value ) or
-         ( item_type == signals_common.sig_type.ground_position.value and
-           item_sub_type == signals_ground_position.ground_pos_sub_type.shunt_ahead.value ) or
-         ( item_type == signals_common.sig_type.ground_position.value and
-           item_sub_type == signals_ground_position.ground_pos_sub_type.early_shunt_ahead.value ) or
-         ( item_type == signals_common.sig_type.ground_disc.value and
-           item_sub_type == signals_ground_disc.ground_disc_sub_type.shunt_ahead.value ) ):
+    if is_distant_signal(signal_id) or is_shunt_ahead_signal(signal_id):
         if ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
              section_behind > 0 and not track_sections.section_occupied(section_behind) ):
             # Section ahead of signal is OCCUPIED and section behind is CLEAR
@@ -431,20 +458,18 @@ def update_track_occupancy(signal_object):
             track_sections.clear_section_occupied(section_behind)
     # Propagate changes to any mirrored track sections
     if section_ahead > 0:
-        update_mirrored_section(objects.schematic_objects[objects.section(section_ahead)])
+        update_mirrored_section(section_ahead)
     if section_behind > 0:
-        update_mirrored_section(objects.schematic_objects[objects.section(section_behind)])
+        update_mirrored_section(section_behind)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to Update any mirrored track sections on a change to one track section
-# Note that the ID is a string (local or remote)
-#####################################################################################
-# TODO - Update function to use Section ID rather than section_object for consistency
-#####################################################################################
+# Note that the Track Section ID is a string (local or remote)
 #------------------------------------------------------------------------------------
 
-def update_mirrored_section(section_object, section_id_just_set:str="0", recursion_level:int=0):
+def update_mirrored_section(section_id, section_id_just_set:str="0", recursion_level:int=0):
+    section_object = objects.schematic_objects[objects.section(section_id)]
     if recursion_level < 20:
         changed_section_id = str(section_object["itemid"])
        # Iterate through the other sections to see if any are set to mirror this section
@@ -462,7 +487,7 @@ def update_mirrored_section(section_object, section_id_just_set:str="0", recursi
                     track_sections.clear_section_occupied(section_id_to_test,label_to_set,publish=False)
                 # See if there are any other sections set to mirror this section
                 if section_id_to_test != section_id_just_set:
-                    update_mirrored_section(section_object=section_object_to_test,
+                    update_mirrored_section(section_id_to_test,
                                 section_id_just_set=mirrored_section_id_of_object_to_test,
                                 recursion_level= recursion_level+1)
     else:
@@ -472,19 +497,19 @@ def update_mirrored_section(section_object, section_id_just_set:str="0", recursi
 #-------------------------------------------------------------------------------------
 # Function to update the Signal interlocking (against points & instruments). Called on
 # sig/sub_switched, point_switched fpl_switched or block_section_ahead_updated events
-# Note that this function processes updates for the entire schematic
+# Note that this function processes updates for all local signals on the schematic
 #------------------------------------------------------------------------------------
 
 def process_all_signal_interlocking():
     for signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(signal_id)]
         # Note that the ID of any associated distant signal is sig_id+100
-        associated_distant_id = signal_object["itemid"]+100
-        distant_arms_can_be_unlocked = has_distant_arms(signal_object)
+        associated_distant_id = int(signal_id)+100
+        distant_arms_can_be_unlocked = has_distant_arms(signal_id)
         signal_can_be_unlocked = False
         subsidary_can_be_unlocked = False
         # Find the route (where points are set/cleared)
-        signal_route = find_signal_route(signal_object)
+        signal_route = find_signal_route(signal_id)
         # If there is a set/locked route then the signal/subsidary can be unlocked
         if signal_route is not None:
             # 'sigroutes' and 'subroutes' represent the routes supported by the
@@ -519,8 +544,8 @@ def process_all_signal_interlocking():
             # The "interlockedahead" flag will only be True if selected and it can only be selected for
             # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
             # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
-            if signal_object["interlockahead"] and home_signal_ahead_at_danger(signal_object):
-                if has_distant_arms(signal_object):
+            if signal_object["interlockahead"] and home_signal_ahead_at_danger(signal_id):
+                if has_distant_arms(signal_id):
                     # Must be a home semaphore signal with secondary distant arms
                     if not signals.signal_clear(signal_object["itemid"]+100):
                         distant_arms_can_be_unlocked = False
@@ -541,14 +566,15 @@ def process_all_signal_interlocking():
             if subsidary_can_be_unlocked: signals.unlock_subsidary(signal_id)
             else: signals.lock_subsidary(signal_id)
         # lock/unlock the associated distant arms (if the signal has any)
-        if has_distant_arms(signal_object):
+        if has_distant_arms(signal_id):
             if distant_arms_can_be_unlocked: signals.unlock_signal(associated_distant_id)
             else: signals.lock_signal(associated_distant_id)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to update the Point interlocking (against signals). Called on sig/sub
-# switched events. This function processes updates for the entire schematic
+# switched events. Note that this function processes updates for all local points
+# on the schematic
 #------------------------------------------------------------------------------------
 
 def process_all_point_interlocking():
@@ -572,54 +598,51 @@ def process_all_point_interlocking():
 
 #------------------------------------------------------------------------------------
 # Function to Set/Clear all signal overrides based on track occupancy
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
+# Note that this function processes updates for all local signals on the schematic
 #------------------------------------------------------------------------------------
 
 def update_all_signal_overrides():
     # Sub-function to set a signal override
-    def set_signal_override(signal_object):
-        signal_id = signal_object["itemid"]
-        if signal_object["overridesignal"]:
+    def set_signal_override(signal_id:int):
+        if objects.schematic_objects[objects.signal(signal_id)]["overridesignal"]:
             signals.set_signal_override(signal_id)
-            if has_distant_arms(signal_object):
+            if has_distant_arms(signal_id):
                 signals.set_signal_override(signal_id+100)
     # Sub-function to Clear a signal override
-    def clear_signal_override(signal_object):
-        signal_id = signal_object["itemid"]
-        if signal_object["overridesignal"]:
+    def clear_signal_override(signal_id:int):
+        if objects.schematic_objects[objects.signal(signal_id)]["overridesignal"]:
             signals.clear_signal_override(signal_id)
-            if has_distant_arms(signal_object):
+            if has_distant_arms(signal_id):
                 signals.clear_signal_override(signal_id+100)
+                
     # Start of main function
-    for signal_id in objects.signal_index:
+    for signal_id_str in objects.signal_index:
+        signal_id_int = int(signal_id_str)
+        signal_object = objects.schematic_objects[objects.signal(signal_id_int)]
+        signal_route = find_signal_route(signal_id_int)
         # Override/clear the current signal based on the section ahead
-        signal_object = objects.schematic_objects[objects.signal(signal_id)]
-        signal_route = find_signal_route(signal_object)
         if signal_route is not None:
             section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
             if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
                        and signal_object["sigroutes"][signal_route.value-1] ):
-                set_signal_override(signal_object)
+                set_signal_override(signal_id_int)
             else:
-                clear_signal_override(signal_object)
+                clear_signal_override(signal_id_int)
         else:
-            clear_signal_override(signal_object)
+            clear_signal_override(signal_id_int)
     return()
 
 #------------------------------------------------------------------------------------
 # Function to override any distant signals that have been configured to be overridden
 # to CAUTION if any of the home signals on the route ahead are at DANGER. If this
 # results in an aspect change then we also work back to update any dependent signals
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
+# Note that this function processes updates for all LOCAL signals on the schematic
 #------------------------------------------------------------------------------------
 
 def update_all_distant_overrides():
-    for signal_id in objects.signal_index:
-        signal_object = objects.schematic_objects[objects.signal(signal_id)]
+    for signal_id_str in objects.signal_index:
+        signal_id_int = int(signal_id_str)
+        signal_object = objects.schematic_objects[objects.signal(signal_id_int)]
         # The "overrideahead" flag will only be True if selected and it can only be selected for
         # a semaphore distant, a colour light distant or a semaphore home with secondary distant arms
         # In the latter case then a call to "has_distant_arms" will be true (false for all other types)
@@ -631,114 +654,60 @@ def update_all_distant_overrides():
             #    section - e.g. A home signal with an secondary distant arm. In this case the distant
             #    arm would be under the control of the next block section (on that block section schematic)
             #    but you might still want to show the signal (and its state) on your own block schematic
-            if distant_signal_ahead_at_caution(signal_object) or home_signal_ahead_at_danger(signal_object):
-                if has_distant_arms(signal_object):
-                    signals.set_signal_override_caution(int(signal_id)+100)
+            if distant_signal_ahead_at_caution(signal_id_int) or home_signal_ahead_at_danger(signal_id_int):
+                if has_distant_arms(signal_id_int):
+                    signals.set_signal_override_caution(signal_id_int+100)
                 else:
-                    signals.set_signal_override_caution(int(signal_id))
+                    signals.set_signal_override_caution(signal_id_int)
             else:
-                if has_distant_arms(signal_object):
-                    signals.clear_signal_override_caution(int(signal_id)+100)
+                if has_distant_arms(signal_id_int):
+                    signals.clear_signal_override_caution(signal_id_int+100)
                 else:
-                    signals.clear_signal_override_caution(int(signal_id))
+                    signals.clear_signal_override_caution(signal_id_int)
             # Update the signal aspect and propogate any aspect updates back along the route
-            process_aspect_updates(signal_object)
+            process_aspect_updates(signal_id_int)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to SET or CLEAR a signal's approach control state and refresh the displayed
-# aspect. The function then recursively calls itself to work backwards along the route
-# updating the approach control state (and displayed aspect)of preceding signals
-# Note that Approach control won't be set in the period between signal released and
-# signal passed events unless the 'force_set' flag is set
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
+# Function to Update the approach control state of all signals (LOCAL signals only)
+# Note that the 'force_set' flag is set for the signal that has been switched (this
+# is passed in on a signal switched event only) to enforce a "reset" of the Approach
+# control mode in the period between signal released and signal passed events.
 #------------------------------------------------------------------------------------
 
-def update_signal_approach_control(signal_object, force_set:bool, recursion_level:int=0):
-    if recursion_level < 20:
-        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
-                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
-            signal_route = find_signal_route(signal_object)
-            if signal_route is not None:
-                # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
-                # Each element represents the approach control mode that has been set
-                # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3
-                if signal_object["approachcontrol"][signal_route.value-1] == 1:
-                    signals.set_approach_control(signal_object["itemid"],
-                                  release_on_yellow=False, force_set=force_set)
-                elif signal_object["approachcontrol"][signal_route.value-1] == 2:
-                    signals.set_approach_control(signal_object["itemid"],
-                                release_on_yellow=True, force_set=force_set)
-                elif (signal_object["approachcontrol"][signal_route.value-1] == 3 and
-                                    home_signal_ahead_at_danger(signal_object) ):
-                    signals.set_approach_control(signal_object["itemid"],
-                                release_on_yellow=False, force_set=force_set)
-                else:
-                    signals.clear_approach_control(signal_object["itemid"])
-            else:
-                signals.clear_approach_control(signal_object["itemid"])
-        # Update the signal aspect and work back along the route to see if any other signals need
-        # approach control to be set/cleared depending on the updated aspect of this signal
-        process_aspect_updates(signal_object)    
-        signal_behind_object = find_signal_behind(signal_object)
-        if signal_behind_object is not None:
-            update_signal_approach_control(signal_behind_object, False, recursion_level+1)
-    else:
-        logging.error("RUN LAYOUT - Update Approach Control on signals ahead - Maximum recursion level reached")
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to Update the approach control state of all signals
-# Note that the 'force_set' flag is set for the signal that has been switched
-# (this is passed in on a signal switched event only) to enforce a "reset" of
-# the Approach control mode in the period between signal released and signal passed events
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
-#------------------------------------------------------------------------------------
-
-def update_all_signal_approach_control(item_id=None, callback_type=None):
-    for signal_id in objects.signal_index:
+def update_all_signal_approach_control(item_id:Union[int,str]=None, callback_type=None):
+    for signal_id_str in objects.signal_index:
         if (callback_type == signals_common.sig_callback_type.sig_switched and
-            signal_id == str(item_id) ): force_set = True
+            signal_id_str == str(item_id) ): force_set = True
         else: force_set = False
-        signal_object = objects.schematic_objects[objects.signal(signal_id)]
-        update_signal_approach_control(signal_object, force_set)
+        update_signal_approach_control(int(signal_id_str), force_set)
     return()
 
 #------------------------------------------------------------------------------------
-# Function to clear all signal overrides
+# Function to clear all signal overrides (LOCAL signals only)
 #------------------------------------------------------------------------------------
 
 def clear_all_signal_overrides():
-    for sig_id in objects.signal_index:
-        signals.clear_signal_override(sig_id)
+    for signal_id_str in objects.signal_index:
+        signals.clear_signal_override(int(signal_id_str))
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Process all route updates
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
+# Function to Process all route updates on the schematic (LOCAL signals only)
 #------------------------------------------------------------------------------------
 
 def set_all_signal_routes():
-    for sig_id in objects.signal_index:
-        set_signal_route(objects.schematic_objects[objects.signal(sig_id)])
+    for signal_id_str in objects.signal_index:
+        set_signal_route(int(signal_id_str))
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Update all mirrored track sections
-#####################################################################################
-# TODO - Update function in light of the move to using IDs rather than objects
-#####################################################################################
+# Function to Update all mirrored track sections (LOCAL track sections only)
 #------------------------------------------------------------------------------------
 
 def update_all_mirrored_sections():
-    for sec_id in objects.section_index:
-        update_mirrored_section(objects.schematic_objects[objects.section(sec_id)])
+    for signal_id_str in objects.section_index:
+        update_mirrored_section(int(signal_id_str))
     return()
 
 #------------------------------------------------------------------------------------
@@ -748,20 +717,20 @@ def update_all_mirrored_sections():
 #####################################################################################
 #------------------------------------------------------------------------------------
 
-def schematic_callback(item_id,callback_type):
+def schematic_callback(item_id, callback_type):
     global editing_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
     # Timed signal sequences can be triggered by 'signal_passed' events
     if callback_type == signals_common.sig_callback_type.sig_passed:
         logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
-        trigger_timed_sequence(objects.schematic_objects[objects.signal(item_id)])
+        trigger_timed_sequence(item_id)
             
     # 'signal_passed' events can trigger changes in track occupancy but only in RUN mode
     # This is because Track section library objects only 'exist' in Run mode
     if callback_type == signals_common.sig_callback_type.sig_passed and not editing_enabled:
         logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
-        update_track_occupancy(objects.schematic_objects[objects.signal(item_id)])
+        update_track_occupancy(item_id)
 
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
     if ( callback_type == points.point_callback_type.point_switched or
@@ -775,7 +744,7 @@ def schematic_callback(item_id,callback_type):
     # is important as Track sections (the library objects) only "exist" in run mode
     if callback_type == track_sections.section_callback_type.section_updated:
         logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
-        update_mirrored_section(objects.schematic_objects[objects.section(item_id)])
+        update_mirrored_section(item_id)
 
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
