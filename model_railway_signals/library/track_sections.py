@@ -428,7 +428,9 @@ def send_mqtt_section_updated_event(section_id:int):
 # ------------------------------------------------------------------------------------------
 # Non public API function for deleting a section object (including all the drawing objects)
 # This is used by the schematic editor for changing section types where we delete the existing
-# section with all its data and then recreate it (with the same ID) in its new configuration
+# section with all its data and then recreate it (with the same ID) in its new configuration.
+# Note that we don't delete the section from the list_of_sections_to_publish (via MQTT) as
+# the MQTT configuration can be set completely asynchronously from create/delete sections
 # ------------------------------------------------------------------------------------------
 
 def delete_section(section_id:int):
@@ -444,9 +446,6 @@ def delete_section(section_id:int):
         sections[str(section_id)]["canvas"].delete("section"+str(section_id))
         # Delete all the tkinter button objects created for the section
         sections[str(section_id)]["button1"].destroy()
-        # Delete the section from the list_of_sections_to_publish (if required)
-        if section_id in list_of_sections_to_publish:
-            list_of_sections_to_publish.remove(section_id)
         # Finally, delete the entry from the dictionary of sections
         del sections[str(section_id)]
     return()
