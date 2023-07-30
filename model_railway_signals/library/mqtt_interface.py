@@ -197,6 +197,10 @@ def configure_networking (broker_host:str,
     # Handle the case where we are already have a client instance - in this case we disconnect
     # and kill off the current client before re-creating a client with the new configuration
     mqtt_shutdown()
+    # Configure this module (to enable subscriptions to be configured even if not connected
+    node_config["enhanced_debugging"] = mqtt_enhanced_debugging
+    node_config["network_identifier"] = network_identifier
+    node_config["node_identifier"] = node_identifier
     # Create a new instance of the MQTT client and configure / connect
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
     mqtt_client = paho.mqtt.client.Client(clean_session=True)
@@ -213,9 +217,6 @@ def configure_networking (broker_host:str,
     except Exception as exception:
         logging.error("MQTT-Client: Error connecting to broker: "+str(exception)+" - No messages will be published/received")
     else:
-        node_config["enhanced_debugging"] = mqtt_enhanced_debugging
-        node_config["network_identifier"] = network_identifier
-        node_config["node_identifier"] = node_identifier
         # Wait for connection acknowledgement (from on-connect callback function)
         timeout_start = time.time()
         while time.time() < timeout_start + 5:
