@@ -475,11 +475,7 @@ def reset_mqtt_configuration():
     # through the dictionary of sections to remove items as it will change under us
     new_sections = {}
     for key in sections:
-        try:
-            local_id = int(key)
-            new_sections[key] = sections[key]
-        except:
-            pass
+        if key.isdigit(): new_sections[key] = sections[key]
     sections = new_sections
     return()
 

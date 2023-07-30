@@ -735,6 +735,8 @@ def send_mqtt_ring_section_bell_event(block_id:int):
 # Non public API function for deleting an instrument object (including all the drawing objects)
 # This is used by the schematic editor for changing instrument types where we delete the existing
 # instrument with all its data and then recreate it (with the same ID) in its new configuration
+# Note that we don't delete the instrument from the list_of_instruments_to_publish (via MQTT) as
+# the MQTT configuration can be set completely asynchronously from create/delete instruments
 # ------------------------------------------------------------------------------------------
 
 def delete_instrument(block_id:int):
@@ -803,11 +805,7 @@ def reset_mqtt_configuration():
     # through the dictionary of instruments to remove items as it will change under us
     new_instruments = {}
     for key in instruments:
-        try:
-            local_id = int(key)
-            new_instruments[key] = instruments[key]
-        except:
-            pass
+        if key.isdigit(): new_instruments[key] = instruments[key]
     instruments = new_instruments
     return()
 

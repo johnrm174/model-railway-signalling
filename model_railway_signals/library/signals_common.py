@@ -657,11 +657,7 @@ def reset_mqtt_configuration():
     # through the dictionary of signals to remove items as it will change under us
     new_signals = {}
     for key in signals:
-        try:
-            local_id = int(key)
-            new_signals[key] = signals[key]
-        except:
-            pass
+        if key.isdigit(): new_signals[key] = signals[key]
     signals = new_signals
     return()
 
