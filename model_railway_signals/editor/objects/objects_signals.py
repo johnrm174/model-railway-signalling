@@ -725,17 +725,16 @@ def delete_signal(object_id):
 #------------------------------------------------------------------------------------
 # Function to update the MQTT networking configuration for signals, namely
 # subscribing to remote signals and setting local signals to publish state
+# Note that the editor doesn't use signal passed events
 #------------------------------------------------------------------------------------
 
 def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
     signals_common.reset_mqtt_configuration()
     for signal in signals_to_publish:
         signals.set_signals_to_publish_state(signal)
-        signals.set_signals_to_publish_passed_events(signal)
     for signal in signals_to_subscribe_to:
         [node_str, item_id_str] = signal.rsplit('-')
         signals.subscribe_to_signal_updates(node_str, run_layout.schematic_callback, int(item_id_str))
-        signals.subscribe_to_signal_passed_events(node_str, run_layout.schematic_callback, int(item_id_str))
     return()
 
 ####################################################################################
