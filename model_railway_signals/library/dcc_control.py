@@ -424,6 +424,10 @@ def update_dcc_point(point_id:int, state:bool):
         if dcc_mapping["address"] > 0:
             # Send the DCC commands to change the state
             pi_sprog_interface.send_accessory_short_event (dcc_mapping["address"],state)        
+            # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+            # Note that the commands will only be published if networking is configured and
+            # the node this software is running on is not configured as a "pi-sprog" node
+            publish_accessory_short_event(dcc_mapping["address"],state)        
     return ()
 
 #-----------------------------------------------------------------------------------------
