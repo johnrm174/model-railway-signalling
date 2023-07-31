@@ -19,7 +19,27 @@
 #    settings.get_general() - Get the current settings (for info/editing)
 #    settings.set_general() - Save the new settings (layout info)
 #    settings.get_sprog() - Get the current settings (for editing)
-#    settings.set_sprog(params) - Save the new settings
+#    settings.set_sprog() - Save the new settings
+#    settings.get_sub_dcc_nodes() - get the list of subscribed dccc command feeds
+#    settings.get_sub_signals() - get the list of subscribed items
+#    settings.get_sub_sections() - get the list of subscribed items
+#    settings.get_sub_instruments() - get the list of subscribed items
+#    settings.get_sub_sensors() - get the list of subscribed items
+#    settings.get_pub_dcc() - get the publish dcc command feed flag
+#    settings.get_pub_signals() - get the list of items to publish
+#    settings.get_pub_sections() - get the list of items to publish
+#    settings.get_pub_instruments() - get the list of items to publish
+#    settings.get_pub_sensors() - get the list of items to publish
+#    settings.set_sub_dcc_nodes() - set the list of subscribed nodes
+#    settings.set_sub_signals() - set the list of subscribed items
+#    settings.set_sub_sections() - set the list of subscribed items
+#    settings.set_sub_instruments() - set the list of subscribed items
+#    settings.set_sub_sensors() - set the list of subscribed items
+#    settings.set_pub_dcc() - set the publish dcc command feed flag
+#    settings.set_pub_signals() - set the list of items to publish
+#    settings.set_pub_sections() - set the list of items to publish
+#    settings.set_pub_instruments() - set the list of items to publish
+#    settings.set_pub_sensors() - set the list of items to publish
 #
 # Uses the following common editor UI elements:
 #    common.selection_buttons
@@ -616,7 +636,10 @@ class mqtt_subscribe_tab():
         self.instruments = entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors (GPIO)")
-        self.frame5.pack(padx=2, pady=2, fill='x')
+        ##########################################################################################################
+        ## TODO - enable the Track Sensors UI element when the publish/subscribe feature is complete #############
+        ##  self.frame5.pack(padx=2, pady=2, fill='x')
+        ##########################################################################################################
         self.sensors = entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
 
@@ -651,7 +674,10 @@ class mqtt_publish_tab():
         self.instruments = entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
         self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors (GPIO)")
-        self.frame5.pack(padx=2, pady=2, fill='x')
+        ##########################################################################################################
+        ## TODO - enable the Track Sensors UI element when the publish/subscribe feature is complete #############
+        ## self.frame5.pack(padx=2, pady=2, fill='x')
+        ##########################################################################################################
         self.sensors = entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
 
