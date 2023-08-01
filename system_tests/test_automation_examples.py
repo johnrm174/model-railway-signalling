@@ -788,7 +788,7 @@ def run_shunting_tests(delay=0):
 
 #-----------------------------------------------------------------------------------
 
-def run_all_automation_example_tests(delay=0):
+def run_all_automation_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
     set_run_mode()
     reset_layout()
@@ -818,10 +818,10 @@ def run_all_automation_example_tests(delay=0):
     run_shunting_tests(delay)
     run_main_line_approach_control_tests(delay)
     run_loop_line_approach_control_tests(delay)
-
+    if shutdown: report_results()
+    
 if __name__ == "__main__":
-    run_all_automation_example_tests(delay=1)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_automation_example_tests(delay=0.0, shutdown=True))
 
 ######################################################################################################
 

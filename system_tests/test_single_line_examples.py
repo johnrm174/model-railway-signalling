@@ -408,7 +408,7 @@ def run_shunting_tests(delay:float=0.0):
 
 #-----------------------------------------------------------------------------------
 
-def run_all_single_line_example_tests(delay=0):
+def run_all_single_line_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/single_line_semaphore_example.sig")
     set_run_mode()
     reset_layout()
@@ -417,9 +417,9 @@ def run_all_single_line_example_tests(delay=0):
     run_signal_route_tests()
     run_signal_override_tests()
     run_shunting_tests(delay)
-
+    if shutdown: report_results()
+    
 if __name__ == "__main__":
-    run_all_single_line_example_tests(delay=1)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_single_line_example_tests(delay=0.0, shutdown=True))
 
 ######################################################################################################

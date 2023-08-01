@@ -625,7 +625,7 @@ def run_override_on_signal_ahead_tests_2(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_run_layout_tests(delay=0):
+def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./run_layout_tests.sig")
     set_run_mode()
     run_track_occupancy_tests_1(delay)
@@ -634,10 +634,10 @@ def run_all_run_layout_tests(delay=0):
     run_track_occupancy_tests_7(delay)
     run_override_on_signal_ahead_tests_1 (delay)
     run_override_on_signal_ahead_tests_2 (delay)
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_run_layout_tests(delay = 0.1)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_run_layout_tests(delay=0.0, shutdown=True))
 
 ###############################################################################################################################
     

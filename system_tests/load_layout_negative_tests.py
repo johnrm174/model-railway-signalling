@@ -29,13 +29,13 @@ ERROR: Block Instruments - Error loading audio resource file 'non_existant_file1
 ERROR: Block Instruments - Error loading audio file '/signals/__init__.py' 
 """
 
-def run_all_load_layout_negative_tests():
+def run_all_load_layout_negative_tests(delay:float=0.0, shutdown:bool=False):
     print(expected_warnings)
     initialise_test_harness(filename="./load_layout_negative_tests.sig")
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_load_layout_negative_tests()
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_load_layout_negative_tests(delay=0.0, shutdown=True))
 
 ###############################################################################################################################
     
