@@ -353,8 +353,6 @@ def mqtt_shutdown():
         # Wait for everything to be published to the broker (with a sleep) and disconnect
         time.sleep(0.25)
         mqtt_broker_disconnect()
-        mqtt_client.loop_stop()
-        mqtt_client = None
         node_config["network_configured"] = False
         node_config["connected_to_broker"] = False
         node_config["mqtt_client_running"] = False
