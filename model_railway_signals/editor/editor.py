@@ -171,8 +171,8 @@ class main_menubar:
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
+        self.mqtt_update()
         if settings.get_mqtt()[7]: self.mqtt_connect()
-        self.mqtt_update(reset_connection=False)
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -264,7 +264,7 @@ class main_menubar:
 
     def mqtt_connect(self, show_popup:bool=True):
         url, port, network, node, username, password, debug, startup = settings.get_mqtt()
-        connected = mqtt_interface.configure_networking(url, network, node, port, username, password, debug)
+        connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
         if connected:
             new_label = "MQTT:CONNECTED "
         else:
@@ -277,15 +277,20 @@ class main_menubar:
         return(connected)
     
     def mqtt_disconnect(self):
-        mqtt_interface.mqtt_shutdown()
-        new_label = "MQTT:DISCONNECTED "
+        connected = mqtt_interface.mqtt_broker_disconnect()
+        if connected:
+            new_label = "MQTT:CONNECTED "
+        else:
+            new_label = "MQTT:DISCONNECTED "
         self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
         self.mqtt_label = new_label
 
-    def mqtt_update(self,reset_connection=True):
-        # Only update the configuration if we are already connected - otherwise 
+    def mqtt_update(self):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        mqtt_interface.configure_mqtt_client(network, node, debug)
+        # Only reset the broker connection if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if reset_connection and self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
+        if self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
         ######################################################################
         ######## TO DO - publish/subscribe for track sensors #################
         ######################################################################
