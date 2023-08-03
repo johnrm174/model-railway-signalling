@@ -166,11 +166,14 @@ class main_menubar:
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
         # The "connect" and "power" flags are the 4th and 5th parameter returned
+        if self.power_label == "DCC Power:ON  ": self.dcc_power_off()
+        if self.sprog_label == "SPROG:CONNECTED ": self.sprog_disconnect()
         if settings.get_sprog()[3]: self.sprog_connect()
         if settings.get_sprog()[4]: self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
+        if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_disconnect()
         self.mqtt_update()
         if settings.get_mqtt()[7]: self.mqtt_connect()
         # Set the edit mode (2nd param in the returned tuple)
