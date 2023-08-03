@@ -68,16 +68,12 @@ default_settings["mqtt"]["pubsensors"] = []
 settings = copy.deepcopy (default_settings)
 
 #------------------------------------------------------------------------------------
-# Function to restore the default settings - note we maintain the current canvas size
+# Function to restore the default settings
 #------------------------------------------------------------------------------------
 
 def restore_defaults():
     global filename, settings
-    canvas_width = settings["canvas"]["width"]
-    canvas_height = settings["canvas"]["height"]
     settings = copy.deepcopy (default_settings)
-    settings["canvas"]["width"] = canvas_width
-    settings["canvas"]["height"] = canvas_height
     return()
 
 #------------------------------------------------------------------------------------
