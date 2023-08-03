@@ -503,14 +503,19 @@ def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id
             # Note that the use case of trwo sections set to mirror each other is valid
             # For this, we just update the first mirrored section and then exit
             if str(int_or_str_section_id) == str_mirrored_section_id_of_object_to_test:
+                current_label = track_sections.section_label(str_section_id_to_test)
+                current_state = track_sections.section_occupied(str_section_id_to_test)
                 label_to_set = track_sections.section_label(int_or_str_section_id)
                 state_to_set = track_sections.section_occupied(int_or_str_section_id)
                 if state_to_set:
                     track_sections.set_section_occupied(str_section_id_to_test,label_to_set,publish=False)
                 else:
                     track_sections.clear_section_occupied(str_section_id_to_test,label_to_set,publish=False)
-                # See if there are any other sections set to mirror this section
-                if str_section_id_to_test != str_section_id_just_set:
+                # See if there are any other sections set to mirror this section - but only bother if the
+                # state or label of this section have actually changed (otherwise there is no point). We
+                # also don't bother looping back on ourselves (if 2 sections are set to mirror each other)
+                if ((current_label != label_to_set or current_state != state_to_set) and
+                           str_section_id_to_test != str_section_id_just_set ):
                     update_mirrored_section(str_section_id_to_test,
                                 str_mirrored_section_id_of_object_to_test,
                                 recursion_level= recursion_level+1)
