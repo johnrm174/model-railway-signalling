@@ -208,6 +208,7 @@ def find_signal_ahead(int_signal_id:int):
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         str_signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
         if str_signal_ahead_id == "": str_signal_ahead_id = None
+        if not signals_common.sig_exists(str_signal_ahead_id): str_signal_ahead_id = None
     return(str_signal_ahead_id)
 
 #------------------------------------------------------------------------------------
