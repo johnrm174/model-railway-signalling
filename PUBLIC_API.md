@@ -676,6 +676,9 @@ for connecting in to the broker but note that these are NOT ENCRYPTED when sendi
 internet unless you are also using a SSL connection.
 <pre>
 configure_networking - Configures the local client and opens a connection to the MQTT broker
+                   Returns whether the connection was successful (or timed out)
+                   NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
+                   Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
   Mandatory Parameters:
       broker_host:str - The name/IP address of the MQTT broker host to be used
       network_identifier:str - The name to use for this signalling network (any string)
@@ -685,8 +688,22 @@ configure_networking - Configures the local client and opens a connection to the
       broker_username:str - the username to log into the MQTT Broker (default = None)
       broker_password:str - the password to log into the MQTT Broker (default = None)
       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
-          returns True - if we have acknowledgement that the broker connection has been successful
-          returns False - if the broker connection has failed or the request times out
+
+configure_mqtt_client - Configures the local MQTT client and layout network node
+  Mandatory Parameters:
+      network_identifier:str - The name to use for this signalling network (any string)
+      node_identifier:str - The name to use for this node on the network (can be any string)
+  Optional Parameters:
+      mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+
+mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
+                   Returns whether the connection was successful or not (True/False)
+  Mandatory Parameters:
+      broker_host:str - The name/IP address of the MQTT broker host to be used
+  Optional Parameters:
+      broker_port:int - The network port for the broker host (default = 1883)
+      broker_username:str - the username to log into the MQTT Broker (default = None)
+      broker_password:str - the password to log into the MQTT Broker (default = None)
 
 set_node_to_publish_dcc_commands - Enables publishing of DCC commands to other network nodes
   Optional Parameters:

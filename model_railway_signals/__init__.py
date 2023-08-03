@@ -73,7 +73,9 @@ from .library.dcc_control import map_dcc_point
 from .library.dcc_control import subscribe_to_dcc_command_feed
 from .library.dcc_control import set_node_to_publish_dcc_commands
 
-from .library.mqtt_interface import configure_networking
+from .library.mqtt_interface import configure_networking   #### DEPRECATED
+from .library.mqtt_interface import configure_mqtt_client
+from .library.mqtt_interface import mqtt_broker_connect
 
 from .library.file_interface import load_layout_state
 
@@ -159,7 +161,9 @@ __all__ = [
         'subscribe_to_dcc_command_feed',
         'set_node_to_publish_dcc_commands',
       # Public networking functions
-        'configure_networking',
+        'configure_networking',     ## DEPRECATED
+        'configure_mqtt_client',
+        'mqtt_broker_connect',
       # Public File load/save functions
         'load_layout_state',
       # public block instrument types
