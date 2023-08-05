@@ -77,6 +77,7 @@ pi_cbus_node = 1              # The arbitary CBUS Node ID we will use for the Pi
 transmit_delay = 0.02         # The delay between sending CBUS Messages (in seconds)
 
 # Global Variables (configured/changed by the functions in the module)
+port_open = False             # Whether the port is open or closed
 debug = False                 # Enhanced Debug logging - set when Pi Sprog is initialised
 threads_started = False       # if the Tx and Rx threads have been started then don't start again
 track_power_on = None         # if track power is OFF or unknown (None) we wont send DCC Bus commands
@@ -104,8 +105,9 @@ def thread_to_send_buffered_data ():
         if debug:logging.debug ("Pi-SPROG - Transmit CBUS Message: " + command_string)
         # Write the CBUS Message to the serial port (with exception handling
         # We just handle any exceptions (we'll get exceptions during port re-configuration)
-        try: serial_port.write(bytes(command_string,"Ascii"))
-        except: pass
+        if serial_port.is_open:
+            try: serial_port.write(bytes(command_string,"Ascii"))
+            except: pass
         # Sleep before sending the next CBUS message
         time.sleep(transmit_delay)
     return()
@@ -127,81 +129,82 @@ def thread_to_read_received_data ():
         time.sleep(0.0001)
         # Read from the port until we get the GridConnect Protocol message termination character
         # We just handle any exceptions (we'll get exceptions during port re-configuration)
-        try: byte_string = serial_port.read_until(b";")
-        except: pass
-        else:
-            # Log the Received message (if the appropriate debug level is set
-            if debug:logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
-            # Extract the OpCode - so we can decide what to do - Note that we put an exception handler around
-            # The remainder of this code to handle "edge-case" exceptions (port config being changed)
-            try:
-                op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
-                
-                # Process selected commands (note that only a subset is supported)
-                
-                if op_code == 227:  # Command Station Status Report
+        if serial_port.is_open:
+            try: byte_string = serial_port.read_until(b";")
+            except: pass
+            else:
+                # Log the Received message (if the appropriate debug level is set
+                if debug:logging.debug("Pi-SPROG - Received CBUS Message: " + byte_string.decode('Ascii') + "\r")
+                # Extract the OpCode - so we can decide what to do - Note that we put an exception handler around
+                # The remainder of this code to handle "edge-case" exceptions (port config being changed)
+                try:
+                    op_code = int((chr(byte_string[7]) + chr(byte_string[8])),16)
+                    
+                    # Process selected commands (note that only a subset is supported)
+                    
+                    if op_code == 227:  # Command Station Status Report
+                                    
+                        # Print out the status report (if the appropriate debug level is set)
+                        logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report):")
+                        logging.debug ("    Node Id       :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
+                                                                  + chr(byte_string[11]) + chr(byte_string[12]),16)))
+                        logging.debug ("    CS Number     :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
+                        logging.debug ("    Version       :"+str(int(chr(byte_string[17]) + chr(byte_string[18]),16))+"."
+                                                           +str(int(chr(byte_string[19]) + chr(byte_string[20]),16))+"."
+                                                           +str(int(chr(byte_string[21]) + chr(byte_string[22]),16)))
+                        # Get the Flags - we only need the last hex character (to get the 4 bits)
+                        flags = int(chr(byte_string[16]),16)
+                        logging.debug ("    Reserved      :"+str((flags & 0x080)==0x80))
+                        logging.debug ("    Service Mode  :"+str((flags & 0x040)==0x40))
+                        logging.debug ("    Reset Done    :"+str((flags & 0x02)==0x20))
+                        logging.debug ("    Emg Stop Perf :"+str((flags & 0x10)==0x10))
+                        logging.debug ("    Bus On        :"+str((flags & 0x08)==0x08))
+                        logging.debug ("    Track On      :"+str((flags & 0x04)==0x04))
+                        logging.debug ("    Track Error   :"+str((flags & 0x02)==0x02))
+                        logging.debug ("    H/W Error     :"+str((flags & 0x01)==0x01)+"\r")
+                        rstat_response = True
+                        
+                    elif op_code == 182:  # Response to Query Node
                                 
-                    # Print out the status report (if the appropriate debug level is set)
-                    logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report):")
-                    logging.debug ("    Node Id       :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
+                        # Print out the status report (if the appropriate debug level is set)
+                        logging.debug ("Pi-SPROG: Received PNN (Response to Query Node)")
+                        logging.debug ("    Node Id   :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
                                                               + chr(byte_string[11]) + chr(byte_string[12]),16)))
-                    logging.debug ("    CS Number     :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
-                    logging.debug ("    Version       :"+str(int(chr(byte_string[17]) + chr(byte_string[18]),16))+"."
-                                                       +str(int(chr(byte_string[19]) + chr(byte_string[20]),16))+"."
-                                                       +str(int(chr(byte_string[21]) + chr(byte_string[22]),16)))
-                    # Get the Flags - we only need the last hex character (to get the 4 bits)
-                    flags = int(chr(byte_string[16]),16)
-                    logging.debug ("    Reserved      :"+str((flags & 0x080)==0x80))
-                    logging.debug ("    Service Mode  :"+str((flags & 0x040)==0x40))
-                    logging.debug ("    Reset Done    :"+str((flags & 0x02)==0x20))
-                    logging.debug ("    Emg Stop Perf :"+str((flags & 0x10)==0x10))
-                    logging.debug ("    Bus On        :"+str((flags & 0x08)==0x08))
-                    logging.debug ("    Track On      :"+str((flags & 0x04)==0x04))
-                    logging.debug ("    Track Error   :"+str((flags & 0x02)==0x02))
-                    logging.debug ("    H/W Error     :"+str((flags & 0x01)==0x01)+"\r")
-                    rstat_response = True
-                    
-                elif op_code == 182:  # Response to Query Node
-                            
-                    # Print out the status report (if the appropriate debug level is set)
-                    logging.debug ("Pi-SPROG: Received PNN (Response to Query Node)")
-                    logging.debug ("    Node Id   :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
-                                                          + chr(byte_string[11]) + chr(byte_string[12]),16)))
-                    logging.debug ("    Mfctre ID :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
-                    logging.debug ("    Module ID :"+str(int(chr(byte_string[15]) + chr(byte_string[16]),16)))
-                    # Get the Flags - we only need the last hex character (to get the 4 bits)
-                    flags = int(chr(byte_string[18]),16)
-                    logging.debug ("    Bldr Comp :"+str((flags & 0x08)==0x08))
-                    logging.debug ("    FLiM Mode :"+str((flags & 0x04)==0x04))
-                    logging.debug ("    Prod Node :"+str((flags & 0x02)==0x02))
-                    logging.debug ("    Cons Node :"+str((flags & 0x01)==0x01)+"\r")
-                    qnn_response = True
-                    
-                elif op_code == 4:  # Track Power is OFF
-                    
-                    logging.debug ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
-                    track_power_on = False
+                        logging.debug ("    Mfctre ID :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
+                        logging.debug ("    Module ID :"+str(int(chr(byte_string[15]) + chr(byte_string[16]),16)))
+                        # Get the Flags - we only need the last hex character (to get the 4 bits)
+                        flags = int(chr(byte_string[18]),16)
+                        logging.debug ("    Bldr Comp :"+str((flags & 0x08)==0x08))
+                        logging.debug ("    FLiM Mode :"+str((flags & 0x04)==0x04))
+                        logging.debug ("    Prod Node :"+str((flags & 0x02)==0x02))
+                        logging.debug ("    Cons Node :"+str((flags & 0x01)==0x01)+"\r")
+                        qnn_response = True
+                        
+                    elif op_code == 4:  # Track Power is OFF
+                        
+                        logging.debug ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
+                        track_power_on = False
 
-                elif op_code == 5:  # Track Power is ON
-                    
-                    logging.debug ("Pi-SPROG: Received TON (Track ON) acknowledgement")
-                    track_power_on = True
-                    
-                elif op_code == 76:  # Service Mode Status response
-                    
-                    session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
-                    service_mode_status = int(chr(byte_string[11]) + chr(byte_string[12]),16)
-                    if service_mode_status == 0: status = "Reserved"
-                    elif service_mode_status == 1: status = "No Acknowledge"
-                    elif service_mode_status == 2: status = "Overload on Programming Track"
-                    elif service_mode_status == 3: status = "Write Acknowledge"
-                    elif service_mode_status == 4: status = "Busy"
-                    elif service_mode_status == 5: status = "CV Out of Range"
-                    else: status = "Unrecognised response code" + str (service_mode_status)
-                    logging.debug ("Pi-SPROG: Received SSTAT (Service Mode Status) - Session: "
-                                           + str(session_id) + ", Status: " + status)
-            except:
-                logging.error("Pi-SPROG: Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
+                    elif op_code == 5:  # Track Power is ON
+                        
+                        logging.debug ("Pi-SPROG: Received TON (Track ON) acknowledgement")
+                        track_power_on = True
+                        
+                    elif op_code == 76:  # Service Mode Status response
+                        
+                        session_id = int(chr(byte_string[9]) + chr(byte_string[10]),16)
+                        service_mode_status = int(chr(byte_string[11]) + chr(byte_string[12]),16)
+                        if service_mode_status == 0: status = "Reserved"
+                        elif service_mode_status == 1: status = "No Acknowledge"
+                        elif service_mode_status == 2: status = "Overload on Programming Track"
+                        elif service_mode_status == 3: status = "Write Acknowledge"
+                        elif service_mode_status == 4: status = "Busy"
+                        elif service_mode_status == 5: status = "CV Out of Range"
+                        else: status = "Unrecognised response code" + str (service_mode_status)
+                        logging.debug ("Pi-SPROG: Received SSTAT (Service Mode Status) - Session: "
+                                               + str(session_id) + ", Status: " + status)
+                except:
+                    logging.error("Pi-SPROG: Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
             
     return()
 
