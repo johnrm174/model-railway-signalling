@@ -142,49 +142,49 @@ def thread_to_read_received_data ():
                 if op_code == 227:  # Command Station Status Report
                                 
                     # Print out the status report (if the appropriate debug level is set)
-                    logging.info ("Pi-SPROG: Received STAT (Command Station Status Report):")
-                    logging.info ("    Node Id       :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
+                    logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report):")
+                    logging.debug ("    Node Id       :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
                                                               + chr(byte_string[11]) + chr(byte_string[12]),16)))
-                    logging.info ("    CS Number     :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
-                    logging.info ("    Version       :"+str(int(chr(byte_string[17]) + chr(byte_string[18]),16))+"."
+                    logging.debug ("    CS Number     :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
+                    logging.debug ("    Version       :"+str(int(chr(byte_string[17]) + chr(byte_string[18]),16))+"."
                                                        +str(int(chr(byte_string[19]) + chr(byte_string[20]),16))+"."
                                                        +str(int(chr(byte_string[21]) + chr(byte_string[22]),16)))
                     # Get the Flags - we only need the last hex character (to get the 4 bits)
                     flags = int(chr(byte_string[16]),16)
-                    logging.info ("    Reserved      :"+str((flags & 0x080)==0x80))
-                    logging.info ("    Service Mode  :"+str((flags & 0x040)==0x40))
-                    logging.info ("    Reset Done    :"+str((flags & 0x02)==0x20))
-                    logging.info ("    Emg Stop Perf :"+str((flags & 0x10)==0x10))
-                    logging.info ("    Bus On        :"+str((flags & 0x08)==0x08))
-                    logging.info ("    Track On      :"+str((flags & 0x04)==0x04))
-                    logging.info ("    Track Error   :"+str((flags & 0x02)==0x02))
-                    logging.info ("    H/W Error     :"+str((flags & 0x01)==0x01)+"\r")
+                    logging.debug ("    Reserved      :"+str((flags & 0x080)==0x80))
+                    logging.debug ("    Service Mode  :"+str((flags & 0x040)==0x40))
+                    logging.debug ("    Reset Done    :"+str((flags & 0x02)==0x20))
+                    logging.debug ("    Emg Stop Perf :"+str((flags & 0x10)==0x10))
+                    logging.debug ("    Bus On        :"+str((flags & 0x08)==0x08))
+                    logging.debug ("    Track On      :"+str((flags & 0x04)==0x04))
+                    logging.debug ("    Track Error   :"+str((flags & 0x02)==0x02))
+                    logging.debug ("    H/W Error     :"+str((flags & 0x01)==0x01)+"\r")
                     rstat_response = True
                     
                 elif op_code == 182:  # Response to Query Node
                             
                     # Print out the status report (if the appropriate debug level is set)
-                    logging.info ("Pi-SPROG: Received PNN (Response to Query Node)")
-                    logging.info ("    Node Id   :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
+                    logging.debug ("Pi-SPROG: Received PNN (Response to Query Node)")
+                    logging.debug ("    Node Id   :"+str(int(chr(byte_string[9]) + chr(byte_string[10])
                                                           + chr(byte_string[11]) + chr(byte_string[12]),16)))
-                    logging.info ("    Mfctre ID :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
-                    logging.info ("    Module ID :"+str(int(chr(byte_string[15]) + chr(byte_string[16]),16)))
+                    logging.debug ("    Mfctre ID :"+str(int(chr(byte_string[13]) + chr(byte_string[14]),16)))
+                    logging.debug ("    Module ID :"+str(int(chr(byte_string[15]) + chr(byte_string[16]),16)))
                     # Get the Flags - we only need the last hex character (to get the 4 bits)
                     flags = int(chr(byte_string[18]),16)
-                    logging.info ("    Bldr Comp :"+str((flags & 0x08)==0x08))
-                    logging.info ("    FLiM Mode :"+str((flags & 0x04)==0x04))
-                    logging.info ("    Prod Node :"+str((flags & 0x02)==0x02))
-                    logging.info ("    Cons Node :"+str((flags & 0x01)==0x01)+"\r")
+                    logging.debug ("    Bldr Comp :"+str((flags & 0x08)==0x08))
+                    logging.debug ("    FLiM Mode :"+str((flags & 0x04)==0x04))
+                    logging.debug ("    Prod Node :"+str((flags & 0x02)==0x02))
+                    logging.debug ("    Cons Node :"+str((flags & 0x01)==0x01)+"\r")
                     qnn_response = True
                     
                 elif op_code == 4:  # Track Power is OFF
                     
-                    logging.info ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
+                    logging.debug ("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
                     track_power_on = False
 
                 elif op_code == 5:  # Track Power is ON
                     
-                    logging.info ("Pi-SPROG: Received TON (Track ON) acknowledgement")
+                    logging.debug ("Pi-SPROG: Received TON (Track ON) acknowledgement")
                     track_power_on = True
                     
                 elif op_code == 76:  # Service Mode Status response
@@ -267,7 +267,7 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
     debug = dcc_debug_mode
     # Rx and Tx threads are Daemon so they will terminate with the main programme
     if not threads_started:
-        logging.info ("Pi-SPROG: Starting Tx and Rx Threads")
+        logging.debug ("Pi-SPROG: Starting Tx and Rx Threads")
         rx_thread = threading.Thread (target=thread_to_read_received_data)
         rx_thread.setDaemon(True)
         rx_thread.start()
@@ -276,7 +276,7 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
         tx_thread.start()
         threads_started = True
     # First try to configure the port (capturing any exceptions)
-    logging.info ("Pi-SPROG: Configuring Serial Port")
+    logging.debug ("Pi-SPROG: Configuring Serial Port")
     try:    
         # We're not receiving anything else on this port so its OK to set up the port without
         # a timeout - as we are only interested in "complete" messages (terminated by ';')
@@ -291,7 +291,7 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
         logging.error("Pi-SPROG: Error configuring Serial Port - "+str(exception))
     # Next, try to open the port (again, catching any exceptions)
     if not serial_port.is_open:
-        logging.info ("Pi-SPROG: Opening Serial Port")
+        logging.debug ("Pi-SPROG: Opening Serial Port")
         try:
             serial_port.open()
             serial_port.reset_input_buffer()
@@ -302,6 +302,7 @@ def initialise_pi_sprog (port_name:str="/dev/serial0",
     # finally, we query the command station status to verify connectivity
     if serial_port.is_open and threads_started:
         pi_sprog_connected = query_command_station_status()
+        if pi_sprog_connected: logging.info("Pi-SPROG: Successfully connected to Pi-SPROG")
     else:
         pi_sprog_connected = False
     return(pi_sprog_connected)
@@ -315,7 +316,7 @@ def query_command_station_status():
     global rstat_response
     # Query the status of the command station to confirm connectivity
     rstat_response = False
-    logging.info ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
+    logging.debug ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
     send_cbus_command (mj_pri=2, min_pri=2, op_code=12)
     # If the SPROG hasn't responded in 2 seconds its not going to respond at all
     timeout_start = time.time()
@@ -334,7 +335,7 @@ def query_command_station_status():
 def query_node_number():
     global qnn_response
     qnn_response = False
-    logging.info ("Pi-SPROG: Sending QNN command (Query Node Number)")
+    logging.debug ("Pi-SPROG: Sending QNN command (Query Node Number)")
     send_cbus_command (mj_pri=2, min_pri=3, op_code=13)
     # If the SPROG hasn't responded in 2 seconds its not going to respond at all
     timeout_start = time.time()
@@ -354,9 +355,10 @@ def sprog_shutdown():
     if track_power_on: request_dcc_power_off()
     # Now close the comms port
     if serial_port.is_open:
-        logging.info ("Pi-SPROG: Closing Serial Port")
+        logging.debug ("Pi-SPROG: Closing Serial Port")
         try:
             serial_port.close()
+            logging.info("Pi-SPROG: Successfully disconnected from Pi-SPROG")
         except Exception as exception:
             # If the attempt to open the serial port fails then we catch the exception
             logging.error("Pi-SPROG: Error closing Serial Port - "+str(exception))
@@ -372,7 +374,7 @@ def request_dcc_power_on():
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
         # Send the command to switch on the Track Supply (to the DCC Bus)
-        logging.info ("Pi-SPROG: Sending RTON command (Request Track Power On)")
+        logging.debug ("Pi-SPROG: Sending RTON command (Request Track Power On)")
         send_cbus_command (mj_pri=2, min_pri=2, op_code=9)
         # Now wait until we get confirmation thet the Track power is on
         # If the SPROG hasn't responded in 2 seconds its not going to respond at all
@@ -382,7 +384,9 @@ def request_dcc_power_on():
             time.sleep(0.001)
         # Give things time to get established before sending out any commands
         time.sleep (0.5)
-    if track_power_on != True:
+    if track_power_on == True:
+        logging.info("Pi-SPROG: DCC Power to layout has been switched ON")
+    else:
         logging.error("Pi-SPROG: Request to turn on Track Power failed")
     return(track_power_on == True)
 
@@ -396,7 +400,7 @@ def request_dcc_power_off():
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
     if serial_port.is_open:
         # Send the command to switch on the Track Supply (to the DCC Bus)
-        logging.info ("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
+        logging.debug ("Pi-SPROG: Sending RTOF command (Request Track Power Off)")
         send_cbus_command (mj_pri=2, min_pri=2, op_code=8)
         # Now wait until we get confirmation thet the Track power is on
         # If the SPROG hasn't responded in 2 seconds its not going to respond at all
@@ -405,7 +409,9 @@ def request_dcc_power_off():
             if not track_power_on:break
             time.sleep(0.001)
         time.sleep (0.5)
-    if track_power_on != False:
+    if track_power_on == False:
+        logging.info("Pi-SPROG: DCC Power to layout has been switched OFF")
+    else:
         logging.error("Pi-SPROG: Request to turn off Track Power failed")
     return(track_power_on == False)
 
