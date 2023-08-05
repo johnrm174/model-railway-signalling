@@ -72,6 +72,11 @@ from ..library import mqtt_interface
 from ..library import dcc_control
 from ..library import common as library_common
 
+# The following imports are only used for the advanced debugging functions
+from collections import Counter
+import linecache
+import tracemalloc
+
 #------------------------------------------------------------------------------------
 # Top level class for the toolbar window
 #------------------------------------------------------------------------------------
@@ -146,9 +151,59 @@ class main_menubar:
         # Parse the command line arguments to get the filename (and load it)
         # The version is the third parameter provided by 'get_general'
         parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
-        parser.add_argument("-f","--file",dest="filename",help="schematic file to load on startup",metavar="FILE")
+        parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
+        parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
         args = parser.parse_args()
         if args.filename is not None: self.load_schematic(args.filename)
+        # The following code is to help with advanced debugging (start the app with the -d flag)
+        if args.debug_mode:
+            self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+            self.debug_menu.add_command(label =" Start memory allocation reporting", command=self.start_memory_monitoring)
+            self.debug_menu.add_command(label =" Stop memory allocation reporting", command=self.stop_memory_monitoring)
+            self.debug_menu.add_command(label =" Report the top 10 users of memory", command=self.report_highest_memory_users)
+            self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
+            tracemalloc.start()
+        self.monitor_memory_usage = False
+        
+    # --------------------------------------------------------------------------------------
+    # Advanced debugging functions (memory allocation monitoring/reporting)
+    # Full acknowledgements to stack overflow for the reporting functions used here
+    # --------------------------------------------------------------------------------------
+
+    def start_memory_monitoring(self):
+        if not self.monitor_memory_usage:
+            self.monitor_memory_usage=True
+            self.report_memory_usage()
+
+    def stop_memory_monitoring(self):
+        self.monitor_memory_usage=False
+        
+    def report_memory_usage(self):
+        current, peak = tracemalloc.get_traced_memory()
+        print(f"Current memory usage is {current / 10**3}KB; Peak was {peak / 10**3}KB; Diff = {(peak - current) / 10**3}KB")
+        if self.monitor_memory_usage: self.root.after(5000,lambda:self.report_memory_usage())
+
+    def report_highest_memory_users(self):
+        key_type='lineno'
+        limit=10
+        snapshot = tracemalloc.take_snapshot()
+        snapshot = snapshot.filter_traces((tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+                                           tracemalloc.Filter(False, "<unknown>"),))
+        top_stats = snapshot.statistics(key_type)
+        print("Top %s users of memory (lines of python code)" % limit)
+        for index, stat in enumerate(top_stats[:limit], 1):
+            frame = stat.traceback[0]
+            # replace "/path/to/module/file.py" with "module/file.py"
+            filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+            print("#%s: %s:%s: %.1f KiB" % (index, filename, frame.lineno, stat.size / 1024))
+            line = linecache.getline(frame.filename, frame.lineno).strip()
+            if line: print('        %s' % line)
+        other = top_stats[limit:]
+        if other:
+            size = sum(stat.size for stat in other)
+            print("%s other: %.1f KiB" % (len(other), size / 1024))
+        total = sum(stat.size for stat in top_stats)
+        print("Total allocated size: %.1f KiB" % (total / 1024))
     
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
@@ -166,8 +221,8 @@ class main_menubar:
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
         # The "connect" and "power" flags are the 4th and 5th parameter returned
-        if self.power_label == "DCC Power:ON  ": self.dcc_power_off()
-        if self.sprog_label == "SPROG:CONNECTED ": self.sprog_disconnect()
+        if self.power_label == "DCC Power:ON  " and not settings.get_sprog()[4]: self.dcc_power_off()
+        if self.sprog_label == "SPROG:CONNECTED " and not settings.get_sprog()[3]: self.sprog_disconnect()
         if settings.get_sprog()[3]: self.sprog_connect()
         if settings.get_sprog()[4]: self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
