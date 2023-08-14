@@ -659,7 +659,10 @@ def set_instruments_to_publish_state(*inst_ids:int):
             list_of_instruments_to_publish.append(inst_id)
             # Publish the initial state now this has been added to the list of instruments to publish
             # This allows the publish/subscribe functions to be configured after instrument creation
-            if str(inst_id) in instruments.keys(): send_mqtt_instrument_updated_event(inst_id)
+            if str(inst_id) in instruments.keys():
+                linked_to_id = instruments[str(inst_id)]['linkedto']
+                if linked_to_id is not None and isinstance(instruments[str(inst_id)]['linkedto'],str):
+                    send_mqtt_instrument_updated_event(inst_id)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -693,19 +696,23 @@ def handle_mqtt_instrument_updated_event(message):
     if "instrumentid" in message.keys() and "sectionstate" in message.keys():
         block_identifier = message["instrumentid"]
         section_state = message["sectionstate"]
-        node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
-        logging.info("Block Instrument "+str(block_id)+": State update from remote instrument ********************")
-        if section_state == True: set_repeater_clear(block_id)
-        elif section_state == False: set_repeater_occupied(block_id)
-        else: set_repeater_blocked(block_id)
+        if block_identifier is not None:
+            node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
+            if instrument_exists(block_id):
+                logging.info("Block Instrument "+str(block_id)+": State update from remote instrument ********************")
+                if section_state == True: set_repeater_clear(block_id)
+                elif section_state == False: set_repeater_occupied(block_id)
+                else: set_repeater_blocked(block_id)
     return()
 
 def handle_mqtt_ring_section_bell_event(message):
-    if "instrumentid" in message.keys():
+    if "instrumentid" in message.keys() :
         block_identifier = message["instrumentid"]
-        node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
-        logging.debug("Block Instrument "+str(block_id)+": Telegraph key event from remote instrument ************")
-        ring_section_bell(block_id)
+        if block_identifier is not None:
+            node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
+            if instrument_exists(block_id):
+                logging.debug("Block Instrument "+str(block_id)+": Telegraph key event from remote instrument ************")
+                ring_section_bell(block_id)
     return()
 
 # --------------------------------------------------------------------------------
