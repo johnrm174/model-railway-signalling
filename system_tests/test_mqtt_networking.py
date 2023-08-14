@@ -98,8 +98,9 @@ def run_basic_networking_tests(delay:float=0.0):
 #-----------------------------------------------------------------------------------
 # This tests the more complex functions still "work" with networking:
 #   Interlock distant with home signals ahead
-#   Override distant on home signals ahead
-#   Approach control (approach on red if home signals ahead are at danger)
+#   Override distant on all local home signals ahead
+#   Override distant on distant signal ahead
+#   Approach control (approach on red if any local home signals ahead are at danger)
 #-----------------------------------------------------------------------------------
 
 def run_specific_signal_ahead_tests(delay:float=0.0):
@@ -110,7 +111,125 @@ def run_specific_signal_ahead_tests(delay:float=0.0):
     network_delay = 0.1
     sleep(delay)
     set_run_mode()
-    ################### TO DO #########################
+    # Test interlocking of distant signals against all home signal ahead
+    # Signals are only interlocked against LOCAL home signals as the first signal on
+    # the next section should always be a distant signal (and we always assume that)
+    # Scenario 1
+    assert_signals_locked(2)
+    sleep(delay)
+    set_signals_off(3)
+    sleep(network_delay)
+    assert_signals_unlocked(2)
+    sleep(delay)
+    set_signals_off(13)
+    sleep(network_delay)
+    assert_signals_unlocked(2)
+    sleep(delay)
+    set_signals_on(3)
+    sleep(network_delay)
+    assert_signals_locked(2)
+    sleep(delay)
+    set_signals_on(13)
+    sleep(network_delay)
+    assert_signals_locked(2)
+    # Scenario 2
+    assert_signals_unlocked(4)
+    sleep(delay)
+    set_signals_off(14)
+    sleep(network_delay)
+    assert_signals_unlocked(4)
+    sleep(delay)
+    set_signals_on(14)
+    sleep(network_delay)
+    assert_signals_unlocked(4)
+    # Test approach control of home signals (release on red) against home signals ahead
+    # Signals are only subject to approach control against LOCAL home signals as the first
+    # signal on the next section should always be a distant signal (and we always assume that)
+    assert_signals_DANGER(3,13)
+    sleep(delay)
+    set_signals_off(13)
+    assert_signals_PROCEED(13)
+    assert_signals_DANGER(3)
+    sleep(delay)
+    set_signals_off(3)
+    sleep(network_delay)
+    assert_signals_PROCEED(3,13)
+    sleep(delay)
+    set_signals_on(3,13)
+    sleep(network_delay)
+    assert_signals_DANGER(3,13)
+    # Test override of distant signals (to caution) against home signals ahead
+    # Distant signals are only subject to override control against LOCAL home signals as the first
+    # signal on the next section should always be a distant signal (and we always assume that)
+    assert_signals_CAUTION(2)
+    assert_signals_DANGER(13,3)
+    sleep(delay)
+    set_signals_off(3,13)
+    sleep(delay)
+    set_signals_off(2)
+    sleep(network_delay)
+    assert_signals_PROCEED(2,3,13)
+    sleep(delay)
+    set_signals_on(13)
+    sleep(network_delay)
+    assert_signals_PROCEED(2,3)
+    assert_signals_DANGER(13)
+    sleep(delay)
+    set_signals_on(3)
+    sleep(network_delay)
+    assert_signals_CAUTION(2)
+    assert_signals_DANGER(13,3)
+    sleep(delay)
+    set_signals_off(3)
+    sleep(network_delay)
+    assert_signals_PROCEED(2,3)
+    assert_signals_DANGER(13)
+    sleep(delay)
+    set_signals_off(13)
+    sleep(network_delay)
+    assert_signals_PROCEED(2,3,13)
+    sleep(delay)
+    set_signals_on(2)
+    sleep(delay)
+    set_signals_on(3,13)
+    sleep(network_delay)
+    assert_signals_CAUTION(2)
+    assert_signals_DANGER(13,3)
+    # Test override of secondary distant arms (to caution) against distant signals ahead
+    # This is the case where a signal controlled by a remote signal box may be mounted on
+    # the post of a home signal controlled by the local signal box. In this case we still
+    # want it to appear on the local schematic (effectively mirroring the distant signal
+    # on the remote signal box's schematic
+    assert_signals_route_MAIN(1)
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_signals_off(1)
+    sleep(network_delay)
+    assert_signals_PROCEED(1)
+    sleep(delay)
+    set_signals_on(1)
+    sleep(network_delay)
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_points_switched(1)
+    sleep(delay)
+    set_signals_off(1)
+    sleep(network_delay)
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_signals_off(11)
+    sleep(network_delay)
+    assert_signals_PROCEED(1)
+    sleep(delay)
+    set_signals_on(11)
+    sleep(network_delay)
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_signals_on(1)
+    sleep(network_delay)
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_points_normal(1)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -184,8 +303,9 @@ def run_object_deletion_tests(delay:float=0.0):
 
 def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
-    run_object_deletion_tests(delay)
-    run_basic_networking_tests(delay)
+#    run_object_deletion_tests(delay)
+#    run_basic_networking_tests(delay)
+    run_specific_signal_ahead_tests(delay)
     if shutdown: report_results()
     
 if __name__ == "__main__":
