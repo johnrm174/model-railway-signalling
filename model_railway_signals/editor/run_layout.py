@@ -781,7 +781,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # updated in RUN Mode (i.e. following a signal passed event in RUN Mode) - this
     # is important as Track sections (the library objects) only "exist" in run mode
     # Note that this must handle local (int) or remote (str) Item IDs
-    if callback_type == track_sections.section_callback_type.section_updated:
+    if callback_type == track_sections.section_callback_type.section_updated and not editing_enabled:
         logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_mirrored_section(item_id)   # Could be an int (local) or str (remote)
 
