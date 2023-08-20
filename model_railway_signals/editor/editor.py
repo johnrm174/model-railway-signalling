@@ -73,7 +73,6 @@ from ..library import dcc_control
 from ..library import common as library_common
 
 # The following imports are only used for the advanced debugging functions
-from collections import Counter
 import linecache
 import tracemalloc
 
