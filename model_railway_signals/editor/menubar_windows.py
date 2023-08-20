@@ -192,12 +192,12 @@ class edit_layout_info():
         winy = self.root_window.winfo_rooty() + 40
         self.window = Tk.Toplevel(self.root_window)
         self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Networking Settings")
+        self.window.title("Layout Info")
         self.window.attributes('-topmost',True)
         # Create the srollable textbox to display the text. We specify
         # the max height/width (in case the text grows in the future) and also
         # the min height/width (to give the user something to start with)
-        self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=100,
+        self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
                 min_height=10, min_width=40, editable=True, auto_resize=True)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self,
