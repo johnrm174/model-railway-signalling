@@ -220,11 +220,11 @@ def increment_tests_executed():
 def initialise_test_harness(filename=None):
     if filename is None:
         # Ensure any queued tkinter events have completed
-        time.sleep(2.0) 
+        time.sleep(1.0) 
         run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=1.0)
     else:
         # Ensure any queued tkinter events have completed
-        time.sleep(2.0) 
+        time.sleep(1.0) 
         print ("System Tests: Load Scematic: '",filename,"'")
         run_function(lambda:main_menubar.load_schematic(filename),delay=2.0)
 
@@ -814,7 +814,7 @@ def set_run_mode():
     run_function(lambda:main_menubar.run_mode(),delay=0.5)
 
 def reset_layout():
-    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=0.5)
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
 
 def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
