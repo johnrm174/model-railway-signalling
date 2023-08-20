@@ -487,15 +487,15 @@ def run_undo_and_redo_tests(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_schematic_editor_tests(delay=0):
+def run_all_schematic_editor_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness()
     set_edit_mode()
     run_basic_editor_tests(delay)
     run_undo_and_redo_tests(delay)
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_schematic_editor_tests(delay = 0.5)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_schematic_editor_tests(delay=0.0, shutdown=True))
 
 ###############################################################################################################################
     

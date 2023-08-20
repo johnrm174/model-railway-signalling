@@ -855,7 +855,7 @@ def run_reset_objects_tests(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_object_editing_tests(delay=0):
+def run_all_object_editing_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness()
     set_edit_mode()
     run_point_chaining_tests(delay)
@@ -864,10 +864,10 @@ def run_all_object_editing_tests(delay=0):
     run_mode_change_tests(delay)
     run_change_of_item_id_tests(delay)
     run_reset_objects_tests(delay)
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_object_editing_tests(delay = 0.5)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_object_editing_tests(delay=0.0, shutdown=True))
 
 ###############################################################################################################################
     

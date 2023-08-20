@@ -667,7 +667,7 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag:
+        if self.sequence_abort_flag or not signals_common.sig_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
@@ -691,7 +691,7 @@ class timed_sequence():
     def timed_signal_sequence_end(self):
         # We've finished - Set the signal back to its "normal" condition
         self.sequence_in_progress = False
-        if not self.sequence_abort_flag:
+        if signals_common.sig_exists(self.sig_id):
             logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_semaphore_signal(self.sig_id)
             signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
@@ -707,6 +707,11 @@ class timed_sequence():
 # -------------------------------------------------------------------------
 
 def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
+    
+    def delayed_sequence_start(sig_id:int, sig_route):
+        if signals_common.sig_exists(sig_id):
+            signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
+            
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
     if common.shutdown_initiated:
         logging.warning("Signal "+str(sig_id)+": Timed Signal - Shutdown initiated - not triggering timed signal")
@@ -720,7 +725,7 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero
         # Otherwise initiate the sequence straight away (so the signal state is updated immediately)
         if start_delay > 0:
-            common.root_window.after(start_delay*1000,lambda:signals_common.signals[str(sig_id)]["timedsequence"][route.value].start())
+            common.root_window.after(start_delay*1000,lambda:delayed_sequence_start(sig_id,route))
         else:
             signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
     return()

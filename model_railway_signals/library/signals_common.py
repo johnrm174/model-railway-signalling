@@ -120,12 +120,15 @@ def subsidary_button_event (sig_id:int):
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sub_switched)
     return ()
 
+def reset_sig_passed_button (sig_id:int):
+    if sig_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
+    
 def sig_passed_button_event (sig_id:int):
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
     if not common.shutdown_initiated:
         signals[str(sig_id)]["passedbutton"].config(bg="red")
-        common.root_window.after(1000,lambda:signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised))
+        common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
     # Reset the approach control 'released' state (if the signal supports approach control)
     if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
          signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
@@ -614,6 +617,8 @@ def publish_signal_passed_event(sig_id:int):
 # Common internal functions for deleting a signal object (including all the drawing objects)
 # This is used by the schematic editor for moving signals and changing signal types where we
 # delete the existing signal with all its data and then recreate it in its new configuration
+# Note that we don't delete the signal from the list_of_signals_to_publish (via MQTT) as
+# the MQTT configuration can be set completely asynchronously from create/delete signals
 # ------------------------------------------------------------------------------------------
 
 def delete_signal(sig_id:int):
@@ -630,11 +635,6 @@ def delete_signal(sig_id:int):
         # This buttons is only common to colour light and semaphore types
         if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
             signals[str(sig_id)]["releasebutton"].destroy()
-        # Delete the signal from the list_of_signals_to_publish (if required)
-        if sig_id in list_of_signals_to_publish_passed_events:
-            list_of_signals_to_publish_passed_events.remove(sig_id)
-        if sig_id in list_of_signals_to_publish_state_changes:
-            list_of_signals_to_publish_state_changes.remove(sig_id)
         # Finally, delete the signal entry from the dictionary of signals
         del signals[str(sig_id)]
     return()
@@ -660,8 +660,7 @@ def reset_mqtt_configuration():
     # through the dictionary of signals to remove items as it will change under us
     new_signals = {}
     for key in signals:
-        if mqtt_interface.split_remote_item_identifier(key) is not None:
-            new_signals[key] = signals[key]
+        if key.isdigit(): new_signals[key] = signals[key]
     signals = new_signals
     return()
 

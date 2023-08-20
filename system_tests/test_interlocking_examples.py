@@ -594,7 +594,7 @@ def run_signal_interlock_ahead_tests(semaphore=False):
 
 ######################################################################################################
 
-def run_all_interlocking_example_tests():
+def run_all_interlocking_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/interlocking_colour_light_example.sig")
     set_run_mode()
     reset_layout()
@@ -613,9 +613,9 @@ def run_all_interlocking_example_tests():
     run_point_interlocking_tests()
     run_signal_interlocking_tests()
     run_signal_interlock_ahead_tests(semaphore=True)
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_interlocking_example_tests()
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_interlocking_example_tests(delay=0.0, shutdown=True))
 
 ######################################################################################################

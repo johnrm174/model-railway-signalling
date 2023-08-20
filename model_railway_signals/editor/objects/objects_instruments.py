@@ -10,6 +10,7 @@
 #    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_instrument_object(object_id) - Redraw the object on the canvas following an update
 #    default_instrument_object - The dictionary of default values for the object
+#    mqtt_update_instruments(pub_list, sub_list) - Configure MQTT publish/subscribe
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
@@ -32,7 +33,8 @@
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
 #    block_instruments.update_linked_to(old_id, new_id) - update the linked instrument reference
 #    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
-#
+#    block_instruments.set_instruments_to_publish_state(IDs) - configure MQTT networking
+#    block_instruments.subscribe_to_instrument_updates(node,IDs) - configure MQTT networking
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -207,4 +209,18 @@ def delete_instrument(object_id):
     del objects_common.schematic_objects[object_id]
     return()
 
+#------------------------------------------------------------------------------------
+# Function to update the MQTT networking configuration for instruments, namely
+# subscribing to remote instruments and setting local instruments to publish state
+#------------------------------------------------------------------------------------
+
+def mqtt_update_instruments(instruments_to_publish:list, instruments_to_subscribe_to:list):
+    block_instruments.reset_mqtt_configuration()
+    for instrument in instruments_to_publish:
+        block_instruments.set_instruments_to_publish_state(instrument)
+    for instrument in instruments_to_subscribe_to:
+        [node_str, item_id_str] = instrument.rsplit('-')
+        block_instruments.subscribe_to_instrument_updates(node_str, int(item_id_str))
+    return()
+    
 ####################################################################################

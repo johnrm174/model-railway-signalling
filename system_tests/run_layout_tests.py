@@ -277,8 +277,6 @@ def run_track_occupancy_tests_2(delay:float=0.0):
 
 def run_track_occupancy_tests_3(delay:float=0.0):
     print("Track occupancy tests - section ahead of signal only")
-    sleep(delay)
-    reset_layout()
     # Section will be set to occupied if signal is on
     sleep(delay)
     trigger_signals_passed(9)
@@ -351,6 +349,9 @@ def run_track_occupancy_tests_3(delay:float=0.0):
     trigger_signals_passed(11)
     assert_sections_occupied(11)
     assert_sections_clear(12)
+    # Set everything back to normal
+    set_signals_on(11)
+    set_sections_clear(10,11)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -394,19 +395,249 @@ def run_track_occupancy_tests_4(delay:float=0.0):
     update_object_configuration(s11, {"itemtype":2, "itemsubtype":4} )
     run_track_occupancy_tests_3(delay)
     return()
-                                
+
+#-----------------------------------------------------------------------------------
+# This function runs the above tests for the two cases of the signal having a valid
+# route configured and the signal having no valid route configured (which is a possible
+# scenario for splitting distant signals which rely on the points ahead of the home
+# signal to set the appropriate route arms. In this case, the home signal could
+# be locked at DANGER if the points are not set/locked but the distant signal can
+# still be legitimately passed at CAUTION (and move to the track section ahead)
+#-----------------------------------------------------------------------------------
+
+def run_track_occupancy_tests_5(delay:float=0.0):
+    sleep(delay)
+    reset_layout()
+    # Signals 9,10,11 have a valid route
+    print("Track occupancy tests - Signals 9,10,11 have no valid route configured")
+    run_track_occupancy_tests_4(delay)
+    # signals 9,10,11 have no valid route
+    print("Track occupancy tests - Signals 9,10,11 have a valid route configured")
+    sleep(delay)
+    set_points_switched(5)
+    run_track_occupancy_tests_4(delay)
+    # Set everything back to its default state
+    set_points_normal(5)
+    return()
+
+#-----------------------------------------------------------------------------------
+# This function tests the correct behavior for shunt ahead signals (can be passed whilst ON)
+#-----------------------------------------------------------------------------------
+
+def run_track_occupancy_tests_6(delay:float=0.0):
+    sleep(delay)
+    set_sections_occupied(13)
+    assert_sections_clear(14,15)
+    sleep(delay)
+    trigger_signals_passed(12)
+    assert_sections_occupied(14)
+    assert_sections_clear(13,15)
+    sleep(delay)
+    trigger_signals_passed(12)
+    assert_sections_occupied(13)
+    assert_sections_clear(14,15)
+    sleep(delay)
+    set_points_switched(6)
+    sleep(delay)
+    trigger_signals_passed(12)
+    assert_sections_occupied(15)
+    assert_sections_clear(13,14)
+    sleep(delay)
+    trigger_signals_passed(12)
+    assert_sections_occupied(13)
+    assert_sections_clear(14,15)
+    # Clear everything down again
+    set_sections_clear(13)
+    set_points_normal(6)
+    return()
+
+def run_track_occupancy_tests_7(delay:float=0.0):
+    sleep(delay)
+    reset_layout()
+    print("Track occupancy tests - Shunting signal ON")
+    run_track_occupancy_tests_6(delay)
+    sleep(delay)
+    set_signals_off(6)
+    print("Track occupancy tests - Shunting signal OFF")
+    run_track_occupancy_tests_6(delay)
+    # Clear everything down
+    set_signals_on(6)
+    return()    
+
+#-----------------------------------------------------------------------------------
+# This function tests the interlocking and override of distant signals based on the
+# state of home signals ahead (i.e. signal is only unlocked when ALL home signals
+# ahead are showing CLEAR. Similarly, the signal is overridden to CAUTION if any
+# home signals ahead are showing DANGER)
+#-----------------------------------------------------------------------------------
+
+def run_override_on_signal_ahead_tests_1(delay:float=0.0):
+    sleep(delay)
+    reset_layout()
+    print("Interlock distant on home signal ahead tests - main route")
+    # Test the interlocking on the main route
+    assert_signals_locked(13,19,116)
+    assert_signals_unlocked(14,15,16,17,18,20)
+    sleep(delay)
+    set_signals_off(17)
+    assert_signals_locked(13,19)
+    assert_signals_unlocked(14,15,16,17,18,20,116)
+    sleep(delay)
+    set_signals_off(116)
+    assert_signals_locked(13,19)
+    assert_signals_unlocked(14,15,16,17,18,20,116)
+    sleep(delay)
+    set_signals_off(16)
+    assert_signals_locked(13,19)
+    assert_signals_unlocked(14,15,16,17,18,20,116)
+    sleep(delay)
+    set_signals_off(15)
+    assert_signals_locked(13,19)
+    assert_signals_unlocked(14,15,16,17,18,20,116)
+    sleep(delay)
+    set_signals_off(14)
+    assert_signals_locked(19)
+    assert_signals_unlocked(13,14,15,16,17,18,20,116)
+    sleep(delay)
+    set_signals_off(13)
+    # Test the override ahead for the main route
+    print("Override distant on home signal ahead tests - main route")
+    assert_signals_PROCEED(13,14,15,16,17,116)
+    sleep(delay)
+    set_signals_on(17)
+    assert_signals_DANGER(17)
+    assert_signals_CAUTION(16,116)
+    assert_signals_PROCEED(13,14,15)
+    sleep(delay)
+    sleep(delay)
+    set_signals_on(16)
+    assert_signals_DANGER(16,17)
+    assert_signals_CAUTION(13,116)
+    assert_signals_PROCEED(14,15)
+    sleep(delay)
+    set_signals_on(15)
+    assert_signals_DANGER(15,16,17)
+    assert_signals_CAUTION(13,116)
+    assert_signals_PROCEED(14)
+    sleep(delay)
+    set_signals_on(14)
+    assert_signals_DANGER(14,15,16,17)
+    assert_signals_CAUTION(13,116)
+    # Clear down the overrides
+    sleep(delay)
+    set_signals_off(14,15,16)
+    assert_signals_DANGER(17)
+    assert_signals_CAUTION(116,16)
+    assert_signals_PROCEED(13,14,15)
+    sleep(delay)
+    set_signals_off(17)
+    assert_signals_PROCEED(13,14,15,16,17,116)
+    # reset everything back to default
+    sleep(delay)
+    set_signals_on(13,14,15,16,17,116)
+    print("Interlock distant on home signal ahead tests - diverging route")
+    # Test the diverging line
+    sleep(delay)
+    set_points_switched(7)
+    # Test the interlocking on the diverging route
+    assert_signals_locked(13,19,116)
+    assert_signals_unlocked(14,15,16,17,18,20)
+    sleep(delay)
+    set_signals_off(20)
+    assert_signals_locked(13,116)
+    assert_signals_unlocked(14,15,16,17,18,19,20)
+    sleep(delay)
+    set_signals_off(19)
+    assert_signals_locked(13,116)
+    assert_signals_unlocked(14,15,16,17,18,19,20)
+    sleep(delay)
+    set_signals_off(18)
+    assert_signals_locked(13,116)
+    assert_signals_unlocked(14,15,16,17,18,19,20)
+    sleep(delay)
+    set_signals_off(14)
+    assert_signals_locked(116)
+    assert_signals_unlocked(13,14,15,16,17,18,19,20)
+    sleep(delay)
+    set_signals_off(13)
+    # Test the override ahead for the diverging route
+    print("Override distant on home signal ahead tests - diverging route")
+    assert_signals_PROCEED(13,14,18,19,20)
+    sleep(delay)
+    set_signals_on(20)
+    assert_signals_DANGER(20)
+    assert_signals_CAUTION(19)
+    assert_signals_PROCEED(13,14,18)
+    sleep(delay)
+    set_signals_on(18)
+    assert_signals_DANGER(20,18)
+    assert_signals_CAUTION(13,19)
+    assert_signals_PROCEED(14)
+    sleep(delay)
+    set_signals_on(14)
+    assert_signals_DANGER(14,18,20)
+    assert_signals_CAUTION(13,19)
+    # Clear down the overrides
+    sleep(delay)
+    set_signals_off(14,18)
+    assert_signals_DANGER(20)
+    assert_signals_CAUTION(19)
+    assert_signals_PROCEED(13,14,18)
+    sleep(delay)
+    set_signals_off(20)
+    assert_signals_PROCEED(13,14,18,19,20)
+    # reset everything back to default
+    sleep(delay)
+    set_signals_on(13,14,18,19,20)
+    sleep(delay)
+    set_points_normal(7)
+    return()
+        
+#-----------------------------------------------------------------------------------
+# This function tests the interlocking and override of distant signals based on the
+# state of the distant signal ahead - use case is where the same distant signal
+# controlled by one signal box can also appear on the signal box diagram of another
+# signal box if it is co-located (and slotted) with a home signal controlled by that box
+#-----------------------------------------------------------------------------------
+
+def run_override_on_signal_ahead_tests_2(delay:float=0.0):
+    sleep(delay)
+    reset_layout()
+    print("Override distant on distant signal ahead tests")
+    assert_signals_DANGER(23)
+    sleep(delay)
+    set_signals_off(23)
+    assert_signals_PROCEED(23)
+    sleep(delay)
+    set_signals_on(23)
+    sleep(delay)
+    set_points_switched(8)
+    sleep(delay)
+    set_signals_off(23)
+    assert_signals_CAUTION(23)
+    sleep(delay)
+    set_signals_off(21)
+    assert_signals_PROCEED(23)
+    sleep(delay)
+    set_signals_on(21,23)
+    assert_signals_DANGER(23)
+    return()
+
 ######################################################################################################
 
-def run_all_run_layout_tests(delay=0):
+def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./run_layout_tests.sig")
     set_run_mode()
     run_track_occupancy_tests_1(delay)
     run_track_occupancy_tests_2(delay)
-    run_track_occupancy_tests_4(delay)
+    run_track_occupancy_tests_5(delay)
+    run_track_occupancy_tests_7(delay)
+    run_override_on_signal_ahead_tests_1 (delay)
+    run_override_on_signal_ahead_tests_2 (delay)
+    if shutdown: report_results()
     
 if __name__ == "__main__":
-    run_all_run_layout_tests(delay = 0.5)
-    complete_tests(shutdown=False)
+    start_application(lambda:run_all_run_layout_tests(delay=0.0, shutdown=True))
 
 ###############################################################################################################################
     

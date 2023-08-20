@@ -231,9 +231,9 @@ class general_settings_frame():
         self.automatic.pack(padx=2, pady=2)
         self.distant_automatic = common.check_box(self.frame, width=40,
                     label="  Fully automatic distant arms (no control button)",
-                    tool_tip="Select to create without a distant signal control "+
-                    "(signal will have a default signal state of OFF, but can be "+
-                        "overridden to ON via the selections below)")
+                    tool_tip="Select to create without a distant signal button "+
+                    "(distant arms will have a default signal state of OFF, but can "+
+                        "be overridden to CAUTION via the selections below)")
         self.distant_automatic.pack(padx=2, pady=2)
         self.override = common.check_box(self.frame, width=40,
                     label="  Override signal to ON if section ahead is occupied",
@@ -242,7 +242,7 @@ class general_settings_frame():
         self.override.pack(padx=2, pady=2)
         self.override_ahead = common.check_box(self.frame, width=40,
                     label="  Override to CAUTION to reflect home signals ahead",
-                    tool_tip="Select to override distant signal to ON if "+
+                    tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack(padx=2, pady=2)
                         
@@ -289,7 +289,7 @@ class timed_signal_route_element():
         self.label1 = Tk.Label(self.frame, width=5, text=label, anchor='w')
         self.label1.pack(side=Tk.LEFT)
         self.route = common.check_box(self.frame, label="", callback=self.route_selected,
-                tool_tip="Select to trigger a timed signal sequence when the signal is passed (for this route)")
+                tool_tip="Select to trigger a timed signal sequence for this route when the signal is passed")
         self.route.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self.frame, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
@@ -343,6 +343,7 @@ class timed_signal_route_element():
 
     def set_values(self, route:[bool,int,int,int]):
         # A route comprises a list of [selected, sig_id,start_delay, time_delay)
+        if route[1] == 0: route[1] = self.parent_object.config.sigid.get_initial_value()
         self.route.set_value(route[0])
         self.sig.set_value(route[1])
         self.start.set_value(route[2])

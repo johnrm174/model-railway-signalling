@@ -494,13 +494,13 @@ class dcc_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class int_item_id_entry_box (integer_entry_box):
-    def __init__(self, parent_frame, tool_tip:str, callback=None, allow_empty=True,
+    def __init__(self, parent_frame, tool_tip:str, width:int=3, callback=None, allow_empty=True,
                             exists_function=None, current_id_function=None):
         # These are the function calls used for validation
         self.exists_function = exists_function
         self.current_id_function = current_id_function
         # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=3 , min_value=1, max_value=99,
+        super().__init__(parent_frame, width=width , min_value=1, max_value=99,
                 allow_empty=allow_empty, tool_tip=tool_tip, callback=callback)
 
     def validate(self, update_validation_status=True):
@@ -521,10 +521,9 @@ class int_item_id_entry_box (integer_entry_box):
 
 #------------------------------------------------------------------------------------
 # Common class for a str_item_id_entry_box - builds on the common entry_box class.
-# These classes are for entering LOCAL or REMOTE item IDs (where the ID can be an int
-# or str). The class uses the 'exists_function' to check that the item exists on the
-# schematic. If a 'current_id_function' is specified then this function is also used
-# to validate that the entered ID is not the same as the current ID of the item.
+# This class is for REMOTE item IDs (subscribed to via MQTT networking) where the ID
+# is a str in the format 'NODE-ID'. If the 'exists_function' is specified then the 
+# validation function checks that the item exists (i.e. has been subscribed to).
 # Note the responsibility of the instantiating func/class to 'pack' the entry_box.
 #
 # Public class instance methods inherited from the base entry_box class are:
@@ -538,6 +537,61 @@ class int_item_id_entry_box (integer_entry_box):
 #------------------------------------------------------------------------------------
 
 class str_item_id_entry_box (entry_box):
+    def __init__(self, parent_frame, tool_tip:str, width:int=8, callback=None, exists_function = None):
+        # This the function calls used for validation
+        self.exists_function = exists_function
+        # Call the common base class init function to create the EB
+        super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
+
+    def validate(self, update_validation_status=True):
+        valid = True
+        # Validate that the entry is in the correct format for a remote Item (<NODE>-<ID>)
+        # where the NODE element can be any non-on zero length string but the ID element
+        # must be a valid integer between 1 and 99
+        if self.entry.get() != "":
+            if '-' not in self.entry.get():
+                valid = False
+            else:
+                [node_str, item_str] = self.entry.get().rsplit('-')
+                try:
+                    item_id = int(item_str)
+                    if item_id < 1 or item_id > 99: valid = False
+                except:
+                    valid = False
+                else:
+                    if node_str == "":
+                        valid = False
+            if not valid: self.TT.text = ("Invalid ID - must be a remote item ID of the form "+
+                            "'node-ID' with the 'ID' element between 1 and 99 (for a remote ID)")
+        # Next do the optional validation for item existing and not the same as the current ID
+        if valid and self.exists_function is not None:
+            if self.entry.get() != "" and not self.exists_function(self.entry.get()):
+                self.TT.text = "Specified ID has not been subscribed to via MQTT networking"
+                valid = False
+        if update_validation_status: self.set_validation_status(valid)
+        return(valid)
+
+#------------------------------------------------------------------------------------
+# Common class for an int_str_item_id_entry_box - builds on the common entry_box class.
+# This class is for LOCAL IDs (on the current schematic) where the entered ID is a number
+# between 1 and 99), or REMOTE item IDs (subscribed to via MQTT networking) where the ID
+# is a str in the format 'NODE-ID'. If the 'exists_function' is specified then the 
+# validation function checks that the item exists (i.e. has been subscribed to).
+# If the 'current_id_function' is specified then this function is also used
+# to validate that the entered ID is not the same as the current ID of the item.
+# Note the responsibility of the instantiating func/class to 'pack' the entry_box.
+#
+# Public class instance methods inherited from the base entry_box class are:
+#    "disable" - disables/blanks the entry_box 
+#    "enable"  enables/loads the entry_box (with the last value)
+#    "set_value" - set the initial value of the entry_box (str) 
+#    "get_value" - get the last "validated" value of the entry_box (str)
+#
+# Public class instance methods overridden by this class are
+#    "validate" - Validation as described above 
+#------------------------------------------------------------------------------------
+
+class str_int_item_id_entry_box (entry_box):
     def __init__(self, parent_frame, tool_tip:str, callback=None,
                  exists_function = None, current_id_function=None):
         # These are the function calls used for validation
@@ -569,12 +623,12 @@ class str_item_id_entry_box (entry_box):
                         if node_str == "":
                             valid = False
             if not valid: self.TT.text = ("Invalid ID - must be an integer "+
-                            "between 1 and 99 (for a local ID) or of the form 'node-id' "+
-                            "with the 'id' element between 1 and 99 (for a remote ID)")
+                            "between 1 and 99 (for a local ID) or of the form 'node-ID' "+
+                            "with the 'ID' element between 1 and 99 (for a remote ID)")
         # Next do the optional validation for item existing and not the same as the current ID
         if valid and self.exists_function is not None:
             if self.entry.get() != "" and not self.exists_function(self.entry.get()):
-                self.TT.text = "Specified ID does not exist"
+                self.TT.text = "Specified ID does not exist on the schematic (or has not been subscribed to via MQTT networking)"
                 valid = False
         if valid and self.current_id_function is not None:
             if self.entry.get() == str(self.current_id_function()):
@@ -582,7 +636,7 @@ class str_item_id_entry_box (entry_box):
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
-
+    
 #------------------------------------------------------------------------------------
 # Class for a scrollable_text_frame - can be editable (e.g. entering layout info)
 # or non-editable (e.g. displaying a list of warnings)- can also be configured

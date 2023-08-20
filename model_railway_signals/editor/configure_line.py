@@ -47,7 +47,8 @@ def load_state(line):
         arrow_type = objects.schematic_objects[object_id]["arrowtype"]
         arrow_ends = objects.schematic_objects[object_id]["arrowends"]
         line.attributes.set_values(arrow_ends, arrow_type)
-        
+        # Hide the validation error message
+        line.validation_error.pack_forget()        
     return()
     
 #------------------------------------------------------------------------------------
@@ -76,8 +77,6 @@ def save_state(line, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: line.window.destroy()
         else: load_state(line)
-        # Hide the validation error message
-        line.validation_error.pack_forget()
     else:
         # Display the validation error message
         line.validation_error.pack()

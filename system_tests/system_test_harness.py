@@ -2,9 +2,16 @@
 # System test harness - to support the writing of automated tests for schematic
 # layout configurations (and by implication test the main application features)
 #
+# The initialise_test_harness function runs up the schematic editor application
+# in a seperate thread (so the tkinter main-loop is running) and then makes
+# all invocations by running the appropriate functions in that thread, with
+# a configurable delay after each invocation to give the schematic editor time
+# to process the function before the next invocation/assertion
+#
 # Basic Test harness Functions:
+#    start_application(callback_function)
 #    initialise_test_harness(filename=None)
-#    complete_tests(shutdown=False)
+#    report_results(shutdown=False)
 #    sleep(sleep_time)
 #
 # Supported Schematic test invocations:
@@ -102,6 +109,7 @@ import logging
 import tkinter
 import time
 import copy
+import threading
 
 # ------------------------------------------------------------------------------
 # The following enables this module to correctly import the model_railway_signals
@@ -115,6 +123,7 @@ from model_railway_signals.editor import settings
 from model_railway_signals.editor import editor
 from model_railway_signals.editor import schematic
 from model_railway_signals.editor import objects
+from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
 from model_railway_signals.library import signals_common
@@ -125,7 +134,8 @@ from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 
-root = None
+thread_delay_time = 0.1
+tkinter_thread_started = False
 main_menubar = None
 
 # ------------------------------------------------------------------------------
@@ -144,19 +154,53 @@ test_warnings = 0
 train_identifier = 1
 
 # ------------------------------------------------------------------------------
+# Function to start the test harness in its own thread and then run up the
+# main application (under test) in the main thread. The test harness then
+# makes invocations by running the functions in the main thread
+# ------------------------------------------------------------------------------
+        
+def test_harness_thread(callback_function):
+    callback_function()
+    
+def start_application(callback_function):
+    global main_menubar
+    # Set the logging
+    logging.basicConfig(format='%(levelname)s: %(message)s')
+    logging.getLogger().setLevel(logging.WARNING)
+    # Start the application
+    root = tkinter.Tk()
+    main_menubar = editor.main_menubar(root)
+    # Use the signals Lib function to find/store the root window reference
+    # And then re-bind the close window event to the editor quit function
+    common.find_root_window(main_menubar.mainmenubar)
+    root.protocol("WM_DELETE_WINDOW", main_menubar.quit_schematic)
+    # Start the test harness thread
+    test_thread = threading.Thread (target=lambda:test_harness_thread(callback_function))
+    test_thread.setDaemon(True)
+    test_thread.start()
+    # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
+    try: root.mainloop()
+    except KeyboardInterrupt:
+        logging.info("Keyboard Interrupt - Shutting down")
+        library_common.on_closing(ask_to_save_state=False)
+        
+def run_function(test_function, delay:float=thread_delay_time):
+    common.execute_function_in_tkinter_thread (test_function)
+    sleep(delay)
+    return()
+
+# ------------------------------------------------------------------------------
 # Functions to log out test error/warning messages with the filename and line number 
 # of the parent test file that called the test assert functions in this module
 # ------------------------------------------------------------------------------
 
 def raise_test_error(message):
-    global logging
     global test_failures
     caller = getframeinfo(stack()[2][0])
     logging.error("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
     test_failures = test_failures+1
 
 def raise_test_warning(message):
-    global logging
     global test_warnings
     caller = getframeinfo(stack()[2][0])
     logging.warning("Line %d of %s: %s" % (caller.lineno,basename(caller.filename),message))     
@@ -174,47 +218,37 @@ def increment_tests_executed():
 # ------------------------------------------------------------------------------
 
 def initialise_test_harness(filename=None):
-    global main_menubar, root, logging
-    logging.basicConfig(format='%(levelname)s: %(message)s')
-    logging.getLogger().setLevel(logging.WARNING)
-    if root is None:
-        print ("System Tests: Initialise application")
-        root = tkinter.Tk()
-        main_menubar = editor.main_menubar(root)
     if filename is None:
-        print ("System Tests: Create new Schematic")
-        main_menubar.new_schematic(ask_for_confirm=False)
+        # Ensure any queued tkinter events have completed
+        time.sleep(1.0) 
+        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=1.0)
     else:
+        # Ensure any queued tkinter events have completed
+        time.sleep(1.0) 
         print ("System Tests: Load Scematic: '",filename,"'")
-        main_menubar.load_schematic(filename)
-    root.update()
+        run_function(lambda:main_menubar.load_schematic(filename),delay=2.0)
 
 # ------------------------------------------------------------------------------
 # Function to finish the tests and report on any failures. Then drops straight
 # back into the tkinter main loop to allow the schematic to be edited if required
 # ------------------------------------------------------------------------------
 
-def complete_tests(shutdown=False):
+def report_results():
     print ("Tests Run:",tests_executed,"  Tests Passed:",
               tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
-    if shutdown: main_menubar.quit_schematic(ask_for_confirm=False)
-    else: root.mainloop()
+    
 
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
 # the tests to be 'slowed down' so progress can be viewed on the schematic
 # ------------------------------------------------------------------------------
 
-def sleep(sleep_time:float):
-    sleep_end_time = time.time() + sleep_time
-    while time.time() < sleep_end_time:
-        time.sleep(0.0001)
-        root.update() 
-
+def sleep(sleep_time:float): time.sleep(sleep_time)
+        
 # ------------------------------------------------------------------------------
 # Functions to mimic layout 'events' - in terms of button pushes or other events
 # ------------------------------------------------------------------------------
-
+    
 def set_signals_on(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
@@ -222,8 +256,7 @@ def set_signals_on(*sigids):
         elif not signals.signal_clear(sigid):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" is already ON")
         else:
-            signals_common.signal_button_event(sigid)
-    root.update()
+            run_function(lambda:signals_common.signal_button_event(sigid))
 
 def set_signals_off(*sigids):
     for sigid in sigids:
@@ -232,8 +265,7 @@ def set_signals_off(*sigids):
         elif signals.signal_clear(sigid):
             raise_test_warning ("set_signals_off - Signal: "+str(sigid)+" is already OFF")
         else:
-            signals_common.signal_button_event(sigid)
-    root.update()
+            run_function(lambda:signals_common.signal_button_event(sigid))
 
 def set_subsidaries_on(*sigids):
     for sigid in sigids:
@@ -244,8 +276,7 @@ def set_subsidaries_on(*sigids):
         elif not signals.subsidary_clear(sigid):
             raise_test_warning ("set_subsidaries_on - Signal: "+str(sigid)+" - subsidary is already ON")
         else:
-            signals_common.subsidary_button_event(sigid)
-    root.update()
+            run_function(lambda:signals_common.subsidary_button_event(sigid))                                
 
 def set_subsidaries_off(*sigids):
     for sigid in sigids:
@@ -256,24 +287,21 @@ def set_subsidaries_off(*sigids):
         elif signals.subsidary_clear(sigid):
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" - subsidary is already OFF")
         else:
-            signals_common.subsidary_button_event(sigid)
-    root.update()
+            run_function(lambda:signals_common.subsidary_button_event(sigid))                  
 
 def trigger_signals_passed(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("trigger_signals_passed - Signal: "+str(sigid)+" does not exist")
         else:
-            signals_common.sig_passed_button_event(sigid)
-    root.update()
-
+            run_function(lambda:signals_common.sig_passed_button_event(sigid))
+                                               
 def trigger_signals_released(*sigids):
     for sigid in sigids:
         if str(sigid) not in signals_common.signals.keys():
             raise_test_warning ("trigger_signals_released - Signal: "+str(sigid)+" does not exist")
         else:
-            signals_common.approach_release_button_event(sigid)
-    root.update()
+            run_function(lambda:signals_common.approach_release_button_event(sigid) )                             
     
 def set_points_switched(*pointids):
     for pointid in pointids:
@@ -282,9 +310,8 @@ def set_points_switched(*pointids):
         elif points.point_switched(pointid):
             raise_test_warning ("set_points_switched - Point: "+str(pointid)+" is already switched")
         else:
-            points.change_button_event(pointid)
-    root.update()
-
+            run_function(lambda:points.change_button_event(pointid))
+                                               
 def set_points_normal(*pointids):
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
@@ -292,8 +319,7 @@ def set_points_normal(*pointids):
         elif not points.point_switched(pointid):
             raise_test_warning ("set_points_normal - Point: "+str(pointid)+" is already normal")
         else:
-            points.change_button_event(pointid)
-    root.update()
+            run_function(lambda:points.change_button_event(pointid))
 
 def set_fpls_on(*pointids):
     for pointid in pointids:
@@ -304,8 +330,7 @@ def set_fpls_on(*pointids):
         elif points.fpl_active(pointid):
             raise_test_warning ("set_fpls_on - Point: "+str(pointid)+" - FPL is already ON")
         else:
-            points.fpl_button_event(pointid)
-    root.update()
+            run_function(lambda:points.fpl_button_event(pointid))
 
 def set_fpls_off(*pointids):
     for pointid in pointids:
@@ -316,8 +341,7 @@ def set_fpls_off(*pointids):
         elif not points.fpl_active(pointid):
             raise_test_warning ("set_fpls_off - Point: "+str(pointid)+" - FPL is already OFF")
         else:
-            points.fpl_button_event(pointid)
-    root.update()
+            run_function(lambda:points.fpl_button_event(pointid))
 
 def set_sections_occupied(*sectionids):
     global train_identifier
@@ -330,10 +354,9 @@ def set_sections_occupied(*sectionids):
             else:
                 # Two calls are needed - we first clear the section to set the section label
                 # then we call the section callback library function to simulate the 'click'
-                track_sections.clear_section_occupied(secid,str(train_identifier))
-                track_sections.section_button_event(secid)
+                run_function(lambda:track_sections.clear_section_occupied(secid,str(train_identifier)))
+                run_function(lambda:track_sections.section_button_event(secid))
             train_identifier=train_identifier+1
-    root.update()
     
 def set_sections_clear(*sectionids):
     for secid in sectionids:
@@ -343,40 +366,35 @@ def set_sections_clear(*sectionids):
             if not track_sections.section_occupied(secid):
                 raise_test_warning ("set_sections_clear - Section: "+str(secid)+" is already CLEAR")
             else:
-                track_sections.section_button_event(secid)
-    root.update()
+                run_function(lambda:track_sections.section_button_event(secid))
     
 def set_instrument_blocked(*instrumentids):
     for instid in instrumentids:
         if str(instid) not in block_instruments.instruments.keys():
             raise_test_warning ("set_instrument_blocked - Instrument: "+str(instid)+" does not exist")
         else:
-            block_instruments.blocked_button_event(instid)
-    root.update()
+            run_function(lambda:block_instruments.blocked_button_event(instid))
     
 def set_instrument_occupied(*instrumentids):
     for instid in instrumentids:
         if str(instid) not in block_instruments.instruments.keys():
             raise_test_warning ("set_instrument_occupied - Instrument: "+str(instid)+" does not exist")
         else:
-            block_instruments.occup_button_event(instid)
-    root.update()
+            run_function(lambda:block_instruments.occup_button_event(instid))
     
 def set_instrument_clear(*instrumentids):
     for instid in instrumentids:
         if str(instid) not in block_instruments.instruments.keys():
             raise_test_warning ("set_instrument_clear - Instrument: "+str(instid)+" does not exist")
         else:
-            block_instruments.clear_button_event(instid)
-    root.update()
+            run_function(lambda:block_instruments.clear_button_event(instid))
 
 def click_telegraph_key(*instrumentids):
     for instid in instrumentids:
         if str(instid) not in block_instruments.instruments.keys():
             raise_test_warning ("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
         else:
-            block_instruments.telegraph_key_button(instid)
-    root.update()
+            run_function(lambda:block_instruments.telegraph_key_button(instid))
 
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
@@ -687,66 +705,57 @@ class dummy_event():
 # ------------------------------------------------------------------------------
 
 def create_line():
-    objects.create_object(objects.object_type.line)
+    run_function(lambda:objects.create_object(objects.object_type.line))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
     
 def create_colour_light_signal():
-    objects.create_object(objects.object_type.signal,
+    run_function(lambda:objects.create_object(objects.object_type.signal,
                         signals_common.sig_type.colour_light.value,
-                        signals_colour_lights.signal_sub_type.four_aspect.value)
+                        signals_colour_lights.signal_sub_type.four_aspect.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_semaphore_signal():
-    objects.create_object(objects.object_type.signal,
+    run_function(lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.semaphore.value,
-                           signals_semaphores.semaphore_sub_type.home.value)
+                           signals_semaphores.semaphore_sub_type.home.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_ground_position_signal():
-    objects.create_object(objects.object_type.signal,
+    run_function(lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_position.value,
-                           signals_ground_position.ground_pos_sub_type.standard.value)
+                           signals_ground_position.ground_pos_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_ground_disc_signal():
-    objects.create_object(objects.object_type.signal,
+    run_function(lambda:objects.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_disc.value,
-                           signals_ground_disc.ground_disc_sub_type.standard.value)
+                           signals_ground_disc.ground_disc_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_track_section():
-    objects.create_object(objects.object_type.section)
+    run_function(lambda:objects.create_object(objects.object_type.section))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_block_instrument():
-    objects.create_object(objects.object_type.instrument,
-                    block_instruments.instrument_type.single_line.value)
+    run_function(lambda:objects.create_object(objects.object_type.instrument,
+                    block_instruments.instrument_type.single_line.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_left_hand_point():
-    objects.create_object(objects.object_type.point,points.point_type.LH.value)
+    run_function(lambda:objects.create_object(objects.object_type.point,points.point_type.LH.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 def create_right_hand_point():
-    objects.create_object(objects.object_type.point,points.point_type.LH.value)
+    run_function(lambda:objects.create_object(objects.object_type.point,points.point_type.LH.value))
     object_id = list(objects.schematic_objects)[-1]
-    root.update()
     return(object_id)
 
 # ------------------------------------------------------------------------------
@@ -772,7 +781,7 @@ def move_cursor (xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int, de
     sleep_delay = delay/steps
     for step in range(steps+1):
         event = dummy_event(x=xstart+step*(xdiff/steps),y=ystart+step*(ydiff/steps))
-        schematic.track_cursor(event)
+        run_function(lambda:schematic.track_cursor(event))
         sleep(sleep_delay)
 
 # ------------------------------------------------------------------------------
@@ -799,15 +808,13 @@ def get_object_id(item_type:str, item_id:int):
 # ------------------------------------------------------------------------------
 
 def set_edit_mode():
-    main_menubar.edit_mode()
-    root.update()
+    run_function(lambda:main_menubar.edit_mode(),delay=0.5)
     
 def set_run_mode():
-    main_menubar.run_mode()
+    run_function(lambda:main_menubar.run_mode(),delay=0.5)
 
 def reset_layout():
-    main_menubar.reset_layout(ask_for_confirm=False)
-    root.update()
+    run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
 
 def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
@@ -820,8 +827,7 @@ def update_object_configuration(object_id, new_values:dict):
                                     " - element: "+element+" is not valid")
             else:
                 new_object[element] = new_values[element]
-        objects.update_object(object_id, new_object)                
-        root.update()
+        run_function(lambda:objects.update_object(object_id, new_object) )              
 
 def select_or_deselect_objects(*object_ids):
     for object_id in object_ids:
@@ -830,10 +836,8 @@ def select_or_deselect_objects(*object_ids):
         else:
             xpos, ypos = get_selection_position(object_id)
             event = dummy_event(x=xpos, y=ypos)
-            schematic.left_shift_click(event)
-            root.update()
-            schematic.left_button_release(event)
-            root.update()
+            run_function(lambda:schematic.left_shift_click(event))
+            run_function(lambda:schematic.left_button_release(event))
         
 def select_single_object(object_id):
     if object_id not in objects.schematic_objects.keys():
@@ -841,40 +845,32 @@ def select_single_object(object_id):
     else:
         xpos, ypos = get_selection_position(object_id)
         event = dummy_event(x=xpos, y=ypos)
-        schematic.left_button_click(event)
-        root.update()
-        schematic.left_button_release(event)
-        root.update()
+        run_function(lambda:schematic.left_button_click(event))
+        run_function(lambda:schematic.left_button_release(event))
     
-def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
+def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
     else:
         xstart, ystart = get_selection_position(object_id)
         event = dummy_event(x=xstart, y=ystart)
-        schematic.left_button_click(event)
-        root.update()
+        run_function(lambda:schematic.left_button_click(event))
         if object_id in schematic.schematic_state["selectedobjects"]: 
             move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-            root.update()
         else:
             raise_test_warning("select_and_move_objects - move aborted - object: "+str(object_id)+" was not selected")
-        schematic.left_button_release(event)
-        root.update()
+        run_function(lambda:schematic.left_button_release(event))
 
-def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
+def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
     event = dummy_event(x=xstart, y=ystart)
-    schematic.left_button_click(event)
-    root.update()
+    run_function(lambda:schematic.left_button_click(event))
     if schematic.schematic_state["selectedobjects"] != []:
         raise_test_warning ("select_area - area selection aborted - cursor was over an object")
     else:
         move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-        root.update()
-    schematic.left_button_release(event)
-    root.update()
+    run_function(lambda:schematic.left_button_release(event))
 
-def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
+def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_line_end - object: "+str(object_id)+" does not exist")
     elif line_end != 1 and line_end != 2:
@@ -890,49 +886,38 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
             xstart = objects.schematic_objects[object_id]["endx"]
             ystart = objects.schematic_objects[object_id]["endy"]
         event = dummy_event(x=xstart, y=ystart)
-        schematic.left_button_click(event)
-        root.update()
+        run_function(lambda:schematic.left_button_click(event))
         if not schematic.schematic_state["editlineend1"] and not schematic.schematic_state["editlineend2"]:
             raise_test_warning ("select_and_move_line_end - move aborted - Line end was not selected")
         else:
             move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
-            root.update()
-        schematic.left_button_release(event)
-        root.update()
+        run_function(lambda:schematic.left_button_release(event))
         
 def select_all_objects():
-    schematic.select_all_objects()
-    root.update()
+    run_function(lambda:schematic.select_all_objects())
 
 def deselect_all_objects():
-    schematic.deselect_all_objects()
-    root.update()
+    run_function(lambda:schematic.deselect_all_objects())
 
 def rotate_selected_objects():
-    schematic.rotate_selected_objects()
-    root.update()
+    run_function(lambda:schematic.rotate_selected_objects(),delay=0.5)
 
 def delete_selected_objects():
-    schematic.delete_selected_objects()
-    root.update()
+    run_function(lambda:schematic.delete_selected_objects(),delay=0.5)
     
 def copy_selected_objects():
-    schematic.copy_selected_objects()
-    root.update()
+    run_function(lambda:schematic.copy_selected_objects())
     
 def paste_clipboard_objects():
-    schematic.paste_clipboard_objects()
-    root.update()
+    run_function(lambda:schematic.paste_clipboard_objects(),delay=0.5)
     return(schematic.schematic_state["selectedobjects"])
 
 def undo():
-    schematic.schematic_undo()
-    root.update()
+    run_function(lambda:schematic.schematic_undo(),delay=0.5)
     return()
 
 def redo():
-    schematic.schematic_redo()
-    root.update()
+    run_function(lambda:schematic.schematic_redo(),delay=0.5)
     return()
 
 # ------------------------------------------------------------------------------

@@ -28,6 +28,9 @@
 #-----------------------------------------------------------------------------------------------
 #
 # configure_networking - Configures the local client and opens a connection to the MQTT broker
+#                    Returns whether the connection was successful (or timed out)
+#                    NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
+#                    Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
 #   Mandatory Parameters:
 #       broker_host:str - The name/IP address of the MQTT broker host to be used
 #       network_identifier:str - The name to use for this signalling network (any string)
@@ -37,6 +40,22 @@
 #       broker_username:str - the username to log into the MQTT Broker (default = None)
 #       broker_password:str - the password to log into the MQTT Broker (default = None)
 #       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+#
+# configure_mqtt_client - Configures the local MQTT client and layout network node
+#   Mandatory Parameters:
+#       network_identifier:str - The name to use for this signalling network (any string)
+#       node_identifier:str - The name to use for this node on the network (can be any string)
+#   Optional Parameters:
+#       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+#
+# mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
+#                    Returns whether the connection was successful or not (True/False)
+#   Mandatory Parameters:
+#       broker_host:str - The name/IP address of the MQTT broker host to be used
+#   Optional Parameters:
+#       broker_port:int - The network port for the broker host (default = 1883)
+#       broker_username:str - the username to log into the MQTT Broker (default = None)
+#       broker_password:str - the password to log into the MQTT Broker (default = None)
 #
 #-----------------------------------------------------------------------------------------------
 
@@ -59,6 +78,12 @@ node_config["connected_to_broker"] = False
 node_config["list_of_published_topics"] = []
 node_config["list_of_subscribed_topics"] = []
 node_config["callbacks"] = {}
+
+#-----------------------------------------------------------------------------------------------
+# The MQTT client is held globally:
+#-----------------------------------------------------------------------------------------------
+
+mqtt_client = None
 
 # ---------------------------------------------------------------------------------------------
 # Common Function to create a external item identifier from the Item_ID and the remote Node.
@@ -87,7 +112,7 @@ def split_remote_item_identifier(item_identifier:str):
 #-----------------------------------------------------------------------------------------------
 
 def on_log(mqtt_client, obj, level, mqtt_log_message):
-    logging.debug("MQTT-Client: "+mqtt_log_message)
+    if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: "+mqtt_log_message)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -96,7 +121,7 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 
 def on_disconnect(mqtt_client, userdata, rc):
     global node_config
-    if rc==0: logging.info("MQTT-Client: Broker connection terminated")
+    if rc==0: logging.info("MQTT-Client: Broker connection successfully terminated")
     else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
     node_config["connected_to_broker"] = False
     return()
@@ -114,7 +139,7 @@ def on_connect(mqtt_client, userdata, flags, rc):
         # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
         # Note that this means we will immediately receive all retained messages for those topics
         if len(node_config["list_of_subscribed_topics"]) > 0:
-            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics:")
+            logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["list_of_subscribed_topics"]:
                 mqtt_client.subscribe(topic)
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
@@ -173,9 +198,10 @@ def on_message(mqtt_client,obj,msg):
             process_message(msg)
     return()
 
-#-----------------------------------------------------------------------------------------------
-# Public API Function to configure the networking for this particular network "Node"
-#-----------------------------------------------------------------------------------------------
+#################################################################################################
+# DEPRECATED Public API Function to configure the networking for this particular network "Node"
+# Applications should use the configure_mqtt_client and mqtt_broker_connect functions instead
+#################################################################################################
 
 def configure_networking (broker_host:str,
                           network_identifier:str,
@@ -186,6 +212,15 @@ def configure_networking (broker_host:str,
                           mqtt_enhanced_debugging:bool = False):
     global node_config
     global mqtt_client
+    logging.warning ("###########################################################################################")
+    logging.warning ("MQTT Interface - The 'configure_networking' function is DEPRECATED - Use the seperate")
+    logging.warning ("MQTT Interface - configure_mqtt_client and mqtt_broker_connect functions instead")
+    logging.warning ("###########################################################################################")
+    # Configure this module (to enable subscriptions to be configured even if not connected
+    node_config["enhanced_debugging"] = mqtt_enhanced_debugging
+    node_config["network_identifier"] = network_identifier
+    node_config["node_identifier"] = node_identifier
+    # Create a new instance of the MQTT client and configure / connect
     logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
     mqtt_client = paho.mqtt.client.Client(clean_session=True)
     mqtt_client.on_message = on_message    
@@ -194,26 +229,135 @@ def configure_networking (broker_host:str,
     mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
     if mqtt_enhanced_debugging: mqtt_client.on_log = on_log
     if broker_username is not None: mqtt_client.username_pw_set(username=broker_username,password=broker_password)
+    node_config["network_configured"] = True
     # Do some basic exception handling around opening the broker connection
     try:
-        mqtt_client.connect(broker_host,port=broker_port,keepalive = 10)
+        mqtt_client.async_connect(broker_host,port=broker_port,keepalive = 10)
         mqtt_client.loop_start()
     except Exception as exception:
         logging.error("MQTT-Client: Error connecting to broker: "+str(exception)+" - No messages will be published/received")
     else:
-        node_config["enhanced_debugging"] = mqtt_enhanced_debugging
-        node_config["network_identifier"] = network_identifier
-        node_config["node_identifier"] = node_identifier
         # Wait for connection acknowledgement (from on-connect callback function)
         timeout_start = time.time()
         while time.time() < timeout_start + 5:
             if node_config["connected_to_broker"]:
-                node_config["network_configured"] = True
                 break
         if not node_config["connected_to_broker"]:
             logging.warning("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
-            
     return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to configure the MQTT client for this particular network and node
+#-----------------------------------------------------------------------------------------------
+
+def configure_mqtt_client (network_identifier:str,
+                           node_identifier:str,
+                           enhanced_debugging:bool = False):
+    global node_config, mqtt_client
+    logging.debug("MQTT-Client: Configuring MQTT Client for "+network_identifier+":"+node_identifier)
+    # Configure this module (to enable subscriptions to be configured even if not connected)
+    node_config["enhanced_debugging"] = enhanced_debugging
+    node_config["network_identifier"] = network_identifier
+    node_config["node_identifier"] = node_identifier
+    node_config["network_configured"] = True
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to connect and/or re-connect to an external MQTT broker instance
+#
+# A few notes about disconnecting and then re-connecting from the broker:
+#
+# The main application allows the user to disconnect/reconnect at will (a likely use case when
+# configuring the application for networking for the first time). From reading the PAHO MQTT
+# documentation, disconnect() should perform a clean disconnect from the broker, and my
+# assumption was therefore that you should be able to disconnect and all connect() with
+# updated settings to establish a new connection (note I couldn't use reconnect() as I
+# wanted to allow the broker host/port settings to be updated).
+#
+# However, I found that after a few disconnect/reconnect cycles (in relatively quick succession)
+# the connect() function just timed out (and would time out each subsequent time it was called).
+#
+# My workaround was to completely kill off the currrent mqtt client (stop the loop) following
+# a successful disconnect and then create a new class instance for the new session - hoping the
+# old instance will get garbage collected in due course.
+#
+# I don't like this soultion, but it works. I've seen an occasional disconnect timeout, but in
+# this case the old session remains active and a reconnection (with the new settings) isn't
+# attempted. the next time disconnect/reconnect is initialted it all works.
+#
+# The second intermittent issue I had was either the disconnect() or loop_stop() calls hanging
+# if I didn't clear out the message queues prior to disconnect - although as this code includes
+# a sleep, it could be some sort of timing issue - I've never been able to reliably reproduce
+# so can't be sure - all I know is the code as-is seems to hang together relaibly
+#-----------------------------------------------------------------------------------------------
+
+def mqtt_broker_connect (broker_host:str,
+                         broker_port:int = 1883,
+                         broker_username:str = None,
+                         broker_password:str = None):
+    global node_config
+    global mqtt_client
+    if not node_config["network_configured"]:
+        logging.error("MQTT-Client: Network not configured - Cannot connect to broker)")
+    else:
+        # Handle the case where we are already connected to the broker
+        if node_config["connected_to_broker"]: mqtt_broker_disconnect()
+        # Do some basic exception handling around opening the broker connection
+        logging.debug("MQTT-Client: Connecting to Broker "+broker_host+":"+str(broker_port))
+        # Create a new mqtt broker instance
+        if mqtt_client is None: mqtt_client = paho.mqtt.client.Client(clean_session=True)
+        mqtt_client.on_message = on_message    
+        mqtt_client.on_connect = on_connect    
+        mqtt_client.on_disconnect = on_disconnect    
+        mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
+        mqtt_client.on_log = on_log
+        # Configure the basic username/password authentication (if required)
+        if broker_username is not None:
+            mqtt_client.username_pw_set(username=broker_username,password=broker_password)
+        try:
+            mqtt_client.connect_async(broker_host,port=broker_port,keepalive = 10)
+            mqtt_client.loop_start()
+        except Exception as exception:
+            logging.error("MQTT-Client: Error connecting to broker: "+str(exception))
+        else:
+            # Wait for connection acknowledgement (from on-connect callback function)
+            timeout_start = time.time()
+            while time.time() < timeout_start + 2:
+                if node_config["connected_to_broker"]: break
+                time.sleep(0.001)
+            if not node_config["connected_to_broker"]:
+                logging.error("MQTT-Client: Timeout connecting to broker")
+    return(node_config["connected_to_broker"])
+
+#-----------------------------------------------------------------------------------------------
+# Public API Function to disconnect from an external MQTT broker instance
+#-----------------------------------------------------------------------------------------------
+
+def mqtt_broker_disconnect():
+    global node_config
+    global mqtt_client
+    if node_config["connected_to_broker"]:
+        logging.debug("MQTT-Client: Clearing message queues before disconnect")
+        # Clean out the message queues on the broker by publishing null messages (empty strings)
+        # to each of the topics that we have sent messages to during the lifetime of the session
+        for topic in node_config["list_of_published_topics"]:
+            logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
+            mqtt_client.publish(topic,payload=None,retain=True,qos=1)
+        # Wait for everything to be published to the broker (with a sleep) and disconnect
+        time.sleep(0.25)
+        logging.debug("MQTT-Client: Disconnecting from broker")
+        mqtt_client.disconnect()
+        # Wait for disconnection acknowledgement (from on-disconnect callback function)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 2:
+            if not node_config["connected_to_broker"]: break
+            time.sleep(0.001)
+        if node_config["connected_to_broker"]:
+            logging.error("MQTT-Client: Timeout disconnecting from broker")
+        else:
+            mqtt_client.loop_stop()
+            mqtt_client = None
+    return(node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
 # Externally called function to perform a gracefull shutdown of the MQTT networking
@@ -221,24 +365,11 @@ def configure_networking (broker_host:str,
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
-    # Only shut down the mqtt networking if we configured it in the first place
-    if node_config["network_configured"]:
-        logging.info("MQTT-Client: Clearing message queues and shutting down")
-        # Clean out the message queues on the broker by publishing null messages (empty strings)
-        # to each of the topics that we have sent messages to during the lifetime of the session
-        for topic in node_config["list_of_published_topics"]:
-            publish_message(topic,payload=None,retain=True)
-        # Wait for everything to be published to the broker (with a sleep) and disconnect
-        time.sleep(0.25)
-        mqtt_client.disconnect()
-        # Wait for disconnection acknowledgement (from on-disconnect callback function)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 5:
-            if not node_config["connected_to_broker"]:
-                break
-        if node_config["connected_to_broker"]:
-            logging.error("MQTT-Client: Timeout disconnecting broker - Shutting down anyway")
-        mqtt_client.loop_stop()
+    global node_config
+    if node_config["connected_to_broker"]:
+        mqtt_broker_disconnect()
+        node_config["network_configured"] = False
+        node_config["connected_to_broker"] = False
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -253,56 +384,46 @@ def mqtt_shutdown():
 def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callback,subtopics:bool=False):
     global node_config
     global mqtt_client
-    if not node_config["network_configured"]:
-        logging.error("MQTT-Client: Networking Disabled - Cannot subscribe to MQTT messages")
-    else:
-        # The Identifier for a remote object is a string combining the the Node-ID and Object-ID
-        item_identifier = create_remote_item_identifier(item_id,item_node)
-        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
-        topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
-        if subtopics: topic = topic+"/+"
-        logging.info("MQTT-Client: Subscribing to topic' "+topic+"'")
-        mqtt_client.subscribe(topic)
-        # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
-        node_config["list_of_subscribed_topics"].append(topic)
-        # Save the callback details for when we receive a message on the topic
-        node_config["callbacks"][topic] = callback
-        return()
+    # The Identifier for a remote object is a string combining the the Node-ID and Object-ID
+    item_identifier = create_remote_item_identifier(item_id,item_node)
+    # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+    topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
+    if subtopics: topic = topic+"/+"
+    logging.debug("MQTT-Client: Subscribing to topic' "+topic+"'")
+    # Only subscribe if connected to the broker(if the client is disconnected
+    # from the broker then all subscriptions will already have been terminated)
+    if node_config["connected_to_broker"]: mqtt_client.subscribe(topic)
+    # Add to the list of subscribed topics (so we can re-subscribe on reconnection)
+    node_config["list_of_subscribed_topics"].append(topic)
+    # Save the callback details for when we receive a message on the topic
+    node_config["callbacks"][topic] = callback
+    return()
 
 #-----------------------------------------------------------------------------------------------
 # Externally Called Function to Publish a message to the MQTT broker. This function takes
 # in a string that defines the application-specific message type and converts this into
 # a fully qualified MQTT topic. Data items are passed in as a list and converted to json
+# An optional 'info' log message can also be passed in (logged just prior to publishing)
 #-----------------------------------------------------------------------------------------------
 
-def send_mqtt_message (message_type:str,item_id,data:dict,log_message:str=None,retain:bool=False,subtopic=None):
-    # Only publish the broker if networking has been configured
-    if node_config["network_configured"]:
+def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=None,retain:bool=False,subtopic=None):
+    # Only publish the broker if we are connected
+    if node_config["connected_to_broker"]:
         item_identifier = create_remote_item_identifier(item_id,node_config["node_identifier"])
         # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
         topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
         if subtopic is not None: topic = topic+"/"+subtopic
         data["sourceidentifier"] = item_identifier
         payload = json.dumps(data)
-        publish_message (topic,payload,log_message,retain)
-    return()
-
-#-----------------------------------------------------------------------------------------------
-# Internal Function to Publish a json message to a fully qualified topic
-#-----------------------------------------------------------------------------------------------
-
-def publish_message (topic:str,payload:str,log_message:str=None,retain:bool=False):
-    global mqtt_client
-    global node_config
-    if log_message is not None: logging.info(log_message)
-    if payload is None: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
-    else: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-"+str(payload))
-    # Publish the message to the broker
-    mqtt_client.publish(topic,payload,retain=retain,qos=1)
-    # Add to the list of published topics if this is a retained message so we
-    # can 'Clean up' the MQTT broker by publishing empty messages on shutdown
-    if topic not in node_config["list_of_published_topics"]:
-        node_config["list_of_published_topics"].append(topic)
+        if log_message is not None: logging.debug(log_message)
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Publishing: "+str(topic)+"-"+str(payload))
+        # Publish the message to the broker
+        mqtt_client.publish(topic,payload,retain=retain,qos=1)
+        # Add to the list of published topics so we can 'Clean up'
+        # the MQTT broker by publishing empty messages on shutdown
+        if topic not in node_config["list_of_published_topics"]:
+            node_config["list_of_published_topics"].append(topic)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -314,18 +435,19 @@ def publish_message (topic:str,payload:str,log_message:str=None,retain:bool=Fals
 
 def unsubscribe_from_message_type(message_type:str):
     global node_config
-    # Only unsubscribe if networking has been configured
-    if node_config["network_configured"]:
-        # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
-        # Finally, remove all instances of the message type from the internal subscriptions list
-        # Note we don't iterate through the list to remove items as it will change under us
-        new_list_of_subscribed_topics = []
-        for subscribed_topic in node_config["list_of_subscribed_topics"]:
-            if subscribed_topic.startswith(message_type):
-                logging.info("MQTT-Client: Unsubscribing from topic '"+subscribed_topic+"'")
-                mqtt_client.unsubscribe(subscribed_topic)
-            else:
-                new_list_of_subscribed_topics.append(subscribed_topic)
+    # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
+    # Finally, remove all instances of the message type from the internal subscriptions list
+    # Note we don't iterate through the list to remove items as it will change under us
+    new_list_of_subscribed_topics = []
+    for subscribed_topic in node_config["list_of_subscribed_topics"]:
+        if subscribed_topic.startswith(message_type):
+            if node_config["enhanced_debugging"]:
+                logging.debug("MQTT-Client: Unsubscribing from topic '"+subscribed_topic+"'")
+            # Only unsubscribe if connected to the broker(if the client is disconnected
+            # from the broker then all subscriptions will already have been terminated)
+            if node_config["connected_to_broker"]: mqtt_client.unsubscribe(subscribed_topic)
+        else:
+            new_list_of_subscribed_topics.append(subscribed_topic)
         node_config["list_of_subscribed_topics"] = new_list_of_subscribed_topics
     return()
 

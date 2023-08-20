@@ -424,6 +424,10 @@ def update_dcc_point(point_id:int, state:bool):
         if dcc_mapping["address"] > 0:
             # Send the DCC commands to change the state
             pi_sprog_interface.send_accessory_short_event (dcc_mapping["address"],state)        
+            # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
+            # Note that the commands will only be published if networking is configured and
+            # the node this software is running on is not configured as a "pi-sprog" node
+            publish_accessory_short_event(dcc_mapping["address"],state)        
     return ()
 
 #-----------------------------------------------------------------------------------------
@@ -563,7 +567,7 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
 
 def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
     global publish_dcc_commands_to_mqtt_broker
-    if publish_dcc_commands: logging.info("MQTT-Client - Configuring Application to publish DCC Commands to MQTT broker")
+    if publish_dcc_commands: logging.info("MQTT-Client: Configuring Application to publish DCC Commands to MQTT broker")
     else: logging.info("DCC Control - Configuring Application NOT to publish DCC Commands to MQTT broker")
     publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
@@ -572,7 +576,7 @@ def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
 # Public API Function to "subscribe" to the published DCC commands from another "Node"
 #-----------------------------------------------------------------------------------------------
 
-def subscribe_to_dcc_command_feed (*nodes:str):    
+def subscribe_to_dcc_command_feed (*nodes:str):
     for node in nodes:
         # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
         # as each DCC address will appear on a different topic from the remote MQTT node 

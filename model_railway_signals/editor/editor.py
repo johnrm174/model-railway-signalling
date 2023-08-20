@@ -12,6 +12,9 @@
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.reset_objects() - Reset the schematic back to its default state
+#    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking)
+#    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking)
+#    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking)
 #    schematic.initialise(root, callback, width, height, grid) - Create the canvas
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.update_canvas() - For updating the canvas following reload/resizing
@@ -27,6 +30,13 @@
 #    settings.get_sprog() - to get the initial SPROG settings
 #    settings.restore_defaults() - Following user selection of "new"
 #    common.scrollable_text_box - to display a list of warnings on file load
+#    menubar_windows.edit_canvas_settings(parent_window) - opens the config window
+#    menubar_windows.edit_mqtt_settings(parent_window) - opens the config window
+#    menubar_windows.edit_sprog_settings(parent_window) - opens the config window
+#    menubar_windows.edit_logging_settings(parent_window) - opens the config window
+#    menubar_windows.display_help(parent_window) - opens the config window
+#    menubar_windows.display_about(parent_window) - opens the config window
+#    menubar_windows.edit_layout_info(parent_window) - opens the config window
 #
 # Makes the following external API calls to library modules:
 #    library_common.find_root_window (widget) - To set the root window
@@ -35,8 +45,14 @@
 #    file_interface.save_schematic - To save all settings and objects
 #    file_interface.purge_loaded_state_information - Called following a re-load
 #    pi_sprog_interface.initialise_pi_sprog - After update of Pi Sprog Settings
+#    pi_sprog_interface.sprog_shutdown - Disconnect from the Pi-SPROG
 #    pi_sprog_interface.request_dcc_power_off - To turn off the track power
 #    pi_sprog_interface.request_dcc_power_on - To turn on the track power
+#    mqtt_interface.configure_networking - After update of the MQTT Settings
+#    mqtt_interface.mqtt_shutdown - Disconnect from the MQTT Broker
+#    dcc_control.reset_mqtt_configuration() - reset all publish/subscribe
+#    dcc_control.set_node_to_publish_dcc_commands(True/False)
+#    dcc_control.subscribe_to_dcc_command_feed(*nodes)
 #
 #------------------------------------------------------------------------------------
 
@@ -52,7 +68,13 @@ from . import schematic
 from . import menubar_windows
 from ..library import file_interface
 from ..library import pi_sprog_interface
+from ..library import mqtt_interface
+from ..library import dcc_control
 from ..library import common as library_common
+
+# The following imports are only used for the advanced debugging functions
+import linecache
+import tracemalloc
 
 #------------------------------------------------------------------------------------
 # Top level class for the toolbar window
@@ -61,6 +83,8 @@ from ..library import common as library_common
 class main_menubar:
     def __init__(self, root):
         self.root = root
+        # Configure the logger (log level gets set later)
+        logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
         self.mainmenubar = Tk.Menu(self.root)
         self.root.configure(menu=self.mainmenubar)    
@@ -92,12 +116,22 @@ class main_menubar:
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
+        # Create the various menubar items for the SPROG Connection Dropdown
+        self.mqtt_label = "MQTT:DISCONNECTED "
+        self.mqtt_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.mqtt_menu.add_command(label=" Connect ", command=self.mqtt_connect)
+        self.mqtt_menu.add_command(label=" Disconnect ", command=self.mqtt_disconnect)
+        self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
-        self.settings_menu.add_command(label =" Canvas...", command=lambda:menubar_windows.edit_canvas_settings(self.root))
-        self.settings_menu.add_command(label =" MQTT...", command=lambda:menubar_windows.edit_mqtt_settings(self.root))
-        self.settings_menu.add_command(label =" SPROG...", command=lambda:menubar_windows.edit_sprog_settings(self.root, self))
-        self.settings_menu.add_command(label =" Logging...", command=lambda:menubar_windows.edit_logging_settings(self.root))
+        self.settings_menu.add_command(label =" Canvas...",
+                command=lambda:menubar_windows.edit_canvas_settings(self.root, self.canvas_update))
+        self.settings_menu.add_command(label =" MQTT...",
+                command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
+        self.settings_menu.add_command(label =" SPROG...",
+                command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
+        self.settings_menu.add_command(label =" Logging...",
+                command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -108,40 +142,94 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
+        # Initialise the schematic canvas
+        width, height, grid = settings.get_canvas()
+        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
         # Initialise the editor configuration at startup
-        self.initialise_editor(startup=True)
+        self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
         # The version is the third parameter provided by 'get_general'
         parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
-        parser.add_argument("-f","--file",dest="filename",help="schematic file to load on startup",metavar="FILE")
+        parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
+        parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
         args = parser.parse_args()
         if args.filename is not None: self.load_schematic(args.filename)
+        # The following code is to help with advanced debugging (start the app with the -d flag)
+        if args.debug_mode:
+            self.debug_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+            self.debug_menu.add_command(label =" Start memory allocation reporting", command=self.start_memory_monitoring)
+            self.debug_menu.add_command(label =" Stop memory allocation reporting", command=self.stop_memory_monitoring)
+            self.debug_menu.add_command(label =" Report the top 10 users of memory", command=self.report_highest_memory_users)
+            self.mainmenubar.add_cascade(label = "Debug  ", menu=self.debug_menu)
+            tracemalloc.start()
+        self.monitor_memory_usage = False
+        
+    # --------------------------------------------------------------------------------------
+    # Advanced debugging functions (memory allocation monitoring/reporting)
+    # Full acknowledgements to stack overflow for the reporting functions used here
+    # --------------------------------------------------------------------------------------
+
+    def start_memory_monitoring(self):
+        if not self.monitor_memory_usage:
+            self.monitor_memory_usage=True
+            self.report_memory_usage()
+
+    def stop_memory_monitoring(self):
+        self.monitor_memory_usage=False
+        
+    def report_memory_usage(self):
+        current, peak = tracemalloc.get_traced_memory()
+        print(f"Current memory usage is {current / 10**3}KB; Peak was {peak / 10**3}KB; Diff = {(peak - current) / 10**3}KB")
+        if self.monitor_memory_usage: self.root.after(5000,lambda:self.report_memory_usage())
+
+    def report_highest_memory_users(self):
+        key_type='lineno'
+        limit=10
+        snapshot = tracemalloc.take_snapshot()
+        snapshot = snapshot.filter_traces((tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+                                           tracemalloc.Filter(False, "<unknown>"),))
+        top_stats = snapshot.statistics(key_type)
+        print("Top %s users of memory (lines of python code)" % limit)
+        for index, stat in enumerate(top_stats[:limit], 1):
+            frame = stat.traceback[0]
+            # replace "/path/to/module/file.py" with "module/file.py"
+            filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+            print("#%s: %s:%s: %.1f KiB" % (index, filename, frame.lineno, stat.size / 1024))
+            line = linecache.getline(frame.filename, frame.lineno).strip()
+            if line: print('        %s' % line)
+        other = top_stats[limit:]
+        if other:
+            size = sum(stat.size for stat in other)
+            print("%s other: %.1f KiB" % (len(other), size / 1024))
+        total = sum(stat.size for stat in top_stats)
+        print("Total allocated size: %.1f KiB" % (total / 1024))
     
     # --------------------------------------------------------------------------------------
     # Common initialisation functions (called on editor start or layout load or new layout)
     # --------------------------------------------------------------------------------------
     
-    def initialise_editor(self,startup:bool=False):
+    def initialise_editor(self):
         # Set the root window label to the name of the current file (split from the dir path)
         # The fully qualified filename is the first parameter provided by 'get_general'
         path, name = os.path.split(settings.get_general()[0])
         self.root.title(name)
         # Re-size the canvas to reflect the new schematic size
-        width, height, grid = settings.get_canvas()
-        if startup: schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
-        else: schematic.update_canvas(width, height, grid)
+        self.canvas_update()
         # Set the logging level before we start doing stuff
-        initial_log_level = settings.get_logging()
-        logging.basicConfig(format='%(levelname)s: %(message)s')
-        if initial_log_level == 1: logging.getLogger().setLevel(logging.ERROR)
-        elif initial_log_level == 2: logging.getLogger().setLevel(logging.WARNING)
-        elif initial_log_level == 3: logging.getLogger().setLevel(logging.INFO)
-        elif initial_log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+        self.logging_update()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
-        port, baud, debug, startup, power = settings.get_sprog()
-        if startup: self.sprog_connect()
-        if power: self.dcc_power_on()
+        # The "connect" and "power" flags are the 4th and 5th parameter returned
+        if self.power_label == "DCC Power:ON  " and not settings.get_sprog()[4]: self.dcc_power_off()
+        if self.sprog_label == "SPROG:CONNECTED " and not settings.get_sprog()[3]: self.sprog_disconnect()
+        if settings.get_sprog()[3]: self.sprog_connect()
+        if settings.get_sprog()[4]: self.dcc_power_on()
+        # Initialise the MQTT networking (if configured). Note that we use the menubar 
+        # function for connection so the state is correctly reflected in the UI
+        # The "connect on startup" flag is the 8th parameter returned
+        if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_disconnect()
+        self.mqtt_update()
+        if settings.get_mqtt()[7]: self.mqtt_connect()
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -203,7 +291,12 @@ class main_menubar:
         new_label = "SPROG:DISCONNECTED "
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
-                    
+
+    def sprog_update(self):
+        # Only update the configuration if we are already connected - otherwise 
+        # do nothing (wait until the next time the user attempts to connect)
+        if self.sprog_label == "SPROG:CONNECTED ": self.sprog_connect()
+
     def dcc_power_off(self):
         # The power off request returns True if successful
         if pi_sprog_interface.request_dcc_power_off():
@@ -225,6 +318,57 @@ class main_menubar:
                     message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
+
+    def mqtt_connect(self, show_popup:bool=True):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
+        if connected:
+            new_label = "MQTT:CONNECTED "
+        else:
+            new_label = "MQTT:DISCONNECTED "
+            if show_popup:
+                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
+                    message="Broker connection failure\nCheck MQTT settings")
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
+        return(connected)
+    
+    def mqtt_disconnect(self):
+        connected = mqtt_interface.mqtt_broker_disconnect()
+        if connected:
+            new_label = "MQTT:CONNECTED "
+        else:
+            new_label = "MQTT:DISCONNECTED "
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
+
+    def mqtt_update(self):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        mqtt_interface.configure_mqtt_client(network, node, debug)
+        # Only reset the broker connection if we are already connected - otherwise 
+        # do nothing (wait until the next time the user attempts to connect)
+        if self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
+        ######################################################################
+        ######## TO DO - publish/subscribe for track sensors #################
+        ######################################################################
+        dcc_control.reset_mqtt_configuration()
+        dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
+        dcc_control.subscribe_to_dcc_command_feed(*tuple(settings.get_sub_dcc_nodes()))
+        objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
+        objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
+        objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
+#        objects.mqtt_update_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
+        
+    def canvas_update(self):
+        width, height, grid = settings.get_canvas()
+        schematic.update_canvas(width, height, grid)
+        
+    def logging_update(self):
+        log_level = settings.get_logging()
+        if log_level == 1: logging.getLogger().setLevel(logging.ERROR)
+        elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
+        elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
+        elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function

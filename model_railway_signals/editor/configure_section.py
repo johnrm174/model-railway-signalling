@@ -19,7 +19,8 @@
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
-#    common.str_item_id_entry_box
+#    common.entry_box
+#    common.str_int_item_id_entry_box
 #    common.object_id_selection
 #    common.signal_route_selections
 #    common.window_controls
@@ -105,6 +106,8 @@ def load_state(section):
         section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
         section.automation.ahead.set_values(signals_ahead(object_id))
         section.automation.behind.set_values(signals_behind(object_id))
+        # Hide the validation error message
+        section.validation_error.pack_forget()
     return()
     
 #------------------------------------------------------------------------------------
@@ -140,8 +143,6 @@ def save_state(section, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: section.window.destroy()
         else: load_state(section)
-        # Hide the validation error message
-        section.validation_error.pack_forget()
     else:
         # Display the validation error message
         section.validation_error.pack()
@@ -152,17 +153,14 @@ def save_state(section, close_window:bool):
 #####################################################################################
 
 #------------------------------------------------------------------------------------
-# Class for the Mirror Section Entry Box - builds on the common int_item_id_entry_box. 
+# Class for the Mirror Section Entry Box - builds on the common str_int_item_id_entry_box. 
 # Class instance methods inherited/used from the parent classes are:
-#    "set_value" - will set the current value of the entry box (int)
-#    "get_value" - will return the last "valid" value of the entry box (int)
-#    "validate" - Also validate the point is automatic and not switched by another point
-# Class instance methods provided by this class are:
-#    "validate" - Also validate the section is not mirrored by another section
-#    "set_mirrored_by" - to set the read-only value for the "mirrored_by" section
+#    "set_value" - will set the current value of the entry box (str)
+#    "get_value" - will return the last "valid" value of the entry box (str)
+#    "validate" - validate the section exists and not the same as the current item ID
 #------------------------------------------------------------------------------------
 
-class mirrored_section(common.str_item_id_entry_box):
+class mirrored_section(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
         # These are the functions used to validate that the entered section ID
         # exists on the schematic and is different to the current section ID
@@ -176,29 +174,11 @@ class mirrored_section(common.str_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - This can "+
-                    "be a local section or a remote section (subscribed to via MQTT networking)",
+        super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
+                         "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
+                         "which has been subscribed to via MQTT networking",
                     exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
-
-    def validate(self):
-        # Do the basic item validation first (exists and not current item ID)
-        valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            mirrored_section = int(self.entry.get())
-            # Test to see if the entered section is already being mirrored by another section
-            if self.initial_value == "": initial_mirrored = 0
-            else: initial_mirrored = int(self.initial_value)
-            for section_id in objects.section_index:
-                other_section = objects.schematic_objects[objects.section(section_id)]["mirror"]
-                if other_section == "": other_mirrored = 0
-                else: other_mirrored = int(other_section)
-                if other_mirrored == mirrored_section and mirrored_section != initial_mirrored:
-                    self.TT.text = ("Track section "+str(mirrored_section)+" is already "+
-                                          "mirrored by section "+section_id)
-                    valid = False       
-        self.set_validation_status(valid)
-        return(valid)
     
     # We would normally use the library 'section_exists' function to determine if a track section
     # either exists on the local schematic OR has been subscribed to via MQTT networking, but the

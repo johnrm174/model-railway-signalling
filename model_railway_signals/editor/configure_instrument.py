@@ -17,7 +17,7 @@
 #    block_instruments.instrument_exists(id) - To see if the instrument exists
 #
 # Inherits the following common editor base classes (from common):
-#    common.str_item_id_entry_box
+#    common.str_int_item_id_entry_box
 #    common.entry_box
 #    common.create_tool_tip
 #    common.object_id_selection
@@ -105,6 +105,8 @@ def load_state(instrument):
         instrument.config.sounds.set_values(bell_sound, key_sound)
         # Set the read only list of Interlocked signals
         instrument.locking.signals.set_values(interlocked_signals(objects.schematic_objects[object_id]["itemid"]))
+        # Hide the validation error message
+        instrument.validation_error.pack_forget()
     return()
     
 #------------------------------------------------------------------------------------
@@ -138,8 +140,6 @@ def save_state(instrument, close_window:bool):
         # Close window on "OK" or re-load UI for "apply"
         if close_window: instrument.window.destroy()
         else: load_state(instrument)
-        # Hide the validation error message
-        instrument.validation_error.pack_forget()
     else:
         # Display the validation error message
         instrument.validation_error.pack()
@@ -150,7 +150,7 @@ def save_state(instrument, close_window:bool):
 #####################################################################################
 
 #------------------------------------------------------------------------------------
-# Class for the "Linked To" Entry Box - builds on the common str_item_id_entry_box.
+# Class for the "Linked To" Entry Box - builds on the common str_int_item_id_entry_box.
 # Note that linked instrument can either be a local (int) or remote (str) instrument ID
 # Class instance methods inherited/used from the parent classes are:
 #    "set_value" - will set the current value of the entry box (str)
@@ -158,7 +158,7 @@ def save_state(instrument, close_window:bool):
 #    "validate" - Validates the instrument exists and not the current inst_id
 #------------------------------------------------------------------------------------
 
-class linked_to_selection(common.str_item_id_entry_box):
+class linked_to_selection(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame, parent_object):
         # The exists_function from the block_instruments module is used to validate that the
         # entered ID  exists on the schematic or has been subscribed to via mqtt networking
@@ -169,8 +169,9 @@ class linked_to_selection(common.str_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.frame,text="Linked block instrument:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.frame, tool_tip = "Enter the ID of the linked instrument "+
-                "protecting the line from the next block section (or leave blank)",
+        super().__init__(self.frame, tool_tip = "Enter the ID of the linked block instrument - "+
+                "This can be a local instrument ID or a remote instrument ID (in the form 'Node-ID') "+
+                "which has been subscribed to via MQTT networking",
                 exists_function=exists_function, current_id_function=current_id_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
     
