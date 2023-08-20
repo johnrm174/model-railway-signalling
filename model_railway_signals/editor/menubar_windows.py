@@ -76,7 +76,10 @@ basic guidance and top tips for creating your layout signalling system:
    before interlocking (available interlocking selections are driven by this).
 4) Tooltips (hover-over) have been added to most of the UI elements which will hopefully
    provide an insight as to what information needs to be entered (if they don't then please
-   let me know and I will try and make them clearer in a future release)
+   let me know and I will try and make them clearer in a future release).
+5) Play with the configuration examples in the GitHub repo (see Help-About for link) and
+   read the accompanying layout notes (see Help-Info once the example layout has been loaded)
+   To get a feel of how these signalling schemes have been designed and configured.
 
 Schematic functions (in edit mode):
  
@@ -88,22 +91,24 @@ Schematic functions (in edit mode):
 6) Left-click / release (when not over an object) can also be used for an 'area' selection
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
-9) <backspace> will permanently delete all selected object from the schematic
+9) <backspace> will permanently delete all selected objects from the schematic
 10) <cntl-c> will copy all currently selected objects to a copy/paste buffer
 11) <cntl-v> will paste the selected objects at a slightly offset position
-11) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
-12) <m> will toggle the schematic editor between Edit Mode and Run Mode
+12) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
+13) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
 
-1) File - All the functions you would expect
-2) Mode - Selects the schematic editor mode (Edit Mode or Run Mode)
-3) SPROG - Opens the serial port and connects to the SPROG
-4) DCC Power - Toggle the DCC bus supply (SPROG must be initialised)
-5) Settings-Canvas - Change the display size of the schematic
-6) Settings-Logging - Set the log level for running the layout
-7) Settings-SPROG - Configure the serial port and SPROG behavior
-8) Help-Info - Add notes to document your layout configuration
+1) File - All the save/load/new functions you would expect
+2) Mode - Switch between Edit Mode and Run Mode (also Reset layout to default state)
+3) SPROG - Connect and disconnect from the SPROG DCC Command Station
+4) DCC Power - Toggle the DCC bus supply (SPROG must be connected)
+5) MQTT - Connect and disconnect from the external MQTT broker
+6) Settings-Canvas - Change the display size of the schematic
+7) Settings-MQTT - Configure the MQTT broker and signalling network
+8) Settings-SPROG - Configure the serial port and SPROG behavior
+9) Settings-Logging - Set the log level for running the layout
+10) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 
