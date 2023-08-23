@@ -314,10 +314,10 @@ class conflicting_signals_element():
 
     def validate(self):
         # Validate all conflicting signal entries
-        return ( self.sig1.validate and
-                 self.sig2.validate and
-                 self.sig3.validate and
-                 self.sig4.validate )
+        return ( self.sig1.validate() and
+                 self.sig2.validate() and
+                 self.sig3.validate() and
+                 self.sig4.validate() )
 
     def enable_route(self):
         self.sig1.enable()
@@ -369,11 +369,11 @@ class conflicting_signals_frame():
         self.rh2 = conflicting_signals_element(self.frame, parent_object, "RH2 Route")
         
     def validate(self):
-        return ( self.main.validate and
-                 self.lh1.validate and
-                 self.lh2.validate and
-                 self.rh1.validate and
-                 self.rh2.validate )
+        return ( self.main.validate() and
+                 self.lh1.validate() and
+                 self.lh2.validate() and
+                 self.rh1.validate() and
+                 self.rh2.validate() )
 
     def set_values(self, sig_routes_element:[[[int,[bool,bool,bool,bool,bool]],],]):
         # sig_interlocking_routes comprises [main,lh1,lh2,rh1,rh2]

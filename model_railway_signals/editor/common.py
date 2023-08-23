@@ -875,6 +875,7 @@ class signal_route_selections():
                 self.rh2.enable()
     
     def validate(self):
+        self.eb_updated()
         return(self.EB.validate())
     
     def enable(self):
