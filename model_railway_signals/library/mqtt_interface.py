@@ -95,17 +95,18 @@ def create_remote_item_identifier(item_id:int,node:str = None):
 
 # ---------------------------------------------------------------------------------------------
 # Common Function to extract the the item-ID (int) and Node-ID (str) from a compound identifier
-# and return them to the calling programme - Will return None if the conversion fails
+# and return them to the calling programme - Will return None if the conversion fails - hence
+# this function can also be used for validating remote item identifiers
 # ---------------------------------------------------------------------------------------------
 
 def split_remote_item_identifier(item_identifier:str):
-    try:
+    return_value = None
+    if isinstance(item_identifier,str):
         node_id = item_identifier.rpartition("-")[0]
-        item_id = int(item_identifier.rpartition("-")[2])
-        return_value = [node_id,item_id]
-    except:
-        return_value = None
-    return (return_value) 
+        item_id = item_identifier.rpartition("-")[2]
+        if node_id != "" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 99:
+            return_value = [node_id,int(item_id)]                          
+    return (return_value)
 
 #-----------------------------------------------------------------------------------------------
 # Internal call-back to process mqtt log messages (only called if enhanced_debugging is set)
@@ -232,7 +233,7 @@ def configure_networking (broker_host:str,
     node_config["network_configured"] = True
     # Do some basic exception handling around opening the broker connection
     try:
-        mqtt_client.async_connect(broker_host,port=broker_port,keepalive = 10)
+        mqtt_client.connect_async(broker_host,port=broker_port,keepalive = 10)
         mqtt_client.loop_start()
     except Exception as exception:
         logging.error("MQTT-Client: Error connecting to broker: "+str(exception)+" - No messages will be published/received")
