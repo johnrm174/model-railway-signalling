@@ -131,9 +131,9 @@ map_semaphore_signal (sig_id = 12, main_signal = 132)
 
 print ("Initialising MQTT Client and connecting to external Broker")
 # Configure the MQTT Broker networking feature to allow this application node to act as a remote
-# DCC command station for other application nodes (i.e. forward received DCC commands to the Pi-Sprog) 
-configure_networking(broker_host ="broker.emqx.io", network_identifier="network1", broker_port=1883,
-                                 node_identifier= "Box2", mqtt_enhanced_debugging=mqtt_debug)
+# DCC command station for other application nodes (i.e. forward received DCC commands to the Pi-Sprog)
+configure_mqtt_client(network_identifier="network1", node_identifier= "Box2", enhanced_debugging=mqtt_debug)
+mqtt_broker_connect(broker_host ="broker.emqx.io", broker_port=1883)
 # Configure the events/updates we want to publish/subscribe to
 set_sections_to_publish_state(3,9,12)
 set_instruments_to_publish_state(1,2)
@@ -147,9 +147,13 @@ subscribe_to_section_updates("Box1",middle_line_callback,9)
 subscribe_to_signal_passed_events("Box1",middle_line_callback,7)
 subscribe_to_section_updates("Box1",lower_line_callback,12)
 subscribe_to_signal_passed_events("Box1",lower_line_callback,10)
-# Note the lack ofr a callback when subscribing to instrument events
+# Note the lack of a callback when subscribing to instrument events
 subscribe_to_instrument_updates("Box1",2)
 subscribe_to_instrument_updates("Box1",1)
+# Track Sensors
+subscribe_to_remote_track_sensor("Box1-4",signal_passed=1)
+subscribe_to_remote_track_sensor("Box1-5",signal_passed=2)
+subscribe_to_remote_track_sensor("Box1-6",signal_passed=3)
 
 print ("Drawing Layout Schematic")
 canvas.create_line(0,150,750,150,fill="black",width=3)
