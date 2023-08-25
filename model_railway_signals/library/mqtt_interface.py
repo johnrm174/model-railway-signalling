@@ -390,7 +390,7 @@ def subscribe_to_mqtt_messages (message_type:str,item_node:str,item_id:int,callb
     # Topic format: "<Message-Type>/<Network-ID>/<Item_Identifier>/<optional-subtopic>"
     topic = message_type+"/"+node_config["network_identifier"]+"/"+item_identifier
     if subtopics: topic = topic+"/+"
-    logging.debug("MQTT-Client: Subscribing to topic' "+topic+"'")
+    logging.debug("MQTT-Client: Subscribing to topic '"+topic+"'")
     # Only subscribe if connected to the broker(if the client is disconnected
     # from the broker then all subscriptions will already have been terminated)
     if node_config["connected_to_broker"]: mqtt_client.subscribe(topic)
