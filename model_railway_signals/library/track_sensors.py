@@ -25,6 +25,7 @@
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
+#
 # subscribe_to_remote_track_sensor - Subscribes to a remote track sensor object
 #   Mandatory Parameters:
 #       remote_sensor_identifier:str - the remote identifier for the sensor in the form 'node-id'
