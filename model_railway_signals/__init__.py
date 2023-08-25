@@ -60,6 +60,8 @@ from .library.track_sections import set_sections_to_publish_state
 from .library.track_sensors import track_sensor_callback_type
 from .library.track_sensors import create_track_sensor
 from .library.track_sensors import track_sensor_active 
+from .library.track_sensors import subscribe_to_remote_track_sensor
+from .library.track_sensors import set_track_sensors_to_publish_state
 
 from .library.pi_sprog_interface import initialise_pi_sprog
 from .library.pi_sprog_interface import service_mode_write_cv
@@ -149,6 +151,8 @@ __all__ = [
       # public track_sensor functions
         'create_track_sensor',
         'track_sensor_active',
+        'subscribe_to_remote_track_sensor',
+        'set_track_sensors_to_publish_state',
       # Public DCC control functions
         'initialise_pi_sprog',
         'service_mode_write_cv',

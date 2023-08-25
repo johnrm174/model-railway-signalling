@@ -743,6 +743,16 @@ subscribe_to_instrument_updates - Subscribe to instrument updates from another n
       node:str - The name of the node publishing the block instrument update feed
       *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
 
+subscribe_to_remote_track_sensor - Subscribes to a remote track sensor object
+  Mandatory Parameters:
+      remote_sensor_identifier:str - the remote identifier for the sensor in the form 'node-id'
+  Optional Parameters:
+      signal_passed:int    - Raise a "signal passed" event for a signal ID - default = None
+      signal_approach:int  - Raise an "approach release" event for a signal ID - default = None
+      sensor_callback      - Function to call when a sensor has been triggered - default = None
+                             Only one of signal_passed, signal_approach or callback can be specified
+                             Note that for callback, the function returns (item_id, callback type)
+
 set_sections_to_publish_state - Enable the publication of state updates for track sections.
                All subsequent changes will be automatically published to remote subscribers
   Mandatory Parameters:
@@ -762,7 +772,11 @@ set_instruments_to_publish_state - Enable the publication of state updates for b
                All subsequent changes will be automatically published to remote subscribers
   Mandatory Parameters:
       *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
-      
+
+set_track_sensors_to_publish_state- Enable the publication of state updates for track sensors.
+             All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *sensor_ids:int - The track sensors to publish (multiple Sensor IDs can be specified)      
 </pre>
 
 ## Code examples
