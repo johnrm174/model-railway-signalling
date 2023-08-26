@@ -417,8 +417,8 @@ class integer_entry_box(entry_box):
         super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
                 
     def validate(self, update_validation_status=True):
-        valid = False
-        if self.entry.get() == "" or self.entry.get() == "#":
+        entered_value = self.entry.get()        
+        if entered_value == "" or entered_value == "#":
             # The EB value can be blank if the entry box is inhibited (get_value will return zero)
             if self.empty_allowed or not (self.enabled0 and self.enabled1 and self.enabled2):
                 valid = True
@@ -427,18 +427,17 @@ class integer_entry_box(entry_box):
                 # to give a visual indication that there is an error on the form
                 self.entry.set("#")
                 self.TT.text = ("Must specify a value between "+
-                        str(self.min_value)+ " and "+str(self.max_value) )            
+                        str(self.min_value)+ " and "+str(self.max_value) )
+                valid = False
+        elif not entered_value.isdigit(): 
+            self.TT.text = "Not a valid integer"
+            valid = False
+        elif int(entered_value) < self.min_value or int(entered_value) > self.max_value:
+            self.TT.text = ("Value out of range  - enter a value between "+
+                            str(self.min_value)+ " and "+str(self.max_value) )
+            valid = False
         else:
-            try:
-                value = int(self.entry.get())
-            except:
-                self.TT.text = "Not a valid integer"
-            else:
-                if value < self.min_value or value > self.max_value:
-                    self.TT.text = ("Value out of range  - enter a value between "+
-                                    str(self.min_value)+ " and "+str(self.max_value) )
-                else:
-                    valid = True
+            valid = True
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
     
@@ -544,35 +543,35 @@ class str_item_id_entry_box (entry_box):
         super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
 
     def validate(self, update_validation_status=True):
-        valid = True
         # Validate that the entry is in the correct format for a remote Item (<NODE>-<ID>)
         # where the NODE element can be any non-on zero length string but the ID element
         # must be a valid integer between 1 and 99
-        if self.entry.get() != "":
-            if '-' not in self.entry.get():
+        entered_value = self.entry.get()
+        node_id = entered_value.rpartition("-")[0]
+        item_id = entered_value.rpartition("-")[2]
+        if entered_value == "":
+            # Entered value is blank - this is valid
+            valid = True
+        elif node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 99:
+            # We know that the entered value is a valid remote item identifier so now we need to
+            # do the optional validation that the item exists (i.e. has been subscribed to)
+            if self.exists_function is not None and not self.exists_function(entered_value):
+                # An exists_function has been specified and the item does not exist - therefore invalid
                 valid = False
-            else:
-                [node_str, item_str] = self.entry.get().rsplit('-')
-                try:
-                    item_id = int(item_str)
-                    if item_id < 1 or item_id > 99: valid = False
-                except:
-                    valid = False
-                else:
-                    if node_str == "":
-                        valid = False
-            if not valid: self.TT.text = ("Invalid ID - must be a remote item ID of the form "+
-                            "'node-ID' with the 'ID' element between 1 and 99 (for a remote ID)")
-        # Next do the optional validation for item existing and not the same as the current ID
-        if valid and self.exists_function is not None:
-            if self.entry.get() != "" and not self.exists_function(self.entry.get()):
                 self.TT.text = "Specified ID has not been subscribed to via MQTT networking"
-                valid = False
+            else:
+                # An exists_function has been specified and the item exists - therefore valid
+                valid = True
+        else:
+            # The entered value is not a valid remote identifier
+            valid = False
+            self.TT.text = ("Invalid ID - must be a remote item ID of the form "+
+                        "'node-ID' with the 'ID' element between 1 and 99 (for a remote ID)")
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Common class for an int_str_item_id_entry_box - builds on the common entry_box class.
+# Common class for an int_str_item_id_entry_box - builds on the str_item_id_entry_box class.
 # This class is for LOCAL IDs (on the current schematic) where the entered ID is a number
 # between 1 and 99), or REMOTE item IDs (subscribed to via MQTT networking) where the ID
 # is a str in the format 'NODE-ID'. If the 'exists_function' is specified then the 
@@ -592,48 +591,46 @@ class str_item_id_entry_box (entry_box):
 #------------------------------------------------------------------------------------
 
 class str_int_item_id_entry_box (entry_box):
-    def __init__(self, parent_frame, tool_tip:str, callback=None,
-                 exists_function = None, current_id_function=None):
-        # These are the function calls used for validation
-        self.exists_function = exists_function
+
+    def __init__(self, parent_frame, tool_tip:str, width:int=8, callback=None,
+                       exists_function = None, current_id_function=None):
+        # These are the additionalfunction calls used for validation
         self.current_id_function = current_id_function
+        self.exists_function = exists_function
         # Call the common base class init function to create the EB
-        super().__init__(parent_frame, width=8, tool_tip=tool_tip, callback=callback)
+        super().__init__(parent_frame, width=width, tool_tip=tool_tip, callback=callback)
 
     def validate(self, update_validation_status=True):
-        valid = True
-        # First validate that the entered value is either an integer (for a local Item ID)
-        # or a valid remote Item Id format (<NODE>-<ID>) - where the NODE element can be any
-        # non zero length string but the ID element must be a valid integer between 1 and 99
-        if self.entry.get() != "":
-            try:
-                item_id = int(self.entry.get())
-                if item_id < 1 or item_id > 99: valid = False
-            except:
-                if '-' not in self.entry.get():
-                    valid = False
-                else:
-                    [node_str, item_str] = self.entry.get().rsplit('-')
-                    try:
-                        item_id = int(item_str)
-                        if item_id < 1 or item_id > 99: valid = False
-                    except:
-                        valid = False
-                    else:
-                        if node_str == "":
-                            valid = False
-            if not valid: self.TT.text = ("Invalid ID - must be an integer "+
-                            "between 1 and 99 (for a local ID) or of the form 'node-ID' "+
-                            "with the 'ID' element between 1 and 99 (for a remote ID)")
-        # Next do the optional validation for item existing and not the same as the current ID
-        if valid and self.exists_function is not None:
-            if self.entry.get() != "" and not self.exists_function(self.entry.get()):
-                self.TT.text = "Specified ID does not exist on the schematic (or has not been subscribed to via MQTT networking)"
+        # Validate that the entry is in the correct format for a local item id (integer range 1-99)
+        # or a remote item id (string in the form 'NODE-ID' where the NODE element can be any 
+        # non-zero length string but the ID element must be a valid integer between 1 and 99)
+        entered_value = self.entry.get()
+        node_id = entered_value.rpartition("-")[0]
+        item_id = entered_value.rpartition("-")[2]
+        if entered_value == "":
+            # Entered value is blank - this is valid
+            valid = True
+        elif ( (entered_value.isdigit() and int(entered_value) > 0 and int(entered_value) < 99) or
+               (node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 99) ):
+            # The entered value is a valid local or remote item identifier. but we still need to perform
+            # the optional validation that the item exists on the schematic (or has been subscribed to)
+            if self.exists_function is not None and not self.exists_function(entered_value):
+                # An exists_function has been specified but the item does not exist - therefore invalid
                 valid = False
-        if valid and self.current_id_function is not None:
-            if self.entry.get() == str(self.current_id_function()):
+                self.TT.text = ("Specified ID does not exist on the schematic "+
+                                "(or has not been subscribed to via MQTT networking)")
+            # So far, so good, but we still need to perform the optional validation that the item id
+            # is not the same item id as the id of the item we are currently editing 
+            elif self.current_id_function is not None and entered_value == str(self.current_id_function()):
+                # An current_id_function and the entered id is the same as the current id - therefore invalid
+                valid = False
                 self.TT.text = "Entered ID is the same as the current Item ID"
-                valid = False
+            else:
+                valid = True
+        else:
+            valid = False
+            self.TT.text = ("Invalid ID - must be a local ID (integer between 1 and 99) or a remote item ID "+
+                        "of the form 'node-ID' (with the 'ID' element an integer between 1 and 99 ")        
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
     
