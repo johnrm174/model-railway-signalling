@@ -10,6 +10,9 @@
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.schematic_objects - To load/save the object configuration
 #
+# Makes the following external API calls to library modules:
+#    track_sensors.mapped_gpio_port(id) - To see if the track_sensor exists (local or remote)
+#
 # Inherits the following common editor base classes (from common):
 #    common.check_box
 #    common.integer_entry_box
@@ -23,44 +26,42 @@ import tkinter as Tk
 from . import common
 from . import objects
 
+from ..library import track_sensors
+
 #------------------------------------------------------------------------------------
-# Class for a Track Sensor Entry Box - based on the common integer_entry_box class
+# Class for a Signal Sensor Entry Box - based on the str_int_item_id_entry_box class
 # Public Class instance methods (inherited from the integer_entry_box) are
 #    "set_value" - will set the current value (integer)
 #    "get_value" - will return the last "valid" value (integer)
 # Overridden Public Class instance methods provided by this class:
-#    "validate" - Must be a valid GPIO port and not assigned to another signal
+#    "validate" - Must be a valid Sensor ID and not already assigned
 #------------------------------------------------------------------------------------
 
-class signal_sensor(common.integer_entry_box):
+class signal_sensor(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame, parent_object, callback, label:str, tool_tip:str):
         # We need the reference to the parent object so we can call the sibling
         # class method to get the current value of the Signal ID for validation
         self.parent_object = parent_object 
         self.label = Tk.Label(parent_frame, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(parent_frame, width=3, min_value=4, max_value=26,
-                callback = callback, tool_tip=tool_tip, allow_empty=True)
+        # The this function will return true if the track sensor exists
+        exists_function = track_sensors.mapped_gpio_port
+        super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
             
     def validate(self, update_validation_status=True):
-        # Do the basic integer validation first (integer, in range)
+        # Do the basic integer validation first (is it a valid ID and does it exist (or has been subscribed to)
         valid = super().validate(update_validation_status=False)
-        if valid and self.entry.get() != "":
-            new_channel = int(self.entry.get())
-            if new_channel == 14 or new_channel == 15:
-                self.TT.text = ("GPIO Ports 14 and 15 are reserved and canot be used")
-                valid = False
-            else:
-                # Test to see if the gpio channel is alreay assigned to another signal
-                for signal_id in objects.signal_index:
-                    signal_object = objects.schematic_objects[objects.signal(signal_id)]
-                    if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
-                         ( signal_object["passedsensor"][1] == new_channel or
-                              signal_object["approachsensor"][1] == new_channel ) ):
-                        self.TT.text = ("GPIO Channel "+str(new_channel)+" is already assigned to signal "
-                                        +str(signal_object["itemid"]))
-                        valid = False
+        # Next we need to validate it isn't already assigned to another signal appropach or passed event
+        if valid and self.entry.get() != "":                
+            for signal_id in objects.signal_index:
+                signal_object = objects.schematic_objects[objects.signal(signal_id)]
+                if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
+                     ( signal_object["passedsensor"][1] == self.entry.get() or
+                          signal_object["approachsensor"][1] == self.entry.get() ) ):
+                    self.TT.text = ("Track Sensor "+str(new_channel)+" is already assigned to signal "
+                                    +str(signal_object["itemid"]))
+                    valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
@@ -85,16 +86,17 @@ class signal_passed_sensor_frame:
         # Create the elements in a subframe so they are centered
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
+        tool_tip = ("Specify the ID of the associated Track Sensor (or leave blank) - This "+
+                    "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
+                    "which has been subscribed to via MQTT networking")
         self.passed = signal_sensor(self.subframe, parent_object, callback=self.validate,
-                label="  Signal 'passed' sensor:", tool_tip = "Specify a GPIO channel in "+
-                "the range 4-13 or 16-26 for the signal 'passed' event (or leave blank)")
+                label="  Signal 'passed' sensor:", tool_tip = tool_tip)
         self.approach = signal_sensor(self.subframe, parent_object, callback=self.validate,
-                label="  Signal 'approached' sensor:", tool_tip = "Specify a GPIO channel in "+
-                "the range 4-13 or 16-26 for the signal 'approached' event (or leave blank)")
+                label="  Signal 'approached' sensor:", tool_tip = tool_tip)
         
     def validate(self):
         if self.passed.entry.get() != "" and self.passed.entry.get() == self.approach.entry.get():
-            error_text = "GPIO channels for signal 'passed' and signal 'approached' must be different"
+            error_text = "Cannot assign the same track sensor for both signal 'passed' and signal 'approached' events"
             self.passed.TT.text = error_text
             self.approach.TT.text = error_text
             self.passed.set_validation_status(False)
