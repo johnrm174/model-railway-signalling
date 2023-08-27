@@ -12,9 +12,9 @@
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
 #    objects.reset_objects() - Reset the schematic back to its default state
-#    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking)
-#    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking)
-#    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking)
+#    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking
+#    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking
+#    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking
 #    schematic.initialise(root, callback, width, height, grid) - Create the canvas
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.update_canvas() - For updating the canvas following reload/resizing
@@ -57,6 +57,9 @@
 #    dcc_control.subscribe_to_dcc_command_feed - subscribe to DCC from other nodes
 #    track_sensors.create_sensor - Create Track sensor objects (GPIO mappings)
 #    track_sensors.delete_all_track_sensors - Delete all GPIO mappings
+#    track_sensors.reset_mqtt_configuration() - configure MQTT networking
+#    track_sensors.set_track_sensors_to_publish_state(*ids) - configure MQTT networking
+#    track_sensors.subscribe_to_remote_track_sensor(id) - configure MQTT networking
 #
 #------------------------------------------------------------------------------------
 
@@ -137,7 +140,7 @@ class main_menubar:
                 command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.settings_menu.add_command(label =" Logging...",
                 command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
-        self.settings_menu.add_command(label =" GPIO...",
+        self.settings_menu.add_command(label =" Sensors...",
                 command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
@@ -235,8 +238,9 @@ class main_menubar:
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
         if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_disconnect()
-        self.mqtt_update()
+        self.mqtt_reconfigure_client()
         if settings.get_mqtt()[7]: self.mqtt_connect()
+        self.mqtt_reconfigure_pub_sub()
         # Set the edit mode (2nd param in the returned tuple)
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
@@ -352,21 +356,29 @@ class main_menubar:
         self.mqtt_label = new_label
 
     def mqtt_update(self):
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
-        mqtt_interface.configure_mqtt_client(network, node, debug)
+        # Apply the new broker settings (host, port, username, password)
+        self.mqtt_reconfigure_client()
         # Only reset the broker connection if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
         if self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
-        ######################################################################
-        ######## TO DO - publish/subscribe for track sensors #################
-        ######################################################################
+        # Reconfigure all publish and subscribe settings
+        self.mqtt_reconfigure_pub_sub()
+        
+    def mqtt_reconfigure_client(self):
+        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        mqtt_interface.configure_mqtt_client(network, node, debug)
+        
+    def mqtt_reconfigure_pub_sub(self):
         dcc_control.reset_mqtt_configuration()
         dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
-        dcc_control.subscribe_to_dcc_command_feed(*tuple(settings.get_sub_dcc_nodes()))
+        dcc_control.subscribe_to_dcc_command_feed(*settings.get_sub_dcc_nodes())
+        track_sensors.reset_mqtt_configuration()
+        track_sensors.set_track_sensors_to_publish_state(*settings.get_pub_sensors())
+        for remote_sensor_identifier in settings.get_sub_sensors():
+            track_sensors.subscribe_to_remote_track_sensor(remote_sensor_identifier)
         objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
         objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
-#        objects.mqtt_update_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
         
     def canvas_update(self):
         width, height, grid = settings.get_canvas()

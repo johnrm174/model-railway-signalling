@@ -177,8 +177,8 @@ default_signal_object["siginterlock"] = [
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [True,False,False,False,False]
 # Set the default  automation tables for the signal
-default_signal_object["passedsensor"] = [True,0]     # [button, gpio_port]
-default_signal_object["approachsensor"] = [False,0]  # [button, gpio_port]
+default_signal_object["passedsensor"] = [True,""]     # [button, linked track sensor]
+default_signal_object["approachsensor"] = [False,""]  # [button, linked track sensor]
 # Track sections is a list of [section_behind, sections_ahead]
 # where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
 default_signal_object["tracksections"] = [0, [0, 0, 0, 0, 0]]
@@ -449,16 +449,21 @@ def update_signal(object_id, new_object_configuration):
 def redraw_signal_object(object_id):
     # Turn the signal type value back into the required enumeration type
     sig_type = signals_common.sig_type(objects_common.schematic_objects[object_id]["itemtype"])
-    # Create the sensor mappings for the signal (if any have been specified)
-    # As we are using these for signal events, we assign an arbitary item ID
-    if objects_common.schematic_objects[object_id]["passedsensor"][1] > 0:     
-        track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10,
-                        gpio_channel = objects_common.schematic_objects[object_id]["passedsensor"][1],
-                        signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
-    if objects_common.schematic_objects[object_id]["approachsensor"][1] > 0:  
-        track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10+1,
-                        gpio_channel = objects_common.schematic_objects[object_id]["approachsensor"][1],
-                        signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
+#############################################################################################################
+######## TO DO - Sections will already have been created - we need to #######################################
+######## map the passed/approached events via a new library function  #######################################
+#############################################################################################################
+#     # Create the sensor mappings for the signal (if any have been specified)
+#     # As we are using these for signal events, we assign an arbitary item ID
+#     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
+#         track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10,
+#                         gpio_channel = objects_common.schematic_objects[object_id]["passedsensor"][1],
+#                         signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
+#     if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
+#         track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10+1,
+#                         gpio_channel = objects_common.schematic_objects[object_id]["approachsensor"][1],
+#                         signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
+#############################################################################################################
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
             sig_type == signals_common.sig_type.ground_position):
@@ -696,8 +701,11 @@ def delete_signal_object(object_id):
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
-    track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10)
-    track_sensors.delete_sensor_mapping(objects_common.schematic_objects[object_id]["itemid"]*10+1)
+#     ###################################################################################################
+#     ################# TO DO - Delete Sensor mapping rather than delete sensor #########################
+#     track_sensors.delete_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10)
+#     track_sensors.delete_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10+1)
+#     ###################################################################################################
     # Delete the associated distant signal (if there is one)
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
@@ -730,8 +738,7 @@ def delete_signal(object_id):
 
 def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
     signals_common.reset_mqtt_configuration()
-    for signal in signals_to_publish:
-        signals.set_signals_to_publish_state(signal)
+    signals.set_signals_to_publish_state(*signals_to_publish)
     for signal in signals_to_subscribe_to:
         [node_str, item_id_str] = signal.rsplit('-')
         signals.subscribe_to_signal_updates(node_str, run_layout.schematic_callback, int(item_id_str))

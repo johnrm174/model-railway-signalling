@@ -453,7 +453,7 @@ class mqtt_configuration_tab():
         self.subframe1.pack(padx=2, pady=2)
         self.label1 = Tk.Label(self.subframe1, text="Address:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.url = common.entry_box(self.subframe1, width=30,tool_tip="Specify the URL or IP address of "+
+        self.url = common.entry_box(self.subframe1, width=32,tool_tip="Specify the URL or IP address of "+
                     "the MQTT broker (specify 'localhost' for a Broker running on the local machine)")
         self.url.pack(side=Tk.LEFT, padx=2, pady=2)
         self.subframe2 = Tk.Frame(self.frame1)
@@ -644,11 +644,8 @@ class mqtt_subscribe_tab():
         self.frame4.pack(padx=2, pady=2, fill='x')
         self.instruments = entry_box_grid(self.frame4, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote block instruments to subscribe to (in the form 'node-ID')")
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors (GPIO)")
-        ##########################################################################################################
-        ## TODO - enable the Track Sensors UI element when the publish/subscribe feature is complete #############
-        ##  self.frame5.pack(padx=2, pady=2, fill='x')
-        ##########################################################################################################
+        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = entry_box_grid(self.frame5, base_class=common.str_item_id_entry_box, columns=4, width=8,
             tool_tip="Enter the IDs of the remote track sensors (GPIO ports) to subscribe to (in the form 'node-ID')")
 
@@ -682,11 +679,8 @@ class mqtt_publish_tab():
         self.frame4.pack(padx=2, pady=2, fill='x')
         self.instruments = entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the block instruments (on the local schematic) to publish via the MQTT network")
-        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors (GPIO)")
-        ##########################################################################################################
-        ## TODO - enable the Track Sensors UI element when the publish/subscribe feature is complete #############
-        ## self.frame5.pack(padx=2, pady=2, fill='x')
-        ##########################################################################################################
+        self.frame5 = Tk.LabelFrame(parent_tab, text="Track sensors")
+        self.frame5.pack(padx=2, pady=2, fill='x')
         self.sensors = entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9, width=3,
             tool_tip="Enter the IDs of the track sensors (GPIO port) to publish via the MQTT network")
 
@@ -826,7 +820,7 @@ class gpio_port_entry_box(common.int_item_id_entry_box):
 class gpio_port_entry_frame():
     def __init__(self, parent_frame):
         # Create the Label frame for the GPIO port assignments 
-        self.frame = Tk.LabelFrame(parent_frame, text="GPIO Port Mappings")
+        self.frame = Tk.LabelFrame(parent_frame, text="Track Sensors")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                

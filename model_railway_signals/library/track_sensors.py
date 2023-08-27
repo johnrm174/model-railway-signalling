@@ -114,13 +114,22 @@ def gpio_port_is_configured(gpio_port_number:Union[int,str]):
 
 # -----------------------------------------------------------------------------------------------------------
 # Internal function to return the GPIO port that a sensor has been mapped to (None if no mapping exists)
-# Also used to check if a sensor exists (if there is no mapping then the sensor has not been created)
 # -----------------------------------------------------------------------------------------------------------
 
 def mapped_gpio_port(sensor_id:int):
     for gpio_port in gpio_port_mappings.keys():
         if gpio_port_mappings[gpio_port]["sensor_id"] == sensor_id:
             return(int(gpio_port))
+    return(None)
+
+# -----------------------------------------------------------------------------------------------------------
+# Function to check if a sensor exists (either mapped or subscribed to via mqtt metworking)
+# -----------------------------------------------------------------------------------------------------------
+
+def sensor_exists(sensor_id:Union[int,str]):
+    for gpio_port in gpio_port_mappings.keys():
+        if str(gpio_port_mappings[gpio_port]["sensor_id"]) == str(sensor_id):
+            return(True)
     return(None)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -261,7 +270,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
         logging.error ("Sensor "+str(sensor_id)+": Cannot specify a sensor_callback AND map to a signal event")
-    elif mapped_gpio_port(sensor_id) is not None:
+    elif sensor_exists(sensor_id):
         logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to GPIO Port "+str(mapped_gpio_port(sensor_id)))
     else:
         # We're good to go and create the sensor mapping, but we only configure the GPIO if running on a Pi
@@ -286,6 +295,63 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         send_mqtt_track_sensor_updated_event(sensor_id)
     return() 
 
+# ------------------------------------------------------------------------------------------------------------------
+# Public API Function to "subscribe" to track sensor updates published by remote MQTT Nodes
+# and generate the appropriate callbacks or passed / approached events for a specified signal
+# ------------------------------------------------------------------------------------------------------------------
+
+def subscribe_to_remote_track_sensor (remote_sensor_identifier:str,
+                                      sensor_callback = null_callback,
+                                      signal_passed:int = 0,
+                                      signal_approach:int = 0):    
+    global gpio_port_mappings
+    # Validate the remote sensor ID (must be 'node-id' where id is an int between 1 and 99)
+    if mqtt_interface.split_remote_item_identifier(remote_sensor_identifier) is None:
+        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": The sensor identifier must be in the form of 'Node-ID'")
+        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
+    elif signal_passed > 0 and signal_approach > 0:
+        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Can only map to a signal_passed event OR a signal_approach event")
+    elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
+        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Cannot specify a sensor_callback AND map to a signal event")
+    else:
+        if gpio_port_is_configured(remote_sensor_identifier):
+            logging.warning("MQTT-Client: Sensor "+str(remote_sensor_identifier)+" - has already been subscribed to via MQTT networking")
+        # Create a dummy GPIO port mapping to hold the callback information
+        gpio_port_mappings[remote_sensor_identifier] = {"sensor_id"       : remote_sensor_identifier,
+                                                        "callback"        : sensor_callback,
+                                                        "signal_approach" : signal_approach,
+                                                        "signal_passed"   : signal_passed,
+                                                        "sensor_state"    : False}
+        # Subscribe to events from the remote track sensor
+        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_sensor_identifier)
+        mqtt_interface.subscribe_to_mqtt_messages("track_sensor_event",node_id,item_id,
+                                                    handle_mqtt_track_sensor_updated_event)
+    return()
+
+# ------------------------------------------------------------------------------------------------------------------
+# Non-Public API Functions to update the callback behavior for existing track sensors (local or remote)
+# This is called by the Schematic Editor application everytime a signal is updated if the signal has a
+# mapped "passed" or "approached" sensor mapping to make the required callback association. If the
+# sensor does not exist then the call will fail silently (this use case is where a signal has been
+# mapped to a sensor but the sensor has then been unmapped - and the user won't know until they
+# next open the signal configuration dialog and see that the entry is now invalid
+# ------------------------------------------------------------------------------------------------------------------
+
+def update_sensor_callback (sensor_identifier:Union[int,str], signal_passed:int=0, signal_approach:int=0):
+    global gpio_port_mappings
+    if sensor_exists(sensor_identifier):
+        if signal_approach > 0: gpio_port_mappings[sensor_identifier]["signal_approach"] = signal_approach
+        if signal_passed > 0: gpio_port_mappings[sensor_identifier]["signal_passed"] = signal_approach
+
+def remove_sensor_callbacks (signal_id:int):
+    global gpio_port_mappings
+    for gpio_port in gpio_port_mappings:
+        if gpio_port_mappings[gpio_port]["signal_approach"] == signal_id:
+            gpio_port_mappings[gpio_port]["signal_approach"] = 0
+        if gpio_port_mappings[gpio_port]["signal_passed"] == signal_id:
+            gpio_port_mappings[gpio_port]["signal_passed"] = 0
+    return()
+
 # -----------------------------------------------------------------------------------------------------------
 # Externally called function to return the state of a sensor object 
 # -----------------------------------------------------------------------------------------------------------
@@ -309,49 +375,20 @@ def gpio_shutdown():
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
-# Non public API function for deleting a sensor mapping - This is used by the
-# schematic editor for deleting existing GPIO mappings (before creating new ones)
+# Non public API function for deleting all LOCAL sensor mappings - This is used by the
+# schematic editor for deleting all existing GPIO mappings (before creating new ones)
 # ------------------------------------------------------------------------------------------------------------------
 
-def delete_track_sensor(sensor_id:int):
+def delete_all_track_sensors():
     global gpio_port_mappings
-    gpio_port = mapped_gpio_port(sensor_id)
-    if raspberry_pi and gpio_port is not None:
-        GPIO.remove_event_detect(gpio_port)
-        del gpio_port_mappings[str(gpio_port)]
-    return()
-
-# ------------------------------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to track sensor updates published by remote MQTT Nodes
-# and generate the appropriate callbacks or passed / approached events for a specified signal
-# ------------------------------------------------------------------------------------------------------------------
-
-def subscribe_to_remote_track_sensor (remote_sensor_identifier:str,
-                                      sensor_callback = null_callback,
-                                      signal_passed:int = 0,
-                                      signal_approach:int = 0):    
-    global gpio_port_mappings
-    # Validate the remote sensor ID (must be 'node-id' where id is an int between 1 and 99)
-    if mqtt_interface.split_remote_item_identifier(remote_sensor_identifier) is None:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": The sensor identifier must be in the form of 'Node-ID'")
-        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
-    elif signal_passed > 0 and signal_approach > 0:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Can only map to a signal_passed event OR a signal_approach event")
-    elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Cannot specify a sensor_callback AND map to a signal event")
-    else:
-        if gpio_port_is_configured(remote_sensor_identifier):
-            logging.warning("MQTT-Client: Sensor "+str(sensor_id)+" - has already been subscribed to via MQTT networking")
-        # Create a dummy GPIO port mapping to hold the callback information
-        gpio_port_mappings[remote_sensor_identifier] = {"sensor_id"       : remote_sensor_identifier,
-                                                        "callback"        : sensor_callback,
-                                                        "signal_approach" : signal_approach,
-                                                        "signal_passed"   : signal_passed,
-                                                        "sensor_state"    : False}
-        # Subscribe to events from the remote track sensor
-        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_sensor_identifier)
-        mqtt_interface.subscribe_to_mqtt_messages("track_sensor_event",node_id,item_id,
-                                                    handle_mqtt_track_sensor_updated_event)
+    # Delete all "local" sensors from the dictionary of gpio_port_mappings - these
+    # will be re-created if they are subsequently re-subscribed to. Note we don't iterate 
+    # through the dictionary to remove items as it will change under us.
+    new_gpio_port_mappings = {}
+    for gpio_port in gpio_port_mappings:
+        if not gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
+        elif raspberry_pi: GPIO.remove_event_detect(int(gpio_port))
+    gpio_port_mappings = new_gpio_port_mappings
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -367,7 +404,7 @@ def set_track_sensors_to_publish_state(*sensor_ids:int):
         else:
             list_of_track_sensors_to_publish.append(sensor_id)
         # Publish the current state if the track sensor has already been configured
-        if mapped_gpio_port(sensor_id) is not None:
+        if sensor_exists(sensor_id):
             send_mqtt_track_sensor_updated_event(sensor_id)
     return()
 
@@ -383,12 +420,12 @@ def handle_mqtt_track_sensor_updated_event(message):
             # Maintain the state locally (so it can be queried without querying the GPIO port)
             # We do this for consistency with how remote (MQTT) track sensors are handled
             gpio_port_mappings[remote_port_identifier]["sensor_state"] = message["state"]
-            # Only make the callback (or raisesignal approach/passed event) for 'triggered' events
+            # Only make the callback (or raise signal approach/passed event) for 'triggered' events
             if gpio_port_mappings[remote_port_identifier]["sensor_state"]:
-                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been triggered *********************")
+                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been triggered **********************")
                 make_track_sensor_callback(remote_port_identifier)
             else:
-                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been reset *************************")
+                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been reset **************************")
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -421,10 +458,10 @@ def reset_mqtt_configuration():
     # Finally remove all "remote" sensors from the dictionary of gpio_port_mappings - these
     # will be re-created if they are subsequently re-subscribed to. Note we don't iterate 
     # through the dictionary to remove items as it will change under us.
-    new_track_sensors = {}
-    for key in gpio_port_mappings:
-        if key.isdigit(): new_track_sensors[key] = gpio_port_mappings[key]
-    gpio_port_mappings = new_track_sensors
+    new_gpio_port_mappings = {}
+    for gpio_port in gpio_port_mappings:
+        if gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
+    gpio_port_mappings = new_gpio_port_mappings
     return()
 
 ############################################################################

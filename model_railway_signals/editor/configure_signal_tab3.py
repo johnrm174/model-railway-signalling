@@ -11,7 +11,7 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
-#    track_sensors.mapped_gpio_port(id) - To see if the track_sensor exists (local or remote)
+#    track_sensors.sensor_exists(id) - To see if the track_sensor exists (local or remote)
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -45,7 +45,7 @@ class signal_sensor(common.str_int_item_id_entry_box):
         self.label = Tk.Label(parent_frame, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         # The this function will return true if the track sensor exists
-        exists_function = track_sensors.mapped_gpio_port
+        exists_function = track_sensors.sensor_exists
         super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
             
@@ -59,7 +59,7 @@ class signal_sensor(common.str_int_item_id_entry_box):
                 if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
                      ( signal_object["passedsensor"][1] == self.entry.get() or
                           signal_object["approachsensor"][1] == self.entry.get() ) ):
-                    self.TT.text = ("Track Sensor "+str(new_channel)+" is already assigned to signal "
+                    self.TT.text = ("Track Sensor "+str(self.entry.get())+" is already assigned to signal "
                                     +str(signal_object["itemid"]))
                     valid = False
         if update_validation_status: self.set_validation_status(valid)
