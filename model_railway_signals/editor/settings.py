@@ -5,15 +5,38 @@
 #    restore_defaults() - Restores all defaults
 #    get_all() - returns dictionary of settings
 #    set_all(new_settings) - pass in dictionary of new settings
-#    get_general() - returns: (filename, editmode)
-#    get_version() - returns: (application version)
-#    get_layout_info() - returns: (Layout info)
-#    set_layout_info(info) - pass in layout info
-#    set_general(filename, editmode)- pass in one or both
-#    get_canvas() - returns width, height, grid
-#    set_canvas(width, height, grid)
-#    get_logging() - returns level (1=Error, 2=Warning, 3=Info, 4=Debug)
-#    set_logging(level) (1=Error, 2=Warning, 3=Info, 4=Debug)
+#    get_canvas() - Get the current canvas settings (for editing)
+#    set_canvas() - Save the new canvas settings (as specified)
+#    get_logging() - Get the current log level (for editing)
+#    set_logging(level) - Save the new log level (as specified)
+#    get_general() - Get the current settings (layout info, version for info/editing)
+#    set_general() - Save the new settings (only layout info can be edited/saved)
+#    get_sprog() - Get the current SPROG settings (for editing)
+#    set_sprog() - Save the new SPROG settings (as specified)
+#    get_mqtt() - Get the current MQTT settings (for editing)
+#    set_mqtt() - Save the new MQTT settings (as specified)
+#    get_gpio() - Get the current GPIO settings (for editing)
+#    set_gpio() - Save the new GPIO settings (as specified)
+#    get_sub_dcc_nodes() - get the list of subscribed dccc command feeds
+#    get_sub_signals() - get the list of subscribed items
+#    get_sub_sections() - get the list of subscribed items
+#    get_sub_instruments() - get the list of subscribed items
+#    get_sub_sensors() - get the list of subscribed items
+#    get_pub_dcc() - get the publish dcc command feed flag
+#    get_pub_signals() - get the list of items to publish
+#    get_pub_sections() - get the list of items to publish
+#    get_pub_instruments() - get the list of items to publish
+#    get_pub_sensors() - get the list of items to publish
+#    set_sub_dcc_nodes() - set the list of subscribed nodes
+#    set_sub_signals() - set the list of subscribed items
+#    set_sub_sections() - set the list of subscribed items
+#    set_sub_instruments() - set the list of subscribed items
+#    set_sub_sensors() - set the list of subscribed items
+#    set_pub_dcc() - set the publish dcc command feed flag
+#    set_pub_signals() - set the list of items to publish
+#    set_pub_sections() - set the list of items to publish
+#    set_pub_instruments() - set the list of items to publish
+#    set_pub_sensors() - set the list of items to publish
 #------------------------------------------------------------------------------------
 
 import copy
@@ -44,8 +67,8 @@ default_settings["sprog"]["power"] = False
 default_settings["mqtt"] = {}
 default_settings["mqtt"]["url"] = ""
 default_settings["mqtt"]["port"] = 1883
-default_settings["mqtt"]["network"] = ""
-default_settings["mqtt"]["node"] = ""
+default_settings["mqtt"]["network"] = "network"
+default_settings["mqtt"]["node"] = "node"
 default_settings["mqtt"]["username"] = ""
 default_settings["mqtt"]["password"] = ""
 default_settings["mqtt"]["debug"] = False
@@ -60,6 +83,10 @@ default_settings["mqtt"]["pubsignals"] = []
 default_settings["mqtt"]["pubsections"] = []
 default_settings["mqtt"]["pubinstruments"] = []
 default_settings["mqtt"]["pubsensors"] = []
+default_settings["gpio"] = {}
+default_settings["gpio"]["triggerdelay"] = 0.001
+default_settings["gpio"]["timeoutperiod"] = 1.000
+default_settings["gpio"]["portmappings"] = []
 
 #------------------------------------------------------------------------------------
 # These are the 'current' settings - changed by the user as required
@@ -200,6 +227,22 @@ def set_sprog(port:str=None, baud:int=None, debug:bool=None, startup:bool=None, 
     if debug is not None: settings["sprog"]["debug"] = debug
     if startup is not None: settings["sprog"]["startup"] = startup
     if power is not None: settings["sprog"]["power"] = power
+    return()
+
+#------------------------------------------------------------------------------------
+# Functions to set/get the GPIO settings
+#------------------------------------------------------------------------------------
+
+def get_gpio():
+    trigger = settings["gpio"]["triggerdelay"]
+    timeout = settings["gpio"]["timeoutperiod"]
+    mappings = settings["gpio"]["portmappings"]
+    return (trigger, timeout, mappings)
+
+def set_gpio(trigger:float=None, timeout:float=None, mappings:list=None):
+    if trigger is not None: settings["gpio"]["triggerdelay"] = trigger
+    if timeout is not None: settings["gpio"]["timeoutperiod"] = timeout
+    if mappings is not None: settings["gpio"]["portmappings"] = mappings
     return()
 
 #------------------------------------------------------------------------------------

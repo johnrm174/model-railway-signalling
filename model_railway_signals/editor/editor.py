@@ -27,12 +27,14 @@
 #    settings.get_general() - Get the current filename and editor mode
 #    settings.set_general() - Set the filename and editor mode
 #    settings.get_logging() - Set the default log level
-#    settings.get_sprog() - to get the initial SPROG settings
+#    settings.get_sprog() - to get the current SPROG settings
+#    settings.get_gpio() - to get the current track sensor GPIO mappings
 #    settings.restore_defaults() - Following user selection of "new"
 #    common.scrollable_text_box - to display a list of warnings on file load
 #    menubar_windows.edit_canvas_settings(parent_window) - opens the config window
 #    menubar_windows.edit_mqtt_settings(parent_window) - opens the config window
 #    menubar_windows.edit_sprog_settings(parent_window) - opens the config window
+#    menubar_windows.edit_gpio_settings(parent_window) - opens the config window
 #    menubar_windows.edit_logging_settings(parent_window) - opens the config window
 #    menubar_windows.display_help(parent_window) - opens the config window
 #    menubar_windows.display_about(parent_window) - opens the config window
@@ -50,9 +52,11 @@
 #    pi_sprog_interface.request_dcc_power_on - To turn on the track power
 #    mqtt_interface.configure_networking - After update of the MQTT Settings
 #    mqtt_interface.mqtt_shutdown - Disconnect from the MQTT Broker
-#    dcc_control.reset_mqtt_configuration() - reset all publish/subscribe
-#    dcc_control.set_node_to_publish_dcc_commands(True/False)
-#    dcc_control.subscribe_to_dcc_command_feed(*nodes)
+#    dcc_control.reset_mqtt_configuration - reset all publish/subscribe
+#    dcc_control.set_node_to_publish_dcc_commands - set note to publish DCC
+#    dcc_control.subscribe_to_dcc_command_feed - subscribe to DCC from other nodes
+#    track_sensors.create_sensor - Create Track sensor objects (GPIO mappings)
+#    track_sensors.delete_all_track_sensors - Delete all GPIO mappings
 #
 #------------------------------------------------------------------------------------
 
@@ -69,6 +73,7 @@ from . import menubar_windows
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
+from ..library import track_sensors
 from ..library import dcc_control
 from ..library import common as library_common
 
@@ -132,6 +137,8 @@ class main_menubar:
                 command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
         self.settings_menu.add_command(label =" Logging...",
                 command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
+        self.settings_menu.add_command(label =" GPIO...",
+                command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
         self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -234,6 +241,8 @@ class main_menubar:
         # Either of these calls will trigger a run layout update
         if settings.get_general()[1]: self.edit_mode()
         else: self.run_mode()
+        # Create all the track sensor objects that have been defined
+        self.gpio_update()
         
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
@@ -369,6 +378,17 @@ class main_menubar:
         elif log_level == 2: logging.getLogger().setLevel(logging.WARNING)
         elif log_level == 3: logging.getLogger().setLevel(logging.INFO)
         elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
+
+    def gpio_update(self):
+        # Delete all track sensor objects and then re-create from the updated settings - we do this
+        # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
+        track_sensors.delete_all_track_sensors()
+        trigger, timeout, mappings = settings.get_gpio()
+        if len(mappings)>0 and not track_sensors.raspberry_pi:
+            Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
+                    message="Not running on Raspberry Pi - no track sensors will be active")
+        for mapping in mappings:
+            track_sensors.create_track_sensor(mapping[0],mapping[1],trigger_period=trigger,sensor_timeout=timeout)
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function

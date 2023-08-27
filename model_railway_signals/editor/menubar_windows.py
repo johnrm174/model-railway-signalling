@@ -9,17 +9,21 @@
 #    edit_sprog_settings(root)
 #    edit_logging_settings(root)
 #    edit_canvas_settings(root)
-#    ######### MORE COMING #####################
+#    edit_gpio_settings(root)
 #
 # Makes the following external API calls to other editor modules:
-#    settings.get_canvas() - Get the current settings (for editing)
-#    settings.set_canvas(width,height,grid) - Save the new settings
-#    settings.get_logging() - Get the current settings (for editing)
-#    settings.set_logging(level) - Save the new settings
-#    settings.get_general() - Get the current settings (for info/editing)
-#    settings.set_general() - Save the new settings (layout info)
-#    settings.get_sprog() - Get the current settings (for editing)
-#    settings.set_sprog() - Save the new settings
+#    settings.get_canvas() - Get the current canvas settings (for editing)
+#    settings.set_canvas() - Save the new canvas settings (as specified)
+#    settings.get_logging() - Get the current log level (for editing)
+#    settings.set_logging(level) - Save the new log level (as specified)
+#    settings.get_general() - Get the current settings (layout info, version for info/editing)
+#    settings.set_general() - Save the new settings (only layout info can be edited/saved)
+#    settings.get_sprog() - Get the current SPROG settings (for editing)
+#    settings.set_sprog() - Save the new SPROG settings (as specified)
+#    settings.get_mqtt() - Get the current MQTT settings (for editing)
+#    settings.set_mqtt() - Save the new MQTT settings (as specified)
+#    settings.get_gpio() - Get the current GPIO settings (for editing)
+#    settings.set_gpio() - Save the new GPIO settings (as specified)
 #    settings.get_sub_dcc_nodes() - get the list of subscribed dccc command feeds
 #    settings.get_sub_signals() - get the list of subscribed items
 #    settings.get_sub_sections() - get the list of subscribed items
@@ -803,5 +807,138 @@ class edit_mqtt_settings():
         # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
         # self.window.focus()
         pass
+    
+#------------------------------------------------------------------------------------
+# Classes for the GPIO (Track Sensors) configuration window
+#------------------------------------------------------------------------------------
+
+class gpio_port_entry_box(common.int_item_id_entry_box):
+    def __init__(self, parent_frame, label:str, tool_tip:str, callback):
+        # create a frame to hold the label and entry box
+        self.frame = Tk.Frame(parent_frame)
+        self.frame.pack()
+        # Create the label and call the parent init function to create the EB
+        self.label = Tk.Label(self.frame, width=8, text=label)
+        self.label.pack(side=Tk.LEFT)
+        super().__init__(self.frame, tool_tip=tool_tip, callback=callback)
+        super().pack(side=Tk.LEFT)
+    
+class gpio_port_entry_frame():
+    def __init__(self, parent_frame):
+        # Create the Label frame for the GPIO port assignments 
+        self.frame = Tk.LabelFrame(parent_frame, text="GPIO Port Mappings")
+        self.frame.pack(padx=2, pady=2, fill='x')
+        self.list_of_subframes = []
+        self.list_of_entry_boxes = []                
+        self.list_of_available_gpio_ports = [4,5,6,7,8,9,10,11,12,13,16,17,18,19,20,21,22,23,24,25,26]
+        while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
+            # Create the Frame for the row
+            self.list_of_subframes.append(Tk.Frame(self.frame))
+            self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
+            # Create the entry_boxes for the row
+            for value in range (7):
+                if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
+                label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
+                tool_tip = "Enter a Sensor ID to be associated with this GPIO port (or leave blank)"
+                self.list_of_entry_boxes.append(gpio_port_entry_box(self.list_of_subframes[-1],
+                                            label=label, tool_tip=tool_tip, callback=self.validate))
+                
+    def validate(self):
+        valid = True
+        # First do the basic validation on all entry boxes - we do this every time to
+        # clear any duplicate entry validation errors that may now have been corrected
+        for entry_box in self.list_of_entry_boxes:
+            if not entry_box.validate(): valid = False
+        # Then check for duplicate entries
+        for entry_box1 in self.list_of_entry_boxes:
+            value1 = entry_box1.get_value()
+            for entry_box2 in self.list_of_entry_boxes:
+                if entry_box1 != entry_box2 and value1 == entry_box2.get_value() and value1 != 0:
+                    entry_box1.TT.text = ("Duplicate ID - sensor is already assigned to another GPIO port")
+                    entry_box1.set_validation_status(False)
+                    valid = False
+        return (valid)
+
+    def get_values(self):
+        list_of_mappings = []
+        for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
+            sensor_id = self.list_of_entry_boxes[index].get_value()
+            if sensor_id > 0: list_of_mappings.append([sensor_id, gpio_port])
+        return (list_of_mappings)
+    
+    def set_values(self,list_of_mappings:[[int,int],]):
+        # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
+        for mapping in list_of_mappings:
+            for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
+                if gpio_port == mapping[1]:
+                    self.list_of_entry_boxes[index].set_value(mapping[0])
+                    break        
+            
+class edit_gpio_settings():
+    def __init__(self, root_window, update_function):
+        self.root_window = root_window
+        self.update_function = update_function
+        # Create the top level window for editing MQTT settings
+        winx = self.root_window.winfo_rootx() + 240
+        winy = self.root_window.winfo_rooty() + 60
+        self.window = Tk.Toplevel(self.root_window)
+        self.window.geometry(f'+{winx}+{winy}')
+        self.window.title("GPIO Sensors")
+        self.window.attributes('-topmost',True)
+        # Create an overall frame to pack everything in
+        self.frame = Tk.Frame(self.window,)
+        self.frame.pack()
+        # Create the labelframe for the general GPIO settings
+        self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
+        self.subframe1.pack(padx=2, pady=2, fill='x')
+        # Put the elements in a subframe to center them
+        self.subframe2 = Tk.Frame(self.subframe1)
+        self.subframe2.pack()
+        self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
+        self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
+            tool_tip="Enter the delay period (before track sensor events will be triggered) in milliseconds (0-1000)")
+        self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
+        self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        self.timeout = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=5000, allow_empty=False, 
+            tool_tip="Enter the timeout period (during which further triggers will be ignored) in milliseconds (0-5000)")
+        self.timeout.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+        # Create the Label frame for the GPIO port assignments 
+        self.gpio = gpio_port_entry_frame(self.frame)
+        # Create the common Apply/OK/Reset/Cancel buttons for the window
+        self.controls = common.window_controls(self.window, self,
+                                self.load_state, self.save_state)
+        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+        # Create the Validation error message (this gets packed/unpacked on apply/save)
+        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+        # Load the initial UI state
+        self.load_state()
+            
+    def load_state(self, parent_object=None):
+        # Hide the validation error and connection test messages
+        self.validation_error.pack_forget()
+        # Create the UI Elements
+        trigger, timeout, mappings = settings.get_gpio()
+        self.gpio.set_values(mappings)
+        self.trigger.set_value(int(trigger*1000))
+        self.timeout.set_value(int(timeout*1000))
+
+    def save_state(self, parent_object, close_window:bool):
+        # Parent object is passed by the callback - not used here
+        # Only allow close if valid
+        if self.gpio.validate() and self.trigger.validate() and self.timeout.validate():
+            mappings = self.gpio.get_values()
+            trigger = float(self.trigger.get_value())/1000
+            timeout = float(self.timeout.get_value())/1000
+            settings.set_gpio(trigger, timeout, mappings)
+            # Make the callback to apply the updated settings
+            self.update_function()
+            # close the window (on OK or cancel)
+            if close_window: self.window.destroy()
+            else: self.load_state() 
+        else:
+            # Display the validation error message
+            self.validation_error.pack()
 
 #############################################################################################
