@@ -74,6 +74,11 @@ from . import objects_instruments
 
 from .. import run_layout
 
+##################################################################################
+### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
+from .. import settings                                                  #########
+##################################################################################
+
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections to the front of the canvas
 # This insures they are not obscured by any lines drawn on the canvas
@@ -441,9 +446,12 @@ def paste_objects():
 
 def set_all(new_objects):
     ##################################################################################
-    ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+    ### Code block to Handle breaking changes - see later in the code for details ####
+    ##################################################################################
     one_up_line_id = 1
-    ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+    list_of_track_sensors_to_create =[]
+    ##################################################################################
+    ################ End of code block to handle breaking changes ####################
     ##################################################################################
     # List of warning messages to report
     warning_messages = []
@@ -484,6 +492,7 @@ def set_all(new_objects):
                     warning_messages.append(warning_message)
                 ##################################################################################
                 ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+                ##################################################################################
                 elif (new_object_type == objects_common.object_type.line and
                           element == "itemid" and new_objects[object_id][element] is None):                    
                     item_id = one_up_line_id
@@ -493,10 +502,36 @@ def set_all(new_objects):
                     logging.warning("LOAD LAYOUT - "+warning_message)
                     warning_messages.append(warning_message)
                     one_up_line_id = one_up_line_id + 1
-                ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
+                ##################################################################################
+                ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
+                ### This is something we can resolve without affecting the user so we resolve ####
+                ### it silently without an Log message or load warning message - unless the ######
+                ### track sensors - in which case we need to list them for the user to resolve ###
+                ##################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if new_objects[object_id][element][1] == 0:
+                        objects_common.schematic_objects[object_id][element][1] = ""
+                    elif isinstance(new_objects[object_id][element][1],int):
+                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
+                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if new_objects[object_id][element][1] == 0:
+                        objects_common.schematic_objects[object_id][element][1] = ""
+                    elif isinstance(new_objects[object_id][element][1],int):
+                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
+                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                ##################################################################################
+                ###################### End of code to handle breaking changes ####################
                 ##################################################################################
                 else:
-                    objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]        
+                    objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+            ##################################################################################
+            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
+            if len(list_of_track_sensors_to_create) > 0:                             #########
+                settings.set_gpio(mappings = list_of_track_sensors_to_create)        #########
+            ##################################################################################
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
