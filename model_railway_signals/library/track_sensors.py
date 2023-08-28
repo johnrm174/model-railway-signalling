@@ -134,6 +134,27 @@ def sensor_exists(sensor_id:Union[int,str]):
     return(None)
 
 # -----------------------------------------------------------------------------------------------------------
+# Internal Test functions to simulate local GPIO events (support for system test harness
+# -----------------------------------------------------------------------------------------------------------
+
+def simulate_sensor_triggered(gpio_port:int):
+    global gpio_port_mappings
+    gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
+    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+    logging.info("Sensor "+str(sensor_id)+": Simulated Trigger Event ***********************************************")
+    send_mqtt_track_sensor_updated_event(sensor_id)
+    make_track_sensor_callback(gpio_port)
+    return()
+    
+def simulate_sensor_reset(gpio_port:int):
+    global gpio_port_mappings
+    gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
+    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+    logging.debug("Sensor "+str(sensor_id)+": Simulated Reset Event *************************************************")
+    send_mqtt_track_sensor_updated_event(sensor_id)
+    return()
+
+# -----------------------------------------------------------------------------------------------------------
 # Internal Function to make the appropriate callback (callback or signal approach/passed event)
 # for both local track sensors and remote (subscribed to via MQTT networking) track sensors
 # Note that we call into the main tkinter thread to process the callback. We do this as all the

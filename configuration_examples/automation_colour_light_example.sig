@@ -12,7 +12,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 230,
             "dccaspects": [
@@ -527,7 +527,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                19
+                "19"
             ],
             "pointinterlock": [
                 [
@@ -1188,7 +1188,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 269,
             "dccaspects": [
@@ -1703,7 +1703,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                21
+                "21"
             ],
             "pointinterlock": [
                 [
@@ -2229,7 +2229,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 291,
             "dccaspects": [
@@ -2744,7 +2744,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                9
+                "9"
             ],
             "pointinterlock": [
                 [
@@ -3257,7 +3257,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 310,
             "dccaspects": [
@@ -3772,7 +3772,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                11
+                "11"
             ],
             "pointinterlock": [
                 [
@@ -4285,7 +4285,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 329,
             "dccaspects": [
@@ -4800,7 +4800,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                6
+                "6"
             ],
             "pointinterlock": [
                 [
@@ -5313,7 +5313,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 348,
             "dccaspects": [
@@ -5828,7 +5828,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                18
+                "18"
             ],
             "pointinterlock": [
                 [
@@ -6341,7 +6341,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 367,
             "dccaspects": [
@@ -6856,7 +6856,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                5
+                "5"
             ],
             "pointinterlock": [
                 [
@@ -7369,7 +7369,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 379,
             "dccaspects": [
@@ -7884,7 +7884,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                24
+                "24"
             ],
             "pointinterlock": [
                 [
@@ -8463,7 +8463,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 408,
             "dccaspects": [
@@ -8978,7 +8978,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                25
+                "25"
             ],
             "pointinterlock": [
                 [
@@ -9526,7 +9526,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 435,
             "dccaspects": [
@@ -10041,7 +10041,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                13
+                "13"
             ],
             "pointinterlock": [
                 [
@@ -10554,7 +10554,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 454,
             "dccaspects": [
@@ -11069,7 +11069,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                17
+                "17"
             ],
             "pointinterlock": [
                 [
@@ -11604,7 +11604,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 479,
             "dccaspects": [
@@ -12119,7 +12119,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                10
+                "10"
             ],
             "pointinterlock": [
                 [
@@ -12632,7 +12632,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 498,
             "dccaspects": [
@@ -13147,7 +13147,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                12
+                "12"
             ],
             "pointinterlock": [
                 [
@@ -13848,7 +13848,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 540,
             "dccaspects": [
@@ -14363,7 +14363,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                20
+                "20"
             ],
             "pointinterlock": [
                 [
@@ -14928,7 +14928,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 567,
             "dccaspects": [
@@ -15443,7 +15443,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                4
+                "4"
             ],
             "pointinterlock": [
                 [
@@ -15987,7 +15987,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 588,
             "dccaspects": [
@@ -16502,7 +16502,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                22
+                "22"
             ],
             "pointinterlock": [
                 [
@@ -17028,7 +17028,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 602,
             "dccaspects": [
@@ -17543,7 +17543,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                23
+                "23"
             ],
             "pointinterlock": [
                 [
@@ -18100,7 +18100,7 @@
             ],
             "approachsensor": [
                 true,
-                7
+                "7"
             ],
             "bbox": 633,
             "dccaspects": [
@@ -18615,7 +18615,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                8
+                "8"
             ],
             "pointinterlock": [
                 [
@@ -19128,7 +19128,7 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
             "bbox": 652,
             "dccaspects": [
@@ -19643,7 +19643,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                16
+                "16"
             ],
             "pointinterlock": [
                 [
@@ -20251,7 +20251,93 @@
             "editmode": false,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n",
-            "version": "Version 3.5"
+            "version": "Version 3.6"
+        },
+        "gpio": {
+            "portmappings": [
+                [
+                    19,
+                    19
+                ],
+                [
+                    21,
+                    21
+                ],
+                [
+                    9,
+                    9
+                ],
+                [
+                    11,
+                    11
+                ],
+                [
+                    6,
+                    6
+                ],
+                [
+                    18,
+                    18
+                ],
+                [
+                    5,
+                    5
+                ],
+                [
+                    24,
+                    24
+                ],
+                [
+                    25,
+                    25
+                ],
+                [
+                    13,
+                    13
+                ],
+                [
+                    17,
+                    17
+                ],
+                [
+                    10,
+                    10
+                ],
+                [
+                    12,
+                    12
+                ],
+                [
+                    20,
+                    20
+                ],
+                [
+                    4,
+                    4
+                ],
+                [
+                    22,
+                    22
+                ],
+                [
+                    23,
+                    23
+                ],
+                [
+                    7,
+                    7
+                ],
+                [
+                    8,
+                    8
+                ],
+                [
+                    16,
+                    16
+                ]
+            ],
+            "timeoutperiod": 1.0,
+            "triggerdelay": 0.001
         },
         "logging": {
             "level": 2

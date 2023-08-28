@@ -71,6 +71,11 @@
         "random-config-group": {
             "random-config-element": false
         },
+        "gpio": {
+            "portmappings": [],
+            "timeoutperiod": 1.0,
+            "triggerdelay": 0.001
+        },
         "mqtt": {
             "debug": false,
             "network": "",

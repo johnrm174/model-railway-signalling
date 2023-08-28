@@ -315,9 +315,8 @@ def delete_section(object_id):
 def mqtt_update_sections(sections_to_publish:list, sections_to_subscribe_to:list):
     track_sections.reset_mqtt_configuration()
     track_sections.set_sections_to_publish_state(*sections_to_publish)
-    for section in sections_to_subscribe_to:
-        [node_str, item_id_str] = section.rsplit('-')
-        track_sections.subscribe_to_section_updates(node_str, run_layout.schematic_callback, int(item_id_str))
+    for section_identifier in sections_to_subscribe_to:
+        track_sections.subscribe_to_remote_section(section_identifier, run_layout.schematic_callback)
     return()
     
 ####################################################################################

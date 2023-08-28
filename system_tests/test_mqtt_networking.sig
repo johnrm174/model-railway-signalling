@@ -26,19 +26,19 @@
                 20,
                 5
             ],
-            "bbox": 16067,
+            "bbox": 4306,
             "colour": "black",
-            "end1": 16063,
-            "end2": 16064,
+            "end1": 4302,
+            "end2": 4303,
             "endx": 350.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 25,
-            "line": 16062,
+            "line": 4301,
             "posx": 275.0,
             "posy": 200.0,
-            "stop1": 16065,
-            "stop2": 16066,
+            "stop1": 4304,
+            "stop2": 4305,
             "tags": "line25"
         },
         "1c90954a-0075-404e-9c0a-911b924d0d9a": {
@@ -48,19 +48,19 @@
                 20,
                 5
             ],
-            "bbox": 16073,
+            "bbox": 4312,
             "colour": "black",
-            "end1": 16069,
-            "end2": 16070,
+            "end1": 4308,
+            "end2": 4309,
             "endx": 350.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 8,
-            "line": 16068,
+            "line": 4307,
             "posx": 50.0,
             "posy": 75.0,
-            "stop1": 16071,
-            "stop2": 16072,
+            "stop1": 4310,
+            "stop2": 4311,
             "tags": "line8"
         },
         "26d9993d-7068-47ae-8021-a6b2a2069f88": {
@@ -70,23 +70,23 @@
                 0,
                 0
             ],
-            "bbox": 16079,
+            "bbox": 4318,
             "colour": "black",
-            "end1": 16075,
-            "end2": 16076,
+            "end1": 4314,
+            "end2": 4315,
             "endx": 575.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 28,
-            "line": 16074,
+            "line": 4313,
             "posx": 350.0,
             "posy": 150.0,
-            "stop1": 16077,
-            "stop2": 16078,
+            "stop1": 4316,
+            "stop2": 4317,
             "tags": "line28"
         },
         "27f5b927-ee11-4e85-b555-08e086cc5799": {
-            "bbox": 16082,
+            "bbox": 4321,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -105,19 +105,19 @@
                 20,
                 5
             ],
-            "bbox": 16088,
+            "bbox": 4327,
             "colour": "black",
-            "end1": 16084,
-            "end2": 16085,
+            "end1": 4323,
+            "end2": 4324,
             "endx": 575.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 5,
-            "line": 16083,
+            "line": 4322,
             "posx": 375.0,
             "posy": 400.0,
-            "stop1": 16086,
-            "stop2": 16087,
+            "stop1": 4325,
+            "stop2": 4326,
             "tags": "line5"
         },
         "35b3babc-89d0-4ca0-b9c9-a7a3e8318daa": {
@@ -130,9 +130,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16116,
+            "bbox": 4355,
             "dccaspects": [
                 [
                     [
@@ -645,7 +645,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -1155,19 +1155,19 @@
                 20,
                 5
             ],
-            "bbox": 16122,
+            "bbox": 4361,
             "colour": "black",
-            "end1": 16118,
-            "end2": 16119,
+            "end1": 4357,
+            "end2": 4358,
             "endx": 575.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 1,
-            "line": 16117,
+            "line": 4356,
             "posx": 375.0,
             "posy": 200.0,
-            "stop1": 16120,
-            "stop2": 16121,
+            "stop1": 4359,
+            "stop2": 4360,
             "tags": "line1"
         },
         "4569a848-bc65-487d-a60a-039fa6fb7606": {
@@ -1177,19 +1177,19 @@
                 20,
                 5
             ],
-            "bbox": 16128,
+            "bbox": 4367,
             "colour": "black",
-            "end1": 16124,
-            "end2": 16125,
+            "end1": 4363,
+            "end2": 4364,
             "endx": 575.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 7,
-            "line": 16123,
+            "line": 4362,
             "posx": 375.0,
             "posy": 75.0,
-            "stop1": 16126,
-            "stop2": 16127,
+            "stop1": 4365,
+            "stop2": 4366,
             "tags": "line7"
         },
         "5be33ccf-2f0e-4f01-8cd7-074da843b121": {
@@ -1202,9 +1202,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16147,
+            "bbox": 4386,
             "dccaspects": [
                 [
                     [
@@ -1717,7 +1717,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -2230,9 +2230,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16166,
+            "bbox": 4405,
             "dccaspects": [
                 [
                     [
@@ -2745,7 +2745,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -3258,9 +3258,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16222,
+            "bbox": 4461,
             "dccaspects": [
                 [
                     [
@@ -3773,7 +3773,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -4283,23 +4283,23 @@
                 0,
                 0
             ],
-            "bbox": 16228,
+            "bbox": 4467,
             "colour": "black",
-            "end1": 16224,
-            "end2": 16225,
+            "end1": 4463,
+            "end2": 4464,
             "endx": 225.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 26,
-            "line": 16223,
+            "line": 4462,
             "posx": 50.0,
             "posy": 200.0,
-            "stop1": 16226,
-            "stop2": 16227,
+            "stop1": 4465,
+            "stop2": 4466,
             "tags": "line26"
         },
         "70fc3e04-4419-42d9-83fe-295ca1e55b72": {
-            "bbox": 16243,
+            "bbox": 4482,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -4320,9 +4320,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16271,
+            "bbox": 4510,
             "dccaspects": [
                 [
                     [
@@ -4835,7 +4835,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -5339,7 +5339,7 @@
             ]
         },
         "85be3b55-420f-4776-952c-d1472c4f897b": {
-            "bbox": 16274,
+            "bbox": 4513,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5354,7 +5354,7 @@
         "93063a54-5b09-4045-985b-7ba45650ff68": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 16281,
+            "bbox": 4520,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -5381,7 +5381,7 @@
             "tags": "point1"
         },
         "9a0ce7c0-d387-449f-90b7-ec13375d981a": {
-            "bbox": 16284,
+            "bbox": 4523,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5400,19 +5400,19 @@
                 20,
                 5
             ],
-            "bbox": 16290,
+            "bbox": 4529,
             "colour": "black",
-            "end1": 16286,
-            "end2": 16287,
+            "end1": 4525,
+            "end2": 4526,
             "endx": 350.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 2,
-            "line": 16285,
+            "line": 4524,
             "posx": 50.0,
             "posy": 300.0,
-            "stop1": 16288,
-            "stop2": 16289,
+            "stop1": 4527,
+            "stop2": 4528,
             "tags": "line2"
         },
         "a994fe0e-a4e6-48c3-bd42-b865c18f6624": {
@@ -5425,9 +5425,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16318,
+            "bbox": 4557,
             "dccaspects": [
                 [
                     [
@@ -5940,7 +5940,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -6450,19 +6450,19 @@
                 20,
                 5
             ],
-            "bbox": 16324,
+            "bbox": 4563,
             "colour": "black",
-            "end1": 16320,
-            "end2": 16321,
+            "end1": 4559,
+            "end2": 4560,
             "endx": 275.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 27,
-            "line": 16319,
+            "line": 4558,
             "posx": 250.0,
             "posy": 175.0,
-            "stop1": 16322,
-            "stop2": 16323,
+            "stop1": 4561,
+            "stop2": 4562,
             "tags": "line27"
         },
         "c2ef4745-5a5d-4d66-a661-473816576771": {
@@ -6475,9 +6475,9 @@
             ],
             "approachsensor": [
                 true,
-                0
+                ""
             ],
-            "bbox": 16352,
+            "bbox": 4591,
             "dccaspects": [
                 [
                     [
@@ -6990,7 +6990,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -7503,9 +7503,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16380,
+            "bbox": 4619,
             "dccaspects": [
                 [
                     [
@@ -8018,7 +8018,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -8522,7 +8522,7 @@
             ]
         },
         "c488e27b-7a77-49dc-8045-066fb3109702": {
-            "bbox": 16395,
+            "bbox": 4634,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -8543,9 +8543,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16423,
+            "bbox": 4662,
             "dccaspects": [
                 [
                     [
@@ -9058,7 +9058,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -9568,19 +9568,19 @@
                 20,
                 5
             ],
-            "bbox": 16429,
+            "bbox": 4668,
             "colour": "black",
-            "end1": 16425,
-            "end2": 16426,
+            "end1": 4664,
+            "end2": 4665,
             "endx": 300.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 29,
-            "line": 16424,
+            "line": 4663,
             "posx": 350.0,
             "posy": 150.0,
-            "stop1": 16427,
-            "stop2": 16428,
+            "stop1": 4666,
+            "stop2": 4667,
             "tags": "line29"
         },
         "d41f0e5f-13e5-4a7f-bc3e-3388254d6b8c": {
@@ -9593,9 +9593,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 16457,
+            "bbox": 4696,
             "dccaspects": [
                 [
                     [
@@ -10108,7 +10108,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -10618,19 +10618,19 @@
                 20,
                 5
             ],
-            "bbox": 16463,
+            "bbox": 4702,
             "colour": "black",
-            "end1": 16459,
-            "end2": 16460,
+            "end1": 4698,
+            "end2": 4699,
             "endx": 350.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 4,
-            "line": 16458,
+            "line": 4697,
             "posx": 50.0,
             "posy": 400.0,
-            "stop1": 16461,
-            "stop2": 16462,
+            "stop1": 4700,
+            "stop2": 4701,
             "tags": "line4"
         },
         "f0f1cab2-b2f3-4e9e-9a89-b916314c5315": {
@@ -10640,23 +10640,23 @@
                 20,
                 5
             ],
-            "bbox": 16469,
+            "bbox": 4708,
             "colour": "black",
-            "end1": 16465,
-            "end2": 16466,
+            "end1": 4704,
+            "end2": 4705,
             "endx": 575.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 3,
-            "line": 16464,
+            "line": 4703,
             "posx": 375.0,
             "posy": 300.0,
-            "stop1": 16467,
-            "stop2": 16468,
+            "stop1": 4706,
+            "stop2": 4707,
             "tags": "line3"
         },
         "f498f46c-3819-447e-ac88-2ebe032b0b3d": {
-            "bbox": 16472,
+            "bbox": 4711,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -10696,7 +10696,12 @@
             "editmode": true,
             "filename": "/home/pi/model-railway-signalling/system_tests/test_mqtt_networking.sig",
             "info": "Document your layout here",
-            "version": "Version 3.5"
+            "version": "Version 3.6"
+        },
+        "gpio": {
+            "portmappings": [],
+            "timeoutperiod": 1.0,
+            "triggerdelay": 0.001
         },
         "logging": {
             "level": 2

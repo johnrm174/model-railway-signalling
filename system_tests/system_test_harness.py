@@ -31,6 +31,8 @@
 #    set_instrument_occupied(*instrumentids)
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
+#    simulate_sensors_triggered(*sensorids)
+#    simulate_sensors_reset(*sensorids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -133,6 +135,7 @@ from model_railway_signals.library import signals_ground_position
 from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
+from model_railway_signals.library import track_sensors
 
 thread_delay_time = 0.1
 tkinter_thread_started = False
@@ -395,6 +398,20 @@ def click_telegraph_key(*instrumentids):
             raise_test_warning ("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
         else:
             run_function(lambda:block_instruments.telegraph_key_button(instid))
+
+def simulate_gpio_triggered(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
+        else:
+            run_function(lambda:track_sensors.simulate_sensor_triggered(gpioid))
+
+def simulate_gpio_reset(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_reset - GPIO: "+str(gpioid)+" does not exist")
+        else:
+            run_function(lambda:track_sensors.simulate_sensor_reset(gpioid))
 
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior

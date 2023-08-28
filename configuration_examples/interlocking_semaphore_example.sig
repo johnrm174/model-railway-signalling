@@ -12,9 +12,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 1969,
+            "bbox": 1954,
             "dccaspects": [
                 [
                     [
@@ -527,7 +527,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -1060,9 +1060,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 1999,
+            "bbox": 1984,
             "dccaspects": [
                 [
                     [
@@ -1575,7 +1575,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -2085,19 +2085,19 @@
                 0,
                 0
             ],
-            "bbox": 2005,
+            "bbox": 1990,
             "colour": "black",
-            "end1": 2001,
-            "end2": 2002,
+            "end1": 1986,
+            "end2": 1987,
             "endx": 1275,
             "endy": 225,
             "item": "line",
             "itemid": 1,
-            "line": 2000,
+            "line": 1985,
             "posx": 975,
             "posy": 225,
-            "stop1": 2003,
-            "stop2": 2004,
+            "stop1": 1988,
+            "stop2": 1989,
             "tags": "line1"
         },
         "19df44d6-4976-4925-a159-ad9e515da21c": {
@@ -2110,9 +2110,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2033,
+            "bbox": 2018,
             "dccaspects": [
                 [
                     [
@@ -2625,7 +2625,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -3138,9 +3138,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2061,
+            "bbox": 2046,
             "dccaspects": [
                 [
                     [
@@ -3653,7 +3653,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -4166,9 +4166,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2089,
+            "bbox": 2074,
             "dccaspects": [
                 [
                     [
@@ -4681,7 +4681,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -5194,9 +5194,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2117,
+            "bbox": 2102,
             "dccaspects": [
                 [
                     [
@@ -5709,7 +5709,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -6219,19 +6219,19 @@
                 0,
                 0
             ],
-            "bbox": 2123,
+            "bbox": 2108,
             "colour": "black",
-            "end1": 2119,
-            "end2": 2120,
+            "end1": 2104,
+            "end2": 2105,
             "endx": 1375,
             "endy": 225,
             "item": "line",
             "itemid": 2,
-            "line": 2118,
+            "line": 2103,
             "posx": 1800,
             "posy": 225,
-            "stop1": 2121,
-            "stop2": 2122,
+            "stop1": 2106,
+            "stop2": 2107,
             "tags": "line2"
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
@@ -6244,9 +6244,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2132,
+            "bbox": 2117,
             "dccaspects": [
                 [
                     [
@@ -6759,7 +6759,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -7272,9 +7272,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2160,
+            "bbox": 2145,
             "dccaspects": [
                 [
                     [
@@ -7787,7 +7787,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -8300,9 +8300,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2188,
+            "bbox": 2173,
             "dccaspects": [
                 [
                     [
@@ -8815,7 +8815,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -9325,19 +9325,19 @@
                 0,
                 0
             ],
-            "bbox": 2194,
+            "bbox": 2179,
             "colour": "black",
-            "end1": 2190,
-            "end2": 2191,
+            "end1": 2175,
+            "end2": 2176,
             "endx": 1375,
             "endy": 275,
             "item": "line",
             "itemid": 3,
-            "line": 2189,
+            "line": 2174,
             "posx": 1800,
             "posy": 275,
-            "stop1": 2192,
-            "stop2": 2193,
+            "stop1": 2177,
+            "stop2": 2178,
             "tags": "line3"
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
@@ -9350,9 +9350,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2247,
+            "bbox": 2232,
             "dccaspects": [
                 [
                     [
@@ -9865,7 +9865,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -10378,9 +10378,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2275,
+            "bbox": 2260,
             "dccaspects": [
                 [
                     [
@@ -10893,7 +10893,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -11406,9 +11406,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2284,
+            "bbox": 2269,
             "dccaspects": [
                 [
                     [
@@ -11921,7 +11921,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -12427,7 +12427,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 2291,
+            "bbox": 2276,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -12493,9 +12493,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2319,
+            "bbox": 2304,
             "dccaspects": [
                 [
                     [
@@ -13008,7 +13008,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -13518,19 +13518,19 @@
                 0,
                 0
             ],
-            "bbox": 2325,
+            "bbox": 2310,
             "colour": "black",
-            "end1": 2321,
-            "end2": 2322,
+            "end1": 2306,
+            "end2": 2307,
             "endx": 1275,
             "endy": 175,
             "item": "line",
             "itemid": 4,
-            "line": 2320,
+            "line": 2305,
             "posx": 975,
             "posy": 175,
-            "stop1": 2323,
-            "stop2": 2324,
+            "stop1": 2308,
+            "stop2": 2309,
             "tags": "line4"
         },
         "902284fd-0dc0-4ded-96b6-e94ba78a1cf4": {
@@ -13543,9 +13543,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2334,
+            "bbox": 2319,
             "dccaspects": [
                 [
                     [
@@ -14058,7 +14058,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -14568,19 +14568,19 @@
                 0,
                 0
             ],
-            "bbox": 2340,
+            "bbox": 2325,
             "colour": "black",
-            "end1": 2336,
-            "end2": 2337,
+            "end1": 2321,
+            "end2": 2322,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 5,
-            "line": 2335,
+            "line": 2320,
             "posx": 1325,
             "posy": 275,
-            "stop1": 2338,
-            "stop2": 2339,
+            "stop1": 2323,
+            "stop2": 2324,
             "tags": "line5"
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
@@ -14590,25 +14590,25 @@
                 1,
                 1
             ],
-            "bbox": 2346,
+            "bbox": 2331,
             "colour": "black",
-            "end1": 2342,
-            "end2": 2343,
+            "end1": 2327,
+            "end2": 2328,
             "endx": 1325,
             "endy": 175,
             "item": "line",
             "itemid": 6,
-            "line": 2341,
+            "line": 2326,
             "posx": 1575,
             "posy": 175,
-            "stop1": 2344,
-            "stop2": 2345,
+            "stop1": 2329,
+            "stop2": 2330,
             "tags": "line6"
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 2353,
+            "bbox": 2338,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14633,9 +14633,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2381,
+            "bbox": 2366,
             "dccaspects": [
                 [
                     [
@@ -15148,7 +15148,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -15658,25 +15658,25 @@
                 0,
                 0
             ],
-            "bbox": 2387,
+            "bbox": 2372,
             "colour": "black",
-            "end1": 2383,
-            "end2": 2384,
+            "end1": 2368,
+            "end2": 2369,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": 7,
-            "line": 2382,
+            "line": 2367,
             "posx": 925,
             "posy": 225,
-            "stop1": 2385,
-            "stop2": 2386,
+            "stop1": 2370,
+            "stop2": 2371,
             "tags": "line7"
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 2394,
+            "bbox": 2379,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -15739,19 +15739,19 @@
                 1,
                 1
             ],
-            "bbox": 2400,
+            "bbox": 2385,
             "colour": "black",
-            "end1": 2396,
-            "end2": 2397,
+            "end1": 2381,
+            "end2": 2382,
             "endx": 725,
             "endy": 175,
             "item": "line",
             "itemid": 8,
-            "line": 2395,
+            "line": 2380,
             "posx": 925,
             "posy": 175,
-            "stop1": 2398,
-            "stop2": 2399,
+            "stop1": 2383,
+            "stop2": 2384,
             "tags": "line8"
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
@@ -15764,9 +15764,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2409,
+            "bbox": 2394,
             "dccaspects": [
                 [
                     [
@@ -16279,7 +16279,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -16785,7 +16785,7 @@
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 2416,
+            "bbox": 2401,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16854,7 +16854,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 2423,
+            "bbox": 2408,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16879,9 +16879,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2432,
+            "bbox": 2417,
             "dccaspects": [
                 [
                     [
@@ -17394,7 +17394,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -17900,7 +17900,7 @@
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 2439,
+            "bbox": 2424,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17925,9 +17925,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2448,
+            "bbox": 2433,
             "dccaspects": [
                 [
                     [
@@ -18440,7 +18440,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -18953,9 +18953,9 @@
             ],
             "approachsensor": [
                 false,
-                0
+                ""
             ],
-            "bbox": 2479,
+            "bbox": 2464,
             "dccaspects": [
                 [
                     [
@@ -19468,7 +19468,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                0
+                ""
             ],
             "pointinterlock": [
                 [
@@ -20013,9 +20013,14 @@
         },
         "general": {
             "editmode": true,
-            "filename": "/home/john/model_railway_signals/configuration_examples/interlocking_semaphore_example.sig",
+            "filename": "/home/pi/model-railway-signalling/configuration_examples/interlocking_semaphore_example.sig",
             "info": "This is a basic example of a layout without track sensors (and the associated signal automation).\n\nThe layout is signalled with a combination of semaphore home and distant signals. Note that\nSignal 16 is a home signal with a secondary distant arm (controled by the 'D' button). \n\nThe signals and points are interlocked together - and the signals interlocked with opposing signals\n(in 'edit' mode, double click on a signal or point and select the 'interlocking' tab to edit/view).\n\nIn this example, signal 1 is interlocked with point 2 so can only be cleared if the facing point \nlock (the 'L' button) is active. When the main signal is cleared, the appropriate route arm will \nbe cleared. Note that the associated subsidary signal (controlled by the 'S' button) is similarly\ninterlocked with point 2. When cleared, the appropriate subsidary arm will be cleared.\n\nSignal 1 is also interlocked with any opposing signals that could allow a train onto the same\nsection of track - in this example, the signal is interlocked with ground signals 15, 13, 7 and 6\n(dependant on whether the route 'cleared' by these signals conflicts with the route for Signal 1).\n\nNote that the distant signals are also configured to be interlocked with all home signals ahead. \nThis means that the signal cannot be cleared unless all home signals (up to the next distant signal)\nhave also been cleared (note that they can be returned to Caution at any time).\n\nAll point interlocking is automatically configured via the signal interlocking so, for example\npoint 2 is locked if signal 1 (main or subsidary) is cleared for a train movement.\n\nNote that not all signals are configured for all possible routes - the only 'valid' shunting\nmovement allowed from signal 14 is via the crossover back onto the other main line. \n\nSome of the signals and points are configured with DCC Addresses, with a single DCC address used\nfor each main or subsidary route arm. \n\nThis level of configuration is ideal if you want to be the signal man/woman for your layout. Other\nexamples add track sensors to allow semi-automation of the signalling scheme so the signals will \nchange automatically as you watch the trains go round.\n",
-            "version": "Version 3.5"
+            "version": "Version 3.6"
+        },
+        "gpio": {
+            "portmappings": [],
+            "timeoutperiod": 1.0,
+            "triggerdelay": 0.001
         },
         "logging": {
             "level": 2

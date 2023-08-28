@@ -303,8 +303,8 @@ def run_object_deletion_tests(delay:float=0.0):
 
 def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
-#    run_object_deletion_tests(delay)
-#    run_basic_networking_tests(delay)
+    run_object_deletion_tests(delay)
+    run_basic_networking_tests(delay)
     run_specific_signal_ahead_tests(delay)
     if shutdown: report_results()
     
