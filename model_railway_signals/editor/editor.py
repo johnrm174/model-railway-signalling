@@ -50,16 +50,18 @@
 #    pi_sprog_interface.sprog_shutdown - Disconnect from the Pi-SPROG
 #    pi_sprog_interface.request_dcc_power_off - To turn off the track power
 #    pi_sprog_interface.request_dcc_power_on - To turn on the track power
-#    mqtt_interface.configure_networking - After update of the MQTT Settings
-#    mqtt_interface.mqtt_shutdown - Disconnect from the MQTT Broker
+#    mqtt_interface.mqtt_broker_connect - MQTT Broker connection configuration
+#    mqtt_interface.mqtt_broker_disconnect - disconnect prior to reconfiguration
+#    mqtt_interface.configure_mqtt_client - configure client network details
 #    dcc_control.reset_mqtt_configuration - reset all publish/subscribe
 #    dcc_control.set_node_to_publish_dcc_commands - set note to publish DCC
 #    dcc_control.subscribe_to_dcc_command_feed - subscribe to DCC from other nodes
+#    track_sensors.raspberry_pi - To see if the application is running on a Raspberry Pi
 #    track_sensors.create_sensor - Create Track sensor objects (GPIO mappings)
-#    track_sensors.delete_all_track_sensors - Delete all GPIO mappings
+#    track_sensors.delete_all_local_track_sensors - Delete all GPIO mappings
 #    track_sensors.reset_mqtt_configuration() - configure MQTT networking
-#    track_sensors.set_track_sensors_to_publish_state(*ids) - configure MQTT networking
-#    track_sensors.subscribe_to_remote_track_sensor(id) - configure MQTT networking
+#    track_sensors.set_sensors_to_publish_state(*ids) - configure MQTT networking
+#    track_sensors.subscribe_to_remote_sensor(id) - configure MQTT networking
 #
 #------------------------------------------------------------------------------------
 
@@ -372,10 +374,7 @@ class main_menubar:
         dcc_control.reset_mqtt_configuration()
         dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
         dcc_control.subscribe_to_dcc_command_feed(*settings.get_sub_dcc_nodes())
-        track_sensors.reset_mqtt_configuration()
-        track_sensors.set_track_sensors_to_publish_state(*settings.get_pub_sensors())
-        for remote_sensor_identifier in settings.get_sub_sensors():
-            track_sensors.subscribe_to_remote_track_sensor(remote_sensor_identifier)
+        objects.mqtt_update_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
         objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
         objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
@@ -392,15 +391,14 @@ class main_menubar:
         elif log_level == 4: logging.getLogger().setLevel(logging.DEBUG)
 
     def gpio_update(self):
-        # Delete all track sensor objects and then re-create from the updated settings - we do this
-        # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
-        track_sensors.delete_all_track_sensors()
         trigger, timeout, mappings = settings.get_gpio()
+        # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
         if len(mappings)>0 and not track_sensors.raspberry_pi:
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
                     message="Not running on Raspberry Pi - no track sensors will be active")
-        for mapping in mappings:
-            track_sensors.create_track_sensor(mapping[0],mapping[1],trigger_period=trigger,sensor_timeout=timeout)
+        # Delete all track sensor objects and then re-create from the updated settings - we do this
+        # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
+        objects.update_local_sensors(trigger, timeout, mappings)
 
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function

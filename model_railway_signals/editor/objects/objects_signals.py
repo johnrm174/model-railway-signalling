@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------------
-# This module contains all the functions for managing Signal objects
+# This module contains all the functions for managing Signal objects. And also
+# Track Sensors as they are inherently linked to signal passed/approached events
 #------------------------------------------------------------------------------------
 #
 # External API functions / objects intended for use by other editor modules:
@@ -11,6 +12,8 @@
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    default_signal_object - The dictionary of default values for the object
 #    mqtt_update_signals(pub_list, sub_list) - Configure MQTT publish/subscribe
+#    mqtt_update_sensors(pub_list, sub_list) - Configure MQTT publish/subscribe
+#    update_local_sensors(trigger,timeout,mappings) - Configure local track sensors
 #    remove_references_to_point (point_id) - remove point references from the interlocking tables
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
@@ -28,8 +31,8 @@
 #
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
-#    objects_common.objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.objects_common.signal_index - The Index of Signal Objects (for iterating)
+#    objects_common.schematic_objects - the master dictionary of Schematic Objects
+#    objects_common.signal_index - The Index of Signal Objects (for iterating)
 #    objects_common.default_object - The common dictionary element for all objects
 #    objects_common.object_type - The Enumeration of supported objects
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -50,16 +53,19 @@
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
 #    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
+#    signals.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
 #    signals.set_signals_to_publish_state(IDs) - configure MQTT networking
-#    signals.set_signals_to_publish_passed_events(IDs) - configure MQTT networking
-#    signals.subscribe_to_signal_updates(node,IDs) - configure MQTT networking
-#    signals.subscribe_to_signal_passed_events(node,IDs) - configure MQTT networking
+#    signals.subscribe_to_remote_signal(ID,callback) - configure MQTT networking
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
-#    track_sensors.delete_sensor_mapping - delete the existing signal sensor mapping
-#    track_sensors.create_track_sensor - To create a new signal sensor mapping
-#
+#    track_sensors.update_sensor_callback - For managing track sensor objects
+#    track_sensors.remove_sensor_callbacks - For managing track sensor objects
+#    track_sensors.delete_all_local_track_sensors - For managing track sensor objects
+#    track_sensors.reset_mqtt_configuration - For managing track sensor objects
+#    track_sensors.set_sensors_to_publish_state - For managing track sensor objects
+#    track_sensors.subscribe_to_remote_sensor - For managing track sensor objects
+#    track_sensors.create_track_sensor - For managing track sensor objects
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -449,21 +455,13 @@ def update_signal(object_id, new_object_configuration):
 def redraw_signal_object(object_id):
     # Turn the signal type value back into the required enumeration type
     sig_type = signals_common.sig_type(objects_common.schematic_objects[object_id]["itemtype"])
-#############################################################################################################
-######## TO DO - Sections will already have been created - we need to #######################################
-######## map the passed/approached events via a new library function  #######################################
-#############################################################################################################
-#     # Create the sensor mappings for the signal (if any have been specified)
-#     # As we are using these for signal events, we assign an arbitary item ID
-#     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
-#         track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10,
-#                         gpio_channel = objects_common.schematic_objects[object_id]["passedsensor"][1],
-#                         signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
-#     if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
-#         track_sensors.create_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10+1,
-#                         gpio_channel = objects_common.schematic_objects[object_id]["approachsensor"][1],
-#                         signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
-#############################################################################################################
+    # Update the sensor mapping callbacks for the signal (if any have been specified)
+    if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
+        track_sensors.update_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
+                                    signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
+    if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
+        track_sensors.update_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
+                                    signal_approach = objects_common.schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
             sig_type == signals_common.sig_type.ground_position):
@@ -701,11 +699,8 @@ def delete_signal_object(object_id):
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
-#     ###################################################################################################
-#     ################# TO DO - Delete Sensor mapping rather than delete sensor #########################
-#     track_sensors.delete_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10)
-#     track_sensors.delete_track_sensor(objects_common.schematic_objects[object_id]["itemid"]*10+1)
-#     ###################################################################################################
+    track_sensors.remove_sensor_callbacks(objects_common.schematic_objects[object_id]["itemid"]*10)
+    track_sensors.remove_sensor_callbacks(objects_common.schematic_objects[object_id]["itemid"]*10+1)
     # Delete the associated distant signal (if there is one)
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
@@ -739,9 +734,66 @@ def delete_signal(object_id):
 def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
     signals_common.reset_mqtt_configuration()
     signals.set_signals_to_publish_state(*signals_to_publish)
-    for signal in signals_to_subscribe_to:
-        [node_str, item_id_str] = signal.rsplit('-')
-        signals.subscribe_to_signal_updates(node_str, run_layout.schematic_callback, int(item_id_str))
+    for signal_identifier in signals_to_subscribe_to:
+        signals.subscribe_to_remote_signal(signal_identifier, run_layout.schematic_callback)
+    return()
+
+########################################################################################################
+# The following functions are specific to Track Section Objects
+########################################################################################################
+
+#------------------------------------------------------------------------------------
+# Function to re-create local sensors (following a sensor settings update) - this
+# ensures that any signal event mappings are retained for the 'new' sensors
+#------------------------------------------------------------------------------------
+
+def update_local_sensors(trigger:float, timeout:float, mappings:list):
+    # Delete all track sensor objects and then re-create from the updated settings
+    track_sensors.delete_all_local_track_sensors()
+    # Iterate through the sensor mappings to create each (new) track sensor objectin turn
+    for mapping in mappings:
+        sensor_id, gpio_port = mapping[0], mapping[1]
+        signal_passed, signal_approach = 0, 0
+        # Iterate through the signals to find if the sensor has been mapped to a signal approach/passed event
+        for signal_id in objects_common.signal_index:
+            signal_object =  objects_common.schematic_objects[objects_common.signal(signal_id)]
+            # Re-create the signal event mappings if the specified sensor exists in the new configuration 
+            # If not, the sensor is created without any event mappings (these can be added later as required)
+            if signal_object["passedsensor"][1] == str(sensor_id):
+                signal_passed = int(signal_id)
+                break
+            if signal_object["approachsensor"][1] == str(sensor_id):
+                signal_approach = int(signal_id)
+                break
+        track_sensors.create_track_sensor(sensor_id, gpio_port, signal_passed=signal_passed,
+                    signal_approach=signal_approach, trigger_period=trigger, sensor_timeout=timeout)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to re-create local sensors (following a sensor settings update) - this
+# ensures that any signal event mappings are retained for the 'new' sensors
+#------------------------------------------------------------------------------------
+
+def mqtt_update_sensors(pub_sensors:list,sub_sensors:list):
+    # Delete all publish/subscribe configuration prior to re-creating
+    track_sensors.reset_mqtt_configuration()
+    track_sensors.set_sensors_to_publish_state(*pub_sensors)
+    # Iterate through the list of sensors to subscribe to - to create each (new) subscription in turn
+    for remote_identifier in sub_sensors:
+        signal_passed, signal_approach = 0, 0
+        # Iterate through the signals to find if the sensor has been mapped to a signal approach/passed event
+        for signal_id in objects_common.signal_index:
+            signal_object =  objects_common.schematic_objects[objects_common.signal(signal_id)]
+            # Re-create the signal event mappings if the specified sensor exists in the new configuration 
+            # If not, the sensor is created without any event mappings (these can be added later as required)
+            if signal_object["passedsensor"][1] == remote_identifier:
+                signal_passed = int(signal_id)
+                break
+            if signal_object["approachsensor"][1] == remote_identifier:
+                signal_approach = int(signal_id)
+                break
+        track_sensors.subscribe_to_remote_sensor(remote_identifier,
+                    signal_passed=signal_passed, signal_approach=signal_approach)
     return()
 
 ####################################################################################

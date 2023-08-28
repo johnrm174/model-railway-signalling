@@ -675,20 +675,6 @@ appropriate level of security. This package does support basic username/password
 for connecting in to the broker but note that these are NOT ENCRYPTED when sending over the 
 internet unless you are also using a SSL connection.
 <pre>
-configure_networking - Configures the local client and opens a connection to the MQTT broker
-                   Returns whether the connection was successful (or timed out)
-                   NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
-                   Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
-  Mandatory Parameters:
-      broker_host:str - The name/IP address of the MQTT broker host to be used
-      network_identifier:str - The name to use for this signalling network (any string)
-      node_identifier:str - The name to use for this node on the network (can be any string)
-  Optional Parameters:
-      broker_port:int - The network port for the broker host (default = 1883)
-      broker_username:str - the username to log into the MQTT Broker (default = None)
-      broker_password:str - the password to log into the MQTT Broker (default = None)
-      mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
-
 configure_mqtt_client - Configures the local MQTT client and layout network node
   Mandatory Parameters:
       network_identifier:str - The name to use for this signalling network (any string)
@@ -714,7 +700,70 @@ subscribe_to_dcc_command_feed - Subcribes to DCC command feed from another node 
   Mandatory Parameters:
       *nodes:str - The name of the node publishing the feed (multiple nodes can be specified)
 
-subscribe_to_section_updates - Subscribe to section updates from another node on the network 
+subscribe_to_remote_section - Subscribes to a remote track section object
+  Mandatory Parameters:
+      remote_identifier:str - the remote identifier for the track section in the form 'node-id'
+  Optional Parameters:
+      section_callback - Function to call when a track section update is received  - default = None
+
+set_sections_to_publish_state - Enable the publication of state updates for track sections.
+               All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *sec_ids:int - The track sections to publish (multiple Section_IDs can be specified)
+
+subscribe_to_remote_signal - Subscribes to a remote signal object
+  Mandatory Parameters:
+      remote_identifier:str - the remote identifier for the signal in the form 'node-id'
+  Optional Parameters:
+      signal_callback - Function to call when a signal update is received - default = None
+
+set_signals_to_publish_state - Enable the publication of state updates for signals.
+               All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
+
+subscribe_to_remote_instrument - Subscribes to a remote block instrument object
+  Mandatory Parameters:
+      remote_identifier:str - the remote identifier for the block instrument in the form 'node-id'
+
+set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
+               All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
+
+subscribe_to_remote_sensor - Subscribes to a remote track sensor object
+  Mandatory Parameters:
+      remote_identifier:str - the remote identifier for the sensor in the form 'node-id'
+  Optional Parameters:
+      signal_passed:int    - Raise a "signal passed" event for a signal ID - default = None
+      signal_approach:int  - Raise an "approach release" event for a signal ID - default = None
+      sensor_callback      - Function to call when a sensor has been triggered - default = None
+                             Only one of signal_passed, signal_approach or callback can be specified
+                             Note that for callback, the function returns (item_id, callback type)
+
+set_sensors_to_publish_state- Enable the publication of state updates for track sensors.
+             All subsequent changes will be automatically published to remote subscribers
+  Mandatory Parameters:
+      *sensor_ids:int - The track sensors to publish (multiple Sensor IDs can be specified)      
+
+THE FOLLOWING FUNCTIONS ARE DEPRECATED:
+
+configure_networking - Configures the local client and opens a connection to the MQTT broker
+                   Returns whether the connection was successful (or timed out)
+                   NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
+                   Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
+  Mandatory Parameters:
+      broker_host:str - The name/IP address of the MQTT broker host to be used
+      network_identifier:str - The name to use for this signalling network (any string)
+      node_identifier:str - The name to use for this node on the network (can be any string)
+  Optional Parameters:
+      broker_port:int - The network port for the broker host (default = 1883)
+      broker_username:str - the username to log into the MQTT Broker (default = None)
+      broker_password:str - the password to log into the MQTT Broker (default = None)
+      mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+
+subscribe_to_section_updates - Subscribe to section updates from another node on the network
+      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_track_section' instead
   Mandatory Parameters:
       node:str - The name of the node publishing the track section update feed
       sec_callback:name - Function to call when an update is received from the remote node
@@ -723,6 +772,7 @@ subscribe_to_section_updates - Subscribe to section updates from another node on
       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
 
 subscribe_to_signal_updates - Subscribe to signal updates from another node on the network 
+      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_signal' instead
   Mandatory Parameters:
       node:str - The name of the node publishing the signal state feed
       sig_callback:name - Function to call when an update is received from the remote node
@@ -731,6 +781,8 @@ subscribe_to_signal_updates - Subscribe to signal updates from another node on t
       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 
 subscribe_to_signal_passed_events  - Subscribe to signal passed events from another node  
+    NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
+    supported from release 4.0.0 (use track sections to achieve the required functionality)
   Mandatory Parameters:
       node:str - The name of the node publishing the signal passed event feed
       sig_callback:name - Function to call when a signal passed event is received
@@ -738,45 +790,18 @@ subscribe_to_signal_passed_events  - Subscribe to signal passed events from anot
                Item Identifier is a string in the following format "node_id-signal_id"
       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
 
-subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network 
-  Mandatory Parameters:
-      node:str - The name of the node publishing the block instrument update feed
-      *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
-
-subscribe_to_remote_track_sensor - Subscribes to a remote track sensor object
-  Mandatory Parameters:
-      remote_sensor_identifier:str - the remote identifier for the sensor in the form 'node-id'
-  Optional Parameters:
-      signal_passed:int    - Raise a "signal passed" event for a signal ID - default = None
-      signal_approach:int  - Raise an "approach release" event for a signal ID - default = None
-      sensor_callback      - Function to call when a sensor has been triggered - default = None
-                             Only one of signal_passed, signal_approach or callback can be specified
-                             Note that for callback, the function returns (item_id, callback type)
-
-set_sections_to_publish_state - Enable the publication of state updates for track sections.
-               All subsequent changes will be automatically published to remote subscribers
-  Mandatory Parameters:
-      *sec_ids:int - The track sections to publish (multiple Section_IDs can be specified)
-
-set_signals_to_publish_state - Enable the publication of state updates for signals.
-               All subsequent changes will be automatically published to remote subscribers
-  Mandatory Parameters:
-      *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
-
 set_signals_to_publish_passed_events - Enable the publication of signal passed events.
+    NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
+    supported from release 4.0.0 (use track sections to achieve the required functionality)
                All subsequent events will be automatically published to remote subscribers
   Mandatory Parameters:
       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
-      
-set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
-               All subsequent changes will be automatically published to remote subscribers
-  Mandatory Parameters:
-      *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
 
-set_track_sensors_to_publish_state- Enable the publication of state updates for track sensors.
-             All subsequent changes will be automatically published to remote subscribers
+subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network
+      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_instrument' instead
   Mandatory Parameters:
-      *sensor_ids:int - The track sensors to publish (multiple Sensor IDs can be specified)      
+      node:str - The name of the node publishing the block instrument update feed
+      *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
 </pre>
 
 ## Code examples

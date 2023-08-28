@@ -33,8 +33,9 @@
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
 #    block_instruments.update_linked_to(old_id, new_id) - update the linked instrument reference
 #    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
+#    block_instruments.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
 #    block_instruments.set_instruments_to_publish_state(IDs) - configure MQTT networking
-#    block_instruments.subscribe_to_instrument_updates(node,IDs) - configure MQTT networking
+#    block_instruments.subscribe_to_remote_instrument(ID) - configure MQTT networking
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -217,9 +218,8 @@ def delete_instrument(object_id):
 def mqtt_update_instruments(instruments_to_publish:list, instruments_to_subscribe_to:list):
     block_instruments.reset_mqtt_configuration()
     block_instruments.set_instruments_to_publish_state(*instruments_to_publish)
-    for instrument in instruments_to_subscribe_to:
-        [node_str, item_id_str] = instrument.rsplit('-')
-        block_instruments.subscribe_to_instrument_updates(node_str, int(item_id_str))
+    for instrument_identifier in instruments_to_subscribe_to:
+        block_instruments.subscribe_to_remote_instrument(instrument_identifier)
     return()
     
 ####################################################################################

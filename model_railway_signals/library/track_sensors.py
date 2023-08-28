@@ -20,15 +20,15 @@
 #                              Only one of signal_passed, signal_approach or callback can be specified
 #                              Note that for callback, the function returns (item_id, callback type)
 # 
-# sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
+# sensor_active (sensor_id:int/str) - Returns the current state of the sensor (True/False)
 #
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
 #
-# subscribe_to_remote_track_sensor - Subscribes to a remote track sensor object
+# subscribe_to_remote_sensor - Subscribes to a remote track sensor object
 #   Mandatory Parameters:
-#       remote_sensor_identifier:str - the remote identifier for the sensor in the form 'node-id'
+#       remote_identifier:str - the remote identifier for the sensor in the form 'node-id'
 #   Optional Parameters:
 #       signal_passed:int    - Raise a "signal passed" event for a signal ID - default = None
 #       signal_approach:int  - Raise an "approach release" event for a signal ID - default = None
@@ -36,7 +36,7 @@
 #                              Only one of signal_passed, signal_approach or callback can be specified
 #                              Note that for callback, the function returns (item_id, callback type)
 # 
-#   set_track_sensors_to_publish_state- Enable the publication of state updates for track sensors.
+#   set_sensors_to_publish_state- Enable the publication of state updates for track sensors.
 #                All subsequent changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
 #       *sensor_ids:int - The track sensors to publish (multiple Sensor IDs can be specified)
@@ -52,9 +52,17 @@ from . import common
 from . import signals_common
 from . import mqtt_interface
 
+# -----------------------------------------------------------------------------------------------------------
+# Classes used by external functions when using track sensors
+# -----------------------------------------------------------------------------------------------------------
+    
+class track_sensor_callback_type(enum.Enum):
+    sensor_triggered = 31   # The sensor has been triggered (FALLING Event)
+
 # ----------------------------------------------------------------------------------------------------------------------------
-# We can only use GPIO interface if we're running on a Raspberry Pi. Other Platforms don't
-# include the RPi specific GPIO package so this is a quick and dirty way of detecting it
+# We can only use GPIO interface if we're running on a Raspberry Pi. Other Platforms don't include
+# the RPi specific GPIO package so this is a quick and dirty way of detecting it on startup.
+# The result (True or False) is maintained in the global 'raspberry_pi' variable
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def is_raspberrypi():
@@ -67,13 +75,6 @@ def is_raspberrypi():
     return (False)
 
 raspberry_pi = is_raspberrypi()
-
-# -----------------------------------------------------------------------------------------------------------
-# Define the different callbacks types for the sensor events
-# -----------------------------------------------------------------------------------------------------------
-    
-class track_sensor_callback_type(enum.Enum):
-    sensor_triggered = 31   # The sensor has been triggered (FALLING Event)
     
 # -----------------------------------------------------------------------------------------------------------
 # Gpio port mappings are stored in a global dictionary when created with the key beign the GPIO sensor ID
@@ -96,7 +97,7 @@ gpio_port_mappings: dict = {}
 # -----------------------------------------------------------------------------------------------------------
 
 list_of_track_sensors_to_publish=[]
-
+    
 # -----------------------------------------------------------------------------------------------------------
 # The default "External" callback function for the sensor
 # This is called on events if an external callback hasn't neen specified
@@ -118,12 +119,12 @@ def gpio_port_is_configured(gpio_port_number:Union[int,str]):
 
 def mapped_gpio_port(sensor_id:int):
     for gpio_port in gpio_port_mappings.keys():
-        if gpio_port_mappings[gpio_port]["sensor_id"] == sensor_id:
-            return(int(gpio_port))
+        if str(gpio_port_mappings[gpio_port]["sensor_id"]) == str(sensor_id):
+            return(gpio_port)
     return(None)
 
 # -----------------------------------------------------------------------------------------------------------
-# Function to check if a sensor exists (either mapped or subscribed to via mqtt metworking)
+# Internal Function to check if a sensor exists (either mapped or subscribed to via mqtt metworking)
 # -----------------------------------------------------------------------------------------------------------
 
 def sensor_exists(sensor_id:Union[int,str]):
@@ -133,7 +134,7 @@ def sensor_exists(sensor_id:Union[int,str]):
     return(None)
 
 # -----------------------------------------------------------------------------------------------------------
-# Common Function to make the appropriate callback (callback or signal approach/passed event)
+# Internal Function to make the appropriate callback (callback or signal approach/passed event)
 # for both local track sensors and remote (subscribed to via MQTT networking) track sensors
 # Note that we call into the main tkinter thread to process the callback. We do this as all the
 # information out there on the internet concludes tkinter isn't fully thread safe and so all  
@@ -243,7 +244,7 @@ def track_sensor_triggered (gpio_port:int):
     return()            
 
 # -----------------------------------------------------------------------------------------------------------
-# Externally called function to create a sensor object (mapped to a GPIO channel)
+# Public API function to create a sensor object (mapped to a GPIO channel)
 # All attributes (that need to be tracked) are stored as a dictionary
 # This is then added to a dictionary of sensors for later reference
 # -----------------------------------------------------------------------------------------------------------
@@ -271,7 +272,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
         logging.error ("Sensor "+str(sensor_id)+": Cannot specify a sensor_callback AND map to a signal event")
     elif sensor_exists(sensor_id):
-        logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to GPIO Port "+str(mapped_gpio_port(sensor_id)))
+        logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to GPIO Port "+mapped_gpio_port(sensor_id))
     else:
         # We're good to go and create the sensor mapping, but we only configure the GPIO if running on a Pi
         if raspberry_pi:
@@ -295,37 +296,110 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         send_mqtt_track_sensor_updated_event(sensor_id)
     return() 
 
+# -----------------------------------------------------------------------------------------------------------
+# Public API function to return the state of a sensor object 
+# -----------------------------------------------------------------------------------------------------------
+
+def track_sensor_active (sensor_id:int):
+    if sensor_exists(sensor_id):
+        state = gpio_port_mappings[mapped_gpio_port(sensor_id)]["sensor_state"]
+    else:
+        state = False
+        logging.error ("track_sensor_active - Sensor "+str(sensor_id)+": does not exist")
+    return (state)
+
 # ------------------------------------------------------------------------------------------------------------------
 # Public API Function to "subscribe" to track sensor updates published by remote MQTT Nodes
 # and generate the appropriate callbacks or passed / approached events for a specified signal
 # ------------------------------------------------------------------------------------------------------------------
 
-def subscribe_to_remote_track_sensor (remote_sensor_identifier:str,
-                                      sensor_callback = null_callback,
-                                      signal_passed:int = 0,
-                                      signal_approach:int = 0):    
+def subscribe_to_remote_sensor (remote_identifier:str,
+                                sensor_callback = null_callback,
+                                signal_passed:int = 0,
+                                signal_approach:int = 0):    
     global gpio_port_mappings
-    # Validate the remote sensor ID (must be 'node-id' where id is an int between 1 and 99)
-    if mqtt_interface.split_remote_item_identifier(remote_sensor_identifier) is None:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": The sensor identifier must be in the form of 'Node-ID'")
+    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
+    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
+        logging.error ("MQTT-Client: Sensor "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
         logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
     elif signal_passed > 0 and signal_approach > 0:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Can only map to a signal_passed event OR a signal_approach event")
+        logging.error ("MQTT-Client: Sensor "+remote_identifier+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
-        logging.error ("MQTT-Client: Sensor "+remote_sensor_identifier+": Cannot specify a sensor_callback AND map to a signal event")
+        logging.error ("MQTT-Client: Sensor "+remote_identifier+": Cannot specify a sensor_callback AND map to a signal event")
     else:
-        if gpio_port_is_configured(remote_sensor_identifier):
-            logging.warning("MQTT-Client: Sensor "+str(remote_sensor_identifier)+" - has already been subscribed to via MQTT networking")
+        if sensor_exists(remote_identifier):
+            logging.warning("MQTT-Client: Sensor "+remote_identifier+" - has already been subscribed to via MQTT networking")
         # Create a dummy GPIO port mapping to hold the callback information
-        gpio_port_mappings[remote_sensor_identifier] = {"sensor_id"       : remote_sensor_identifier,
-                                                        "callback"        : sensor_callback,
-                                                        "signal_approach" : signal_approach,
-                                                        "signal_passed"   : signal_passed,
-                                                        "sensor_state"    : False}
+        gpio_port_mappings[remote_identifier] = {"sensor_id"       : remote_identifier,
+                                                 "callback"        : sensor_callback,
+                                                 "signal_approach" : signal_approach,
+                                                 "signal_passed"   : signal_passed,
+                                                 "sensor_state"    : False}
         # Subscribe to events from the remote track sensor
-        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_sensor_identifier)
+        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
         mqtt_interface.subscribe_to_mqtt_messages("track_sensor_event",node_id,item_id,
                                                     handle_mqtt_track_sensor_updated_event)
+    return()
+
+# ------------------------------------------------------------------------------------------------------------------
+# Public API Function to set configure a track sensor to publish state changes to remote MQTT nodes
+# ------------------------------------------------------------------------------------------------------------------
+
+def set_sensors_to_publish_state(*sensor_ids:int):    
+    global list_of_track_sensors_to_publish
+    for sensor_id in sensor_ids:
+        logging.debug("MQTT-Client: Configuring track sensor "+str(sensor_id)+" to publish state changes via MQTT broker")
+        if sensor_id in list_of_track_sensors_to_publish:
+            logging.warning("MQTT-Client: Track sensor "+str(sensor_id)+" - is already configured to publish state changes")
+        else:
+            list_of_track_sensors_to_publish.append(sensor_id)
+        # Publish the current state if the track sensor has already been configured
+        if sensor_exists(sensor_id): send_mqtt_track_sensor_updated_event(sensor_id)
+    return()
+
+# ------------------------------------------------------------------------------------------------------------------
+# Callback for handling received MQTT messages from a remote track sensor
+# ------------------------------------------------------------------------------------------------------------------
+
+def handle_mqtt_track_sensor_updated_event(message):
+    if "sourceidentifier" in message.keys() and "state" in message.keys():
+        sensor_identifier = message["sourceidentifier"]
+        # Defensive programming - just in case we get a spurious message
+        if sensor_exists(sensor_identifier):
+            str_gpio_port = mapped_gpio_port(sensor_identifier) 
+            # Maintain the state locally (so it can be queried via the track_sensor_active function)
+            gpio_port_mappings[str_gpio_port]["sensor_state"] = message["state"]
+            # Only make the callback (or raise signal approach/passed event) for 'triggered' events
+            if gpio_port_mappings[str_gpio_port]["sensor_state"]:
+                logging.info("Sensor "+sensor_identifier+": Remote track sensor has been triggered **********************")
+                make_track_sensor_callback(sensor_identifier)
+            else:
+                logging.debug("Sensor "+sensor_identifier+": Remote track sensor has been reset **************************")
+    return()
+
+# ------------------------------------------------------------------------------------------------------------------
+# Internal function for building and sending MQTT messages - but only if the
+# track sensor has been configured to publish updates via the mqtt broker
+# ------------------------------------------------------------------------------------------------------------------
+
+def send_mqtt_track_sensor_updated_event(sensor_id:int):
+    if sensor_id in list_of_track_sensors_to_publish:
+        data = {}
+        data["state"] = gpio_port_mappings[mapped_gpio_port(sensor_id)]["sensor_state"]
+        log_message = "Sensor "+str(sensor_id)+": Publishing sensor state of "+str(data["state"])+" to MQTT Broker"
+        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("track_sensor_event",sensor_id,data=data,log_message=log_message,retain=True)
+    return()
+
+# -----------------------------------------------------------------------------------------------------------
+# Function called on shutdown to set the gpio ports back to their defaults
+# -----------------------------------------------------------------------------------------------------------
+
+def gpio_shutdown():
+    if raspberry_pi:
+        logging.info ("GPIO: Restoring default settings")
+        GPIO.setwarnings(False)
+        GPIO.cleanup()
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -340,8 +414,9 @@ def subscribe_to_remote_track_sensor (remote_sensor_identifier:str,
 def update_sensor_callback (sensor_identifier:Union[int,str], signal_passed:int=0, signal_approach:int=0):
     global gpio_port_mappings
     if sensor_exists(sensor_identifier):
-        if signal_approach > 0: gpio_port_mappings[sensor_identifier]["signal_approach"] = signal_approach
-        if signal_passed > 0: gpio_port_mappings[sensor_identifier]["signal_passed"] = signal_approach
+        str_gpio_port = mapped_gpio_port(sensor_identifier)
+        gpio_port_mappings[str_gpio_port]["signal_approach"] = signal_approach
+        gpio_port_mappings[str_gpio_port]["signal_passed"] = signal_passed
 
 def remove_sensor_callbacks (signal_id:int):
     global gpio_port_mappings
@@ -352,34 +427,12 @@ def remove_sensor_callbacks (signal_id:int):
             gpio_port_mappings[gpio_port]["signal_passed"] = 0
     return()
 
-# -----------------------------------------------------------------------------------------------------------
-# Externally called function to return the state of a sensor object 
-# -----------------------------------------------------------------------------------------------------------
-
-def track_sensor_active (sensor_id:int):
-    for gpio_port in gpio_port_mappings.keys():
-        if gpio_port_mappings[str(gpio_port)]["sensor_id"] == sensor_id:
-            return (gpio_port_mappings[str(gpio_port)]["sensor_state"] )
-    logging.error ("track_sensor_active - Sensor "+str(sensor_id)+": does not exist")
-    return (False)
-
-# -----------------------------------------------------------------------------------------------------------
-# Function called on shutdown to set the gpio ports back to their defaults
-# -----------------------------------------------------------------------------------------------------------
-
-def gpio_shutdown():
-    if raspberry_pi:
-        logging.info ("GPIO: Restoring default settings")
-        GPIO.setwarnings(False)
-        GPIO.cleanup()
-    return()
-
 # ------------------------------------------------------------------------------------------------------------------
 # Non public API function for deleting all LOCAL sensor mappings - This is used by the
 # schematic editor for deleting all existing GPIO mappings (before creating new ones)
 # ------------------------------------------------------------------------------------------------------------------
 
-def delete_all_track_sensors():
+def delete_all_local_track_sensors():
     global gpio_port_mappings
     # Delete all "local" sensors from the dictionary of gpio_port_mappings - these
     # will be re-created if they are subsequently re-subscribed to. Note we don't iterate 
@@ -392,58 +445,7 @@ def delete_all_track_sensors():
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
-# Public API Function to set configure a track sensor to publish state changes to remote MQTT nodes
-# ------------------------------------------------------------------------------------------------------------------
-
-def set_track_sensors_to_publish_state(*sensor_ids:int):    
-    global list_of_track_sensors_to_publish
-    for sensor_id in sensor_ids:
-        logging.info("MQTT-Client: Configuring track sensor "+str(sensor_id)+" to publish state changes via MQTT broker")
-        if sensor_id in list_of_track_sensors_to_publish:
-            logging.warning("MQTT-Client: Track sensor "+str(sensor_id)+" - is already configured to publish state changes")
-        else:
-            list_of_track_sensors_to_publish.append(sensor_id)
-        # Publish the current state if the track sensor has already been configured
-        if sensor_exists(sensor_id):
-            send_mqtt_track_sensor_updated_event(sensor_id)
-    return()
-
-# ------------------------------------------------------------------------------------------------------------------
-# Callback for handling received MQTT messages from a remote track sensor
-# ------------------------------------------------------------------------------------------------------------------
-
-def handle_mqtt_track_sensor_updated_event(message):
-    if "sourceidentifier" in message.keys() and "state" in message.keys():
-        remote_port_identifier = message["sourceidentifier"]
-        # Defensive programming - just in case we get a spurious message
-        if gpio_port_is_configured(remote_port_identifier):
-            # Maintain the state locally (so it can be queried without querying the GPIO port)
-            # We do this for consistency with how remote (MQTT) track sensors are handled
-            gpio_port_mappings[remote_port_identifier]["sensor_state"] = message["state"]
-            # Only make the callback (or raise signal approach/passed event) for 'triggered' events
-            if gpio_port_mappings[remote_port_identifier]["sensor_state"]:
-                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been triggered **********************")
-                make_track_sensor_callback(remote_port_identifier)
-            else:
-                logging.info("Sensor "+remote_port_identifier+": Remote track sensor has been reset **************************")
-    return()
-
-# ------------------------------------------------------------------------------------------------------------------
-# Internal function for building and sending MQTT messages - but only if the
-# track sensor  has been configured to publish updates via the mqtt broker
-# ------------------------------------------------------------------------------------------------------------------
-
-def send_mqtt_track_sensor_updated_event(sensor_id:int):
-    if sensor_id in list_of_track_sensors_to_publish:
-        data = {}
-        data["state"] = gpio_port_mappings[str(mapped_gpio_port(sensor_id))]["sensor_state"]
-        log_message = "Sensor "+str(sensor_id)+": Publishing sensor state of "+str(data["state"])+" to MQTT Broker"
-        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
-        mqtt_interface.send_mqtt_message("track_sensor_event",sensor_id,data=data,log_message=log_message,retain=True)
-    return()
-
-# ------------------------------------------------------------------------------------------------------------------
-# Non public API function to reset the list of published/subscribed track sections. Used
+# Non public API function to reset the list of published/subscribed track sensors. Used
 # by the schematic editor for re-setting the MQTT configuration prior to re-configuring
 # via the set_track_sensors_to_publish_state and subscribe_to_track_sensor_updates functions
 # ------------------------------------------------------------------------------------------------------------------

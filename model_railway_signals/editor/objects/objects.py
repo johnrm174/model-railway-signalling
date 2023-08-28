@@ -515,6 +515,8 @@ def set_all(new_objects):
                     elif isinstance(new_objects[object_id][element][1],int):
                         objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
                         list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                    else:
+                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
                 elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if new_objects[object_id][element][1] == 0:
@@ -522,6 +524,8 @@ def set_all(new_objects):
                     elif isinstance(new_objects[object_id][element][1],int):
                         objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
                         list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                    else:
+                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
                 ##################################################################################
                 ###################### End of code to handle breaking changes ####################
                 ##################################################################################

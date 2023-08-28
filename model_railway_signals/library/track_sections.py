@@ -48,7 +48,8 @@
 #
 # The following functions are associated with the MQTT networking Feature:
 #
-# subscribe_to_section_updates - Subscribe to section updates from another node on the network 
+# subscribe_to_section_updates - Subscribe to section updates from another node on the network
+#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_track_section' instead
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the track section update feed
 #       sec_callback:name - Function to call when an update is received from the remote node
@@ -56,6 +57,12 @@
 #                item_identifier is a string in the following format "node_id-section_id"
 #       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
 #       
+# subscribe_to_remote_section - Subscribes to a remote track section object
+#   Mandatory Parameters:
+#       remote_identifier:str - the remote identifier for the track section in the form 'node-id'
+#   Optional Parameters:
+#       section_callback - Function to call when a track section update is received  - default = None
+#
 # set_sections_to_publish_state - Enable the publication of state updates for track sections.
 #                All subsequent changes will be automatically published to remote subscribers
 #   Mandatory Parameters:
@@ -364,6 +371,9 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
 
 def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
     global sections
+    logging.warning ("#######################################################################################################")
+    logging.warning ("The subscribe_to_section_updates function is DEPRECATED - use subscribe_to_remote_track_section instead")
+    logging.warning ("#######################################################################################################")
     for sec_id in sec_ids:
         # Create a dummy section object to hold the state of the remote track occupancy section
         # The Identifier for a remote Section is a string combining the the Node-ID and Section-ID
@@ -378,6 +388,25 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
                                                   handle_mqtt_section_updated_event)
     return()
 
+def subscribe_to_remote_section (remote_identifier:str,section_callback):   
+    global sections
+    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
+    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
+        logging.error ("MQTT-Client: Section "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
+        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
+    else:
+        if section_exists(remote_identifier):
+            logging.warning("MQTT-Client: Section "+remote_identifier+" - has already been subscribed to via MQTT networking")
+        sections[remote_identifier] = {}
+        sections[remote_identifier]["occupied"] = False
+        sections[remote_identifier]["labeltext"] = "OCCUPIED"
+        sections[remote_identifier]["extcallback"] = section_callback
+        # Subscribe to updates from the remote section
+        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
+        mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node_id,item_id,
+                                                  handle_mqtt_section_updated_event)
+    return()
+
 #-----------------------------------------------------------------------------------------------
 # Public API Function to set configure a section to publish state changes to remote MQTT nodes
 #-----------------------------------------------------------------------------------------------
@@ -385,7 +414,7 @@ def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):
 def set_sections_to_publish_state(*sec_ids:int):    
     global list_of_sections_to_publish
     for sec_id in sec_ids:
-        logging.info("MQTT-Client: Configuring section "+str(sec_id)+" to publish state changes via MQTT broker")
+        logging.debug("MQTT-Client: Configuring section "+str(sec_id)+" to publish state changes via MQTT broker")
         if sec_id in list_of_sections_to_publish:
             logging.warning("MQTT-Client: Section "+str(sec_id)+" - is already configured to publish state changes")
         else:

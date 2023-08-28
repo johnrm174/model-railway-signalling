@@ -52,9 +52,14 @@
 # The following functions are associated with the MQTT networking Feature:
 #
 # subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network
+#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_instrument' instead
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the block instrument update feed
 #       *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
+#
+# subscribe_to_remote_instrument - Subscribes to a remote block instrument object
+#   Mandatory Parameters:
+#       remote_identifier:str - the remote identifier for the block instrument in the form 'node-id'
 #
 # set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
 #                All subsequent changes will be automatically published to remote subscribers
@@ -652,7 +657,7 @@ def block_section_ahead_clear(block_id:int):
 def set_instruments_to_publish_state(*inst_ids:int):
     global list_of_instruments_to_publish
     for inst_id in inst_ids:
-        logging.info("MQTT-Client: Configuring instrument "+str(inst_id)+" to publish state changes via MQTT broker")
+        logging.debug("MQTT-Client: Configuring instrument "+str(inst_id)+" to publish state changes via MQTT broker")
         if inst_id in list_of_instruments_to_publish:
             logging.warning("MQTT-Client: Instrument "+str(inst_id)+" - is already configured to publish state changes")
         else:
@@ -673,6 +678,9 @@ def set_instruments_to_publish_state(*inst_ids:int):
 
 def subscribe_to_instrument_updates (node:str,*inst_ids:int):
     global instruments
+    logging.warning ("#######################################################################################################")
+    logging.warning ("The subscribe_to_instrument_updates function is DEPRECATED - use subscribe_to_remote_instrument instead")
+    logging.warning ("#######################################################################################################")
     for inst_id in inst_ids:
         instrument_identifier = mqtt_interface.create_remote_item_identifier(inst_id,node)
         if not instrument_exists(instrument_identifier):
@@ -687,6 +695,28 @@ def subscribe_to_instrument_updates (node:str,*inst_ids:int):
             mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",node,
                                     inst_id,handle_mqtt_ring_section_bell_event)
     return()
+
+def subscribe_to_remote_instrument (remote_identifier:str):   
+    global instruments
+    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
+    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
+        logging.error ("MQTT-Client: Instrument "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
+        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
+    else:
+        if instrument_exists(remote_identifier):
+            logging.warning("MQTT-Client: Instrument "+str(remote_identifier)+" - has already been subscribed to via MQTT networking")
+        # Create a dummy instrument object to enable 'instrument_exists' validation checks
+        # Note that this does not hold state - as state is reflected on the local repeater indicator
+        instruments[remote_identifier] = {}
+        instruments[remote_identifier]["linkedto"] = None
+        # Subscribe to updates from the remote block instrument
+        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
+        mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",node_id,
+                                    item_id,handle_mqtt_instrument_updated_event)
+        mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",node_id,
+                                    item_id,handle_mqtt_ring_section_bell_event)
+    return()
+
 
 # --------------------------------------------------------------------------------
 # Callbacks for handling received MQTT messages (from a remote Instrument)

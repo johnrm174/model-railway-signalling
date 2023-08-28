@@ -292,15 +292,24 @@
 #
 # The following functions are associated with the MQTT networking Feature:
 # 
+# subscribe_to_remote_signal - Subscribes to a remote signal object
+#   Mandatory Parameters:
+#       remote_identifier:str - the remote identifier for the signal in the form 'node-id'
+#   Optional Parameters:
+#       signal_callback - Function to call when a signal update is received - default = None
+#
 # subscribe_to_signal_updates - Subscribe to signal updates from another node on the network 
+#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_signal' instead
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the signal state feed
 #       sig_callback:name - Function to call when an update is received from the remote node
 #                Callback returns (item_identifier, sig_callback_type.sig_updated)
 #                Item Identifier is a string in the following format "node_id-signal_id"
 #       *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
-# 
+#
 # subscribe_to_signal_passed_events  - Subscribe to signal passed events from another node  
+#     NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
+#     supported from release 4.0.0 (use track sections to achieve the required functionality)
 #   Mandatory Parameters:
 #       node:str - The name of the node publishing the signal passed event feed
 #       sig_callback:name - Function to call when a signal passed event is received
@@ -314,6 +323,8 @@
 #       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
 # 
 # set_signals_to_publish_passed_events - Enable the publication of signal passed events.
+#     NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
+#     supported from release 4.0.0 (use track sections to achieve the required functionality)
 #                All subsequent events will be automatically published to remote subscribers
 #   Mandatory Parameters:
 #       *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
@@ -760,6 +771,9 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):    
+    logging.warning ("#######################################################################################################")
+    logging.warning ("The subscribe_to_signal_updates function is DEPRECATED - use subscribe_to_remote_signal instead")
+    logging.warning ("#######################################################################################################")
     for sig_id in sig_ids:
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
@@ -775,11 +789,34 @@ def subscribe_to_signal_updates (node:str,sig_callback,*sig_ids:int):
                                     signals_common.handle_mqtt_signal_updated_event)
     return()
 
+def subscribe_to_remote_signal (remote_identifier:str,signal_callback):   
+    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
+    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
+        logging.error ("MQTT-Client: Signal "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
+        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
+    else:
+        if signals_common.sig_exists(remote_identifier):
+            logging.warning("MQTT-Client: Signal "+remote_identifier+" - has already been subscribed to via MQTT networking")
+        signals_common.signals[remote_identifier] = {}
+        signals_common.signals[remote_identifier]["sigtype"] = signals_common.sig_type.remote_signal
+        signals_common.signals[remote_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+        signals_common.signals[remote_identifier]["routeset"] = signals_common.route_type.NONE
+        signals_common.signals[remote_identifier]["extcallback"] = signal_callback
+        # Subscribe to updates from the remote signal (even if we have already subscribed)
+        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
+        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node_id,item_id,
+                                    signals_common.handle_mqtt_signal_updated_event)
+    return()
+
 #-----------------------------------------------------------------------------------------------
 # Public API Function to "subscribe" to signal passed events published by another "Node"
 #-----------------------------------------------------------------------------------------------
 
 def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):    
+    logging.warning ("#######################################################################################################")
+    logging.warning ("The subscribe_to_signal_passed_events function is DEPRECATED - only publish/subscribe to signal state")
+    logging.warning ("will be supported from release 4.0.0 (use publish/subscribe to sections and mirroried sections instead)")
+    logging.warning ("#######################################################################################################")
     for sig_id in sig_ids:
         # Create a dummy signal object to hold the state of the remote signal
         # The Identifier is a string combining the the Node-ID and Section-ID
@@ -801,7 +838,7 @@ def subscribe_to_signal_passed_events (node:str, sig_callback, *sig_ids:int):
 
 def set_signals_to_publish_state(*sig_ids:int):    
     for sig_id in sig_ids:
-        logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish state changes via MQTT broker")
+        logging.debug("MQTT-Client: Configuring signal "+str(sig_id)+" to publish state changes via MQTT broker")
         # Add the signal ID to the list of signals to publish
         if sig_id in signals_common.list_of_signals_to_publish_state_changes:
             logging.warning("MQTT-Client: Signal "+str(sig_id)+" - is already configured to publish state changes")
@@ -817,6 +854,10 @@ def set_signals_to_publish_state(*sig_ids:int):
 #-----------------------------------------------------------------------------------------------
 
 def set_signals_to_publish_passed_events(*sig_ids:int):    
+    logging.warning ("#######################################################################################################")
+    logging.warning ("The set_signals_to_publish_passed_events function is DEPRECATED - only pub/subscribe to signal state")
+    logging.warning ("will be supported from release 4.0.0 (use publish/subscribe to sections and mirroried sections instead)")
+    logging.warning ("#######################################################################################################")
     for sig_id in sig_ids:
         logging.info("MQTT-Client: Configuring signal "+str(sig_id)+" to publish passed events via MQTT broker")
         # Add the signal ID to the list of signals to publish

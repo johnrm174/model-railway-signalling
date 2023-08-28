@@ -15,6 +15,8 @@
 #    section_exists(item_id:int) - Common function to see if a given item exists
 #    instrument_exists(item_id:int) - Common function to see if a given item exists
 #    line_exists (item_id:int) - Common function to see if a given item exists
+#    update_local_sensors(trigger,timeout,mappings) - configure local track sections
+#    mqtt_update_sensors(pub_list, sub_list) - configure MQTT publish/subscribe
 #    mqtt_update_signals(pub_list, sub_list) - configure MQTT publish/subscribe
 #    mqtt_update_sections(pub_list, sub_list) - configure MQTT publish/subscribe
 #    mqtt_update_instruments(pub_list, sub_list) - configure MQTT publish/subscribe
@@ -90,6 +92,8 @@ from .objects_common import instrument_index
 from .objects_common import line_index
 
 from .objects_lines import get_endstop_offsets
+from .objects_signals import update_local_sensors
+from .objects_signals import mqtt_update_sensors
 from .objects_signals import mqtt_update_signals
 from .objects_sections import mqtt_update_sections
 from .objects_instruments import mqtt_update_instruments
@@ -126,6 +130,8 @@ assert instrument_exists
 assert line_exists
 assert object_type
 assert get_endstop_offsets
+assert update_local_sensors
+assert mqtt_update_sensors
 assert mqtt_update_signals
 assert mqtt_update_sections
 assert mqtt_update_instruments
