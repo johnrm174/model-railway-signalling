@@ -137,7 +137,7 @@ from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
 
-thread_delay_time = 0.1
+thread_delay_time = 0.150
 tkinter_thread_started = False
 main_menubar = None
 
@@ -240,7 +240,6 @@ def report_results():
     print ("Tests Run:",tests_executed,"  Tests Passed:",
               tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
     
-
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
 # the tests to be 'slowed down' so progress can be viewed on the schematic
