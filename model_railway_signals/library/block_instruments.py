@@ -530,8 +530,7 @@ def create_block_instrument (canvas,
         # will only be published if the MQTT interface has been configured and we are connected to the broker
         # Note that this function is DEPRECATED - you should always 'subscribe' to remote instruments beforehand
         if isinstance(linked_to_id,str) and not instrument_exists(linked_to_id):
-            remote_node,remote_id = mqtt_interface.split_remote_item_identifier(linked_to_id)
-            subscribe_to_instrument_updates(remote_node,remote_id)
+            subscribe_to_remote_instrument(linked_to_id)
             set_instruments_to_publish_state(block_id)
             logging.warning ("###########################################################################################")
             logging.warning ("Block Instrument "+str(block_id)+": Auto publish and subscribe is DEPRECATED - call the")
