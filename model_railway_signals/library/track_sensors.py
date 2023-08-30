@@ -272,11 +272,6 @@ def track_sensor_triggered (gpio_port:int):
                 logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
                 send_mqtt_track_sensor_updated_event(sensor_id)
                 make_track_sensor_callback(gpio_port)
-                
-#             # Check the state has actually changed from the state we hold internally
-#             # Dont fporget 'our' state is the reverse of the GPIO port state
-#             if gpio_port_mappings[str(gpio_port)]["sensor_state"] == gpio_state:
-
     return()            
 
 # -----------------------------------------------------------------------------------------------------------
