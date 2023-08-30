@@ -413,6 +413,9 @@ create_sensor - Creates a sensor object
                              Note that the callback function returns (item_id, callback type)
 
 sensor_active (sensor_id:int) - Returns the current state of the sensor (True/False)
+
+get_list_of_available_ports() - returns a list of supported ports
+
 </pre>
 
 ## Block Instruments
