@@ -53,6 +53,9 @@
 #    common.window_controls
 #    common.CreateToolTip
 #    common.scrollable_text_box
+#
+# Uses the following library functions:
+#    track_sensors.get_list_of_available_ports() - to get a list of supported ports
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -62,6 +65,7 @@ from tkinter import ttk
 
 from . import common
 from . import settings
+from ..library import track_sensors
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_box
@@ -824,7 +828,7 @@ class gpio_port_entry_frame():
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                
-        self.list_of_available_gpio_ports = [4,5,6,7,8,9,10,11,12,13,16,17,18,19,20,21,22,23,24,25,26]
+        self.list_of_available_gpio_ports = track_sensors.get_list_of_available_ports()
         while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
             # Create the Frame for the row
             self.list_of_subframes.append(Tk.Frame(self.frame))
