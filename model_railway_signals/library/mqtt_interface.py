@@ -70,8 +70,8 @@ import paho.mqtt.client
 #-----------------------------------------------------------------------------------------------
 
 node_config: dict = {}
-node_config["network_identifier"] = None
-node_config["node_identifier"] = None   
+node_config["network_identifier"] = ""
+node_config["node_identifier"] = ""   
 node_config["enhanced_debugging"] = False
 node_config["network_configured"] = False
 node_config["connected_to_broker"] = False
