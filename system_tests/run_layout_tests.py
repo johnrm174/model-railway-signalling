@@ -1,5 +1,25 @@
 #-----------------------------------------------------------------------------------
 # System tests for the run layout functions
+#    - Track occupancy changes tests for signal types that aren't a distant or shunt-ahead
+#      signal (we can test a single type to be representitive of all other types)
+#        - sections ahead and behind of signal- testing all the possible routes.
+#        - section ahead of signal, no section behind signal
+#        - only section behind signal, no section ahead of signal
+#    - Track occupancy changes tests for distant and shunt-ahead signals (in this case
+#      we test all subtypes of these signals for completeness). Note we test for the cases
+#      of signals not having a valid route configured as (which is a possible scenario for
+#      distant signals which rely on the points ahead of the home signal to set the appropriate
+#      route arms. In this case, the home signal could be locked at DANGER if the points are not
+#      set/locked but the distant signal can still be legitimately passed at CAUTION (and move to
+#      the track section ahead) as these signals can be passed even if the route is not set
+#        - sections ahead and behind of signal
+#        - section ahead of signal, no section behind signal
+#        - only section behind signal, no section ahead of signal
+#    - Interlock distant on home signal ahead tests - main route
+#    - Interlock distant on home signal ahead tests - diverging route
+#    - Override distant on home signal ahead tests - main route
+#    - Override distant on home signal ahead tests - diverging route
+#    - Override secondary distant on distant signal ahead tests
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
@@ -276,7 +296,7 @@ def run_track_occupancy_tests_2(delay:float=0.0):
 #-----------------------------------------------------------------------------------
 
 def run_track_occupancy_tests_3(delay:float=0.0):
-    print("Track occupancy tests - section ahead of signal only")
+    print("Track occupancy tests --- section ahead of signal only")
     # Section will be set to occupied if signal is on
     sleep(delay)
     trigger_signals_passed(9)
@@ -299,7 +319,7 @@ def run_track_occupancy_tests_3(delay:float=0.0):
     set_sections_occupied(9)
     trigger_signals_passed(9)
     assert_sections_clear(9)
-    print("Track occupancy tests - section behind signal only")
+    print("Track occupancy tests --- section behind signal only")
     sleep(delay)
     set_sections_occupied(10)
     # Section will be Cleared if signal is on
@@ -324,7 +344,7 @@ def run_track_occupancy_tests_3(delay:float=0.0):
     set_sections_clear(10)
     trigger_signals_passed(10)
     assert_sections_occupied(10)
-    print("Track occupancy tests - sections ahead of and behind signal")
+    print("Track occupancy tests --- sections ahead of and behind signal")
     sleep(delay)
     set_sections_occupied(11)
     # Train will be passed forward if signal is on
@@ -369,27 +389,27 @@ def run_track_occupancy_tests_4(delay:float=0.0):
     s10 = get_object_id("signal",10)
     s11 = get_object_id("signal",11)
     # Test with semaphore distants
-    print("Track occupancy tests - Colour Light Distant Signals")
+    print("Track occupancy tests -- Colour Light Distant Signals")
     update_object_configuration(s9, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":1, "itemsubtype":2} )
     run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Semaphore Distant Signals")
+    print("Track occupancy tests -- Semaphore Distant Signals")
     update_object_configuration(s9, {"itemtype":3, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":3, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":3, "itemsubtype":2} )
     run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Disc Shunt Ahead Signals")
+    print("Track occupancy tests -- Ground Disc Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":4, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":4, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":4, "itemsubtype":2} )
     run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Position Shunt Ahead Signals")
+    print("Track occupancy tests -- Ground Position Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":2, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":2, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":2, "itemsubtype":2} )
     run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Position Early Shunt Ahead Signals")
+    print("Track occupancy tests -- Ground Position Early Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":2, "itemsubtype":4} )
     update_object_configuration(s10, {"itemtype":2, "itemsubtype":4} )
     update_object_configuration(s11, {"itemtype":2, "itemsubtype":4} )
@@ -603,7 +623,7 @@ def run_override_on_signal_ahead_tests_1(delay:float=0.0):
 def run_override_on_signal_ahead_tests_2(delay:float=0.0):
     sleep(delay)
     reset_layout()
-    print("Override distant on distant signal ahead tests")
+    print("Override secondary distant on distant signal ahead tests")
     assert_signals_DANGER(23)
     sleep(delay)
     set_signals_off(23)
