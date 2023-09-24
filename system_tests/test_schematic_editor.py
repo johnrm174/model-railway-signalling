@@ -1,5 +1,15 @@
 #-----------------------------------------------------------------------------------
-# System tests for the schematic editor functions
+# System tests for the schematic editor functions (in EDIT MODE ONLY)
+#    Select/de-select objects via mouse/keyboard
+#    Select objects via area selection
+#    Create objects
+#    Delete objects
+#    Rotate objects
+#    Move (drag and drop) objects
+#    Editing of Lines (Drag and drop line ends)
+#    copy and paste objects
+#    The ability to move backwards and forwards through the undo buffer
+#    Resetting of the undo buffer following a change
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
