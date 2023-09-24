@@ -82,10 +82,15 @@ basic guidance and top tips for creating your layout signalling system:
    get cluttered (making it difficult to select the thing you want to move or edit).
 3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
    before interlocking (available interlocking selections are driven by this).
-4) Tooltips (hover-over) have been added to most of the UI elements which will hopefully
+4) If you want to use the Ri-Pis GPIO ports for signalling automation then allocate Sensor IDs
+   to the appropriate GPIO ports (Settings-Sensors) before configuring signal automation (only
+   allocated sensor IDs are avalable as valid selections on the signal automation tab).
+5) Similarly, if you want to use MQTT networking then subscribe to the appropriate signals,
+   sections, instruments and sensors to make them avalable as valid selections for automation.
+6) Tooltips (hover-over) have been added to most of the UI elements which will hopefully
    provide an insight as to what information needs to be entered (if they don't then please
    let me know and I will try and make them clearer in a future release).
-5) Play with the configuration examples in the GitHub repo (see Help-About for link) and
+7) Play with the configuration examples in the GitHub repo (see Help-About for link) and
    read the accompanying layout notes (see Help-Info once the example layout has been loaded)
    To get a feel of how these signalling schemes have been designed and configured.
 
@@ -116,7 +121,8 @@ Menubar Options
 7) Settings-MQTT - Configure the MQTT broker and signalling network
 8) Settings-SPROG - Configure the serial port and SPROG behavior
 9) Settings-Logging - Set the log level for running the layout
-10) Help-Info - Add notes to document your layout configuration
+10) Settings-Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
+11) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 
