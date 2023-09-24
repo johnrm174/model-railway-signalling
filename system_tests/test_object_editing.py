@@ -1,5 +1,41 @@
 #-----------------------------------------------------------------------------------
 # System tests for the object editing functions
+#
+#  -run_instrument_linking_tests - single and double line instruments
+#     - basic linking of instruments (test linking works for block sections)
+#     - change of item ID (test change gets reflected in linked instrument)
+#     - deletion of instrument (test linking gets removed from linked instrument)
+#  - run_point_chaining_tests
+#     - basic chaining of points (test auto switching of chained points works)
+#     - change of item ID (test change gets reflected in upstream chained point)
+#     - deletion of point (test chaining gets removed from upstream point)
+#  - run_mirrored_section_tests
+#     - basic mirroring of sections (update on change of mirrored sections)
+#     - change of item ID (test change gets reflected in upstream section)
+#     - deletion of section (test chaining gets removed from upstream section)
+#  - run_mode_change_tests (toggling of edit/run mode)
+#     - Signals are only overridden on track section ahead in run mode
+#     - Signals are not overridden on track section ahead in edit mode
+#     - section state is maintained from run mode => edit mode => run mode
+#  - run_change_of_item_id_tests
+#     - initial configuration of signal interlocking tables
+#         - point interlocking tables are correctly populated to match
+#         - test the basic interlocking of signals against points and instruments
+#     - Signal timed sequence configuration tables
+#         - Timed signal IDs are updated to reflect change of signal ID
+#         - Timed signal IDs are removed to reflect deletion of signals
+#     - Signal interlocking tables
+#         - signal ahead IDs are updated to reflect change of signal ID
+#         - signal ahead IDs are removed to reflect deletion of signals
+#         - opposing signal IDs are updated to reflect change of signal ID
+#         - opposing signal IDs are removed to reflect deletion of signals
+#         - instrument ahead IDs are updated to reflect change of instrument ID
+#         - instrument ahead IDs are removed to reflect deletion of instruments
+#         - interlocked point IDs are updated to reflect change of point ID
+#         - interlocked point IDs are removed to reflect deletion of points
+#  - run_reset_objects_tests
+#    - test points, signals, instruments and sections are returned to their
+#      default state following a layout "reset"
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
