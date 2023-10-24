@@ -900,12 +900,12 @@ def run_reset_objects_tests(delay:float=0.0):
 def run_all_object_editing_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness()
     set_edit_mode()
-#    run_point_chaining_tests(delay)
-##    run_instrument_linking_tests(delay)
-#    run_mirrored_section_tests(delay)
-#    run_mode_change_tests(delay)
+    run_point_chaining_tests(delay)
+    run_instrument_linking_tests(delay)
+    run_mirrored_section_tests(delay)
+    run_mode_change_tests(delay)
     run_change_of_item_id_tests(delay)
-#    run_reset_objects_tests(delay)
+    run_reset_objects_tests(delay)
     if shutdown: report_results()
     
 if __name__ == "__main__":
