@@ -31,8 +31,8 @@
 #    set_instrument_occupied(*instrumentids)
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
-#    simulate_sensors_triggered(*sensorids)
-#    simulate_sensors_reset(*sensorids)
+#    simulate_gpio_triggered(*gpioids)
+#    simulate_gpio_reset(*gpioids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -836,7 +836,7 @@ def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("update_object_configuration - object: "+str(object_id)+" does not exist")
     else:
-        new_object = copy.deepcopy(objects.schematic_objects[object_id])        
+        new_object = copy.deepcopy(objects.schematic_objects[object_id])
         for element in new_values.keys():
             if element not in new_object.keys():
                 raise_test_warning ("update_object_configuration - object: "+str(object_id)+
