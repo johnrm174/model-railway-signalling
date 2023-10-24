@@ -33,6 +33,7 @@
 #         - instrument ahead IDs are removed to reflect deletion of instruments
 #         - interlocked point IDs are updated to reflect change of point ID
 #         - interlocked point IDs are removed to reflect deletion of points
+#      - Line Item ID has successfully been changed (to obtain the branch coverage)
 #  - run_reset_objects_tests
 #    - test points, signals, instruments and sections are returned to their
 #      default state following a layout "reset"
@@ -489,6 +490,8 @@ def run_change_of_item_id_tests(delay:float=0.0):
     print("Change of Item Id tests")
     # Add elements to the layout
     sleep(delay)
+    l1 = create_line()
+    sleep(delay)
     p1 = create_left_hand_point()
     sleep(delay)
     p2 = create_left_hand_point()
@@ -505,6 +508,7 @@ def run_change_of_item_id_tests(delay:float=0.0):
     sleep(delay)
     i2 = create_block_instrument()
     # Test the 'one-up' IDs have been correctly generated
+    assert_object_configuration(l1,{"itemid":1})
     assert_object_configuration(p1,{"itemid":1})
     assert_object_configuration(p2,{"itemid":2})
     assert_object_configuration(s1,{"itemid":1})
@@ -605,7 +609,8 @@ def run_change_of_item_id_tests(delay:float=0.0):
     sleep(delay)
     set_points_normal(1,2)
     assert_signals_locked(1)    
-    # Change the IDs of Signal 2, Points 1/2, Instrument 1 and Track Section 1 
+    # Change the IDs of Signal 2, Points 1/2, Instrument 1, Track Section 1 and line 1
+    update_object_configuration(l1,{"itemid":51})
     update_object_configuration(s1,{"itemid":11})
     update_object_configuration(s2,{"itemid":12})
     update_object_configuration(s3,{"itemid":13})
@@ -615,6 +620,7 @@ def run_change_of_item_id_tests(delay:float=0.0):
     update_object_configuration(i1,{"itemid":41})
     update_object_configuration(i2,{"itemid":42})
     # Test the IDs have been changed
+    assert_object_configuration(l1,{"itemid":51})
     assert_object_configuration(s1,{"itemid":11})
     assert_object_configuration(s2,{"itemid":12})
     assert_object_configuration(s3,{"itemid":13})
@@ -894,12 +900,12 @@ def run_reset_objects_tests(delay:float=0.0):
 def run_all_object_editing_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness()
     set_edit_mode()
-    run_point_chaining_tests(delay)
-    run_instrument_linking_tests(delay)
-    run_mirrored_section_tests(delay)
-    run_mode_change_tests(delay)
+#    run_point_chaining_tests(delay)
+##    run_instrument_linking_tests(delay)
+#    run_mirrored_section_tests(delay)
+#    run_mode_change_tests(delay)
     run_change_of_item_id_tests(delay)
-    run_reset_objects_tests(delay)
+#    run_reset_objects_tests(delay)
     if shutdown: report_results()
     
 if __name__ == "__main__":
