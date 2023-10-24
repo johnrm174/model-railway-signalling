@@ -507,6 +507,8 @@ def update_tab1_route_selection_elements(signal):
         # Enable the diverging route selections depending on the type of Semaphore signal
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
             # Distant signals only support 'Route Arms' or 'None' so disable all other selections
+            # If 'Theatre' is selected (not valid for a distant signal then change to 'Route arms'
+            if signal.config.routetype.get_value() == 3: signal.config.routetype.set_value(4)
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="disabled")
             signal.config.routetype.B4.configure(state="normal")
