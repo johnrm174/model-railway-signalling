@@ -538,7 +538,8 @@ def redraw_signal_object(object_id):
     elif sig_type == signals_common.sig_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
         sub_type = signals_semaphores.semaphore_sub_type(objects_common.schematic_objects[object_id]["itemsubtype"])
-        # Create the signal drawing object on the canvas
+        # Create the signal drawing object on the canvas. Note that the main signal arm is always enabled for home
+        # or distant signals - it is only optional for secondary distant signals (created after the main signal)
         signals_semaphores.create_semaphore_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
@@ -549,7 +550,7 @@ def redraw_signal_object(object_id):
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
                     approach_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
-                    main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][0][0],
+                    main_signal = True,
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][0][0],
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][0][0],
                     rh1_signal = objects_common.schematic_objects[object_id]["sigarms"][3][0][0],
