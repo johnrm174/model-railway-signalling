@@ -95,7 +95,7 @@ def bring_track_sections_to_the_front():
 # Called following a file load or re-drawing for undo/redo
 #------------------------------------------------------------------------------------
 
-def redraw_all_objects(create_new_bbox:bool):
+def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
     for object_id in objects_common.schematic_objects:
         # Set the bbox reference to none so it will be created on redraw
         if create_new_bbox: objects_common.schematic_objects[object_id]["bbox"] = None
@@ -107,7 +107,7 @@ def redraw_all_objects(create_new_bbox:bool):
         elif this_object_type == objects_common.object_type.point:
             objects_points.redraw_point_object(object_id)
         elif this_object_type == objects_common.object_type.section:
-            objects_sections.redraw_section_object(object_id)
+            objects_sections.redraw_section_object(object_id, reset_state=reset_state)
         elif this_object_type == objects_common.object_type.instrument:
             objects_instruments.redraw_instrument_object(object_id)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
@@ -196,7 +196,7 @@ def restore_schematic_state():
     # Set the seperate schematic dictionary indexes from the restored schematic objects dict
     reset_all_schematic_indexes()
     # Re-draw all objects, ensuring a new bbox is created for each object
-    redraw_all_objects(create_new_bbox=True)
+    redraw_all_objects(create_new_bbox=True, reset_state=False)
     # Recalculate instrument interlocking tables as a 'belt and braces' measure (on the 
     # basis they would have successfully been restored with the rest of the snapshot)
     objects_points.reset_point_interlocking_tables()
@@ -236,7 +236,7 @@ def reset_objects():
             objects_instruments.delete_instrument_object(object_id)
     # Redraw all point, section, instrument and signal objects in their default state
     # We don't need to create a new bbox as soft_delete keeps the tkinter object
-    redraw_all_objects(create_new_bbox=False)
+    redraw_all_objects(create_new_bbox=False, reset_state=True)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # Process any layout changes (interlocking, signal ahead etc)
@@ -548,7 +548,7 @@ def set_all(new_objects):
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
-    redraw_all_objects(create_new_bbox=True)
+    redraw_all_objects(create_new_bbox=True, reset_state=False)
     # Ensure all track sections are in front of any lines
     bring_track_sections_to_the_front()
     # Recalculate point interlocking tables as a 'belt and braces' measure (on the 

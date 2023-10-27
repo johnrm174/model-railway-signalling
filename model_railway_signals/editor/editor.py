@@ -108,7 +108,7 @@ class main_menubar:
         self.file_menu.add_command(label=" Quit",command=lambda:self.quit_schematic())
         self.mainmenubar.add_cascade(label="File  ", menu=self.file_menu)
         # Create the various menubar items for the Mode Dropdown
-        self.mode_label = "Mode:Edit  "
+        self.mode_label = "Mode:XXXX  "
         self.mode_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
@@ -155,8 +155,9 @@ class main_menubar:
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         # Initialise the schematic canvas
+        # Note that the Edit Mode flag is the 2nd param in the returned tuple from get_general
         width, height, grid = settings.get_canvas()
-        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid)
+        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, settings.get_general()[1])
         # Initialise the editor configuration at startup
         self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
@@ -265,18 +266,20 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
 
     def edit_mode(self):
-        new_label = "Mode:Edit  "
-        self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-        self.mode_label = new_label
-        settings.set_general(editmode=True)
-        schematic.enable_editing()
+        if self.mode_label != "Mode:Edit  ":
+            new_label = "Mode:Edit  "
+            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
+            self.mode_label = new_label
+            settings.set_general(editmode=True)
+            schematic.enable_editing()
         
     def run_mode(self):
-        new_label = "Mode:Run   "
-        self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
-        self.mode_label = new_label
-        settings.set_general(editmode=False)
-        schematic.disable_editing()
+        if self.mode_label != "Mode:Run   ":
+            new_label = "Mode:Run   "
+            self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
+            self.mode_label = new_label
+            settings.set_general(editmode=False)
+            schematic.disable_editing()
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
