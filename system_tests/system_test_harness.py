@@ -27,6 +27,7 @@
 #    set_fpls_off(*pointids)
 #    set_sections_occupied(*sectionids)
 #    set_sections_clear(*sectionids)
+#    toggle_sections(*sectionids)
 #    set_instrument_blocked(*instrumentids)
 #    set_instrument_occupied(*instrumentids)
 #    set_instrument_clear(*instrumentids)
@@ -63,6 +64,7 @@
 #    assert_signals_route_RH2(*sigids)
 #    assert_sections_occupied(*secids)
 #    assert_sections_clear(*secids)
+#    assert_section_label(secid,label)
 #    assert_block_section_ahead_clear(instids*)
 #    assert_block_section_ahead_not_clear(instids*)
 #
@@ -359,7 +361,14 @@ def set_sections_occupied(*sectionids):
                 run_function(lambda:track_sections.clear_section_occupied(secid,str(train_identifier)))
                 run_function(lambda:track_sections.section_button_event(secid))
             train_identifier=train_identifier+1
-    
+
+def toggle_sections(*sectionids):
+    for secid in sectionids:
+        if str(secid) not in track_sections.sections.keys():
+            raise_test_warning ("set_sections_occupied - Section: "+str(secid)+" does not exist")
+        else:
+            run_function(lambda:track_sections.section_button_event(secid))
+
 def set_sections_clear(*sectionids):
     for secid in sectionids:
         if str(secid) not in track_sections.sections.keys():
@@ -687,6 +696,14 @@ def assert_sections_clear(*secids):
         elif track_sections.sections[str(secid)]["occupied"]:
             raise_test_error ("assert_sections_clear - Section: "+str(secid)+" - Test Fail")
         increment_tests_executed()
+        
+def assert_section_label(secid,label):
+    if str(secid) not in track_sections.sections.keys():
+        raise_test_warning ("assert_section_label - Section: "+str(secid)+" does not exist")
+    elif track_sections.sections[str(secid)]["labeltext"] != label:
+        raise_test_error ("assert_section_label - Section: "+str(secid)+" - Test Fail - Label is: "
+                           + track_sections.sections[str(secid)]["labeltext"])
+    increment_tests_executed()
 
 def assert_block_section_ahead_clear(*instrumentids):
     for instid in instrumentids:
