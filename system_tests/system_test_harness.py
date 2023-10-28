@@ -19,6 +19,8 @@
 #    set_signals_off(*sigids)
 #    set_subsidaries_on(*sigids)
 #    set_subsidaries_off(*sigids)
+#    set_secondary_dists_on(*sigids) - Semaphore only
+#    set_secondary_dists_off(*sigids) - Semaphore only
 #    trigger_signals_passed(*sigids)
 #    trigger_signals_released(*sigids)
 #    set_points_switched(*pointids)
@@ -292,6 +294,28 @@ def set_subsidaries_off(*sigids):
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" - subsidary is already OFF")
         else:
             run_function(lambda:signals_common.subsidary_button_event(sigid))                  
+
+def set_secondary_dists_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not exist")
+        elif str(sigid+100) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not have a secondary distant")
+        elif not signals.signal_clear(sigid+100):
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        else:
+            run_function(lambda:signals_common.signal_button_event(sigid+100))                                
+
+def set_secondary_dists_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not exist")
+        elif str(sigid+100) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not have a secondary distant")
+        elif signals.signal_clear(sigid+100):
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        else:
+            run_function(lambda:signals_common.signal_button_event(sigid+100))
 
 def trigger_signals_passed(*sigids):
     for sigid in sigids:
