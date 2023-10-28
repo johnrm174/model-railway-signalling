@@ -127,13 +127,19 @@ def get_sub_routes(signal):
     elif signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         routes = signal.config.sub_routes.get_values()
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        semaphore_routes = signal.config.semaphores.get_arms()
-        routes = [False, False, False, False, False]
-        routes[0] = semaphore_routes[0][1][0]
-        routes[1] = semaphore_routes[1][1][0]
-        routes[2] = semaphore_routes[2][1][0]
-        routes[3] = semaphore_routes[3][1][0]
-        routes[4] = semaphore_routes[4][1][0]
+        if signal.config.routetype.get_value() == 4:
+            # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+            # Each Route element comprises: [signal, subsidary, distant]
+            # Each signal element comprises [enabled/disabled, address]        
+            semaphore_routes = signal.config.semaphores.get_arms()
+            routes = [False, False, False, False, False]
+            routes[0] = semaphore_routes[0][1][0]
+            routes[1] = semaphore_routes[1][1][0]
+            routes[2] = semaphore_routes[2][1][0]
+            routes[3] = semaphore_routes[3][1][0]
+            routes[4] = semaphore_routes[4][1][0]
+        else:
+            routes = signal.config.sub_routes.get_values()
     else:
         # Defensive programming (no subsidary routes)
         routes = [False, False, False, False, False]
@@ -603,6 +609,7 @@ def update_tab1_route_selection_elements(signal):
 def update_tab2_available_signal_routes(signal):
     # Hide (pack.forget) all the Conflicting signal elements for diverging routes
     # The ones that need to be enabled get re-packed (in the right order) below
+    print("here")
     signal.locking.conflicting_sigs.lh1.frame.pack_forget()
     signal.locking.conflicting_sigs.lh2.frame.pack_forget()
     signal.locking.conflicting_sigs.rh1.frame.pack_forget()
@@ -610,6 +617,7 @@ def update_tab2_available_signal_routes(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
+    print(sig_routes,sub_routes)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
