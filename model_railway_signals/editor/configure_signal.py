@@ -609,7 +609,6 @@ def update_tab1_route_selection_elements(signal):
 def update_tab2_available_signal_routes(signal):
     # Hide (pack.forget) all the Conflicting signal elements for diverging routes
     # The ones that need to be enabled get re-packed (in the right order) below
-    print("here")
     signal.locking.conflicting_sigs.lh1.frame.pack_forget()
     signal.locking.conflicting_sigs.lh2.frame.pack_forget()
     signal.locking.conflicting_sigs.rh1.frame.pack_forget()
@@ -617,7 +616,6 @@ def update_tab2_available_signal_routes(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
-    print(sig_routes,sub_routes)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
