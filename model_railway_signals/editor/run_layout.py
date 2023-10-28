@@ -336,7 +336,8 @@ def set_signal_route(int_signal_id:int):
     if signal_route is not None:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         # Set the Route (and any associated route indication) for the signal
-        theatre_text = signal_object["dcctheatre"][signal_route.value-1][0]
+        # Note that the main route is the second element (the first element is the dark aspect)
+        theatre_text = signal_object["dcctheatre"][signal_route.value][0]
         signals.set_route(int_signal_id, route=signal_route, theatre_text=theatre_text)
         # For Semaphore Signals with secondary distant arms we also need
         # to set the route for the associated semaphore distant signal
