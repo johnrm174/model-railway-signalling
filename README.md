@@ -21,20 +21,22 @@ What's currently supported by the Editor:
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
 * Configure a level of automation for the signals as trains traverse the layout
 
-What's new in Release 3.5:
-* MQTT networking - large layouts with multiple signalling areas can be split across multiple platforms
-  * Simple configuration for connecting to a local (you'll have to stand-up) or internet-based MQTT broker
-  * Publish and subscribe to signals, track sections and block instruments from each application instance
-  * Publish and subscribe to DCC feeds - allows multiple applications to share the same R-Pi/Pi-SPROG
+What's new in Release 3.6:
+* MQTT Publish/subscribe for track sensors - allows remote applications to use the R-Pi's GPIO sensors
+* Minor bugfixes and application enhansements to (hopefully) improve the overall user experience
+* Consolidation of library functions (if anyone out there is still using the API to write their own code)
 
 What's coming soon:
-* MQTT publish and subscribe to GPIO ports - for signal-passed and signal-approached events
-* Text boxs - Ability to add and edit text boxes on the schematic
+
+* Release 4.0 (where I'm going to rip out all the deprecated functions) - you have been warned
+* Text boxes - Ability to add/edit text boxes on the schematic to annotate your layout
+* Toggle automation - for those occasions you just want to watch the trains go by
 
 Any bug reports and feedback you may have would be gratefully appreciated - specifically:
 * What aspects are intuitive? What aspects aren't?
 * What aspects do you particularly like?
 * What aspects particularly irritate you?
+* What new features would you like to see?
 
 There are some example layout files in the 'configuration_examples' folder.
 
