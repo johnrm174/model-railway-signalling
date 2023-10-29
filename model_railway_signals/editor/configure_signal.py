@@ -77,7 +77,11 @@ def has_route_arms(signal):
                signal.config.semaphores.lh1.dist.get_element()[0] or
                signal.config.semaphores.lh2.dist.get_element()[0] or
                signal.config.semaphores.rh1.dist.get_element()[0] or
-               signal.config.semaphores.rh2.dist.get_element()[0] ) )
+               signal.config.semaphores.rh2.dist.get_element()[0] or
+               signal.config.semaphores.lh1.sub.get_element()[0] or
+               signal.config.semaphores.lh2.sub.get_element()[0] or
+               signal.config.semaphores.rh1.sub.get_element()[0] or
+               signal.config.semaphores.rh2.sub.get_element()[0] ) ) 
 
 #------------------------------------------------------------------------------------
 # Helper functions to return a list of the selected signal, distant and subsidary
@@ -236,7 +240,7 @@ def load_state(signal):
         elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
             if objects.schematic_objects[object_id]["theatreroute"]:
                 signal.config.routetype.set_value(3)
-            elif has_route_arms(signal) or has_subsidary (signal) :
+            elif has_route_arms(signal):
                 signal.config.routetype.set_value(4)
             else:
                 signal.config.routetype.set_value(1)      
