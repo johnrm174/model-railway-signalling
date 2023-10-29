@@ -44,6 +44,7 @@ from .. import run_layout
 
 class object_type():
     none:str = "none"
+    textbox:str = "textbox"
     line:str = "line"
     point:str = "point"
     signal:str = "signal"

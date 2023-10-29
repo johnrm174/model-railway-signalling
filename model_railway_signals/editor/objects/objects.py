@@ -35,6 +35,13 @@
 #    objects_lines.delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_lines.redraw_line_object(object_id) - Redraw the object on the canvas following an update
 #    objects_lines.default_line_object - The dictionary of default values for the object
+#    objects_textboxes.create_textbox() - Create a default object on the schematic
+#    objects_textboxes.delete_textbox(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_textboxes.update_textbox(obj_id,new_obj) - Update the configuration of an existing textbox object
+#    objects_textboxes.paste_textbox(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    objects_textboxes.delete_textbox_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    objects_textboxes.redraw_textbox_object(object_id) - Redraw the object on the canvas following an update
+#    objects_textboxes.default_textbox_object - The dictionary of default values for the object
 #    objects_points.create_point(type) - Create a default object on the schematic
 #    objects_points.delete_point(obj_id) - Hard Delete an object when deleted from the schematic
 #    objects_points.update_point(obj_id,new_obj) - Update the configuration of an existing point object
@@ -71,6 +78,7 @@ from . import objects_points
 from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
+from . import objects_textboxes
 
 from .. import run_layout
 
@@ -97,6 +105,8 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
         this_object_type = objects_common.schematic_objects[object_id]["item"]
         if this_object_type == objects_common.object_type.line:
             objects_lines.redraw_line_object(object_id)
+        elif this_object_type == objects_common.object_type.textbox:
+            objects_textboxes.redraw_textbox_object(object_id)
         elif this_object_type == objects_common.object_type.signal:                
             objects_signals.redraw_signal_object(object_id)
         elif this_object_type == objects_common.object_type.point:
@@ -120,7 +130,9 @@ def reset_all_schematic_indexes():
     for object_id in objects_common.schematic_objects:
         this_object_type = objects_common.schematic_objects[object_id]["item"]
         this_object_item_id = objects_common.schematic_objects[object_id]["itemid"]
-        if this_object_type == objects_common.object_type.signal:                
+        if this_object_type == objects_common.object_type.line:
+            objects_common.line_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.signal:                
             objects_common.signal_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.point:
             objects_common.point_index[str(this_object_item_id)] = object_id
@@ -128,8 +140,7 @@ def reset_all_schematic_indexes():
             objects_common.section_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.instrument:
             objects_common.instrument_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.line:
-            objects_common.line_index[str(this_object_item_id)] = object_id
+        # Note that textboxes don't have an index as we don't track their IDs
     return()
 
 #------------------------------------------------------------------------------------
@@ -221,7 +232,11 @@ def reset_objects():
     # Soft delete all point, section, instrument and signal objects (keeping the bbox)
     for object_id in objects_common.schematic_objects:
         type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.signal:
+        if type_of_object == objects_common.object_type.line:
+            objects_lines.delete_line_object(object_id)
+        elif type_of_object == objects_common.object_type.textbox:
+            objects_textboxes.delete_textbox_object(object_id)
+        elif type_of_object == objects_common.object_type.signal:
             objects_signals.delete_signal_object(object_id)
         elif type_of_object == objects_common.object_type.point:
              objects_points.delete_point_object(object_id)
@@ -247,6 +262,8 @@ def reset_objects():
 def create_object(new_object_type, item_type=None, item_subtype=None):
     if new_object_type == objects_common.object_type.line:
         objects_lines.create_line() 
+    elif new_object_type == objects_common.object_type.textbox:
+        objects_textboxes.create_textbox()
     elif new_object_type == objects_common.object_type.signal:
         objects_signals.create_signal(item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
@@ -269,6 +286,8 @@ def update_object(object_id, new_object):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
         objects_lines.update_line(object_id, new_object)
+    elif type_of_object == objects_common.object_type.textbox:
+        objects_textboxes.update_textbox(object_id, new_object)
     elif type_of_object == objects_common.object_type.signal:
         objects_signals.update_signal(object_id, new_object)
     elif type_of_object == objects_common.object_type.point:
@@ -295,6 +314,8 @@ def delete_object(object_id):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
         objects_lines.delete_line(object_id) 
+    elif type_of_object == objects_common.object_type.textbox:
+        objects_textboxes.delete_textbox(object_id) 
     elif type_of_object == objects_common.object_type.signal:
         objects_signals.delete_signal(object_id)
     elif type_of_object == objects_common.object_type.point:
@@ -415,7 +436,9 @@ def paste_objects():
         type_of_object = object_to_paste["item"]
         if type_of_object == objects_common.object_type.line:
             new_object_id = objects_lines.paste_line(object_to_paste, deltax, deltay)
-        if type_of_object == objects_common.object_type.signal:
+        elif type_of_object == objects_common.object_type.textbox:
+            new_object_id = objects_textboxes.paste_textbox(object_to_paste, deltax, deltay)
+        elif type_of_object == objects_common.object_type.signal:
             new_object_id = objects_signals.paste_signal(object_to_paste, deltax, deltay)
         elif type_of_object == objects_common.object_type.point:
             new_object_id = objects_points.paste_point(object_to_paste, deltax, deltay)
@@ -454,6 +477,8 @@ def set_all(new_objects):
         new_object_type = new_objects[object_id]["item"]
         if new_object_type == objects_common.object_type.line:
             default_object = objects_lines.default_line_object
+        elif new_object_type == objects_common.object_type.textbox:
+            default_object = objects_textboxes.default_textbox_object
         elif new_object_type == objects_common.object_type.signal:
             default_object = objects_signals.default_signal_object
         elif new_object_type == objects_common.object_type.point:

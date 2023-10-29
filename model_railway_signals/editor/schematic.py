@@ -756,7 +756,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, ed
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)
     # Define the object buttons [filename, function_to_call]
-    selections = [ ["line", lambda:objects.create_object(objects.object_type.line) ],
+    selections = [ ["textbox", lambda:objects.create_object(objects.object_type.textbox) ],
+                   ["line", lambda:objects.create_object(objects.object_type.line) ],
                    ["colourlight", lambda:objects.create_object(objects.object_type.signal,
                                             signals_common.sig_type.colour_light.value,
                                             signals_colour_lights.signal_sub_type.four_aspect.value) ],
