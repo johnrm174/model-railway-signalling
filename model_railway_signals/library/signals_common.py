@@ -75,12 +75,6 @@ signals:dict = {}
 # Global lists for Signals configured to publish events to the MQTT Broker
 # -------------------------------------------------------------------------
 
-##################################################################################################################
-############## DEPRECATED - to be removed from Release 4.0.0 #####################################################
-##################################################################################################################
-list_of_signals_to_publish_passed_events=[]
-##################################################################################################################
-
 list_of_signals_to_publish_state_changes=[]
 
 # -------------------------------------------------------------------------
@@ -138,13 +132,6 @@ def sig_passed_button_event (sig_id:int):
     if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
          signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
         signals[str(sig_id)]["released"] = False
-    ##################################################################################################################
-    ############## DEPRECATED - to be removed from Release 4.0.0 #####################################################
-    ##################################################################################################################
-    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
-    # mqtt interface has been successfully configured and the signal has been set to publish passed events
-    publish_signal_passed_event(sig_id)
-    #########################################################################################################
     # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
@@ -588,18 +575,6 @@ def handle_mqtt_signal_updated_event(message):
         signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_updated)
     return()
 
-######################################################################################################################
-############## DEPRECATED - to be removed from Release 4.0.0 #########################################################
-######################################################################################################################
-def handle_mqtt_signal_passed_event(message):
-    if "sourceidentifier" in message.keys():
-        signal_identifier = message["sourceidentifier"]
-        logging.info("Signal "+signal_identifier+": Remote Signal Passed Event ***********************************")
-        # Make the external callback (if one has been defined)
-        signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_passed)
-    return()
-#######################################################################################################################
-
 # --------------------------------------------------------------------------------
 # Common functions for building and sending MQTT messages - but only if the Signal
 # has been configured to publish the specified updates via the mqtt broker. As this
@@ -617,18 +592,6 @@ def publish_signal_state(sig_id:int):
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
         mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
         return()
-
-######################################################################################################################
-############## DEPRECATED - to be removed from Release 4.0.0 #########################################################
-######################################################################################################################
-def publish_signal_passed_event(sig_id:int):
-    if sig_id in list_of_signals_to_publish_passed_events:
-        data = {}
-        log_message = "Signal "+str(sig_id)+": Publishing signal passed event to MQTT Broker"
-        # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
-        mqtt_interface.send_mqtt_message("signal_passed_event",sig_id,data=data,log_message=log_message,retain=False)
-        return()
-#######################################################################################################################
 
 # ------------------------------------------------------------------------------------------
 # Common internal functions for deleting a signal object (including all the drawing objects)
@@ -665,13 +628,10 @@ def delete_signal(sig_id:int):
 def reset_mqtt_configuration():
     global signals
     global list_of_signals_to_publish_state_changes
-    global list_of_signals_to_publish_passed_events
     # We only need to clear the list to stop any further signal events being published
     list_of_signals_to_publish_state_changes.clear()
-    list_of_signals_to_publish_passed_events.clear()
     # For subscriptions we unsubscribe from all topics associated with the message_type
     mqtt_interface.unsubscribe_from_message_type("signal_updated_event")
-    mqtt_interface.unsubscribe_from_message_type("signal_passed_event")
     # Finally remove all "remote" signals from the dictionary of signals - these will
     # be re-created if they are subsequently re-subscribed to. Note we don't iterate 
     # through the dictionary of signals to remove items as it will change under us

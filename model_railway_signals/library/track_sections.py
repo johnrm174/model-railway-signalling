@@ -47,16 +47,7 @@
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
-#
-# subscribe_to_section_updates - Subscribe to section updates from another node on the network
-#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_track_section' instead
-#   Mandatory Parameters:
-#       node:str - The name of the node publishing the track section update feed
-#       sec_callback:name - Function to call when an update is received from the remote node
-#                Callback returns (item_identifier, section_callback_type.section_updated)
-#                item_identifier is a string in the following format "node_id-section_id"
-#       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
-#       
+##       
 # subscribe_to_remote_section - Subscribes to a remote track section object
 #   Mandatory Parameters:
 #       remote_identifier:str - the remote identifier for the track section in the form 'node-id'
@@ -368,25 +359,6 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
 #-----------------------------------------------------------------------------------------------
 # Public API Function to "subscribe" to section updates published by remote MQTT "Node"
 #-----------------------------------------------------------------------------------------------
-
-def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
-    global sections
-    logging.warning ("#######################################################################################################")
-    logging.warning ("The subscribe_to_section_updates function is DEPRECATED - use subscribe_to_remote_track_section instead")
-    logging.warning ("#######################################################################################################")
-    for sec_id in sec_ids:
-        # Create a dummy section object to hold the state of the remote track occupancy section
-        # The Identifier for a remote Section is a string combining the the Node-ID and Section-ID
-        section_identifier = mqtt_interface.create_remote_item_identifier(sec_id,node)
-        if not section_exists(section_identifier):
-            sections[section_identifier] = {}
-            sections[section_identifier]["occupied"] = False
-            sections[section_identifier]["labeltext"] = "OCCUPIED"
-            sections[section_identifier]["extcallback"] = sec_callback
-            # Subscribe to updates from the remote section
-            mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node,sec_id,
-                                                  handle_mqtt_section_updated_event)
-    return()
 
 def subscribe_to_remote_section (remote_identifier:str,section_callback):   
     global sections
