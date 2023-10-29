@@ -466,7 +466,7 @@ def set_signal_override (*sig_ids:int):
             # Set the override and refresh the signal following the change in state
             signals_common.set_signal_override(sig_id)
             signals_common.auto_refresh_signal(sig_id)
-        return()
+    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Clear a Signal Override 
@@ -510,7 +510,7 @@ def set_signal_override_caution (*sig_ids:int):
             signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error("Signal "+str(sig_id)+": - set_signal_override_caution - Function not supported by signal type")
-        return()
+    return()
 
 # -------------------------------------------------------------------------
 # Externally called function to Clear a Signal Override 
@@ -534,7 +534,6 @@ def clear_signal_override_caution (*sig_ids:int):
             signals_common.auto_refresh_signal(sig_id)
         else:
             logging.error("Signal "+str(sig_id)+": - clear_signal_override_caution - Function not supported by signal type")
-        return()
     return()
 
 # -------------------------------------------------------------------------
