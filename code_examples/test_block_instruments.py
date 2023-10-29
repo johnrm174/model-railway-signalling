@@ -48,10 +48,11 @@ create_block_instrument(canvas, 2, 450, 100, linked_to = 1,
 create_block_instrument(canvas, 3, 150, 300, linked_to = 4,
                       bell_sound_file='bell-ring-03.wav',
                       block_callback=process_callbacks,
-                      single_line = True )
+                      inst_type = instrument_type.single_line)
 create_block_instrument(canvas, 4, 450, 300, linked_to = 3,
                       bell_sound_file='bell-ring-04.wav',
-                      single_line = True )
+                      block_callback=process_callbacks,
+                      inst_type = instrument_type.single_line)
 create_block_instrument(canvas, 5, 150, 600, linked_to = "Box2-1")
 
 print ("Entering Main Event Loop")

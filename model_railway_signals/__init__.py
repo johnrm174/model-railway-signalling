@@ -43,10 +43,11 @@ from .library.signals import clear_signal_override_caution
 from .library.signals import set_approach_control
 from .library.signals import clear_approach_control
 from .library.signals import trigger_timed_signal
-from .library.signals import subscribe_to_signal_updates
-from .library.signals import subscribe_to_signal_passed_events
+from .library.signals import subscribe_to_remote_signal
 from .library.signals import set_signals_to_publish_state
-from .library.signals import set_signals_to_publish_passed_events
+from .library.signals import subscribe_to_signal_updates  ######## DEPRECATED ##########
+from .library.signals import set_signals_to_publish_passed_events  ######## DEPRECATED ##########
+from .library.signals import subscribe_to_signal_passed_events  ######## DEPRECATED ##########
 
 from .library.track_sections import section_callback_type
 from .library.track_sections import create_section
@@ -54,12 +55,15 @@ from .library.track_sections import section_occupied
 from .library.track_sections import section_label
 from .library.track_sections import set_section_occupied
 from .library.track_sections import clear_section_occupied
-from .library.track_sections import subscribe_to_section_updates
+from .library.track_sections import subscribe_to_remote_section
 from .library.track_sections import set_sections_to_publish_state
+from .library.track_sections import subscribe_to_section_updates  ######## DEPRECATED ##########
 
 from .library.track_sensors import track_sensor_callback_type
 from .library.track_sensors import create_track_sensor
 from .library.track_sensors import track_sensor_active 
+from .library.track_sensors import subscribe_to_remote_sensor
+from .library.track_sensors import set_sensors_to_publish_state
 
 from .library.pi_sprog_interface import initialise_pi_sprog
 from .library.pi_sprog_interface import service_mode_write_cv
@@ -73,17 +77,19 @@ from .library.dcc_control import map_dcc_point
 from .library.dcc_control import subscribe_to_dcc_command_feed
 from .library.dcc_control import set_node_to_publish_dcc_commands
 
-from .library.mqtt_interface import configure_networking   #### DEPRECATED
+from .library.mqtt_interface import configure_networking  ######## DEPRECATED ##########
 from .library.mqtt_interface import configure_mqtt_client
 from .library.mqtt_interface import mqtt_broker_connect
 
 from .library.file_interface import load_layout_state
 
+from .library.block_instruments import instrument_type
 from .library.block_instruments import block_callback_type
 from .library.block_instruments import create_block_instrument
 from .library.block_instruments import block_section_ahead_clear
-from .library.block_instruments import subscribe_to_instrument_updates
 from .library.block_instruments import set_instruments_to_publish_state
+from .library.block_instruments import subscribe_to_remote_instrument
+from .library.block_instruments import subscribe_to_instrument_updates  ######## DEPRECATED ##########
 
 from .editor.editor import run_editor
 
@@ -130,10 +136,11 @@ __all__ = [
         'set_approach_control',
         'clear_approach_control',
         'trigger_timed_signal',
-        'subscribe_to_signal_updates',
-        'subscribe_to_signal_passed_events',
+        'subscribe_to_remote_signal',
+        'subscribe_to_signal_updates',  ######## DEPRECATED ##########
+        'subscribe_to_signal_passed_events',  ######## DEPRECATED ##########
         'set_signals_to_publish_state',
-        'set_signals_to_publish_passed_events',
+        'set_signals_to_publish_passed_events',  ######## DEPRECATED ##########
       # Public track_section types
         'section_callback_type',
       # Public track_section functions
@@ -142,13 +149,16 @@ __all__ = [
         'section_label',
         'set_section_occupied',
         'clear_section_occupied',
-        'subscribe_to_section_updates',
-        'set_sections_to_publish_state',
+        'subscribe_to_remote_section',
+        'subscribe_to_section_updates', ######## DEPRECATED ##########
+        'set_sections_to_publish_state', 
       # public track_sensor types
         'track_sensor_callback_type',
       # public track_sensor functions
         'create_track_sensor',
         'track_sensor_active',
+        'subscribe_to_remote_sensor',
+        'set_sensors_to_publish_state',
       # Public DCC control functions
         'initialise_pi_sprog',
         'service_mode_write_cv',
@@ -161,17 +171,19 @@ __all__ = [
         'subscribe_to_dcc_command_feed',
         'set_node_to_publish_dcc_commands',
       # Public networking functions
-        'configure_networking',     ## DEPRECATED
+        'configure_networking',     ######## DEPRECATED ##########
         'configure_mqtt_client',
         'mqtt_broker_connect',
       # Public File load/save functions
         'load_layout_state',
       # public block instrument types
         'block_callback_type',
+        'instrument_type',
       # Public block instrument functions
         'create_block_instrument',
         'block_section_ahead_clear',
-        'subscribe_to_instrument_updates',
+        'subscribe_to_remote_instrument',
+        'subscribe_to_instrument_updates', ######## DEPRECATED ##########
         'set_instruments_to_publish_state',
       # Public function to run editor
         'run_editor'

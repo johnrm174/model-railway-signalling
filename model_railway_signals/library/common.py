@@ -102,16 +102,14 @@ def find_root_window (canvas):
 #-------------------------------------------------------------------------
 
 def handle_callback_in_tkinter_thread(*args):
-    try:
-       callback = event_queue.get(False)
-    except event_queue.Empty:
-        return()
-    callback()
+    while not event_queue.empty():
+        callback = event_queue.get(False)
+        callback()
     return()
     
 def execute_function_in_tkinter_thread(callback_function):
-    event_queue.put(callback_function)
     if root_window is not None:
+        event_queue.put(callback_function)
         root_window.event_generate("<<ExtCallback>>", when="tail")
     else:
         logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")

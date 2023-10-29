@@ -89,6 +89,7 @@ canvas = None
 canvas_width = 0
 canvas_height = 0
 canvas_grid = 0
+canvas_grid_state = "normal"
 # The callback to make (for selected canvas events). Currently only the mode change keypress
 # event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
@@ -121,13 +122,12 @@ def canvas_coordinates(event):
 def draw_grid():
     # Note we leave the 'state' of the grid  unchanged when re-drawing
     # As the 'state' is set (normal or hidden) when enabling/disabling editing
-    grid_state = canvas.itemcget("grid",'state')
     canvas.delete("grid")
-    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline='#999', fill="", tags="grid", state=grid_state)
+    canvas.create_rectangle(0, 0, canvas_width, canvas_height, outline='#999', fill="", tags="grid", state=canvas_grid_state)
     for i in range(0, canvas_height, canvas_grid):
-        canvas.create_line(0,i,canvas_width,i,fill='#999',tags="grid",state=grid_state)
+        canvas.create_line(0,i,canvas_width,i,fill='#999',tags="grid",state=canvas_grid_state)
     for i in range(0, canvas_width, canvas_grid):
-        canvas.create_line(i,0,i,canvas_height,fill='#999',tags="grid",state=grid_state)
+        canvas.create_line(i,0,i,canvas_height,fill='#999',tags="grid",state=canvas_grid_state)
     # Push the grid to the back (behind any drawing objects)
     canvas.tag_lower("grid")
     return()
@@ -169,6 +169,7 @@ def deselect_object(object_id):
 #------------------------------------------------------------------------------------
 
 def select_all_objects(event=None):
+    global schematic_state
     # Clear out the list of selected objects first
     schematic_state["selectedobjects"] = []
     for object_id in objects.schematic_objects:
@@ -268,6 +269,7 @@ def move_selected_objects(xdiff:int,ydiff:int):
 #------------------------------------------------------------------------------------
 
 def delete_selected_objects(event=None):
+    global schematic_state
     # Delete the objects from the schematic
     objects.delete_objects(schematic_state["selectedobjects"])
     # Remove the objects from the list of selected objects
@@ -287,7 +289,6 @@ def rotate_selected_objects(event=None):
 #------------------------------------------------------------------------------------
         
 def copy_selected_objects(event=None):
-    global schematic_state
     objects.copy_objects(schematic_state["selectedobjects"])
     return()
 
@@ -296,7 +297,6 @@ def copy_selected_objects(event=None):
 #------------------------------------------------------------------------------------
 
 def paste_clipboard_objects(event=None):
-    global schematic_state
     # Paste the objects and re-copy (for a subsequent paste)
     list_of_new_object_ids = objects.paste_objects()
     objects.copy_objects(list_of_new_object_ids)
@@ -341,6 +341,7 @@ def find_highlighted_object(xpos:int,ypos:int):
 #------------------------------------------------------------------------------------
 
 def find_highlighted_line_end(xpos:int,ypos:int):
+    global schematic_state
     # Iterate through the selected objects to see if any "line ends" are selected
     for object_id in schematic_state["selectedobjects"]:
         if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
@@ -378,7 +379,6 @@ def snap_to_grid(xpos:int,ypos:int):
 #------------------------------------------------------------------------------------
 
 def right_button_click(event):
-    global schematic_state
     # Find the object at the current cursor position (if there is one)
     # Note that we use the the canvas coordinates to see if the cursor
     # is over the object (as these take into account the current scroll
@@ -450,7 +450,6 @@ def left_button_click(event):
 #------------------------------------------------------------------------------------
 
 def left_shift_click(event):
-    global schematic_state
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
     canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
@@ -469,7 +468,6 @@ def left_shift_click(event):
 #------------------------------------------------------------------------------------
 
 def left_double_click(event):
-    global schematic_state
     # Get the canvas coordinates (to take into account any scroll bar offsets) 
     canvas_x, canvas_y = canvas_coordinates(event)
     # Find the object at the current cursor position (if there is one)
@@ -658,10 +656,9 @@ def disable_edit_keypress_events():
 #------------------------------------------------------------------------------------
 
 def enable_editing():
-    global schematic_state
-    global canvas_event_callback
-    global button_frame, canvas_frame
-    canvas.itemconfig("grid",state="normal")
+    global canvas_grid_state
+    canvas_grid_state = "normal"
+    canvas.itemconfig("grid",state=canvas_grid_state)
     # Enable editing of the schematic objects
     objects.enable_editing()
     # Re-pack the subframe containing the "add object" buttons to display it. Note that we
@@ -686,8 +683,9 @@ def enable_editing():
     return()
 
 def disable_editing():
-    global schematic_state
-    canvas.itemconfig("grid",state="hidden")
+    global canvas_grid_state
+    canvas_grid_state = "hidden"
+    canvas.itemconfig("grid",state=canvas_grid_state)
     deselect_all_objects()
     # Disable editing of the schematic objects
     objects.disable_editing()
@@ -712,9 +710,9 @@ def disable_editing():
 # Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
-def initialise (root_window, event_callback, width:int, height:int, grid:int):
+def initialise (root_window, event_callback, width:int, height:int, grid:int, edit_mode:bool):
     global root, canvas, popup1, popup2
-    global canvas_width, canvas_height, canvas_grid
+    global canvas_width, canvas_height, canvas_grid, canvas_grid_state
     global button_frame, canvas_frame, buttons, images
     global canvas_event_callback
     root = root_window
@@ -732,6 +730,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
     canvas_width, canvas_height, canvas_grid = width, height, grid
+    if edit_mode: canvas_grid_state = "normal"
+    else: canvas_grid_state = "hidden"
     # Create the canvas and scrollbars inside the parent frame
     # We also set focus on the canvas so the keypress events will take effect
     canvas = Tk.Canvas(canvas_frame ,bg="grey85", scrollregion=(0, 0, canvas_width, canvas_height))
@@ -755,8 +755,6 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int):
     popup2 = Tk.Menu(tearoff=0)
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)
-    # Now draw the initial grid
-    draw_grid()
     # Define the object buttons [filename, function_to_call]
     selections = [ ["line", lambda:objects.create_object(objects.object_type.line) ],
                    ["colourlight", lambda:objects.create_object(objects.object_type.signal,

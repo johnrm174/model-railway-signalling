@@ -19,6 +19,8 @@
 #    set_signals_off(*sigids)
 #    set_subsidaries_on(*sigids)
 #    set_subsidaries_off(*sigids)
+#    set_secondary_dists_on(*sigids) - Semaphore only
+#    set_secondary_dists_off(*sigids) - Semaphore only
 #    trigger_signals_passed(*sigids)
 #    trigger_signals_released(*sigids)
 #    set_points_switched(*pointids)
@@ -27,10 +29,13 @@
 #    set_fpls_off(*pointids)
 #    set_sections_occupied(*sectionids)
 #    set_sections_clear(*sectionids)
+#    toggle_sections(*sectionids)
 #    set_instrument_blocked(*instrumentids)
 #    set_instrument_occupied(*instrumentids)
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
+#    simulate_gpio_triggered(*gpioids)
+#    simulate_gpio_reset(*gpioids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -61,6 +66,7 @@
 #    assert_signals_route_RH2(*sigids)
 #    assert_sections_occupied(*secids)
 #    assert_sections_clear(*secids)
+#    assert_section_label(secid,label)
 #    assert_block_section_ahead_clear(instids*)
 #    assert_block_section_ahead_not_clear(instids*)
 #
@@ -133,8 +139,9 @@ from model_railway_signals.library import signals_ground_position
 from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
+from model_railway_signals.library import track_sensors
 
-thread_delay_time = 0.1
+thread_delay_time = 0.150
 tkinter_thread_started = False
 main_menubar = None
 
@@ -237,7 +244,6 @@ def report_results():
     print ("Tests Run:",tests_executed,"  Tests Passed:",
               tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
     
-
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
 # the tests to be 'slowed down' so progress can be viewed on the schematic
@@ -288,6 +294,28 @@ def set_subsidaries_off(*sigids):
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" - subsidary is already OFF")
         else:
             run_function(lambda:signals_common.subsidary_button_event(sigid))                  
+
+def set_secondary_dists_on(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not exist")
+        elif str(sigid+100) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not have a secondary distant")
+        elif not signals.signal_clear(sigid+100):
+            raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        else:
+            run_function(lambda:signals_common.signal_button_event(sigid+100))                                
+
+def set_secondary_dists_off(*sigids):
+    for sigid in sigids:
+        if str(sigid) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not exist")
+        elif str(sigid+100) not in signals_common.signals.keys():
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not have a secondary distant")
+        elif signals.signal_clear(sigid+100):
+            raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
+        else:
+            run_function(lambda:signals_common.signal_button_event(sigid+100))
 
 def trigger_signals_passed(*sigids):
     for sigid in sigids:
@@ -357,7 +385,14 @@ def set_sections_occupied(*sectionids):
                 run_function(lambda:track_sections.clear_section_occupied(secid,str(train_identifier)))
                 run_function(lambda:track_sections.section_button_event(secid))
             train_identifier=train_identifier+1
-    
+
+def toggle_sections(*sectionids):
+    for secid in sectionids:
+        if str(secid) not in track_sections.sections.keys():
+            raise_test_warning ("set_sections_occupied - Section: "+str(secid)+" does not exist")
+        else:
+            run_function(lambda:track_sections.section_button_event(secid))
+
 def set_sections_clear(*sectionids):
     for secid in sectionids:
         if str(secid) not in track_sections.sections.keys():
@@ -395,6 +430,20 @@ def click_telegraph_key(*instrumentids):
             raise_test_warning ("click_telegraph_key - Instrument: "+str(instid)+" does not exist")
         else:
             run_function(lambda:block_instruments.telegraph_key_button(instid))
+
+def simulate_gpio_triggered(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
+        else:
+            run_function(lambda:track_sensors.simulate_sensor_triggered(gpioid))
+
+def simulate_gpio_reset(*gpioids):
+    for gpioid in gpioids:
+        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
+            raise_test_warning ("simulate_gpio_reset - GPIO: "+str(gpioid)+" does not exist")
+        else:
+            run_function(lambda:track_sensors.simulate_sensor_reset(gpioid))
 
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
@@ -671,6 +720,14 @@ def assert_sections_clear(*secids):
         elif track_sections.sections[str(secid)]["occupied"]:
             raise_test_error ("assert_sections_clear - Section: "+str(secid)+" - Test Fail")
         increment_tests_executed()
+        
+def assert_section_label(secid,label):
+    if str(secid) not in track_sections.sections.keys():
+        raise_test_warning ("assert_section_label - Section: "+str(secid)+" does not exist")
+    elif track_sections.sections[str(secid)]["labeltext"] != label:
+        raise_test_error ("assert_section_label - Section: "+str(secid)+" - Test Fail - Label is: "
+                           + track_sections.sections[str(secid)]["labeltext"])
+    increment_tests_executed()
 
 def assert_block_section_ahead_clear(*instrumentids):
     for instid in instrumentids:
@@ -820,7 +877,7 @@ def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("update_object_configuration - object: "+str(object_id)+" does not exist")
     else:
-        new_object = copy.deepcopy(objects.schematic_objects[object_id])        
+        new_object = copy.deepcopy(objects.schematic_objects[object_id])
         for element in new_values.keys():
             if element not in new_object.keys():
                 raise_test_warning ("update_object_configuration - object: "+str(object_id)+

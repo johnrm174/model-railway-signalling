@@ -75,7 +75,12 @@ signals:dict = {}
 # Global lists for Signals configured to publish events to the MQTT Broker
 # -------------------------------------------------------------------------
 
+##################################################################################################################
+############## DEPRECATED - to be removed from Release 4.0.0 #####################################################
+##################################################################################################################
 list_of_signals_to_publish_passed_events=[]
+##################################################################################################################
+
 list_of_signals_to_publish_state_changes=[]
 
 # -------------------------------------------------------------------------
@@ -133,9 +138,13 @@ def sig_passed_button_event (sig_id:int):
     if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
          signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
         signals[str(sig_id)]["released"] = False
+    ##################################################################################################################
+    ############## DEPRECATED - to be removed from Release 4.0.0 #####################################################
+    ##################################################################################################################
     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
     # mqtt interface has been successfully configured and the signal has been set to publish passed events
     publish_signal_passed_event(sig_id)
+    #########################################################################################################
     # Make the external callback (if one was specified at signal creation time)
     signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
@@ -579,6 +588,9 @@ def handle_mqtt_signal_updated_event(message):
         signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_updated)
     return()
 
+######################################################################################################################
+############## DEPRECATED - to be removed from Release 4.0.0 #########################################################
+######################################################################################################################
 def handle_mqtt_signal_passed_event(message):
     if "sourceidentifier" in message.keys():
         signal_identifier = message["sourceidentifier"]
@@ -586,6 +598,7 @@ def handle_mqtt_signal_passed_event(message):
         # Make the external callback (if one has been defined)
         signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_passed)
     return()
+#######################################################################################################################
 
 # --------------------------------------------------------------------------------
 # Common functions for building and sending MQTT messages - but only if the Signal
@@ -605,6 +618,9 @@ def publish_signal_state(sig_id:int):
         mqtt_interface.send_mqtt_message("signal_updated_event",sig_id,data=data,log_message=log_message,retain=True)
         return()
 
+######################################################################################################################
+############## DEPRECATED - to be removed from Release 4.0.0 #########################################################
+######################################################################################################################
 def publish_signal_passed_event(sig_id:int):
     if sig_id in list_of_signals_to_publish_passed_events:
         data = {}
@@ -612,6 +628,7 @@ def publish_signal_passed_event(sig_id:int):
         # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
         mqtt_interface.send_mqtt_message("signal_passed_event",sig_id,data=data,log_message=log_message,retain=False)
         return()
+#######################################################################################################################
 
 # ------------------------------------------------------------------------------------------
 # Common internal functions for deleting a signal object (including all the drawing objects)

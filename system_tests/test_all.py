@@ -12,8 +12,11 @@ import system_test_harness
 import run_layout_tests
 import load_layout_negative_tests
 import test_mqtt_networking_example
+import basic_library_tests
 
 def run_all_tests():
+    print("*** Running tests from 'basic_library_tests.py' ***")
+    basic_library_tests.run_all_basic_library_tests()
     print("*** Running tests from 'test_schematic_editor.py' ***")
     test_schematic_editor.run_all_schematic_editor_tests()
     print("*** Running tests from 'test_object_editing.py' ***")

@@ -56,7 +56,7 @@ def has_subsidary(signal):
 # Helper functions to find out if the signal has distant arms (semaphore
 #------------------------------------------------------------------------------------
 
-def has_distant_arms(signal):
+def has_secondary_distant(signal):
     return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
              ( signal.config.semaphores.main.dist.get_element()[0] or
                signal.config.semaphores.lh1.dist.get_element()[0] or
@@ -73,7 +73,15 @@ def has_route_arms(signal):
              (signal.config.semaphores.lh1.sig.get_element()[0] or
                signal.config.semaphores.lh2.sig.get_element()[0] or
                signal.config.semaphores.rh1.sig.get_element()[0] or
-               signal.config.semaphores.rh2.sig.get_element()[0] ) )
+               signal.config.semaphores.rh2.sig.get_element()[0] or
+               signal.config.semaphores.lh1.dist.get_element()[0] or
+               signal.config.semaphores.lh2.dist.get_element()[0] or
+               signal.config.semaphores.rh1.dist.get_element()[0] or
+               signal.config.semaphores.rh2.dist.get_element()[0] or
+               signal.config.semaphores.lh1.sub.get_element()[0] or
+               signal.config.semaphores.lh2.sub.get_element()[0] or
+               signal.config.semaphores.rh1.sub.get_element()[0] or
+               signal.config.semaphores.rh2.sub.get_element()[0] ) ) 
 
 #------------------------------------------------------------------------------------
 # Helper functions to return a list of the selected signal, distant and subsidary
@@ -123,13 +131,19 @@ def get_sub_routes(signal):
     elif signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
         routes = signal.config.sub_routes.get_values()
     elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
-        semaphore_routes = signal.config.semaphores.get_arms()
-        routes = [False, False, False, False, False]
-        routes[0] = semaphore_routes[0][1][0]
-        routes[1] = semaphore_routes[1][1][0]
-        routes[2] = semaphore_routes[2][1][0]
-        routes[3] = semaphore_routes[3][1][0]
-        routes[4] = semaphore_routes[4][1][0]
+        if signal.config.routetype.get_value() == 4:
+            # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
+            # Each Route element comprises: [signal, subsidary, distant]
+            # Each signal element comprises [enabled/disabled, address]        
+            semaphore_routes = signal.config.semaphores.get_arms()
+            routes = [False, False, False, False, False]
+            routes[0] = semaphore_routes[0][1][0]
+            routes[1] = semaphore_routes[1][1][0]
+            routes[2] = semaphore_routes[2][1][0]
+            routes[3] = semaphore_routes[3][1][0]
+            routes[4] = semaphore_routes[4][1][0]
+        else:
+            routes = signal.config.sub_routes.get_values()
     else:
         # Defensive programming (no subsidary routes)
         routes = [False, False, False, False, False]
@@ -507,6 +521,8 @@ def update_tab1_route_selection_elements(signal):
         # Enable the diverging route selections depending on the type of Semaphore signal
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
             # Distant signals only support 'Route Arms' or 'None' so disable all other selections
+            # If 'Theatre' is selected (not valid for a distant signal then change to 'Route arms'
+            if signal.config.routetype.get_value() == 3: signal.config.routetype.set_value(4)
             signal.config.routetype.B2.configure(state="disabled")
             signal.config.routetype.B3.configure(state="disabled")
             signal.config.routetype.B4.configure(state="normal")
@@ -670,7 +686,7 @@ def update_tab2_interlock_ahead_selection(signal):
            signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
-           has_distant_arms(signal) ) ):
+           has_secondary_distant(signal) ) ):
         signal.locking.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
         signal.locking.interlock_ahead.enable()
     else:
@@ -717,7 +733,7 @@ def update_tab3_general_settings_selections(signal):
         signal.automation.general_settings.override.disable()
     # Enable/disable the "Dustant Automatic"(no distant button) selection
     if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-         has_distant_arms(signal) ):
+         has_secondary_distant(signal) ):
         signal.automation.general_settings.distant_automatic.enable()
     else:
         signal.automation.general_settings.distant_automatic.disable()
@@ -728,7 +744,7 @@ def update_tab3_general_settings_selections(signal):
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
            signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.home.value ) or
          ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
-           has_distant_arms(signal) ) ):
+           has_secondary_distant(signal) ) ):
         signal.automation.general_settings.override_ahead.enable()
     else:
         signal.automation.general_settings.override_ahead.disable()

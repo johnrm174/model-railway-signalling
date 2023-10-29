@@ -1,5 +1,26 @@
 #-----------------------------------------------------------------------------------
 # System tests for the run layout functions
+#  All tests are run with simulated user-generated signal passed events and simulated gpio events
+#    - Track occupancy changes tests for signal types that aren't a distant or shunt-ahead
+#      signal (we can test a single type to be representitive of all other types)
+#        - sections ahead and behind of signal- testing all the possible routes.
+#        - section ahead of signal, no section behind signal
+#        - only section behind signal, no section ahead of signal
+#    - Track occupancy changes tests for distant and shunt-ahead signals (in this case
+#      we test all subtypes of these signals for completeness). Note we test for the cases
+#      of signals not having a valid route configured as (which is a possible scenario for
+#      distant signals which rely on the points ahead of the home signal to set the appropriate
+#      route arms. In this case, the home signal could be locked at DANGER if the points are not
+#      set/locked but the distant signal can still be legitimately passed at CAUTION (and move to
+#      the track section ahead) as these signals can be passed even if the route is not set
+#        - sections ahead and behind of signal
+#        - section ahead of signal, no section behind signal
+#        - only section behind signal, no section ahead of signal
+#    - Interlock distant on home signal ahead tests - main route
+#    - Interlock distant on home signal ahead tests - diverging route
+#    - Override distant on home signal ahead tests - main route
+#    - Override distant on home signal ahead tests - diverging route
+#    - Override secondary distant on distant signal ahead tests
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
@@ -10,7 +31,7 @@ from system_test_harness import *
 # case has track sections both ahead of and behind the signal
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_1(delay:float=0.0):
+def run_track_occupancy_tests_1(delay:float=0.0, test_sensors:bool=False):
     print("Track occupancy tests - sections ahead of and behind signal")
     sleep(delay)
     reset_layout()
@@ -19,18 +40,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - forward
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(4)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(1)
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(4)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(4)
     assert_sections_clear(1,2,3,5,6)
     sleep(delay)
@@ -38,18 +57,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(4)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(7)
+    else: trigger_signals_passed(4)
     assert_sections_occupied(4)
     assert_sections_clear(1,2,3,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(4)
     sleep(delay)
-    trigger_signals_passed(4)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(7)
+    else: trigger_signals_passed(4)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     sleep(delay)
@@ -59,18 +76,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     set_points_switched(1)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(5)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(1)
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(5)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(5)
     assert_sections_clear(1,2,3,4,6)
     sleep(delay)
@@ -78,18 +93,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(5)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(8)
+    else: trigger_signals_passed(5)
     assert_sections_occupied(5)
     assert_sections_clear(1,2,3,4,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(5)
     sleep(delay)
-    trigger_signals_passed(5)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(8)
+    else: trigger_signals_passed(5)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     sleep(delay)
@@ -99,18 +112,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     set_points_switched(2)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(6)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(1)
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(6)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(6)
     assert_sections_clear(1,2,3,4,5)
     sleep(delay)
@@ -118,18 +129,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(6)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(9)
+    else: trigger_signals_passed(6)
     assert_sections_occupied(6)
     assert_sections_clear(1,2,3,4,5)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(6)
     sleep(delay)
-    trigger_signals_passed(6)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(9)
+    else: trigger_signals_passed(6)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     sleep(delay)
@@ -141,18 +150,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     set_points_switched(3)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(3)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(1)
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(3)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(3)
     assert_sections_clear(1,2,4,5,6)
     sleep(delay)
@@ -160,18 +167,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(3)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(6)
+    else: trigger_signals_passed(3)
     assert_sections_occupied(3)
     assert_sections_clear(1,2,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(3)
     sleep(delay)
-    trigger_signals_passed(3)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(6)
+    else: trigger_signals_passed(3)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     sleep(delay)
@@ -181,18 +186,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     set_points_switched(4)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(2)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(1)
     sleep(delay)
-    trigger_signals_passed(1)
-    sleep(delay)
-    trigger_signals_passed(2)
+    if test_sensors: simulate_gpio_triggered(4)
+    else: trigger_signals_passed(1)
     assert_sections_occupied(2)
     assert_sections_clear(1,3,4,5,6)
     sleep(delay)
@@ -200,18 +203,16 @@ def run_track_occupancy_tests_1(delay:float=0.0):
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(2)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(7)
+    else: trigger_signals_passed(2)
     assert_sections_occupied(2)
     assert_sections_clear(1,3,4,5,6)
     # Train will be passed if signal is OFF
     sleep(delay)
     set_signals_off(2)
     sleep(delay)
-    trigger_signals_passed(2)
-    sleep(delay)
-    trigger_signals_passed(1)
+    if test_sensors: simulate_gpio_triggered(5)
+    else: trigger_signals_passed(2)
     assert_sections_occupied(1)
     assert_sections_clear(2,3,4,5,6)
     sleep(delay)
@@ -223,50 +224,58 @@ def run_track_occupancy_tests_1(delay:float=0.0):
 # and non-shunt-ahead signals - where sections only exist one side of the signal
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_2(delay:float=0.0):
+def run_track_occupancy_tests_2(delay:float=0.0, test_sensors:bool=False):
     print("Track occupancy tests - section ahead of signal only")
     sleep(delay)
     reset_layout()
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(7)
+    if test_sensors: simulate_gpio_triggered(10)
+    else: trigger_signals_passed(7)
     assert_sections_clear(7)
     # Section will be set to occupied if signal is off
     sleep(delay)
     set_signals_off(7)
     sleep(delay)
-    trigger_signals_passed(7)
+    if test_sensors: simulate_gpio_triggered(10)
+    else: trigger_signals_passed(7)
     assert_sections_occupied(7)
     # Check the train doesn't get passed back
     sleep(delay)
-    trigger_signals_passed(7)
+    if test_sensors: simulate_gpio_triggered(10)
+    else: trigger_signals_passed(7)
     assert_sections_occupied(7)
     sleep(delay)
     set_signals_on(7)
     sleep(delay)
-    trigger_signals_passed(7)
+    if test_sensors: simulate_gpio_triggered(10)
+    else: trigger_signals_passed(7)
     assert_sections_occupied(7)
     print("Track occupancy tests - section behind signal only")
     sleep(delay)
     set_sections_occupied(8)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    trigger_signals_passed(8)
+    if test_sensors: simulate_gpio_triggered(11)
+    else: trigger_signals_passed(8)
     assert_sections_occupied(8)
     # Section will be cleared if signal is off
     sleep(delay)
     set_signals_off(8)
     sleep(delay)
-    trigger_signals_passed(8)
+    if test_sensors: simulate_gpio_triggered(11)
+    else: trigger_signals_passed(8)
     assert_sections_clear(8)
     # Check the train doesn't get passed back
     sleep(delay)
-    trigger_signals_passed(8)
+    if test_sensors: simulate_gpio_triggered(11)
+    else: trigger_signals_passed(8)
     assert_sections_clear(8)
     sleep(delay)
     set_signals_on(8)
     sleep(delay)
-    trigger_signals_passed(8)
+    if test_sensors: simulate_gpio_triggered(11)
+    else: trigger_signals_passed(8)
     assert_sections_clear(8)
     return()
 
@@ -275,11 +284,12 @@ def run_track_occupancy_tests_2(delay:float=0.0):
 # and shunt-ahead signals - all combinations of section ahead/behind
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_3(delay:float=0.0):
-    print("Track occupancy tests - section ahead of signal only")
+def run_track_occupancy_tests_3(delay:float=0.0, test_sensors:bool=False):
+    print("Track occupancy tests --- section ahead of signal only")
     # Section will be set to occupied if signal is on
     sleep(delay)
-    trigger_signals_passed(9)
+    if test_sensors: simulate_gpio_triggered(12)
+    else: trigger_signals_passed(9)
     assert_sections_occupied(9)
     sleep(delay)
     set_sections_clear(9)
@@ -287,24 +297,30 @@ def run_track_occupancy_tests_3(delay:float=0.0):
     sleep(delay)
     set_signals_off(9)
     sleep(delay)
-    trigger_signals_passed(9)
+    if test_sensors: simulate_gpio_triggered(12)
+    else: trigger_signals_passed(9)
     assert_sections_occupied(9)
     # Check the train gets passed back the other way
     sleep(delay)
-    trigger_signals_passed(9)
+    if test_sensors: simulate_gpio_triggered(12)
+    else: trigger_signals_passed(9)
     assert_sections_clear(9)
     sleep(delay)
     set_signals_on(9)
     sleep(delay)
     set_sections_occupied(9)
-    trigger_signals_passed(9)
+    if test_sensors: simulate_gpio_triggered(12)
+    else: trigger_signals_passed(9)
     assert_sections_clear(9)
-    print("Track occupancy tests - section behind signal only")
+    print("Track occupancy tests --- section behind signal only")
+    sleep(delay)
+    # Test the normal condition (section behind occupied) - Section will be Cleared if signal is on
     sleep(delay)
     set_sections_occupied(10)
     # Section will be Cleared if signal is on
     sleep(delay)
-    trigger_signals_passed(10)
+    if test_sensors: simulate_gpio_triggered(13)
+    else: trigger_signals_passed(10)
     assert_sections_clear(10)
     sleep(delay)
     set_sections_occupied(10)
@@ -312,41 +328,48 @@ def run_track_occupancy_tests_3(delay:float=0.0):
     sleep(delay)
     set_signals_off(10)
     sleep(delay)
-    trigger_signals_passed(10)
+    if test_sensors: simulate_gpio_triggered(13)
+    else: trigger_signals_passed(10)
     assert_sections_clear(10)
     # Check the train gets passed back the other way
     sleep(delay)
-    trigger_signals_passed(10)
+    if test_sensors: simulate_gpio_triggered(13)
+    else: trigger_signals_passed(10)
     assert_sections_occupied(10)
     sleep(delay)
     set_signals_on(10)
     sleep(delay)
     set_sections_clear(10)
-    trigger_signals_passed(10)
+    if test_sensors: simulate_gpio_triggered(13)
+    else: trigger_signals_passed(10)
     assert_sections_occupied(10)
-    print("Track occupancy tests - sections ahead of and behind signal")
+    print("Track occupancy tests --- sections ahead of and behind signal")
     sleep(delay)
     set_sections_occupied(11)
     # Train will be passed forward if signal is on
     sleep(delay)
-    trigger_signals_passed(11)
+    if test_sensors: simulate_gpio_triggered(16)
+    else: trigger_signals_passed(11)
     assert_sections_occupied(12)
     assert_sections_clear(11)
     # Check the train gets passed back the other way
     sleep(delay)
-    trigger_signals_passed(11)
+    if test_sensors: simulate_gpio_triggered(16)
+    else: trigger_signals_passed(11)
     assert_sections_occupied(11)
     assert_sections_clear(12)
     # Train will be passed forward if signal is off
     sleep(delay)
     set_signals_off(11)
     sleep(delay)
-    trigger_signals_passed(11)
+    if test_sensors: simulate_gpio_triggered(16)
+    else: trigger_signals_passed(11)
     assert_sections_occupied(12)
     assert_sections_clear(11)
     # Check the train gets passed back the other way
     sleep(delay)
-    trigger_signals_passed(11)
+    if test_sensors: simulate_gpio_triggered(16)
+    else: trigger_signals_passed(11)
     assert_sections_occupied(11)
     assert_sections_clear(12)
     # Set everything back to normal
@@ -364,36 +387,36 @@ def run_track_occupancy_tests_3(delay:float=0.0):
 # Sub type (ground disc): shunt_ahead=2
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_4(delay:float=0.0):
+def run_track_occupancy_tests_4(delay:float=0.0, test_sensors:bool=False):
     s9 = get_object_id("signal",9)
     s10 = get_object_id("signal",10)
     s11 = get_object_id("signal",11)
     # Test with semaphore distants
-    print("Track occupancy tests - Colour Light Distant Signals")
+    print("Track occupancy tests -- Colour Light Distant Signals")
     update_object_configuration(s9, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":1, "itemsubtype":2} )
-    run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Semaphore Distant Signals")
+    run_track_occupancy_tests_3(delay,test_sensors)
+    print("Track occupancy tests -- Semaphore Distant Signals")
     update_object_configuration(s9, {"itemtype":3, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":3, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":3, "itemsubtype":2} )
-    run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Disc Shunt Ahead Signals")
+    run_track_occupancy_tests_3(delay,test_sensors)
+    print("Track occupancy tests -- Ground Disc Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":4, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":4, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":4, "itemsubtype":2} )
-    run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Position Shunt Ahead Signals")
+    run_track_occupancy_tests_3(delay,test_sensors)
+    print("Track occupancy tests -- Ground Position Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":2, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":2, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":2, "itemsubtype":2} )
-    run_track_occupancy_tests_3(delay)
-    print("Track occupancy tests - Ground Position Early Shunt Ahead Signals")
+    run_track_occupancy_tests_3(delay,test_sensors)
+    print("Track occupancy tests -- Ground Position Early Shunt Ahead Signals")
     update_object_configuration(s9, {"itemtype":2, "itemsubtype":4} )
     update_object_configuration(s10, {"itemtype":2, "itemsubtype":4} )
     update_object_configuration(s11, {"itemtype":2, "itemsubtype":4} )
-    run_track_occupancy_tests_3(delay)
+    run_track_occupancy_tests_3(delay,test_sensors)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -405,17 +428,17 @@ def run_track_occupancy_tests_4(delay:float=0.0):
 # still be legitimately passed at CAUTION (and move to the track section ahead)
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_5(delay:float=0.0):
+def run_track_occupancy_tests_5(delay:float=0.0, test_sensors:bool=False):
     sleep(delay)
     reset_layout()
     # Signals 9,10,11 have a valid route
     print("Track occupancy tests - Signals 9,10,11 have no valid route configured")
-    run_track_occupancy_tests_4(delay)
+    run_track_occupancy_tests_4(delay,test_sensors)
     # signals 9,10,11 have no valid route
     print("Track occupancy tests - Signals 9,10,11 have a valid route configured")
     sleep(delay)
     set_points_switched(5)
-    run_track_occupancy_tests_4(delay)
+    run_track_occupancy_tests_4(delay,test_sensors)
     # Set everything back to its default state
     set_points_normal(5)
     return()
@@ -424,26 +447,30 @@ def run_track_occupancy_tests_5(delay:float=0.0):
 # This function tests the correct behavior for shunt ahead signals (can be passed whilst ON)
 #-----------------------------------------------------------------------------------
 
-def run_track_occupancy_tests_6(delay:float=0.0):
+def run_track_occupancy_tests_6(delay:float=0.0, test_sensors:bool=False):
     sleep(delay)
     set_sections_occupied(13)
     assert_sections_clear(14,15)
     sleep(delay)
-    trigger_signals_passed(12)
+    if test_sensors: simulate_gpio_triggered(17)
+    else: trigger_signals_passed(12)
     assert_sections_occupied(14)
     assert_sections_clear(13,15)
     sleep(delay)
-    trigger_signals_passed(12)
+    if test_sensors: simulate_gpio_triggered(17)
+    else: trigger_signals_passed(12)
     assert_sections_occupied(13)
     assert_sections_clear(14,15)
     sleep(delay)
     set_points_switched(6)
     sleep(delay)
-    trigger_signals_passed(12)
+    if test_sensors: simulate_gpio_triggered(17)
+    else: trigger_signals_passed(12)
     assert_sections_occupied(15)
     assert_sections_clear(13,14)
     sleep(delay)
-    trigger_signals_passed(12)
+    if test_sensors: simulate_gpio_triggered(17)
+    else: trigger_signals_passed(12)
     assert_sections_occupied(13)
     assert_sections_clear(14,15)
     # Clear everything down again
@@ -451,15 +478,15 @@ def run_track_occupancy_tests_6(delay:float=0.0):
     set_points_normal(6)
     return()
 
-def run_track_occupancy_tests_7(delay:float=0.0):
+def run_track_occupancy_tests_7(delay:float=0.0, test_sensors:bool=False):
     sleep(delay)
     reset_layout()
     print("Track occupancy tests - Shunting signal ON")
-    run_track_occupancy_tests_6(delay)
+    run_track_occupancy_tests_6(delay,test_sensors)
     sleep(delay)
     set_signals_off(6)
     print("Track occupancy tests - Shunting signal OFF")
-    run_track_occupancy_tests_6(delay)
+    run_track_occupancy_tests_6(delay,test_sensors)
     # Clear everything down
     set_signals_on(6)
     return()    
@@ -603,7 +630,7 @@ def run_override_on_signal_ahead_tests_1(delay:float=0.0):
 def run_override_on_signal_ahead_tests_2(delay:float=0.0):
     sleep(delay)
     reset_layout()
-    print("Override distant on distant signal ahead tests")
+    print("Override secondary distant on distant signal ahead tests")
     assert_signals_DANGER(23)
     sleep(delay)
     set_signals_off(23)
@@ -628,10 +655,16 @@ def run_override_on_signal_ahead_tests_2(delay:float=0.0):
 def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./run_layout_tests.sig")
     set_run_mode()
-    run_track_occupancy_tests_1(delay)
-    run_track_occupancy_tests_2(delay)
-    run_track_occupancy_tests_5(delay)
-    run_track_occupancy_tests_7(delay)
+    print("Run track occupancy tests with simulated user-generated signal passed events")    
+    run_track_occupancy_tests_1(delay,test_sensors=False)
+    run_track_occupancy_tests_2(delay,test_sensors=False)
+    run_track_occupancy_tests_5(delay,test_sensors=False)
+    run_track_occupancy_tests_7(delay,test_sensors=False)
+    print("Run track occupancy tests with simulated GPIO sensor signal passed events")    
+    run_track_occupancy_tests_1(delay,test_sensors=True)
+    run_track_occupancy_tests_2(delay,test_sensors=True)
+    run_track_occupancy_tests_5(delay,test_sensors=True)
+    run_track_occupancy_tests_7(delay,test_sensors=True)
     run_override_on_signal_ahead_tests_1 (delay)
     run_override_on_signal_ahead_tests_2 (delay)
     if shutdown: report_results()

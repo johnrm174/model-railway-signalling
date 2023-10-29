@@ -164,6 +164,8 @@ def test_end_to_end_layout(delay=0.0):
 #-----------------------------------------------------------------------------------
 # Test the circular one-way layout (2 seperate signalling areas)
 # This tests the publish/subscribe of signals and track sections
+# Note the use of simulating GPIO triggers rather than generating
+# the normal signal passed events
 #-----------------------------------------------------------------------------------
 
 def test_circular_layout(delay=0.0):
@@ -186,7 +188,9 @@ def test_circular_layout(delay=0.0):
         assert_signals_PRELIM_CAUTION(31)
         assert_signals_PROCEED(22)
         sleep(delay)
-        trigger_signals_passed(22)
+#        trigger_signals_passed(22)
+        simulate_gpio_triggered(5)
+        simulate_gpio_reset(5)
         sleep(network_delay)
         assert_sections_occupied(23,31)
         assert_sections_clear(21,22,32,33)
@@ -195,7 +199,9 @@ def test_circular_layout(delay=0.0):
         assert_signals_PRELIM_CAUTION(32)
         assert_signals_PROCEED(31)
         sleep(delay)
-        trigger_signals_passed(31)
+#        trigger_signals_passed(31)
+        simulate_gpio_triggered(6)
+        simulate_gpio_reset(6)
         sleep(network_delay)
         assert_sections_occupied(32)
         assert_sections_clear(21,22,23,31,33)
@@ -204,7 +210,9 @@ def test_circular_layout(delay=0.0):
         assert_signals_PRELIM_CAUTION(21)
         assert_signals_PROCEED(32)
         sleep(delay)
-        trigger_signals_passed(32)
+#        trigger_signals_passed(32)
+        simulate_gpio_triggered(7)
+        simulate_gpio_reset(7)
         sleep(network_delay)
         assert_sections_occupied(33,21)
         assert_sections_clear(22,23,31,32)
@@ -213,7 +221,9 @@ def test_circular_layout(delay=0.0):
         assert_signals_PRELIM_CAUTION(22)
         assert_signals_PROCEED(21)
         sleep(delay)
-        trigger_signals_passed(21)
+#        trigger_signals_passed(21)
+        simulate_gpio_triggered(4)
+        simulate_gpio_reset(4)
         sleep(network_delay)
         assert_sections_occupied(22)
         assert_sections_clear(23,31,32,33)
@@ -231,8 +241,8 @@ def test_circular_layout(delay=0.0):
 
 def run_all_mqtt_networking_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/mqtt_networked_example.sig")
-    test_end_to_end_layout(delay)
     test_circular_layout(delay)
+    test_end_to_end_layout(delay)
     if shutdown: report_results()
 
 if __name__ == "__main__":

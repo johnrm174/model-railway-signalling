@@ -412,6 +412,21 @@ def update_signal_arm (sig_id, signal_arm, off_element, on_element, set_to_clear
     return()
 
 #-------------------------------------------------------------------
+# Helper function to determine if the signal has any diverging route arms
+#-------------------------------------------------------------------
+
+def has_diverging_route_arms(sig_id:int):
+    has_route_arms = (signals_common.signals[str(sig_id)]["lh1_subsidary"] is not None or
+                      signals_common.signals[str(sig_id)]["lh2_subsidary"] is not None or
+                      signals_common.signals[str(sig_id)]["rh1_subsidary"] is not None or
+                      signals_common.signals[str(sig_id)]["rh1_subsidary"] is not None or
+                      signals_common.signals[str(sig_id)]["lh1_signal"] is not None or
+                      signals_common.signals[str(sig_id)]["lh2_signal"] is not None or
+                      signals_common.signals[str(sig_id)]["rh1_signal"] is not None or
+                      signals_common.signals[str(sig_id)]["rh2_signal"] is not None )
+    return (has_route_arms)
+
+#-------------------------------------------------------------------
 # Internal Function to update each of the subsidary signal arms supported by
 # a signal to reflect the current state of the subsidary (either ON or OFF)
 # and the route set for the signal (i.e the actual subsidary arm that is changed
@@ -422,8 +437,12 @@ def update_signal_arm (sig_id, signal_arm, off_element, on_element, set_to_clear
 def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
     # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
     if signals_common.signals[str(sig_id)]["subclear"] == True:
-        # If the route has been set to signals_common.route_type.NONE then we assume the MAIN Route
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
+        # If the route has been set to signals_common.route_type.NONE then we assume MAIN and change the MAIN arm
+        # We also change the MAIN subsidary arm for Home signals without any diverging route arms (main signal or 
+        # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes
+        if ( signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.MAIN or
+             signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.NONE or
+             not has_diverging_route_arms(sig_id)):
             update_signal_arm (sig_id, "main_subsidary", "mainsuboff", "mainsubon", True, log_message)
             update_signal_arm (sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
             update_signal_arm (sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
@@ -431,7 +450,7 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
             if signals_common.signals[str(sig_id)]["lh1_subsidary"] is None:
-                logging.error ("Signal "+str(sig_id)+": No subsidary arm exists for route LH1")
+                logging.info ("Signal "+str(sig_id)+": No subsidary arm exists for route LH1")
             update_signal_arm (sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm (sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", True, log_message)
             update_signal_arm (sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
@@ -439,7 +458,7 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
             if signals_common.signals[str(sig_id)]["lh2_subsidary"] is None:
-                logging.error ("Signal "+str(sig_id)+": No subsidary arm exists for route LH2")
+                logging.info ("Signal "+str(sig_id)+": No subsidary arm exists for route LH2")
             update_signal_arm (sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm (sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
             update_signal_arm (sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", True, log_message)
@@ -447,7 +466,7 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH1:
             if signals_common.signals[str(sig_id)]["rh1_subsidary"] is None:
-                logging.error ("Signal "+str(sig_id)+": No subsidary arm exists for route RH1")
+                logging.info ("Signal "+str(sig_id)+": No subsidary arm exists for route RH1")
             update_signal_arm (sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm (sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
             update_signal_arm (sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
@@ -455,7 +474,7 @@ def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_subsidary", "rh2suboff", "rh2subon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH2:
             if signals_common.signals[str(sig_id)]["rh2_subsidary"] is None:
-                logging.error ("Signal "+str(sig_id)+": No subsidary arm exists for route RH2")
+                logging.info ("Signal "+str(sig_id)+": No subsidary arm exists for route RH2")
             update_signal_arm (sig_id, "main_subsidary", "mainsuboff", "mainsubon", False, log_message)
             update_signal_arm (sig_id, "lh1_subsidary", "lh1suboff", "lh1subon", False, log_message)
             update_signal_arm (sig_id, "lh2_subsidary", "lh2suboff", "lh2subon", False, log_message)
@@ -486,7 +505,14 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
     if (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED or
          (signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION and
            signals_common.signals[str(sig_id)]["subtype"] == semaphore_sub_type.home) ):
-        if signals_common.signals[str(sig_id)]["routeset"] in (signals_common.route_type.MAIN,signals_common.route_type.NONE):
+        # If the route has been set to signals_common.route_type.NONE then we assume MAIN and change the MAIN arm
+        # We also change the MAIN signal arm for (1) Home signals without any diverging route arms (main signal or 
+        # subsidary signal) to cover the case of a single subsidary signal arm controlling multiple routes, and
+        # (2) Associated Distant signals where the associated home signal has no diverging route arms
+        if ( signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.MAIN or
+             signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.NONE or
+             (not has_diverging_route_arms(sig_id) and not (signals_common.signals[str(sig_id)]["associatedsignal"] > 0
+                      and has_diverging_route_arms(signals_common.signals[str(sig_id)]["associatedsignal"])))):
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", True, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
@@ -494,7 +520,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH1:
             if signals_common.signals[str(sig_id)]["lh1_signal"] is None:
-                logging.error ("Signal "+str(sig_id)+": No main signal arm exists for route LH1")
+                logging.info ("Signal "+str(sig_id)+": No main signal arm exists for route LH1")
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", True, log_message)
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
@@ -502,7 +528,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.LH2:
             if signals_common.signals[str(sig_id)]["lh2_signal"] is None:
-                logging.error ("Signal "+str(sig_id)+": No main signal arm exists for route LH2")
+                logging.info ("Signal "+str(sig_id)+": No main signal arm exists for route LH2")
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", True, log_message)
@@ -510,7 +536,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH1:
             if signals_common.signals[str(sig_id)]["rh1_signal"] is None:
-                logging.error ("Signal "+str(sig_id)+": No main signal arm exists for route RH1")
+                logging.info ("Signal "+str(sig_id)+": No main signal arm exists for route RH1")
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
@@ -518,7 +544,7 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
             update_signal_arm (sig_id, "rh2_signal", "rh2sigoff", "rh2sigon", False, log_message)
         elif signals_common.signals[str(sig_id)]["routeset"] == signals_common.route_type.RH2:
             if signals_common.signals[str(sig_id)]["rh2_signal"] is None:
-                logging.error ("Signal "+str(sig_id)+": No main signal arm exists for route RH2")
+                logging.info ("Signal "+str(sig_id)+": No main signal arm exists for route RH2")
             update_signal_arm (sig_id, "main_signal", "mainsigoff", "mainsigon", False, log_message)
             update_signal_arm (sig_id, "lh1_signal", "lh1sigoff", "lh1sigon", False, log_message)
             update_signal_arm (sig_id, "lh2_signal", "lh2sigoff", "lh2sigon", False, log_message)
