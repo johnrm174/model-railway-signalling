@@ -324,7 +324,7 @@ class point_configuration_tab():
                                       "Select Point Type", None, "RH", "LH")
         self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the Point colour selection element
-        self.colour = common.colour_selection(self.frame)
+        self.colour = common.colour_selection(self.frame, label="Colour")
         self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
         # Create the UI element for the general settings
         # Note that the class needs the parent object (to reference siblings)
