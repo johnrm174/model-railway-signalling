@@ -677,15 +677,20 @@ class scrollable_text_frame(Tk.Frame):
         # configure the window for editable or non-editable
         if not self.editable: self.text_box.config(state="disabled")
         # Set up the callback for auto re-size (if specified)
-        if self.auto_resize: self.text_box.bind("<Key>", self.resize_text_box)
+        if self.auto_resize: self.text_box.bind('<KeyRelease>', self.resize_text_box)
         # Set the initial size for the text box
         self.resize_text_box()
+        # Define the tags we are goint to use for justifying the text
+        self.text_box.tag_configure("justify_center", justify='center')
+        self.text_box.tag_configure("justify_left", justify='left')
+        self.text_box.tag_configure("justify_right", justify='right')
 
     def resize_text_box(self, event=None):
         # Calculate the height and width of the text
         self.text = self.text_box.get("1.0",Tk.END)
         list_of_lines = self.text.splitlines()
         number_of_lines = len(list_of_lines)
+        # Find the maximum line length (to set the width of the text box)
         max_line_length = 0
         for line in list_of_lines:
             if len(line) > max_line_length: max_line_length = len(line)
@@ -699,7 +704,7 @@ class scrollable_text_frame(Tk.Frame):
         if self.max_width is not None and max_line_length > self.max_width:
             max_line_length = self.max_width
         # re-size the text box
-        self.text_box.config(height=number_of_lines+1, width=max_line_length+1)
+        self.text_box.config(height=number_of_lines, width=max_line_length+1)
         
     def set_value(self, text:str):
         self.text = text
@@ -711,8 +716,23 @@ class scrollable_text_frame(Tk.Frame):
     
     def get_value(self):
         self.text = self.text_box.get("1.0",Tk.END)
+        # Remove the spurious new line (text widget always inserts one)
+        if self.text.endswith('\r\n'): self.text = self.text[:-2]  ## Windows
+        elif self.text.endswith('\n'): self.text = self.text[:-1]  ## Everything else
         return(self.text)
     
+    def set_justification(self, value:int):
+        # Define the tags we are goint to use for justifying the text
+        self.text_box.tag_remove("justify_left",1.0,Tk.END)
+        self.text_box.tag_remove("justify_center",1.0,Tk.END)
+        self.text_box.tag_remove("justify_right",1.0,Tk.END)
+        if value == 1: self.text_box.tag_add("justify_left",1.0,Tk.END)
+        if value == 2: self.text_box.tag_add("justify_center",1.0,Tk.END)
+        if value == 3: self.text_box.tag_add("justify_right",1.0,Tk.END)
+
+    def set_font(self, font:str, font_size:int, font_style:str):
+        self.text_box.configure(font=(font, font_size, font_style))
+
 #------------------------------------------------------------------------------------
 # Compound UI element for an object_id_selection LabelFrame - uses the integer_entry_box.
 # This is used across all object windows for displaying / changing the item ID.
@@ -999,7 +1019,7 @@ class selection_buttons():
 
     def set_value(self, value:int):
         self.value.set(value)
-
+        
     def get_value(self):
         return(self.value.get())
 
@@ -1014,16 +1034,16 @@ class selection_buttons():
 #------------------------------------------------------------------------------------
 
 class colour_selection():
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, label:str):
         # Variable to hold the currently selected colour:
         self.colour ='black'
         # Create a frame to hold the tkinter widgets
         # The parent class is responsible for packing the frame
-        self.frame = Tk.LabelFrame(parent_frame,text="Colour")
+        self.frame = Tk.LabelFrame(parent_frame,text=label)
         # Create a sub frame for the UI elements to centre them
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour)
+        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour, borderwidth=1, relief="solid")
         self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.label2, "Currently selected colour")
         self.B1 = Tk.Button(self.subframe, text="Change", command=self.update)
@@ -1031,7 +1051,7 @@ class colour_selection():
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
         
     def update(self):
-        colour_code = colorchooser.askcolor(parent=self.frame, title ="Select Colour")
+        colour_code = colorchooser.askcolor(self.colour, parent=self.frame, title ="Select Colour")
         self.colour = colour_code[1]
         self.label2.config(bg=self.colour)
         
