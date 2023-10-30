@@ -40,8 +40,8 @@ default_textbox_object["justify"] = 2   ## 1=Left, 2=Center, 3=right
 default_textbox_object["background"] = "grey85"
 default_textbox_object["font"] = "Courier"  
 default_textbox_object["fontsize"] = 10  
-default_textbox_object["fontstyle"] = "bold"  
-default_textbox_object["outline"] = ""  
+default_textbox_object["fontstyle"] = ""  
+default_textbox_object["border"] = 0  
 
 #------------------------------------------------------------------------------------
 # Function to to update a text box object following a configuration change
@@ -64,11 +64,11 @@ def redraw_textbox_object(object_id):
     y1 = objects_common.schematic_objects[object_id]["posy"]
     colour = objects_common.schematic_objects[object_id]["colour"]
     background  = objects_common.schematic_objects[object_id]["background"]
-    outline = objects_common.schematic_objects[object_id]["outline"]
     font = (objects_common.schematic_objects[object_id]["font"],
             objects_common.schematic_objects[object_id]["fontsize"],
             objects_common.schematic_objects[object_id]["fontstyle"])
     text = objects_common.schematic_objects[object_id]["text"]
+    width = objects_common.schematic_objects[object_id]["border"]
     # Create the textbox, justifying the text as required
     if objects_common.schematic_objects[object_id]["justify"] == 1: justify=Tk.LEFT
     elif objects_common.schematic_objects[object_id]["justify"] == 2: justify=Tk.CENTER
@@ -76,8 +76,8 @@ def redraw_textbox_object(object_id):
     text_box = objects_common.canvas.create_text(x1,y1,fill=colour,text=text,tags=str(object_id),justify=justify,font=font)
     # find the boundary box and create the rectangle for the background
     bbox = objects_common.canvas.bbox(text_box)
-    rectangle = objects_common.canvas.create_rectangle(bbox[0]-3, bbox[1]-1, bbox[2]+3, bbox[3],
-                                tags=str(object_id), fill=background, outline=outline)
+    rectangle = objects_common.canvas.create_rectangle(bbox[0]-3, bbox[1]-3, bbox[2]+3, bbox[3]+2,
+                             width=width, tags=str(object_id), fill=background, outline=colour)
     # Raise the text item to be in front of the rectangle item
     objects_common.canvas.tag_raise(text_box, rectangle)
     # Store the reference for the the Tkinter drawing objects
