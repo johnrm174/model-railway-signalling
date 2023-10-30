@@ -15,9 +15,9 @@
 #    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking
 #    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking
 #    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking
-#    schematic.initialise(root, callback, width, height, grid) - Create the canvas
+#    schematic.initialise(root, callback, width, height, grid, snap) - Create the canvas
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
-#    schematic.update_canvas() - For updating the canvas following reload/resizing
+#    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
 #    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
 #    settings.get_all() - Get all settings (for save)
@@ -156,8 +156,9 @@ class main_menubar:
         self.file_has_been_saved = False
         # Initialise the schematic canvas
         # Note that the Edit Mode flag is the 2nd param in the returned tuple from get_general
-        width, height, grid = settings.get_canvas()
-        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, settings.get_general()[1])
+        width, height, grid, snap_to_grid = settings.get_canvas()
+        edit_mode = settings.get_general()[1]
+        schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, snap_to_grid, edit_mode)
         # Initialise the editor configuration at startup
         self.initialise_editor()
         # Parse the command line arguments to get the filename (and load it)
@@ -260,6 +261,12 @@ class main_menubar:
             # the Edit mode flag is the second parameter returned
             if settings.get_general()[1]: self.run_mode()
             else: self.edit_mode()
+        elif event.keysym == 's':
+            # the Snap to Grid flag is the fourth parameter returned
+            if settings.get_canvas()[3]: settings.set_canvas(snap_to_grid=False)
+            else: settings.set_canvas(snap_to_grid=True)
+            # Apply the new canvas settings
+            self.canvas_update()
             
     # --------------------------------------------------------------------------------------
     # Callback functions to handle menubar selection events
@@ -383,8 +390,8 @@ class main_menubar:
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
         
     def canvas_update(self):
-        width, height, grid = settings.get_canvas()
-        schematic.update_canvas(width, height, grid)
+        width, height, grid, snap_to_grid = settings.get_canvas()
+        schematic.update_canvas(width, height, grid, snap_to_grid)
         
     def logging_update(self):
         log_level = settings.get_logging()

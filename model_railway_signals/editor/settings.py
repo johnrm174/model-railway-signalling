@@ -56,6 +56,7 @@ default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
 default_settings["canvas"]["grid"] = 25
+default_settings["canvas"]["snaptogrid"] = True
 default_settings["logging"] = {}
 default_settings["logging"]["level"] = 2   # Warning
 default_settings["sprog"] = {}
@@ -189,12 +190,14 @@ def get_canvas():
     width = settings["canvas"]["width"]
     height = settings["canvas"]["height"]
     grid = settings["canvas"]["grid"]
-    return (width, height, grid)
+    snap_to_grid = settings["canvas"]["snaptogrid"]
+    return (width, height, grid, snap_to_grid)
 
-def set_canvas(width:int=None, height:int=None, grid:int=None):
+def set_canvas(width:int=None, height:int=None, grid:int=None, snap_to_grid:bool=None):
     if width is not None: settings["canvas"]["width"] = width
     if height is not None: settings["canvas"]["height"] = height
     if grid is not None: settings["canvas"]["grid"] = grid
+    if snap_to_grid is not None: settings["canvas"]["snaptogrid"] = snap_to_grid
     return()
 
 #------------------------------------------------------------------------------------

@@ -104,11 +104,13 @@ Schematic functions (in edit mode):
 6) Left-click / release (when not over an object) can also be used for an 'area' selection
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
-9) <backspace> will permanently delete all selected objects from the schematic
-10) <cntl-c> will copy all currently selected objects to a copy/paste buffer
-11) <cntl-v> will paste the selected objects at a slightly offset position
-12) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
-13) <m> will toggle the schematic editor between Edit Mode and Run Mode
+9) <s> will snap all selected objects to the grid (whether snap to grid is enabled or not)
+10) <backspace> will permanently delete all selected objects from the schematic
+11) <cntl-c> will copy all currently selected objects to a copy/paste buffer
+12) <cntl-v> will paste the selected objects at a slightly offset position
+13) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
+14) <cntl-s> will toggle 'snap-to-grid' on/off for Edit Mode
+15) <m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
 
@@ -253,7 +255,7 @@ class edit_canvas_settings():
         self.window.geometry(f'+{winx}+{winy}')
         self.window.title("Canvas")
         self.window.attributes('-topmost',True)
-        # Create the entry box elements for the width and height
+        # Create the entry box elements for the width, height and grid
         # Pack the elements as a grid to get an aligned layout
         self.frame = Tk.Frame(self.window)
         self.frame.pack()
@@ -269,6 +271,15 @@ class edit_canvas_settings():
         self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=2000,
                         allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
         self.height.grid(row=1, column=1)
+        self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
+        self.label3.grid(row=2, column=0)
+        self.grid = common.integer_entry_box(self.frame, width=5, min_value=5, max_value=25,
+                        allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
+        self.grid.grid(row=2, column=1)
+        # Create the check box element for snap to grid
+        self.snap = common.check_box (self.window, label="Snap to Grid",
+                        tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
+        self.snap.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
         self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
         self.controls.frame.pack(padx=2, pady=2)
@@ -277,17 +288,21 @@ class edit_canvas_settings():
 
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
-        width, height, grid = settings.get_canvas()
+        width, height, grid, snap_to_grid = settings.get_canvas()
         self.width.set_value(width)
         self.height.set_value(height)
+        self.grid.set_value(grid)
+        self.snap.set_value(snap_to_grid)
         
     def save_state(self, parent_object, close_window:bool):
         # Parent object is passed by the callback - not used here
         # Only allow the changes to be applied / window closed if both values are valid
-        if self.width.validate() and self.height.validate():
+        if self.width.validate() and self.height.validate() and self.grid.validate():
             width = self.width.get_value()
             height = self.height.get_value()
-            settings.set_canvas(width=width, height=height)
+            grid = self.grid.get_value()
+            snap_to_grid = self.snap.get_value()
+            settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid)
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK or cancel)

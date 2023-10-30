@@ -4,8 +4,8 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    initialise(root, callback, width, height, grid) - Call once on startup
-#    update_canvas() - Call following a size update (or layout load/canvas resize)
+#    initialise(root, callback, width, height, grid, snap) - Call once on startup
+#    update_canvas(width,height,grid,snap) - Call following a size update (or layout load/canvas resize)
 #    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
 #    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
 #    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
@@ -90,6 +90,7 @@ canvas_width = 0
 canvas_height = 0
 canvas_grid = 0
 canvas_grid_state = "normal"
+canvas_snap_to_grid = True
 # The callback to make (for selected canvas events). Currently only the mode change keypress
 # event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
@@ -224,6 +225,22 @@ def edit_selected_object():
         configure_section.edit_section(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
         configure_instrument.edit_instrument(root,object_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to snap all selected objects to the grid (if snap to grid is enabled)
+#------------------------------------------------------------------------------------
+
+def snap_selected_objects_to_grid(event=None):
+    for object_id in schematic_state["selectedobjects"]:
+        posx = objects.schematic_objects[object_id]["posx"]
+        posy = objects.schematic_objects[object_id]["posy"]
+        xdiff,ydiff = snap_to_grid(posx,posy, force_snap=True)
+        # All drawing objects should be "tagged" apart from the bbox
+        canvas.move(objects.schematic_objects[object_id]["tags"],xdiff,ydiff)
+        canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
+        # Finalise the move by updating the current object position
+        objects.move_objects([object_id],xdiff1=xdiff, ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff )
     return()
 
 #------------------------------------------------------------------------------------
@@ -366,13 +383,17 @@ def find_highlighted_line_end(xpos:int,ypos:int):
 # Uses the global canvas_grid variable
 #------------------------------------------------------------------------------------
 
-def snap_to_grid(xpos:int,ypos:int):
-    remainderx = xpos%canvas_grid
-    remaindery = ypos%canvas_grid
-    if remainderx < canvas_grid/2: remainderx = 0 - remainderx
-    else: remainderx = canvas_grid - remainderx
-    if remaindery < canvas_grid/2: remaindery = 0 - remaindery
-    else: remaindery = canvas_grid - remaindery
+def snap_to_grid(xpos:int,ypos:int, force_snap:bool=False):
+    if canvas_snap_to_grid or force_snap:
+        remainderx = xpos%canvas_grid
+        remaindery = ypos%canvas_grid
+        if remainderx < canvas_grid/2: remainderx = 0 - remainderx
+        else: remainderx = canvas_grid - remainderx
+        if remaindery < canvas_grid/2: remaindery = 0 - remaindery
+        else: remaindery = canvas_grid - remaindery
+    else:
+        remainderx = 0
+        remaindery = 0
     return(remainderx,remaindery)
 
 #------------------------------------------------------------------------------------
@@ -581,8 +602,8 @@ def left_button_release(event):
 # of new schematic or re-size of canvas via menubar). Updates the global variables
 #------------------------------------------------------------------------------------
 
-def update_canvas(width:int, height:int, grid:int):
-    global canvas_width, canvas_height, canvas_grid
+def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool):
+    global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid
     # Update the tkinter canvas object
     canvas.config (width=width, height=height, scrollregion=(0,0,width, height))
     # reset the root window size (this will fit to contents)
@@ -591,6 +612,7 @@ def update_canvas(width:int, height:int, grid:int):
     canvas_width = width
     canvas_height = height
     canvas_grid = grid
+    canvas_snap_to_grid = snap_to_grid
     draw_grid()
     # Also update the objects module with the new settings
     objects.update_canvas(width, height, grid)
@@ -622,7 +644,7 @@ def enable_all_keypress_events():
 
 def disable_all_keypress_events():
     disable_edit_keypress_events()
-    canvas.unbind('m')
+    canvas.unbind('m')                             # Toggle Mode (Edit/Run)
     return()
 
 #------------------------------------------------------------------------------------
@@ -638,7 +660,9 @@ def enable_edit_keypress_events():
     canvas.bind('<Control-Key-v>', paste_clipboard_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
+    canvas.bind('<Control-Key-s>', canvas_event_callback)    # Toggle Snap to Grid
     canvas.bind('r', rotate_selected_objects)
+    canvas.bind('s', snap_selected_objects_to_grid)      
     return()
 
 def disable_edit_keypress_events():
@@ -649,7 +673,9 @@ def disable_edit_keypress_events():
     canvas.unbind('<Control-Key-v>')
     canvas.unbind('<Control-Key-z>')
     canvas.unbind('<Control-Key-y>')
+    canvas.unbind('<Control-Key-s>')
     canvas.unbind('r')
+    canvas.unbind('s')    
     return()
 
 #------------------------------------------------------------------------------------
@@ -712,9 +738,9 @@ def disable_editing():
 # Externally Called Initialisation function for the Canvas object
 #------------------------------------------------------------------------------------
 
-def initialise (root_window, event_callback, width:int, height:int, grid:int, edit_mode:bool):
+def initialise (root_window, event_callback, width:int, height:int, grid:int, snap_to_grid:bool, edit_mode:bool):
     global root, canvas, popup1, popup2
-    global canvas_width, canvas_height, canvas_grid, canvas_grid_state
+    global canvas_width, canvas_height, canvas_grid, canvas_grid_state, canvas_snap_to_grid
     global button_frame, canvas_frame, buttons, images
     global canvas_event_callback
     root = root_window
@@ -731,7 +757,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, ed
     canvas_frame = Tk.Frame(frame, borderwidth=1)
     canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
     # Save the Default values for the canvas as global variables
-    canvas_width, canvas_height, canvas_grid = width, height, grid
+    canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid = width, height, grid, snap_to_grid
     if edit_mode: canvas_grid_state = "normal"
     else: canvas_grid_state = "hidden"
     # Create the canvas and scrollbars inside the parent frame
@@ -753,6 +779,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, ed
     popup1.add_command(label="Edit", command=edit_selected_object)
     popup1.add_command(label="Rotate", command=rotate_selected_objects)
     popup1.add_command(label="Delete", command=delete_selected_objects)
+    popup1.add_command(label="Snap to Grid", command=snap_selected_objects_to_grid)
     # Define the Canvas Popup menu for Right Click (nothing selected)
     popup2 = Tk.Menu(tearoff=0)
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
