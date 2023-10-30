@@ -26,7 +26,7 @@
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
 #    configure_instrument.edit_instrument(root,object_id) - Open inst edit window (on double click)
 #    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
-#    ########################## More to be added ########################################
+#    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -40,7 +40,6 @@
 #    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
 #    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
-#    ########################## More to be added ########################################
 #
 #------------------------------------------------------------------------------------
 
@@ -60,6 +59,7 @@ from . import configure_point
 from . import configure_section
 from . import configure_instrument
 from . import configure_line
+from . import configure_textbox
 
 import importlib.resources
 import math
@@ -214,6 +214,8 @@ def edit_selected_object():
     object_id = schematic_state["selectedobjects"][0]
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
         configure_line.edit_line(root, object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.textbox:
+        configure_textbox.edit_textbox(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
         configure_signal.edit_signal(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
