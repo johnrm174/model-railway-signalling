@@ -21,16 +21,13 @@ What's currently supported by the Editor:
 * Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
 * Configure a level of automation for the signals as trains traverse the layout
 
-What's new in Release 3.6:
-* MQTT Publish/subscribe for track sensors - allows remote applications to use the R-Pi's GPIO sensors
-* Minor bugfixes and application enhansements to (hopefully) improve the overall user experience
-* Consolidation of library functions (if anyone out there is still using the API to write their own code)
-
-What's coming soon:
-
-* Release 4.0 (where I'm going to rip out all the deprecated functions) - you have been warned
+What's new in Release 4.0:
 * Text boxes - Ability to add/edit text boxes on the schematic to annotate your layout
-* Toggle automation - for those occasions you just want to watch the trains go by
+* Canvas configuration - Ability to change the grid size and toggle 'snap-to-grid'
+* Keyboard shortcut for toggling Edit/Run mode is now 'Cntl-m' (for consistency)
+* Toggle signal automation - Be an active signalman or just wtch the trains go by
+* Consolidation of library functions (deprecated library API functions removed)
+* Minor bugfixes and application enhansements to improve the overall user experience
 
 Any bug reports and feedback you may have would be gratefully appreciated - specifically:
 * What aspects are intuitive? What aspects aren't?
