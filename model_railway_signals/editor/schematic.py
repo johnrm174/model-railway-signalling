@@ -83,7 +83,7 @@ schematic_state["selectareabox"] = None      # Tkinter drawing object
 schematic_state["selectedobjects"] = []
 # The Root reference is used when calling a "configure object" module (to open a popup window)
 # The Canvas reference is used for configuring and moving canvas widgets for schematic editing
-# canvas_width / canvas_height / canvas_grid are used for positioning of objects
+# canvas_width / canvas_height / canvas_grid are used for positioning of objects.
 root = None
 canvas = None
 canvas_width = 0
@@ -91,7 +91,7 @@ canvas_height = 0
 canvas_grid = 0
 canvas_grid_state = "normal"
 canvas_snap_to_grid = True
-# The callback to make (for selected canvas events). Currently only the mode change keypress
+# The callback to make (for selected canvas events) - Mode change, toggle Snap to Grid etc
 # event makes this callback (to enable the application mode to be toggled between edit and run)
 canvas_event_callback = None
 # The following Tkinter objects are also treated as global variables as they need to remain
@@ -639,12 +639,12 @@ def schematic_redo(event=None):
 
 def enable_all_keypress_events():
     enable_edit_keypress_events()
-    canvas.bind('m', canvas_event_callback)        # Toggle Mode (Edit/Run)
+    canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     return()
 
 def disable_all_keypress_events():
     disable_edit_keypress_events()
-    canvas.unbind('m')                             # Toggle Mode (Edit/Run)
+    canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
     return()
 
 #------------------------------------------------------------------------------------
@@ -707,7 +707,7 @@ def enable_editing():
     enable_edit_keypress_events()
     # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
-    canvas.bind('m', canvas_event_callback)
+    canvas.bind('<Control-Key-m>', canvas_event_callback)
     return()
 
 def disable_editing():
@@ -731,7 +731,7 @@ def disable_editing():
     disable_edit_keypress_events()
     # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
     # it is enabled/disabled only during object moves or area selections on the schematic
-    canvas.bind('m', canvas_event_callback)
+    canvas.bind('<Control-Key-m>', canvas_event_callback)
     return()
 
 #------------------------------------------------------------------------------------
