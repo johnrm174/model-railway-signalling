@@ -52,6 +52,7 @@ default_settings["general"]["filename"] = "new_layout.sig"
 default_settings["general"]["editmode"] = True
 default_settings["general"]["version"] = "Version 3.6"
 default_settings["general"]["info"] = "Document your layout here"
+default_settings["general"]["automation"] = True
 default_settings["canvas"] = {}
 default_settings["canvas"]["width"] = 1000
 default_settings["canvas"]["height"] = 500
@@ -173,13 +174,15 @@ def get_general(param=None):
     editmode = settings["general"]["editmode"]
     version = settings["general"]["version"]
     info = settings["general"]["info"]
-    return(filename, editmode, version, info)
+    automation = settings["general"]["automation"]
+    return(filename, editmode, version, info, automation)
 
-def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None):
+def set_general(filename:str=None, editmode:bool=None, version:str=None, info:str=None, automation:bool=None):
     if filename is not None: settings["general"]["filename"] = filename
     if editmode is not None: settings["general"]["editmode"] = editmode
     if version is not None: settings["general"]["version"] = version
     if info is not None: settings["general"]["info"] = info
+    if automation is not None: settings["general"]["automation"] = automation
     return()
 
 #------------------------------------------------------------------------------------

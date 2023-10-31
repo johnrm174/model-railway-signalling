@@ -18,8 +18,10 @@
 #    schematic.initialise(root, callback, width, height, grid, snap) - Create the canvas
 #    schematic.delete_all_objects() - For deleting all objects (on new/load)
 #    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
-#    schematic.enable_editing() - On mode toggle or load (if file is in edit mode)
-#    schematic.disable_editing() - On mode toggle or load (if file is in run mode)
+#    schematic.enable_editing() - On mode toggle or load (if loaded file is in edit mode and not already in edit mode)
+#    schematic.disable_editing() - On mode toggle or load (if loaded file is in run mode and not already in run mode)
+#    run_layout.enable_automation() - On automation toggle or load
+#    run_layout.disable_automation() - On automation toggle or load
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
@@ -74,6 +76,7 @@ from . import common
 from . import objects
 from . import settings
 from . import schematic
+from . import run_layout
 from . import menubar_windows
 from ..library import file_interface
 from ..library import pi_sprog_interface
@@ -106,28 +109,34 @@ class main_menubar:
         self.file_menu.add_command(label=" Save as...", command=lambda:self.save_schematic(True))
         self.file_menu.add_separator()
         self.file_menu.add_command(label=" Quit",command=lambda:self.quit_schematic())
-        self.mainmenubar.add_cascade(label="File  ", menu=self.file_menu)
+        self.mainmenubar.add_cascade(label="File", menu=self.file_menu)
         # Create the various menubar items for the Mode Dropdown
-        self.mode_label = "Mode:XXXX  "
+        self.mode_label = "Mode:xxx"
         self.mode_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mode_menu.add_command(label=" Edit ", command=self.edit_mode)
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
         self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
+        # Create the various menubar items for the Mode Dropdown
+        self.auto_label = "Automation:xxx"
+        self.auto_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.auto_menu.add_command(label=" Enable ", command=self.automation_enable)
+        self.auto_menu.add_command(label=" Disable", command=self.automation_disable)
+        self.mainmenubar.add_cascade(label=self.auto_label, menu=self.auto_menu)
         # Create the various menubar items for the SPROG Connection Dropdown
-        self.sprog_label = "SPROG:DISCONNECTED "
+        self.sprog_label = "SPROG:Disconnected"
         self.sprog_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.sprog_menu.add_command(label=" Connect ", command=self.sprog_connect)
         self.sprog_menu.add_command(label=" Disconnect ", command=self.sprog_disconnect)
         self.mainmenubar.add_cascade(label=self.sprog_label, menu=self.sprog_menu)
         # Create the various menubar items for the DCC Power Dropdown
-        self.power_label = "DCC Power:??? "
+        self.power_label = "DCC Power:???"
         self.power_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
         # Create the various menubar items for the SPROG Connection Dropdown
-        self.mqtt_label = "MQTT:DISCONNECTED "
+        self.mqtt_label = "MQTT:Disconnected"
         self.mqtt_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mqtt_menu.add_command(label=" Connect ", command=self.mqtt_connect)
         self.mqtt_menu.add_command(label=" Disconnect ", command=self.mqtt_disconnect)
@@ -144,13 +153,13 @@ class main_menubar:
                 command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" Sensors...",
                 command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
-        self.mainmenubar.add_cascade(label = "Settings  ", menu=self.settings_menu)
+        self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.help_menu.add_command(label =" Help...", command=lambda:menubar_windows.display_help(self.root))
         self.help_menu.add_command(label =" About...", command=lambda:menubar_windows.display_about(self.root))
         self.help_menu.add_command(label =" Info...", command=lambda:menubar_windows.edit_layout_info(self.root))
-        self.mainmenubar.add_cascade(label = "Help  ", menu=self.help_menu)
+        self.mainmenubar.add_cascade(label = "Help", menu=self.help_menu)
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
@@ -234,19 +243,23 @@ class main_menubar:
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
         # The "connect" and "power" flags are the 4th and 5th parameter returned
-        if self.power_label == "DCC Power:ON  " and not settings.get_sprog()[4]: self.dcc_power_off()
-        if self.sprog_label == "SPROG:CONNECTED " and not settings.get_sprog()[3]: self.sprog_disconnect()
+        if self.power_label == "DCC Power:On" and not settings.get_sprog()[4]: self.dcc_power_off()
+        if self.sprog_label == "SPROG:Connected" and not settings.get_sprog()[3]: self.sprog_disconnect()
         if settings.get_sprog()[3]: self.sprog_connect()
         if settings.get_sprog()[4]: self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
-        if self.mqtt_label == "MQTT:CONNECTED ": self.mqtt_disconnect()
+        if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         self.mqtt_reconfigure_client()
         if settings.get_mqtt()[7]: self.mqtt_connect()
         self.mqtt_reconfigure_pub_sub()
+        # Set the Automation Mode (5th param in the returned tuple)
+        # Either of these calls will update 'run_layout'
+        if settings.get_general()[4]: self.automation_enable()
+        else: self.automation_disable()
         # Set the edit mode (2nd param in the returned tuple)
-        # Either of these calls will trigger a run layout update
+        # Either of these calls will update run layout
         if settings.get_general()[1]: self.edit_mode()
         else: self.run_mode()
         # Create all the track sensor objects that have been defined
@@ -257,6 +270,7 @@ class main_menubar:
     # --------------------------------------------------------------------------------------
 
     def handle_canvas_event(self, event=None):
+        # Note that event.keysym returns the character (event.state would be 'Control')
         if event.keysym == 'm':
             # the Edit mode flag is the second parameter returned
             if settings.get_general()[1]: self.run_mode()
@@ -267,26 +281,58 @@ class main_menubar:
             else: settings.set_canvas(snap_to_grid=True)
             # Apply the new canvas settings
             self.canvas_update()
+        elif event.keysym == 'a':
+            # the Automation flag is the fifth parameter returned
+            if settings.get_general()[4]: self.automation_disable()
+            else: self.automation_enable()
             
     # --------------------------------------------------------------------------------------
     # Callback functions to handle menubar selection events
     # --------------------------------------------------------------------------------------
+        
+    def automation_enable(self):
+        new_label = "Automation:On"
+        self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
+        self.auto_label = new_label
+        settings.set_general(automation=True)
+        run_layout.enable_automation()
+            
+    def automation_disable(self):
+        new_label = "Automation:Off"
+        self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
+        self.auto_label = new_label
+        settings.set_general(automation=False)
+        run_layout.disable_automation()
 
     def edit_mode(self):
-        if self.mode_label != "Mode:Edit  ":
-            new_label = "Mode:Edit  "
+        if self.mode_label != "Mode:Edit":
+            new_label = "Mode:Edit"
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
             settings.set_general(editmode=True)
             schematic.enable_editing()
+        # Disable the automation menubar selection and set to "off" (automation is always disabled
+        # in Run mode so we just need to update the indication (no need to update 'run_layout')
+        new_label1 = "Automation:Off"
+        self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
+        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
+        self.auto_label = new_label1
         
     def run_mode(self):
-        if self.mode_label != "Mode:Run   ":
-            new_label = "Mode:Run   "
+        if self.mode_label != "Mode:Run":
+            new_label = "Mode:Run"
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
             settings.set_general(editmode=False)
             schematic.disable_editing()
+        # Enable the the automation menubar selection and update to reflect the current setting
+        # Note that automation is only enbled in Run mode so we just need to update the indication
+        # no need to update 'run_layout'. Note the Automation flag is the fifth parameter returned
+        if settings.get_general()[4]: new_label1 = "Automation:On"
+        else: new_label1 = "Automation:Off"
+        self.mainmenubar.entryconfigure(self.auto_label, state="normal")
+        self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
+        self.auto_label = new_label1
 
     def reset_layout(self, ask_for_confirm:bool=True):
         if ask_for_confirm:
@@ -301,9 +347,9 @@ class main_menubar:
         port, baud, debug, startup, power = settings.get_sprog()
         connected = pi_sprog_interface.initialise_pi_sprog(port, baud, debug)
         if connected:
-            new_label = "SPROG:CONNECTED "
+            new_label = "SPROG:Connected"
         else:
-            new_label = "SPROG:DISCONNECTED "
+            new_label = "SPROG:Disconnected"
             if show_popup:
                 Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
                     message="SPROG connection failure\nCheck SPROG settings")
@@ -313,21 +359,21 @@ class main_menubar:
     
     def sprog_disconnect(self):
         pi_sprog_interface.sprog_shutdown()
-        new_label = "SPROG:DISCONNECTED "
+        new_label = "SPROG:Disconnected"
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
 
     def sprog_update(self):
         # Only update the configuration if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if self.sprog_label == "SPROG:CONNECTED ": self.sprog_connect()
+        if self.sprog_label == "SPROG:Connected": self.sprog_connect()
 
     def dcc_power_off(self):
         # The power off request returns True if successful
         if pi_sprog_interface.request_dcc_power_off():
-            new_label = "DCC Power:OFF "
+            new_label = "DCC Power:Off"
         else:
-            new_label = "DCC Power:??? "
+            new_label = "DCC Power:???"
             Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
                     message="DCC power off failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
@@ -336,9 +382,9 @@ class main_menubar:
     def dcc_power_on(self):
         # The power on request returns True if successful 
         if pi_sprog_interface.request_dcc_power_on():
-            new_label = "DCC Power:ON  "
+            new_label = "DCC Power:On"
         else:
-            new_label = "DCC Power:??? "
+            new_label = "DCC Power:???"
             Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
                     message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
@@ -348,9 +394,9 @@ class main_menubar:
         url, port, network, node, username, password, debug, startup = settings.get_mqtt()
         connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
         if connected:
-            new_label = "MQTT:CONNECTED "
+            new_label = "MQTT:Connected"
         else:
-            new_label = "MQTT:DISCONNECTED "
+            new_label = "MQTT:Disconnected"
             if show_popup:
                 Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
                     message="Broker connection failure\nCheck MQTT settings")
@@ -361,9 +407,9 @@ class main_menubar:
     def mqtt_disconnect(self):
         connected = mqtt_interface.mqtt_broker_disconnect()
         if connected:
-            new_label = "MQTT:CONNECTED "
+            new_label = "MQTT:Connected"
         else:
-            new_label = "MQTT:DISCONNECTED "
+            new_label = "MQTT:Disconnected"
         self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
         self.mqtt_label = new_label
 
@@ -372,7 +418,7 @@ class main_menubar:
         self.mqtt_reconfigure_client()
         # Only reset the broker connection if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
-        if self.mqtt_label == "MQTT:CONNECTED " : self.mqtt_connect()
+        if self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
         # Reconfigure all publish and subscribe settings
         self.mqtt_reconfigure_pub_sub()
         
@@ -437,6 +483,7 @@ class main_menubar:
     def save_schematic(self, save_as:bool=False):
         settings_to_save = settings.get_all()
         objects_to_save = objects.get_all()
+        # Filename is the first parameter returned from settings.get_general
         filename_to_save = settings.get_general()[0]
         # If the filename is the default "new_schematic.sig" then we force a 'save as'
         if not self.file_has_been_saved:

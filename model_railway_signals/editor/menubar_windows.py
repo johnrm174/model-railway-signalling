@@ -116,15 +116,17 @@ Menubar Options
 
 1) File - All the save/load/new functions you would expect
 2) Mode - Switch between Edit Mode and Run Mode (also Reset layout to default state)
-3) SPROG - Connect and disconnect from the SPROG DCC Command Station
-4) DCC Power - Toggle the DCC bus supply (SPROG must be connected)
-5) MQTT - Connect and disconnect from the external MQTT broker
-6) Settings-Canvas - Change the display size of the schematic
-7) Settings-MQTT - Configure the MQTT broker and signalling network
-8) Settings-SPROG - Configure the serial port and SPROG behavior
-9) Settings-Logging - Set the log level for running the layout
-10) Settings-Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
-11) Help-Info - Add notes to document your layout configuration
+3) Automation - Enable/disable signal override functions (disable for completely manual
+     control of all signals on the layout - Track occupancy changes remain functional)
+4) SPROG - Connect/disconnect from the SPROG DCC Command Station
+5) DCC Power - Enable/Disable the DCC bus supply (SPROG must be connected)
+6) MQTT - Connect/disconnect from the external MQTT broker
+7) Settings-Canvas - Change the display size of the schematic
+8) Settings-MQTT - Configure the MQTT broker and signalling network
+9) Settings-SPROG - Configure the serial port and SPROG behavior
+10) Settings-Logging - Set the log level for running the layout
+11) Settings-Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
+12) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 

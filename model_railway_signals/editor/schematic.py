@@ -705,9 +705,10 @@ def enable_editing():
     canvas.bind('<Double-Button-1>', left_double_click)
     # Bind the canvas keypresses to the associated functions
     enable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in both edit and run modes)
-    # it is enabled/disabled only during object moves or area selections on the schematic
-    canvas.bind('<Control-Key-m>', canvas_event_callback)
+    # Bind the Toggle Mode and toggle automation keypress events (this active in edit and run modes)
+    # Note that Toggle Mode is disabled during object moves and area selections on the schematic
+    canvas.bind('<Control-Key-m>', canvas_event_callback)    # Toggle Edit/Run Mode
+    canvas.bind('<Control-Key-a>', canvas_event_callback)    # Toggle Layout Automation
     return()
 
 def disable_editing():
