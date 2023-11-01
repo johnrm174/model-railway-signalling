@@ -625,6 +625,14 @@ initialise_pi_sprog - Opens/configures the serial comms port to the Pi Sprog and
       dcc_debug_mode:bool - Set to 'True' to log the CBUS commands being sent to the Pi-SPROG
         returns True - if communications with the Pi-Sprog have been established (otherwise False)
 
+service_mode_read_cv - Queries a CV in direct bit mode and waits for response
+                      (events are only sent if the track power is currently switched on)
+                      (request times out after 5 secs if the request was unsuccessful)
+   Mandatory Parameters:
+      cv:int - The CV (Configuration Variable) to be queried
+         returns the current value of the CV if a response is received
+         returns None - if the request fails or the request times out
+
 service_mode_write_cv - programmes a CV in direct bit mode and waits for response
                       (events are only sent if the track power is currently switched on)
                       (request times out after 5 secs if the request was unsuccessful)
