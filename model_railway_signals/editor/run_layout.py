@@ -7,12 +7,13 @@
 #    schematic_callback(item_id,callback_type) - the callback for all schematic objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
+#    enable_automation() - Call when Automation is enabled (from Editor Module)
+#    disable_automation() - Call when Automation is disabled (from Editor Module)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
 #    objects.section(section_id) - To get the object_id for a given section_id
-#    <MORE COMING>
 #    
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -20,7 +21,6 @@
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.point_index - To iterate through all the point objects
 #    objects.section_index - To iterate through all the section objects
-#    <MORE COMING>
 #
 # Accesses the following external library objects directly:
 #    signals_common.route_type - for accessing the enum value
@@ -34,7 +34,6 @@
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
 #    signals_ground_position.ground_pos_sub_type - for accessing the enum value
 #    signals_ground_disc.ground_disc_sub_type - for accessing the enum value
-#    <MORE COMING>
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_state(sig_id) - For testing the current displayed aspect
@@ -58,7 +57,6 @@
 #    track_sections.set_section_occupied (section_id) - Set "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Clear "Occupied"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
-#    <MORE COMING>
 #
 #------------------------------------------------------------------------------------
 
@@ -822,8 +820,9 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
 
     # Timed signal sequences can be triggered by 'signal_passed' events - LOCAL SIGNALS ONLY
-    # Timed sequences are ENABLED in both Run and Edit Modes, whether automation is Enabled or Disabled
-    if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id):
+    # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
+    if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
+           and not editing_enabled and automation_enabled:
         logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(int(item_id)) 
             
