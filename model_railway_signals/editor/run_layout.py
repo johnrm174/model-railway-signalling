@@ -821,8 +821,8 @@ def schematic_callback(item_id:Union[int,str], callback_type):
 
     # Timed signal sequences can be triggered by 'signal_passed' events - LOCAL SIGNALS ONLY
     # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
-    if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
-           and not editing_enabled and automation_enabled:
+    if (callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
+           and not editing_enabled and automation_enabled):
         logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(int(item_id)) 
             
