@@ -504,7 +504,7 @@ def service_mode_read_cv (cv:int):
             if service_mode_cv_value is not None: break
             time.sleep(0.001)
         if service_mode_cv_value is None:
-            logging.error("Pi-SPROG: WCVS (Write CV in Service Mode) - Failed")
+            logging.error("Pi-SPROG: QCVS (Read CV in Service Mode) - Failed")
         time.sleep (0.1)
     return (service_mode_cv_value)
 
