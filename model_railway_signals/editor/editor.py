@@ -33,14 +33,15 @@
 #    settings.get_gpio() - to get the current track sensor GPIO mappings
 #    settings.restore_defaults() - Following user selection of "new"
 #    common.scrollable_text_box - to display a list of warnings on file load
-#    menubar_windows.edit_canvas_settings(parent_window) - opens the config window
-#    menubar_windows.edit_mqtt_settings(parent_window) - opens the config window
-#    menubar_windows.edit_sprog_settings(parent_window) - opens the config window
-#    menubar_windows.edit_gpio_settings(parent_window) - opens the config window
-#    menubar_windows.edit_logging_settings(parent_window) - opens the config window
+#    menubar_windows.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
+#    menubar_windows.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
+#    menubar_windows.edit_logging_settings(root, logging_update_callback)
+#    menubar_windows.edit_canvas_settings(root, canvas_update_callback)
+#    menubar_windows.edit_gpio_settings(root, gpio_update_callback)
 #    menubar_windows.display_help(parent_window) - opens the config window
 #    menubar_windows.display_about(parent_window) - opens the config window
 #    menubar_windows.edit_layout_info(parent_window) - opens the config window
+#    utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
 #
 # Makes the following external API calls to library modules:
 #    library_common.find_root_window (widget) - To set the root window
@@ -78,6 +79,7 @@ from . import settings
 from . import schematic
 from . import run_layout
 from . import menubar_windows
+from . import utilities
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
@@ -117,7 +119,7 @@ class main_menubar:
         self.mode_menu.add_command(label=" Run  ", command=self.run_mode)
         self.mode_menu.add_command(label=" Reset", command=self.reset_layout)
         self.mainmenubar.add_cascade(label=self.mode_label, menu=self.mode_menu)
-        # Create the various menubar items for the Mode Dropdown
+        # Create the various menubar items for the Automation  Dropdown
         self.auto_label = "Automation:xxx"
         self.auto_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.auto_menu.add_command(label=" Enable ", command=self.automation_enable)
@@ -135,12 +137,18 @@ class main_menubar:
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
-        # Create the various menubar items for the SPROG Connection Dropdown
+        # Create the various menubar items for the MQTT Connection Dropdown
         self.mqtt_label = "MQTT:Disconnected"
         self.mqtt_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.mqtt_menu.add_command(label=" Connect ", command=self.mqtt_connect)
         self.mqtt_menu.add_command(label=" Disconnect ", command=self.mqtt_disconnect)
         self.mainmenubar.add_cascade(label=self.mqtt_label, menu=self.mqtt_menu)
+        # Create the various menubar items for the Utilities Dropdown
+        self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
+        self.utilities_menu.add_command(label =" DCC Programming...",
+                command=lambda:utilities.dcc_programming(self.root, self.dcc_power_is_on,
+                                                         self.dcc_power_off, self.dcc_power_on))
+        self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...",
@@ -389,6 +397,9 @@ class main_menubar:
                     message="DCC power on failed \nCheck SPROG settings")
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
+
+    def dcc_power_is_on(self):
+        return (self.power_label=="DCC Power:On")
 
     def mqtt_connect(self, show_popup:bool=True):
         url, port, network, node, username, password, debug, startup = settings.get_mqtt()
