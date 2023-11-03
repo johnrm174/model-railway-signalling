@@ -5,11 +5,11 @@
 #    display_help(root)
 #    display_about(root)
 #    edit_layout_info()
-#    edit_mqtt_settings(root)
-#    edit_sprog_settings(root)
-#    edit_logging_settings(root)
-#    edit_canvas_settings(root)
-#    edit_gpio_settings(root)
+#    edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
+#    edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
+#    edit_logging_settings(root, logging_update_callback)
+#    edit_canvas_settings(root, canvas_update_callback)
+#    edit_gpio_settings(root, gpio_update_callback)
 #
 # Makes the following external API calls to other editor modules:
 #    settings.get_canvas() - Get the current canvas settings (for editing)
@@ -69,7 +69,6 @@ from ..library import track_sensors
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_box
-# Note the packing order to keep the button visible during window re-sizing
 #------------------------------------------------------------------------------------
 
 help_text = """
@@ -681,7 +680,7 @@ class mqtt_subscribe_tab():
                 and self.instruments.validate() and self.sensors.validate())
     
 #------------------------------------------------------------------------------------
-# Class for the MQTT Configuration 'Subscribe' Tab
+# Class for the MQTT Configuration 'Publish' Tab
 #------------------------------------------------------------------------------------    
 
 class mqtt_publish_tab():
@@ -894,7 +893,11 @@ class gpio_port_entry_frame():
                 if gpio_port == mapping[1]:
                     self.list_of_entry_boxes[index].set_value(mapping[0])
                     break        
-            
+
+#------------------------------------------------------------------------------------
+# Class for the "Sensors" window - Uses the classes above
+#------------------------------------------------------------------------------------
+
 class edit_gpio_settings():
     def __init__(self, root_window, update_function):
         self.root_window = root_window
@@ -907,7 +910,7 @@ class edit_gpio_settings():
         self.window.title("GPIO Sensors")
         self.window.attributes('-topmost',True)
         # Create an overall frame to pack everything in
-        self.frame = Tk.Frame(self.window,)
+        self.frame = Tk.Frame(self.window)
         self.frame.pack()
         # Create the labelframe for the general GPIO settings
         self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
@@ -961,5 +964,5 @@ class edit_gpio_settings():
         else:
             # Display the validation error message
             self.validation_error.pack()
-
+        
 #############################################################################################
