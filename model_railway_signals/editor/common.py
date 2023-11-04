@@ -1070,11 +1070,12 @@ class colour_selection():
 #------------------------------------------------------------------------------------
 
 class window_controls():
-    def __init__(self, parent_window, parent_object, load_callback, save_callback):
+    def __init__(self, parent_window, parent_object, load_callback, save_callback, cancel_callback):
         # Create the class instance variables
         self.window = parent_window
         self.save_callback = save_callback
         self.load_callback = load_callback
+        self.cancel_callback = cancel_callback
         self.parent_object = parent_object
         self.frame = Tk.Frame(self.window)
         # Create the buttons and tooltips
@@ -1104,6 +1105,6 @@ class window_controls():
         self.load_callback(self.parent_object)
         
     def cancel(self):
-        self.window.destroy()
+        self.cancel_callback(self.parent_object)
 
 ###########################################################################################

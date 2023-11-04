@@ -68,7 +68,8 @@ from . import settings
 from ..library import track_sensors
 
 #------------------------------------------------------------------------------------
-# Class for the "Help" window - Uses the common.scrollable_text_box
+# Class for the "Help" window - Uses the common.scrollable_text_box.
+# Note that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
 
 help_text = """
@@ -133,33 +134,42 @@ Schematic object configuration
 2) Use the hover-over Tooltips to get more information on the selections 
 """
 
+help_window = None
+
 class display_help():
     def __init__(self, root_window):
-        self.root_window = root_window
-        # Create the top level window for application help
-        winx = self.root_window.winfo_rootx() + 250
-        winy = self.root_window.winfo_rooty() + 20
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Application Help")
-        self.window.attributes('-topmost',True)
-        # Create the srollable textbox to display the help text. We only specify
-        # the max height (in case the help text grows in the future) leaving
-        # the width to auto-scale to the maximum width of the help text
-        self.text = common.scrollable_text_frame(self.window, max_height=25)
-        self.text.set_value(help_text)
-        # Create the ok/close button and tooltip
-        self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
-        self.TT1 = common.CreateToolTip(self.B1, "Close window")
-        # Pack the OK button First - so it remains visible on re-sizing
-        self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
-        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+        global help_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if help_window is not None:
+            help_window.lift()
+            help_window.state('normal')
+            help_window.focus_force()
+        else:
+            # Create the top level window for application help
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Application Help")
+            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            help_window = self.window
+            # Create the srollable textbox to display the help text. We only specify
+            # the max height (in case the help text grows in the future) leaving
+            # the width to auto-scale to the maximum width of the help text
+            self.text = common.scrollable_text_frame(self.window, max_height=25)
+            self.text.set_value(help_text)
+            # Create the ok/close button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            # Pack the OK button First - so it remains visible on re-sizing
+            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+            self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         
     def ok(self):
+        global help_window
+        help_window = None
         self.window.destroy()
 
 #------------------------------------------------------------------------------------
-# Class for the "About" window- uses a hyperlink to go to the github repo
+# Class for the "About" window - uses a hyperlink to go to the github repo.
+# Note that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
 
 # The version is the third parameter provided by 'get_general'
@@ -175,61 +185,77 @@ but must ensure those same rights are passed on to all recipients.
 
 For more information visit: """
 
+about_window = None
+
 class display_about():
     def __init__(self, root_window):
-        self.root_window = root_window
-        # Create the top level window for application about
-        winx = self.root_window.winfo_rootx() + 260
-        winy = self.root_window.winfo_rooty() + 30
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Application Info")
-        self.window.attributes('-topmost',True)
-        self.label1 = Tk.Label(self.window, text=about_text)
-        self.label1.pack(padx=5, pady=5)
-        hyperlink = "https://github.com/johnrm174/model-railway-signalling"
-        self.label2 = Tk.Label(self.window, text=hyperlink, fg="blue", cursor="hand2")
-        self.label2.pack(padx=5, pady=5)
-        self.label2.bind("<Button-1>", self.callback)
-        # Create the close button and tooltip
-        self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
-        self.B1.pack(padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Close window")
+        global about_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if about_window is not None:
+            about_window.lift()
+            about_window.state('normal')
+            about_window.focus_force()
+        else:
+            # Create the top level window for application about
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Application Info")
+            self.window.protocol("WM_DELETE_WINDOW", self.self.ok)
+            about_window = self.window
+            # Create the Help text and hyperlink
+            self.label1 = Tk.Label(self.window, text=about_text)
+            self.label1.pack(padx=5, pady=5)
+            hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+            self.label2 = Tk.Label(self.window, text=hyperlink, fg="blue", cursor="hand2")
+            self.label2.pack(padx=5, pady=5)
+            self.label2.bind("<Button-1>", self.callback)
+            # Create the close button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
+            self.B1.pack(padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
         
     def ok(self):
+        global about_window
+        about_window = None
         self.window.destroy()
 
     def callback(self,event):
         webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
 
 #------------------------------------------------------------------------------------
-# Class for the Edit Layout Information window
+# Class for the Edit Layout Information window - Uses the common.scrollable_text_box.
+# Note that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+edit_layout_info_window = None
 
 class edit_layout_info():
     def __init__(self, root_window):
-        self.root_window = root_window
-        # Create the top level window for application help
-        winx = self.root_window.winfo_rootx() + 270
-        winy = self.root_window.winfo_rooty() + 40
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Layout Info")
-        self.window.attributes('-topmost',True)
-        # Create the srollable textbox to display the text. We specify
-        # the max height/width (in case the text grows in the future) and also
-        # the min height/width (to give the user something to start with)
-        self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
-                min_height=10, min_width=40, editable=True, auto_resize=True)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self,
-                                self.load_state, self.save_state)
-        # We need to pack the window buttons at the bottom and then pack the text
-        # frame - so the buttons remain visible if the user re-sizes the window
-        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
-        self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
-        # Load the initial UI state
-        self.load_state()
+        global edit_layout_info_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_layout_info_window is not None:
+            edit_layout_info_window.lift()
+            edit_layout_info_window.state('normal')
+            edit_layout_info_window.focus_force()
+        else:
+            # Create the top level window for application help
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Layout Info")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            edit_layout_info_window = self.window
+            # Create the srollable textbox to display the text. We specify
+            # the max height/width (in case the text grows in the future) and also
+            # the min height/width (to give the user something to start with)
+            self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
+                    min_height=10, min_width=40, editable=True, auto_resize=True)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self,
+                                    self.load_state, self.save_state, self.close_window)
+            # We need to pack the window buttons at the bottom and then pack the text
+            # frame - so the buttons remain visible if the user re-sizes the window
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
+            # Load the initial UI state
+            self.load_state()
         
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
@@ -239,53 +265,67 @@ class edit_layout_info():
     def save_state(self, parent_object, close_window:bool):
         # Parent object is passed by the callback - not used here
         settings.set_general(info=self.text.get_value())
-        if close_window: self.window.destroy()
+        # close the window (on OK)
+        if close_window: self.close_window(parent_object)
+            
+    def close_window(self, parent_object):
+        global edit_layout_info_window
+        edit_layout_info_window = None
+        self.window.destroy()
 
 #------------------------------------------------------------------------------------
-# Class for the Canvas configuration toolbar window
+# Class for the Canvas configuration toolbar window. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+canvas_settings_window = None
 
 class edit_canvas_settings():
     def __init__(self, root_window, update_function):
-        self.root_window = root_window
-        self.update_function = update_function
-        # Create the top level window for the canvas settings
-        winx = self.root_window.winfo_rootx() + 200
-        winy = self.root_window.winfo_rooty() + 20
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Canvas")
-        self.window.attributes('-topmost',True)
-        # Create the entry box elements for the width, height and grid
-        # Pack the elements as a grid to get an aligned layout
-        self.frame = Tk.Frame(self.window)
-        self.frame.pack()
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(1, weight=1)
-        self.label1 = Tk.Label(self.frame, text="Canvas width:")
-        self.label1.grid(row=0, column=0)
-        self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=4000,
-                        allow_empty=False, tool_tip="Enter width in pixels (400-4000)")
-        self.width.grid(row=0, column=1)
-        self.label2 = Tk.Label(self.frame, text="Canvas height:")
-        self.label2.grid(row=1, column=0)
-        self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=2000,
-                        allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
-        self.height.grid(row=1, column=1)
-        self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
-        self.label3.grid(row=2, column=0)
-        self.grid = common.integer_entry_box(self.frame, width=5, min_value=5, max_value=25,
-                        allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
-        self.grid.grid(row=2, column=1)
-        # Create the check box element for snap to grid
-        self.snap = common.check_box (self.window, label="Snap to Grid",
-                        tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
-        self.snap.pack(padx=2, pady=2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Load the initial UI state
-        self.load_state()
+        global canvas_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if canvas_settings_window is not None:
+            canvas_settings_window.lift()
+            canvas_settings_window.state('normal')
+            canvas_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the top level window for the canvas settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Canvas")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            canvas_settings_window = self.window
+            # Create the entry box elements for the width, height and grid
+            # Pack the elements as a grid to get an aligned layout
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack()
+            self.frame.grid_columnconfigure(0, weight=1)
+            self.frame.grid_columnconfigure(1, weight=1)
+            self.label1 = Tk.Label(self.frame, text="Canvas width:")
+            self.label1.grid(row=0, column=0)
+            self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=4000,
+                            allow_empty=False, tool_tip="Enter width in pixels (400-4000)")
+            self.width.grid(row=0, column=1)
+            self.label2 = Tk.Label(self.frame, text="Canvas height:")
+            self.label2.grid(row=1, column=0)
+            self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=2000,
+                            allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
+            self.height.grid(row=1, column=1)
+            self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
+            self.label3.grid(row=2, column=0)
+            self.grid = common.integer_entry_box(self.frame, width=5, min_value=5, max_value=25,
+                            allow_empty=False, tool_tip="Enter grid size in pixels (5-25)")
+            self.grid.grid(row=2, column=1)
+            # Create the check box element for snap to grid
+            self.snap = common.check_box (self.window, label="Snap to Grid",
+                            tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
+            self.snap.pack(padx=2, pady=2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
 
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
@@ -306,68 +346,80 @@ class edit_canvas_settings():
             settings.set_canvas(width=width, height=height, grid=grid, snap_to_grid=snap_to_grid)
             # Make the callback to apply the updated settings
             self.update_function()
-            # close the window (on OK or cancel)
-            if close_window: self.window.destroy()
+            # close the window (on OK)
+            if close_window: self.close_window(parent_object)
+
+    def close_window(self, parent_object):
+        global canvas_settings_window
+        canvas_settings_window = None
+        self.window.destroy()
 
 #------------------------------------------------------------------------------------
-# Class for the SPROG settings selection toolbar window. Note the function also takes
-# in a callback object so it can call the function to update the menubar sprog status
+# Class for the SPROG settings selection toolbar window. Note the init function takes
+# in callbacks for connecting to the SPROG and for applying the updated settings.
+# Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+edit_sprog_settings_window = None
 
 class edit_sprog_settings():
     def __init__(self, root_window, connect_function, update_function):
-        self.root_window = root_window
-        self.connect_function = connect_function
-        self.update_function = update_function
-        # Create the top level window for the SPROG configuration
-        winx = self.root_window.winfo_rootx() + 220
-        winy = self.root_window.winfo_rooty() + 40
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("SPROG DCC")
-        self.window.attributes('-topmost',True)
-        # Create the Serial Port and baud rate UI elements 
-        self.frame1 = Tk.Frame(self.window)
-        self.frame1.pack()
-        self.label1 = Tk.Label(self.frame1, text="Port:")
-        self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
-                        "the serial port to use for communicating with the SPROG")
-        self.port.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.label2 = Tk.Label(self.frame1, text="Baud:")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
-        self.baud_selection = Tk.StringVar(self.window, "")
-        self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
-        menu_width = len(max(self.options, key=len))
-        self.baud.config(width=menu_width)
-        common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
-        self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create the remaining UI elements
-        self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
-            tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
-                     "to 'debug')")
-        self.debug.pack(padx=2, pady=2)
-        self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
-            tool_tip="Select to configure serial port and initialise SPROG following layout load",
-            callback=self.selection_changed)
-        self.startup.pack(padx=2, pady=2)
-        self.power = common.check_box(self.window, label="Enable DCC power on layout load", width=28,
-            tool_tip="Select to enable DCC accessory bus power following layout load")
-        self.power.pack(padx=2, pady=2)
-        # Create the Button to test connectivity
-        self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
-        self.B1.pack(padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
-                        "the command station status to confirm a connection to the SPROG has been established")
-        # Create the Status Label
-        self.status = Tk.Label(self.window, text="")
-        self.status.pack(padx=2, pady=2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Load the initial UI state
-        self.load_state()
+        global edit_sprog_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_sprog_settings_window is not None:
+            edit_sprog_settings_window.lift()
+            edit_sprog_settings_window.state('normal')
+            edit_sprog_settings_window.focus_force()
+        else:
+            self.connect_function = connect_function
+            self.update_function = update_function
+            # Create the top level window for the SPROG configuration
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("SPROG DCC")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            edit_sprog_settings_window = self.window
+            # Create the Serial Port and baud rate UI elements 
+            self.frame1 = Tk.Frame(self.window)
+            self.frame1.pack()
+            self.label1 = Tk.Label(self.frame1, text="Port:")
+            self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
+                            "the serial port to use for communicating with the SPROG")
+            self.port.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.label2 = Tk.Label(self.frame1, text="Baud:")
+            self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
+            self.baud_selection = Tk.StringVar(self.window, "")
+            self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
+            menu_width = len(max(self.options, key=len))
+            self.baud.config(width=menu_width)
+            common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
+            self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
+            # Create the remaining UI elements
+            self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
+                tool_tip="Select to enable enhanced debug logging (Layout log level must also be set "+
+                         "to 'debug')")
+            self.debug.pack(padx=2, pady=2)
+            self.startup = common.check_box(self.window, label="Initialise SPROG on layout load", width=28, 
+                tool_tip="Select to configure serial port and initialise SPROG following layout load",
+                callback=self.selection_changed)
+            self.startup.pack(padx=2, pady=2)
+            self.power = common.check_box(self.window, label="Enable DCC power on layout load", width=28,
+                tool_tip="Select to enable DCC accessory bus power following layout load")
+            self.power.pack(padx=2, pady=2)
+            # Create the Button to test connectivity
+            self.B1 = Tk.Button (self.window, text="Test SPROG connectivity",command=self.test_connectivity)
+            self.B1.pack(padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B1, "Will configure/open the specified serial port and request "+
+                            "the command station status to confirm a connection to the SPROG has been established")
+            # Create the Status Label
+            self.status = Tk.Label(self.window, text="")
+            self.status.pack(padx=2, pady=2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
 
     def selection_changed(self):
         # If connect on startup is selected then enable the DCC power on startup selection
@@ -421,35 +473,47 @@ class edit_sprog_settings():
         settings.set_sprog(port=port, baud=baud, debug=debug, startup=startup, power=power)
         # Make the callback to apply the updated settings
         self.update_function()
-        # close the window (on OK or cancel)
-        if close_window: self.window.destroy()
-        else: self.load_state() 
-        
+        # close the window (on OK)
+        if close_window: self.close_window(parent_object)
+
+    def close_window(self, parent_object):
+        global edit_sprog_settings_window
+        edit_sprog_settings_window = None
+        self.window.destroy()
+
 #------------------------------------------------------------------------------------
-# Class for the Logging Level selection toolbar window
+# Class for the Logging Level selection toolbar window. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+edit_logging_settings_window = None
 
 class edit_logging_settings():
     def __init__(self, root_window, update_function):
-        self.root_window = root_window
-        self.update_function = update_function
-        # Create the top level window for the Logging Configuration
-        winx = self.root_window.winfo_rootx() + 230
-        winy = self.root_window.winfo_rooty() + 50
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("Logging")
-        self.window.attributes('-topmost',True)
-        # Create the logging Level selections element
-        self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
-                                            b1="Error", b2="Warning", b3="Info", b4="Debug",
-                                            tool_tip="Set the logging level for running the layout")
-        self.log_level.frame.pack()
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, self.load_state, self.save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Load the initial UI state
-        self.load_state()
+        global edit_logging_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_logging_settings_window is not None:
+            edit_logging_settings_window.lift()
+            edit_logging_settings_window.state('normal')
+            edit_logging_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the top level window for the Logging Configuration
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("Logging")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            edit_logging_settings_window = self.window
+            # Create the logging Level selections element
+            self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
+                                                b1="Error", b2="Warning", b3="Info", b4="Debug",
+                                                tool_tip="Set the logging level for running the layout")
+            self.log_level.frame.pack()
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
 
     def load_state(self, parent_object=None):
         # Parent object is passed by the callback - not used here
@@ -461,8 +525,13 @@ class edit_logging_settings():
         settings.set_logging(log_level)
         # Make the callback to apply the updated settings
         self.update_function()
-        # close the window (on OK or cancel)
-        if close_window: self.window.destroy()
+        # close the window (on OK )
+        if close_window: self.close_window(parent_object)
+
+    def close_window(self, parent_object):
+        global edit_logging_settings_window
+        edit_logging_settings_window = None
+        self.window.destroy()
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT 'Broker configuration' Tab
@@ -715,46 +784,51 @@ class mqtt_publish_tab():
             and self.instruments.validate() and self.sensors.validate())
 
 #------------------------------------------------------------------------------------
-# Class for the MQTT Settings window (uses the classes above for each tab)
+# Class for the MQTT Settings window (uses the classes above for each tab). Note that init
+# takes in callbacks for connecting to the broker and for applying the updated settings.
+# Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+edit_mqtt_settings_window = None
 
 class edit_mqtt_settings():
     def __init__(self, root_window, connect_function, update_function):
-        self.root_window = root_window
-        self.connect_function = connect_function
-        self.update_function = update_function
-        # Create the top level window for editing MQTT settings
-        winx = self.root_window.winfo_rootx() + 210
-        winy = self.root_window.winfo_rooty() + 30
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("MQTT Networking")
-        self.window.attributes('-topmost',True)
-        # Create the Notebook (for the tabs) 
-        self.tabs = ttk.Notebook(self.window)
-        # When you change tabs tkinter focuses on the first entry box - we don't want this
-        # So we bind the tab changed event to a function which will focus on something else 
-        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
-        # Create the Window tabs
-        self.tab1 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab1, text="Network")
-        self.tab2 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab2, text="Subscribe")
-        self.tab3 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab3, text="Publish")
-        self.tabs.pack()
-        # Create the tabs themselves:
-        self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
-        self.subscribe = mqtt_subscribe_tab(self.tab2)
-        self.publish = mqtt_publish_tab(self.tab3)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self,
-                                self.load_state, self.save_state)
-        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # Load the initial UI state
-        self.load_state()
+        global edit_mqtt_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_mqtt_settings_window is not None:
+            edit_mqtt_settings_window.lift()
+            edit_mqtt_settings_window.state('normal')
+            edit_mqtt_settings_window.focus_force()
+        else:
+            self.connect_function = connect_function
+            self.update_function = update_function
+            # Create the top level window for editing MQTT settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("MQTT Networking")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            edit_mqtt_settings_window = self.window
+            # Create the Notebook (for the tabs) 
+            self.tabs = ttk.Notebook(self.window)
+            # Create the Window tabs
+            self.tab1 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab1, text="Network")
+            self.tab2 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab2, text="Subscribe")
+            self.tab3 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab3, text="Publish")
+            self.tabs.pack()
+            # Create the tabs themselves:
+            self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
+            self.subscribe = mqtt_subscribe_tab(self.tab2)
+            self.publish = mqtt_publish_tab(self.tab3)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self,
+                                    self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Load the initial UI state
+            self.load_state()
             
     def load_state(self, parent_object=None):
         # Hide the validation error and connection test messages
@@ -815,19 +889,17 @@ class edit_mqtt_settings():
             settings.set_pub_sensors(self.publish.sensors.get_values())
             # Make the callback to apply the updated settings
             self.update_function()
-            # close the window (on OK or cancel)
-            if close_window: self.window.destroy()
-            else: self.load_state() 
+            # close the window (on OK)
+            if close_window: self.close_window(parent_object)
         else:
             # Display the validation error message
             self.validation_error.pack()
 
-    def tab_changed(self,event):
-        # Focus on the top level window to remove focus from the first entry box
-        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
-        # self.window.focus()
-        pass
-    
+    def close_window(self, parent_object):
+        global edit_mqtt_settings_window
+        edit_mqtt_settings_window = None
+        self.window.destroy()
+        
 #------------------------------------------------------------------------------------
 # Classes for the GPIO (Track Sensors) configuration window
 #------------------------------------------------------------------------------------
@@ -895,49 +967,57 @@ class gpio_port_entry_frame():
                     break        
 
 #------------------------------------------------------------------------------------
-# Class for the "Sensors" window - Uses the classes above
+# Class for the "Sensors" window - Uses the classes above. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
 #------------------------------------------------------------------------------------
+
+edit_gpio_settings_window = None
 
 class edit_gpio_settings():
     def __init__(self, root_window, update_function):
-        self.root_window = root_window
-        self.update_function = update_function
-        # Create the top level window for editing MQTT settings
-        winx = self.root_window.winfo_rootx() + 240
-        winy = self.root_window.winfo_rooty() + 60
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("GPIO Sensors")
-        self.window.attributes('-topmost',True)
-        # Create an overall frame to pack everything in
-        self.frame = Tk.Frame(self.window)
-        self.frame.pack()
-        # Create the labelframe for the general GPIO settings
-        self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
-        self.subframe1.pack(padx=2, pady=2, fill='x')
-        # Put the elements in a subframe to center them
-        self.subframe2 = Tk.Frame(self.subframe1)
-        self.subframe2.pack()
-        self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
-        self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-        self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
-            tool_tip="Enter the delay period (before track sensor events will be triggered) in milliseconds (0-1000)")
-        self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-        self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
-        self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-        self.timeout = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=5000, allow_empty=False, 
-            tool_tip="Enter the timeout period (during which further triggers will be ignored) in milliseconds (0-5000)")
-        self.timeout.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
-        # Create the Label frame for the GPIO port assignments 
-        self.gpio = gpio_port_entry_frame(self.frame)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self,
-                                self.load_state, self.save_state)
-        self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # Load the initial UI state
-        self.load_state()
+        global edit_gpio_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_gpio_settings_window is not None:
+            edit_gpio_settings_window.lift()
+            edit_gpio_settings_window.state('normal')
+            edit_gpio_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the top level window for editing MQTT settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("GPIO Sensors")
+            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            edit_gpio_settings_window = self.window
+            # Create an overall frame to pack everything in
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack()
+            # Create the labelframe for the general GPIO settings
+            self.subframe1 = Tk.LabelFrame(self.frame, text="GPIO Port Settings")
+            self.subframe1.pack(padx=2, pady=2, fill='x')
+            # Put the elements in a subframe to center them
+            self.subframe2 = Tk.Frame(self.subframe1)
+            self.subframe2.pack()
+            self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
+            self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
+                tool_tip="Enter the delay period (before track sensor events will be triggered) in milliseconds (0-1000)")
+            self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
+            self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            self.timeout = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=5000, allow_empty=False, 
+                tool_tip="Enter the timeout period (during which further triggers will be ignored) in milliseconds (0-5000)")
+            self.timeout.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
+            # Create the Label frame for the GPIO port assignments 
+            self.gpio = gpio_port_entry_frame(self.frame)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self,
+                                    self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Load the initial UI state
+            self.load_state()
             
     def load_state(self, parent_object=None):
         # Hide the validation error and connection test messages
@@ -958,11 +1038,15 @@ class edit_gpio_settings():
             settings.set_gpio(trigger, timeout, mappings)
             # Make the callback to apply the updated settings
             self.update_function()
-            # close the window (on OK or cancel)
-            if close_window: self.window.destroy()
-            else: self.load_state() 
+            # close the window (on OK)
+            if close_window: self.close_window(parent_object) 
         else:
             # Display the validation error message
             self.validation_error.pack()
-        
+
+    def close_window(self, parent_object):
+        global edit_gpio_settings_window
+        edit_gpio_settings_window = None
+        self.window.destroy()
+
 #############################################################################################

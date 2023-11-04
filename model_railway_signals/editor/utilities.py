@@ -23,7 +23,6 @@ import tkinter as Tk
 from ..library import pi_sprog_interface
 from . import common
 
-
 #------------------------------------------------------------------------------------
 # Class for a CV Programming entry element
 #------------------------------------------------------------------------------------
@@ -189,7 +188,7 @@ class cv_programming_element():
         pi_sprog_interface.request_dcc_power_on()
 
 #------------------------------------------------------------------------------------
-# Class for the "one touch) Programming UI Element (uses class above)
+# Class for the "one touch" Programming UI Element (uses class above)
 #------------------------------------------------------------------------------------
 
 class one_touch_programming_element():
@@ -225,40 +224,46 @@ class one_touch_programming_element():
        
 #------------------------------------------------------------------------------------
 # Class for the "DCC Programming" window - Uses the classes above
+# Note that if a window is already open then we just raise it and exit
 #------------------------------------------------------------------------------------
+
+dcc_programming_window = None
 
 class dcc_programming():
     def __init__(self, root_window, dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function):
-        self.root_window = root_window
-        self.dcc_power_is_on_function = dcc_power_is_on_function
-        self.dcc_power_off_function = dcc_power_off_function
-        self.dcc_power_on_function = dcc_power_on_function
-        # Create the top level window for DCC Programming 
-        winx = self.root_window.winfo_rootx() + 240
-        winy = self.root_window.winfo_rooty() + 60
-        self.window = Tk.Toplevel(self.root_window)
-        self.window.geometry(f'+{winx}+{winy}')
-        self.window.title("DCC Programming")
-        self.window.attributes('-topmost',True)
-        # Create an overall frame to pack everything in
-        self.frame = Tk.Frame(self.window)
-        self.frame.pack()
-        # Create the labelframe for "one Touch" DCC Programming (this gets packed later)
-        self.labelframe1 = Tk.LabelFrame(self.frame, text="DCC One Touch Programming")
-        self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_power_is_on_function)
-        # Create the labelframe for CV Programming (this gets packed later)
-        self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
-        self.cv_programming = cv_programming_element(self.root_window, self.labelframe2,
-                dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function)        
-        # Create the ok/close button and tooltip
-        self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
-        self.TT1 = common.CreateToolTip(self.B1, "Close window")
-        # Pack the OK button First - so it remains visible on re-sizing
-        self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
-        self.labelframe1.pack(padx=2, pady=2, fill='x')
-        self.labelframe2.pack(padx=2, pady=2, fill='x')
+        global dcc_programming_window
+        # If there is already a dcc programming window open then we just make it jump to the top and exit
+        if dcc_programming_window is not None:
+            dcc_programming_window.lift()
+            dcc_programming_window.state('normal')
+            dcc_programming_window.focus_force()
+        else:
+            # Create the top level window for DCC Programming 
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("DCC Programming")
+            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            dcc_programming_window = self.window
+            # Create an overall frame to pack everything in
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack()
+            # Create the labelframe for "one Touch" DCC Programming (this gets packed later)
+            self.labelframe1 = Tk.LabelFrame(self.frame, text="DCC One Touch Programming")
+            self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_power_is_on_function)
+            # Create the labelframe for CV Programming (this gets packed later)
+            self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
+            self.cv_programming = cv_programming_element(root_window, self.labelframe2,
+                    dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function)        
+            # Create the ok/close button and tooltip
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            # Pack the OK button First - so it remains visible on re-sizing
+            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+            self.labelframe1.pack(padx=2, pady=2, fill='x')
+            self.labelframe2.pack(padx=2, pady=2, fill='x')
         
     def ok(self):
+        global dcc_programming_window
+        dcc_programming_window = None
         self.window.destroy()
 
 #############################################################################################
