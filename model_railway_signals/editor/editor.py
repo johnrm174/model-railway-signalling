@@ -125,6 +125,7 @@ class main_menubar:
         self.auto_menu.add_command(label=" Enable ", command=self.automation_enable)
         self.auto_menu.add_command(label=" Disable", command=self.automation_disable)
         self.mainmenubar.add_cascade(label=self.auto_label, menu=self.auto_menu)
+        self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
         # Create the various menubar items for the SPROG Connection Dropdown
         self.sprog_label = "SPROG:Disconnected"
         self.sprog_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -137,6 +138,7 @@ class main_menubar:
         self.power_menu.add_command(label=" OFF ", command=self.dcc_power_off)
         self.power_menu.add_command(label=" ON  ", command=self.dcc_power_on)
         self.mainmenubar.add_cascade(label=self.power_label, menu=self.power_menu)
+        self.mainmenubar.entryconfigure(self.power_label, state="disabled")
         # Create the various menubar items for the MQTT Connection Dropdown
         self.mqtt_label = "MQTT:Disconnected"
         self.mqtt_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -356,8 +358,10 @@ class main_menubar:
         connected = pi_sprog_interface.initialise_pi_sprog(port, baud, debug)
         if connected:
             new_label = "SPROG:Connected"
+            self.mainmenubar.entryconfigure(self.power_label, state="normal")
         else:
             new_label = "SPROG:Disconnected"
+            self.mainmenubar.entryconfigure(self.power_label, state="disabled")
             if show_popup:
                 Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
                     message="SPROG connection failure\nCheck SPROG settings")
@@ -366,8 +370,10 @@ class main_menubar:
         return(connected)
     
     def sprog_disconnect(self):
+        print("here")
         pi_sprog_interface.sprog_shutdown()
         new_label = "SPROG:Disconnected"
+        self.mainmenubar.entryconfigure(self.power_label, state="disabled")
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
 
