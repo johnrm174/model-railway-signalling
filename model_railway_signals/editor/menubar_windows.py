@@ -248,8 +248,7 @@ class edit_layout_info():
             self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
                     min_height=10, min_width=40, editable=True, auto_resize=True)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self,
-                                    self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             # We need to pack the window buttons at the bottom and then pack the text
             # frame - so the buttons remain visible if the user re-sizes the window
             self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
@@ -257,18 +256,16 @@ class edit_layout_info():
             # Load the initial UI state
             self.load_state()
         
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
+    def load_state(self):
         # The version is the forth parameter provided by 'get_general'
         self.text.set_value(settings.get_general()[3])
         
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
+    def save_state(self, close_window:bool):
         settings.set_general(info=self.text.get_value())
         # close the window (on OK)
-        if close_window: self.close_window(parent_object)
+        if close_window: self.close_window()
             
-    def close_window(self, parent_object):
+    def close_window(self):
         global edit_layout_info_window
         edit_layout_info_window = None
         self.window.destroy()
@@ -322,21 +319,19 @@ class edit_canvas_settings():
                             tool_tip="Enable/Disable 'Snap-to-Grid' for schematic editing")
             self.snap.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
+    def load_state(self):
         width, height, grid, snap_to_grid = settings.get_canvas()
         self.width.set_value(width)
         self.height.set_value(height)
         self.grid.set_value(grid)
         self.snap.set_value(snap_to_grid)
         
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
+    def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
         if self.width.validate() and self.height.validate() and self.grid.validate():
             width = self.width.get_value()
@@ -347,9 +342,9 @@ class edit_canvas_settings():
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
-            if close_window: self.close_window(parent_object)
+            if close_window: self.close_window()
 
-    def close_window(self, parent_object):
+    def close_window(self):
         global canvas_settings_window
         canvas_settings_window = None
         self.window.destroy()
@@ -416,7 +411,7 @@ class edit_sprog_settings():
             self.status = Tk.Label(self.window, text="")
             self.status.pack(padx=2, pady=2)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
@@ -448,10 +443,9 @@ class edit_sprog_settings():
         # Now restore the existing settings (as they haven't been "applied" yet)
         settings.set_sprog(s1, s2, s3, s4, s5)
         
-    def load_state(self, parent_object=None):
+    def load_state(self):
         # Reset the Test connectivity message
         self.status.config(text="")
-        # Parent object is passed by the callback - not used here
         port, baud, debug, startup, power = settings.get_sprog()
         self.port.set_value(port)
         self.baud_selection.set(str(baud))
@@ -460,10 +454,9 @@ class edit_sprog_settings():
         self.power.set_value(power)
         self.selection_changed()
         
-    def save_state(self, parent_object, close_window:bool):
+    def save_state(self, close_window:bool):
         # Validate the port to "accept" the current value
         self.port.validate()
-        # Parent object is passed by the callback - not used here
         baud = int(self.baud_selection.get())
         port = self.port.get_value()
         debug = self.debug.get_value()
@@ -474,9 +467,9 @@ class edit_sprog_settings():
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK)
-        if close_window: self.close_window(parent_object)
+        if close_window: self.close_window()
 
-    def close_window(self, parent_object):
+    def close_window(self):
         global edit_sprog_settings_window
         edit_sprog_settings_window = None
         self.window.destroy()
@@ -510,25 +503,23 @@ class edit_logging_settings():
                                                 tool_tip="Set the logging level for running the layout")
             self.log_level.frame.pack()
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self, self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
             # Load the initial UI state
             self.load_state()
 
-    def load_state(self, parent_object=None):
-        # Parent object is passed by the callback - not used here
+    def load_state(self):
         self.log_level.set_value(settings.get_logging())
         
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
+    def save_state(self, close_window:bool):
         log_level = self.log_level.get_value()
         settings.set_logging(log_level)
         # Make the callback to apply the updated settings
         self.update_function()
         # close the window (on OK )
-        if close_window: self.close_window(parent_object)
+        if close_window: self.close_window()
 
-    def close_window(self, parent_object):
+    def close_window(self):
         global edit_logging_settings_window
         edit_logging_settings_window = None
         self.window.destroy()
@@ -822,19 +813,17 @@ class edit_mqtt_settings():
             self.subscribe = mqtt_subscribe_tab(self.tab2)
             self.publish = mqtt_publish_tab(self.tab3)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self,
-                                    self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
             
-    def load_state(self, parent_object=None):
+    def load_state(self):
         # Hide the validation error and connection test messages
         self.config.status.config(text="")
         self.validation_error.pack_forget()
-        # Parent object is passed by the callback - not used here
         # Populate the network configuration tab
         url, port, network, node, username, password, debug, startup = settings.get_mqtt()
         self.config.url.set_value(url)
@@ -858,8 +847,7 @@ class edit_mqtt_settings():
         self.publish.instruments.set_values(settings.get_pub_instruments())
         self.publish.sensors.set_values(settings.get_pub_sensors())
         
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
+    def save_state(self, close_window:bool):
         # Validate the entries to "accept" the current values before reading
         self.config.accept_all_entries()
         # Only allow close if valid
@@ -890,12 +878,12 @@ class edit_mqtt_settings():
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
-            if close_window: self.close_window(parent_object)
+            if close_window: self.close_window()
         else:
             # Display the validation error message
             self.validation_error.pack()
 
-    def close_window(self, parent_object):
+    def close_window(self):
         global edit_mqtt_settings_window
         edit_mqtt_settings_window = None
         self.window.destroy()
@@ -1011,15 +999,14 @@ class edit_gpio_settings():
             # Create the Label frame for the GPIO port assignments 
             self.gpio = gpio_port_entry_frame(self.frame)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self,
-                                    self.load_state, self.save_state, self.close_window)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
             self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
             
-    def load_state(self, parent_object=None):
+    def load_state(self):
         # Hide the validation error and connection test messages
         self.validation_error.pack_forget()
         # Create the UI Elements
@@ -1028,8 +1015,7 @@ class edit_gpio_settings():
         self.trigger.set_value(int(trigger*1000))
         self.timeout.set_value(int(timeout*1000))
 
-    def save_state(self, parent_object, close_window:bool):
-        # Parent object is passed by the callback - not used here
+    def save_state(self, close_window:bool):
         # Only allow close if valid
         if self.gpio.validate() and self.trigger.validate() and self.timeout.validate():
             mappings = self.gpio.get_values()
@@ -1039,12 +1025,12 @@ class edit_gpio_settings():
             # Make the callback to apply the updated settings
             self.update_function()
             # close the window (on OK)
-            if close_window: self.close_window(parent_object) 
+            if close_window: self.close_window() 
         else:
             # Display the validation error message
             self.validation_error.pack()
 
-    def close_window(self, parent_object):
+    def close_window(self):
         global edit_gpio_settings_window
         edit_gpio_settings_window = None
         self.window.destroy()

@@ -24,71 +24,6 @@ import tkinter as Tk
 from . import common
 from . import objects
 
-#------------------------------------------------------------------------------------
-# Function to load the initial UI state when the Edit window is created
-# Also called to re-load the UI state on an "Apply" (i.e. after the save)
-#------------------------------------------------------------------------------------
- 
-def load_state(textbox):
-    object_id = textbox.object_id
-    # Check the object we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        textbox.window.destroy()
-    else:
-        # Label the edit window
-        textbox.window.title("Text Box")
-        # Set the Initial UI state from the current object settings
-        textbox.text.set_value(objects.schematic_objects[object_id]["text"])
-        textbox.colour.set_value(objects.schematic_objects[object_id]["colour"])
-        textbox.background.set_value(objects.schematic_objects[object_id]["background"])
-        justify = objects.schematic_objects[object_id]["justify"]
-        font = objects.schematic_objects[object_id]["font"]
-        font_size = objects.schematic_objects[object_id]["fontsize"]
-        font_style = objects.schematic_objects[object_id]["fontstyle"]
-        border = objects.schematic_objects[object_id]["border"]
-        textbox.textstyle.set_values (font, font_size, font_style, border)
-        textbox.justify.set_value(justify)
-        # Justify the text and resize the font to match the initial selection
-        textbox.text.set_justification(justify)
-        textbox.text.set_font(font, font_size, font_style)
-        # Hide the validation error message
-        textbox.validation_error.pack_forget()        
-    return()
-    
-#------------------------------------------------------------------------------------
-# Function to commit all configuration changes (Apply/OK Button)
-#------------------------------------------------------------------------------------
- 
-def save_state(textbox, close_window:bool):
-    object_id = textbox.object_id
-    # Check the object we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        textbox.window.destroy()
-    elif textbox.textstyle.validate():
-        # Copy the original object Configuration (elements get overwritten as required)
-        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
-        # Update the object coniguration elements from the current user selections
-        new_object_configuration["text"] = textbox.text.get_value()
-        new_object_configuration["colour"] = textbox.colour.get_value()
-        new_object_configuration["background"] = textbox.background.get_value()
-        new_object_configuration["justify"] = textbox.justify.get_value()
-        font, font_size, font_style, border = textbox.textstyle.get_values()
-        new_object_configuration["font"] = font
-        new_object_configuration["fontsize"] = font_size
-        new_object_configuration["fontstyle"] = font_style
-        new_object_configuration["border"] = border
-        # Save the updated configuration (and re-draw the object)
-        objects.update_object(object_id, new_object_configuration)
-        # Close window on "OK" or re-load UI for "apply"
-        if close_window: textbox.window.destroy()
-        else: load_state(textbox)
-    else:
-        # Display the validation error message
-        textbox.validation_error.pack()
-    return()
-
 #####################################################################################
 # Classes for the Edit Text Box UI Elements
 #####################################################################################
@@ -149,6 +84,7 @@ class edit_textbox():
         self.object_id = object_id
         # Creatre the basic Top Level window
         self.window = Tk.Toplevel(root)
+        self.window.title("Text Box")
         self.window.attributes('-topmost',True)
         # Create a frame to hold all UI elements (so they don't expand on window resize
         # to provide consistent behavior with the other configure object popup windows)
@@ -179,12 +115,12 @@ class edit_textbox():
         self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
         self.textstyle.frame.pack(padx=2, pady=2, fill='x')        
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
-        load_state(self)
+        self.load_state()
         
     def justification_updated(self):
         self.text.set_justification(self.justify.get_value())
@@ -192,6 +128,60 @@ class edit_textbox():
     def text_style_updated(self):
         font, font_size, font_style, border = self.textstyle.get_values()
         self.text.set_font (font, font_size, font_style)
-        
+ 
+    def load_state(self):
+        # Check the object we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Set the Initial UI state from the current object settings
+            self.text.set_value(objects.schematic_objects[self.object_id]["text"])
+            self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            self.background.set_value(objects.schematic_objects[self.object_id]["background"])
+            justify = objects.schematic_objects[self.object_id]["justify"]
+            font = objects.schematic_objects[self.object_id]["font"]
+            font_size = objects.schematic_objects[self.object_id]["fontsize"]
+            font_style = objects.schematic_objects[self.object_id]["fontstyle"]
+            border = objects.schematic_objects[self.object_id]["border"]
+            self.textstyle.set_values (font, font_size, font_style, border)
+            self.justify.set_value(justify)
+            # Justify the text and resize the font to match the initial selection
+            self.text.set_justification(justify)
+            self.text.set_font(font, font_size, font_style)
+            # Hide the validation error message
+            self.validation_error.pack_forget()        
+        return()
+ 
+    def save_state(self, close_window:bool):
+        # Check the object we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        elif self.textstyle.validate():
+            # Copy the original object Configuration (elements get overwritten as required)
+            new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+            # Update the object coniguration elements from the current user selections
+            new_object_configuration["text"] = self.text.get_value()
+            new_object_configuration["colour"] = self.colour.get_value()
+            new_object_configuration["background"] = self.background.get_value()
+            new_object_configuration["justify"] = self.justify.get_value()
+            font, font_size, font_style, border = self.textstyle.get_values()
+            new_object_configuration["font"] = font
+            new_object_configuration["fontsize"] = font_size
+            new_object_configuration["fontstyle"] = font_style
+            new_object_configuration["border"] = border
+            # Save the updated configuration (and re-draw the object)
+            objects.update_object(self.object_id, new_object_configuration)
+            # Close window on "OK" or re-load UI for "apply"
+            if close_window: self.close_window()
+            else: self.load_state()
+        else:
+            # Display the validation error message
+            self.validation_error.pack()
+        return()
 
+    def close_window(self):
+        self.window.destroy()
+    
 #############################################################################################

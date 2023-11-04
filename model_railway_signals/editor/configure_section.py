@@ -85,69 +85,6 @@ def signals_behind(object_id):
             list_of_signals_behind.append(signal_entry)
     return(list_of_signals_behind)
 
-#------------------------------------------------------------------------------------
-# Function to load the initial UI state when the Edit window is created
-# Also called to re-load the UI state on an "Apply" (i.e. after the save)
-#------------------------------------------------------------------------------------
- 
-def load_state(section):
-    object_id = section.object_id
-    # Check the section we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        section.window.destroy()
-    else:
-        # Label the edit window with the Section ID
-        section.window.title("Track Section "+str(objects.schematic_objects[object_id]["itemid"]))
-        # Set the Initial UI state from the current object settings
-        section.config.sectionid.set_value(objects.schematic_objects[object_id]["itemid"])
-        section.config.readonly.set_value(not objects.schematic_objects[object_id]["editable"])
-        section.config.mirror.set_value(objects.schematic_objects[object_id]["mirror"])
-        section.config.label.set_value(objects.schematic_objects[object_id]["defaultlabel"])
-        section.automation.ahead.set_values(signals_ahead(object_id))
-        section.automation.behind.set_values(signals_behind(object_id))
-        # Hide the validation error message
-        section.validation_error.pack_forget()
-    return()
-    
-#------------------------------------------------------------------------------------
-# Function to commit all configuration changes (Apply/OK Button)
-#------------------------------------------------------------------------------------
- 
-def save_state(section, close_window:bool):
-    object_id = section.object_id
-    # Check the section we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        section.window.destroy()
-    # Validate all user entries prior to applying the changes. Each of these would have
-    # been validated on entry, but changes to other objects may have been made since then
-    elif ( section.config.sectionid.validate() and section.config.mirror.validate() and
-              section.config.label.validate() ):
-        # Copy the original section Configuration (elements get overwritten as required)
-        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
-        # Update the section coniguration elements from the current user selections
-        new_object_configuration["itemid"] = section.config.sectionid.get_value()
-        new_object_configuration["editable"] = not section.config.readonly.get_value()
-        new_object_configuration["mirror"] = section.config.mirror.get_value()
-        # If the default label has changed then we also need to update the actual
-        # label if the actual label text is still set to the old default label text
-        current_label = new_object_configuration["label"]
-        old_default_label = new_object_configuration["defaultlabel"]
-        new_default_label = section.config.label.get_value()
-        new_object_configuration["defaultlabel"] = new_default_label
-        if old_default_label != new_default_label and current_label == old_default_label:
-            new_object_configuration["label"] = new_default_label
-        # Save the updated configuration (and re-draw the object)
-        objects.update_object(object_id, new_object_configuration)
-        # Close window on "OK" or re-load UI for "apply"
-        if close_window: section.window.destroy()
-        else: load_state(section)
-    else:
-        # Display the validation error message
-        section.validation_error.pack()
-    return()
-
 #####################################################################################
 # Classes for the Track Section Configuration Tab
 #####################################################################################
@@ -318,9 +255,6 @@ class edit_section():
         self.main_frame.pack()
         # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.main_frame)
-        # When you change tabs tkinter focuses on the first entry box - we don't want this
-        # So we bind the tab changed event to a function which will focus on something else 
-        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
         # Create the Window tabs
         self.tab1 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
@@ -330,17 +264,71 @@ class edit_section():
         self.config = section_configuration_tab(self.tab1)
         self.automation = section_automation_tab(self.tab2)        
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
-        load_state(self)
+        self.load_state()
+        
+#------------------------------------------------------------------------------------
+# Functions for Load, Save and close Window
+#------------------------------------------------------------------------------------
+ 
+    def load_state(self):
+        # Check the section we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Label the edit window with the Section ID
+            self.window.title("Track Section "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            # Set the Initial UI state from the current object settings
+            self.config.sectionid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
+            self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"])
+            self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
+            self.automation.ahead.set_values(signals_ahead(self.object_id))
+            self.automation.behind.set_values(signals_behind(self.object_id))
+            # Hide the validation error message
+            self.validation_error.pack_forget()
+        return()
+     
+    def save_state(self, close_window:bool):
+        # Check the section we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        # Validate all user entries prior to applying the changes. Each of these would have
+        # been validated on entry, but changes to other objects may have been made since then
+        elif ( self.config.sectionid.validate() and self.config.mirror.validate() and
+                  self.config.label.validate() ):
+            # Copy the original section Configuration (elements get overwritten as required)
+            new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+            # Update the section coniguration elements from the current user selections
+            new_object_configuration["itemid"] = self.config.sectionid.get_value()
+            new_object_configuration["editable"] = not self.config.readonly.get_value()
+            new_object_configuration["mirror"] = self.config.mirror.get_value()
+            # If the default label has changed then we also need to update the actual
+            # label if the actual label text is still set to the old default label text
+            current_label = new_object_configuration["label"]
+            old_default_label = new_object_configuration["defaultlabel"]
+            new_default_label = self.config.label.get_value()
+            new_object_configuration["defaultlabel"] = new_default_label
+            if old_default_label != new_default_label and current_label == old_default_label:
+                new_object_configuration["label"] = new_default_label
+            # Save the updated configuration (and re-draw the object)
+            objects.update_object(self.object_id, new_object_configuration)
+            # Close window on "OK" or re-load UI for "apply"
+            if close_window: self.close_window()
+            else: self.load_state()
+        else:
+            # Display the validation error message
+            self.validation_error.pack()
+        return()
 
-    def tab_changed(self,event):
-        # Focus on the top level window to remove focus from the first entry box
-        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
-        # self.window.focus()
-        pass
+    def close_window(self):
+        self.window.destroy()
+
     
 #############################################################################################

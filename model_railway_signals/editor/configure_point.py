@@ -48,86 +48,7 @@ def switched_with_point(object_id):
         if also_switch_point_id == objects.schematic_objects[object_id]["itemid"]:
             switched_with_point_id = int(point_id)
     return(switched_with_point_id)
-
-#------------------------------------------------------------------------------------
-# Function to load the initial UI state when the Edit window is created
-# Also called to re-load the UI state on an "Apply" (i.e. after the save)
-#------------------------------------------------------------------------------------
- 
-def load_state(point):
-    object_id = point.object_id
-    # Check the point we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        point.window.destroy()
-    else:
-        # Label the edit window with the Point ID
-        point.window.title("Point "+str(objects.schematic_objects[object_id]["itemid"]))
-        # Set the Initial UI state from the current object settings
-        point.config.pointid.set_value(objects.schematic_objects[object_id]["itemid"])
-        point.config.alsoswitch.set_value(objects.schematic_objects[object_id]["alsoswitch"])
-        point.config.alsoswitch.set_switched_with(switched_with_point(object_id))
-        point.config.pointtype.set_value(objects.schematic_objects[object_id]["itemtype"])
-        point.config.colour.set_value(objects.schematic_objects[object_id]["colour"])
-        # These are the general settings for the point
-        auto = objects.schematic_objects[object_id]["automatic"]
-        rev = objects.schematic_objects[object_id]["reverse"]
-        fpl = objects.schematic_objects[object_id]["hasfpl"]
-        if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
-        else:rot = False
-        point.config.settings.set_values(rot, rev, auto, fpl)
-        # Set the initial DCC address values
-        add = objects.schematic_objects[object_id]["dccaddress"]
-        rev = objects.schematic_objects[object_id]["dccreversed"]
-        point.config.dccsettings.set_values (add, rev)
-        # Set the read only list of Interlocked signals
-        point.locking.signals.set_values(objects.schematic_objects[object_id]["siginterlock"])
-        # Hide the validation error message
-        point.validation_error.pack_forget()
-    return()
     
-#------------------------------------------------------------------------------------
-# Function to commit all configuration changes (Apply/OK Button)
-#------------------------------------------------------------------------------------
- 
-def save_state(point, close_window:bool):
-    object_id = point.object_id
-    # Check the point we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        point.window.destroy()
-    # Validate all user entries prior to applying the changes. Each of these would have
-    # been validated on entry, but changes to other objects may have been made since then
-    elif (point.config.pointid.validate() and point.config.alsoswitch.validate() and
-             point.config.settings.validate() and point.config.dccsettings.validate()):
-        # Copy the original point Configuration (elements get overwritten as required)
-        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
-        # Update the point coniguration elements from the current user selections
-        new_object_configuration["itemid"] = point.config.pointid.get_value()
-        new_object_configuration["itemtype"] = point.config.pointtype.get_value()
-        new_object_configuration["alsoswitch"] = point.config.alsoswitch.get_value()
-        new_object_configuration["colour"] = point.config.colour.get_value()
-        # These are the general settings
-        rot, rev, auto, fpl = point.config.settings.get_values()
-        new_object_configuration["reverse"] = rev
-        new_object_configuration["automatic"] = auto
-        new_object_configuration["hasfpl"] = fpl
-        if rot: new_object_configuration["orientation"] = 180
-        else: new_object_configuration["orientation"] = 0
-        # Get the  DCC address
-        add, rev = point.config.dccsettings.get_values()
-        new_object_configuration["dccaddress"] = add
-        new_object_configuration["dccreversed"] = rev
-        # Save the updated configuration (and re-draw the object)
-        objects.update_object(object_id, new_object_configuration)
-        # Close window on "OK" or re-load UI for "apply"
-        if close_window: point.window.destroy()
-        else: load_state(point)
-    else:
-        # Display the validation error message
-        point.validation_error.pack()
-    return()
-
 #####################################################################################
 # Classes for the Point "Configuration" Tab
 #####################################################################################
@@ -260,6 +181,8 @@ class general_settings():
         self.CB2.set_value(fpl)
         self.CB3.set_value(rev)
         self.CB4.set_value(auto)
+        # Set the initial state (Enabled/Disabled) of the FPL selection
+        self.automatic_updated()
         
     def get_values(self):
         return (self.CB1.get_value(), self.CB3.get_value(),
@@ -360,9 +283,6 @@ class edit_point():
         self.window.attributes('-topmost',True)
         # Create the Notebook (for the tabs) 
         self.tabs = ttk.Notebook(self.window)
-        # When you change tabs tkinter focuses on the first entry box - we don't want this
-        # So we bind the tab changed event to a function which will focus on something else 
-        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
         # Create the Window tabs
         self.tab1 = Tk.Frame(self.tabs)
         self.tabs.add(self.tab1, text="Configration")
@@ -372,17 +292,86 @@ class edit_point():
         self.config = point_configuration_tab(self.tab1)
         self.locking = point_interlocking_tab(self.tab2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
-        load_state(self)
+        self.load_state()
+        
+#------------------------------------------------------------------------------------
+# Functions for Load, Save and close window
+#------------------------------------------------------------------------------------
+ 
+    def load_state(self):
+        # Check the point we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Label the edit window with the Point ID
+            self.window.title("Point "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            # Set the Initial UI state from the current object settings
+            self.config.pointid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.alsoswitch.set_value(objects.schematic_objects[self.object_id]["alsoswitch"])
+            self.config.alsoswitch.set_switched_with(switched_with_point(self.object_id))
+            self.config.pointtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
+            self.config.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            # These are the general settings for the point
+            auto = objects.schematic_objects[self.object_id]["automatic"]
+            rev = objects.schematic_objects[self.object_id]["reverse"]
+            fpl = objects.schematic_objects[self.object_id]["hasfpl"]
+            if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
+            else:rot = False
+            self.config.settings.set_values(rot, rev, auto, fpl)
+            # Set the initial DCC address values
+            add = objects.schematic_objects[self.object_id]["dccaddress"]
+            rev = objects.schematic_objects[self.object_id]["dccreversed"]
+            self.config.dccsettings.set_values (add, rev)
+            # Set the read only list of Interlocked signals
+            self.locking.signals.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
+            # Hide the validation error message
+            self.validation_error.pack_forget()
+        return()
+        
+    def save_state(self, close_window:bool):
+        # Check the point we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        # Validate all user entries prior to applying the changes. Each of these would have
+        # been validated on entry, but changes to other objects may have been made since then
+        elif (self.config.pointid.validate() and self.config.alsoswitch.validate() and
+                 self.config.settings.validate() and self.config.dccsettings.validate()):
+            # Copy the original point Configuration (elements get overwritten as required)
+            new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+            # Update the point coniguration elements from the current user selections
+            new_object_configuration["itemid"] = self.config.pointid.get_value()
+            new_object_configuration["itemtype"] = self.config.pointtype.get_value()
+            new_object_configuration["alsoswitch"] = self.config.alsoswitch.get_value()
+            new_object_configuration["colour"] = self.config.colour.get_value()
+            # These are the general settings
+            rot, rev, auto, fpl = self.config.settings.get_values()
+            new_object_configuration["reverse"] = rev
+            new_object_configuration["automatic"] = auto
+            new_object_configuration["hasfpl"] = fpl
+            if rot: new_object_configuration["orientation"] = 180
+            else: new_object_configuration["orientation"] = 0
+            # Get the  DCC address
+            add, rev = self.config.dccsettings.get_values()
+            new_object_configuration["dccaddress"] = add
+            new_object_configuration["dccreversed"] = rev
+            # Save the updated configuration (and re-draw the object)
+            objects.update_object(self.object_id, new_object_configuration)
+            # Close window on "OK" or re-load UI for "apply"
+            if close_window: self.close_window()
+            else: self.load_state()
+        else:
+            # Display the validation error message
+            self.validation_error.pack()
+        return()
 
-    def tab_changed(self,event):
-        # Focus on the top level window to remove focus from the first entry box
-        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
-        # self.window.focus()
-        pass
-
+    def close_window(self):
+        self.window.destroy()
+    
 #############################################################################################

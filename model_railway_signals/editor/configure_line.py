@@ -27,61 +27,6 @@ import tkinter as Tk
 from . import common
 from . import objects
 
-#------------------------------------------------------------------------------------
-# Function to load the initial UI state when the Edit window is created
-# Also called to re-load the UI state on an "Apply" (i.e. after the save)
-#------------------------------------------------------------------------------------
- 
-def load_state(line):
-    object_id = line.object_id
-    # Check the line we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        line.window.destroy()
-    else:
-        # Label the edit window
-        line.window.title("Line "+str(objects.schematic_objects[object_id]["itemid"]))
-        # Set the Initial UI state from the current object settings
-        line.lineid.set_value(objects.schematic_objects[object_id]["itemid"])
-        line.colour.set_value(objects.schematic_objects[object_id]["colour"])
-        arrow_type = objects.schematic_objects[object_id]["arrowtype"]
-        arrow_ends = objects.schematic_objects[object_id]["arrowends"]
-        line.attributes.set_values(arrow_ends, arrow_type)
-        # Hide the validation error message
-        line.validation_error.pack_forget()        
-    return()
-    
-#------------------------------------------------------------------------------------
-# Function to commit all configuration changes (Apply/OK Button)
-#------------------------------------------------------------------------------------
- 
-def save_state(line, close_window:bool):
-    object_id = line.object_id
-    # Check the object we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        line.window.destroy()
-    # Validate all user entries prior to applying the changes. Each of these would have
-    # been validated on entry, but changes to other objects may have been made since then
-    elif line.lineid.validate():
-        # Copy the original object Configuration (elements get overwritten as required)
-        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
-        # Update the object coniguration elements from the current user selections
-        new_object_configuration["itemid"] = line.lineid.get_value()
-        new_object_configuration["colour"] = line.colour.get_value()
-        arrow_ends, arrow_type = line.attributes.get_values()
-        new_object_configuration["arrowtype"] = arrow_type
-        new_object_configuration["arrowends"] = arrow_ends
-        # Save the updated configuration (and re-draw the object)
-        objects.update_object(object_id, new_object_configuration)
-        # Close window on "OK" or re-load UI for "apply"
-        if close_window: line.window.destroy()
-        else: load_state(line)
-    else:
-        # Display the validation error message
-        line.validation_error.pack()
-    return()
-
 #####################################################################################
 # Classes for the Edit Line UI Elements
 #####################################################################################
@@ -194,11 +139,62 @@ class edit_line():
         self.attributes = line_attributes(self.main_frame)
         self.attributes.frame.pack(padx=2, pady=2)
         # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
+        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
         self.controls.frame.pack(padx=2, pady=2)
         # Create the Validation error message (this gets packed/unpacked on apply/save)
         self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
         # load the initial UI state
-        load_state(self)
+        self.load_state()
+        
+#------------------------------------------------------------------------------------
+# Functions for load, save and close window
+#------------------------------------------------------------------------------------
+ 
+    def load_state(self):
+        # Check the line we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Label the edit window
+            self.window.title("Line "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            # Set the Initial UI state from the current object settings
+            self.lineid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
+            arrow_type = objects.schematic_objects[self.object_id]["arrowtype"]
+            arrow_ends = objects.schematic_objects[self.object_id]["arrowends"]
+            self.attributes.set_values(arrow_ends, arrow_type)
+            # Hide the validation error message
+            self.validation_error.pack_forget()        
+        return()
+     
+    def save_state(self, close_window:bool):
+        # Check the object we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        # Validate all user entries prior to applying the changes. Each of these would have
+        # been validated on entry, but changes to other objects may have been made since then
+        elif self.lineid.validate():
+            # Copy the original object Configuration (elements get overwritten as required)
+            new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+            # Update the object coniguration elements from the current user selections
+            new_object_configuration["itemid"] = self.lineid.get_value()
+            new_object_configuration["colour"] = self.colour.get_value()
+            arrow_ends, arrow_type = self.attributes.get_values()
+            new_object_configuration["arrowtype"] = arrow_type
+            new_object_configuration["arrowends"] = arrow_ends
+            # Save the updated configuration (and re-draw the object)
+            objects.update_object(self.object_id, new_object_configuration)
+            # Close window on "OK" or re-load UI for "apply"
+            if close_window: self.close_window()
+            else: self.load_state()
+        else:
+            # Display the validation error message
+            self.validation_error.pack()
+        return()
+
+    def close_window(self):
+        self.window.destroy()
 
 #############################################################################################
