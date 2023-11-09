@@ -40,11 +40,22 @@ from . import objects
 
 from ..library import block_instruments
 
+#------------------------------------------------------------------------------------
+# We maintain a global dictionary of open edit windows (where the key is the UUID
+# of the object being edited) to prevent duplicate windows being opened. If the user
+# tries to edit an object which is already being edited, then we just bring the
+# existing edit window to the front (expanding if necessary) and set focus on it
+#------------------------------------------------------------------------------------
+
+open_windows={}
+
+#------------------------------------------------------------------------------------
 # We can only use audio for the block instruments if 'simpleaudio' is installed
 # Although this package is supported across different platforms, for Windows
 # it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
 # haven't made audio a hard and fast dependency for the 'model_railway_signals'
 # package as a whole - its up to the user to install if required
+#------------------------------------------------------------------------------------
 
 def is_simpleaudio_installed():
     global simpleaudio
@@ -231,28 +242,36 @@ class instrument_interlocking_tab():
 
 class edit_instrument():
     def __init__(self, root, object_id):
-        # This is the UUID for the object being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Tk.Toplevel(root)
-        self.window.attributes('-topmost',True)
-        # Create the Notebook (for the tabs) 
-        self.tabs = ttk.Notebook(self.window)
-        # Create the Window tabs
-        self.tab1 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab1, text="Configration")
-        self.tab2 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab2, text="Interlocking")
-        self.tabs.pack()
-        self.config = instrument_configuration_tab(self.tab1)
-        self.locking = instrument_interlocking_tab(self.tab2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # load the initial UI state
-        self.load_state()
+        global open_windows
+        # If there is already a  window open then we just make it jump to the top and exit
+        if object_id in open_windows.keys():
+            open_windows[object_id].lift()
+            open_windows[object_id].state('normal')
+            open_windows[object_id].focus_force()
+        else:
+            # This is the UUID for the object being edited
+            self.object_id = object_id
+            # Creatre the basic Top Level window
+            self.window = Tk.Toplevel(root)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            open_windows[object_id] = self.window
+            # Create the Notebook (for the tabs) 
+            self.tabs = ttk.Notebook(self.window)
+            # Create the Window tabs
+            self.tab1 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab1, text="Configration")
+            self.tab2 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab2, text="Interlocking")
+            self.tabs.pack()
+            self.config = instrument_configuration_tab(self.tab1)
+            self.locking = instrument_interlocking_tab(self.tab2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # load the initial UI state
+            self.load_state()
 
 #------------------------------------------------------------------------------------
 # Functions for load, save and close window
@@ -312,5 +331,6 @@ class edit_instrument():
 
     def close_window(self):
         self.window.destroy()
+        del open_windows[self.object_id]
     
 #############################################################################################

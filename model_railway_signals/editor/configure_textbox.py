@@ -24,6 +24,15 @@ import tkinter as Tk
 from . import common
 from . import objects
 
+#------------------------------------------------------------------------------------
+# We maintain a global dictionary of open edit windows (where the key is the UUID
+# of the object being edited) to prevent duplicate windows being opened. If the user
+# tries to edit an object which is already being edited, then we just bring the
+# existing edit window to the front (expanding if necessary) and set focus on it
+#------------------------------------------------------------------------------------
+
+open_windows={}
+
 #####################################################################################
 # Classes for the Edit Text Box UI Elements
 #####################################################################################
@@ -80,47 +89,54 @@ class text_style_entry():
 
 class edit_textbox():
     def __init__(self, root, object_id):
-        # This is the UUID for the object being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Tk.Toplevel(root)
-        self.window.title("Text Box")
-        self.window.attributes('-topmost',True)
-        # Create a frame to hold all UI elements (so they don't expand on window resize
-        # to provide consistent behavior with the other configure object popup windows)
-        self.main_frame = Tk.Frame(self.window)
-        self.main_frame.pack()
-        self.frame1 = Tk.Frame(self.main_frame)
-        self.frame1.pack(padx=2, pady=2, fill='both')
-        self.text = common.scrollable_text_frame(self.frame1, max_height=5,max_width=30,
-                min_height=1, min_width=10, editable=True, auto_resize=True)
-        self.text.pack(padx=2, pady=2)
-        # Create a Frame for the colour selections
-        self.frame2 = Tk.Frame(self.main_frame)
-        self.frame2.pack(padx=2, pady=2, fill='x')
-        # Create the text colour and text background colour selection elements
-        self.colour = common.colour_selection(self.frame2, label="Text colour")
-        self.colour.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-        self.background = common.colour_selection(self.frame2, label="Background colour")
-        self.background.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
-        # Create a Frame for the Text Justification
-        self.frame3 = Tk.Frame(self.main_frame)
-        self.frame3.pack(padx=2, pady=2, fill='x')
-        # Use radio buttons for the text justification selection
-        self.justify = common.selection_buttons(self.frame3, label="Text Justification",
-                tool_tip= "select text justification", b1="Left", b2="Centre", b3="Right",
-                callback=self.justification_updated)
-        self.justify.frame.pack(padx=2, pady=2, fill='x')
-        # Create a Frame for the Text Style Entry widgey
-        self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
-        self.textstyle.frame.pack(padx=2, pady=2, fill='x')        
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # load the initial UI state
-        self.load_state()
+        global open_windows
+        # If there is already a  window open then we just make it jump to the top and exit
+        if object_id in open_windows.keys():
+            open_windows[object_id].lift()
+            open_windows[object_id].state('normal')
+            open_windows[object_id].focus_force()
+        else:
+            # This is the UUID for the object being edited
+            self.object_id = object_id
+            # Creatre the basic Top Level window
+            self.window = Tk.Toplevel(root)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            open_windows[object_id] = self.window
+            # Create a frame to hold all UI elements (so they don't expand on window resize
+            # to provide consistent behavior with the other configure object popup windows)
+            self.main_frame = Tk.Frame(self.window)
+            self.main_frame.pack()
+            self.frame1 = Tk.Frame(self.main_frame)
+            self.frame1.pack(padx=2, pady=2, fill='both')
+            self.text = common.scrollable_text_frame(self.frame1, max_height=5,max_width=30,
+                    min_height=1, min_width=10, editable=True, auto_resize=True)
+            self.text.pack(padx=2, pady=2)
+            # Create a Frame for the colour selections
+            self.frame2 = Tk.Frame(self.main_frame)
+            self.frame2.pack(padx=2, pady=2, fill='x')
+            # Create the text colour and text background colour selection elements
+            self.colour = common.colour_selection(self.frame2, label="Text colour")
+            self.colour.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
+            self.background = common.colour_selection(self.frame2, label="Background colour")
+            self.background.frame.pack(padx=2, pady=2, fill='x', side=Tk.LEFT, expand=1)
+            # Create a Frame for the Text Justification
+            self.frame3 = Tk.Frame(self.main_frame)
+            self.frame3.pack(padx=2, pady=2, fill='x')
+            # Use radio buttons for the text justification selection
+            self.justify = common.selection_buttons(self.frame3, label="Text Justification",
+                    tool_tip= "select text justification", b1="Left", b2="Centre", b3="Right",
+                    callback=self.justification_updated)
+            self.justify.frame.pack(padx=2, pady=2, fill='x')
+            # Create a Frame for the Text Style Entry widgey
+            self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
+            self.textstyle.frame.pack(padx=2, pady=2, fill='x')        
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # load the initial UI state
+            self.load_state()
         
     def justification_updated(self):
         self.text.set_justification(self.justify.get_value())
@@ -135,6 +151,8 @@ class edit_textbox():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            # Label the edit window
+            self.window.title("Textbox")
             # Set the Initial UI state from the current object settings
             self.text.set_value(objects.schematic_objects[self.object_id]["text"])
             self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
@@ -183,5 +201,6 @@ class edit_textbox():
 
     def close_window(self):
         self.window.destroy()
-    
+        del open_windows[self.object_id]
+        
 #############################################################################################

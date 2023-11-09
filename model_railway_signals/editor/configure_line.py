@@ -27,6 +27,15 @@ import tkinter as Tk
 from . import common
 from . import objects
 
+#------------------------------------------------------------------------------------
+# We maintain a global dictionary of open edit windows (where the key is the UUID
+# of the object being edited) to prevent duplicate windows being opened. If the user
+# tries to edit an object which is already being edited, then we just bring the
+# existing edit window to the front (expanding if necessary) and set focus on it
+#------------------------------------------------------------------------------------
+
+open_windows={}
+
 #####################################################################################
 # Classes for the Edit Line UI Elements
 #####################################################################################
@@ -116,35 +125,43 @@ class line_attributes():
 
 class edit_line():
     def __init__(self, root, object_id):
-        # This is the UUID for the object being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Tk.Toplevel(root)
-        self.window.attributes('-topmost',True)
-        # Create a frame to hold all UI elements (so they don't expand on window resize
-        # to provide consistent behavior with the other configure object popup windows)
-        self.main_frame = Tk.Frame(self.window)
-        self.main_frame.pack()
-        # Create a Frame to hold the Line ID and Line Colour Selections
-        self.frame = Tk.Frame(self.main_frame)
-        self.frame.pack(padx=2, pady=2, fill='x')
-        # Create the UI Element for Line ID selection
-        self.lineid = common.object_id_selection(self.frame, "Line ID",
-                                exists_function = objects.line_exists) 
-        self.lineid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-        # Create the line colour selection element
-        self.colour = common.colour_selection(self.frame, label="Colour")
-        self.colour.frame.pack(padx=2, pady=2, fill='x')
-        # Create the line Attributes UI Element
-        self.attributes = line_attributes(self.main_frame)
-        self.attributes.frame.pack(padx=2, pady=2)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # load the initial UI state
-        self.load_state()
+        global open_windows
+        # If there is already a  window open then we just make it jump to the top and exit
+        if object_id in open_windows.keys():
+            open_windows[object_id].lift()
+            open_windows[object_id].state('normal')
+            open_windows[object_id].focus_force()
+        else:
+            # This is the UUID for the object being edited
+            self.object_id = object_id
+            # Creatre the basic Top Level window
+            self.window = Tk.Toplevel(root)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            open_windows[object_id] = self.window
+            # Create a frame to hold all UI elements (so they don't expand on window resize
+            # to provide consistent behavior with the other configure object popup windows)
+            self.main_frame = Tk.Frame(self.window)
+            self.main_frame.pack()
+            # Create a Frame to hold the Line ID and Line Colour Selections
+            self.frame = Tk.Frame(self.main_frame)
+            self.frame.pack(padx=2, pady=2, fill='x')
+            # Create the UI Element for Line ID selection
+            self.lineid = common.object_id_selection(self.frame, "Line ID",
+                                    exists_function = objects.line_exists) 
+            self.lineid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+            # Create the line colour selection element
+            self.colour = common.colour_selection(self.frame, label="Colour")
+            self.colour.frame.pack(padx=2, pady=2, fill='x')
+            # Create the line Attributes UI Element
+            self.attributes = line_attributes(self.main_frame)
+            self.attributes.frame.pack(padx=2, pady=2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # load the initial UI state
+            self.load_state()
         
 #------------------------------------------------------------------------------------
 # Functions for load, save and close window
@@ -196,5 +213,6 @@ class edit_line():
 
     def close_window(self):
         self.window.destroy()
-
+        del open_windows[self.object_id]
+        
 #############################################################################################
