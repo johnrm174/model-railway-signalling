@@ -19,6 +19,8 @@
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
+import json
+import os
 
 from ..library import pi_sprog_interface
 from . import common
@@ -29,18 +31,21 @@ from . import common
 
 class cv_programming_entry():
     def __init__(self, parent_frame, row):
-        self.configuration_variable = common.integer_entry_box(parent_frame, width=5,
-                    min_value=1, max_value=1023, callback=self.cv_updated, allow_empty=True,
+        self.configuration_variable = common.integer_entry_box(parent_frame, width=5, min_value=1, 
+                    max_value=1023, callback=self.cv_updated, allow_empty=True, empty_equals_zero=False,
                     tool_tip="Enter the number of the Configuration Variable (CV) to read or program")
-        self.configuration_variable.grid(column=0, row=row, padx=2)
+        self.configuration_variable.grid(column=0, row=row)
         self.current_value = common.entry_box(parent_frame, width=5,
                     tool_tip="Last Read value of CV (select 'Read' to populate or refresh)")
         self.current_value.configure(state="disabled", disabledforeground="black")
-        self.current_value.grid(column=1, row=row, padx=2)
-        self.value_to_set = common.integer_entry_box(parent_frame, width=5, min_value=0,
-                    max_value=255, allow_empty=True, callback=self.value_updated,
+        self.current_value.grid(column=1, row=row)
+        self.value_to_set = common.integer_entry_box(parent_frame, width=5, min_value=0, max_value=255, 
+                    allow_empty=True, empty_equals_zero=False, callback=self.value_updated,
                     tool_tip="Enter the new value to set (select 'write' to program)")
-        self.value_to_set.grid(column=2, row=row, padx=2)
+        self.value_to_set.grid(column=2, row=row)
+        self.notes = common.entry_box(parent_frame, width=15,
+                    tool_tip="Add any user notes for this CV / value")
+        self.notes.grid(column=3, row=row)
 
     def validate(self):
         # No need to validate the current value as this is read only
@@ -65,8 +70,8 @@ class cv_programming_grid():
         self.grid_frame = Tk.Frame(parent_frame)
         self.grid_frame.pack()
         self.list_of_entries = []
-        number_of_columns = 3
-        number_of_rows = 10
+        number_of_columns = 2
+        number_of_rows = 15
         for column_index in range(number_of_columns):
             # Create a new column in its own subframe
             self.frame = Tk.Frame(self.grid_frame)
@@ -78,6 +83,8 @@ class cv_programming_grid():
             self.label2.grid(row=0, column=1)
             self.label3 = Tk.Label(self.frame,text="New")
             self.label3.grid(row=0, column=2)
+            self.label4 = Tk.Label(self.frame,text="Notes")
+            self.label4.grid(row=0, column=3)
             # Create the cv_programming_entry element
             for row_index in range(number_of_rows):
                 self.list_of_entries.append(cv_programming_entry(self.frame,row=row_index+1))
@@ -93,21 +100,29 @@ class cv_programming_grid():
 #------------------------------------------------------------------------------------
 
 class cv_programming_element():
-    def __init__(self, root_window, parent_frame, dcc_power_is_on_function,
+    def __init__(self, root_window, parent_window, parent_frame, dcc_power_is_on_function,
                        dcc_power_off_function, dcc_power_on_function):
         self.dcc_power_is_on_function = dcc_power_is_on_function
         self.dcc_power_off_function = dcc_power_off_function
         self.dcc_power_on_function = dcc_power_on_function
         self.root_window = root_window
+        self.parent_window = parent_window
+        # Default CV configuration filename
+        self.loaded_file = ""
         # Create the warning text
         self.label=Tk.Label(parent_frame,text="WARNING - Before programming CVs, ensure only the device to be "+
             "programmed\nis connected to the  DCC bus -  all other devices should be disconnected", fg="red")
-        self.label.pack(padx=2, pady=2)       
+        self.label.pack(padx=2, pady=2)
         # Create the grid of CVs to programe
         self.cv_grid = cv_programming_grid (parent_frame)
         # Create the Status Label
         self.status = Tk.Label(parent_frame, text="")
         self.status.pack(padx=2, pady=2)
+        # Create the notes and documentation text entry
+        self.notes = common.scrollable_text_frame(parent_frame, max_height=5,
+            min_height=5, editable=True, auto_resize=True)
+        self.notes.pack(padx=2, pady=2, fill='x', expand=True)
+        self.notes.set_value("Document your CV configuration here")
         # Create the Buttons (in a subframe to center them)
         self.subframe = Tk.Frame(parent_frame)
         self.subframe.pack()
@@ -117,6 +132,17 @@ class cv_programming_element():
         self.B2 = Tk.Button (self.subframe, text = "Write CVs",command=self.write_all_cvs)
         self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.B2, "Write all CVs to set the new values")
+        self.spacer_label=Tk.Label(self.subframe,)
+        self.spacer_label.pack(side=Tk.LEFT, padx=50, pady=2)       
+        self.B3 = Tk.Button (self.subframe, text = "Open",command=self.load_config)
+        self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT3 = common.CreateToolTip(self.B3, "Load a CV configuration from file")
+        self.B4 = Tk.Button (self.subframe, text = "Save",command=lambda:self.save_config(save_as=False))
+        self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT4 = common.CreateToolTip(self.B4, "Save the current CV configuration to file")
+        self.B5 = Tk.Button (self.subframe, text = "Save as",command=lambda:self.save_config(save_as=True))
+        self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT5 = common.CreateToolTip(self.B5, "Save the current CV configuration as a new file")
     
     def read_all_cvs(self):
         # Force a focus out event to "accept" all values before programming (if the focus out
@@ -137,7 +163,7 @@ class cv_programming_element():
             read_errors = False
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_to_read = cv_entry_element.configuration_variable.get_value()
-                if cv_to_read > 0:
+                if cv_to_read is not None:
                     cv_value = pi_sprog_interface.service_mode_read_cv(cv_to_read)
                     if cv_value is not None:
                         cv_entry_element.current_value.set_value(str(cv_value))
@@ -152,7 +178,7 @@ class cv_programming_element():
 
     def write_all_cvs(self):
         # Force a focus out event to "accept" all values before programming (if the focus out
-        # event is processed after programming it will be interpreted as the calue being updated
+        # event is processed after programming it will be interpreted as the value being updated
         # which will then set the colour of the value back to black as it may have been changed
         self.B1.focus_set()
         self.root_window.update()
@@ -170,8 +196,7 @@ class cv_programming_element():
             for cv_entry_element in self.cv_grid.list_of_entries:
                 cv_to_write = cv_entry_element.configuration_variable.get_value()
                 value_to_write = cv_entry_element.value_to_set.get_value()
-                entry_is_blank = cv_entry_element.value_to_set.get() == ""
-                if not entry_is_blank and cv_to_write > 0:
+                if cv_to_write is not None and value_to_write is not None:
                     write_success = pi_sprog_interface.service_mode_write_cv(cv_to_write,value_to_write)
                     if write_success:
                         cv_entry_element.value_to_set.config(fg="green")
@@ -187,6 +212,78 @@ class cv_programming_element():
         pi_sprog_interface.request_dcc_power_off()
         pi_sprog_interface.request_dcc_power_on()
 
+    def save_config(self, save_as:bool):
+        self.B4.focus_set()
+        self.root_window.update()
+        if not self.cv_grid.validate():
+            self.status.config(text="Entries on form need correcting", fg="red")
+        else:
+            self.status.config(text="")
+            # Filename to save is the filename loaded - or ask the user
+            if self.loaded_file == "" or save_as:
+                initial_filename = os.path.split(self.loaded_file)[1]
+                filename_to_save=Tk.filedialog.asksaveasfilename(title='Save CV Configuration', parent=self.parent_window,
+                      filetypes=(('CV configuration files','*.cvc'),('all files','*.*')),initialfile=initial_filename)
+                # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
+                if filename_to_save == (): filename_to_save = ""
+                # If the filename is not blank enforce the '.cvc' extention
+                if filename_to_save != "" and not filename_to_save.endswith(".cvc"): filename_to_save.append(".cvc")
+            else:
+                filename_to_save = self.loaded_file
+            # Only continue (to save the file) if the filename is not blank
+            if filename_to_save != "":
+                # Create a json structure to save the data 
+                data_to_save = {}
+                data_to_save["filename"] = filename_to_save
+                data_to_save["documentation"] = self.notes.get_value()
+                data_to_save["configuration"] = []
+                for cv_entry_element in self.cv_grid.list_of_entries:
+                    cv_number = cv_entry_element.configuration_variable.get_value()
+                    cv_value = cv_entry_element.value_to_set.get_value()
+                    cv_notes = cv_entry_element.notes.get_value()
+                    data_to_save["configuration"].append([cv_number,cv_value,cv_notes])
+                try:
+                    file_contents = json.dumps(data_to_save,indent=3,sort_keys=False)
+                except Exception as exception:
+                    Tk.messagebox.showerror(parent=self.parent_window,title="Data Error",message=str(exception))
+                else:
+                    # write the json structure to file
+                    try:
+                        with open (filename_to_save,'w') as file: file.write(file_contents)
+                        file.close
+                    except Exception as exception:
+                        Tk.messagebox.showerror(parent=self.parent_window,title="File Save Error",message=str(exception))
+                    else:
+                        self.loaded_file = filename_to_save
+            
+    def load_config(self):
+        self.B4.focus_set()
+        self.root_window.update()
+        filename_to_load = Tk.filedialog.askopenfilename(parent=self.parent_window,title='Load CV configuration',
+                filetypes=(('cvc files','*.cvc'),('all files','*.*')),initialdir = '.')
+        # Set the filename to blank if the user has cancelled out of (or closed) the dialogue
+        if filename_to_load == (): filename_to_load = ""
+        # Only continue (to load the file) if the filename is not blank
+        if filename_to_load != "":
+            try:
+                with open (filename_to_load,'r') as file: loaded_data=file.read()
+                file.close
+            except Exception as exception:
+                Tk.messagebox.showerror(parent=self.parent_window,title="File Load Error", message=str(exception))
+            else:
+                try:
+                    loaded_data = json.loads(loaded_data)
+                except Exception as exception:
+                    Tk.messagebox.showerror(parent=self.parent_window,title="File Parse Error", message=str(exception))
+                else:
+                    self.loaded_file = filename_to_load
+                    self.notes.set_value(loaded_data["documentation"])
+                    for index, cv_entry_element in enumerate(loaded_data["configuration"]):
+                        self.cv_grid.list_of_entries[index].configuration_variable.set_value(cv_entry_element[0])
+                        self.cv_grid.list_of_entries[index].value_to_set.set_value(cv_entry_element[1])
+                        self.cv_grid.list_of_entries[index].notes.set_value(cv_entry_element[2])
+                        self.cv_grid.list_of_entries[index].current_value.set_value("")
+                    
 #------------------------------------------------------------------------------------
 # Class for the "one touch" Programming UI Element (uses class above)
 #------------------------------------------------------------------------------------
@@ -221,7 +318,7 @@ class one_touch_programming_element():
         elif self.entry.get_value() > 0:
             self.status.config(text="")
             pi_sprog_interface.send_accessory_short_event(self.entry.get_value(), command)
-       
+ 
 #------------------------------------------------------------------------------------
 # Class for the "DCC Programming" window - Uses the classes above
 # Note that if a window is already open then we just raise it and exit
@@ -251,7 +348,7 @@ class dcc_programming():
             self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_power_is_on_function)
             # Create the labelframe for CV Programming (this gets packed later)
             self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
-            self.cv_programming = cv_programming_element(root_window, self.labelframe2,
+            self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
                     dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function)        
             # Create the ok/close button and tooltip
             self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
