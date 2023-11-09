@@ -119,8 +119,8 @@ class cv_programming_element():
         self.status = Tk.Label(parent_frame, text="")
         self.status.pack(padx=2, pady=2)
         # Create the notes and documentation text entry
-        self.notes = common.scrollable_text_frame(parent_frame, max_height=5,
-            min_height=5, editable=True, auto_resize=True)
+        self.notes = common.scrollable_text_frame(parent_frame, max_height=10, max_width=38,
+            min_height=5, min_width=38, editable=True, auto_resize=True)
         self.notes.pack(padx=2, pady=2, fill='x', expand=True)
         self.notes.set_value("Document your CV configuration here")
         # Create the Buttons (in a subframe to center them)
