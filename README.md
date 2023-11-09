@@ -26,8 +26,9 @@ What's new in Release 4.0:
 * Canvas configuration - Ability to change the grid size and toggle 'snap-to-grid'
 * Keyboard shortcut for toggling Edit/Run mode is now 'Cntl-m' (for consistency)
 * Toggle signal automation - Be an active signalman or just wtch the trains go by
+* Basic DCC Programming - 'one touch' and Configuration Variable (CV) programming
 * Consolidation of library functions (deprecated library API functions removed)
-* Minor bugfixes and application enhansements to improve the overall user experience
+* Minor bugfixes and application enhancements to improve the overall user experience
 
 Any bug reports and feedback you may have would be gratefully appreciated - specifically:
 * What aspects are intuitive? What aspects aren't?
