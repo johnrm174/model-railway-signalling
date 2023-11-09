@@ -240,7 +240,7 @@ class edit_layout_info():
             # Create the top level window for application help
             self.window = Tk.Toplevel(root_window)
             self.window.title("Layout Info")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_layout_info_window = self.window
             # Create the srollable textbox to display the text. We specify
             # the max height/width (in case the text grows in the future) and also
@@ -291,7 +291,7 @@ class edit_canvas_settings():
             # Create the top level window for the canvas settings
             self.window = Tk.Toplevel(root_window)
             self.window.title("Canvas")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             canvas_settings_window = self.window
             # Create the entry box elements for the width, height and grid
             # Pack the elements as a grid to get an aligned layout
@@ -371,7 +371,7 @@ class edit_sprog_settings():
             # Create the top level window for the SPROG configuration
             self.window = Tk.Toplevel(root_window)
             self.window.title("SPROG DCC")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_sprog_settings_window = self.window
             # Create the Serial Port and baud rate UI elements 
             self.frame1 = Tk.Frame(self.window)
@@ -495,7 +495,7 @@ class edit_logging_settings():
             # Create the top level window for the Logging Configuration
             self.window = Tk.Toplevel(root_window)
             self.window.title("Logging")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_logging_settings_window = self.window
             # Create the logging Level selections element
             self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
@@ -546,8 +546,8 @@ class mqtt_configuration_tab():
         self.subframe2.pack(padx=2, pady=2)
         self.label2 = Tk.Label(self.subframe2, text="Port:")
         self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.port = common.integer_entry_box(self.subframe2, width=6, min_value=0, max_value=65535, tool_tip=
-                        "Specify the TCP/IP Port to use for the Broker (default is usually 1883)")
+        self.port = common.integer_entry_box(self.subframe2, width=6, min_value=1, max_value=65535,
+            allow_empty=False, tool_tip="Specify the TCP/IP Port to use for the Broker (default is usually 1883)")
         self.port.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the User Name and Password elements 
         self.subframe3 = Tk.Frame(self.frame1)
@@ -796,7 +796,7 @@ class edit_mqtt_settings():
             # Create the top level window for editing MQTT settings
             self.window = Tk.Toplevel(root_window)
             self.window.title("MQTT Networking")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_mqtt_settings_window = self.window
             # Create the Notebook (for the tabs) 
             self.tabs = ttk.Notebook(self.window)
@@ -975,7 +975,7 @@ class edit_gpio_settings():
             # Create the top level window for editing MQTT settings
             self.window = Tk.Toplevel(root_window)
             self.window.title("GPIO Sensors")
-            self.window.protocol("WM_DELETE_WINDOW", lambda:self.close_window(None))
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_gpio_settings_window = self.window
             # Create an overall frame to pack everything in
             self.frame = Tk.Frame(self.window)
