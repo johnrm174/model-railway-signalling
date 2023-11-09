@@ -444,9 +444,10 @@ class integer_entry_box(entry_box):
     
     def set_value(self, value:int):
         if self.empty_allowed and (value==None or (value==0 and self.empty_equals_zero)) :
-            self.empty_allowed: super().set_value("")
-        elif value==None: super().set_value(0)
+            super().set_value("")
+        elif value==None: super().set_value(str(0))
         else: super().set_value(str(value))
+
 
     def get_value(self):
         if super().get_value() == "" or super().get_value() == "#":
