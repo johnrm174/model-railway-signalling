@@ -199,7 +199,7 @@ class display_about():
             # Create the top level window for application about
             self.window = Tk.Toplevel(root_window)
             self.window.title("Application Info")
-            self.window.protocol("WM_DELETE_WINDOW", self.self.ok)
+            self.window.protocol("WM_DELETE_WINDOW", self.ok)
             about_window = self.window
             # Create the Help text and hyperlink
             self.label1 = Tk.Label(self.window, text=about_text)
