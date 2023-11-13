@@ -99,6 +99,8 @@ canvas_event_callback = None
 # The two popup menus (for right click on the canvas or a schematic object)
 popup1 = None
 popup2 = None
+# This global reference to the popup edit window class is maintained for test purposes
+edit_popup = None
 # The Frame holding the "add object" buttons (for pack/forget on enable/disable editing)
 # and the Tkinter PhotoImage labels for the buttons
 button_frame = None
@@ -212,21 +214,31 @@ def delete_all_objects():
 #------------------------------------------------------------------------------------
 
 def edit_selected_object():
+    global edit_popup
     object_id = schematic_state["selectedobjects"][0]
     if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
-        configure_line.edit_line(root, object_id)
+        edit_popup = configure_line.edit_line(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.textbox:
-        configure_textbox.edit_textbox(root, object_id)
+        edit_popup = configure_textbox.edit_textbox(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.signal:
-        configure_signal.edit_signal(root, object_id)
+        edit_popup = configure_signal.edit_signal(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.point:
-        configure_point.edit_point(root, object_id)
+        edit_popup = configure_point.edit_point(root, object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.section:
-        configure_section.edit_section(root,object_id)
+        edit_popup = configure_section.edit_section(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
-        configure_instrument.edit_instrument(root,object_id)
+        edit_popup = configure_instrument.edit_instrument(root,object_id)
     return()
 
+# The following function is for test purposes only - to close the windows opened above by the system tests
+
+def close_edit_window (ok:bool=False, cancel:bool=False, apply:bool=False, reset:bool=False):
+    global edit_popup
+    if ok: edit_popup.save_state(close_window=True)
+    elif apply: edit_popup.save_state(close_window=False)
+    elif cancel: edit_popup.close_window()
+    elif reset: edit_popup.load_state()
+    
 #------------------------------------------------------------------------------------
 # Internal function to snap all selected objects to the grid (if snap to grid is enabled)
 #------------------------------------------------------------------------------------
