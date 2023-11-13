@@ -345,7 +345,6 @@ class timed_signal_route_element():
 
     def set_values(self, route:[bool,int,int,int]):
         # A route comprises a list of [selected, sig_id,start_delay, time_delay)
-        if route[1] == 0: route[1] = self.parent_object.config.sigid.get_initial_value()
         self.route.set_value(route[0])
         self.sig.set_value(route[1])
         self.start.set_value(route[2])
