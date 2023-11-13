@@ -175,6 +175,9 @@ class cv_programming_element():
                 self.status.config(text="One or more CVs could not be read", fg="red")
             else:
                 self.status.config(text="")
+            # Cycle the power to enable the changes (revert back to normal operation)
+            pi_sprog_interface.request_dcc_power_off()
+            pi_sprog_interface.request_dcc_power_on()
 
     def write_all_cvs(self):
         # Force a focus out event to "accept" all values before programming (if the focus out
@@ -208,9 +211,9 @@ class cv_programming_element():
                 self.status.config(text="One or more CVs could not be written", fg="red")
             else:
                 self.status.config(text="")
-        # Cycle the power to enable the changes
-        pi_sprog_interface.request_dcc_power_off()
-        pi_sprog_interface.request_dcc_power_on()
+            # Cycle the power to enable the changes (revert back to normal operation)
+            pi_sprog_interface.request_dcc_power_off()
+            pi_sprog_interface.request_dcc_power_on()
 
     def save_config(self, save_as:bool):
         self.B4.focus_set()
