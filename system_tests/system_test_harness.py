@@ -83,6 +83,7 @@
 #    create_block_instrument()
 #    create_left_hand_point()
 #    create_right_hand_point()
+#    create_textbox()
 #    update_object_configuration(object_id, new_values:dict)
 #    select_or_deselect_objects(*object_ids)
 #    select_single_object(object_id)
@@ -144,6 +145,7 @@ from model_railway_signals.library import track_sensors
 thread_delay_time = 0.150
 tkinter_thread_started = False
 main_menubar = None
+root = None
 
 # ------------------------------------------------------------------------------
 # Global variables to keep a count on the total number of tests and failures
@@ -170,7 +172,7 @@ def test_harness_thread(callback_function):
     callback_function()
     
 def start_application(callback_function):
-    global main_menubar
+    global main_menubar, root
     # Set the logging
     logging.basicConfig(format='%(levelname)s: %(message)s')
     logging.getLogger().setLevel(logging.WARNING)
@@ -815,6 +817,11 @@ def create_right_hand_point():
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
+def create_textbox():
+    run_function(lambda:objects.create_object(objects.object_type.textbox))
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
 # ------------------------------------------------------------------------------
 # Internal functions to get the selection position and simulate a move
 # ------------------------------------------------------------------------------
@@ -991,8 +998,8 @@ def assert_object_configuration(object_id, test_values:dict):
                 raise_test_warning ("assert_object_configuration - object: "+str(object_id)+
                                     " - element: "+element+" is not valid")
             elif object_to_test[element] != test_values[element]:
-                raise_test_error ("assert_object_configuration - object:" +str(object_id)+
-                            " - element: "+element+" - Test Fail - State : "+str(object_to_test[element]))
+                raise_test_error ("assert_object_configuration - object:" +str(object_id)+" - element: "+element+
+                    " - Test Fail" +"\nExpected: "+str(test_values[element])+"\nActual: "+str(object_to_test[element]))
             increment_tests_executed()
 
 def assert_object_position(object_id, x1:int, y1:int, x2:int=None, y2:int=None):
