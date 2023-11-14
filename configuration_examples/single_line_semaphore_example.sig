@@ -23,7 +23,7 @@
                 false,
                 ""
             ],
-            "bbox": 3042,
+            "bbox": 166,
             "dccaspects": [
                 [
                     [
@@ -343,7 +343,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -1051,7 +1051,7 @@
                 false,
                 ""
             ],
-            "bbox": 3070,
+            "bbox": 194,
             "dccaspects": [
                 [
                     [
@@ -1371,7 +1371,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -2068,7 +2068,7 @@
             ]
         },
         "0b251a10-3b3a-44be-89e2-f6954d641b29": {
-            "bbox": 3072,
+            "bbox": 196,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2092,7 +2092,7 @@
                 false,
                 ""
             ],
-            "bbox": 3103,
+            "bbox": 227,
             "dccaspects": [
                 [
                     [
@@ -2412,7 +2412,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -3068,31 +3068,31 @@
             "timedsequences": [
                 [
                     false,
-                    4,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    4,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    4,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    4,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    4,
+                    0,
                     0,
                     0
                 ]
@@ -3120,7 +3120,7 @@
                 false,
                 ""
             ],
-            "bbox": 3131,
+            "bbox": 255,
             "dccaspects": [
                 [
                     [
@@ -3440,7 +3440,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -4096,31 +4096,31 @@
             "timedsequences": [
                 [
                     false,
-                    1,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    1,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    1,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    1,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    1,
+                    0,
                     0,
                     0
                 ]
@@ -4148,7 +4148,7 @@
                 false,
                 ""
             ],
-            "bbox": 3162,
+            "bbox": 286,
             "dccaspects": [
                 [
                     [
@@ -4468,7 +4468,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -5176,7 +5176,7 @@
                 false,
                 ""
             ],
-            "bbox": 3193,
+            "bbox": 317,
             "dccaspects": [
                 [
                     [
@@ -5496,7 +5496,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -6204,7 +6204,7 @@
                 false,
                 ""
             ],
-            "bbox": 3221,
+            "bbox": 345,
             "dccaspects": [
                 [
                     [
@@ -6524,7 +6524,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -7227,23 +7227,23 @@
                 0,
                 0
             ],
-            "bbox": 3227,
+            "bbox": 351,
             "colour": "black",
-            "end1": 3223,
-            "end2": 3224,
+            "end1": 1013,
+            "end2": 1014,
             "endx": 1400,
             "endy": 100,
             "item": "line",
             "itemid": 1,
-            "line": 3222,
+            "line": 1012,
             "posx": 1200,
             "posy": 100,
-            "stop1": 3225,
-            "stop2": 3226,
+            "stop1": 1015,
+            "stop2": 1016,
             "tags": "line1"
         },
         "8b2daea0-c49c-4dc2-880e-73ec00bb4a7d": {
-            "bbox": 3229,
+            "bbox": 353,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7256,7 +7256,7 @@
             "tags": "section3"
         },
         "8cd209c0-9f73-42bd-ac04-e555e25372e5": {
-            "bbox": 3244,
+            "bbox": 368,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -7274,19 +7274,19 @@
                 0,
                 0
             ],
-            "bbox": 3250,
+            "bbox": 374,
             "colour": "black",
-            "end1": 3246,
-            "end2": 3247,
+            "end1": 1033,
+            "end2": 1034,
             "endx": 200,
             "endy": 150,
             "item": "line",
             "itemid": 2,
-            "line": 3245,
+            "line": 1032,
             "posx": 0,
             "posy": 150,
-            "stop1": 3248,
-            "stop2": 3249,
+            "stop1": 1035,
+            "stop2": 1036,
             "tags": "line2"
         },
         "99a82c21-0fb5-493a-a165-4e580ca22b53": {
@@ -7301,7 +7301,7 @@
                 false,
                 ""
             ],
-            "bbox": 3281,
+            "bbox": 405,
             "dccaspects": [
                 [
                     [
@@ -7621,7 +7621,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -8277,31 +8277,31 @@
             "timedsequences": [
                 [
                     false,
-                    7,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    7,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    7,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    7,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    7,
+                    0,
                     0,
                     0
                 ]
@@ -8318,7 +8318,7 @@
             ]
         },
         "9f0084b0-536d-4ba4-8429-d507dfe749f3": {
-            "bbox": 3296,
+            "bbox": 420,
             "bellsound": "bell-ring-04.wav",
             "item": "instrument",
             "itemid": 2,
@@ -8330,7 +8330,7 @@
             "tags": "instrument2"
         },
         "a00e5871-328c-4d71-a1df-a464efe5cce4": {
-            "bbox": 3298,
+            "bbox": 422,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8345,7 +8345,7 @@
         "a26a7440-68cc-4d3a-8186-dda77da27e7a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3305,
+            "bbox": 429,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8402,7 +8402,7 @@
             "tags": "point1"
         },
         "a6aaaf9c-ad0e-40dc-adda-60b9daabc3a9": {
-            "bbox": 3307,
+            "bbox": 431,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8421,23 +8421,23 @@
                 0,
                 0
             ],
-            "bbox": 3313,
+            "bbox": 437,
             "colour": "black",
-            "end1": 3309,
-            "end2": 3310,
+            "end1": 1090,
+            "end2": 1091,
             "endx": 1200,
             "endy": 100,
             "item": "line",
             "itemid": 3,
-            "line": 3308,
+            "line": 1089,
             "posx": 1175,
             "posy": 125,
-            "stop1": 3311,
-            "stop2": 3312,
+            "stop1": 1092,
+            "stop2": 1093,
             "tags": "line3"
         },
         "b9d8ab0e-cd28-4590-ba49-36393b716aee": {
-            "bbox": 3315,
+            "bbox": 439,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8456,19 +8456,19 @@
                 0,
                 0
             ],
-            "bbox": 3321,
+            "bbox": 445,
             "colour": "black",
-            "end1": 3317,
-            "end2": 3318,
+            "end1": 1096,
+            "end2": 1097,
             "endx": 200,
             "endy": 100,
             "item": "line",
             "itemid": 4,
-            "line": 3316,
+            "line": 1095,
             "posx": 0,
             "posy": 100,
-            "stop1": 3319,
-            "stop2": 3320,
+            "stop1": 1098,
+            "stop2": 1099,
             "tags": "line4"
         },
         "c3fc3d01-76e5-4626-a536-ac7e18d5aab1": {
@@ -8478,19 +8478,19 @@
                 0,
                 0
             ],
-            "bbox": 3327,
+            "bbox": 451,
             "colour": "black",
-            "end1": 3323,
-            "end2": 3324,
+            "end1": 1101,
+            "end2": 1102,
             "endx": 225,
             "endy": 125,
             "item": "line",
             "itemid": 5,
-            "line": 3322,
+            "line": 1100,
             "posx": 200,
             "posy": 100,
-            "stop1": 3325,
-            "stop2": 3326,
+            "stop1": 1103,
+            "stop2": 1104,
             "tags": "line5"
         },
         "ccc40157-3a05-43e0-90a3-bfa0441f9d7f": {
@@ -8500,23 +8500,23 @@
                 0,
                 0
             ],
-            "bbox": 3333,
+            "bbox": 457,
             "colour": "black",
-            "end1": 3329,
-            "end2": 3330,
+            "end1": 1106,
+            "end2": 1107,
             "endx": 1400,
             "endy": 150,
             "item": "line",
             "itemid": 6,
-            "line": 3328,
+            "line": 1105,
             "posx": 1200,
             "posy": 150,
-            "stop1": 3331,
-            "stop2": 3332,
+            "stop1": 1108,
+            "stop2": 1109,
             "tags": "line6"
         },
         "cd47274b-172c-4b41-b8be-6c3d73d17084": {
-            "bbox": 3335,
+            "bbox": 459,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8531,7 +8531,7 @@
         "d79d5363-5db2-49c7-bb7a-197d8f798b69": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3342,
+            "bbox": 466,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8588,7 +8588,7 @@
             "tags": "point2"
         },
         "e1580065-8556-4f74-924e-9a88db52729d": {
-            "bbox": 3344,
+            "bbox": 468,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8607,32 +8607,32 @@
                 0,
                 0
             ],
-            "bbox": 3350,
+            "bbox": 474,
             "colour": "black",
-            "end1": 3346,
-            "end2": 3347,
+            "end1": 1119,
+            "end2": 1120,
             "endx": 1150,
             "endy": 150,
             "item": "line",
             "itemid": 7,
-            "line": 3345,
+            "line": 1118,
             "posx": 250,
             "posy": 150,
-            "stop1": 3348,
-            "stop2": 3349,
+            "stop1": 1121,
+            "stop2": 1122,
             "tags": "line7"
         }
     },
     "points": {
         "1": {
             "fpllock": true,
-            "locked": true,
+            "locked": false,
             "switched": false
         },
         "2": {
             "fpllock": true,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
     "sections": {
@@ -8654,7 +8654,7 @@
         },
         "5": {
             "labeltext": "XXXXX",
-            "occupied": true
+            "occupied": false
         },
         "6": {
             "labeltext": "XXXXX",
@@ -8669,13 +8669,15 @@
         "canvas": {
             "grid": 25,
             "height": 500,
+            "snaptogrid": true,
             "width": 1400
         },
         "general": {
+            "automation": true,
             "editmode": false,
-            "filename": "/home/pi/model-railway-signalling/configuration_examples/single_line_semaphore_example.sig",
+            "filename": "../configuration_examples/single_line_semaphore_example.sig",
             "info": "This layout is an example of a single line between two 'block sections', with the points and signals in\nin each block section interlocked - e.g. signal 1 is interlocked with point 2 and opposing signals 3 & 4.\nThe distant signals are also interlocked with the home signals ahead - e.g. signal 4 can only be cleared\nif signal 3 has already been cleared - note it can be returned to 'on' at any time.\n\nBlock instruments are used to coordinate train movements between the two block sections and allow \ncommunication via bell codes (right click on the 'Telegraph' button to bring up a list of common bell \ncodes). In this example, the 'starter' signals for each block section have been interlocked with their \nrespective instruments (and the instruments linked together) - so signals 1/2 can only be cleared when\ninstrument 2 (on the right hand side) has been set to 'line clear' and signals 5/6 can only be cleared \nwhen instrument 1 (on the left hand side) has been set to 'line clear'.\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' on the layout).\n\nTrack sections have bene included on the schematic to provide a mimic display of track occupancy (when\na train passes a signal (signal is 'off') it gets passed from the section behind to the section ahead).\nThe desired behavior is again configured via the 'automation' tab of each signal. For example, signal 3\ncontrols two 'routes' so when passed, section 3 will be cleared and either section 1 or 2 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change from 'off' to 'on' when passed (section ahead is occupied) \nand then revert to'off' as soon as the section ahead is cleared.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. \n\nSignalman 1 - Right click the top left track section and enter a train designation code of your choice \n(this sets the track section to 'occupied'). Unlock, switch and re-lock point 2. On the LH instrument,\nuse the telegraph key to call attention and ask if the line is clear (just for a bit of fun). \n\nSignalman 2 - Set the RH instrument to 'clear' (this will finally unlock signal 1), set signal 7 to \n'off' and then set signal 8 to 'off' to set the route through the block section \n\nSignalman 1 - Set Signal 1 to 'off' and move the train through the schematic, clicking the 'signal \npassed' button at the base of each signal along the route in turn (don't forget to telegraph 'train \nentering section' so signalman 2 knows they need to set their instrument to 'occupied'). \n\nSignalman 2 - When the train has cleared the home signal, telegraph 'train arrived' and revert the \nRH instrument back to 'line blocked, in readiness for the next movement.\n\nThe use of block instruments in this example may seem like overkill (this is only a single application\nwith a single user after all) but with MQTT networking you can create and configure any number of linked\napplication instances. Only the application instance acting as the DCC command station needs to be run\nup on the R-Pi (other instances can be run up on Windows, iOS, linux or any other platform / operating\nsystem combiination that supports python). This provides the potential for splitting large layouts into \ndifferent signalling areas each with a signalman responsible for their area\nDocument your layout here\n\n",
-            "version": "Version 3.6"
+            "version": "Version 4.0"
         },
         "gpio": {
             "portmappings": [],
@@ -8740,7 +8742,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 4,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -8751,7 +8753,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 4,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": true,
             "subclear": false,
@@ -8759,7 +8761,7 @@
             "theatretext": "NONE"
         },
         "5": {
-            "override": true,
+            "override": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
@@ -8785,19 +8787,19 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 2,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
         },
         "8": {
-            "override": true,
+            "override": false,
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 2,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
