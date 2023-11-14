@@ -5,6 +5,7 @@
 from system_test_harness import *
 from model_railway_signals.library import signals
 from model_railway_signals.library import signals_common
+import configuration_window_tests
 
 def test_basic_point_operation(delay:float=0.0):
     # The sig file was saved with all points switched (and locked)
@@ -43,7 +44,7 @@ def test_basic_section_operation(delay:float=0.0):
     return()
 
 def test_basic_instrument_operation(delay:float=0.0):
-    # The sig file was saved with all instrument 1,3 OCCUPIED and 4 CLEAR
+    # The sig file was saved with instrument 1,3 OCCUPIED and 4 CLEAR
     # Instrument 1 is linked to 3 and Instrument 2 is linked to 4
     print("Running basic single line instrument switching tests")
     assert_block_section_ahead_not_clear(1,3)
@@ -341,6 +342,7 @@ def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
     ### TO DO - colour light release on yellow
     ### TO DO - colour light release on red
     set_edit_mode()
+    configuration_window_tests.test_all_object_edit_windows(delay)
     initialise_test_harness(filename="./basic_library_tests2.sig")
     # basic_library_tests1.sig was saved in edit mode
     set_run_mode()
@@ -354,6 +356,7 @@ def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
     ### TO DO - semaphore update distant on home signal ahead
     ### TO DO - semaphore release on red
     set_edit_mode()
+    configuration_window_tests.test_all_object_edit_windows(delay)
     if shutdown: report_results()
     
 if __name__ == "__main__":

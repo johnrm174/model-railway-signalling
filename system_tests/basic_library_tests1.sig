@@ -22,7 +22,7 @@
         "053feb6a-7922-4337-bb10-f880165707c2": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6473,
+            "bbox": 157,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -44,19 +44,19 @@
                 20,
                 5
             ],
-            "bbox": 6479,
+            "bbox": 163,
             "colour": "#00ff00",
-            "end1": 6475,
-            "end2": 6476,
+            "end1": 159,
+            "end2": 160,
             "endx": 400.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 5,
-            "line": 6474,
+            "line": 158,
             "posx": 350.0,
             "posy": 50.0,
-            "stop1": 6477,
-            "stop2": 6478,
+            "stop1": 161,
+            "stop2": 162,
             "tags": "line5"
         },
         "0ada4f32-22e8-467e-ad64-e060c5129ee8": {
@@ -71,7 +71,7 @@
                 false,
                 ""
             ],
-            "bbox": 6498,
+            "bbox": 182,
             "dccaspects": [
                 [
                     [
@@ -391,7 +391,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -743,7 +743,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -1047,31 +1047,31 @@
             "timedsequences": [
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ]
@@ -1090,7 +1090,7 @@
         "0b92c02c-b761-4d4b-9b9a-dc4c26f127e1": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6505,
+            "bbox": 189,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1108,7 +1108,7 @@
         "0f81e6c2-e582-466e-b4e5-96d5bcb39ef6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6512,
+            "bbox": 196,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1135,7 +1135,7 @@
                 false,
                 ""
             ],
-            "bbox": 6531,
+            "bbox": 215,
             "dccaspects": [
                 [
                     [
@@ -1676,10 +1676,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -1687,44 +1683,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -1778,10 +1736,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -1793,6 +1747,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -1827,7 +1807,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -2110,13 +2090,13 @@
             ],
             "sigroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -2183,7 +2163,7 @@
                 false,
                 ""
             ],
-            "bbox": 6550,
+            "bbox": 234,
             "dccaspects": [
                 [
                     [
@@ -2503,7 +2483,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -2855,7 +2835,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -3211,7 +3191,7 @@
                 false,
                 ""
             ],
-            "bbox": 6570,
+            "bbox": 254,
             "dccaspects": [
                 [
                     [
@@ -3752,10 +3732,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -3763,44 +3739,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -3854,10 +3792,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -3869,6 +3803,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -3903,7 +3863,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -4192,7 +4152,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -4250,7 +4210,7 @@
         "1b7a84db-6541-4df1-ab8d-4ef7b1864432": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6577,
+            "bbox": 261,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4272,23 +4232,23 @@
                 20,
                 5
             ],
-            "bbox": 6583,
+            "bbox": 267,
             "colour": "#0000ff",
-            "end1": 6579,
-            "end2": 6580,
+            "end1": 263,
+            "end2": 264,
             "endx": 500.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 6,
-            "line": 6578,
+            "line": 262,
             "posx": 425.0,
             "posy": 50.0,
-            "stop1": 6581,
-            "stop2": 6582,
+            "stop1": 265,
+            "stop2": 266,
             "tags": "line6"
         },
         "1fa8aac5-1b5c-4f83-8ec5-f33a65ef133e": {
-            "bbox": 6598,
+            "bbox": 282,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 3,
@@ -4302,7 +4262,7 @@
         "2053b6fe-69cf-48de-b6dc-116f20b2e029": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6605,
+            "bbox": 289,
             "colour": "#0000ff",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4318,7 +4278,7 @@
             "tags": "point11"
         },
         "2564416e-45c0-4787-abbc-2788dd87ec95": {
-            "bbox": 6629,
+            "bbox": 313,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -4341,7 +4301,7 @@
                 false,
                 ""
             ],
-            "bbox": 6641,
+            "bbox": 325,
             "dccaspects": [
                 [
                     [
@@ -4882,10 +4842,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -4893,44 +4849,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -4984,10 +4902,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -4999,6 +4913,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -5033,7 +4973,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -5322,7 +5262,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -5389,7 +5329,7 @@
                 false,
                 ""
             ],
-            "bbox": 6653,
+            "bbox": 337,
             "dccaspects": [
                 [
                     [
@@ -5930,10 +5870,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -5941,44 +5877,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -6032,10 +5930,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -6047,6 +5941,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -6081,7 +6001,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -6370,7 +6290,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -6437,7 +6357,7 @@
                 false,
                 ""
             ],
-            "bbox": 6672,
+            "bbox": 356,
             "dccaspects": [
                 [
                     [
@@ -6978,10 +6898,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -6989,44 +6905,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -7080,10 +6958,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -7095,6 +6969,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -7129,7 +7029,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -7412,13 +7312,13 @@
             ],
             "sigroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -7485,7 +7385,7 @@
                 false,
                 ""
             ],
-            "bbox": 6691,
+            "bbox": 375,
             "dccaspects": [
                 [
                     [
@@ -8026,10 +7926,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -8037,44 +7933,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -8128,10 +7986,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -8143,6 +7997,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -8177,7 +8057,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -8466,7 +8346,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -8533,7 +8413,7 @@
                 false,
                 ""
             ],
-            "bbox": 6710,
+            "bbox": 400,
             "dccaspects": [
                 [
                     [
@@ -8853,7 +8733,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -9205,7 +9085,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -9561,7 +9441,7 @@
                 false,
                 ""
             ],
-            "bbox": 6731,
+            "bbox": 421,
             "dccaspects": [
                 [
                     [
@@ -9881,7 +9761,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -10233,7 +10113,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -10589,7 +10469,7 @@
                 false,
                 ""
             ],
-            "bbox": 6751,
+            "bbox": 441,
             "dccaspects": [
                 [
                     [
@@ -11130,10 +11010,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -11141,44 +11017,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -11232,10 +11070,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -11247,6 +11081,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -11281,7 +11141,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -11564,10 +11424,10 @@
             ],
             "sigroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subroutes": [
                 true,
@@ -11628,7 +11488,7 @@
         "42c037c5-2fc6-4259-a87d-62cf59bc7479": {
             "alsoswitch": 12,
             "automatic": false,
-            "bbox": 6758,
+            "bbox": 448,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -11655,7 +11515,7 @@
                 false,
                 ""
             ],
-            "bbox": 6777,
+            "bbox": 467,
             "dccaspects": [
                 [
                     [
@@ -11975,7 +11835,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -12327,7 +12187,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -12674,7 +12534,7 @@
         "4879bd5b-c42f-475a-8061-347180955f1b": {
             "alsoswitch": 10,
             "automatic": false,
-            "bbox": 6784,
+            "bbox": 474,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12701,7 +12561,7 @@
                 false,
                 ""
             ],
-            "bbox": 6796,
+            "bbox": 486,
             "dccaspects": [
                 [
                     [
@@ -13242,10 +13102,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -13253,44 +13109,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -13344,10 +13162,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -13359,6 +13173,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -13393,7 +13233,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -13682,7 +13522,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -13738,7 +13578,7 @@
             ]
         },
         "4afb821f-7fb5-4cec-be1a-d4945e0e028b": {
-            "bbox": 6798,
+            "bbox": 489,
             "defaultlabel": "12345",
             "editable": false,
             "item": "section",
@@ -13762,7 +13602,7 @@
                 false,
                 ""
             ],
-            "bbox": 6818,
+            "bbox": 509,
             "dccaspects": [
                 [
                     [
@@ -14082,7 +13922,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -14434,7 +14274,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -14790,7 +14630,7 @@
                 false,
                 ""
             ],
-            "bbox": 6837,
+            "bbox": 528,
             "dccaspects": [
                 [
                     [
@@ -15110,7 +14950,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -15462,7 +15302,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -15813,25 +15653,25 @@
                 20,
                 8
             ],
-            "bbox": 6843,
+            "bbox": 534,
             "colour": "black",
-            "end1": 6839,
-            "end2": 6840,
+            "end1": 530,
+            "end2": 531,
             "endx": 750.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 9,
-            "line": 6838,
+            "line": 529,
             "posx": 675.0,
             "posy": 50.0,
-            "stop1": 6841,
-            "stop2": 6842,
+            "stop1": 532,
+            "stop2": 533,
             "tags": "line9"
         },
         "60196aff-19d8-4a4d-bd5b-6e287777e001": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6850,
+            "bbox": 541,
             "colour": "#ffffff",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15849,7 +15689,7 @@
         "65ea9ab3-4b0e-4984-be97-13f01108d7f0": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6857,
+            "bbox": 548,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15876,7 +15716,7 @@
                 false,
                 ""
             ],
-            "bbox": 6876,
+            "bbox": 567,
             "dccaspects": [
                 [
                     [
@@ -16417,10 +16257,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -16428,44 +16264,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -16519,10 +16317,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -16534,6 +16328,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -16568,7 +16388,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -16857,7 +16677,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -16924,7 +16744,7 @@
                 false,
                 ""
             ],
-            "bbox": 6895,
+            "bbox": 586,
             "dccaspects": [
                 [
                     [
@@ -17465,10 +17285,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -17476,44 +17292,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -17567,10 +17345,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -17582,6 +17356,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -17616,7 +17416,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -17899,13 +17699,13 @@
             ],
             "sigroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -17963,7 +17763,7 @@
         "6fd9fa5c-372d-4d6d-a8f8-efb02c07a2db": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6902,
+            "bbox": 593,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17990,7 +17790,7 @@
                 false,
                 ""
             ],
-            "bbox": 6922,
+            "bbox": 613,
             "dccaspects": [
                 [
                     [
@@ -18531,10 +18331,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -18542,44 +18338,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -18633,10 +18391,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -18648,6 +18402,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -18682,7 +18462,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -18971,7 +18751,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -19029,7 +18809,7 @@
         "72f09e5b-29c8-41f1-ae04-f46f5cfb70a4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 6929,
+            "bbox": 620,
             "colour": "#00ff00",
             "dccaddress": 0,
             "dccreversed": false,
@@ -19056,7 +18836,7 @@
                 false,
                 ""
             ],
-            "bbox": 6949,
+            "bbox": 640,
             "dccaspects": [
                 [
                     [
@@ -19597,10 +19377,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -19608,44 +19384,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -19699,10 +19437,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -19714,6 +19448,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -19748,7 +19508,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -20037,7 +19797,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -20104,7 +19864,7 @@
                 false,
                 ""
             ],
-            "bbox": 6969,
+            "bbox": 660,
             "dccaspects": [
                 [
                     [
@@ -20424,7 +20184,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -20776,7 +20536,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -21080,31 +20840,31 @@
             "timedsequences": [
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ]
@@ -21132,7 +20892,7 @@
                 false,
                 ""
             ],
-            "bbox": 6989,
+            "bbox": 680,
             "dccaspects": [
                 [
                     [
@@ -21673,10 +21433,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -21684,44 +21440,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -21775,10 +21493,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -21790,6 +21504,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -21824,7 +21564,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -22113,7 +21853,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -22171,7 +21911,7 @@
         "7bc29386-cbc0-4933-872b-2d254f130b99": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 6996,
+            "bbox": 687,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22187,7 +21927,7 @@
             "tags": "point2"
         },
         "81ce1745-0d19-431c-893e-2c2dacdd324e": {
-            "bbox": 6998,
+            "bbox": 690,
             "defaultlabel": "XXXXX",
             "editable": false,
             "item": "section",
@@ -22206,19 +21946,19 @@
                 1,
                 1
             ],
-            "bbox": 7004,
+            "bbox": 696,
             "colour": "black",
-            "end1": 7000,
-            "end2": 7001,
+            "end1": 692,
+            "end2": 693,
             "endx": 250.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 3,
-            "line": 6999,
+            "line": 691,
             "posx": 200.0,
             "posy": 50.0,
-            "stop1": 7002,
-            "stop2": 7003,
+            "stop1": 694,
+            "stop2": 695,
             "tags": "line3"
         },
         "85b2463e-ea08-431c-8363-5d8b86586acf": {
@@ -22233,7 +21973,7 @@
                 false,
                 ""
             ],
-            "bbox": 7024,
+            "bbox": 716,
             "dccaspects": [
                 [
                     [
@@ -22553,7 +22293,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -22905,7 +22645,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -23261,7 +23001,7 @@
                 false,
                 ""
             ],
-            "bbox": 7036,
+            "bbox": 728,
             "dccaspects": [
                 [
                     [
@@ -23581,7 +23321,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -23933,7 +23673,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -24289,7 +24029,7 @@
                 false,
                 ""
             ],
-            "bbox": 7055,
+            "bbox": 747,
             "dccaspects": [
                 [
                     [
@@ -24609,7 +24349,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -24961,7 +24701,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -25317,7 +25057,7 @@
                 false,
                 ""
             ],
-            "bbox": 7067,
+            "bbox": 759,
             "dccaspects": [
                 [
                     [
@@ -25637,7 +25377,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -25989,7 +25729,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -26345,7 +26085,7 @@
                 false,
                 ""
             ],
-            "bbox": 7079,
+            "bbox": 771,
             "dccaspects": [
                 [
                     [
@@ -26886,10 +26626,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -26897,44 +26633,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -26988,10 +26686,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -27003,6 +26697,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -27037,7 +26757,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -27326,7 +27046,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -27393,7 +27113,7 @@
                 false,
                 ""
             ],
-            "bbox": 7091,
+            "bbox": 783,
             "dccaspects": [
                 [
                     [
@@ -27713,7 +27433,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -28065,7 +27785,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -28410,7 +28130,7 @@
             ]
         },
         "9002b06d-954a-4bd3-ad24-96045778d202": {
-            "bbox": 7093,
+            "bbox": 786,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -28425,7 +28145,7 @@
         "91bf3074-5f3f-45f1-b398-ced7a4aef742": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 7100,
+            "bbox": 793,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -28443,7 +28163,7 @@
         "92c14e0a-6980-4380-8105-d55c9d64aaef": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 7107,
+            "bbox": 800,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -28465,19 +28185,19 @@
                 1,
                 1
             ],
-            "bbox": 7113,
+            "bbox": 806,
             "colour": "black",
-            "end1": 7109,
-            "end2": 7110,
+            "end1": 802,
+            "end2": 803,
             "endx": 100.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 1,
-            "line": 7108,
+            "line": 801,
             "posx": 50.0,
             "posy": 50.0,
-            "stop1": 7111,
-            "stop2": 7112,
+            "stop1": 804,
+            "stop2": 805,
             "tags": "line1"
         },
         "99230944-029f-42b4-bf3e-6b05cda36120": {
@@ -28492,7 +28212,7 @@
                 false,
                 ""
             ],
-            "bbox": 7133,
+            "bbox": 826,
             "dccaspects": [
                 [
                     [
@@ -28812,7 +28532,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -29164,7 +28884,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -29454,10 +29174,10 @@
             ],
             "subroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subsidary": [
                 true,
@@ -29520,7 +29240,7 @@
                 false,
                 ""
             ],
-            "bbox": 7154,
+            "bbox": 847,
             "dccaspects": [
                 [
                     [
@@ -30061,10 +29781,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -30072,44 +29788,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -30163,10 +29841,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -30178,6 +29852,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -30212,7 +29912,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -30568,7 +30268,7 @@
                 false,
                 ""
             ],
-            "bbox": 7173,
+            "bbox": 866,
             "dccaspects": [
                 [
                     [
@@ -31109,10 +30809,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -31120,44 +30816,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -31211,10 +30869,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -31226,6 +30880,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -31260,7 +30940,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -31549,7 +31229,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -31607,7 +31287,7 @@
         "b0ae6f43-3247-44a1-b6de-18c8247edf21": {
             "alsoswitch": 11,
             "automatic": false,
-            "bbox": 7180,
+            "bbox": 873,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -31629,19 +31309,19 @@
                 1,
                 1
             ],
-            "bbox": 7186,
+            "bbox": 879,
             "colour": "black",
-            "end1": 7182,
-            "end2": 7183,
+            "end1": 875,
+            "end2": 876,
             "endx": 175.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 2,
-            "line": 7181,
+            "line": 874,
             "posx": 125.0,
             "posy": 50.0,
-            "stop1": 7184,
-            "stop2": 7185,
+            "stop1": 877,
+            "stop2": 878,
             "tags": "line2"
         },
         "b654be08-1b1d-40f3-8e2d-5a03b8cc803d": {
@@ -31656,7 +31336,7 @@
                 false,
                 ""
             ],
-            "bbox": 7198,
+            "bbox": 891,
             "dccaspects": [
                 [
                     [
@@ -31976,7 +31656,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -32328,7 +32008,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -32684,7 +32364,7 @@
                 false,
                 ""
             ],
-            "bbox": 7217,
+            "bbox": 910,
             "dccaspects": [
                 [
                     [
@@ -33004,7 +32684,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -33356,7 +33036,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -33712,7 +33392,7 @@
                 false,
                 ""
             ],
-            "bbox": 7236,
+            "bbox": 929,
             "dccaspects": [
                 [
                     [
@@ -34253,10 +33933,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -34264,44 +33940,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -34355,10 +33993,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -34370,6 +34004,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -34404,7 +34064,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -34693,7 +34353,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -34749,7 +34409,7 @@
             ]
         },
         "c18b6c22-b077-498f-a56e-f35359349f4f": {
-            "bbox": 7260,
+            "bbox": 953,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 4,
@@ -34763,7 +34423,7 @@
         "c1c9f3e1-2805-494e-8a55-c2ebdb9493f8": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 7267,
+            "bbox": 960,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -34779,7 +34439,7 @@
             "tags": "point20"
         },
         "c2bacf51-1b13-4507-a3ee-87011591bba5": {
-            "bbox": 7269,
+            "bbox": 963,
             "defaultlabel": "12345",
             "editable": true,
             "item": "section",
@@ -34803,7 +34463,7 @@
                 false,
                 ""
             ],
-            "bbox": 7288,
+            "bbox": 982,
             "dccaspects": [
                 [
                     [
@@ -35123,7 +34783,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -35475,7 +35135,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -35831,7 +35491,7 @@
                 false,
                 ""
             ],
-            "bbox": 7308,
+            "bbox": 1002,
             "dccaspects": [
                 [
                     [
@@ -36151,7 +35811,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -36503,7 +36163,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -36848,7 +36508,7 @@
             ]
         },
         "ce8ac4e7-e4a6-49f4-ab13-acf69940385e": {
-            "bbox": 7323,
+            "bbox": 1017,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -36866,19 +36526,19 @@
                 20,
                 8
             ],
-            "bbox": 7329,
+            "bbox": 1023,
             "colour": "black",
-            "end1": 7325,
-            "end2": 7326,
+            "end1": 1019,
+            "end2": 1020,
             "endx": 650.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 8,
-            "line": 7324,
+            "line": 1018,
             "posx": 600.0,
             "posy": 50.0,
-            "stop1": 7327,
-            "stop2": 7328,
+            "stop1": 1021,
+            "stop2": 1022,
             "tags": "line8"
         },
         "d7d4f8d8-4e71-4272-a3b5-da88b587ea87": {
@@ -36888,19 +36548,19 @@
                 20,
                 5
             ],
-            "bbox": 7335,
+            "bbox": 1029,
             "colour": "#ff0300",
-            "end1": 7331,
-            "end2": 7332,
+            "end1": 1025,
+            "end2": 1026,
             "endx": 325.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 4,
-            "line": 7330,
+            "line": 1024,
             "posx": 275.0,
             "posy": 50.0,
-            "stop1": 7333,
-            "stop2": 7334,
+            "stop1": 1027,
+            "stop2": 1028,
             "tags": "line4"
         },
         "d7f16ff2-2a3e-4e70-bb8a-b46809efd0ca": {
@@ -36915,7 +36575,7 @@
                 false,
                 ""
             ],
-            "bbox": 7354,
+            "bbox": 1048,
             "dccaspects": [
                 [
                     [
@@ -37235,7 +36895,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -37587,7 +37247,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -37934,7 +37594,7 @@
         "dd819af5-409e-423a-a480-9a0a3ebe0121": {
             "alsoswitch": 9,
             "automatic": false,
-            "bbox": 7361,
+            "bbox": 1055,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -37952,7 +37612,7 @@
         "e7bc5daa-aa6a-4c55-8d4e-7341742666ec": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 7368,
+            "bbox": 1062,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -37979,7 +37639,7 @@
                 false,
                 ""
             ],
-            "bbox": 7387,
+            "bbox": 1081,
             "dccaspects": [
                 [
                     [
@@ -38520,10 +38180,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -38531,44 +38187,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -38622,10 +38240,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -38637,6 +38251,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -38671,7 +38311,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -38954,13 +38594,13 @@
             ],
             "sigroutes": [
                 true,
-                false,
-                false,
-                false,
-                false
+                true,
+                true,
+                true,
+                true
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -39018,7 +38658,7 @@
         "ed3d241d-7446-4c66-a078-4ecd1dc1fcc6": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 7394,
+            "bbox": 1088,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -39045,7 +38685,7 @@
                 false,
                 ""
             ],
-            "bbox": 7413,
+            "bbox": 1107,
             "dccaspects": [
                 [
                     [
@@ -39586,10 +39226,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -39597,44 +39233,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -39688,10 +39286,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -39703,6 +39297,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -39737,7 +39357,7 @@
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -40026,7 +39646,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -40084,7 +39704,7 @@
         "f50b64e4-eb07-4455-ad99-613aa3775614": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 7420,
+            "bbox": 1114,
             "colour": "#ff0000",
             "dccaddress": 0,
             "dccreversed": false,
@@ -40106,19 +39726,19 @@
                 20,
                 8
             ],
-            "bbox": 7426,
+            "bbox": 1120,
             "colour": "black",
-            "end1": 7422,
-            "end2": 7423,
+            "end1": 1116,
+            "end2": 1117,
             "endx": 575.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 7,
-            "line": 7421,
+            "line": 1115,
             "posx": 525.0,
             "posy": 50.0,
-            "stop1": 7424,
-            "stop2": 7425,
+            "stop1": 1118,
+            "stop2": 1119,
             "tags": "line7"
         }
     },
@@ -40229,13 +39849,15 @@
         "canvas": {
             "grid": 25,
             "height": 600,
-            "width": 1500
+            "snaptogrid": true,
+            "width": 1600
         },
         "general": {
+            "automation": true,
             "editmode": true,
             "filename": "/home/pi/model-railway-signalling/system_tests/basic_library_tests1.sig",
             "info": "Document your layout here",
-            "version": "Version 3.6"
+            "version": "Version 4.0"
         },
         "gpio": {
             "portmappings": [],
@@ -40437,7 +40059,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "#"
+            "theatretext": ""
         },
         "23": {
             "override": false,
@@ -40448,7 +40070,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "#"
+            "theatretext": ""
         },
         "24": {
             "override": false,
@@ -40459,7 +40081,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "#"
+            "theatretext": ""
         },
         "25": {
             "override": false,
@@ -40470,7 +40092,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": "#"
+            "theatretext": ""
         },
         "26": {
             "override": false,
@@ -40613,7 +40235,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
-            "theatretext": ""
+            "theatretext": "M"
         },
         "67": {
             "override": false,
@@ -40668,7 +40290,7 @@
             "siglocked": false,
             "subclear": false,
             "sublocked": true,
-            "theatretext": "#"
+            "theatretext": ""
         },
         "8": {
             "override": false,

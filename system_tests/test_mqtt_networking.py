@@ -3,6 +3,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
+import configuration_window_tests
 
 #-----------------------------------------------------------------------------------
 # This function tests the basic network tx/rx of signals, sections and instruments
@@ -303,6 +304,9 @@ def run_object_deletion_tests(delay:float=0.0):
 
 def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    configuration_window_tests.test_all_object_edit_windows(delay)
     run_object_deletion_tests(delay)
     run_basic_networking_tests(delay)
     run_specific_signal_ahead_tests(delay)

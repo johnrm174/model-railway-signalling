@@ -7,6 +7,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
+import configuration_window_tests
 
 #-----------------------------------------------------------------------------------
 # Test the end to end layout with block instruments(2 seperate signalling areas)
@@ -241,6 +242,10 @@ def test_circular_layout(delay=0.0):
 
 def run_all_mqtt_networking_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/mqtt_networked_example.sig")
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    configuration_window_tests.test_all_object_edit_windows(delay)
+    set_run_mode()
     test_circular_layout(delay)
     test_end_to_end_layout(delay)
     if shutdown: report_results()
