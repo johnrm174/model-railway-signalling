@@ -156,7 +156,7 @@ def update_identifier(section_id):
     # Set the new label for the section button and set the width to the width it was created with
     # If we get back an empty string then set the label back to the default (OCCUPIED)
     new_section_label =text_entry_box.get()
-    if new_section_label=="": new_section_label="OCCUPIED"
+    if new_section_label=="": new_section_label="XXXX"
     sections[str(section_id)]["labeltext"] = new_section_label
     sections[str(section_id)]["button1"]["text"] = new_section_label
     sections[str(section_id)]["button1"].config(width=sections[str(section_id)]["labellength"])
@@ -238,7 +238,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         # Create the button objects and their callbacks
         font_size = common.fontsize
         section_button = Tk.Button (canvas, text=label, state="normal", relief="raised",
-                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
+                    padx=2, pady=1, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id), width = len(label))
         # Note the "Tag" for the drawing objects for this track section (i.e. this window)
@@ -371,7 +371,7 @@ def subscribe_to_remote_section (remote_identifier:str,section_callback):
             logging.warning("MQTT-Client: Section "+remote_identifier+" - has already been subscribed to via MQTT networking")
         sections[remote_identifier] = {}
         sections[remote_identifier]["occupied"] = False
-        sections[remote_identifier]["labeltext"] = "OCCUPIED"
+        sections[remote_identifier]["labeltext"] = "XXXX"
         sections[remote_identifier]["extcallback"] = section_callback
         # Subscribe to updates from the remote section
         [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)

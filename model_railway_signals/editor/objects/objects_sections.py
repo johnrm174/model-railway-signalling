@@ -203,7 +203,7 @@ def redraw_section_object(object_id, reset_state:bool=True):
         # get the boundary box of the text box and use this to create the background rectangle
         bbox = objects_common.canvas.bbox(text_item)
         rect_item = objects_common.canvas.create_rectangle(
-                    bbox[0]-6, bbox[1]-6, bbox[2]+6, bbox[3]+6,
+                    bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+3,
                     tags=objects_common.schematic_objects[object_id]["tags"],
                     fill="black")
         # raise the text item to be in front of the rectangle item
