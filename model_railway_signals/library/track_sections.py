@@ -201,10 +201,11 @@ def open_entry_box(section_id):
     # Set the font size and length for the text entry box
     font_size = common.fontsize
     label_length = sections[str(section_id)]["labellength"]
-    # Create the entry box and bind the RETURN and ESCAPE events to it
+    # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
     text_entry_box = Tk.Entry(canvas,width=label_length,font=('Ariel',font_size,"normal"))
     text_entry_box.bind('<Return>', lambda event:update_identifier(section_id))
     text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
+    text_entry_box.bind('<FocusOut>', lambda event:update_identifier(section_id))
     # if the section button is already showing occupied then we EDIT the value
     if sections[str(section_id)]["occupied"]:
         text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
