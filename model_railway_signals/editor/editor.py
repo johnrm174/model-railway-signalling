@@ -148,7 +148,7 @@ class main_menubar:
         # Create the various menubar items for the Utilities Dropdown
         self.utilities_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.utilities_menu.add_command(label =" DCC Programming...",
-                command=lambda:utilities.dcc_programming(self.root, self.dcc_power_is_on,
+                command=lambda:utilities.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
@@ -370,7 +370,6 @@ class main_menubar:
         return(connected)
     
     def sprog_disconnect(self):
-        print("here")
         pi_sprog_interface.sprog_shutdown()
         new_label = "SPROG:Disconnected"
         self.mainmenubar.entryconfigure(self.power_label, state="disabled")
@@ -404,8 +403,8 @@ class main_menubar:
         self.mainmenubar.entryconfigure(self.power_label, label=new_label)
         self.power_label = new_label
 
-    def dcc_power_is_on(self):
-        return (self.power_label=="DCC Power:On")
+    def dcc_programming_enabled(self):
+        return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
 
     def mqtt_connect(self, show_popup:bool=True):
         url, port, network, node, username, password, debug, startup = settings.get_mqtt()

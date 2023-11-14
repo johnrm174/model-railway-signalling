@@ -2,7 +2,7 @@
 # This module contains all the functions for the menubar utilities
 #
 # Classes (pop up windows) called from the main editor module menubar selections
-#    dcc_programming(root, dcc_power_is_on_function, dcc_power_on_function, dcc_power_off_function)
+#    dcc_programming(root, dcc_programming_enabled_function, dcc_power_on_function, dcc_power_off_function)
 #
 # Uses the following library functions:
 #    pi_sprog_interface.service_mode_read_cv(cv_to_read)
@@ -100,9 +100,9 @@ class cv_programming_grid():
 #------------------------------------------------------------------------------------
 
 class cv_programming_element():
-    def __init__(self, root_window, parent_window, parent_frame, dcc_power_is_on_function,
+    def __init__(self, root_window, parent_window, parent_frame, dcc_programming_enabled_function,
                        dcc_power_off_function, dcc_power_on_function):
-        self.dcc_power_is_on_function = dcc_power_is_on_function
+        self.dcc_programming_enabled_function = dcc_programming_enabled_function
         self.dcc_power_off_function = dcc_power_off_function
         self.dcc_power_on_function = dcc_power_on_function
         self.root_window = root_window
@@ -115,34 +115,36 @@ class cv_programming_element():
         self.label.pack(padx=2, pady=2)
         # Create the grid of CVs to programe
         self.cv_grid = cv_programming_grid (parent_frame)
-        # Create the Status Label
-        self.status = Tk.Label(parent_frame, text="")
-        self.status.pack(padx=2, pady=2)
-        # Create the notes and documentation text entry
+        # Create the Read/Write Buttons and the status label in a subframe to center them
+        self.subframe1 = Tk.Frame(parent_frame)
+        self.subframe1.pack()
+        self.B1 = Tk.Button (self.subframe1, text = "Read CVs",command=self.read_all_cvs)
+        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT1 = common.CreateToolTip(self.B1, "Read all CVs to retrieve the current values")
+        self.B2 = Tk.Button (self.subframe1, text = "Write CVs",command=self.write_all_cvs)
+        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.TT2 = common.CreateToolTip(self.B2, "Write all CVs to set the new values")
+        self.status = Tk.Label(self.subframe1, width=42,  borderwidth=1, relief="solid")
+        self.status.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
+        # Create the notes/documentation text entry
         self.notes = common.scrollable_text_frame(parent_frame, max_height=10, max_width=38,
             min_height=5, min_width=38, editable=True, auto_resize=True)
         self.notes.pack(padx=2, pady=2, fill='x', expand=True)
         self.notes.set_value("Document your CV configuration here")
-        # Create the Buttons (in a subframe to center them)
-        self.subframe = Tk.Frame(parent_frame)
-        self.subframe.pack()
-        self.B1 = Tk.Button (self.subframe, text = "Read CVs",command=self.read_all_cvs)
-        self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Read all CVs to retrieve the current values")
-        self.B2 = Tk.Button (self.subframe, text = "Write CVs",command=self.write_all_cvs)
-        self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT2 = common.CreateToolTip(self.B2, "Write all CVs to set the new values")
-        self.spacer_label=Tk.Label(self.subframe,)
-        self.spacer_label.pack(side=Tk.LEFT, padx=50, pady=2)       
-        self.B3 = Tk.Button (self.subframe, text = "Open",command=self.load_config)
+        # Create the Save/load Buttons and the filename label in a subframe to center them
+        self.subframe2 = Tk.Frame(parent_frame)
+        self.subframe2.pack()
+        self.B3 = Tk.Button (self.subframe2, text = "Open",command=self.load_config)
         self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT3 = common.CreateToolTip(self.B3, "Load a CV configuration from file")
-        self.B4 = Tk.Button (self.subframe, text = "Save",command=lambda:self.save_config(save_as=False))
+        self.B4 = Tk.Button (self.subframe2, text = "Save",command=lambda:self.save_config(save_as=False))
         self.B4.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT4 = common.CreateToolTip(self.B4, "Save the current CV configuration to file")
-        self.B5 = Tk.Button (self.subframe, text = "Save as",command=lambda:self.save_config(save_as=True))
+        self.B5 = Tk.Button (self.subframe2, text = "Save as",command=lambda:self.save_config(save_as=True))
         self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT5 = common.CreateToolTip(self.B5, "Save the current CV configuration as a new file")
+        self.name=Tk.Label(self.subframe2, width=40, borderwidth=1, relief="solid")
+        self.name.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
     
     def read_all_cvs(self):
         # Force a focus out event to "accept" all values before programming (if the focus out
@@ -151,8 +153,8 @@ class cv_programming_element():
         self.B1.focus_set()
         self.root_window.update()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_power_is_on_function():
-            self.status.config(text="Enable DCC power to read and write CVs", fg="red")            
+        if not self.dcc_programming_enabled_function():
+            self.status.config(text="Connect to SPROG and enable DCC power to read CVs", fg="red")            
         elif not self.cv_grid.validate():
             self.status.config(text="Entries on form need correcting", fg="red")            
         else:
@@ -186,8 +188,8 @@ class cv_programming_element():
         self.B1.focus_set()
         self.root_window.update()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_power_is_on_function():
-            self.status.config(text="Enable DCC power to read and write CVs", fg="red")            
+        if not self.dcc_programming_enabled_function():
+            self.status.config(text="Connect to SPROG and enable DCC power to write CVs", fg="red")            
         elif not self.cv_grid.validate():
             self.status.config(text="Entries on form need correcting", fg="red")            
         else:
@@ -258,6 +260,8 @@ class cv_programming_element():
                         Tk.messagebox.showerror(parent=self.parent_window,title="File Save Error",message=str(exception))
                     else:
                         self.loaded_file = filename_to_save
+                        self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
+
             
     def load_config(self):
         self.B4.focus_set()
@@ -280,6 +284,7 @@ class cv_programming_element():
                     Tk.messagebox.showerror(parent=self.parent_window,title="File Parse Error", message=str(exception))
                 else:
                     self.loaded_file = filename_to_load
+                    self.name.config(text="Configuration file: "+os.path.split(self.loaded_file)[1])
                     self.notes.set_value(loaded_data["documentation"])
                     for index, cv_entry_element in enumerate(loaded_data["configuration"]):
                         self.cv_grid.list_of_entries[index].configuration_variable.set_value(cv_entry_element[0])
@@ -292,8 +297,8 @@ class cv_programming_element():
 #------------------------------------------------------------------------------------
 
 class one_touch_programming_element():
-    def __init__(self, parent_frame, dcc_power_is_on_function):
-        self.dcc_power_is_on_function = dcc_power_is_on_function
+    def __init__(self, parent_frame, dcc_programming_enabled_function):
+        self.dcc_programming_enabled_function = dcc_programming_enabled_function
         # Create the Address and entry Buttons (in a subframe to center them)
         self.subframe = Tk.Frame(parent_frame)
         self.subframe.pack()
@@ -314,11 +319,11 @@ class one_touch_programming_element():
     def send_command(self, command):
         self.subframe.focus_set()
         # Check programmng is enabled (DCC power on - which implies SPROG is connected
-        if not self.dcc_power_is_on_function():
-            self.status.config(text="Enable DCC power to programme a device", fg="red")            
-        elif not self.entry.validate():
+        if not self.dcc_programming_enabled_function():
+            self.status.config(text="Connect to SPROG and enable DCC power to programme", fg="red")            
+        elif not self.entry.validate() or self.entry.get_value() < 1:
             self.status.config(text="Entered DCC address is invalid", fg="red")            
-        elif self.entry.get_value() > 0:
+        else:
             self.status.config(text="")
             pi_sprog_interface.send_accessory_short_event(self.entry.get_value(), command)
  
@@ -330,7 +335,7 @@ class one_touch_programming_element():
 dcc_programming_window = None
 
 class dcc_programming():
-    def __init__(self, root_window, dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function):
+    def __init__(self, root_window, dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function):
         global dcc_programming_window
         # If there is already a dcc programming window open then we just make it jump to the top and exit
         if dcc_programming_window is not None:
@@ -348,11 +353,11 @@ class dcc_programming():
             self.frame.pack()
             # Create the labelframe for "one Touch" DCC Programming (this gets packed later)
             self.labelframe1 = Tk.LabelFrame(self.frame, text="DCC One Touch Programming")
-            self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_power_is_on_function)
+            self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_programming_enabled_function)
             # Create the labelframe for CV Programming (this gets packed later)
             self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
             self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
-                    dcc_power_is_on_function, dcc_power_off_function, dcc_power_on_function)        
+                    dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function)        
             # Create the ok/close button and tooltip
             self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
