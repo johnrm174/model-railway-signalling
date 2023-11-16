@@ -835,8 +835,8 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
         except:
             # Else fall back to using a text label (filename) for the button
             buttons.append(Tk.Button (button_frame, text=selections[index][0],
-                       command=selections[index][1]))
-        buttons[-1].pack(padx=2, pady=2)
+                       command=selections[index][1], bg="grey85"))
+        buttons[-1].pack(padx=2, pady=2, fill='x')
     # Initialise the Objects package with the required parameters
     objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
     return()
