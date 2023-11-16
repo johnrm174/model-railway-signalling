@@ -196,10 +196,11 @@ class display_about():
             about_window.state('normal')
             about_window.focus_force()
         else:
-            # Create the top level window for application about
+            # Create the (non-resizable) top level window for application about
             self.window = Tk.Toplevel(root_window)
             self.window.title("Application Info")
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.resizable(False, False)
             about_window = self.window
             # Create the Help text and hyperlink
             self.label1 = Tk.Label(self.window, text=about_text)
@@ -288,10 +289,11 @@ class edit_canvas_settings():
             canvas_settings_window.focus_force()
         else:
             self.update_function = update_function
-            # Create the top level window for the canvas settings
+            # Create the (non resizable) top level window for the canvas settings
             self.window = Tk.Toplevel(root_window)
             self.window.title("Canvas")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             canvas_settings_window = self.window
             # Create the entry box elements for the width, height and grid
             # Pack the elements as a grid to get an aligned layout
@@ -368,10 +370,11 @@ class edit_sprog_settings():
         else:
             self.connect_function = connect_function
             self.update_function = update_function
-            # Create the top level window for the SPROG configuration
+            # Create the (non resizable) top level window for the SPROG configuration
             self.window = Tk.Toplevel(root_window)
             self.window.title("SPROG DCC")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             edit_sprog_settings_window = self.window
             # Create the Serial Port and baud rate UI elements 
             self.frame1 = Tk.Frame(self.window)
@@ -492,10 +495,11 @@ class edit_logging_settings():
             edit_logging_settings_window.focus_force()
         else:
             self.update_function = update_function
-            # Create the top level window for the Logging Configuration
+            # Create the (non resizable) top level window for the Logging Configuration
             self.window = Tk.Toplevel(root_window)
             self.window.title("Logging")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             edit_logging_settings_window = self.window
             # Create the logging Level selections element
             self.log_level = common.selection_buttons (self.window, label="Layout Log Level",
@@ -798,6 +802,11 @@ class edit_mqtt_settings():
             self.window.title("MQTT Networking")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             edit_mqtt_settings_window = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
@@ -812,11 +821,6 @@ class edit_mqtt_settings():
             self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
             self.subscribe = mqtt_subscribe_tab(self.tab2)
             self.publish = mqtt_publish_tab(self.tab3)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
             
@@ -852,6 +856,7 @@ class edit_mqtt_settings():
         self.config.accept_all_entries()
         # Only allow close if valid
         if self.subscribe.validate() and self.publish.validate():
+            self.validation_error.pack_forget()
             url = self.config.url.get_value()
             port = self.config.port.get_value()
             network = self.config.network.get_value()
@@ -881,7 +886,7 @@ class edit_mqtt_settings():
             if close_window: self.close_window()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
 
     def close_window(self):
         global edit_mqtt_settings_window
@@ -972,10 +977,11 @@ class edit_gpio_settings():
             edit_gpio_settings_window.focus_force()
         else:
             self.update_function = update_function
-            # Create the top level window for editing MQTT settings
+            # Create the (non resizable) top level window for editing MQTT settings
             self.window = Tk.Toplevel(root_window)
             self.window.title("GPIO Sensors")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             edit_gpio_settings_window = self.window
             # Create an overall frame to pack everything in
             self.frame = Tk.Frame(self.window)
