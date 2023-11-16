@@ -44,8 +44,8 @@ class cv_programming_entry():
                     tool_tip="Enter the new value to set (select 'write' to program)")
         self.value_to_set.grid(column=2, row=row)
         self.notes = common.entry_box(parent_frame, width=15,
-                    tool_tip="Add any user notes for this CV / value")
-        self.notes.grid(column=3, row=row)
+                    tool_tip="Add notes for this CV / value")
+        self.notes.grid(column=3, row=row, sticky="ew")
 
     def validate(self):
         # No need to validate the current value as this is read only
@@ -68,15 +68,21 @@ class cv_programming_entry():
 class cv_programming_grid():
     def __init__(self, parent_frame):
         self.grid_frame = Tk.Frame(parent_frame)
-        self.grid_frame.pack()
+        self.grid_frame.pack(fill='x')
         self.list_of_entries = []
         number_of_columns = 2
         number_of_rows = 15
+        # Create the columns of CV programming values
         for column_index in range(number_of_columns):
-            # Create a new column in its own subframe
+            # Enable the column to expand to fill the available space
+            self.grid_frame.columnconfigure(column_index, weight=1)
+            # Create a frame to hold the columns of values (allow it to expand)
+            # Also allow the 3rd column (holding the notes) to expand within it
             self.frame = Tk.Frame(self.grid_frame)
-            self.frame.grid(row=0, column=column_index, padx=10)
+            self.frame.grid(row=0, column=column_index, padx=10, sticky="ew")
+            self.frame.columnconfigure(3, weight=1)
             # Create the heading labels for the cv_programming_entry elements
+            # Pack the "Notes" heading so it can expand to fill the available space
             self.label1 = Tk.Label(self.frame,text="CV")
             self.label1.grid(row=0, column=0)
             self.label2 = Tk.Label(self.frame,text="Value")
@@ -84,7 +90,7 @@ class cv_programming_grid():
             self.label3 = Tk.Label(self.frame,text="New")
             self.label3.grid(row=0, column=2)
             self.label4 = Tk.Label(self.frame,text="Notes")
-            self.label4.grid(row=0, column=3)
+            self.label4.grid(row=0, column=3, sticky="ew")
             # Create the cv_programming_entry element
             for row_index in range(number_of_rows):
                 self.list_of_entries.append(cv_programming_entry(self.frame,row=row_index+1))
@@ -120,20 +126,21 @@ class cv_programming_element():
         self.subframe1.pack()
         self.B1 = Tk.Button (self.subframe1, text = "Read CVs",command=self.read_all_cvs)
         self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.TT1 = common.CreateToolTip(self.B1, "Read all CVs to retrieve the current values")
+        self.TT1 = common.CreateToolTip(self.B1, "Read all CVs to retrieve / refresh the current values")
         self.B2 = Tk.Button (self.subframe1, text = "Write CVs",command=self.write_all_cvs)
         self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = common.CreateToolTip(self.B2, "Write all CVs to set the new values")
-        self.status = Tk.Label(self.subframe1, width=42,  borderwidth=1, relief="solid")
+        self.status = Tk.Label(self.subframe1, width=45,  borderwidth=1, relief="solid")
         self.status.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
+        self.statusTT = common.CreateToolTip(self.status, "Displays the CV Read / Write progress and status")
         # Create the notes/documentation text entry
         self.notes = common.scrollable_text_frame(parent_frame, max_height=10, max_width=38,
             min_height=5, min_width=38, editable=True, auto_resize=True)
-        self.notes.pack(padx=2, pady=2, fill='x', expand=True)
+        self.notes.pack(padx=2, pady=2, fill='both', expand=True)
         self.notes.set_value("Document your CV configuration here")
         # Create the Save/load Buttons and the filename label in a subframe to center them
         self.subframe2 = Tk.Frame(parent_frame)
-        self.subframe2.pack()
+        self.subframe2.pack(fill='y')
         self.B3 = Tk.Button (self.subframe2, text = "Open",command=self.load_config)
         self.B3.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT3 = common.CreateToolTip(self.B3, "Load a CV configuration from file")
@@ -143,8 +150,9 @@ class cv_programming_element():
         self.B5 = Tk.Button (self.subframe2, text = "Save as",command=lambda:self.save_config(save_as=True))
         self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT5 = common.CreateToolTip(self.B5, "Save the current CV configuration as a new file")
-        self.name=Tk.Label(self.subframe2, width=40, borderwidth=1, relief="solid")
+        self.name=Tk.Label(self.subframe2, width=45, borderwidth=1, relief="solid")
         self.name.pack(side=Tk.LEFT, padx=2, pady=2, expand='y')
+        self.nameTT = common.CreateToolTip(self.name, "Displays the name of the CV config file after save or load")
     
     def read_all_cvs(self):
         # Force a focus out event to "accept" all values before programming (if the focus out
@@ -348,23 +356,22 @@ class dcc_programming():
             self.window.title("DCC Programming")
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
             dcc_programming_window = self.window
-            # Create an overall frame to pack everything in
+            # Create the ok/close button and tooltip - pack first so it remains visible on re-sizing
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
+            # Create an overall frame to pack everything  else in
             self.frame = Tk.Frame(self.window)
-            self.frame.pack()
+            self.frame.pack(fill='both', expand=True)
             # Create the labelframe for "one Touch" DCC Programming (this gets packed later)
             self.labelframe1 = Tk.LabelFrame(self.frame, text="DCC One Touch Programming")
+            self.labelframe1.pack(padx=2, pady=2, fill='x')
             self.one_touch_programming = one_touch_programming_element(self.labelframe1, dcc_programming_enabled_function)
             # Create the labelframe for CV Programming (this gets packed later)
             self.labelframe2 = Tk.LabelFrame(self.frame, text="DCC Configuration Variable (CV) Programming")
+            self.labelframe2.pack(padx=2, pady=2, fill='both', expand=True)
             self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
                     dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function)        
-            # Create the ok/close button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
-            self.TT1 = common.CreateToolTip(self.B1, "Close window")
-            # Pack the OK button First - so it remains visible on re-sizing
-            self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
-            self.labelframe1.pack(padx=2, pady=2, fill='x')
-            self.labelframe2.pack(padx=2, pady=2, fill='x')
         
     def ok(self):
         global dcc_programming_window
