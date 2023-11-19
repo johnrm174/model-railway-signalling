@@ -953,7 +953,12 @@ class gpio_port_entry_frame():
         return (list_of_mappings)
     
     def set_values(self,list_of_mappings:[[int,int],]):
+        # Clear down all entry boxes first before re-populating as we only
+        # populate those where a mapping has been defined
+        for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
+            self.list_of_entry_boxes[index].set_value(None)
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
+        print(list_of_mappings)
         for mapping in list_of_mappings:
             for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
                 if gpio_port == mapping[1]:
@@ -1014,7 +1019,7 @@ class edit_gpio_settings():
             self.load_state()
             
     def load_state(self):
-        # Hide the validation error and connection test messages
+        # Hide the validation error
         self.validation_error.pack_forget()
         # Create the UI Elements
         trigger, timeout, mappings = settings.get_gpio()
@@ -1025,6 +1030,7 @@ class edit_gpio_settings():
     def save_state(self, close_window:bool):
         # Only allow close if valid
         if self.gpio.validate() and self.trigger.validate() and self.timeout.validate():
+            self.validation_error.pack_forget()
             mappings = self.gpio.get_values()
             trigger = float(self.trigger.get_value())/1000
             timeout = float(self.timeout.get_value())/1000
@@ -1035,7 +1041,7 @@ class edit_gpio_settings():
             if close_window: self.close_window() 
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
 
     def close_window(self):
         global edit_gpio_settings_window
