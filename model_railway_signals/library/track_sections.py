@@ -239,7 +239,7 @@ def create_section (canvas, section_id:int, x:int, y:int,
         # Create the button objects and their callbacks
         font_size = common.fontsize
         section_button = Tk.Button (canvas, text=label, state="normal", relief="raised",
-                    padx=2, pady=1, font=('Ariel',font_size,"normal"),
+                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
                     bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
                     command = lambda:section_button_event(section_id), width = len(label))
         # Note the "Tag" for the drawing objects for this track section (i.e. this window)

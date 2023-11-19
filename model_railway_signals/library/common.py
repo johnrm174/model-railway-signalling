@@ -20,8 +20,8 @@ from . import track_sensors
 # on the screen. This is to allow the appearance to be optimised for
 # particular window sizes/screen resolutions.
 fontsize = 9  # Used by the Signals, Points and sections modules
-xpadding = 4  # Used by the Signals, Points and sections modules
-ypadding = 3  # Used by the Signals, Points and sections modules
+xpadding = 2  # Used by the Signals, Points and sections modules
+ypadding = 0  # Used by the Signals, Points and sections modules
 bgraised = "grey85"   # Used by the Signals and Points modules
 bgsunken = "white"    # Used by the Signals and Points modules
 
