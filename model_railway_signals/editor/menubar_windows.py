@@ -324,10 +324,13 @@ class edit_canvas_settings():
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Load the initial UI state
             self.load_state()
 
     def load_state(self):
+        self.validation_error.pack_forget()
         width, height, grid, snap_to_grid = settings.get_canvas()
         self.width.set_value(width)
         self.height.set_value(height)
@@ -337,6 +340,7 @@ class edit_canvas_settings():
     def save_state(self, close_window:bool):
         # Only allow the changes to be applied / window closed if both values are valid
         if self.width.validate() and self.height.validate() and self.grid.validate():
+            self.validation_error.pack_forget()
             width = self.width.get_value()
             height = self.height.get_value()
             grid = self.grid.get_value()
@@ -346,7 +350,10 @@ class edit_canvas_settings():
             self.update_function()
             # close the window (on OK)
             if close_window: self.close_window()
-
+        else:
+            # Display the validation error message
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            
     def close_window(self):
         global canvas_settings_window
         canvas_settings_window = None
@@ -958,7 +965,6 @@ class gpio_port_entry_frame():
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
             self.list_of_entry_boxes[index].set_value(None)
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
-        print(list_of_mappings)
         for mapping in list_of_mappings:
             for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
                 if gpio_port == mapping[1]:
@@ -1019,9 +1025,7 @@ class edit_gpio_settings():
             self.load_state()
             
     def load_state(self):
-        # Hide the validation error
         self.validation_error.pack_forget()
-        # Create the UI Elements
         trigger, timeout, mappings = settings.get_gpio()
         self.gpio.set_values(mappings)
         self.trigger.set_value(int(trigger*1000))
