@@ -608,6 +608,6 @@ def run_editor():
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
-        library_common.on_closing(ask_to_save_state=False)
+        library_common.shutdown()
 
 ####################################################################################
