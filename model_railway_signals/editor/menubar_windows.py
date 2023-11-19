@@ -96,16 +96,16 @@ basic guidance and top tips for creating your layout signalling system:
 
 Schematic functions (in edit mode):
  
-1) Use the photoimage buttons on the left to add objects to the schematic.
+1) Use the buttons on the left to add objects to the schematic.
 2) Left-click to select objects (shift-left-click will 'add' to the selection).
 3) Left-click / release to drag / drop selected objects around the schematic.
-4) Double-left-click on a point or signal to open the object configuraton window
+4) Double-left-click on a schematic object to open the object configuraton window
 5) Left-click on the 'end' of a selected line to move/edit the position
 6) Left-click / release (when not over an object) can also be used for an 'area' selection
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
 9) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
-10) <backspace> will permanently delete all selected objects from the schematic
+10) <backspace> will delete all currently selected objects from the schematic
 11) <cntl-c> will copy all currently selected objects to a copy/paste buffer
 12) <cntl-v> will paste the selected objects at a slightly offset position
 13) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
@@ -116,17 +116,18 @@ Menubar Options
 
 1) File - All the save/load/new functions you would expect
 2) Mode - Switch between Edit Mode and Run Mode (also Reset layout to default state)
-3) Automation - Enable/disable signal override functions (disable for completely manual
+3) Automation - Enable/disable signal override functions in Run Mode (disable for manual
      control of all signals on the layout - Track occupancy changes remain functional)
 4) SPROG - Connect/disconnect from the SPROG DCC Command Station
 5) DCC Power - Enable/Disable the DCC bus supply (SPROG must be connected)
 6) MQTT - Connect/disconnect from the external MQTT broker
-7) Settings-Canvas - Change the display size of the schematic
-8) Settings-MQTT - Configure the MQTT broker and signalling network
-9) Settings-SPROG - Configure the serial port and SPROG behavior
-10) Settings-Logging - Set the log level for running the layout
-11) Settings-Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
-12) Help-Info - Add notes to document your layout configuration
+7) Utilities => DCC Programmming - One touch and CV programming of signals/points
+8) Settings => Canvas - Change the display size of the schematic
+9) Settings => MQTT - Configure the MQTT broker and signalling networking
+10) Settings => SPROG - Configure the serial port and SPROG behavior
+11) Settings => Logging - Set the log level for running the layout
+12) Settings => Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
+13) Help-Info - Add notes to document your layout configuration
 
 Schematic object configuration
 
