@@ -745,6 +745,11 @@ class edit_signal:
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             open_windows[object_id] = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
@@ -765,11 +770,6 @@ class edit_signal:
             self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
             # The automation tab needs the parent object so the sig_id can be accessed for validation
             self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
             self.load_state()
                 
@@ -986,7 +986,7 @@ class edit_signal:
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):

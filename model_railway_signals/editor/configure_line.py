@@ -134,9 +134,10 @@ class edit_line():
         else:
             # This is the UUID for the object being edited
             self.object_id = object_id
-            # Creatre the basic Top Level window
+            # Create the (non-resizable) top level window
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             open_windows[object_id] = self.window
             # Create a frame to hold all UI elements (so they don't expand on window resize
             # to provide consistent behavior with the other configure object popup windows)
@@ -208,7 +209,7 @@ class edit_line():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):

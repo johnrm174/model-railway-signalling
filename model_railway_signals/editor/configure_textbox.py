@@ -102,15 +102,20 @@ class edit_textbox():
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             open_windows[object_id] = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create a frame to hold all UI elements (so they don't expand on window resize
             # to provide consistent behavior with the other configure object popup windows)
             self.main_frame = Tk.Frame(self.window)
-            self.main_frame.pack()
+            self.main_frame.pack(fill='both', expand=True)
             self.frame1 = Tk.Frame(self.main_frame)
-            self.frame1.pack(padx=2, pady=2, fill='both')
+            self.frame1.pack(padx=2, pady=2, fill='both', expand=True)
             self.text = common.scrollable_text_frame(self.frame1, max_height=5,max_width=30,
                     min_height=1, min_width=10, editable=True, auto_resize=True)
-            self.text.pack(padx=2, pady=2)
+            self.text.pack(padx=2, pady=2, fill='both', expand=True)
             # Create a Frame for the colour selections
             self.frame2 = Tk.Frame(self.main_frame)
             self.frame2.pack(padx=2, pady=2, fill='x')
@@ -130,11 +135,6 @@ class edit_textbox():
             # Create a Frame for the Text Style Entry widgey
             self.textstyle = text_style_entry (self.main_frame, callback = self.text_style_updated)
             self.textstyle.frame.pack(padx=2, pady=2, fill='x')        
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
             self.load_state()
         
@@ -196,7 +196,7 @@ class edit_textbox():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):

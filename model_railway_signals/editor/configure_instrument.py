@@ -255,6 +255,11 @@ class edit_instrument():
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             open_windows[object_id] = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create the Notebook (for the tabs) 
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
@@ -265,11 +270,6 @@ class edit_instrument():
             self.tabs.pack()
             self.config = instrument_configuration_tab(self.tab1)
             self.locking = instrument_interlocking_tab(self.tab2)
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
             self.load_state()
 
@@ -326,7 +326,7 @@ class edit_instrument():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):

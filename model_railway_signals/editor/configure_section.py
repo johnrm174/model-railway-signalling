@@ -266,6 +266,11 @@ class edit_section():
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             open_windows[object_id] = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # Create a frame to hold all UI elements (so they don't expand on window resize
             # to provide consistent behavior with the other configure object popup windows)
             self.main_frame = Tk.Frame(self.window)
@@ -280,11 +285,6 @@ class edit_section():
             self.tabs.pack(fill='x')
             self.config = section_configuration_tab(self.tab1)
             self.automation = section_automation_tab(self.tab2)        
-            # Create the common Apply/OK/Reset/Cancel buttons for the window
-            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
-            self.controls.frame.pack(padx=2, pady=2)
-            # Create the Validation error message (this gets packed/unpacked on apply/save)
-            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
             # load the initial UI state
             self.load_state()
         
@@ -341,7 +341,7 @@ class edit_section():
             else: self.load_state()
         else:
             # Display the validation error message
-            self.validation_error.pack()
+            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):
