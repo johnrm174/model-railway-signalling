@@ -94,46 +94,49 @@ basic guidance and top tips for creating your layout signalling system:
    read the accompanying layout notes (see Help-Info once the example layout has been loaded)
    To get a feel of how these signalling schemes have been designed and configured.
 
-Schematic functions (in edit mode):
+Schematic editor functions (Edit Mode):
  
 1) Use the buttons on the left to add objects to the schematic.
-2) Left-click to select objects (shift-left-click will 'add' to the selection).
-3) Left-click / release to drag / drop selected objects around the schematic.
-4) Double-left-click on a schematic object to open the object configuraton window
-5) Left-click on the 'end' of a selected line to move/edit the position
-6) Left-click / release (when not over an object) can also be used for an 'area' selection
+2) Left-click to select objects (shift-left-click will add/remove from the selection).
+3) Left-click/release when over an object to drag/drop selected objects.
+4) Left-click/release when not over an object to seleact an 'area'.
+5) Left-click/release on the 'end' of a selected line to move the line end.
+6) Double-left-click on a schematic object to open the object configuraton window
 7) Right-click on an object or the canvas to bring up additional options
 8) <r> will rotate all selected point and signal objects by 180 degrees
 9) <s> will snap all selected objects to the grid ('snap-to-grid' enabled or disabled)
 10) <backspace> will delete all currently selected objects from the schematic
-11) <cntl-c> will copy all currently selected objects to a copy/paste buffer
-12) <cntl-v> will paste the selected objects at a slightly offset position
-13) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
-14) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
-15) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
-16) <Esc> will deselect all objects (or cancel a move in progress)
+11) <cntl-c> / <cntl-v> will copy/paste all currently selected objects
+12) <cntl-z> / <cntl-y> will undo/redo schematic and object configuration changes
+13) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
+14) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
+15) <Esc> will deselect all objects (or cancel the move of selected objects)
+16) Arrow keys will 'nudge' selected objects (or scroll the canvas if nothing selected)
+17) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+
+Schematic editor functions (Run Mode):
+
+1) <cntl-a> will toggle the signal automation on / off when in Run Mode
+2) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
+3) Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
+4) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
 
 Menubar Options
 
 1) File - All the save/load/new functions you would expect
-2) Mode - Switch between Edit Mode and Run Mode (also Reset layout to default state)
-3) Automation - Enable/disable signal override functions in Run Mode (disable for manual
-     control of all signals on the layout - Track occupancy changes remain functional)
-4) SPROG - Connect/disconnect from the SPROG DCC Command Station
-5) DCC Power - Enable/Disable the DCC bus supply (SPROG must be connected)
-6) MQTT - Connect/disconnect from the external MQTT broker
+2) Mode => Edit/Run/Reset - Select Edit or Run Mode (also Reset layout to default state)
+3) Automation => Enable/Disable - signal automation functions in Run Mode
+4) SPROG => Connect/Disconnect - from the SPROG DCC Command Station
+5) DCC Power => Enable/Disable - the DCC bus supply (SPROG must be connected)
+6) MQTT => Connect/disconnect - from the external MQTT broker
 7) Utilities => DCC Programmming - One touch and CV programming of signals/points
 8) Settings => Canvas - Change the display size of the schematic
 9) Settings => MQTT - Configure the MQTT broker and signalling networking
 10) Settings => SPROG - Configure the serial port and SPROG behavior
 11) Settings => Logging - Set the log level for running the layout
 12) Settings => Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
-13) Help-Info - Add notes to document your layout configuration
+13) Help => Info - Add notes to document your layout configuration
 
-Schematic object configuration
-
-1) Double click on the object to open the object's configuration window
-2) Use the hover-over Tooltips to get more information on the selections 
 """
 
 help_window = None
@@ -305,13 +308,13 @@ class edit_canvas_settings():
             self.frame.grid_columnconfigure(1, weight=1)
             self.label1 = Tk.Label(self.frame, text="Canvas width:")
             self.label1.grid(row=0, column=0)
-            self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=4000,
-                            allow_empty=False, tool_tip="Enter width in pixels (400-4000)")
+            self.width = common.integer_entry_box(self.frame, width=5, min_value=400, max_value=8000,
+                            allow_empty=False, tool_tip="Enter width in pixels (400-8000)")
             self.width.grid(row=0, column=1)
             self.label2 = Tk.Label(self.frame, text="Canvas height:")
             self.label2.grid(row=1, column=0)
-            self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=2000,
-                            allow_empty=False, tool_tip="Enter height in pixels (200-2000)")
+            self.height = common.integer_entry_box(self.frame, width=5, min_value=200, max_value=4000,
+                            allow_empty=False, tool_tip="Enter height in pixels (200-4000)")
             self.height.grid(row=1, column=1)
             self.label3 = Tk.Label(self.frame, text="Canvas Grid:")
             self.label3.grid(row=2, column=0)
