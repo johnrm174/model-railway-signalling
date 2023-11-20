@@ -256,6 +256,48 @@ def snap_selected_objects_to_grid(event=None):
     return()
 
 #------------------------------------------------------------------------------------
+# Internal function to nudge all selected objects (move on arrow keys). Note that we
+# Throttle the key-repeat (user holding the arrow key down) so Tkinter can keep up.
+# If nothing is selected, then we scroll the canvas instead
+#------------------------------------------------------------------------------------
+
+def nudge_selected_objects(event=None):
+    disable_arrow_keypress_events()
+    # Move the selected objects or scroll the canvas if nothing selected
+    if schematic_state["selectedobjects"] == []:
+        canvas.focus_set()
+        canvas.config(xscrollincrement=canvas_grid, yscrollincrement=canvas_grid)
+        if event.keysym == 'Left': canvas.xview_scroll(-1, "units")
+        if event.keysym == 'Right': canvas.xview_scroll(1, "units")
+        if event.keysym == 'Up': canvas.yview_scroll(-1, "units")
+        if event.keysym == 'Down': canvas.yview_scroll(1, "units")
+    else:
+        if canvas_snap_to_grid: delta = canvas_grid
+        else: delta = 1
+        if event.keysym == 'Left': xdiff, ydiff = -delta, 0
+        if event.keysym == 'Right': xdiff, ydiff = delta, 0
+        if event.keysym == 'Up': xdiff, ydiff = 0, -delta
+        if event.keysym == 'Down': xdiff, ydiff = 0, delta
+        move_selected_objects(xdiff,ydiff)
+        objects.move_objects(schematic_state["selectedobjects"],xdiff1=xdiff, ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff)
+    canvas.after(50,enable_arrow_keypress_events)
+    return()
+
+def enable_arrow_keypress_events(event=None):
+    canvas.bind('<KeyPress-Left>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Right>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Up>',nudge_selected_objects)
+    canvas.bind('<KeyPress-Down>',nudge_selected_objects)
+    return()
+
+def disable_arrow_keypress_events(event=None):
+    canvas.unbind('<KeyPress-Left>')
+    canvas.unbind('<KeyPress-Right>')
+    canvas.unbind('<KeyPress-Up>')
+    canvas.unbind('<KeyPress-Down>')
+    return()
+
+#------------------------------------------------------------------------------------
 # Internal function to edit a line object on the canvas. The "editlineend1" and
 # "editlineend2" dictionary elements specify the line end that needs to be moved
 # Only a single Object will be selected when this function is called
@@ -640,18 +682,28 @@ def cancel_move_in_progress(event):
 
 def update_canvas(width:int, height:int, grid:int, snap_to_grid:bool):
     global canvas_width, canvas_height, canvas_grid, canvas_snap_to_grid
-    # Update the tkinter canvas object
-    canvas.config (width=width, height=height, scrollregion=(0,0,width, height))
-    # reset the root window size (this will fit to contents)
-    root.geometry("")
+    # Update the tkinter canvas object if the size has been updated
+    if canvas_width != width or canvas_height != height:
+        canvas_width, canvas_height = width, height
+        reset_window_size()
+    else:
+        canvas_width, canvas_height = width, height
     # Set the global variables (used in the 'draw_grid' function)
-    canvas_width = width
-    canvas_height = height
-    canvas_grid = grid
-    canvas_snap_to_grid = snap_to_grid
+    canvas_grid, canvas_snap_to_grid = grid, snap_to_grid
     draw_grid()
     # Also update the objects module with the new settings
-    objects.update_canvas(width, height, grid)
+    objects.update_canvas(canvas_width, canvas_height, canvas_grid)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to reset the root window sizeto fit the canvas.  Note that the maximum
+# window size will have been been set to the screen size on application creation
+#------------------------------------------------------------------------------------
+
+def reset_window_size(event=None):
+    global canvas_width, canvas_height
+    canvas.config(width=canvas_width, height=canvas_height, scrollregion=(0,0,canvas_width,canvas_height))
+    root.geometry("")
     return()
 
 #------------------------------------------------------------------------------------
@@ -679,13 +731,17 @@ def schematic_redo(event=None):
 
 def enable_all_keypress_events_after_completion_of_move():
     enable_edit_keypress_events()
+    enable_arrow_keypress_events()
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
+    canvas.bind('<Control-Key-r>', reset_window_size)
     return()
 
 def disable_all_keypress_events_during_move():
     disable_edit_keypress_events()
+    disable_arrow_keypress_events()
     canvas.bind('<Escape>',cancel_move_in_progress)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
+    canvas.unbind('<Control-Key-r>')                             # Toggle Mode (Edit/Run)
     return()
 
 #------------------------------------------------------------------------------------
@@ -701,7 +757,7 @@ def enable_edit_keypress_events():
     canvas.bind('<Control-Key-v>', paste_clipboard_objects)
     canvas.bind('<Control-Key-z>', schematic_undo)
     canvas.bind('<Control-Key-y>', schematic_redo)
-    canvas.bind('<Control-Key-s>', canvas_event_callback)    # Toggle Snap to Grid
+    canvas.bind('<Control-Key-s>', canvas_event_callback)    # Toggle Snap to Grid Mode
     canvas.bind('r', rotate_selected_objects)
     canvas.bind('s', snap_selected_objects_to_grid)      
     return()
@@ -716,7 +772,7 @@ def disable_edit_keypress_events():
     canvas.unbind('<Control-Key-y>')
     canvas.unbind('<Control-Key-s>')
     canvas.unbind('r')
-    canvas.unbind('s')    
+    canvas.unbind('s')
     return()
 
 #------------------------------------------------------------------------------------
@@ -746,9 +802,11 @@ def enable_editing():
     canvas.bind('<Double-Button-1>', left_double_click)
     # Bind the canvas keypresses to the associated functions
     enable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in both edit and run modes
-    # only disabled during Edit Mode moves and area selections on the schematic
+    # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
+    # and Run Modes - only disabled during Edit Mode object moves and area selections)
+    canvas.bind('<Control-Key-r>', reset_window_size)
     canvas.bind('<Control-Key-m>', canvas_event_callback)
+    enable_arrow_keypress_events()
     # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
     canvas.unbind('<Control-Key-a>')
     return()
@@ -772,11 +830,13 @@ def disable_editing():
     canvas.unbind('<Double-Button-1>')
     # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
     disable_edit_keypress_events()
-    # Bind the Toggle Mode keypress event (this is active in both edit and run modes
-    # only disabled during Edit Mode moves and area selections on the schematic
+    # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
+    # and Run Modes - only disabled during Edit Mode object moves and area selections)
+    canvas.bind('<Control-Key-r>', reset_window_size)
     canvas.bind('<Control-Key-m>', canvas_event_callback)
-    # Layout Automation toggle is only enabled in Run Mode
-    canvas.bind('<Control-Key-a>', canvas_event_callback)  
+    enable_arrow_keypress_events()
+    # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
+    canvas.bind('<Control-Key-a>', canvas_event_callback)
     return()
 
 #------------------------------------------------------------------------------------
