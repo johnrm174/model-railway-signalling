@@ -111,6 +111,7 @@ Schematic functions (in edit mode):
 13) <cntl-z> / <cntl-y>  undo and redo for schematic and object configuration changes
 14) <cntl-s> will toggle 'snap-to-grid' on/off for moving objects in Edit Mode
 15) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+16) <Esc> will deselect all objects (or cancel a move in progress)
 
 Menubar Options
 

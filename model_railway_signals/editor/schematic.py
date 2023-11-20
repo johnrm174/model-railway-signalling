@@ -476,7 +476,7 @@ def left_button_click(event):
             canvas.itemconfigure(schematic_state["selectareabox"],state="normal")
     # Unbind the canvas keypresses until left button release to prevent mode changes,
     # rotate/delete of objects (i.e. prevent undesirable editor behavior)
-    disable_all_keypress_events()
+    disable_all_keypress_events_during_move()
     return()
 
 #------------------------------------------------------------------------------------
@@ -570,7 +570,7 @@ def left_button_release(event):
                 xdiff1=finalx, ydiff1=finaly, xdiff2=finalx, ydiff2=finaly )
         # Clear the "select object mode" - but leave all objects selected
         schematic_state["moveobjects"] = False
-    elif schematic_state["editlineend1"]:
+    elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
         # Finish the move by snapping the line end to the grid
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
@@ -579,20 +579,12 @@ def left_button_release(event):
         finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
         finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
         # Finalise the move by updating the current object position
-        objects.move_objects(schematic_state["selectedobjects"], xdiff1=finalx, ydiff1=finaly)
+        if schematic_state["editlineend1"]:
+            objects.move_objects(schematic_state["selectedobjects"], xdiff1=finalx, ydiff1=finaly)
+        else:
+            objects.move_objects(schematic_state["selectedobjects"], xdiff2=finalx, ydiff2=finaly)
         # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend1"] = False
-    elif schematic_state["editlineend2"]:
-        # Finish the move by snapping the line end to the grid
-        xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
-                                   schematic_state["lasty"]- schematic_state["starty"])
-        move_line_end(xdiff,ydiff)
-        # Calculate the total deltas for the move (from the startposition)
-        finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
-        finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
-        # Finalise the move by updating the current object position
-        objects.move_objects(schematic_state["selectedobjects"], xdiff2=finalx, ydiff2=finaly)
-        # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend2"] = False
         # Note the defensive programming - to ensure the bbox exists
     elif schematic_state["selectarea"] and schematic_state["selectareabox"] is not None:
@@ -606,7 +598,39 @@ def left_button_release(event):
         canvas.itemconfigure(schematic_state["selectareabox"],state="hidden")
         schematic_state["selectarea"] = False
     # Re-bind the canvas keypresses on completion of area selection or Move Objects
-    enable_all_keypress_events()
+    enable_all_keypress_events_after_completion_of_move()
+    return()
+
+#------------------------------------------------------------------------------------
+# Left Button Release - Finish Object or line end Moves (by snapping to grid)
+# or select all objects within the canvas area selection box
+# The event will only be bound to the canvas in "Edit" Mode
+#------------------------------------------------------------------------------------
+
+def cancel_move_in_progress(event):
+    global schematic_state
+    if schematic_state["moveobjects"]:
+        # Undo the move by returning all objects to their start position
+        xdiff = schematic_state["startx"] - schematic_state["lastx"]
+        ydiff = schematic_state["starty"] - schematic_state["lasty"]
+        move_selected_objects(xdiff,ydiff)
+        # Clear the "select object mode" - but leave all objects selected
+        schematic_state["moveobjects"] = False
+    elif schematic_state["editlineend1"] or  schematic_state["editlineend2"]:
+        # Undo the move by returning all objects to their start position
+        xdiff = schematic_state["startx"] - schematic_state["lastx"]
+        ydiff = schematic_state["starty"] - schematic_state["lasty"]
+        move_line_end(xdiff,ydiff)
+        # Clear the "Edit line mode" - but leave the line selected
+        schematic_state["editlineend1"] = False
+        schematic_state["editlineend2"] = False
+        # Note the defensive programming - to ensure the bbox exists
+    elif schematic_state["selectarea"] and schematic_state["selectareabox"] is not None:
+        # Clear the Select Area Mode and Hide the area selection rectangle
+        canvas.itemconfigure(schematic_state["selectareabox"],state="hidden")
+        schematic_state["selectarea"] = False
+    # Re-bind the canvas keypresses on completion of area selection or Move Objects
+    enable_all_keypress_events_after_completion_of_move()
     return()
 
 #------------------------------------------------------------------------------------
@@ -646,16 +670,21 @@ def schematic_redo(event=None):
 
 #------------------------------------------------------------------------------------
 # Internal Functions to enable/disable all canvas keypress events during an object
-# move, line edit or area selection function (to ensure deterministic behavior)
+# move, line edit or area selection function (to ensure deterministic behavior).
+# Note that on disable (when a move or area selection has been initiated) then we
+# re-bind the escape key to the function for canceling the move / area selection.
+# on enable (at completion or cancel of the move/area seclection) then the Escape
+# key will be re-bound to 'deselect_all_objects' in 'enable_edit_keypress_events'
 #------------------------------------------------------------------------------------
 
-def enable_all_keypress_events():
+def enable_all_keypress_events_after_completion_of_move():
     enable_edit_keypress_events()
     canvas.bind('<Control-Key-m>', canvas_event_callback)        # Toggle Mode (Edit/Run)
     return()
 
-def disable_all_keypress_events():
+def disable_all_keypress_events_during_move():
     disable_edit_keypress_events()
+    canvas.bind('<Escape>',cancel_move_in_progress)
     canvas.unbind('<Control-Key-m>')                             # Toggle Mode (Edit/Run)
     return()
 
