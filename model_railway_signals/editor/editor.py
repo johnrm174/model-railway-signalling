@@ -598,6 +598,11 @@ class main_menubar:
 def run_editor():
     # Create the Main Root Window
     root = Tk.Tk()
+    # Limit the maximum window size to the size of the screen (layout can be scrolled in this)
+    # Note the slight adjustment for the window title bar - this makes it a perfect fit on the Pi
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()-30
+    root.maxsize(screen_width,screen_height)
     # Create the menubar and editor canvas (canvas size will be set on creation)
     main_window_menubar = main_menubar(root)
     # Use the signals Lib function to find/store the root window reference
