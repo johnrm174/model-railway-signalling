@@ -136,6 +136,16 @@ def draw_grid():
     return()
 
 #------------------------------------------------------------------------------------
+# Internal function to create an object (and make it the only selected object)
+#------------------------------------------------------------------------------------
+
+def create_object(new_object_type, item_type=None, item_subtype=None):
+    deselect_all_objects()
+    object_id = objects.create_object(new_object_type, item_type, item_subtype)
+    select_object(object_id)
+    return()
+
+#------------------------------------------------------------------------------------
 # Internal function to select an object (adding to the list of selected objects)
 #------------------------------------------------------------------------------------
 
@@ -890,27 +900,27 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     popup2.add_command(label="Paste", command=paste_clipboard_objects)
     popup2.add_command(label="Select all", command=select_all_objects)
     # Define the object buttons [filename, function_to_call]
-    selections = [ ["textbox", lambda:objects.create_object(objects.object_type.textbox) ],
-                   ["line", lambda:objects.create_object(objects.object_type.line) ],
-                   ["colourlight", lambda:objects.create_object(objects.object_type.signal,
-                                            signals_common.sig_type.colour_light.value,
-                                            signals_colour_lights.signal_sub_type.four_aspect.value) ],
-                   ["semaphore", lambda:objects.create_object(objects.object_type.signal,
-                                            signals_common.sig_type.semaphore.value,
-                                            signals_semaphores.semaphore_sub_type.home.value) ],
-                   ["groundpos", lambda:objects.create_object(objects.object_type.signal,
-                                            signals_common.sig_type.ground_position.value,
-                                            signals_ground_position.ground_pos_sub_type.standard.value) ],
-                   ["grounddisc", lambda:objects.create_object(objects.object_type.signal,
-                                            signals_common.sig_type.ground_disc.value,
-                                            signals_ground_disc.ground_disc_sub_type.standard.value) ],
-                   ["lhpoint", lambda:objects.create_object(objects.object_type.point,
-                                            points.point_type.LH.value) ],
-                   ["rhpoint", lambda:objects.create_object(objects.object_type.point,
-                                            points.point_type.RH.value) ],
-                   ["section", lambda:objects.create_object(objects.object_type.section) ],
-                   ["instrument", lambda:objects.create_object(objects.object_type.instrument,
-                                            block_instruments.instrument_type.single_line.value) ] ]
+    selections = [ ["textbox", lambda:create_object(objects.object_type.textbox) ],
+                   ["line", lambda:create_object(objects.object_type.line) ],
+                   ["colourlight", lambda:create_object(objects.object_type.signal,
+                                        signals_common.sig_type.colour_light.value,
+                                        signals_colour_lights.signal_sub_type.four_aspect.value) ],
+                   ["semaphore", lambda:create_object(objects.object_type.signal,
+                                        signals_common.sig_type.semaphore.value,
+                                        signals_semaphores.semaphore_sub_type.home.value) ],
+                   ["groundpos", lambda:create_object(objects.object_type.signal,
+                                        signals_common.sig_type.ground_position.value,
+                                        signals_ground_position.ground_pos_sub_type.standard.value) ],
+                   ["grounddisc", lambda:create_object(objects.object_type.signal,
+                                        signals_common.sig_type.ground_disc.value,
+                                        signals_ground_disc.ground_disc_sub_type.standard.value) ],
+                   ["lhpoint", lambda:create_object(objects.object_type.point,
+                                        points.point_type.LH.value) ],
+                   ["rhpoint", lambda:create_object(objects.object_type.point,
+                                        points.point_type.RH.value) ],
+                   ["section", lambda:create_object(objects.object_type.section) ],
+                   ["instrument", lambda:create_object(objects.object_type.instrument,
+                                        block_instruments.instrument_type.single_line.value) ] ]
     # Create the buttons we need (adding the references to the buttons and images
     # to a global list so they don't go out of scope and dont get garbage collected)
     buttons = []

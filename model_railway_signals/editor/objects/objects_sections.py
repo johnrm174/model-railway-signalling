@@ -246,7 +246,7 @@ def create_section():
     objects_common.section_index[str(item_id)] = object_id 
     # Draw the object on the canvas
     redraw_section_object(object_id)
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to Paste a copy of an existing Track Section - returns the new Object ID

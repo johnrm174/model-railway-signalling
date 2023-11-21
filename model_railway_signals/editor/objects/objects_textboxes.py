@@ -101,7 +101,7 @@ def create_textbox():
     objects_common.schematic_objects[object_id]["posy"] = y
     # Draw the text box on the canvas
     redraw_textbox_object(object_id)
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to paste a copy of an existing text box - returns the new Object ID

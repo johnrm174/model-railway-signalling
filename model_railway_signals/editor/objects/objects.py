@@ -261,21 +261,23 @@ def reset_objects():
 
 def create_object(new_object_type, item_type=None, item_subtype=None):
     if new_object_type == objects_common.object_type.line:
-        objects_lines.create_line() 
+        object_id = objects_lines.create_line() 
     elif new_object_type == objects_common.object_type.textbox:
-        objects_textboxes.create_textbox()
+        object_id = objects_textboxes.create_textbox()
     elif new_object_type == objects_common.object_type.signal:
-        objects_signals.create_signal(item_type, item_subtype)
+        object_id = objects_signals.create_signal(item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
-         objects_points.create_point(item_type)
+         object_id = objects_points.create_point(item_type)
     elif new_object_type == objects_common.object_type.section:
-        objects_sections.create_section()
+        object_id = objects_sections.create_section()
     elif new_object_type == objects_common.object_type.instrument:
-        objects_instruments.create_instrument(item_type)
+        object_id = objects_instruments.create_instrument(item_type)
+    else:
+        object_id = None
     # save the current state (for undo/redo)
     save_schematic_state()
     # As we are creating 'new' objects we don't need to process layout changes
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to update the configuration of an existing schematic object and re-draw it

@@ -153,7 +153,7 @@ def create_instrument(item_type):
     objects_common.instrument_index[str(item_id)] = object_id 
     # Draw the object on the canvas
     redraw_instrument_object(object_id)
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to Paste a copy of an existing Block Instrument  - returns the new Object ID
