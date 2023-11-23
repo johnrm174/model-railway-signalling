@@ -332,14 +332,14 @@ def run_undo_and_redo_tests(delay:float=0.0):
     s1 = create_colour_light_signal()                     # event 1 #
     assert_objects_exist(s1)
     sleep(delay)
-    assert_object_position(s1,50,50)
+    assert_object_position(s1,75,50)
     select_and_move_objects(s1,100,100,delay=delay)       # event 2 #
     assert_object_position(s1,100,100)
     sleep(delay)
     l1 = create_line()                                    # event 3 #
     assert_objects_exist(l1)
     sleep(delay)
-    assert_object_position(l1,50,50,100,50)
+    assert_object_position(l1,75,50,125,50)
     select_and_move_objects(l1,500,150,delay=delay)       # event 4 #
     assert_object_position(l1,475,150,525,150)
     sleep(delay)
@@ -391,7 +391,7 @@ def run_undo_and_redo_tests(delay:float=0.0):
     assert_object_position(l1,475,150,525,150)
     sleep(delay)
     undo()                                                # undo of event 4 #
-    assert_object_position(l1,50,50,100,50)    
+    assert_object_position(l1,75,50,125,50)    
     sleep(delay)
     assert_objects_exist(l1)
     undo()                                                # undo of event 3 #
@@ -399,7 +399,7 @@ def run_undo_and_redo_tests(delay:float=0.0):
     sleep(delay)
     assert_object_position(s1,100,100)
     undo()                                                # undo of event 2 #
-    assert_object_position(s1,50,50)
+    assert_object_position(s1,75,50)
     sleep(delay)
     assert_objects_exist(s1)
     undo()                                                # undo of event 1 #
@@ -419,7 +419,7 @@ def run_undo_and_redo_tests(delay:float=0.0):
     redo()
     assert_objects_exist(s1)
     sleep(delay)
-    assert_object_position(s1,50,50)
+    assert_object_position(s1,75,50)
     redo()
     assert_object_position(s1,100,100)
     sleep(delay)
@@ -427,7 +427,7 @@ def run_undo_and_redo_tests(delay:float=0.0):
     redo()
     assert_objects_exist(l1)
     sleep(delay)
-    assert_object_position(l1,50,50,100,50)
+    assert_object_position(l1,75,50,125,50)
     redo()
     assert_object_position(l1,475,150,525,150)
     sleep(delay)
