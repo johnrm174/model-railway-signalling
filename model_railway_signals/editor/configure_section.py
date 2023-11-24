@@ -47,6 +47,27 @@ from ..library import track_sections
 open_windows={}
 
 #------------------------------------------------------------------------------------
+# Function to return the read-only interlocked_signals element. This is the back-reference
+# to the signals that are configured to be interlocked with the track sections ahead
+#------------------------------------------------------------------------------------
+
+def interlocked_signals(object_id):
+    list_of_interlocked_signals = []
+    for signal_id in objects.signal_index:
+        interlocked_routes = objects.schematic_objects[objects.signal(signal_id)]["trackinterlock"]
+        signal_routes_to_set = [False, False, False, False, False]
+        add_signal_to_interlock_list = False
+        for index, interlocked_route in enumerate(interlocked_routes):
+            for interlocked_section in interlocked_route:
+                if interlocked_section == int(objects.schematic_objects[object_id]["itemid"]):
+                    signal_routes_to_set[index] = True
+                    add_signal_to_interlock_list = True
+        if add_signal_to_interlock_list:
+            signal_entry = [int(signal_id), signal_routes_to_set]
+            list_of_interlocked_signals.append(signal_entry)
+    return(list_of_interlocked_signals)
+
+#------------------------------------------------------------------------------------
 # Helper Function to return the list of available signal routes for the signal ahead
 #------------------------------------------------------------------------------------
 
@@ -235,9 +256,18 @@ class signal_route_frame():
         else:
             self.label = Tk.Label(self.subframe, text="No automation configured")
             self.label.pack()
-            
+
 #------------------------------------------------------------------------------------
-# Class for the main Track Section configuration tab
+# Top level Class for the Track Section Interlocking Tab
+#------------------------------------------------------------------------------------
+
+class section_interlocking_tab():
+    def __init__(self, parent_tab):
+        self.signals = common.signal_route_interlocking_frame(parent_tab)
+        self.signals.frame.pack(padx=2, pady=2, fill='x')
+
+#------------------------------------------------------------------------------------
+# Class for the main Track Section automation tab
 #------------------------------------------------------------------------------------
 
 class section_automation_tab():
@@ -246,7 +276,7 @@ class section_automation_tab():
         self.behind.frame.pack(padx=2, pady=2, fill='x')
         self.ahead = signal_route_frame (parent_tab, label="Signals ahead of section")
         self.ahead.frame.pack(padx=2, pady=2, fill='x')
-
+        
 #####################################################################################
 # Top level Class for the Edit Section window
 #####################################################################################
@@ -281,13 +311,16 @@ class edit_section():
             self.tab1 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab1, text="Configration")
             self.tab2 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab2, text="Automation")
+            self.tabs.add(self.tab2, text="Interlocking")
+            self.tab3 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab3, text="Automation")
             self.tabs.pack(fill='x')
             self.config = section_configuration_tab(self.tab1)
-            self.automation = section_automation_tab(self.tab2)        
+            self.interlocking = section_interlocking_tab(self.tab2)        
+            self.automation = section_automation_tab(self.tab3)        
             # load the initial UI state
             self.load_state()
-        
+
 #------------------------------------------------------------------------------------
 # Functions for Load, Save and close Window
 #------------------------------------------------------------------------------------
@@ -305,6 +338,7 @@ class edit_section():
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
             self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"])
             self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
+            self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             self.automation.behind.set_values(signals_behind(self.object_id))
             # Hide the validation error message

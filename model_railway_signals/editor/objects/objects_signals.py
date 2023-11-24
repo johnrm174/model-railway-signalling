@@ -153,6 +153,11 @@ default_signal_object["pointinterlock"] = [
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ]
+# This is the default Track Section interlocking table for a signal
+# Track Section interlocking table comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
+# Each route element contains a list of interlocked sections for that route [t1,t2,t3]
+# Each entry is the ID of a (loacl) track section the signal is to be interlocked with
+default_signal_object["trackinterlock"] = [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0] ]
 # This is the default opposing signal interlocking table for a signal
 # The table comprises a list of route elements [main, lh1, lh2, rh1, rh2]
 # Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
@@ -368,6 +373,12 @@ def remove_references_to_section(section_id:int):
         for index1, section_ahead in enumerate(track_sections[1]):
             if section_ahead == section_id:
                 objects_common.schematic_objects[sig_object]["tracksections"][1][index1] = 0
+        # Check the track interlocking table
+        track_interlocking = objects_common.schematic_objects[sig_object]["trackinterlock"]
+        for index1, route in enumerate(track_interlocking):
+            for index2, track_section in enumerate(route):
+                if track_section == section_id:
+                    objects_common.schematic_objects[sig_object]["trackinterlock"][index1][index2] = 0
     return()
 
 #------------------------------------------------------------------------------------
@@ -387,6 +398,12 @@ def update_references_to_section(old_section_id:int, new_section_id:int):
         for index1, section_ahead in enumerate(track_sections[1]):
             if section_ahead == old_section_id:
                 objects_common.schematic_objects[sig_object]["tracksections"][1][index1] = new_section_id
+        # Check the track interlocking table
+        track_interlocking = objects_common.schematic_objects[sig_object]["trackinterlock"]
+        for index1, route in enumerate(track_interlocking):
+            for index2, track_section in enumerate(route):
+                if track_section == old_section_id:
+                    objects_common.schematic_objects[sig_object]["trackinterlock"][index1][index2] = new_section_id
     return()
 
 #------------------------------------------------------------------------------------
@@ -658,6 +675,7 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["subroutes"] = default_signal_object["subroutes"]
     # All interlocking elements (will be completely different for the new signal)
     objects_common.schematic_objects[new_object_id]["pointinterlock"] = default_signal_object["pointinterlock"]
+    objects_common.schematic_objects[new_object_id]["trackinterlock"] = default_signal_object["trackinterlock"]
     objects_common.schematic_objects[new_object_id]["siginterlock"] = default_signal_object["siginterlock"]
     objects_common.schematic_objects[new_object_id]["interlockahead"] = default_signal_object["interlockahead"]
     # All DCC Addresses (will be completely different for the new signal)
@@ -740,7 +758,7 @@ def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
     return()
 
 ########################################################################################################
-# The following functions are specific to Track Section Objects
+# The following functions are specific to Track Sensor Objects
 ########################################################################################################
 
 #------------------------------------------------------------------------------------

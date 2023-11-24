@@ -4,6 +4,7 @@
 # Makes the following external API calls to other editor modules:
 #    objects.point_exists(id) - To see if the point exists (local)
 #    objects.signal_exists(id) - To see if the point exists (local)
+#    objects.section_exists(id) - To see if the track section exists (local)
 #
 # Makes the following external API calls to library modules:
 #    signals_common.sig_exists(id) - To see if the instrument exists (local or remote)
@@ -276,7 +277,7 @@ class interlocking_route_frame:
 # uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes 
-#    "get_values" - Populates the list of interlocked signals and their routes
+#    "get_values" - Returns the list of interlocked signals and their routes
 #    "enable_route" - Enables/loads all selections for the route
 #    "disable_route" - Disables/blanks all selections for the route
 #    "validate" - Validates all Entry boxes (Signals exist and not current ID) 
@@ -353,9 +354,9 @@ class conflicting_signals_element():
 # Class for a conflicting signal frame UI Element (for interlocking)
 # uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
-#    "set_values" - Populates the list of interlocked signals and their routes 
-#    "get_values" - Populates the list of interlocked signals and their routes 
-#    "validate" - Validates all Entry boxes (Signals exist and not current ID) 
+#    "set_values" - Populates the table of interlocked signal routes
+#    "get_values" - Returns the table of interlocked signal routes
+#    "validate" - Validates all entries (Signals exist and not the current ID)
 #------------------------------------------------------------------------------------
 
 class conflicting_signals_frame():
@@ -375,22 +376,22 @@ class conflicting_signals_frame():
                  self.rh1.validate() and
                  self.rh2.validate() )
 
-    def set_values(self, sig_routes_element:[[[int,[bool,bool,bool,bool,bool]],],]):
-        # sig_interlocking_routes comprises [main,lh1,lh2,rh1,rh2]
-        # each sig_route comprises [sig1, sig2, sig3, sig4]
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
-        self.main.set_values(sig_routes_element[0])
-        self.lh1.set_values(sig_routes_element[1])
-        self.lh2.set_values(sig_routes_element[2])
-        self.rh1.set_values(sig_routes_element[3])
-        self.rh2.set_values(sig_routes_element[4])
+    def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],]):
+        # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
+        # each sig_route comprises a list of interlocked signals [sig1, sig2, sig3, sig4]
+        # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # sig_id is the interlocked signal and the interlocked routes are True/False
+        self.main.set_values(sig_interlocking_routes[0])
+        self.lh1.set_values(sig_interlocking_routes[1])
+        self.lh2.set_values(sig_interlocking_routes[2])
+        self.rh1.set_values(sig_interlocking_routes[3])
+        self.rh2.set_values(sig_interlocking_routes[4])
 
     def get_values(self):
-        # sig_interlocking_routes comprises [main,lh1,lh2,rh1,rh2]
-        # each sig_route comprises [sig1, sig2, sig3, sig4]
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
+        # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
+        # each sig_route comprises a list of interlocked signals [sig1, sig2, sig3, sig4]
+        # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # sig_id is the interlocked signal and the interlocked routes are True/False
         return ( [self.main.get_values(),
                   self.lh1.get_values(),
                   self.lh2.get_values(),
@@ -398,8 +399,116 @@ class conflicting_signals_frame():
                   self.rh2.get_values() ] )
 
 #------------------------------------------------------------------------------------
+# Class for a interlocked track sections group UI Element (for interlocking)
+# Provides a label frame containing 3 track section entry boxes for a signal route
+# Public class instance methods provided by this class are:
+#    "set_route" - Populates the list of interlocked track sections for the group
+#    "get_route" - Returns the list of interlocked track sections for the route
+#    "enable_route" - Enables/loads all selections for the route
+#    "disable_route" - Disables/blanks all selections for the route
+#    "validate" - Validates all Entries (Track Section exists on schematic)
+#------------------------------------------------------------------------------------
+
+class interlocked_sections_group:
+    def __init__(self, parent_frame, label:str):
+        self.frame = Tk.LabelFrame(parent_frame, text=label)
+        self.frame.pack(side=Tk.LEFT, padx=8, pady=2)
+        tool_tip = "Specify any track sections along the route that will lock this signal when occupied by another train"
+        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t1.pack(side = Tk.LEFT)
+        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t2.pack(side = Tk.LEFT)
+        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t3.pack(side = Tk.LEFT)
+
+    def validate(self):
+        # Validate everything - to highlight ALL validation failures in the UI
+        valid = True
+        if not self.t1.validate(): valid = False
+        if not self.t2.validate(): valid = False
+        if not self.t3.validate(): valid = False
+        return(valid)
+
+    def enable_route(self):
+        self.t1.enable()
+        self.t2.enable()
+        self.t3.enable()
+
+    def disable_route(self):
+        self.t1.disable()
+        self.t2.disable()
+        self.t3.disable()
+
+    def set_route(self, interlocked_route:[int,int,int]):
+        # An interlocked_route comprises: [t1,t2,t3] Where each element is
+        # the ID of a track section the signal is to be interlocked with
+        self.t1.set_value(interlocked_route[0])
+        self.t2.set_value(interlocked_route[1])
+        self.t3.set_value(interlocked_route[2])
+
+    def get_route(self):
+        # An interlocked_route comprises: [t1,t2,t3] Where each element is
+        # the ID of a track section the signal is to be interlocked with
+        interlocked_route = [ self.t1.get_value(), self.t2.get_value(), self.t3.get_value() ]
+        return(interlocked_route)
+
+#------------------------------------------------------------------------------------
+# Class for a interlocked track sections frame UI Element
+# uses multiple instances of the interlocked_sections_group class
+# Public class instance methods provided by this class are:
+#    "set_routes" - Populates the list of interlocked track sections for each route
+#    "get_routes" - Returns the list of interlocked track sections for each route
+#    "validate" - Validates all Entries(Track sections exist on the schematic)
+#------------------------------------------------------------------------------------
+
+class interlocked_sections_frame():
+    def __init__(self, parent_frame):
+        # Create the Label Frame for the UI element (packed by the creating function/class)
+        self.frame = Tk.LabelFrame(parent_frame, text="Interlock with occupied track sections")
+        # Create a subframe to pack everything into so the contents are centered
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        # Create the Interlocked group UI elements (one for each signal route)
+        self.main = interlocked_sections_group(self.subframe, "Main")
+        self.lh1 = interlocked_sections_group(self.subframe, "LH1")
+        self.lh2 = interlocked_sections_group(self.subframe, "LH2")
+        self.rh1 = interlocked_sections_group(self.subframe, "RH1")
+        self.rh2 = interlocked_sections_group(self.subframe, "RH2")
+
+    def validate(self):
+        # Validate everything - to highlight ALL validation failures in the UI
+        valid = True
+        if not self.main.validate(): valid =False
+        if not self.lh1.validate(): valid =False
+        if not self.lh2.validate(): valid =False
+        if not self.rh1.validate(): valid =False
+        if not self.rh2.validate(): valid =False
+        return(valid)
+
+    def set_routes(self, interlocked_sections):
+        # interlocked_sections comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
+        # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
+        # Each entry is the ID of a track section the signal is to be interlocked with
+        self.main.set_route(interlocked_sections[0])
+        self.lh1.set_route(interlocked_sections[1])
+        self.lh2.set_route(interlocked_sections[2])
+        self.rh1.set_route(interlocked_sections[3])
+        self.rh2.set_route(interlocked_sections[4])
+
+    def get_routes(self):
+        # Returned list comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
+        # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
+        # Each entry is the ID of a track section the signal is to be interlocked with
+        return ( [self.main.get_route(),
+                  self.lh1.get_route(),
+                  self.lh2.get_route(),
+                  self.rh1.get_route(),
+                  self.rh2.get_route() ] )
+
+#------------------------------------------------------------------------------------
 # Class for the Distant 'interlock with home signals ahead" ui element
 # Inherits from  common.check_box class (get_value/set_value/enable/disable)
+# Only enabled if the signal type is a distant signal (semaphore or colour light)
 #------------------------------------------------------------------------------------
 
 class interlock_with_signals_ahead(common.check_box):
@@ -420,6 +529,8 @@ class signal_interlocking_tab:
     def __init__(self, parent_tab, parent_object):
         self.interlocking = interlocking_route_frame(parent_tab, parent_object)
         self.interlocking.frame.pack(padx=2, pady=2, fill='x')
+        self.interlocked_sections = interlocked_sections_frame(parent_tab)
+        self.interlocked_sections.frame.pack(padx=2, pady=2, fill='x')
         self.conflicting_sigs = conflicting_signals_frame(parent_tab, parent_object)
         self.conflicting_sigs.frame.pack(padx=2, pady=2, fill='x')
         self.interlock_ahead = interlock_with_signals_ahead(parent_tab)

@@ -482,35 +482,44 @@ def update_tab2_available_signal_routes(signal):
     sub_routes = get_sub_routes(signal)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
+    signal.locking.interlocked_sections.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
     # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
+        signal.locking.interlocked_sections.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh1.disable_route()
+        signal.locking.interlocked_sections.lh1.disable_route()
         signal.locking.conflicting_sigs.lh1.disable_route()
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
+        signal.locking.interlocked_sections.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh2.disable_route()
+        signal.locking.interlocked_sections.lh2.disable_route()
         signal.locking.conflicting_sigs.lh2.disable_route()
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
+        signal.locking.interlocked_sections.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.frame.pack(padx=2, pady=2, fill='x')
     else: 
         signal.locking.interlocking.rh1.disable_route()
+        signal.locking.interlocked_sections.rh1.disable_route()
         signal.locking.conflicting_sigs.rh1.disable_route()
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
+        signal.locking.interlocked_sections.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.rh2.disable_route()
+        signal.locking.interlocked_sections.rh2.disable_route()
         signal.locking.conflicting_sigs.rh2.disable_route()
     # Enable/disable the signal / block instrument ahead selections on signal type
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
@@ -878,6 +887,7 @@ class edit_signal:
             self.config.settings.set_value(rot)
             # These elements are for the signal intelocking tab
             self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"])
+            self.locking.interlocked_sections.set_routes(objects.schematic_objects[self.object_id]["trackinterlock"])
             self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
             # These elements are for the Automation tab
@@ -936,7 +946,8 @@ class edit_signal:
                self.config.theatre.validate() and self.config.feathers.validate() and
                self.config.semaphores.validate() and self.locking.interlocking.validate() and
                self.locking.conflicting_sigs.validate() and self.automation.track_sensors.validate() and
-               self.automation.track_occupancy.validate() and self.automation.timed_signal.validate() ):        
+               self.automation.track_occupancy.validate() and self.automation.timed_signal.validate() and
+               self.locking.interlocked_sections.validate() ):
             # Copy the original signal Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the signal coniguration elements from the current user selections
@@ -964,6 +975,7 @@ class edit_signal:
                 new_object_configuration["theatreroute"] = False
             # These elements are for the signal intelocking tab
             new_object_configuration["pointinterlock"] = self.locking.interlocking.get_routes()
+            new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()
             new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
             new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
             # These elements are for the Automation tab
