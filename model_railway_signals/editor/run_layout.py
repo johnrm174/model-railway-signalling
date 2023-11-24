@@ -617,6 +617,19 @@ def process_all_signal_interlocking():
                     # Must be a distant signal (colour light or semaphore)
                     if not signals.signal_clear(signal_object["itemid"]):
                         signal_can_be_unlocked = False
+            # Interlock against track sections on the route ahead - note that this is the
+            # one bit of interlocking functionality that we can only do in RUN mode as
+            # track section objects dont 'exist' as such in EDIT mode
+            if not editing_enabled:
+                interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
+                print (interlocked_sections)
+                for section in interlocked_sections:
+                    if section > 0 and track_sections.section_occupied(section):
+                        # Only lock the signal if it is already ON (we always need to allow the
+                        # signalman to return the signal to ON if it is currently OFF
+                        if not signals.signal_clear(signal_object["itemid"]):
+                            signal_can_be_unlocked = False
+                            break
         # Interlock the main signal with the subsidary
         if signals.signal_clear(int_signal_id):
             subsidary_can_be_unlocked = False
