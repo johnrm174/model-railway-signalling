@@ -129,10 +129,16 @@ class interlocking_route_group:
         self.block.pack(side=Tk.LEFT)
     
     def validate(self):
-        # Validates all point, signal and block instrument entries
-        valid = (self.p1.validate() and self.p2.validate() and self.p3.validate() and
-                 self.p4.validate() and self.p5.validate() and self.p6.validate() and
-                 self.sig.validate() and self.block.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.p1.validate(): valid = False
+        if not self.p2.validate(): valid = False
+        if not self.p3.validate(): valid = False
+        if not self.p4.validate(): valid = False
+        if not self.p5.validate(): valid = False
+        if not self.p6.validate(): valid = False
+        if not self.sig.validate(): valid = False
+        if not self.block.validate(): valid = False
         return(valid)
     
     def enable_sig_ahead(self):
@@ -218,9 +224,14 @@ class interlocking_route_frame:
         self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2")
 
     def validate(self):
-        # Validates all point, signal and block instrument entries for all routes
-        return(self.main.validate() and self.lh1.validate() and self.lh2.validate() and
-               self.rh1.validate() and self.rh2.validate())
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
 
     def set_routes(self, interlocking_frame:[[[[int,bool],],str,int]]):
         # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
@@ -314,11 +325,13 @@ class conflicting_signals_element():
         self.sig4.frame.pack(side=Tk.LEFT, padx=5)
 
     def validate(self):
-        # Validate all conflicting signal entries
-        return ( self.sig1.validate() and
-                 self.sig2.validate() and
-                 self.sig3.validate() and
-                 self.sig4.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.sig1.validate(): valid = False
+        if not self.sig2.validate(): valid = False
+        if not self.sig3.validate(): valid = False
+        if not self.sig4.validate(): valid = False
+        return(valid)
 
     def enable_route(self):
         self.sig1.enable()
@@ -370,11 +383,14 @@ class conflicting_signals_frame():
         self.rh2 = conflicting_signals_element(self.frame, parent_object, "RH2 Route")
         
     def validate(self):
-        return ( self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return(valid)
 
     def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],]):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]

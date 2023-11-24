@@ -940,65 +940,74 @@ class edit_signal:
         # If it no longer exists then we just destroy the window and exit without saving
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
-        # Validate all user entries prior to applying the changes. Each of these would have
-        # been validated on entry, but changes to other objects may have been made since then
-        elif ( self.config.sigid.validate() and self.config.aspects.validate() and
-               self.config.theatre.validate() and self.config.feathers.validate() and
-               self.config.semaphores.validate() and self.locking.interlocking.validate() and
-               self.locking.conflicting_sigs.validate() and self.automation.track_sensors.validate() and
-               self.automation.track_occupancy.validate() and self.automation.timed_signal.validate() and
-               self.locking.interlocked_sections.validate() ):
-            # Copy the original signal Configuration (elements get overwritten as required)
-            new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
-            # Update the signal coniguration elements from the current user selections
-            new_object_configuration["itemid"] = self.config.sigid.get_value()
-            new_object_configuration["itemtype"] = self.config.sigtype.get_value()
-            new_object_configuration["itemsubtype"] = self.config.subtype.get_value()
-            new_object_configuration["subsidary"] = self.config.aspects.get_subsidary()
-            new_object_configuration["feathers"] = self.config.feathers.get_feathers()
-            new_object_configuration["dccaspects"] = self.config.aspects.get_addresses()
-            new_object_configuration["dccfeathers"] = self.config.feathers.get_addresses()
-            new_object_configuration["dcctheatre"] = self.config.theatre.get_theatre()
-            new_object_configuration["sigarms"] = self.config.semaphores.get_arms()
-            new_object_configuration["sigroutes"] = get_sig_routes(self)
-            new_object_configuration["subroutes"] = get_sub_routes(self)
-            # These are the general settings for the signal
-            rot = self.config.settings.get_value()
-            if rot: new_object_configuration["orientation"] = 180
-            else: new_object_configuration["orientation"] = 0
-            # Set the Theatre route indicator flag if that particular radio button is selected
-            if self.config.routetype.get_value() == 3:
-                new_object_configuration["theatreroute"] = True
-                new_object_configuration["dccautoinhibit"] = self.config.theatre.get_auto_inhibit()
-            else:
-                new_object_configuration["dccautoinhibit"] = self.config.feathers.get_auto_inhibit()
-                new_object_configuration["theatreroute"] = False
-            # These elements are for the signal intelocking tab
-            new_object_configuration["pointinterlock"] = self.locking.interlocking.get_routes()
-            new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()
-            new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
-            new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
-            # These elements are for the Automation tab
-            new_object_configuration["passedsensor"][0] = True
-            new_object_configuration["passedsensor"][1] = self.automation.track_sensors.passed.get_value()
-            new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
-            new_object_configuration["approachsensor"][1] = self.automation.track_sensors.approach.get_value()
-            new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
-            override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
-            new_object_configuration["fullyautomatic"] = main_auto
-            new_object_configuration["distautomatic"] = dist_auto
-            new_object_configuration["overridesignal"] = override
-            new_object_configuration["overrideahead"] = override_ahead
-            new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
-            new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
-            # Save the updated configuration (and re-draw the object)
-            objects.update_object(self.object_id, new_object_configuration)
-            # Close window on "OK" or re-load UI for "apply"
-            if close_window: self.close_window()
-            else: self.load_state()
         else:
-            # Display the validation error message
-            self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+            # Validate all user entries prior to applying the changes. Each of these would have
+            # been validated on entry, but changes to other objects may have been made since then
+            # Note that we validate ALL elements to ensure all UI elements are updated accordingly 
+            valid = True
+            if not self.config.sigid.validate(): valid = False
+            if not self.config.aspects.validate(): valid = False
+            if not self.config.theatre.validate(): valid = False
+            if not self.config.feathers.validate(): valid = False
+            if not self.config.semaphores.validate(): valid = False
+            if not self.locking.interlocking.validate(): valid = False
+            if not self.locking.interlocked_sections.validate(): valid = False
+            if not self.locking.conflicting_sigs.validate(): valid = False
+            if not self.automation.track_sensors.validate(): valid = False
+            if not self.automation.track_occupancy.validate(): valid = False
+            if not self.automation.timed_signal.validate()
+            if valid:
+                # Copy the original signal Configuration (elements get overwritten as required)
+                new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+                # Update the signal coniguration elements from the current user selections
+                new_object_configuration["itemid"] = self.config.sigid.get_value()
+                new_object_configuration["itemtype"] = self.config.sigtype.get_value()
+                new_object_configuration["itemsubtype"] = self.config.subtype.get_value()
+                new_object_configuration["subsidary"] = self.config.aspects.get_subsidary()
+                new_object_configuration["feathers"] = self.config.feathers.get_feathers()
+                new_object_configuration["dccaspects"] = self.config.aspects.get_addresses()
+                new_object_configuration["dccfeathers"] = self.config.feathers.get_addresses()
+                new_object_configuration["dcctheatre"] = self.config.theatre.get_theatre()
+                new_object_configuration["sigarms"] = self.config.semaphores.get_arms()
+                new_object_configuration["sigroutes"] = get_sig_routes(self)
+                new_object_configuration["subroutes"] = get_sub_routes(self)
+                # These are the general settings for the signal
+                rot = self.config.settings.get_value()
+                if rot: new_object_configuration["orientation"] = 180
+                else: new_object_configuration["orientation"] = 0
+                # Set the Theatre route indicator flag if that particular radio button is selected
+                if self.config.routetype.get_value() == 3:
+                    new_object_configuration["theatreroute"] = True
+                    new_object_configuration["dccautoinhibit"] = self.config.theatre.get_auto_inhibit()
+                else:
+                    new_object_configuration["dccautoinhibit"] = self.config.feathers.get_auto_inhibit()
+                    new_object_configuration["theatreroute"] = False
+                # These elements are for the signal intelocking tab
+                new_object_configuration["pointinterlock"] = self.locking.interlocking.get_routes()
+                new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()
+                new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
+                new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
+                # These elements are for the Automation tab
+                new_object_configuration["passedsensor"][0] = True
+                new_object_configuration["passedsensor"][1] = self.automation.track_sensors.passed.get_value()
+                new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
+                new_object_configuration["approachsensor"][1] = self.automation.track_sensors.approach.get_value()
+                new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
+                override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
+                new_object_configuration["fullyautomatic"] = main_auto
+                new_object_configuration["distautomatic"] = dist_auto
+                new_object_configuration["overridesignal"] = override
+                new_object_configuration["overrideahead"] = override_ahead
+                new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
+                new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
+                # Save the updated configuration (and re-draw the object)
+                objects.update_object(self.object_id, new_object_configuration)
+                # Close window on "OK" or re-load UI for "apply"
+                if close_window: self.close_window()
+                else: self.load_state()
+            else:
+                # Display the validation error message
+                self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
         return()
 
     def close_window(self):

@@ -103,6 +103,8 @@ class signal_passed_sensor_frame:
             self.approach.set_validation_status(False)
             return(False)
         else:
+            # As both validation calls are made before the return statement
+            # all UI eelements will be updated to show their validation status
             self.passed.set_validation_status(self.passed.validate())
             self.approach.set_validation_status(self.approach.validate())
             return(self.passed.validate() and self.approach.validate())
@@ -156,8 +158,14 @@ class section_ahead_frame():
         self.rh2 = section_ahead_element(parent_frame, label=" RH2 ==> ")
         
     def validate(self):
-        return (self.main.validate() and self.lh1.validate() and self.lh2.validate()
-                             and self.rh1.validate() and self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return (valid)
 
 #------------------------------------------------------------------------------------
 # Class for the Track Occupancy Frame - inherits from the sub-classes above
@@ -202,9 +210,11 @@ class track_occupancy_frame():
                      self.section_ahead.rh2.get_value() ] ])
 
     def validate(self):
-        # Validates all track section entry boxes
-        return ( self.section_behind.validate() and
-                 self.section_ahead.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.section_behind.validate(): valid = False
+        if not self.section_ahead.validate(): valid = False
+        return (valid)
 
 #------------------------------------------------------------------------------------
 # Class for the General automation settings subframe
@@ -359,10 +369,12 @@ class timed_signal_route_element():
                    self.delay.get_value() ] )
 
     def validate(self):
-        # Validate the sig_id, start delay and time delay
-        return ( self.sig.validate() and
-                 self.start.validate() and
-                 self.delay.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.sig.validate(): valid = False
+        if not self.start.validate(): valid = False
+        if not self.delay.validate(): valid = False
+        return (valid)
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route frame (comprising selections for each route)
@@ -410,12 +422,14 @@ class timed_signal_frame():
                    self.rh2.get_values() ] )
 
     def validate(self):
-        # Validate the sig_id, start delay and time delay for all routes
-        return ( self.main.validate() and
-                 self.lh1.validate() and
-                 self.lh2.validate() and
-                 self.rh1.validate() and
-                 self.rh2.validate() )
+        # Validate everything - to highlight ALL validation errors in the UI
+        valid = True
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
+        return (valid)
 
 #------------------------------------------------------------------------------------
 # Class for a approach control route element comprising a route selection checkbox,
@@ -541,9 +555,11 @@ class approach_control_route_element():
 #    "disable_release_on_red"  enables/loads the "Release on Red" radio button
 #    "enable_release_on_yel" - disables/blanks the "Release on yellow" radio button 
 #    "disable_release_on_yel"  enables/loads the "Release on yellow" radio button
-#    "set_values" - set the initial values for the check box and entry boxes) 
-#    "get_values" - get the last "validated" values of the check box and entry boxes
-#    "validate" - validate all signal IDs and entered timed sequence parameters
+#    "enable_release_on_red_sig_ahead" - disables/blanks the "Release on sig ahead" radio button 
+#    "disable_release_on_red_sig_ahead"  enables/loads the "Release on sig ahead" radio button
+#    "set_values" - sets the initial values for the check boxes & radio buttons) 
+#    "get_values" - get current last values for the check boxes & radio buttons
+#    "is_selected" - returns whether the signal has been configured for approach control
 # Note that no route enable/disable functions are provided - External functions 
 # should call the individal route_enable/disable functions for each element
 #------------------------------------------------------------------------------------
