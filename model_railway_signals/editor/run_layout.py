@@ -622,7 +622,6 @@ def process_all_signal_interlocking():
             # track section objects dont 'exist' as such in EDIT mode
             if not editing_enabled:
                 interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
-                print (interlocked_sections)
                 for section in interlocked_sections:
                     if section > 0 and track_sections.section_occupied(section):
                         # Only lock the signal if it is already ON (we always need to allow the
