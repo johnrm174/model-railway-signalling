@@ -955,7 +955,7 @@ class edit_signal:
             if not self.locking.conflicting_sigs.validate(): valid = False
             if not self.automation.track_sensors.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
-            if not self.automation.timed_signal.validate()
+            if not self.automation.timed_signal.validate(): valid = False
             if valid:
                 # Copy the original signal Configuration (elements get overwritten as required)
                 new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
