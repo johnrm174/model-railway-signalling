@@ -22,7 +22,7 @@
 #    common.entry_box
 #    common.str_int_item_id_entry_box
 #    common.object_id_selection
-#    common.signal_route_selections
+#    common.signal_route_frame
 #    common.window_controls
 #
 #------------------------------------------------------------------------------------
@@ -91,29 +91,42 @@ def signals_ahead(object_id):
         section_behind_signal = objects.schematic_objects[objects.signal(signal_id)]["tracksections"][0]
         if section_behind_signal == int(objects.schematic_objects[object_id]["itemid"]):
             signal_routes = get_signal_routes(objects.signal(signal_id))
-            signal_entry = [objects.schematic_objects[object_id]["itemid"],signal_routes]
-            list_of_signals_ahead.append(signal_entry)
+            list_of_signals_ahead.append([int(signal_id), signal_routes])
     return(list_of_signals_ahead)
 
 #------------------------------------------------------------------------------------
-# Function to return the read-only "signals behind" element. This is the back-reference
-# to the signals that are configured to set the track section to occupied when passed
+# Function to return the read-only "signals behind" and "signals_overriden" elements.
+# These are the back-references to signals configured to set the track section to occupied
+# when passed and any signals configured to be overridden when the section is occupied
 #------------------------------------------------------------------------------------
 
-def signals_behind(object_id):
+def signals_behind_and_overridden(object_id):
     list_of_signals_behind = []
+    list_of_overridden_signals = []
     for signal_id in objects.signal_index:
+        section_id = int(objects.schematic_objects[object_id]["itemid"])
         sections_ahead_of_signal = objects.schematic_objects[objects.signal(signal_id)]["tracksections"][1]
-        signal_routes_to_set = [False, False, False, False, False]
+        override_on_occupied_flag = objects.schematic_objects[objects.signal(signal_id)]["overridesignal"]
+        signal_routes_to_set_for_override = [False, False, False, False, False]
+        signal_routes_to_set_for_sig_behind = [False, False, False, False, False]
         add_signal_to_signals_behind_list = False
-        for index, section_ahead in enumerate(sections_ahead_of_signal):
-            if section_ahead == int(objects.schematic_objects[object_id]["itemid"]):
-                signal_routes_to_set[index] = True
-                add_signal_to_signals_behind_list = True
+        add_signal_to_overriden_signals_list = False
+        for index1, signal_route in enumerate(sections_ahead_of_signal):
+            if signal_route[0] == section_id:
+                signal_routes_to_set_for_sig_behind[index1] = True
+                add_signal_to_signals_behind_list = True 
+            if override_on_occupied_flag:
+                for index2, section_ahead_of_signal in enumerate(signal_route):
+                    if section_ahead_of_signal == section_id:
+                        signal_routes_to_set_for_override[index1] = True
+                        add_signal_to_overriden_signals_list = True
         if add_signal_to_signals_behind_list:
-            signal_entry = [int(signal_id), signal_routes_to_set]
+            signal_entry = [int(signal_id), signal_routes_to_set_for_sig_behind]
             list_of_signals_behind.append(signal_entry)
-    return(list_of_signals_behind)
+        if add_signal_to_overriden_signals_list:
+            signal_entry = [int(signal_id), signal_routes_to_set_for_override]
+            list_of_overridden_signals.append(signal_entry)
+    return(list_of_signals_behind, list_of_overridden_signals)
 
 #####################################################################################
 # Classes for the Track Section Configuration Tab
@@ -217,53 +230,14 @@ class section_configuration_tab():
         self.label = default_label_entry(parent_tab)
         self.label.frame.pack(padx=2, pady=2, fill='x')
 
-#####################################################################################
-# Classes for the Track Section Automation Tab
-#####################################################################################
-
-#------------------------------------------------------------------------------------
-# Class for a signal routes frame - uses multiple instances of the
-# signal_route_selection_element which are created when "set_values" is called
-# Public class instance methods provided by this class are:
-#    "set_values" - Populates the list of signals and their routes
-#------------------------------------------------------------------------------------
-
-class signal_route_frame():
-    def __init__(self, parent_frame, label:str):
-        # Create the Label Frame for the Signal Interlocking List 
-        self.frame = Tk.LabelFrame(parent_frame, text=label)
-        self.frame.pack(padx=2, pady=2, fill='x')
-        # These are the lists that hold the references to the subframes and subclasses
-        self.sigelements = []
-        self.subframe = None
-
-    def set_values(self, sig_interlocking_frame:[[int,[bool,bool,bool,bool,bool]],]):
-        # If the lists are not empty (case of "reloading" the config) then destroy
-        # all the UI elements and create them again (the list may have changed)
-        if self.subframe: self.subframe.destroy()
-        self.subframe = Tk.Frame(self.frame)
-        self.subframe.pack()
-        self.sigelements = []
-        # sig_interlocking_frame is a variable length list where each element is [sig_id, interlocked_routes]
-        if sig_interlocking_frame:
-            for sig_interlocking_routes in sig_interlocking_frame:
-                # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-                # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(common.signal_route_selections(self.subframe, read_only=True,
-                                    tool_tip="Edit the appropriate signals\nto configure automation"))
-                self.sigelements[-1].frame.pack()
-                self.sigelements[-1].set_values (sig_interlocking_routes)
-        else:
-            self.label = Tk.Label(self.subframe, text="No automation configured")
-            self.label.pack()
-
 #------------------------------------------------------------------------------------
 # Top level Class for the Track Section Interlocking Tab
 #------------------------------------------------------------------------------------
 
 class section_interlocking_tab():
     def __init__(self, parent_tab):
-        self.signals = common.signal_route_interlocking_frame(parent_tab)
+        self.signals = common.signal_route_frame (parent_tab, label="Signals locked when section occupied",
+                                    tool_tip="Edit the appropriate signals to configure interlocking")
         self.signals.frame.pack(padx=2, pady=2, fill='x')
 
 #------------------------------------------------------------------------------------
@@ -272,10 +246,15 @@ class section_interlocking_tab():
 
 class section_automation_tab():
     def __init__(self, parent_tab):
-        self.behind = signal_route_frame (parent_tab, label="Signals behind section")
+        self.behind = common.signal_route_frame (parent_tab, label="Signals controlling access into section",
+                                tool_tip="Edit the appropriate signals to configure automation")
         self.behind.frame.pack(padx=2, pady=2, fill='x')
-        self.ahead = signal_route_frame (parent_tab, label="Signals ahead of section")
+        self.ahead = common.signal_route_frame (parent_tab, label="Signals controlling access out of section",
+                                tool_tip="Edit the appropriate signals to configure automation")
         self.ahead.frame.pack(padx=2, pady=2, fill='x')
+        self.override = common.signal_route_frame (parent_tab, label="Signals overridden when section occupied",
+                                tool_tip="Edit the appropriate signals to configure automation")
+        self.override.frame.pack(padx=2, pady=2, fill='x')
         
 #####################################################################################
 # Top level Class for the Edit Section window
@@ -340,7 +319,9 @@ class edit_section():
             self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
-            self.automation.behind.set_values(signals_behind(self.object_id))
+            signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
+            self.automation.behind.set_values(signals_behind)
+            self.automation.override.set_values(signals_overridden)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()

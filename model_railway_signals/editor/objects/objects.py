@@ -504,6 +504,24 @@ def set_all(new_objects):
                             " - Unexpected element: '"+element+"' - DISCARDED")
                     logging.warning("LOAD LAYOUT - "+warning_message)
                     warning_messages.append(warning_message)
+                #############################################################################################
+                ## Handle breaking change for release 4.0 - tracksections now a list of 3 sections 
+                ## The 'tracksections# element is a list of [section_behind, sections_ahead]
+                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2]
+                ## Before release 4.0, each route element was a single track section (integer value)
+                ## From Release 4.0 onwards, each element comprises a list of track sections [T1, T2, T3]
+                #############################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "tracksections":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if type(new_objects[object_id][element][1][0]) == int:
+                        for index, route in enumerate(new_objects[object_id][element][1]):
+                            list_of_sections = [new_objects[object_id][element][1][index],0,0]
+                            objects_common.schematic_objects[object_id][element][1][index] = list_of_sections
+                    else:
+                        objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
+                #############################################################################################
+                ## End of Handle breaking change for release 4.0  ###########################################
+                #############################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             # Now report any elements missing from the new object - intended to provide a

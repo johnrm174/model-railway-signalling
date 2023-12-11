@@ -128,34 +128,67 @@ class section_behind_element(common.int_item_id_entry_box):
     def __init__(self, parent_frame):
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
-        self.label1 = Tk.Label(self.frame, width=1)
-        self.label1.pack(side=Tk.LEFT)
-        tool_tip = "Sepecify the track section 'behind' this signal (to be cleared when the signal is passed)"
+        tool_tip = "Sepecify the track section 'in the rear of' this signal to be cleared when the signal is passed"
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=Tk.LEFT)
-        self.label = Tk.Label(self.frame, text=" ==>")
+        self.label = Tk.Label(self.frame, text="=>")
         self.label.pack(side=Tk.LEFT)
 
-class section_ahead_element(common.int_item_id_entry_box):
+class section_ahead_element():
     def __init__(self, parent_frame, label):
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
-        self.label1 = Tk.Label(self.frame, text=label, width=10)
+        self.label1 = Tk.Label(self.frame, text=label, width=8)
         self.label1.pack(side=Tk.LEFT)
-        tool_tip = ("Specify the track section on the route 'ahead of' the signal "+
-                             "(to be occupied when the signal is passed)")
-        super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
-        self.pack(side=Tk.LEFT)
-        self.label2 = Tk.Label(self.frame, width=1)
-        self.label2.pack(side=Tk.LEFT)
-                
+        tool_tip1 = ("Specify the track section on the route 'ahead of' the signal "+
+                             "to be occupied when the signal is passed")
+        tool_tip2 = ("Specify any other track sections on the route that will also override "+
+                            "this signal to ON if occupied (if enabled on the right)")
+        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip1)
+        self.t1.pack(side = Tk.LEFT)
+        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip2)
+        self.t2.pack(side = Tk.LEFT)
+        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip2)
+        self.t3.pack(side = Tk.LEFT)
+
+    def validate(self):
+        # Validate everything - to highlight ALL validation failures in the UI
+        valid = True
+        if not self.t1.validate(): valid = False
+        if not self.t2.validate(): valid = False
+        if not self.t3.validate(): valid = False
+        return(valid)
+
+    def enable(self):
+        self.t1.enable()
+        self.t2.enable()
+        self.t3.enable()
+
+    def disable(self):
+        self.t1.disable()
+        self.t2.disable()
+        self.t3.disable()
+
+    def set_values(self, list_of_sections:[int,int,int]):
+        # The list_of_sections comprises: [t1,t2,t3] Where each element is
+        # the ID of a track section on the route ahead
+        self.t1.set_value(list_of_sections[0])
+        self.t2.set_value(list_of_sections[1])
+        self.t3.set_value(list_of_sections[2])
+
+    def get_values(self):
+        # The list_of_sections comprises: [t1,t2,t3] Where each element is
+        # the ID of a track section on the route ahead
+        interlocked_route = [ self.t1.get_value(), self.t2.get_value(), self.t3.get_value() ]
+        return(interlocked_route)
+
 class section_ahead_frame():
     def __init__(self, parent_frame):
-        self.main = section_ahead_element(parent_frame, label=" MAIN ==> ")
-        self.lh1 = section_ahead_element(parent_frame, label=" LH1 ==> ")
-        self.lh2 = section_ahead_element(parent_frame, label=" LH2 ==> ")
-        self.rh1 = section_ahead_element(parent_frame, label=" RH1 ==> ")
-        self.rh2 = section_ahead_element(parent_frame, label=" RH2 ==> ")
+        self.main = section_ahead_element(parent_frame, label="MAIN =>")
+        self.lh1 = section_ahead_element(parent_frame, label="LH1 =>")
+        self.lh2 = section_ahead_element(parent_frame, label="LH2 =>")
+        self.rh1 = section_ahead_element(parent_frame, label="RH1 =>")
+        self.rh2 = section_ahead_element(parent_frame, label="RH2 =>")
         
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -191,23 +224,25 @@ class track_occupancy_frame():
 
     def set_values(self, sections):
         # sections is a list of [section_behind, sections_ahead]
-        # where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
+        # where sections_ahead is a list of routes [MAIN,LH1,LH2,RH1,RH2]
+        # And each route element is a list of track sections [t1,t2,t3]
         self.section_behind.set_value(sections[0])
-        self.section_ahead.main.set_value(sections[1][0])
-        self.section_ahead.lh1.set_value(sections[1][1])
-        self.section_ahead.lh2.set_value(sections[1][2])
-        self.section_ahead.rh1.set_value(sections[1][3])
-        self.section_ahead.rh2.set_value(sections[1][4])
+        self.section_ahead.main.set_values(sections[1][0])
+        self.section_ahead.lh1.set_values(sections[1][1])
+        self.section_ahead.lh2.set_values(sections[1][2])
+        self.section_ahead.rh1.set_values(sections[1][3])
+        self.section_ahead.rh2.set_values(sections[1][4])
 
     def get_values(self):
         # sections is a list of [section_behind, sections_ahead]
-        # where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
+        # where sections_ahead is a list of routes [MAIN,LH1,LH2,RH1,RH2]
+        # And each route element is a list of track sections [t1,t2,t3]
         return ( [ self.section_behind.get_value(),
-                   [ self.section_ahead.main.get_value(),
-                     self.section_ahead.lh1.get_value(),
-                     self.section_ahead.lh2.get_value(),
-                     self.section_ahead.rh1.get_value(),
-                     self.section_ahead.rh2.get_value() ] ])
+                   [ self.section_ahead.main.get_values(),
+                     self.section_ahead.lh1.get_values(),
+                     self.section_ahead.lh2.get_values(),
+                     self.section_ahead.rh1.get_values(),
+                     self.section_ahead.rh2.get_values() ] ])
 
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -235,28 +270,28 @@ class general_settings_frame():
     def __init__(self, parent_frame):
         # Create the Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_frame, text="General settings")
-        self.automatic = common.check_box(self.frame, width=40,
-                    label="  Fully automatic signal (no control button)",
+        self.automatic = common.check_box(self.frame, width=39,
+                    label="Fully automatic signal (no control button)",
                     tool_tip="Select to create without a main signal button "+
                     "(signal will have a default signal state of OFF, but can be "+
                         "overridden to ON via the selections below)")
-        self.automatic.pack(padx=2, pady=2)
-        self.distant_automatic = common.check_box(self.frame, width=40,
-                    label="  Fully automatic distant arms (no control button)",
+        self.automatic.pack(pady=2)
+        self.distant_automatic = common.check_box(self.frame, width=39,
+                    label="Fully automatic distant arms (no control button)",
                     tool_tip="Select to create without a distant signal button "+
                     "(distant arms will have a default signal state of OFF, but can "+
                         "be overridden to CAUTION via the selections below)")
-        self.distant_automatic.pack(padx=2, pady=2)
-        self.override = common.check_box(self.frame, width=40,
-                    label="  Override signal to ON if section ahead is occupied",
-                    tool_tip="Select to override the signal to ON if "+
-                    "the track section ahead of the signal is occupied")
-        self.override.pack(padx=2, pady=2)
-        self.override_ahead = common.check_box(self.frame, width=40,
-                    label="  Override to CAUTION to reflect home signals ahead",
+        self.distant_automatic.pack(pady=2)
+        self.override = common.check_box(self.frame, width=39,
+                    label="Override signal to ON if section(s) ahead occupied",
+                    tool_tip="Select to override the signal to ON if the track "+
+                    "sections ahead of the signal (specified on the left) are occupied")
+        self.override.pack(pady=2)
+        self.override_ahead = common.check_box(self.frame, width=39,
+                    label="Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
-        self.override_ahead.pack(padx=2, pady=2)
+        self.override_ahead.pack(pady=2)
                         
     def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
         self.override.set_value(override)

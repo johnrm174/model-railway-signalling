@@ -191,8 +191,9 @@ default_signal_object["subroutes"] = [False,False,False,False,False]
 default_signal_object["passedsensor"] = [True,""]     # [button, linked track sensor]
 default_signal_object["approachsensor"] = [False,""]  # [button, linked track sensor]
 # Track sections is a list of [section_behind, sections_ahead]
-# where sections_ahead is a list of [MAIN,LH1,LH2,RH1,RH2]
-default_signal_object["tracksections"] = [0, [0, 0, 0, 0, 0]]
+# sections_ahead is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2]
+# each route element comprises a list of track sections [T1, T2, T3]
+default_signal_object["tracksections"] = [0, [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0]]]
 # General automation settings for the signal
 # 'overrideahead' will override distant if any home signals ahead are at DANGER
 default_signal_object["fullyautomatic"] = False # Main signal is automatic (no button)
@@ -369,10 +370,11 @@ def remove_references_to_section(section_id:int):
         # Check the track section behind the signal
         if track_sections[0] == section_id:
             track_sections[0] = 0
-        #Check the track sections in front of the signal
-        for index1, section_ahead in enumerate(track_sections[1]):
-            if section_ahead == section_id:
-                objects_common.schematic_objects[sig_object]["tracksections"][1][index1] = 0
+        # Check the track sections in front of the signal
+        for index1, list_of_sections_ahead in enumerate(track_sections[1]):
+            for index2, section_ahead in enumerate (list_of_sections_ahead):
+                if section_ahead == section_id:
+                    objects_common.schematic_objects[sig_object]["tracksections"][1][index1][index2] = 0
         # Check the track interlocking table
         track_interlocking = objects_common.schematic_objects[sig_object]["trackinterlock"]
         for index1, route in enumerate(track_interlocking):
@@ -394,10 +396,11 @@ def update_references_to_section(old_section_id:int, new_section_id:int):
         track_sections = objects_common.schematic_objects[sig_object]["tracksections"]
         # Check the track section behind the signal
         if track_sections[0] == old_section_id: track_sections[0] = new_section_id
-        # Check the track sections in front of the signal
-        for index1, section_ahead in enumerate(track_sections[1]):
-            if section_ahead == old_section_id:
-                objects_common.schematic_objects[sig_object]["tracksections"][1][index1] = new_section_id
+        # Check the track sections in front of the signal 
+        for index1, list_of_sections_ahead in enumerate(track_sections[1]):
+            for index2, section_ahead in enumerate (list_of_sections_ahead):
+                if section_ahead == old_section_id:
+                    objects_common.schematic_objects[sig_object]["tracksections"][1][index1][index2] = new_section_id
         # Check the track interlocking table
         track_interlocking = objects_common.schematic_objects[sig_object]["trackinterlock"]
         for index1, route in enumerate(track_interlocking):
