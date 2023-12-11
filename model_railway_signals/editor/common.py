@@ -16,6 +16,7 @@
 #    object_id_selection(Tk.integer_entry_box)
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
+#    signal_route_frame() - read only list of signal_route_selections()
 #    selection_buttons() - combines 5 RadioButtons
 #    colour_selection() - Allows the colour of an item to be changed
 #    window_controls() - apply/ok/reset/cancel
@@ -932,21 +933,21 @@ class signal_route_selections():
                                           self.rh2.get_value() ] ])
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a signal route interlocking LabelFrame - creates a variable
-# number of instances of the signal_route_selection_element when "set_values" is called
-# (according to the length of the supplied list).Note that this is a 'read-only' element.
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
+# Compound UI Element for a "read only" signal_route_frame (LabelFrame) - creates a 
+# variable number of instances of the signal_route_selection_element when "set_values" 
+# is called (according to the length of the supplied list). Note the responsibility of
+# the instantiating func/class to 'pack' the Frame of the UI element.
 #
 # Public class instance methods provided by this class are:
-#    "set_values" - Populates the list of interlocked signals and their routes
+#    "set_values" - Populates the list of  signals and their routes
 #------------------------------------------------------------------------------------
 
-class signal_route_interlocking_frame():
-    def __init__(self, parent_frame):
+class signal_route_frame():
+    def __init__(self, parent_frame, label:str, tool_tip:str):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = Tk.LabelFrame(parent_frame, text="Interlocking with signals")
+        self.frame = Tk.LabelFrame(parent_frame, text=label)
         # These are the lists that hold the references to the subframes and subclasses
+        self.tooltip = tool_tip
         self.sigelements = []
         self.subframe = None
 
@@ -962,12 +963,11 @@ class signal_route_interlocking_frame():
             for sig_interlocking_routes in sig_interlocking_frame:
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(signal_route_selections(self.subframe,read_only=True,
-                        tool_tip="Edit the appropriate signals\nto configure interlocking"))
+                self.sigelements.append(signal_route_selections(self.subframe, read_only=True, tool_tip=self.tooltip))
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Tk.Label(self.subframe, text="No interlocked signals")
+            self.label = Tk.Label(self.subframe, text="Nothing configured")
             self.label.pack()
 
 #------------------------------------------------------------------------------------

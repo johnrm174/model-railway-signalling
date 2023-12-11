@@ -20,8 +20,7 @@
 #    common.dcc_entry_box
 #    common.object_id_selection
 #    common.selection_buttons
-#    common.signal_route_interlocking_frame
-#    common.signal_route_selections
+#    common.signal_route_frame
 #    common.colour_selector
 #    common.window_controls
 #
@@ -276,7 +275,8 @@ class point_configuration_tab():
 
 class point_interlocking_tab():
     def __init__(self, parent_tab):
-        self.signals = common.signal_route_interlocking_frame(parent_tab)
+        self.signals = common.signal_route_frame(parent_tab, label="Signals interlocked with point",
+                                tool_tip="Edit the appropriate signals to configure interlocking")
         self.signals.frame.pack(padx=2, pady=2, fill='x')
 
 #####################################################################################
