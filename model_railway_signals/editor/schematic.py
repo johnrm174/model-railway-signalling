@@ -659,7 +659,7 @@ def left_button_release(event):
 # The event will only be bound to the canvas in "Edit" Mode
 #------------------------------------------------------------------------------------
 
-def cancel_move_in_progress(event):
+def cancel_move_in_progress(event=None):
     global schematic_state
     if schematic_state["moveobjects"]:
         # Undo the move by returning all objects to their start position
