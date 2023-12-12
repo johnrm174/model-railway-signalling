@@ -764,61 +764,61 @@ class dummy_event():
 # ------------------------------------------------------------------------------
 
 def create_line():
-    run_function(lambda:objects.create_object(objects.object_type.line))
+    run_function(lambda:schematic.create_object(objects.object_type.line))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
     
 def create_colour_light_signal():
-    run_function(lambda:objects.create_object(objects.object_type.signal,
+    run_function(lambda:schematic.create_object(objects.object_type.signal,
                         signals_common.sig_type.colour_light.value,
                         signals_colour_lights.signal_sub_type.four_aspect.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_semaphore_signal():
-    run_function(lambda:objects.create_object(objects.object_type.signal,
+    run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals_common.sig_type.semaphore.value,
                            signals_semaphores.semaphore_sub_type.home.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_position_signal():
-    run_function(lambda:objects.create_object(objects.object_type.signal,
+    run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_position.value,
                            signals_ground_position.ground_pos_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_disc_signal():
-    run_function(lambda:objects.create_object(objects.object_type.signal,
+    run_function(lambda:schematic.create_object(objects.object_type.signal,
                            signals_common.sig_type.ground_disc.value,
                            signals_ground_disc.ground_disc_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_track_section():
-    run_function(lambda:objects.create_object(objects.object_type.section))
+    run_function(lambda:schematic.create_object(objects.object_type.section))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_block_instrument():
-    run_function(lambda:objects.create_object(objects.object_type.instrument,
+    run_function(lambda:schematic.create_object(objects.object_type.instrument,
                     block_instruments.instrument_type.single_line.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_left_hand_point():
-    run_function(lambda:objects.create_object(objects.object_type.point,points.point_type.LH.value))
+    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_right_hand_point():
-    run_function(lambda:objects.create_object(objects.object_type.point,points.point_type.LH.value))
+    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_textbox():
-    run_function(lambda:objects.create_object(objects.object_type.textbox))
+    run_function(lambda:schematic.create_object(objects.object_type.textbox))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
