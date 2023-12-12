@@ -70,10 +70,17 @@
 #    assert_block_section_ahead_clear(instids*)
 #    assert_block_section_ahead_not_clear(instids*)
 #
-# Supported Editor test invocations:
+# Supported Menubar/Schematic control invocations:
 #    set_edit_mode()
 #    set_run_mode()
+#    toggle_mode()
+#    set_automation_on()
+#    set_automation_off()
+#    toggle_automation()
+#    toggle_snap_to_grid()
 #    reset_layout()
+#    reset_window_size()
+# Supported Schematic test invocations:
 #    create_line()
 #    create_colour_light_signal()
 #    create_semaphore_signal()
@@ -96,6 +103,7 @@
 #    delete_selected_objects()
 #    copy_selected_objects()
 #    paste_clipboard_objects()
+#    snap_selected_objects_to_grid()
 #    undo() and redo()
 #    get_item_id(object_id) - This is a helper function
 #    get_object_id(item_type, item_id) - This is a helper function
@@ -154,7 +162,7 @@ root = None
 tests_executed = 0
 test_failures = 0
 test_warnings = 0
-
+    
 # ------------------------------------------------------------------------------
 # Global variables to track the 'one up' train idenntifier for every time
 # we set a section to 'occupied' during a test
@@ -752,12 +760,13 @@ def assert_block_section_ahead_not_clear(*instrumentids):
 # ------------------------------------------------------------------------------
 
 class dummy_event():
-    def __init__(self, x=0, y=0, x_root=0, y_root=0):
+    def __init__(self, x=0, y=0, x_root=0, y_root=0, keysym=""):
         self.x = x
         self.y = y
         self.x_root = x_root
         self.y_root = y_root
         self.widget = schematic.canvas
+        self.keysym = keysym
 
 # ------------------------------------------------------------------------------
 # Functions to excersise the schematic Editor - Create Functions
@@ -868,7 +877,7 @@ def get_object_id(item_type:str, item_id:int):
     return(0)
 
 # ------------------------------------------------------------------------------
-# Functions to excersise the schematic Editor - Move, update and edit
+# Functions to exercise the Main Menubar Controls
 # ------------------------------------------------------------------------------
 
 def set_edit_mode():
@@ -876,9 +885,34 @@ def set_edit_mode():
     
 def set_run_mode():
     run_function(lambda:main_menubar.run_mode(),delay=0.5)
+    
+def toggle_mode():
+    event = dummy_event(keysym="m")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+    
+def set_automation_on():
+    run_function(lambda:main_menubar.automation_enable(),delay=0.5)
+    
+def set_automation_off():
+    run_function(lambda:main_menubar.automation_disable(),delay=0.5)
+
+def toggle_automation():
+    event = dummy_event(keysym="a")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+
+def toggle_snap_to_grid():
+    event = dummy_event(keysym="s")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
 
 def reset_layout():
     run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
+    
+def reset_window_size():
+    run_function(lambda:schematic.reset_window_size(),delay=0.5)
+
+# ------------------------------------------------------------------------------
+# Functions to exercise the schematic Editor
+# ------------------------------------------------------------------------------
 
 def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
@@ -912,7 +946,7 @@ def select_single_object(object_id):
         run_function(lambda:schematic.left_button_click(event))
         run_function(lambda:schematic.left_button_release(event))
     
-def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
+def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
     else:
@@ -923,6 +957,7 @@ def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, d
             move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
         else:
             raise_test_warning("select_and_move_objects - move aborted - object: "+str(object_id)+" was not selected")
+        if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
         run_function(lambda:schematic.left_button_release(event))
 
 def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
@@ -957,6 +992,16 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
             move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
         run_function(lambda:schematic.left_button_release(event))
         
+def nudge_selected_objects(direction:str="Left"):
+    if not direction in ("Left", "Right", "Up", "Down"):
+        raise_test_warning ("nudge_selected_objects - invalid direction: '"+direction+"'")
+    else: 
+        event=dummy_event(keysym=direction)
+        run_function(lambda:schematic.nudge_selected_objects(event))
+        
+def snap_selected_objects_to_grid():
+    run_function(lambda:schematic.snap_selected_objects_to_grid(), delay=0.5)
+
 def select_all_objects():
     run_function(lambda:schematic.select_all_objects())
 
