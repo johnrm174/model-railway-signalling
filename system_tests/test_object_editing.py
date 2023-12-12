@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------------
-# System tests for the object editing functions
+# System tests for the object configuration editing functions
 #
 #  -run_instrument_linking_tests - single and double line instruments
 #     - basic linking of instruments (test linking works for block sections)
@@ -33,6 +33,10 @@
 #         - instrument ahead IDs are removed to reflect deletion of instruments
 #         - interlocked point IDs are updated to reflect change of point ID
 #         - interlocked point IDs are removed to reflect deletion of points
+#         - interlocked section IDs are updated to reflect change of point ID
+#         - interlocked section IDs are removed to reflect deletion of points
+#         - automation section IDs are updated to reflect change of point ID
+#         - automation section IDs are removed to reflect deletion of points
 #      - Line Item ID has successfully been changed (to obtain the branch coverage)
 #  - run_reset_objects_tests
 #    - test points, signals, instruments and sections are returned to their
@@ -435,7 +439,7 @@ def run_mode_change_tests(delay:float=0.0):
     assert_object_configuration(t1,{"itemid":1})
     # Configure Signal 1 to be overridden if Section 1 is occupied
     update_object_configuration(s1,{
-                "tracksections":[0,[1,0,0,0,0]],
+                "tracksections":[0,[[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,0,0]]],
                 "overridesignal":True})
     # Test the override works
     sleep(delay)
@@ -479,11 +483,13 @@ def run_mode_change_tests(delay:float=0.0):
     
 #-----------------------------------------------------------------------------------
 # These test the Item ID update functions, specifically:
-#    Update of point interlocking tables when Signal ID is changed or deleted
-#    Update of signal interlocking tables when Signal ID is changed or deleted
-#    Update of signal interlocking tables when Point ID is changed or deleted
-#    Update of signal interlocking tables when Instrument ID is changed or deleted
-#    Update of signal automation tables when Section ID is changed or deleted
+#    Update of point interlocking when Signal ID is changed or deleted
+#    Update of signal ahead value when Signal ID is changed or deleted
+#    Update of signal interlocking when Signal ID is changed or deleted
+#    Update of signal interlocking when Point ID is changed or deleted
+#    Update of signal interlocking when Instrument ID is changed or deleted
+#    Update of signal interlocking when Track Section ID is changed or deleted
+#    Update of signal automation (override) when Section ID is changed or deleted
 #-----------------------------------------------------------------------------------
 
 def run_change_of_item_id_tests(delay:float=0.0):
@@ -496,13 +502,19 @@ def run_change_of_item_id_tests(delay:float=0.0):
     sleep(delay)
     p2 = create_left_hand_point()
     sleep(delay)
-    s1 = create_semaphore_signal()
+    s1 = create_colour_light_signal()
     sleep(delay)
-    s2 = create_semaphore_signal()
+    s2 = create_colour_light_signal()
     sleep(delay)
-    s3 = create_semaphore_signal()
+    s3 = create_colour_light_signal()
+    sleep(delay)
+    s4 = create_colour_light_signal()
     sleep(delay)
     t1 = create_track_section()
+    sleep(delay)
+    t2 = create_track_section()
+    sleep(delay)
+    t3 = create_track_section()
     sleep(delay)
     i1 = create_block_instrument()
     sleep(delay)
@@ -514,7 +526,10 @@ def run_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(s1,{"itemid":1})
     assert_object_configuration(s2,{"itemid":2})
     assert_object_configuration(s3,{"itemid":3})
+    assert_object_configuration(s4,{"itemid":4})
     assert_object_configuration(t1,{"itemid":1})
+    assert_object_configuration(t2,{"itemid":2})
+    assert_object_configuration(t3,{"itemid":3})
     assert_object_configuration(i1,{"itemid":1})
     assert_object_configuration(i2,{"itemid":2})
     sleep(delay)
@@ -526,16 +541,17 @@ def run_change_of_item_id_tests(delay:float=0.0):
     update_object_configuration(i1,{"linkedto":"2"})
     update_object_configuration(i2,{"linkedto":"1"})
     # Set up the signal interlocking tables and the automation tables for Signal 1
-    # This includes point/signal/inst interlocking, track sections & timed signals
-    # Signal is interlocked on instrument 1 and points 1/2 - Sig ahead is 2
+    # This includes point/signal/inst/section interlocking, track sections & timed signals
+    # Signal is interlocked on instrument 1, section 1 and points 1/2 - Sig ahead is 4
     update_object_configuration(s1,{
         "sigroutes":[True,True,True,True,True],
+        "overridesignal": True,
         "pointinterlock":[
-           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"2",1],
-           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"2",1],
-           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"2",1],
-           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"2",1],
-           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"2",1] ],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"4",1],
+           [[[1,True],[1,True],[1,True],[1,True],[2,True],[2,True],[2,True]],"4",1] ],
         "siginterlock":[
              [ [2, [True, True, True, True, True]], 
                [2, [True, True, True, True, True]], 
@@ -557,7 +573,8 @@ def run_change_of_item_id_tests(delay:float=0.0):
                [2, [True, True, True, True, True]], 
                [3, [True, True, True, True, True]], 
                [3, [True, True, True, True, True]] ] ],
-        "tracksections":[1, [1,1,1,1,1] ],
+        "trackinterlock":[[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]],
+        "tracksections":[1, [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]] ],
         "timedsequences":[ [True,2,1,1],
                            [True,2,1,1],
                            [True,3,1,1],
@@ -583,40 +600,154 @@ def run_change_of_item_id_tests(delay:float=0.0):
                          [2, [False,True,True,True,True] ] ] } )
     assert_object_configuration(p2,{
         "siginterlock":[ [1, [True,True,True,True,True] ] ] } )
-
-    # Test the basic interlocking
+    # Test the basic interlocking for signal 1 (in run mode)
+    sleep(delay)
+    set_run_mode()
+    # Initial (default) configuration
     assert_points_unlocked(1,2)
     assert_block_section_ahead_not_clear(1)
+    assert_sections_clear(1,2,3)
     assert_signals_locked(1)
+    # Clear the instrument and switch the points to unlock the signal
     sleep(delay)
     set_points_switched(1,2)
     assert_signals_locked(1)
     sleep(delay)
     set_instrument_clear(2)
     assert_signals_unlocked(1)
+    # Test interlocking of signal with points
+    sleep(delay)
+    set_points_normal(1)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_points_switched(1)
+    assert_signals_unlocked(1)
+    sleep(delay)
+    set_points_normal(2)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_points_switched(2)
+    assert_signals_unlocked(1)
+    # Test interlocking of signal with track sections
+    sleep(delay)
+    set_sections_occupied(1)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_sections_clear(1)
+    assert_signals_unlocked(1)
+    sleep(delay)
+    set_sections_occupied(2)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_sections_clear(2)
+    assert_signals_unlocked(1)
+    sleep(delay)
+    set_sections_occupied(3)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_sections_clear(3)
+    assert_signals_unlocked(1)
+    # Test interlocking of points with signal
     sleep(delay)
     set_signals_off(1)
     assert_points_locked(1,2)
     sleep(delay)
-    set_instrument_blocked(2)
+    set_signals_on(1)
+    assert_points_unlocked(1,2)
+    # Test interlocking of signal with conflicting signals
+    sleep(delay)
+    set_signals_off(2)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_signals_on(2)
     assert_signals_unlocked(1)
     sleep(delay)
-    set_signals_on(1)
+    set_signals_off(3)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_signals_on(3)
+    assert_signals_unlocked(1)
+    # Test interlocking of signal with block instrument
+    sleep(delay)
+    set_instrument_blocked(2)
     assert_signals_locked(1)
     sleep(delay)
     set_instrument_clear(2)
     assert_signals_unlocked(1)
     sleep(delay)
+    set_instrument_occupied(2)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_instrument_clear(2)
+    assert_signals_unlocked(1)
+    # Test the signal overrides (on track section occupied)
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_signals_off(1)
+    assert_signals_override_clear(1)    
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_sections_occupied(1)
+    assert_signals_override_set(1)    
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_sections_clear(1)
+    assert_signals_override_clear(1)    
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_sections_occupied(2)
+    assert_signals_override_set(1)    
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_sections_clear(2)
+    assert_signals_override_clear(1)    
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_sections_occupied(3)
+    assert_signals_override_set(1)    
+    assert_signals_DANGER(1)
+    sleep(delay)
+    set_sections_clear(3)
+    assert_signals_override_clear(1)    
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_signals_on(1)
+    assert_signals_DANGER(1)
+    # Test the signal interaction with the signal ahead
+    sleep(delay)
+    set_signals_off(1)
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_signals_off(4)
+    assert_signals_PROCEED(1)
+    sleep(delay)
+    set_signals_on(4)
+    assert_signals_CAUTION(1)
+    sleep(delay)
+    set_signals_on(1)
+    assert_signals_DANGER(1)
+    # Return everything to its default state
+    sleep(delay)
+    set_instrument_blocked(2)
+    sleep(delay)
     set_points_normal(1,2)
-    assert_signals_locked(1)    
+    assert_points_unlocked(1,2)
+    assert_block_section_ahead_not_clear(1)
+    assert_sections_clear(1,2,3)
+    assert_signals_locked(1)
+    sleep(delay)
+    set_edit_mode()
     # Change the IDs of Signal 2, Points 1/2, Instrument 1, Track Section 1 and line 1
     update_object_configuration(l1,{"itemid":51})
     update_object_configuration(s1,{"itemid":11})
     update_object_configuration(s2,{"itemid":12})
     update_object_configuration(s3,{"itemid":13})
+    update_object_configuration(s4,{"itemid":14})
     update_object_configuration(p1,{"itemid":21})
     update_object_configuration(p2,{"itemid":22})
     update_object_configuration(t1,{"itemid":31})
+    update_object_configuration(t2,{"itemid":32})
+    update_object_configuration(t3,{"itemid":33})
     update_object_configuration(i1,{"itemid":41})
     update_object_configuration(i2,{"itemid":42})
     # Test the IDs have been changed
@@ -624,20 +755,23 @@ def run_change_of_item_id_tests(delay:float=0.0):
     assert_object_configuration(s1,{"itemid":11})
     assert_object_configuration(s2,{"itemid":12})
     assert_object_configuration(s3,{"itemid":13})
+    assert_object_configuration(s4,{"itemid":14})
     assert_object_configuration(p1,{"itemid":21})
     assert_object_configuration(p2,{"itemid":22})
     assert_object_configuration(t1,{"itemid":31})
+    assert_object_configuration(t2,{"itemid":32})
+    assert_object_configuration(t3,{"itemid":33})
     # Note the linked instrument is a string (local or remote)
     assert_object_configuration(i1,{"itemid":41,"linkedto":"42"})
     assert_object_configuration(i2,{"itemid":42,"linkedto":"41"})
-    # Test the interlocking and automation tables have been updated
+    # Test the signal interlocking and automation tables have been updated correctly
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"12",41],
-           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"12",41],
-           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"12",41],
-           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"12",41],
-           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"12",41] ],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"14",41],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"14",41],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"14",41],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"14",41],
+           [[[21,True],[21,True],[21,True],[21,True],[22,True],[22,True],[22,True]],"14",41] ],
         "siginterlock":[
              [ [12, [True, True, True, True, True]], 
                [12, [True, True, True, True, True]], 
@@ -659,43 +793,154 @@ def run_change_of_item_id_tests(delay:float=0.0):
                [12, [True, True, True, True, True]], 
                [13, [True, True, True, True, True]], 
                [13, [True, True, True, True, True]] ] ],
-        "tracksections":[31,[31,31,31,31,31] ],
+        "trackinterlock":[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]],
+        "tracksections":[31,[[31,32,33],[31,32,33],[31,32,33],[31,32,33],[31,32,33]] ],
         "timedsequences":[ [True,12,1,1],
                            [True,12,1,1],
                            [True,13,1,1],
                            [True,12,1,1],
                            [True,12,1,1] ]} )
-    # Assert the point interlocking tables have been configured correctly
+    # Assert the point interlocking tables have been updated correctly
     assert_object_configuration(p1,{
         "siginterlock":[ [11, [True,True,True,True,True] ],
                          [12, [False,True,True,True,True] ] ] } )
     assert_object_configuration(p2,{
         "siginterlock":[ [11, [True,True,True,True,True] ] ] } )
-    # Test the basic interlocking
+    # Re-Test the basic interlocking for signal 1 (in run mode) with the new IDs
+    sleep(delay)
+    set_run_mode()
+    # Initial (default) configuration
     assert_points_unlocked(21,22)
     assert_block_section_ahead_not_clear(41)
+    assert_sections_clear(31,32,33)
     assert_signals_locked(11)
+    # Clear the instrument and switch the points to unlock the signal
     sleep(delay)
     set_points_switched(21,22)
     assert_signals_locked(11)
     sleep(delay)
     set_instrument_clear(42)
     assert_signals_unlocked(11)
+    # Test interlocking of signal with points
+    sleep(delay)
+    set_points_normal(21)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_points_switched(21)
+    assert_signals_unlocked(11)
+    sleep(delay)
+    set_points_normal(22)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_points_switched(22)
+    assert_signals_unlocked(11)
+    # Test interlocking of signal with track sections
+    sleep(delay)
+    set_sections_occupied(31)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_sections_clear(31)
+    assert_signals_unlocked(11)
+    sleep(delay)
+    set_sections_occupied(32)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_sections_clear(32)
+    assert_signals_unlocked(11)
+    sleep(delay)
+    set_sections_occupied(33)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_sections_clear(33)
+    assert_signals_unlocked(11)
+    # Test interlocking of points with signal
     sleep(delay)
     set_signals_off(11)
     assert_points_locked(21,22)
     sleep(delay)
-    set_instrument_blocked(42)
+    set_signals_on(11)
+    assert_points_unlocked(21,22)
+    # Test interlocking of signal with conflicting signals
+    sleep(delay)
+    set_signals_off(12)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_signals_on(12)
     assert_signals_unlocked(11)
     sleep(delay)
-    set_signals_on(11)
+    set_signals_off(13)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_signals_on(13)
+    assert_signals_unlocked(11)
+    # Test interlocking of signal with block instrument
+    sleep(delay)
+    set_instrument_blocked(42)
     assert_signals_locked(11)
     sleep(delay)
     set_instrument_clear(42)
     assert_signals_unlocked(11)
     sleep(delay)
+    set_instrument_occupied(42)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_instrument_clear(42)
+    assert_signals_unlocked(11)
+    # Test the signal overrides (on track section occupied)
+    sleep(delay)
+    set_signals_off(11)
+    assert_signals_override_clear(11)    
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_sections_occupied(31)
+    assert_signals_override_set(11)    
+    assert_signals_DANGER(11)
+    sleep(delay)
+    set_sections_clear(31)
+    assert_signals_override_clear(11)    
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_sections_occupied(32)
+    assert_signals_override_set(11)    
+    assert_signals_DANGER(11)
+    sleep(delay)
+    set_sections_clear(32)
+    assert_signals_override_clear(11)    
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_sections_occupied(33)
+    assert_signals_override_set(11)    
+    assert_signals_DANGER(11)
+    sleep(delay)
+    set_sections_clear(33)
+    assert_signals_override_clear(11)    
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_signals_on(11)    
+    # Test the signal interaction with the signal ahead
+    sleep(delay)
+    set_signals_off(11)
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_signals_off(14)
+    assert_signals_PROCEED(11)
+    sleep(delay)
+    set_signals_on(14)
+    assert_signals_CAUTION(11)
+    sleep(delay)
+    set_signals_on(11)
+    assert_signals_DANGER(11)
+    # Return everything to its default state
+    sleep(delay)
+    set_instrument_blocked(42)
+    sleep(delay)
     set_points_normal(21,22)
-    assert_signals_locked(11)  
+    assert_points_unlocked(21,22)
+    assert_block_section_ahead_not_clear(41)
+    assert_sections_clear(31,32,33)
+    assert_signals_locked(11)
+    sleep(delay)
+    set_edit_mode()
     # Delete Point 21 and test all references have been removed
     # Note that the point 22 entries will have shuffled down in the list
     sleep(delay)
@@ -704,11 +949,11 @@ def run_change_of_item_id_tests(delay:float=0.0):
     delete_selected_objects()
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"12",41] ] })
+           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[22,True],[22,True],[22,True],[0,False],[0,False],[0,False],[0,False]],"14",41] ] })
     # Delete Point 22 and test all references have been removed
     sleep(delay)
     select_single_object(p2)
@@ -716,11 +961,11 @@ def run_change_of_item_id_tests(delay:float=0.0):
     delete_selected_objects()
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"12",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"12",41] ] })
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41] ] })
     # Delete signal 12 and test all references have been removed
     sleep(delay)
     select_single_object(s2)
@@ -728,11 +973,11 @@ def run_change_of_item_id_tests(delay:float=0.0):
     delete_selected_objects()
     assert_object_configuration(s1,{
         "pointinterlock":[
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
-           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41] ],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41] ],
         "siginterlock":[
              [ [13, [True, True, True, True, True]], 
                [13, [True, True, True, True, True]], 
@@ -759,6 +1004,56 @@ def run_change_of_item_id_tests(delay:float=0.0):
                            [True,13,1,1],
                            [False,0,0,0],
                            [False,0,0,0] ] } )
+    # Delete signal 13 and test all references have been removed
+    sleep(delay)
+    select_single_object(s3)
+    sleep(delay)
+    delete_selected_objects()
+    assert_object_configuration(s1,{
+        "pointinterlock":[
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"14",41] ],
+        "siginterlock":[
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ], 
+             [ [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]], 
+               [0, [False, False, False, False, False]] ] ],
+        "timedsequences":[ [False,0,0,0],
+                           [False,0,0,0],
+                           [False,0,0,0],
+                           [False,0,0,0],
+                           [False,0,0,0] ] } )
+    # Delete signal 14 and test all references have been removed
+    sleep(delay)
+    select_single_object(s4)
+    sleep(delay)
+    delete_selected_objects()
+    assert_object_configuration(s1,{
+        "pointinterlock":[
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41],
+           [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",41] ] } )
     # Delete Instrument 1 and test all references have been removed
     sleep(delay)
     select_single_object(i1)
@@ -771,45 +1066,30 @@ def run_change_of_item_id_tests(delay:float=0.0):
            [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0],
            [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],"",0] ] })
-    # Delete Section 41 and test all references have been removed
+    # Delete Section 31 and test all references have been removed
     sleep(delay)
     select_single_object(t1)
     sleep(delay)
     delete_selected_objects()
     assert_object_configuration(s1,{
-        "tracksections":[0,[0,0,0,0,0] ] } )
-    # Delete signal 13 and test all references have been removed
+        "tracksections":[0,[[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33]] ],
+        "trackinterlock":[[0,32,33],[0,32,33],[0,32,33],[0,32,33],[0,32,33]] } )
+    # Delete Section 32 and test all references have been removed
     sleep(delay)
-    select_single_object(s3)
+    select_single_object(t2)
     sleep(delay)
     delete_selected_objects()
     assert_object_configuration(s1,{
-        "siginterlock":[
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ] ],
-        "timedsequences":[ [False,0,0,0],
-                           [False,0,0,0],
-                           [False,0,0,0],
-                           [False,0,0,0],
-                           [False,0,0,0] ] } )
+        "tracksections":[0,[[0,0,33],[0,0,33],[0,0,33],[0,0,33],[0,0,33]] ],
+        "trackinterlock":[[0,0,33],[0,0,33],[0,0,33],[0,0,33],[0,0,33]] } )
+    # Delete Section 33 and test all references have been removed
+    sleep(delay)
+    select_single_object(t3)
+    sleep(delay)
+    delete_selected_objects()
+    assert_object_configuration(s1,{
+        "tracksections":[0,[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] ],
+        "trackinterlock":[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]] } )
     # clean up
     sleep(delay)
     select_all_objects()
