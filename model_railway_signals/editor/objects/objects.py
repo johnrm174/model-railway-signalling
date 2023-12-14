@@ -400,7 +400,7 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                                 (objects_common.schematic_objects[object_id]["line"]))
             else:
                 objects_common.schematic_objects[object_id]["posx"] += xdiff1 
-                objects_common.schematic_objects[object_id]["posy"] += ydiff2
+                objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
         # save the current state (for undo/redo)
