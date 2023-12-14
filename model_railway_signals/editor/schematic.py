@@ -250,19 +250,30 @@ def close_edit_window (ok:bool=False, cancel:bool=False, apply:bool=False, reset
     elif reset: edit_popup.load_state()
     
 #------------------------------------------------------------------------------------
-# Internal function to snap all selected objects to the grid (if snap to grid is enabled)
+# Internal function to snap all selected objects to the grid ('s' keypress). We do
+# this an object at a time as each object may require different offsets to be applied.
+# Note that for lines, we need to snap each end to the grid seperately because the
+# line ends may have been previously edited with snap-to-grid disabled. If we just
+# snap the line to the grid, line end 2 may still be off the grid.
 #------------------------------------------------------------------------------------
 
 def snap_selected_objects_to_grid(event=None):
     for object_id in schematic_state["selectedobjects"]:
         posx = objects.schematic_objects[object_id]["posx"]
         posy = objects.schematic_objects[object_id]["posy"]
-        xdiff,ydiff = snap_to_grid(posx,posy, force_snap=True)
-        # All drawing objects should be "tagged" apart from the bbox
-        canvas.move(objects.schematic_objects[object_id]["tags"],xdiff,ydiff)
-        canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
-        # Finalise the move by updating the current object position
-        objects.move_objects([object_id],xdiff1=xdiff, ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff )
+        xdiff1,ydiff1 = snap_to_grid(posx,posy, force_snap=True)
+        if objects.schematic_objects[object_id]["item"] == objects.object_type.line:
+            posx = objects.schematic_objects[object_id]["endx"]
+            posy = objects.schematic_objects[object_id]["endy"]
+            xdiff2,ydiff2 = snap_to_grid(posx,posy, force_snap=True)
+            move_line_end_1(object_id,xdiff1,ydiff1)
+            objects.move_objects([object_id],xdiff1=xdiff1,ydiff1=ydiff1)
+            move_line_end_2(object_id,xdiff2,ydiff2)
+            objects.move_objects([object_id],xdiff2=xdiff2,ydiff2=ydiff2)
+        else:
+            canvas.move(objects.schematic_objects[object_id]["tags"],xdiff1,ydiff1)
+            canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff1,ydiff1)
+            objects.move_objects([object_id],xdiff1=xdiff1, ydiff1=ydiff1, xdiff2=xdiff1, ydiff2=ydiff1)
     return()
 
 #------------------------------------------------------------------------------------
@@ -313,27 +324,36 @@ def disable_arrow_keypress_events(event=None):
 # Only a single Object will be selected when this function is called
 #------------------------------------------------------------------------------------
         
-def move_line_end(xdiff:int,ydiff:int):
-    object_id = schematic_state["selectedobjects"][0]       
-    startx = objects.schematic_objects[object_id]["posx"]
-    starty = objects.schematic_objects[object_id]["posy"]
-    endx = objects.schematic_objects[object_id]["endx"]
-    endy = objects.schematic_objects[object_id]["endy"]
-    # Move the end of the line that has been selected
-    if schematic_state["editlineend1"]:
-        canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
-        x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end1"])
-        canvas.coords(objects.schematic_objects[object_id]["line"],(x1+x2)/2,(y1+y2)/2,endx,endy)
-    elif schematic_state["editlineend2"]:
-        canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
-        x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end2"])
-        canvas.coords(objects.schematic_objects[object_id]["line"],startx,starty,(x1+x2)/2,(y1+y2)/2)
-    # Update the coordinates for the line end stops using the 
-    # common function provided by the objects sub-package
+def update_end_stops(object_id):
+    # Update the line end stops using the common function provided by the objects sub-package
     x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["line"])
     dx,dy = objects.get_endstop_offsets(x1,y1,x2,y2)
     canvas.coords(objects.schematic_objects[object_id]["stop1"],x1+dx,y1+dy,x1-dx,y1-dy)
     canvas.coords(objects.schematic_objects[object_id]["stop2"],x2+dx,y2+dy,x2-dx,y2-dy)
+    return()
+
+def move_line_end_1(object_id, xdiff:int,ydiff:int):
+    # Move the tkinter selection circle for the 'start' of the line
+    canvas.move(objects.schematic_objects[object_id]["end1"],xdiff,ydiff)
+    # Update the line coordinates to reflect the changed 'start' position
+    end2x = objects.schematic_objects[object_id]["endx"]
+    end2y = objects.schematic_objects[object_id]["endy"]
+    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end1"])
+    canvas.coords(objects.schematic_objects[object_id]["line"],(x1+x2)/2,(y1+y2)/2,end2x,end2y)
+    # Update the position of the line end stops to reflect the new line geometry
+    update_end_stops(object_id)
+    return()
+
+def move_line_end_2(object_id, xdiff:int,ydiff:int):
+    # Move the tkinter selection circle for the 'end' of the line
+    canvas.move(objects.schematic_objects[object_id]["end2"],xdiff,ydiff)
+    # Update the line coordinates to reflect the changed 'end' position
+    end1x = objects.schematic_objects[object_id]["posx"]
+    end1y = objects.schematic_objects[object_id]["posy"]
+    x1,y1,x2,y2 = canvas.coords(objects.schematic_objects[object_id]["end2"])
+    canvas.coords(objects.schematic_objects[object_id]["line"],end1x,end1y,(x1+x2)/2,(y1+y2)/2)
+    # Update the position of the line end stops to reflect the new line geometry
+    update_end_stops(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -578,21 +598,23 @@ def track_cursor(event):
     canvas_x, canvas_y = canvas_coordinates(event)
     if schematic_state["moveobjects"]:
         # Work out the delta movement since the last re-draw
-        deltax = canvas_x - schematic_state["lastx"]
-        deltay = canvas_y - schematic_state["lasty"]
+        xdiff = canvas_x - schematic_state["lastx"]
+        ydiff = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
-        move_selected_objects(deltax,deltay)
+        move_selected_objects(xdiff,ydiff)
         # Set the 'last' position for the next move event
-        schematic_state["lastx"] += deltax
-        schematic_state["lasty"] += deltay
+        schematic_state["lastx"] += xdiff
+        schematic_state["lasty"] += ydiff
     elif schematic_state["editlineend1"] or schematic_state["editlineend2"]:
-        deltax = canvas_x - schematic_state["lastx"]
-        deltay = canvas_y - schematic_state["lasty"]
-        # Move all the objects that are selected
-        move_line_end(deltax,deltay)
+        xdiff = canvas_x - schematic_state["lastx"]
+        ydiff = canvas_y - schematic_state["lasty"]
+        # Move the selected line end (only one object will be selected)
+        object_id = schematic_state["selectedobjects"][0]       
+        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
+        else: move_line_end_2(object_id,xdiff,ydiff)
         # Reset the "start" position for the next move
-        schematic_state["lastx"] += deltax
-        schematic_state["lasty"] += deltay
+        schematic_state["lastx"] += xdiff
+        schematic_state["lasty"] += ydiff
     elif schematic_state["selectarea"]:
         # Dynamically resize the selection area
         x1 = schematic_state["startx"]
@@ -626,7 +648,10 @@ def left_button_release(event):
         # Finish the move by snapping the line end to the grid
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
-        move_line_end(xdiff,ydiff)
+        # Move the selected line end (only one object will be selected)
+        object_id = schematic_state["selectedobjects"][0]       
+        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
+        else: move_line_end_2(object_id,xdiff,ydiff)
         # Calculate the total deltas for the move (from the startposition)
         finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
         finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
@@ -672,7 +697,10 @@ def cancel_move_in_progress(event=None):
         # Undo the move by returning all objects to their start position
         xdiff = schematic_state["startx"] - schematic_state["lastx"]
         ydiff = schematic_state["starty"] - schematic_state["lasty"]
-        move_line_end(xdiff,ydiff)
+        # Move the selected line end (only one object will be selected)
+        object_id = schematic_state["selectedobjects"][0]       
+        if schematic_state["editlineend1"]: move_line_end_1(object_id,xdiff,ydiff)
+        else: move_line_end_2(object_id,xdiff,ydiff)
         # Clear the "Edit line mode" - but leave the line selected
         schematic_state["editlineend1"] = False
         schematic_state["editlineend2"] = False
