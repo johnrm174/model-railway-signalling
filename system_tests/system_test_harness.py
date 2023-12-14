@@ -94,9 +94,10 @@
 #    update_object_configuration(object_id, new_values:dict)
 #    select_or_deselect_objects(*object_ids)
 #    select_single_object(object_id)
-#    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1)
-#    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1)
-#    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1):
+#    select_and_edit_single_object (object_id)
+#    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1, test_cancel:bool=True)
+#    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1, test_cancel:bool=True)
+#    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1, test_cancel:bool=True):
 #    select_all_objects()
 #    deselect_all_objects()
 #    rotate_selected_objects()
@@ -886,34 +887,44 @@ def set_edit_mode():
 def set_run_mode():
     run_function(lambda:main_menubar.run_mode(),delay=0.5)
     
-def toggle_mode():
-    event = dummy_event(keysym="m")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
-    
 def set_automation_on():
     run_function(lambda:main_menubar.automation_enable(),delay=0.5)
     
 def set_automation_off():
     run_function(lambda:main_menubar.automation_disable(),delay=0.5)
 
-def toggle_automation():
-    event = dummy_event(keysym="a")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
-
-def toggle_snap_to_grid():
-    event = dummy_event(keysym="s")
-    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
-
 def reset_layout():
     run_function(lambda:main_menubar.reset_layout(ask_for_confirm=False),delay=1.0)
     
-def reset_window_size():
-    run_function(lambda:schematic.reset_window_size(),delay=0.5)
-
 # ------------------------------------------------------------------------------
 # Functions to exercise the schematic Editor
 # ------------------------------------------------------------------------------
 
+# Simulates the <cntl-a> keypress on the canvas
+# This event is normally only enabled in RUN Mode
+def toggle_automation():
+    event = dummy_event(keysym="a")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+
+# Simulates the <cntl-m> keypress on the canvas
+# This event is normally enabled in both EDIT Mode (disabled when move in progress) and RUN mode
+def toggle_mode():
+    event = dummy_event(keysym="m")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+
+# Simulates the <cntl-s> keypress on the canvas
+# This event is normally only enabled in EDIT Mode (disabled when move in progress)
+def toggle_snap_to_grid():
+    event = dummy_event(keysym="s")
+    run_function(lambda:main_menubar.handle_canvas_event(event),delay=0.5)
+
+# Simulates the <cntl-r> keypress on the canvas
+# This event is normally enabled in EDIT Mode (disabled when move in progress) and RUN mode
+def reset_window_size():
+    run_function(lambda:schematic.reset_window_size(),delay=0.5)
+
+# This function enables object configurations to be changed in support of the testing
+# (effectively simulating OK/Apply from an object configuration window to save the changes)
 def update_object_configuration(object_id, new_values:dict):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("update_object_configuration - object: "+str(object_id)+" does not exist")
@@ -927,6 +938,10 @@ def update_object_configuration(object_id, new_values:dict):
                 new_object[element] = new_values[element]
         run_function(lambda:objects.update_object(object_id, new_object) )              
 
+# Simulates <left_shift_click> followed by <left_button_release>
+# The canvas coords of the events are determined from the object position so calling scripts need
+# to be careful that there are no overlapping objects at that position (that might get selected instead)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)    
 def select_or_deselect_objects(*object_ids):
     for object_id in object_ids:
         if object_id not in objects.schematic_objects.keys():
@@ -937,6 +952,10 @@ def select_or_deselect_objects(*object_ids):
             run_function(lambda:schematic.left_shift_click(event))
             run_function(lambda:schematic.left_button_release(event))
         
+# Simulates <left_button_click> followed by <left_button_release>
+# The canvas coords of the events are determined from the object position so calling scripts need
+# to be careful that there are no overlapping objects at that position (that might get selected instead)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)    
 def select_single_object(object_id):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_or_deselect_objects - object: "+str(object_id)+" does not exist")
@@ -945,7 +964,27 @@ def select_single_object(object_id):
         event = dummy_event(x=xpos, y=ypos)
         run_function(lambda:schematic.left_button_click(event))
         run_function(lambda:schematic.left_button_release(event))
-    
+
+# Simulates a <double_left_click> event on the canvas (to bring up the object editing window)
+# As this function is intended to excersise the schematic editor, we close the window straight afterwards
+# The canvas coords of the event is determined from the object position so calling scripts need
+# to be careful that there are no overlapping objects at that position (that might get selected instead)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)    
+def select_and_edit_single_object(object_id):
+    if object_id not in objects.schematic_objects.keys():
+        raise_test_warning ("select_and_edit_single_object - object: "+str(object_id)+" does not exist")
+    else:
+        xpos, ypos = get_selection_position(object_id)
+        event = dummy_event(x=xpos, y=ypos)
+        run_function(lambda:schematic.left_double_click(event), delay=1.0)
+        run_function(lambda:schematic.close_edit_window(cancel=True))
+        
+# Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
+# The canvas coords of the initial event is determined from the line position so calling scripts need
+# to be careful that there are no overlapping objects at that position (that might get selected instead)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)
+# If the 'test_cancel' flag is set then an <esc> event is raised before the <left_button_release>
+# event to cancel the move and return all selected objects to their initial positions
 def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_objects - object: "+str(object_id)+" does not exist")
@@ -960,16 +999,30 @@ def select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=10, d
         if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
         run_function(lambda:schematic.left_button_release(event))
 
-def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
+# Simulates <right_button_click> followed by a series of <motion> events then <right_button_release>
+# The canvas coords of the events are determined from the coordinates passed into the test function. Note
+# that calling scripts need to be careful that there are no objects at that position (otherwise the
+# initial right click will bring up the Object popup menu rather than starting the area selection)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)
+# If the 'test_cancel' flag is set then an <esc> event is raised before the <left_button_release>
+# event to cancel the move and return all selected objects to their initial positions
+def select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     event = dummy_event(x=xstart, y=ystart)
     run_function(lambda:schematic.left_button_click(event))
     if schematic.schematic_state["selectedobjects"] != []:
         raise_test_warning ("select_area - area selection aborted - cursor was over an object")
     else:
         move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+    if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
     run_function(lambda:schematic.left_button_release(event))
 
-def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0):
+# Simulates <left_button_click> followed by a series of <motion> events then <left_button_release>
+# The canvas coords of the initial event is determined from the line position so calling scripts need
+# to be careful that there are no overlapping objects at that position (that might get selected instead)
+# These events are only enabled in EDIT Mode (NOT disabled when a move is in progress)
+# If the 'test_cancel' flag is set then an <esc> event is raised before the <left_button_release>
+# event to cancel the move and return all selected objects to their initial positions
+def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=10, delay:float=0.0, test_cancel:bool=False):
     if object_id not in objects.schematic_objects.keys():
         raise_test_warning ("select_and_move_line_end - object: "+str(object_id)+" does not exist")
     elif line_end != 1 and line_end != 2:
@@ -990,41 +1043,64 @@ def select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, 
             raise_test_warning ("select_and_move_line_end - move aborted - Line end was not selected")
         else:
             move_cursor(xstart, ystart, xfinish, yfinish, steps, delay)
+        if test_cancel: run_function(lambda:schematic.cancel_move_in_progress())
         run_function(lambda:schematic.left_button_release(event))
         
+# Simulates the <up>, <down>, <left> or <right> 'arrow' keypresses
+# These events are enabled in both EDIT Mode (disabled when move in progress) and RUN Mode
+# In RUN Mode they are used to scroll the canvas (if the canvas is bigger than the window)
 def nudge_selected_objects(direction:str="Left"):
     if not direction in ("Left", "Right", "Up", "Down"):
         raise_test_warning ("nudge_selected_objects - invalid direction: '"+direction+"'")
     else: 
         event=dummy_event(keysym=direction)
         run_function(lambda:schematic.nudge_selected_objects(event))
-        
+
+# Simulates the <s> keypress or 'snap-to-grid' selection from object popup menu
+# These events are only enabled in EDIT Mode (disabled when move in progress)
 def snap_selected_objects_to_grid():
     run_function(lambda:schematic.snap_selected_objects_to_grid(), delay=0.5)
 
+# Simulates the 'select_all' selection from the canvas popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def select_all_objects():
     run_function(lambda:schematic.select_all_objects())
 
+# Simulates the <esc> keypress to de-select all objects when a move is not in progress
+# Note that if a move is in progress the <esc> key has a different function to cancel the move
+# This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def deselect_all_objects():
     run_function(lambda:schematic.deselect_all_objects())
 
+# Simulates the <r> keypress or 'rotate' selection from the object popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def rotate_selected_objects():
     run_function(lambda:schematic.rotate_selected_objects(),delay=0.5)
 
+# Simulates the <backspace>/<delete> keypress or 'delete' selection from the object popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def delete_selected_objects():
     run_function(lambda:schematic.delete_selected_objects(),delay=0.5)
     
+# Simulates the <cntl-c> keypress or 'copy' selection from the object popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def copy_selected_objects():
     run_function(lambda:schematic.copy_selected_objects())
     
+# Simulates the <cntl-v> keypress or 'paste' selection from the canvas popup menu
+# These events are normally only enabled in EDIT Mode (disabled when move in progress)
 def paste_clipboard_objects():
     run_function(lambda:schematic.paste_clipboard_objects(),delay=0.5)
     return(schematic.schematic_state["selectedobjects"])
 
+# Simulates the <cntl-z> keypress event on the canvas
+# This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def undo():
     run_function(lambda:schematic.schematic_undo(),delay=0.5)
     return()
 
+# Simulates the <cntl-v> keypress event on the canvas
+# This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def redo():
     run_function(lambda:schematic.schematic_redo(),delay=0.5)
     return()
