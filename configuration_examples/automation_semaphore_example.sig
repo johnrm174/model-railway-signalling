@@ -14,7 +14,7 @@
                 true,
                 ""
             ],
-            "bbox": 184,
+            "bbox": 735,
             "dccaspects": [
                 [
                     [
@@ -1019,14 +1019,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                12,
+            "trackinterlock": [
                 [
-                    4,
-                    13,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                12,
+                [
+                    [
+                        4,
+                        0,
+                        0
+                    ],
+                    [
+                        13,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -1042,7 +1089,7 @@
                 true,
                 ""
             ],
-            "bbox": 212,
+            "bbox": 763,
             "dccaspects": [
                 [
                     [
@@ -2047,14 +2094,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                10,
+            "trackinterlock": [
                 [
-                    5,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                10,
+                [
+                    [
+                        5,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -2065,19 +2159,19 @@
                 0,
                 0
             ],
-            "bbox": 218,
+            "bbox": 769,
             "colour": "black",
-            "end1": 1360,
-            "end2": 1361,
+            "end1": 765,
+            "end2": 766,
             "endx": 1275,
             "endy": 225,
             "item": "line",
             "itemid": 1,
-            "line": 1359,
+            "line": 764,
             "posx": 975,
             "posy": 225,
-            "stop1": 1362,
-            "stop2": 1363,
+            "stop1": 767,
+            "stop2": 768,
             "tags": "line1"
         },
         "16c59187-f382-4e52-9d40-41856f8c57e9": {
@@ -2092,7 +2186,7 @@
                 true,
                 ""
             ],
-            "bbox": 246,
+            "bbox": 797,
             "dccaspects": [
                 [
                     [
@@ -3097,19 +3191,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                14,
+            "trackinterlock": [
                 [
-                    15,
                     0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                14,
+                [
+                    [
+                        15,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "1b3f1dca-d687-4ec6-98e3-cc017d9f844a": {
-            "bbox": 248,
+            "bbox": 799,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3122,7 +3263,7 @@
             "tags": "section11"
         },
         "23ef06a2-5597-4aba-920c-ca15828a7733": {
-            "bbox": 250,
+            "bbox": 801,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3146,7 +3287,7 @@
                 true,
                 ""
             ],
-            "bbox": 278,
+            "bbox": 829,
             "dccaspects": [
                 [
                     [
@@ -4151,14 +4292,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                7,
+            "trackinterlock": [
                 [
-                    8,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                7,
+                [
+                    [
+                        8,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -4174,7 +4362,7 @@
                 true,
                 ""
             ],
-            "bbox": 306,
+            "bbox": 857,
             "dccaspects": [
                 [
                     [
@@ -5179,14 +5367,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                1,
+            "trackinterlock": [
                 [
-                    2,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                1,
+                [
+                    [
+                        2,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -5202,7 +5437,7 @@
                 false,
                 ""
             ],
-            "bbox": 334,
+            "bbox": 885,
             "dccaspects": [
                 [
                     [
@@ -6207,19 +6442,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                6,
+            "trackinterlock": [
                 [
-                    7,
                     0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                6,
+                [
+                    [
+                        7,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "3c5565ee-45f3-4298-a7da-5c1c52ebf2d2": {
-            "bbox": 336,
+            "bbox": 887,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -6238,23 +6520,23 @@
                 0,
                 0
             ],
-            "bbox": 342,
+            "bbox": 893,
             "colour": "black",
-            "end1": 1476,
-            "end2": 1477,
+            "end1": 889,
+            "end2": 890,
             "endx": 1375,
             "endy": 225,
             "item": "line",
             "itemid": 2,
-            "line": 1475,
+            "line": 888,
             "posx": 1800,
             "posy": 225,
-            "stop1": 1478,
-            "stop2": 1479,
+            "stop1": 891,
+            "stop2": 892,
             "tags": "line2"
         },
         "40da50ad-40cf-4f2f-a86f-eef794d41ace": {
-            "bbox": 344,
+            "bbox": 895,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -6278,7 +6560,7 @@
                 false,
                 ""
             ],
-            "bbox": 353,
+            "bbox": 904,
             "dccaspects": [
                 [
                     [
@@ -7283,19 +7565,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                12,
+            "trackinterlock": [
                 [
-                    11,
-                    2,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                12,
+                [
+                    [
+                        11,
+                        0,
+                        0
+                    ],
+                    [
+                        2,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "49436626-93f4-4b47-b9ae-5221c9d27577": {
-            "bbox": 355,
+            "bbox": 906,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7319,7 +7648,7 @@
                 true,
                 ""
             ],
-            "bbox": 383,
+            "bbox": 934,
             "dccaspects": [
                 [
                     [
@@ -8324,14 +8653,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                3,
+            "trackinterlock": [
                 [
-                    4,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                3,
+                [
+                    [
+                        4,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -8342,19 +8718,19 @@
                 0,
                 0
             ],
-            "bbox": 389,
+            "bbox": 940,
             "colour": "black",
-            "end1": 1518,
-            "end2": 1519,
+            "end1": 936,
+            "end2": 937,
             "endx": 1375,
             "endy": 275,
             "item": "line",
             "itemid": 3,
-            "line": 1517,
+            "line": 935,
             "posx": 1800,
             "posy": 275,
-            "stop1": 1520,
-            "stop2": 1521,
+            "stop1": 938,
+            "stop2": 939,
             "tags": "line3"
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
@@ -8369,7 +8745,7 @@
                 false,
                 ""
             ],
-            "bbox": 442,
+            "bbox": 993,
             "dccaspects": [
                 [
                     [
@@ -9374,14 +9750,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                5,
+            "trackinterlock": [
                 [
-                    1,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                5,
+                [
+                    [
+                        1,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -9397,7 +9820,7 @@
                 false,
                 ""
             ],
-            "bbox": 451,
+            "bbox": 1002,
             "dccaspects": [
                 [
                     [
@@ -10402,21 +10825,68 @@
                     0
                 ]
             ],
-            "tracksections": [
-                3,
+            "trackinterlock": [
                 [
-                    2,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                3,
+                [
+                    [
+                        2,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 458,
+            "bbox": 1009,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -10484,7 +10954,7 @@
                 false,
                 ""
             ],
-            "bbox": 486,
+            "bbox": 1037,
             "dccaspects": [
                 [
                     [
@@ -11489,19 +11959,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                4,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                4,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "85d79875-69a8-4f48-b990-56add64e268d": {
-            "bbox": 488,
+            "bbox": 1039,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11520,19 +12037,19 @@
                 0,
                 0
             ],
-            "bbox": 494,
+            "bbox": 1045,
             "colour": "black",
-            "end1": 1617,
-            "end2": 1618,
+            "end1": 1041,
+            "end2": 1042,
             "endx": 1275,
             "endy": 175,
             "item": "line",
             "itemid": 4,
-            "line": 1616,
+            "line": 1040,
             "posx": 975,
             "posy": 175,
-            "stop1": 1619,
-            "stop2": 1620,
+            "stop1": 1043,
+            "stop2": 1044,
             "tags": "line4"
         },
         "902284fd-0dc0-4ded-96b6-e94ba78a1cf4": {
@@ -11547,7 +12064,7 @@
                 false,
                 ""
             ],
-            "bbox": 503,
+            "bbox": 1054,
             "dccaspects": [
                 [
                     [
@@ -12552,19 +13069,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                8,
+            "trackinterlock": [
                 [
-                    4,
                     0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                8,
+                [
+                    [
+                        4,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "94fd8cf6-a410-4f67-9da5-c985edcbf688": {
-            "bbox": 505,
+            "bbox": 1056,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12588,7 +13152,7 @@
                 false,
                 ""
             ],
-            "bbox": 533,
+            "bbox": 1084,
             "dccaspects": [
                 [
                     [
@@ -13593,14 +14157,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                9,
+            "trackinterlock": [
                 [
-                    14,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                9,
+                [
+                    [
+                        14,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -13611,23 +14222,23 @@
                 0,
                 0
             ],
-            "bbox": 539,
+            "bbox": 1090,
             "colour": "black",
-            "end1": 1658,
-            "end2": 1659,
+            "end1": 1086,
+            "end2": 1087,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 5,
-            "line": 1657,
+            "line": 1085,
             "posx": 1325,
             "posy": 275,
-            "stop1": 1660,
-            "stop2": 1661,
+            "stop1": 1088,
+            "stop2": 1089,
             "tags": "line5"
         },
         "a6e56e82-869d-4a63-b9fe-649476f59a62": {
-            "bbox": 541,
+            "bbox": 1092,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -13646,19 +14257,19 @@
                 1,
                 1
             ],
-            "bbox": 547,
+            "bbox": 1098,
             "colour": "black",
-            "end1": 1664,
-            "end2": 1665,
+            "end1": 1094,
+            "end2": 1095,
             "endx": 1325,
             "endy": 175,
             "item": "line",
             "itemid": 6,
-            "line": 1663,
+            "line": 1093,
             "posx": 1600,
             "posy": 175,
-            "stop1": 1666,
-            "stop2": 1667,
+            "stop1": 1096,
+            "stop2": 1097,
             "tags": "line6"
         },
         "aa07d0f4-841d-40c9-87ef-cf9ec08a9239": {
@@ -13673,7 +14284,7 @@
                 false,
                 ""
             ],
-            "bbox": 575,
+            "bbox": 1126,
             "dccaspects": [
                 [
                     [
@@ -14678,19 +15289,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                15,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                15,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "af408a69-7a43-4f8e-9453-728ec2747514": {
-            "bbox": 577,
+            "bbox": 1128,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14705,7 +15363,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 584,
+            "bbox": 1135,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14721,7 +15379,7 @@
             "tags": "point4"
         },
         "bd8c0b62-add0-4714-b49a-7bbae0da4124": {
-            "bbox": 586,
+            "bbox": 1137,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14745,7 +15403,7 @@
                 false,
                 ""
             ],
-            "bbox": 614,
+            "bbox": 1165,
             "dccaspects": [
                 [
                     [
@@ -15750,14 +16408,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                8,
+            "trackinterlock": [
                 [
-                    9,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                8,
+                [
+                    [
+                        9,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -15768,25 +16473,25 @@
                 0,
                 0
             ],
-            "bbox": 620,
+            "bbox": 1171,
             "colour": "black",
-            "end1": 1731,
-            "end2": 1732,
+            "end1": 1167,
+            "end2": 1168,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": 7,
-            "line": 1730,
+            "line": 1166,
             "posx": 925,
             "posy": 225,
-            "stop1": 1733,
-            "stop2": 1734,
+            "stop1": 1169,
+            "stop2": 1170,
             "tags": "line7"
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 627,
+            "bbox": 1178,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -15849,23 +16554,23 @@
                 1,
                 1
             ],
-            "bbox": 633,
+            "bbox": 1184,
             "colour": "black",
-            "end1": 1742,
-            "end2": 1743,
+            "end1": 1180,
+            "end2": 1181,
             "endx": 675,
             "endy": 175,
             "item": "line",
             "itemid": 8,
-            "line": 1741,
+            "line": 1179,
             "posx": 925,
             "posy": 175,
-            "stop1": 1744,
-            "stop2": 1745,
+            "stop1": 1182,
+            "stop2": 1183,
             "tags": "line8"
         },
         "c88a11f5-d1b0-4a02-869e-f53d2c930635": {
-            "bbox": 635,
+            "bbox": 1186,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15889,7 +16594,7 @@
                 false,
                 ""
             ],
-            "bbox": 644,
+            "bbox": 1195,
             "dccaspects": [
                 [
                     [
@@ -16894,19 +17599,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                11,
+            "trackinterlock": [
                 [
-                    12,
                     0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                11,
+                [
+                    [
+                        12,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "d5bac97c-de07-407d-966d-83ea0ae26a83": {
-            "bbox": 646,
+            "bbox": 1197,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -16921,7 +17673,7 @@
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 653,
+            "bbox": 1204,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16988,7 +17740,7 @@
             "tags": "point5"
         },
         "dcf7ea0d-cd58-45bf-842e-d4e6e87c9a2a": {
-            "bbox": 655,
+            "bbox": 1206,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -17003,7 +17755,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 662,
+            "bbox": 1213,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17019,7 +17771,7 @@
             "tags": "point1"
         },
         "e0705584-fbf0-47f0-a695-810489e4d5d4": {
-            "bbox": 664,
+            "bbox": 1215,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -17043,7 +17795,7 @@
                 false,
                 ""
             ],
-            "bbox": 673,
+            "bbox": 1224,
             "dccaspects": [
                 [
                     [
@@ -18048,21 +18800,68 @@
                     0
                 ]
             ],
-            "tracksections": [
-                13,
+            "trackinterlock": [
                 [
-                    12,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                13,
+                [
+                    [
+                        12,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 680,
+            "bbox": 1231,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -18089,7 +18888,7 @@
                 false,
                 ""
             ],
-            "bbox": 689,
+            "bbox": 1240,
             "dccaspects": [
                 [
                     [
@@ -19094,14 +19893,61 @@
                     0
                 ]
             ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
             "tracksections": [
                 4,
                 [
-                    3,
-                    8,
-                    0,
-                    12,
-                    0
+                    [
+                        3,
+                        0,
+                        0
+                    ],
+                    [
+                        8,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        12,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -19117,7 +19963,7 @@
                 true,
                 ""
             ],
-            "bbox": 720,
+            "bbox": 1271,
             "dccaspects": [
                 [
                     [
@@ -20122,19 +20968,66 @@
                     0
                 ]
             ],
-            "tracksections": [
-                2,
+            "trackinterlock": [
                 [
-                    3,
-                    12,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                2,
+                [
+                    [
+                        3,
+                        0,
+                        0
+                    ],
+                    [
+                        12,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "fc4b8a11-3862-417f-ba09-493456b59064": {
-            "bbox": 722,
+            "bbox": 1273,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -20251,9 +21144,9 @@
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "../configuration_examples/automation_semaphore_example.sig",
+            "filename": "/home/pi/model-railway-signalling/configuration_examples/automation_semaphore_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto-isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration (note that external\nGPIO sensors haven't been configured for this particular example layout). 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to 'off' as soon as the section ahead is cleared. Note that some of the signals in this example \nhave been configured as 'fully automatic' (without a control button). This means that they will be 'off'\nby default and controlled entirely by whether the track section ahead is occupied or not.\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed (when 'off') they are overriden \nto 'on' (as per the other signals on the layout) but then revert to 'off' after the specified delay.\n\nTrack sensors can also be positioned slightly before the signal and mapped to generate 'signal \napproached' events to simulate 'approach control'. In this example, all non-fully-automatic home signals \nare configured for 'release on red based on the signals ahead'. This means that if any home signals ahead\nare showing danger then the home signal will also be overridden to 'on' by default.As the train approaches\nthe signal (at a slow speed as the signal is against it) then the signal will be released to 'off' to\nallow the train to pass and then revert back to the overidden 'on' state when the signal is passed.\nSignal 1 is also configured for 'release on red' for the diverging (low-speed) route. In this case it\nwill be overridden to 'on' even if all home signals ahead are 'off', only released as the train approaches.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. Right click the far left track section and enter a train\ndesignation code of your choice (this sets the section to 'occupied'). Set signals 8, 1 and 3 to 'off' (note\nthat they will remail overridden to 'on' as home signal ahead 4 is still showing 'on'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of each signal if you want to see\napproach control working). When the train reaches signal 4, set the signal to 'off' and trigger the signal\npassed event. The track section before the signal will be cleared and the signal overridden to 'on' as part\nof the timed sequence. After a short delay it will revert to 'off' and when it does, all home signals behind\nwill also revert to 'off' (as they will no longer be overridden on a home signal ahead).\n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n",
-            "version": "Version 4.0"
+            "version": "Version 4.0.0"
         },
         "gpio": {
             "portmappings": [],
