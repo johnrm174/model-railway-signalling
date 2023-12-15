@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
-import configuration_window_tests
+import test_object_edit_windows
 
 #-----------------------------------------------------------------------------------
 

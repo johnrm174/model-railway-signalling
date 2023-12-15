@@ -24,7 +24,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
-import configuration_window_tests
+import test_object_edit_windows
 
 #-----------------------------------------------------------------------------------
 # These test the changes to track occupancy on signal passed events for non-distant
@@ -654,10 +654,10 @@ def run_override_on_signal_ahead_tests_2(delay:float=0.0):
 ######################################################################################################
 
 def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
-    initialise_test_harness(filename="./run_layout_tests.sig")
+    initialise_test_harness(filename="./test_run_layout.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    configuration_window_tests.test_all_object_edit_windows(delay)
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     set_run_mode()
     print("Run track occupancy tests with simulated user-generated signal passed events")    
     run_track_occupancy_tests_1(delay,test_sensors=False)
