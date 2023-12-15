@@ -63,7 +63,7 @@
             "filename": "new_layout.sig",
             "info": "",
             "random-config-element": 25,
-            "version": "Version 1.1.0"
+            "version": "Version 3.5.1"
         },
         "logging": {
             "level": 2
