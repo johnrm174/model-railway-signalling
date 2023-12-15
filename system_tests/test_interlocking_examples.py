@@ -9,7 +9,7 @@
 #-----------------------------------------------------------------------------------
 
 from system_test_harness import *
-import configuration_window_tests
+import test_object_edit_windows
 
 #-----------------------------------------------------------------------------------
 
@@ -599,7 +599,7 @@ def run_all_interlocking_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/interlocking_colour_light_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    configuration_window_tests.test_all_object_edit_windows(delay)
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     set_run_mode()
     reset_layout()
     run_initial_state_tests()
@@ -611,7 +611,7 @@ def run_all_interlocking_example_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="../configuration_examples/interlocking_semaphore_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
-    configuration_window_tests.test_all_object_edit_windows(delay)
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     set_run_mode()
     reset_layout()
     run_initial_state_tests(semaphore=True)
