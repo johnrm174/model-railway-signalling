@@ -82,6 +82,14 @@ from . import objects_textboxes
 
 from .. import run_layout
 
+#######################################################################################################
+### Handle change of sensors being a configuration item in their own right from release 3.6.0 #########
+#######################################################################################################
+from .. import settings 
+#######################################################################################################
+################################## End of code to handle breaking changes #############################
+#######################################################################################################
+
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections to the front of the canvas
 # This insures they are not obscured by any lines drawn on the canvas
@@ -465,8 +473,13 @@ def paste_objects():
 #------------------------------------------------------------------------------------
 
 def set_all(new_objects):
-    # List of warning messages to report
-    warning_messages = []
+    ##################################################################################
+    ### Code block to Handle breaking changes - see later in the code for details ####
+    ##################################################################################
+    list_of_track_sensors_to_create =[]
+    ##################################################################################
+    ################ End of code block to handle breaking changes ####################
+    ##################################################################################
     # For each loaded object, create a new default object of the same type
     # and then copy across each element in turn. This is defensive programming
     # to populate the objects gracefully whilst handling changes to an object
@@ -491,48 +504,85 @@ def set_all(new_objects):
             default_object = objects_instruments.default_instrument_object
         else:
             default_object = {}
-            warning_message = (new_object_type+" "+str(item_id)+
-                            " - Unrecognised object type - DISCARDED")
-            logging.warning("LOAD LAYOUT - "+warning_message)
-            warning_messages.append(warning_message)
+            logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Unrecognised object type - DISCARDED")
         # Populate each element at a time and report any elements not recognised
         if default_object != {}:
             objects_common.schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
                 if element not in default_object.keys():
-                    warning_message = (new_object_type+" "+str(item_id)+
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
-                    logging.warning("LOAD LAYOUT - "+warning_message)
-                    warning_messages.append(warning_message)
-                #############################################################################################
-                ## Handle breaking change for release 4.0 - tracksections now a list of 3 sections 
-                ## The 'tracksections# element is a list of [section_behind, sections_ahead]
-                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2]
-                ## Before release 4.0, each route element was a single track section (integer value)
-                ## From Release 4.0 onwards, each element comprises a list of track sections [T1, T2, T3]
-                #############################################################################################
+                #################################################################################################
+                ## Handle breaking change of tracksections now a list of 3 sections from release 4.0.0 ##########
+                ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
+                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
+                ## Before release 4.0.0, each route element was a single track section (integer value) ##########
+                ## From Release 4.0.0 onwards, each element comprises a list of track sections [T1, T2, T3] #####
+                #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "tracksections":
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if type(new_objects[object_id][element][1][0]) == int:
                         for index, route in enumerate(new_objects[object_id][element][1]):
                             list_of_sections = [new_objects[object_id][element][1][index],0,0]
                             objects_common.schematic_objects[object_id][element][1][index] = list_of_sections
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 4.0.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
+                ##################################################################################
+                ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
+                ### This is something we can resolve without affecting the user so we resolve ####
+                ### it silently without an Log message or load warning message - unless the ######
+                ### track sensors - in which case we need to list them for the user to resolve ###
+                ##################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if new_objects[object_id][element][1] == 0:
+                        objects_common.schematic_objects[object_id][element][1] = ""
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
+                    elif isinstance(new_objects[object_id][element][1],int):
+                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
+                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
+                    else:
+                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+                elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if new_objects[object_id][element][1] == 0:
+                        objects_common.schematic_objects[object_id][element][1] = ""
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
+                    elif isinstance(new_objects[object_id][element][1],int):
+                        objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
+                        list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
+                    else:
+                        objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
                 #############################################################################################
-                ## End of Handle breaking change for release 4.0  ###########################################
+                ## End of Handle breaking change for track sections and sensor IDs ##########################
                 #############################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
+            ##################################################################################
+            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
+            ##################################################################################
+            if len(list_of_track_sensors_to_create) > 0:
+                logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
+                settings.set_gpio(mappings = list_of_track_sensors_to_create)       
+            ##################################################################################
+            ## End of Handle breaking change for sensor IDs ##################################
+            ##################################################################################
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
                 if element not in new_objects[object_id].keys():
                     default_value = objects_common.schematic_objects[object_id][element]
-                    warning_message = (new_object_type+" "+str(item_id)+" - Missing element: '"
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: '"
                             +element+"' - Asigning default values: "+str(default_value))
-                    logging.warning("LOAD LAYOUT - "+warning_message)
-                    warning_messages.append(warning_message)
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
@@ -546,8 +596,7 @@ def set_all(new_objects):
     run_layout.initialise_layout()    
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
-    # Return the list of warning messages (for display to the user)
-    return(warning_messages)
+    return()
 
 #------------------------------------------------------------------------------------
 # Function get the current objects dictionary (for saving to file)
