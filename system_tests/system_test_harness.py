@@ -239,12 +239,12 @@ def initialise_test_harness(filename=None):
     if filename is None:
         # Ensure any queued tkinter events have completed
         time.sleep(1.0) 
-        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=1.0)
+        run_function(lambda:main_menubar.new_schematic(ask_for_confirm=False),delay=2.0)
     else:
         # Ensure any queued tkinter events have completed
         time.sleep(1.0) 
         print ("System Tests: Load Scematic: '",filename,"'")
-        run_function(lambda:main_menubar.load_schematic(filename),delay=2.0)
+        run_function(lambda:main_menubar.load_schematic(filename),delay=3.0)
 
 # ------------------------------------------------------------------------------
 # Function to finish the tests and report on any failures. Then drops straight
