@@ -14,7 +14,7 @@
         "00df7795-1ac5-4b0a-8400-0ae0f64e3cf7": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 143,
+            "bbox": 1597,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -61,7 +61,7 @@
             "tags": "point4"
         },
         "059e8b30-21fe-4a68-8fde-644d31f5963f": {
-            "bbox": 146,
+            "bbox": 1600,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -85,7 +85,7 @@
                 false,
                 ""
             ],
-            "bbox": 174,
+            "bbox": 1628,
             "dccaspects": [
                 [
                     [
@@ -1155,23 +1155,23 @@
                 0,
                 0
             ],
-            "bbox": 180,
+            "bbox": 1634,
             "colour": "black",
-            "end1": 4214,
-            "end2": 4215,
+            "end1": 2723,
+            "end2": 2724,
             "endx": 750.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 20,
-            "line": 4213,
+            "line": 2722,
             "posx": 650.0,
             "posy": 600.0,
-            "stop1": 4216,
-            "stop2": 4217,
+            "stop1": 2725,
+            "stop2": 2726,
             "tags": "line20"
         },
         "0d5da466-b04e-402a-aa88-1afa3c1a0ed1": {
-            "bbox": 183,
+            "bbox": 1637,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1190,23 +1190,23 @@
                 0,
                 0
             ],
-            "bbox": 189,
+            "bbox": 1643,
             "colour": "black",
-            "end1": 4220,
-            "end2": 4221,
+            "end1": 2729,
+            "end2": 2730,
             "endx": 400.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 25,
-            "line": 4219,
+            "line": 2728,
             "posx": 250.0,
             "posy": 600.0,
-            "stop1": 4222,
-            "stop2": 4223,
+            "stop1": 2731,
+            "stop2": 2732,
             "tags": "line25"
         },
         "15e208d0-1738-407c-adac-0119c52527d6": {
-            "bbox": 204,
+            "bbox": 1658,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1219,7 +1219,7 @@
         },
         "1691d3ee-af50-44d0-af70-e400407393aa": {
             "background": "grey85",
-            "bbox": 5416,
+            "bbox": 1661,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1234,7 +1234,7 @@
             "text": "Section ahead or section behind tests\n Distant and shunt-ahead signal types"
         },
         "1ccdf967-6bae-4665-a682-489a7b7542ee": {
-            "bbox": 207,
+            "bbox": 1664,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1247,7 +1247,7 @@
             "tags": "section4"
         },
         "1cfdad25-a454-44a3-b440-988209da6738": {
-            "bbox": 210,
+            "bbox": 1667,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1266,19 +1266,19 @@
                 0,
                 0
             ],
-            "bbox": 216,
+            "bbox": 1673,
             "colour": "black",
-            "end1": 4241,
-            "end2": 4242,
+            "end1": 2752,
+            "end2": 2753,
             "endx": 900.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 9,
-            "line": 4240,
+            "line": 2751,
             "posx": 575.0,
             "posy": 200.0,
-            "stop1": 4243,
-            "stop2": 4244,
+            "stop1": 2754,
+            "stop2": 2755,
             "tags": "line9"
         },
         "20f2e28c-a01b-475e-8cf4-15a251fd5fe3": {
@@ -1293,7 +1293,7 @@
                 false,
                 ""
             ],
-            "bbox": 235,
+            "bbox": 1692,
             "dccaspects": [
                 [
                     [
@@ -2357,7 +2357,7 @@
             ]
         },
         "263cd888-5471-4263-91a7-f957c7ba98fa": {
-            "bbox": 238,
+            "bbox": 1695,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2376,23 +2376,23 @@
                 0,
                 0
             ],
-            "bbox": 244,
+            "bbox": 1701,
             "colour": "black",
-            "end1": 4265,
-            "end2": 4266,
+            "end1": 2776,
+            "end2": 2777,
             "endx": 400.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 28,
-            "line": 4264,
+            "line": 2775,
             "posx": 325.0,
             "posy": 550.0,
-            "stop1": 4267,
-            "stop2": 4268,
+            "stop1": 2778,
+            "stop2": 2779,
             "tags": "line28"
         },
         "27215a1d-9b38-4e57-80af-f67a4ee7448e": {
-            "bbox": 247,
+            "bbox": 1704,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2416,7 +2416,7 @@
                 false,
                 ""
             ],
-            "bbox": 259,
+            "bbox": 1716,
             "dccaspects": [
                 [
                     [
@@ -3486,23 +3486,23 @@
                 0,
                 0
             ],
-            "bbox": 265,
+            "bbox": 1722,
             "colour": "black",
-            "end1": 4282,
-            "end2": 4283,
+            "end1": 2793,
+            "end2": 2794,
             "endx": 425.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 2,
-            "line": 4281,
+            "line": 2792,
             "posx": 400.0,
             "posy": 125.0,
-            "stop1": 4284,
-            "stop2": 4285,
+            "stop1": 2795,
+            "stop2": 2796,
             "tags": "line2"
         },
         "294ffd9a-e658-4095-9446-9608c6565ea5": {
-            "bbox": 268,
+            "bbox": 1725,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3526,7 +3526,7 @@
                 false,
                 ""
             ],
-            "bbox": 280,
+            "bbox": 1737,
             "dccaspects": [
                 [
                     [
@@ -4601,7 +4601,7 @@
                 false,
                 ""
             ],
-            "bbox": 299,
+            "bbox": 1756,
             "dccaspects": [
                 [
                     [
@@ -5676,7 +5676,7 @@
                 false,
                 ""
             ],
-            "bbox": 311,
+            "bbox": 1768,
             "dccaspects": [
                 [
                     [
@@ -6751,7 +6751,7 @@
                 false,
                 ""
             ],
-            "bbox": 339,
+            "bbox": 1796,
             "dccaspects": [
                 [
                     [
@@ -7816,7 +7816,7 @@
         },
         "3921c74d-11e9-4a28-baac-22741f00f5f6": {
             "background": "grey85",
-            "bbox": 5016,
+            "bbox": 1799,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -7826,9 +7826,9 @@
             "itemid": 0,
             "justify": 2,
             "posx": 200.0,
-            "posy": 75.0,
+            "posy": 59.0,
             "tags": "3921c74d-11e9-4a28-baac-22741f00f5f6",
-            "text": "Basic track occupancy tests\nBasic interlocking/override tests"
+            "text": "Basic track occupancy tests\nBasic interlocking/override tests\n(Tests include manual triggering\nof signal passed events and\nsimulated triggering of GPIO inputs)"
         },
         "3bd65ffb-4f36-4d7b-8606-bd1b875623e2": {
             "arrowends": 0,
@@ -7837,19 +7837,19 @@
                 0,
                 0
             ],
-            "bbox": 345,
+            "bbox": 1805,
             "colour": "black",
-            "end1": 4355,
-            "end2": 4356,
+            "end1": 2868,
+            "end2": 2869,
             "endx": 1100.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 14,
-            "line": 4354,
+            "line": 2867,
             "posx": 800.0,
             "posy": 600.0,
-            "stop1": 4357,
-            "stop2": 4358,
+            "stop1": 2870,
+            "stop2": 2871,
             "tags": "line14"
         },
         "41271867-259f-4e9b-92d8-fc6362917365": {
@@ -7864,7 +7864,7 @@
                 false,
                 ""
             ],
-            "bbox": 364,
+            "bbox": 1824,
             "dccaspects": [
                 [
                     [
@@ -8939,7 +8939,7 @@
                 false,
                 ""
             ],
-            "bbox": 373,
+            "bbox": 1833,
             "dccaspects": [
                 [
                     [
@@ -10009,23 +10009,23 @@
                 0,
                 0
             ],
-            "bbox": 379,
+            "bbox": 1839,
             "colour": "black",
-            "end1": 4386,
-            "end2": 4387,
+            "end1": 2899,
+            "end2": 2900,
             "endx": 900.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 8,
-            "line": 4385,
+            "line": 2898,
             "posx": 525.0,
             "posy": 150.0,
-            "stop1": 4388,
-            "stop2": 4389,
+            "stop1": 2901,
+            "stop2": 2902,
             "tags": "line8"
         },
         "4e39406c-54ed-48bb-9835-c4a93664e288": {
-            "bbox": 382,
+            "bbox": 1842,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -10034,7 +10034,7 @@
             "mirror": "",
             "posx": 1050.0,
             "posy": 375.0,
-            "state": true,
+            "state": false,
             "tags": "section7"
         },
         "4ec8decd-fe88-4ef8-8510-0f8b3097f86c": {
@@ -10049,7 +10049,7 @@
                 false,
                 ""
             ],
-            "bbox": 401,
+            "bbox": 1861,
             "dccaspects": [
                 [
                     [
@@ -11113,7 +11113,7 @@
             ]
         },
         "58a3b159-ccd8-46fa-b40e-cb8e0f6dfe7b": {
-            "bbox": 404,
+            "bbox": 1864,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11126,7 +11126,7 @@
             "tags": "section9"
         },
         "59728ad9-d204-4ca9-8c8d-a3e340bc7e72": {
-            "bbox": 407,
+            "bbox": 1867,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11145,19 +11145,19 @@
                 0,
                 0
             ],
-            "bbox": 413,
+            "bbox": 1873,
             "colour": "black",
-            "end1": 4412,
-            "end2": 4413,
+            "end1": 2925,
+            "end2": 2926,
             "endx": 300.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 21,
-            "line": 4411,
+            "line": 2924,
             "posx": 25.0,
             "posy": 350.0,
-            "stop1": 4414,
-            "stop2": 4415,
+            "stop1": 2927,
+            "stop2": 2928,
             "tags": "line21"
         },
         "5e14d312-7750-4ab5-9376-09c40e391a55": {
@@ -11167,19 +11167,19 @@
                 0,
                 0
             ],
-            "bbox": 419,
+            "bbox": 1879,
             "colour": "black",
-            "end1": 4417,
-            "end2": 4418,
+            "end1": 2930,
+            "end2": 2931,
             "endx": 350.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 24,
-            "line": 4416,
+            "line": 2929,
             "posx": 325.0,
             "posy": 375.0,
-            "stop1": 4419,
-            "stop2": 4420,
+            "stop1": 2932,
+            "stop2": 2933,
             "tags": "line24"
         },
         "5f7adc51-3867-4068-89e9-951344c619aa": {
@@ -11194,7 +11194,7 @@
                 false,
                 ""
             ],
-            "bbox": 447,
+            "bbox": 1907,
             "dccaspects": [
                 [
                     [
@@ -12258,7 +12258,7 @@
             ]
         },
         "67ab0983-6537-46c7-95e5-8e6f48075319": {
-            "bbox": 450,
+            "bbox": 1910,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12277,19 +12277,19 @@
                 0,
                 0
             ],
-            "bbox": 456,
+            "bbox": 1916,
             "colour": "black",
-            "end1": 4450,
-            "end2": 4451,
+            "end1": 2963,
+            "end2": 2964,
             "endx": 1100.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 15,
-            "line": 4449,
+            "line": 2962,
             "posx": 800.0,
             "posy": 550.0,
-            "stop1": 4452,
-            "stop2": 4453,
+            "stop1": 2965,
+            "stop2": 2966,
             "tags": "line15"
         },
         "6c791787-8ce0-4db7-9308-7c5144fe412f": {
@@ -12304,7 +12304,7 @@
                 false,
                 ""
             ],
-            "bbox": 512,
+            "bbox": 1972,
             "dccaspects": [
                 [
                     [
@@ -13374,19 +13374,19 @@
                 0,
                 0
             ],
-            "bbox": 518,
+            "bbox": 1978,
             "colour": "black",
-            "end1": 4510,
-            "end2": 4511,
+            "end1": 3023,
+            "end2": 3024,
             "endx": 200.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 26,
-            "line": 4509,
+            "line": 3022,
             "posx": 25.0,
             "posy": 600.0,
-            "stop1": 4512,
-            "stop2": 4513,
+            "stop1": 3025,
+            "stop2": 3026,
             "tags": "line26"
         },
         "7482f7e1-f1ad-473d-b856-6f70ab6a8015": {
@@ -13396,19 +13396,19 @@
                 0,
                 0
             ],
-            "bbox": 524,
+            "bbox": 1984,
             "colour": "black",
-            "end1": 4515,
-            "end2": 4516,
+            "end1": 3028,
+            "end2": 3029,
             "endx": 1100.0,
             "endy": 375.0,
             "item": "line",
             "itemid": 12,
-            "line": 4514,
+            "line": 3027,
             "posx": 800.0,
             "posy": 375.0,
-            "stop1": 4517,
-            "stop2": 4518,
+            "stop1": 3030,
+            "stop2": 3031,
             "tags": "line12"
         },
         "76a00814-9701-437d-99a8-32e60ed4ba17": {
@@ -13418,23 +13418,23 @@
                 0,
                 0
             ],
-            "bbox": 530,
+            "bbox": 1990,
             "colour": "black",
-            "end1": 4520,
-            "end2": 4521,
+            "end1": 3033,
+            "end2": 3034,
             "endx": 475.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 5,
-            "line": 4519,
+            "line": 3032,
             "posx": 450.0,
             "posy": 75.0,
-            "stop1": 4522,
-            "stop2": 4523,
+            "stop1": 3035,
+            "stop2": 3036,
             "tags": "line5"
         },
         "792e40e8-1303-49a8-b2d7-1e1e255cbff0": {
-            "bbox": 533,
+            "bbox": 1993,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -13458,7 +13458,7 @@
                 false,
                 ""
             ],
-            "bbox": 552,
+            "bbox": 2012,
             "dccaspects": [
                 [
                     [
@@ -14528,25 +14528,25 @@
                 0,
                 0
             ],
-            "bbox": 558,
+            "bbox": 2018,
             "colour": "black",
-            "end1": 4544,
-            "end2": 4545,
+            "end1": 3057,
+            "end2": 3058,
             "endx": 575.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 11,
-            "line": 4543,
+            "line": 3056,
             "posx": 550.0,
             "posy": 225.0,
-            "stop1": 4546,
-            "stop2": 4547,
+            "stop1": 3059,
+            "stop2": 3060,
             "tags": "line11"
         },
         "93063a54-5b09-4045-985b-7ba45650ff68": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 565,
+            "bbox": 2025,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14573,7 +14573,7 @@
             "tags": "point8"
         },
         "95c43eba-116d-461f-acf5-2942ee2de9a0": {
-            "bbox": 568,
+            "bbox": 2028,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14587,7 +14587,7 @@
         },
         "97e058d0-9fc8-4595-a6c1-38b76dbc6930": {
             "background": "grey85",
-            "bbox": 5023,
+            "bbox": 2031,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -14602,7 +14602,7 @@
             "text": "Section ahead or section behind tests\nNon distant/shunt-ahead signal types"
         },
         "97f92095-a77f-4a82-ac03-58020be13cda": {
-            "bbox": 583,
+            "bbox": 2046,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -14625,7 +14625,7 @@
                 false,
                 ""
             ],
-            "bbox": 614,
+            "bbox": 2077,
             "dccaspects": [
                 [
                     [
@@ -15689,7 +15689,7 @@
             ]
         },
         "9a297b55-f32f-427e-97f3-d29601155e06": {
-            "bbox": 617,
+            "bbox": 2080,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15703,7 +15703,7 @@
         },
         "a168039e-a91a-4d28-8f9c-c9847dddcb6d": {
             "background": "grey85",
-            "bbox": 5423,
+            "bbox": 2083,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -15718,7 +15718,7 @@
             "text": "Shunt-ahead signal route tests"
         },
         "a2a63569-61ec-4286-806c-3fb2b9669cae": {
-            "bbox": 620,
+            "bbox": 2086,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15737,24 +15737,24 @@
                 0,
                 0
             ],
-            "bbox": 626,
+            "bbox": 2092,
             "colour": "black",
-            "end1": 4602,
-            "end2": 4603,
+            "end1": 3119,
+            "end2": 3120,
             "endx": 900.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 6,
-            "line": 4601,
+            "line": 3118,
             "posx": 475.0,
             "posy": 50.0,
-            "stop1": 4604,
-            "stop2": 4605,
+            "stop1": 3121,
+            "stop2": 3122,
             "tags": "line6"
         },
         "a37162c4-c2da-42a6-9d5d-2ded06f14cc5": {
             "background": "grey85",
-            "bbox": 5428,
+            "bbox": 2095,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -15771,7 +15771,7 @@
         "a4a3951a-8365-413c-a29f-001a13e6ef21": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 633,
+            "bbox": 2102,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15798,7 +15798,7 @@
             "tags": "point6"
         },
         "a6510982-7180-4a78-a46e-55ef46497bef": {
-            "bbox": 636,
+            "bbox": 2105,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15813,7 +15813,7 @@
         "a7754934-0d4a-428d-ab57-5599d44e8d85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 643,
+            "bbox": 2112,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15896,19 +15896,19 @@
                 0,
                 0
             ],
-            "bbox": 649,
+            "bbox": 2118,
             "colour": "black",
-            "end1": 4620,
-            "end2": 4621,
+            "end1": 3139,
+            "end2": 3140,
             "endx": 475.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 4,
-            "line": 4619,
+            "line": 3138,
             "posx": 425.0,
             "posy": 150.0,
-            "stop1": 4622,
-            "stop2": 4623,
+            "stop1": 3141,
+            "stop2": 3142,
             "tags": "line4"
         },
         "a994fe0e-a4e6-48c3-bd42-b865c18f6624": {
@@ -15923,7 +15923,7 @@
                 false,
                 ""
             ],
-            "bbox": 677,
+            "bbox": 2146,
             "dccaspects": [
                 [
                     [
@@ -16987,12 +16987,12 @@
             ]
         },
         "aa85f250-0909-453e-9de0-fc5dd1ac977a": {
-            "bbox": 680,
+            "bbox": 2149,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 8,
-            "label": "34",
+            "label": "XXXXX",
             "mirror": "",
             "posx": 850.0,
             "posy": 425.0,
@@ -17000,7 +17000,7 @@
             "tags": "section8"
         },
         "ab1c75b8-5187-4e29-89aa-1ad8efff6e41": {
-            "bbox": 683,
+            "bbox": 2152,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -17013,7 +17013,7 @@
             "tags": "section15"
         },
         "ab65202c-8dbc-4a49-9df4-b2a210d1b773": {
-            "bbox": 686,
+            "bbox": 2155,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -17032,19 +17032,19 @@
                 0,
                 0
             ],
-            "bbox": 692,
+            "bbox": 2161,
             "colour": "black",
-            "end1": 4655,
-            "end2": 4656,
+            "end1": 3174,
+            "end2": 3175,
             "endx": 750.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 18,
-            "line": 4654,
+            "line": 3173,
             "posx": 650.0,
             "posy": 550.0,
-            "stop1": 4657,
-            "stop2": 4658,
+            "stop1": 3176,
+            "stop2": 3177,
             "tags": "line18"
         },
         "aefa13ab-557e-4572-9b67-988243b51c6f": {
@@ -17059,7 +17059,7 @@
                 false,
                 ""
             ],
-            "bbox": 745,
+            "bbox": 2214,
             "dccaspects": [
                 [
                     [
@@ -18123,7 +18123,7 @@
             ]
         },
         "afd35369-6f78-4dab-be3c-62460b51f8bd": {
-            "bbox": 748,
+            "bbox": 2217,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -18138,7 +18138,7 @@
         "b149ba67-d83f-4f67-ac37-6ac099d886d1": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 755,
+            "bbox": 2224,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -18196,7 +18196,7 @@
                 false,
                 ""
             ],
-            "bbox": 774,
+            "bbox": 2243,
             "dccaspects": [
                 [
                     [
@@ -19266,19 +19266,19 @@
                 0,
                 0
             ],
-            "bbox": 780,
+            "bbox": 2249,
             "colour": "black",
-            "end1": 4737,
-            "end2": 4738,
+            "end1": 3256,
+            "end2": 3257,
             "endx": 1100.0,
             "endy": 425.0,
             "item": "line",
             "itemid": 13,
-            "line": 4736,
+            "line": 3255,
             "posx": 800.0,
             "posy": 425.0,
-            "stop1": 4739,
-            "stop2": 4740,
+            "stop1": 3258,
+            "stop2": 3259,
             "tags": "line13"
         },
         "bc1c1e57-d938-4721-a8f1-4009975fc3fd": {
@@ -19288,23 +19288,23 @@
                 20,
                 5
             ],
-            "bbox": 786,
+            "bbox": 2255,
             "colour": "black",
-            "end1": 4742,
-            "end2": 4743,
+            "end1": 3261,
+            "end2": 3262,
             "endx": 250.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 27,
-            "line": 4741,
+            "line": 3260,
             "posx": 225.0,
             "posy": 575.0,
-            "stop1": 4744,
-            "stop2": 4745,
+            "stop1": 3263,
+            "stop2": 3264,
             "tags": "line27"
         },
         "be3430e8-fa0a-4ed5-8e15-bbe161956db4": {
-            "bbox": 789,
+            "bbox": 2258,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -19328,7 +19328,7 @@
                 false,
                 ""
             ],
-            "bbox": 817,
+            "bbox": 2286,
             "dccaspects": [
                 [
                     [
@@ -20398,24 +20398,24 @@
                 0,
                 0
             ],
-            "bbox": 823,
+            "bbox": 2292,
             "colour": "black",
-            "end1": 4775,
-            "end2": 4776,
+            "end1": 3294,
+            "end2": 3295,
             "endx": 650.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 19,
-            "line": 4774,
+            "line": 3293,
             "posx": 625.0,
             "posy": 575.0,
-            "stop1": 4777,
-            "stop2": 4778,
+            "stop1": 3296,
+            "stop2": 3297,
             "tags": "line19"
         },
         "c27d25b7-5b4c-44d3-bd35-e5a1449de1ec": {
             "background": "grey85",
-            "bbox": 5437,
+            "bbox": 2295,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -20436,23 +20436,23 @@
                 0,
                 0
             ],
-            "bbox": 829,
+            "bbox": 2301,
             "colour": "black",
-            "end1": 4780,
-            "end2": 4781,
+            "end1": 3301,
+            "end2": 3302,
             "endx": 750.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 23,
-            "line": 4779,
+            "line": 3300,
             "posx": 350.0,
             "posy": 400.0,
-            "stop1": 4782,
-            "stop2": 4783,
+            "stop1": 3303,
+            "stop2": 3304,
             "tags": "line23"
         },
         "c6bcd861-e896-4b6c-9d38-d472b7d12d67": {
-            "bbox": 832,
+            "bbox": 2304,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -20471,25 +20471,25 @@
                 20,
                 5
             ],
-            "bbox": 838,
+            "bbox": 2310,
             "colour": "black",
-            "end1": 4786,
-            "end2": 4787,
+            "end1": 3307,
+            "end2": 3308,
             "endx": 275.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 29,
-            "line": 4785,
+            "line": 3306,
             "posx": 325.0,
             "posy": 550.0,
-            "stop1": 4788,
-            "stop2": 4789,
+            "stop1": 3309,
+            "stop2": 3310,
             "tags": "line29"
         },
         "cd84d65b-c1fb-48f9-abfe-e37d2799986c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 845,
+            "bbox": 2317,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -20542,25 +20542,25 @@
                 0,
                 0
             ],
-            "bbox": 851,
+            "bbox": 2323,
             "colour": "black",
-            "end1": 4797,
-            "end2": 4798,
+            "end1": 3318,
+            "end2": 3319,
             "endx": 900.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 7,
-            "line": 4796,
+            "line": 3317,
             "posx": 475.0,
             "posy": 100.0,
-            "stop1": 4799,
-            "stop2": 4800,
+            "stop1": 3320,
+            "stop2": 3321,
             "tags": "line7"
         },
         "d210a466-1fdb-417c-b9a4-b190c54b8c0d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 858,
+            "bbox": 2330,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -20623,19 +20623,19 @@
                 0,
                 0
             ],
-            "bbox": 864,
+            "bbox": 2336,
             "colour": "black",
-            "end1": 4808,
-            "end2": 4809,
+            "end1": 3329,
+            "end2": 3330,
             "endx": 900.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 10,
-            "line": 4807,
+            "line": 3328,
             "posx": 575.0,
             "posy": 250.0,
-            "stop1": 4810,
-            "stop2": 4811,
+            "stop1": 3331,
+            "stop2": 3332,
             "tags": "line10"
         },
         "d41f0e5f-13e5-4a7f-bc3e-3388254d6b8c": {
@@ -20650,7 +20650,7 @@
                 false,
                 ""
             ],
-            "bbox": 892,
+            "bbox": 2364,
             "dccaspects": [
                 [
                     [
@@ -21720,19 +21720,19 @@
                 0,
                 0
             ],
-            "bbox": 898,
+            "bbox": 2370,
             "colour": "black",
-            "end1": 4840,
-            "end2": 4841,
+            "end1": 3361,
+            "end2": 3362,
             "endx": 375.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 1,
-            "line": 4839,
+            "line": 3360,
             "posx": 25.0,
             "posy": 150.0,
-            "stop1": 4842,
-            "stop2": 4843,
+            "stop1": 3363,
+            "stop2": 3364,
             "tags": "line1"
         },
         "da669646-6975-4489-9d20-5a5f4bcd2ed7": {
@@ -21747,7 +21747,7 @@
                 false,
                 ""
             ],
-            "bbox": 929,
+            "bbox": 2401,
             "dccaspects": [
                 [
                     [
@@ -22817,23 +22817,23 @@
                 0,
                 0
             ],
-            "bbox": 935,
+            "bbox": 2407,
             "colour": "black",
-            "end1": 4875,
-            "end2": 4876,
+            "end1": 3396,
+            "end2": 3397,
             "endx": 600.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 17,
-            "line": 4874,
+            "line": 3395,
             "posx": 450.0,
             "posy": 550.0,
-            "stop1": 4877,
-            "stop2": 4878,
+            "stop1": 3398,
+            "stop2": 3399,
             "tags": "line17"
         },
         "e1b0ee5f-12f4-45de-8fc6-7d4615c50a8d": {
-            "bbox": 938,
+            "bbox": 2410,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -22857,7 +22857,7 @@
                 false,
                 ""
             ],
-            "bbox": 966,
+            "bbox": 2438,
             "dccaspects": [
                 [
                     [
@@ -23921,7 +23921,7 @@
             ]
         },
         "ea7fe3f2-f03e-46b4-b081-a9a7fd72c579": {
-            "bbox": 969,
+            "bbox": 2441,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -23940,25 +23940,25 @@
                 0,
                 0
             ],
-            "bbox": 975,
+            "bbox": 2447,
             "colour": "black",
-            "end1": 4909,
-            "end2": 4910,
+            "end1": 3430,
+            "end2": 3431,
             "endx": 500.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 3,
-            "line": 4908,
+            "line": 3429,
             "posx": 525.0,
             "posy": 200.0,
-            "stop1": 4911,
-            "stop2": 4912,
+            "stop1": 3432,
+            "stop2": 3433,
             "tags": "line3"
         },
         "ecdbe7e9-941c-45d4-9054-be1fc4e9bf85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 982,
+            "bbox": 2454,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -24001,23 +24001,23 @@
                 0,
                 0
             ],
-            "bbox": 988,
+            "bbox": 2460,
             "colour": "black",
-            "end1": 4920,
-            "end2": 4921,
+            "end1": 3441,
+            "end2": 3442,
             "endx": 1100.0,
             "endy": 650.0,
             "item": "line",
             "itemid": 16,
-            "line": 4919,
+            "line": 3440,
             "posx": 800.0,
             "posy": 650.0,
-            "stop1": 4922,
-            "stop2": 4923,
+            "stop1": 3443,
+            "stop2": 3444,
             "tags": "line16"
         },
         "ee1cb09a-869b-4445-a027-105f24cc1685": {
-            "bbox": 991,
+            "bbox": 2463,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -24036,23 +24036,23 @@
                 0,
                 0
             ],
-            "bbox": 997,
+            "bbox": 2469,
             "colour": "black",
-            "end1": 4926,
-            "end2": 4927,
+            "end1": 3447,
+            "end2": 3448,
             "endx": 750.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 22,
-            "line": 4925,
+            "line": 3446,
             "posx": 350.0,
             "posy": 350.0,
-            "stop1": 4928,
-            "stop2": 4929,
+            "stop1": 3449,
+            "stop2": 3450,
             "tags": "line22"
         },
         "f82bb5bd-b0b1-4fe1-bb06-3bb60e528e30": {
-            "bbox": 1000,
+            "bbox": 2472,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -24065,7 +24065,7 @@
             "tags": "section14"
         },
         "f8dae4ee-8601-441b-8d76-7056a2289fa1": {
-            "bbox": 1003,
+            "bbox": 2475,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -24089,7 +24089,7 @@
                 false,
                 ""
             ],
-            "bbox": 1031,
+            "bbox": 2503,
             "dccaspects": [
                 [
                     [
@@ -25186,16 +25186,125 @@
         },
         "7": {
             "fpllock": false,
-            "locked": true,
+            "locked": false,
             "switched": false
         },
         "8": {
             "fpllock": false,
-            "locked": true,
-            "switched": true
+            "locked": false,
+            "switched": false
         }
     },
-    "sections": {},
+    "sections": {
+        "1": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "10": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "11": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "12": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "13": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "14": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "15": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "16": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "17": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "18": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "19": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "2": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "20": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "21": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "22": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "23": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "24": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "25": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "26": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "27": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "3": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "4": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "5": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "6": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "7": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "8": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "9": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        }
+    },
     "settings": {
         "canvas": {
             "grid": 25,
@@ -25205,8 +25314,8 @@
         },
         "general": {
             "automation": true,
-            "editmode": true,
-            "filename": "./test_run_layout.sig",
+            "editmode": false,
+            "filename": "/home/pi/model-railway-signalling/system_tests/test_run_layout.sig",
             "info": "Document your layout here",
             "version": "Version 4.0.0"
         },
@@ -25371,7 +25480,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -25391,7 +25500,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": true,
             "siglocked": false,
             "subclear": false,
@@ -25403,8 +25512,8 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
-            "siglocked": false,
+            "sigclear": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -25414,7 +25523,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
@@ -25425,7 +25534,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
@@ -25436,7 +25545,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
@@ -25447,7 +25556,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
@@ -25512,8 +25621,8 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
-            "sigclear": true,
+            "routeset": 1,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
