@@ -494,6 +494,8 @@ class main_menubar:
             self.initialise_editor()
             # save the current state (for undo/redo) - deleting all previous history
             objects.save_schematic_state(reset_pointer=True)
+            # Set the file saved flag back to false (to force a "save as" on next save)
+            self.file_has_been_saved = False
         return()
 
     def save_schematic(self, save_as:bool=False):
