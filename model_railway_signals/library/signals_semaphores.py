@@ -640,8 +640,15 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         signals_common.enable_disable_theatre_route_indication(sig_id)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        signals_common.publish_signal_state(sig_id)            
-
+        signals_common.publish_signal_state(sig_id)
+        # For associated distant signals we need to take into account the state of both the home and distant signals
+        # to set the correct "state" for the associated home/distant signal - and we will only know this state once
+        # both home and distant signals have been updated (to take into account any "slotting")
+        if ( signals_common.signals[str(sig_id)]["subtype"] == semaphore_sub_type.home and associated_signal > 0 and
+             signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION and
+             signals_common.signals[str(associated_signal)]["sigstate"] == signals_common.signal_state_type.PROCEED ):
+            logging.info ("Signal "+str(sig_id)+": Updating signal state to PROCEED - associated (slotted) distant is now OFF")
+            signals_common.signals[str(sig_id)]["sigstate"] = signals_common.signal_state_type.PROCEED
     return()
 
 # -------------------------------------------------------------------------
