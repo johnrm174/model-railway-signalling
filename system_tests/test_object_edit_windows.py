@@ -49,6 +49,16 @@ def test_all_window_controls(delay:float=0.0):
         for object_id in schematic_objects.keys():
             # Only test the object types one at a time
             configuration = copy.deepcopy(schematic_objects[object_id])
+            # Get rid of the bits we dont need
+            if configuration["item"] == objects.object_type.line:
+                del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
+                del configuration["end1"]   ## Tkinter drawing object - re-created on re-draw
+                del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
+                del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
+                del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
+            elif configuration["item"] == objects.object_type.section:
+                del configuration["label"]  ## Always reset to default after editing
+                del configuration["state"]  ## Always reset to default after editing
             if configuration["item"] == object_type:
                 print("Editing:",configuration["item"],configuration["itemid"])
                 run_function(lambda:schematic.deselect_all_objects())
@@ -69,16 +79,17 @@ def test_all_window_controls(delay:float=0.0):
                 print("CANCEL - abandon edit and close edit window")
                 run_function(lambda:schematic.close_edit_window(cancel=True))
                 sleep(1.0)
-                # Get rid of the bits we dont need
-                if configuration["item"] == objects.object_type.line:
-                    del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end1"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
-                elif configuration["item"] == objects.object_type.section:
-                    del configuration["label"]  ## Always reset to default after editing
-                    del configuration["state"]  ## Always reset to default after editing
+                # Test the configuration has remained unchanged
+                assert_object_configuration(object_id,configuration)
+                # Re-open the window and test OK
+                print("Editing:",configuration["item"],configuration["itemid"])
+                run_function(lambda:schematic.deselect_all_objects())
+                run_function(lambda:schematic.select_object(object_id))
+                run_function(lambda:schematic.edit_selected_object())
+                sleep(1.0)
+                print("OK - apply changes and close window")
+                run_function(lambda:schematic.close_edit_window(ok=True))
+                sleep(1.0)
                 # Test the configuration has remained unchanged
                 assert_object_configuration(object_id,configuration)        
     return()
@@ -92,7 +103,10 @@ def test_all_object_edit_windows(delay:float=0.0):
     object_types=(objects.object_type.line, objects.object_type.textbox, objects.object_type.point,
         objects.object_type.section, objects.object_type.instrument, objects.object_type.signal)
     for object_type in object_types:
-        print ("Testing popup edit windows (Edit and OK) for: ",object_type)
+        ###################################################################################################
+        ##### Printing has been inhibited as it is just fills the logs up and doesn't add much value ######       
+        ##### print ("Testing popup edit windows (Edit and OK) for: ",object_type) ########################
+        ###################################################################################################
         for object_id in schematic_objects.keys():
             configuration = copy.deepcopy(schematic_objects[object_id])
             # Only test the object types one at a time
@@ -107,7 +121,10 @@ def test_all_object_edit_windows(delay:float=0.0):
                 elif configuration["item"] == objects.object_type.section:
                     del configuration["label"]  ## Always reset to default after editing
                     del configuration["state"]  ## Always reset to default after editing
-                print("Editing:",configuration["item"],configuration["itemid"])
+                ###################################################################################################
+                ##### Printing has been inhibited as it is just fills the logs up and doesn't add much value ######       
+                #####print("Editing:",configuration["item"],configuration["itemid"]) ##############################
+                ###################################################################################################
                 run_function(lambda:schematic.deselect_all_objects())
                 run_function(lambda:schematic.select_object(object_id))
                 run_function(lambda:schematic.edit_selected_object())
