@@ -22,10 +22,16 @@ What's currently supported by the Editor:
 * Configure a level of automation for the signals as trains traverse the layout
 
 What's new in Release 4.0:
-* Text boxes - Ability to add/edit text boxes on the schematic to annotate your layout
+* 'Arrow keys' will 'nudge' objects in edit mode (or scroll canvas if nothing selected)
+* 'Escape' key can be used to cancel 'in progress' object moves and area selections
+* 'Cntl-r' will reset the main window to fit the specified canvas size (after user re-sizing)
+* 'Cntl-m' is now the keyboard shortcut for toggling Edit/Run mode (for consistency)
+* Improvements to layout load - errors/warnings simplified (no more spam messages)
+* Text boxes - Ability to add/edit text boxes on the schematic to annotate the layout
 * Canvas configuration - Ability to change the grid size and toggle 'snap-to-grid'
-* Keyboard shortcut for toggling Edit/Run mode is now 'Cntl-m' (for consistency)
-* Toggle signal automation - Be an active signalman or just wtch the trains go by
+* Toggle signal automation - Be an active signalman or just watch the trains go by
+* Signals can be overridden (to DANGER) on up to 3 track sections ahead
+* Signals can be interlocked with up to 3 occupied track sections ahead
 * Basic DCC Programming - 'one touch' and Configuration Variable (CV) programming
 * Consolidation of library functions (deprecated library API functions removed)
 * Minor bugfixes and application enhancements to improve the overall user experience

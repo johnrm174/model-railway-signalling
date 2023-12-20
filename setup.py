@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="model-railway-signals",
-    version="3.6",
+    version="4.0.0",
     packages=find_packages(),
     include_package_data=True,
     description="Create your own DCC model railway signalling scheme",
