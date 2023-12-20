@@ -941,10 +941,13 @@ def initialise_layout():
     if not editing_enabled and not automation_enabled:
         # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
         # the process_all_aspect_updates function (as we are not making the other update calls)
-        logging.info("RUN LAYOUT - Clearing down any Signal Overrides (automation disabled):")
-        clear_all_signal_overrides()
         logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
         update_all_mirrored_sections()
+        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
+        clear_all_signal_overrides()
+        clear_all_distant_overrides()
+        logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
+        clear_all_approach_control()
         logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
     elif not editing_enabled and automation_enabled:
@@ -961,12 +964,11 @@ def initialise_layout():
     else:
         # Edit mode (automation disabled by default - we don't care about the user selection)
         # Note that we need to call the process_all_aspect_updates function (see above)
-        logging.info("RUN LAYOUT - Clearing down any Signal Overrides (automation disabled):")
+        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
+        clear_all_distant_overrides()
         logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
         clear_all_approach_control()
-        logging.info("RUN LAYOUT - Clearing down any Distant Overrides (automation disabled):")
-        clear_all_distant_overrides()
         logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
     # We always process interlocking - for all modes whether automation is enabled/disabled
