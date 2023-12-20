@@ -73,7 +73,6 @@ import tkinter as Tk
 import logging
 from argparse import ArgumentParser
 
-from . import common
 from . import objects
 from . import settings
 from . import schematic
