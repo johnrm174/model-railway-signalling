@@ -1,9 +1,13 @@
 # model-railway-signalling - Public API
 
-This file provides details of the public API for the model railway signalling package and is intended 
-for use by people who want to use the provided library functions to code their own signalling schemes.
+All of the functions for creating and managing 'signals', 'points', 'sections', 'sensors' and 'block instruments',
+were originally developed as a Python Package and a 'Public API' was maintained to allow these functions to be 
+re-used by others writing their own layout automation code. However, as the schematic editor application now 
+allows users to exploit 99% of the library features when creating and operating signalling schemes within the 
+editor, I feel it unlikely that anyone would consider re-using the library functions in their own code
+(although if this is not the case then please do tell me).
 
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API_screenshot1.png)
+The Public API is therefore DEPRECATED from Release 4.0
 
 ## Using the library functions
 

@@ -73,27 +73,6 @@ from ..library import track_sensors
 #------------------------------------------------------------------------------------
 
 help_text = """
-Application documentation is still on the 'ToDo' list, but in the meantime here is some
-basic guidance and top tips for creating your layout signalling system:
-
-1) Save your progress - The editor is still in active development so may still contain
-   latent bugs (any you find please do report back to me so I can fix them).
-2) Draw the track layout (points and lines) before adding any signals or the schematic may
-   get cluttered (making it difficult to select the thing you want to move or edit).
-3) Complete the signal configuration (signal type, routes indications, DCC addresses etc)
-   before interlocking (available interlocking selections are driven by this).
-4) If you want to use the Ri-Pis GPIO ports for signalling automation then allocate Sensor IDs
-   to the appropriate GPIO ports (Settings-Sensors) before configuring signal automation (only
-   allocated sensor IDs are avalable as valid selections on the signal automation tab).
-5) Similarly, if you want to use MQTT networking then subscribe to the appropriate signals,
-   sections, instruments and sensors to make them avalable as valid selections for automation.
-6) Tooltips (hover-over) have been added to most of the UI elements which will hopefully
-   provide an insight as to what information needs to be entered (if they don't then please
-   let me know and I will try and make them clearer in a future release).
-7) Play with the configuration examples in the GitHub repo (see Help-About for link) and
-   read the accompanying layout notes (see Help-Info once the example layout has been loaded)
-   To get a feel of how these signalling schemes have been designed and configured.
-
 Schematic editor functions (Edit Mode):
  
 1) Use the buttons on the left to add objects to the schematic.
@@ -118,24 +97,25 @@ Schematic editor functions (Run Mode):
 
 1) <cntl-a> will toggle the signal automation on / off when in Run Mode
 2) <cntl-r> will re-size the window to fit the canvas (following user re-sizing)
-3) Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
-4) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+3) <cntl-m> will toggle the schematic editor between Edit Mode and Run Mode
+4) Arrow keys will scroll the canvas area (if the canvas is bigger than the window)
 
 Menubar Options
 
 1) File - All the save/load/new functions you would expect
 2) Mode => Edit/Run/Reset - Select Edit or Run Mode (also Reset layout to default state)
-3) Automation => Enable/Disable - signal automation functions in Run Mode
-4) SPROG => Connect/Disconnect - from the SPROG DCC Command Station
-5) DCC Power => Enable/Disable - the DCC bus supply (SPROG must be connected)
-6) MQTT => Connect/disconnect - from the external MQTT broker
+3) Automation => Enable/Disable - Toggle signal automation functions (in Run Mode)
+4) SPROG => Connect/Disconnect - Toggle the connection to the SPROG DCC Command Station
+5) DCC Power => Enable/Disable - Toggle the DCC bus supply (SPROG must be connected)
+6) MQTT => Connect/disconnect - Toggle connection to an external MQTT broker
 7) Utilities => DCC Programmming - One touch and CV programming of signals/points
-8) Settings => Canvas - Change the display size of the schematic
+8) Settings => Canvas - Change the layout display size and grid configuration
 9) Settings => MQTT - Configure the MQTT broker and signalling networking
 10) Settings => SPROG - Configure the serial port and SPROG behavior
 11) Settings => Logging - Set the log level for running the layout
-12) Settings => Sensors - Designate Ri-Pi GPIO ports to be used for track sensors
-13) Help => Info - Add notes to document your layout configuration
+12) Settings => Sensors - Define the Ri-Pi GPIO port to track sensor mappings
+13) Help => About - Application version and licence information
+13) Help => Info - Add user notes to document your layout configuration
 
 """
 
