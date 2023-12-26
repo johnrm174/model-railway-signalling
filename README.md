@@ -13,8 +13,9 @@ without some of the Raspberry-Pi specific interfacing functions).
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
-## What's new in Release 4.0:
+## What's new for Release 4.0:
 
+* Application documentation in the form of a 'quick-start' guide (see below for link)
 * 'Arrow keys' will 'nudge' objects in edit mode (or scroll canvas if nothing selected)
 * 'Escape' key can be used to cancel 'in progress' object moves and area selections
 * 'Cntl-r' will reset the main window to fit the specified canvas size (after user re-sizing)
@@ -65,7 +66,7 @@ $ python3 -m model_railway_signals -f layout_file.sig
 </pre>
 
 Documentation, in the form of a Quick-Start guide can be found in the 'user_guide' folder: 
-################################################################################################
+[https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide](https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide)
 
 Some example layout configuration files can be found in the 'configuration_examples' folder:
 [https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)

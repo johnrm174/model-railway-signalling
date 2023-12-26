@@ -135,6 +135,13 @@ class display_help():
             self.window.title("Application Help")
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
             help_window = self.window
+            # Create the link to the Quickstart Guide
+            self.frame = Tk.LabelFrame(self.window, text="Application quickstart guide (view and/or download)" )
+            self.frame.pack(padx=5, pady=5, fill='x')
+            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling/blob/main/user_guide/quickstart_guide.pdf"
+            self.label2 = Tk.Label(self.frame, text=self.hyperlink, fg="blue", cursor="hand2")
+            self.label2.pack(padx=5, pady=5)
+            self.label2.bind("<Button-1>", self.callback)
             # Create the srollable textbox to display the help text. We only specify
             # the max height (in case the help text grows in the future) leaving
             # the width to auto-scale to the maximum width of the help text
@@ -147,6 +154,9 @@ class display_help():
             self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
             self.text.pack(padx=2, pady=2, fill=Tk.BOTH, expand=True)
         
+    def callback(self,event):
+        webbrowser.open_new_tab(self.hyperlink)
+
     def ok(self):
         global help_window
         help_window = None
@@ -190,8 +200,8 @@ class display_about():
             # Create the Help text and hyperlink
             self.label1 = Tk.Label(self.window, text=about_text)
             self.label1.pack(padx=5, pady=5)
-            hyperlink = "https://github.com/johnrm174/model-railway-signalling"
-            self.label2 = Tk.Label(self.window, text=hyperlink, fg="blue", cursor="hand2")
+            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+            self.label2 = Tk.Label(self.window, text=self.hyperlink, fg="blue", cursor="hand2")
             self.label2.pack(padx=5, pady=5)
             self.label2.bind("<Button-1>", self.callback)
             # Create the close button and tooltip
@@ -205,7 +215,7 @@ class display_about():
         self.window.destroy()
 
     def callback(self,event):
-        webbrowser.open_new_tab("https://github.com/johnrm174/model-railway-signalling")
+        webbrowser.open_new_tab(self.hyperlink)
 
 #------------------------------------------------------------------------------------
 # Class for the Edit Layout Information window - Uses the common.scrollable_text_box.
