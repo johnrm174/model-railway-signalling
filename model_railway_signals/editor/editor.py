@@ -587,6 +587,16 @@ class main_menubar:
 def run_editor():
     # Create the Main Root Window
     root = Tk.Tk()
+    # Configure Tkinter to not show hidden files in the file open/save dialogs
+    # Full credit to Stack Overflow for the solution to this problem
+    try:
+        try:
+            root.tk.call('tk_getOpenFile', '-foobarbaz')
+        except Tk.TclError:
+            pass
+        root.tk.call('set', '::tk::dialog::file::showHiddenVar', '0')
+    except:
+        pass
     # Limit the maximum window size to the size of the screen (layout can be scrolled in this)
     # Note the slight adjustment for the window title bar - this makes it a perfect fit on the Pi
     screen_width = root.winfo_screenwidth()
