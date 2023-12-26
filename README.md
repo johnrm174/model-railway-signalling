@@ -1,64 +1,42 @@
 # model-railway-signalling
 
-A DCC model railway signalling system written in Python. Primarily intended for the Raspberry Pi, but 
-will also run on other platforms (albeit without some of the Raspberry-Pi specific interfacing functions). 
-* Enables schematics to be created with signals, points, track occupancy sections and block instruments
-* Most types of colour light signals, semaphore signals, and ground signals are supported.
+A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
+signalling schemes to be designed and configured via the UI without the need to write any code. The 
+application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
+without some of the Raspberry-Pi specific interfacing functions).
+
+* Enables layout schematics to be created with signals, points, track sections and block instruments
+* Supports most types of UK colour light signals, semaphore signals, and ground signals.
 * Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout
 * Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation
 * Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts
 
-## Layout editor
+![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
-The schematic editor application enables automated and interlocked layout signalling schemes to be
-designed and configured via the UI without the need to write any code. Note that the editor is in
-active development so any comments and suggestions for future features are welcome.
+## What's new for Release 4.0:
 
-What's currently supported by the Editor:
-* Draw your schematic with lines, points, signals, track occupancy sections and block instruments
-* Define the DCC command sequences needed to drive the signals and points out on the layout
-* Configure the signals, points and block instruments for protototypical interlocking
-* Configure GPIO sensors and track sections to provide a 'mimic' display of the layout
-* Configure a level of automation for the signals as trains traverse the layout
+* Application documentation in the form of a 'quick-start' guide (see below for link)
+* 'Arrow keys' will 'nudge' objects in edit mode (or scroll canvas if nothing selected)
+* 'Escape' key can be used to cancel 'in progress' object moves and area selections
+* 'Cntl-r' will reset the main window to fit the specified canvas size (after user re-sizing)
+* 'Cntl-m' is now the keyboard shortcut for toggling Edit/Run mode (for consistency)
+* Improvements to layout load - errors/warnings simplified (no more spam messages)
+* Text boxes - Ability to add/edit text boxes on the schematic to annotate the layout
+* Canvas configuration - Ability to change the grid size and toggle 'snap-to-grid'
+* Toggle signal automation - Be an active signalman or just watch the trains go by
+* Signals can be overridden (to DANGER) on up to 3 track sections ahead
+* Signals can be interlocked with up to 3 occupied track sections ahead
+* Basic DCC Programming - 'one touch' and Configuration Variable (CV) programming
+* Consolidation of library functions (deprecated library API functions removed)
+* Minor bugfixes and application enhancements to improve the overall user experience
 
-What's new in Release 3.6:
-* MQTT Publish/subscribe for track sensors - allows remote applications to use the R-Pi's GPIO sensors
-* Minor bugfixes and application enhansements to (hopefully) improve the overall user experience
-* Consolidation of library functions (if anyone out there is still using the API to write their own code)
-
-What's coming soon:
-
-* Release 4.0 (where I'm going to rip out all the deprecated functions) - you have been warned
-* Text boxes - Ability to add/edit text boxes on the schematic to annotate your layout
-* Toggle automation - for those occasions you just want to watch the trains go by
-
-Any bug reports and feedback you may have would be gratefully appreciated - specifically:
+Bug reports and feedback are welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
 * What aspects do you particularly like?
 * What aspects particularly irritate you?
 * What new features would you like to see?
 
-There are some example layout files in the 'configuration_examples' folder.
-
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
-## Library functions
-
-All of the functions for creating and managing 'signals', 'points', 'sections', 'sensors' and 'block instruments' 
-have been developed as a Python Package to promote re-use across other layouts. This includes functions to support 
-the interlocking of signals, points and block instruments, enabling fully prototypical signalling schemes to be 
-developed in code.
-
-An interface to a SPROG DCC Command station enables control of the signals and points out on the layout. 
-The signals and points can be mapped to one or more DCC addresses in a manner that should be compatible with 
-the majority of DCC signal/points decoders currently on the market. A GPIO interface allows external train 
-detectors to be connected in via opto-isolators. These sensors can be configured to trigger 'signal approached' 
-or 'signal passed' events, enabling full automatic control of the layout signalling. A MQTT interface enables 
-multiple signalling applications to be networked together so that complex layouts can be split into different 
-signalling sections/areas, with communication between them.
-
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot1.png)
-
-## Installation
+## Installing the application
 
 For a first time installation use:
 <pre>
@@ -76,24 +54,20 @@ If 'simpleaudio' is not installed then the software will still function correctl
 $ python3 -m pip install simpleaudio
 </pre>
 
-## Using the layout editor
-
-To run the editor application:
+## Running the application
 
 The python package should be run as a module (note underscores):
 <pre>
 $ python3 -m model_railway_signals
 </pre>
-or to load a layout schematic at startup
+If required, a layout schematic can be loaded at startup
 <pre>
 $ python3 -m model_railway_signals -f layout_file.sig
 </pre>
 
-## Using the library functions
+Documentation, in the form of a Quick-Start guide can be found in the 'user_guide' folder: 
+[https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide](https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide)
 
-To use the public API functions for developing your own layout signalling system:
-<pre>
-from model_railway_signals import * 
-</pre>
-For details of the API and code examples see the seperate 'PUBLIC_API.md' file.
+Some example layout configuration files can be found in the 'configuration_examples' folder:
+[https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
 

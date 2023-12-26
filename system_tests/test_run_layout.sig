@@ -1,21 +1,30 @@
 {
     "information": "Model Railway Signalling Configuration File",
-    "instruments": {},
+    "instruments": {
+        "1": {
+            "repeaterstate": null,
+            "sectionstate": null
+        },
+        "2": {
+            "repeaterstate": null,
+            "sectionstate": null
+        }
+    },
     "objects": {
         "00df7795-1ac5-4b0a-8400-0ae0f64e3cf7": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 204,
+            "bbox": 1597,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 4,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 400,
-            "posy": 200,
+            "posx": 550.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -52,15 +61,15 @@
             "tags": "point4"
         },
         "059e8b30-21fe-4a68-8fde-644d31f5963f": {
-            "bbox": 207,
+            "bbox": 1600,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 2,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 550,
-            "posy": 250,
+            "posx": 700.0,
+            "posy": 250.0,
             "state": false,
             "tags": "section2"
         },
@@ -76,7 +85,7 @@
                 false,
                 ""
             ],
-            "bbox": 235,
+            "bbox": 1628,
             "dccaspects": [
                 [
                     [
@@ -396,7 +405,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -743,8 +752,8 @@
                     0
                 ]
             ],
-            "posx": 800,
-            "posy": 100,
+            "posx": 925.0,
+            "posy": 425.0,
             "sigarms": [
                 [
                     [
@@ -1052,31 +1061,58 @@
             "timedsequences": [
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    8,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -1084,11 +1120,31 @@
             "tracksections": [
                 8,
                 [
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -1099,20 +1155,33 @@
                 0,
                 0
             ],
-            "bbox": 241,
+            "bbox": 1634,
             "colour": "black",
-            "end1": 8637,
-            "end2": 8638,
-            "endx": 1125.0,
-            "endy": 400.0,
+            "end1": 2723,
+            "end2": 2724,
+            "endx": 750.0,
+            "endy": 600.0,
             "item": "line",
             "itemid": 20,
-            "line": 8636,
-            "posx": 1025.0,
-            "posy": 400.0,
-            "stop1": 8639,
-            "stop2": 8640,
+            "line": 2722,
+            "posx": 650.0,
+            "posy": 600.0,
+            "stop1": 2725,
+            "stop2": 2726,
             "tags": "line20"
+        },
+        "0d5da466-b04e-402a-aa88-1afa3c1a0ed1": {
+            "bbox": 1637,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 18,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 775.0,
+            "posy": 100.0,
+            "state": false,
+            "tags": "section18"
         },
         "14c21c57-208a-4bdb-bc9e-b59169b5cd0e": {
             "arrowends": 0,
@@ -1121,44 +1190,72 @@
                 0,
                 0
             ],
-            "bbox": 247,
+            "bbox": 1643,
             "colour": "black",
-            "end1": 8642,
-            "end2": 8643,
-            "endx": 450.0,
-            "endy": 525.0,
+            "end1": 2729,
+            "end2": 2730,
+            "endx": 400.0,
+            "endy": 600.0,
             "item": "line",
             "itemid": 25,
-            "line": 8641,
+            "line": 2728,
             "posx": 250.0,
-            "posy": 525.0,
-            "stop1": 8644,
-            "stop2": 8645,
+            "posy": 600.0,
+            "stop1": 2731,
+            "stop2": 2732,
             "tags": "line25"
         },
+        "15e208d0-1738-407c-adac-0119c52527d6": {
+            "bbox": 1658,
+            "bellsound": "bell-ring-01.wav",
+            "item": "instrument",
+            "itemid": 1,
+            "itemtype": 1,
+            "keysound": "telegraph-key-01.wav",
+            "linkedto": "2",
+            "posx": 975.0,
+            "posy": 75.0,
+            "tags": "instrument1"
+        },
+        "1691d3ee-af50-44d0-af70-e400407393aa": {
+            "background": "grey85",
+            "bbox": 1661,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 957.0,
+            "posy": 486.0,
+            "tags": "1691d3ee-af50-44d0-af70-e400407393aa",
+            "text": "Section ahead or section behind tests\n Distant and shunt-ahead signal types"
+        },
         "1ccdf967-6bae-4665-a682-489a7b7542ee": {
-            "bbox": 250,
+            "bbox": 1664,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 4,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 550,
-            "posy": 150,
+            "posx": 700.0,
+            "posy": 150.0,
             "state": false,
             "tags": "section4"
         },
         "1cfdad25-a454-44a3-b440-988209da6738": {
-            "bbox": 253,
+            "bbox": 1667,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 12,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 925,
-            "posy": 250,
+            "posx": 1050.0,
+            "posy": 650.0,
             "state": false,
             "tags": "section12"
         },
@@ -1169,19 +1266,19 @@
                 0,
                 0
             ],
-            "bbox": 259,
+            "bbox": 1673,
             "colour": "black",
-            "end1": 8649,
-            "end2": 8650,
-            "endx": 600,
-            "endy": 200,
+            "end1": 2752,
+            "end2": 2753,
+            "endx": 900.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 9,
-            "line": 8648,
-            "posx": 425,
-            "posy": 200,
-            "stop1": 8651,
-            "stop2": 8652,
+            "line": 2751,
+            "posx": 575.0,
+            "posy": 200.0,
+            "stop1": 2754,
+            "stop2": 2755,
             "tags": "line9"
         },
         "20f2e28c-a01b-475e-8cf4-15a251fd5fe3": {
@@ -1196,7 +1293,7 @@
                 false,
                 ""
             ],
-            "bbox": 278,
+            "bbox": 1692,
             "dccaspects": [
                 [
                     [
@@ -1516,7 +1613,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -1706,7 +1803,7 @@
             "itemtype": 1,
             "orientation": 180,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "6"
@@ -1863,12 +1960,12 @@
                     0
                 ]
             ],
-            "posx": 475,
-            "posy": 200,
+            "posx": 625.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -1940,12 +2037,12 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        1,
                         [
                             false,
                             false,
                             false,
-                            false,
+                            true,
                             false
                         ]
                     ],
@@ -2172,31 +2269,58 @@
             "timedsequences": [
                 [
                     false,
-                    3,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    3,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    3,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    3,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    3,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    1,
+                    26,
+                    27
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -2204,13 +2328,46 @@
             "tracksections": [
                 3,
                 [
-                    1,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        1,
+                        26,
+                        27
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
+        },
+        "263cd888-5471-4263-91a7-f957c7ba98fa": {
+            "bbox": 1695,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 21,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 850.0,
+            "posy": 150.0,
+            "state": false,
+            "tags": "section21"
         },
         "26d9993d-7068-47ae-8021-a6b2a2069f88": {
             "arrowends": 0,
@@ -2219,20 +2376,33 @@
                 0,
                 0
             ],
-            "bbox": 284,
+            "bbox": 1701,
             "colour": "black",
-            "end1": 8672,
-            "end2": 8673,
-            "endx": 450.0,
-            "endy": 475.0,
+            "end1": 2776,
+            "end2": 2777,
+            "endx": 400.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 28,
-            "line": 8671,
+            "line": 2775,
             "posx": 325.0,
-            "posy": 475.0,
-            "stop1": 8674,
-            "stop2": 8675,
+            "posy": 550.0,
+            "stop1": 2778,
+            "stop2": 2779,
             "tags": "line28"
+        },
+        "27215a1d-9b38-4e57-80af-f67a4ee7448e": {
+            "bbox": 1704,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 25,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 850.0,
+            "posy": 250.0,
+            "state": false,
+            "tags": "section25"
         },
         "278b1c3b-1e55-4252-98fb-deaa7795a5db": {
             "approachcontrol": [
@@ -2246,7 +2416,7 @@
                 false,
                 ""
             ],
-            "bbox": 296,
+            "bbox": 1716,
             "dccaspects": [
                 [
                     [
@@ -2566,7 +2736,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -2913,12 +3083,12 @@
                     0
                 ]
             ],
-            "posx": 800,
-            "posy": 200,
+            "posx": 925.0,
+            "posy": 600.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -3251,14 +3421,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                10,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                10,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -3269,31 +3486,31 @@
                 0,
                 0
             ],
-            "bbox": 302,
+            "bbox": 1722,
             "colour": "black",
-            "end1": 8688,
-            "end2": 8689,
-            "endx": 275,
-            "endy": 100,
+            "end1": 2793,
+            "end2": 2794,
+            "endx": 425.0,
+            "endy": 100.0,
             "item": "line",
             "itemid": 2,
-            "line": 8687,
-            "posx": 250,
-            "posy": 125,
-            "stop1": 8690,
-            "stop2": 8691,
+            "line": 2792,
+            "posx": 400.0,
+            "posy": 125.0,
+            "stop1": 2795,
+            "stop2": 2796,
             "tags": "line2"
         },
         "294ffd9a-e658-4095-9446-9608c6565ea5": {
-            "bbox": 305,
+            "bbox": 1725,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 11,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 725,
-            "posy": 250,
+            "posx": 850.0,
+            "posy": 650.0,
             "state": false,
             "tags": "section11"
         },
@@ -3309,7 +3526,7 @@
                 false,
                 ""
             ],
-            "bbox": 317,
+            "bbox": 1737,
             "dccaspects": [
                 [
                     [
@@ -3629,7 +3846,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -3976,12 +4193,12 @@
                     0
                 ]
             ],
-            "posx": 800,
-            "posy": 250,
+            "posx": 925.0,
+            "posy": 650.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -4314,14 +4531,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                11,
+            "trackinterlock": [
                 [
-                    12,
-                    0,
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                11,
+                [
+                    [
+                        12,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -4337,7 +4601,7 @@
                 false,
                 ""
             ],
-            "bbox": 336,
+            "bbox": 1756,
             "dccaspects": [
                 [
                     [
@@ -4657,7 +4921,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -4847,7 +5111,7 @@
             "itemtype": 1,
             "orientation": 180,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "5"
@@ -5004,12 +5268,12 @@
                     0
                 ]
             ],
-            "posx": 475,
-            "posy": 250,
+            "posx": 625.0,
+            "posy": 250.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -5081,13 +5345,13 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        1,
                         [
                             false,
                             false,
                             false,
                             false,
-                            false
+                            true
                         ]
                     ],
                     [
@@ -5313,31 +5577,58 @@
             "timedsequences": [
                 [
                     false,
-                    2,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    2,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    2,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    2,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    2,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    1,
+                    26,
+                    27
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -5345,11 +5636,31 @@
             "tracksections": [
                 2,
                 [
-                    1,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        1,
+                        26,
+                        27
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -5365,7 +5676,7 @@
                 false,
                 ""
             ],
-            "bbox": 348,
+            "bbox": 1768,
             "dccaspects": [
                 [
                     [
@@ -5685,7 +5996,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -6032,12 +6343,12 @@
                     0
                 ]
             ],
-            "posx": 800,
-            "posy": 150,
+            "posx": 925.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -6341,31 +6652,58 @@
             "timedsequences": [
                 [
                     false,
-                    9,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    9,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    9,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    9,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    9,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -6373,11 +6711,31 @@
             "tracksections": [
                 0,
                 [
-                    9,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        9,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -6393,7 +6751,7 @@
                 false,
                 ""
             ],
-            "bbox": 376,
+            "bbox": 1796,
             "dccaspects": [
                 [
                     [
@@ -6713,7 +7071,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -7060,8 +7418,8 @@
                     0
                 ]
             ],
-            "posx": 800,
-            "posy": 50,
+            "posx": 925.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -7398,16 +7756,79 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
-                    7,
                     0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        7,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
+        },
+        "3921c74d-11e9-4a28-baac-22741f00f5f6": {
+            "background": "grey85",
+            "bbox": 1799,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 200.0,
+            "posy": 59.0,
+            "tags": "3921c74d-11e9-4a28-baac-22741f00f5f6",
+            "text": "Basic track occupancy tests\nBasic interlocking/override tests\n(Tests include manual triggering\nof signal passed events and\nsimulated triggering of GPIO inputs)"
         },
         "3bd65ffb-4f36-4d7b-8606-bd1b875623e2": {
             "arrowends": 0,
@@ -7416,19 +7837,19 @@
                 0,
                 0
             ],
-            "bbox": 382,
+            "bbox": 1805,
             "colour": "black",
-            "end1": 8761,
-            "end2": 8762,
-            "endx": 975,
-            "endy": 200,
+            "end1": 2868,
+            "end2": 2869,
+            "endx": 1100.0,
+            "endy": 600.0,
             "item": "line",
             "itemid": 14,
-            "line": 8760,
-            "posx": 675,
-            "posy": 200,
-            "stop1": 8763,
-            "stop2": 8764,
+            "line": 2867,
+            "posx": 800.0,
+            "posy": 600.0,
+            "stop1": 2870,
+            "stop2": 2871,
             "tags": "line14"
         },
         "41271867-259f-4e9b-92d8-fc6362917365": {
@@ -7443,7 +7864,7 @@
                 false,
                 ""
             ],
-            "bbox": 401,
+            "bbox": 1824,
             "dccaspects": [
                 [
                     [
@@ -7763,7 +8184,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -7953,7 +8374,7 @@
             "itemtype": 1,
             "orientation": 180,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "9"
@@ -8110,12 +8531,12 @@
                     0
                 ]
             ],
-            "posx": 475,
-            "posy": 50,
+            "posx": 625.0,
+            "posy": 50.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -8187,11 +8608,11 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        1,
                         [
                             false,
                             false,
-                            false,
+                            true,
                             false,
                             false
                         ]
@@ -8419,31 +8840,58 @@
             "timedsequences": [
                 [
                     false,
-                    6,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    6,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    6,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    6,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    6,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    1,
+                    26,
+                    27
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -8451,11 +8899,31 @@
             "tracksections": [
                 6,
                 [
-                    1,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        1,
+                        26,
+                        27
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -8471,7 +8939,7 @@
                 false,
                 ""
             ],
-            "bbox": 410,
+            "bbox": 1833,
             "dccaspects": [
                 [
                     [
@@ -8791,7 +9259,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -9138,8 +9606,8 @@
                     0
                 ]
             ],
-            "posx": 950.0,
-            "posy": 350.0,
+            "posx": 575.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -9476,14 +9944,61 @@
                     0
                 ]
             ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
             "tracksections": [
                 13,
                 [
-                    14,
-                    0,
-                    0,
-                    15,
-                    0
+                    [
+                        14,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        15,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -9494,31 +10009,31 @@
                 0,
                 0
             ],
-            "bbox": 416,
+            "bbox": 1839,
             "colour": "black",
-            "end1": 8792,
-            "end2": 8793,
-            "endx": 600,
-            "endy": 150,
+            "end1": 2899,
+            "end2": 2900,
+            "endx": 900.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 8,
-            "line": 8791,
-            "posx": 375,
-            "posy": 150,
-            "stop1": 8794,
-            "stop2": 8795,
+            "line": 2898,
+            "posx": 525.0,
+            "posy": 150.0,
+            "stop1": 2901,
+            "stop2": 2902,
             "tags": "line8"
         },
         "4e39406c-54ed-48bb-9835-c4a93664e288": {
-            "bbox": 419,
+            "bbox": 1842,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 7,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 925,
-            "posy": 50,
+            "posx": 1050.0,
+            "posy": 375.0,
             "state": false,
             "tags": "section7"
         },
@@ -9534,7 +10049,7 @@
                 false,
                 ""
             ],
-            "bbox": 438,
+            "bbox": 1861,
             "dccaspects": [
                 [
                     [
@@ -9854,7 +10369,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -10044,7 +10559,7 @@
             "itemtype": 1,
             "orientation": 180,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "8"
@@ -10201,12 +10716,12 @@
                     0
                 ]
             ],
-            "posx": 475,
-            "posy": 100,
+            "posx": 625.0,
+            "posy": 100.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -10278,10 +10793,10 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        1,
                         [
                             false,
-                            false,
+                            true,
                             false,
                             false,
                             false
@@ -10510,31 +11025,58 @@
             "timedsequences": [
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    5,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    1,
+                    26,
+                    27
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -10542,37 +11084,57 @@
             "tracksections": [
                 5,
                 [
-                    1,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        1,
+                        26,
+                        27
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
         "58a3b159-ccd8-46fa-b40e-cb8e0f6dfe7b": {
-            "bbox": 441,
+            "bbox": 1864,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 9,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 925,
-            "posy": 150,
+            "posx": 1050.0,
+            "posy": 550.0,
             "state": false,
             "tags": "section9"
         },
         "59728ad9-d204-4ca9-8c8d-a3e340bc7e72": {
-            "bbox": 444,
+            "bbox": 1867,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 5,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 550,
-            "posy": 100,
+            "posx": 700.0,
+            "posy": 100.0,
             "state": false,
             "tags": "section5"
         },
@@ -10583,19 +11145,19 @@
                 0,
                 0
             ],
-            "bbox": 450,
+            "bbox": 1873,
             "colour": "black",
-            "end1": 8818,
-            "end2": 8819,
+            "end1": 2925,
+            "end2": 2926,
             "endx": 300.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 21,
-            "line": 8817,
+            "line": 2924,
             "posx": 25.0,
             "posy": 350.0,
-            "stop1": 8820,
-            "stop2": 8821,
+            "stop1": 2927,
+            "stop2": 2928,
             "tags": "line21"
         },
         "5e14d312-7750-4ab5-9376-09c40e391a55": {
@@ -10605,19 +11167,19 @@
                 0,
                 0
             ],
-            "bbox": 456,
+            "bbox": 1879,
             "colour": "black",
-            "end1": 8823,
-            "end2": 8824,
+            "end1": 2930,
+            "end2": 2931,
             "endx": 350.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 24,
-            "line": 8822,
+            "line": 2929,
             "posx": 325.0,
             "posy": 375.0,
-            "stop1": 8825,
-            "stop2": 8826,
+            "stop1": 2932,
+            "stop2": 2933,
             "tags": "line24"
         },
         "5f7adc51-3867-4068-89e9-951344c619aa": {
@@ -10632,7 +11194,7 @@
                 false,
                 ""
             ],
-            "bbox": 484,
+            "bbox": 1907,
             "dccaspects": [
                 [
                     [
@@ -11173,10 +11735,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -11184,44 +11742,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -11275,10 +11795,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -11290,6 +11806,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -11613,7 +12155,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -11657,27 +12199,74 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "67ab0983-6537-46c7-95e5-8e6f48075319": {
-            "bbox": 487,
+            "bbox": 1910,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 13,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 875.0,
-            "posy": 350.0,
+            "posx": 500.0,
+            "posy": 550.0,
             "state": false,
             "tags": "section13"
         },
@@ -11688,19 +12277,19 @@
                 0,
                 0
             ],
-            "bbox": 493,
+            "bbox": 1916,
             "colour": "black",
-            "end1": 8856,
-            "end2": 8857,
-            "endx": 975,
-            "endy": 150,
+            "end1": 2963,
+            "end2": 2964,
+            "endx": 1100.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 15,
-            "line": 8855,
-            "posx": 675,
-            "posy": 150,
-            "stop1": 8858,
-            "stop2": 8859,
+            "line": 2962,
+            "posx": 800.0,
+            "posy": 550.0,
+            "stop1": 2965,
+            "stop2": 2966,
             "tags": "line15"
         },
         "6c791787-8ce0-4db7-9308-7c5144fe412f": {
@@ -11715,7 +12304,7 @@
                 false,
                 ""
             ],
-            "bbox": 549,
+            "bbox": 1972,
             "dccaspects": [
                 [
                     [
@@ -12035,7 +12624,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -12383,7 +12972,7 @@
                 ]
             ],
             "posx": 100.0,
-            "posy": 525.0,
+            "posy": 600.0,
             "sigarms": [
                 [
                     [
@@ -12720,14 +13309,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -12738,19 +13374,19 @@
                 0,
                 0
             ],
-            "bbox": 555,
+            "bbox": 1978,
             "colour": "black",
-            "end1": 8916,
-            "end2": 8917,
+            "end1": 3023,
+            "end2": 3024,
             "endx": 200.0,
-            "endy": 525.0,
+            "endy": 600.0,
             "item": "line",
             "itemid": 26,
-            "line": 8915,
+            "line": 3022,
             "posx": 25.0,
-            "posy": 525.0,
-            "stop1": 8918,
-            "stop2": 8919,
+            "posy": 600.0,
+            "stop1": 3025,
+            "stop2": 3026,
             "tags": "line26"
         },
         "7482f7e1-f1ad-473d-b856-6f70ab6a8015": {
@@ -12760,19 +13396,19 @@
                 0,
                 0
             ],
-            "bbox": 561,
+            "bbox": 1984,
             "colour": "black",
-            "end1": 8921,
-            "end2": 8922,
-            "endx": 975,
-            "endy": 50,
+            "end1": 3028,
+            "end2": 3029,
+            "endx": 1100.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 12,
-            "line": 8920,
-            "posx": 675,
-            "posy": 50,
-            "stop1": 8923,
-            "stop2": 8924,
+            "line": 3027,
+            "posx": 800.0,
+            "posy": 375.0,
+            "stop1": 3030,
+            "stop2": 3031,
             "tags": "line12"
         },
         "76a00814-9701-437d-99a8-32e60ed4ba17": {
@@ -12782,20 +13418,33 @@
                 0,
                 0
             ],
-            "bbox": 567,
+            "bbox": 1990,
             "colour": "black",
-            "end1": 8926,
-            "end2": 8927,
-            "endx": 325,
-            "endy": 50,
+            "end1": 3033,
+            "end2": 3034,
+            "endx": 475.0,
+            "endy": 50.0,
             "item": "line",
             "itemid": 5,
-            "line": 8925,
-            "posx": 300,
-            "posy": 75,
-            "stop1": 8928,
-            "stop2": 8929,
+            "line": 3032,
+            "posx": 450.0,
+            "posy": 75.0,
+            "stop1": 3035,
+            "stop2": 3036,
             "tags": "line5"
+        },
+        "792e40e8-1303-49a8-b2d7-1e1e255cbff0": {
+            "bbox": 1993,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 23,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 850.0,
+            "posy": 200.0,
+            "state": false,
+            "tags": "section23"
         },
         "7bdabd95-5597-4e06-8130-48b446f66571": {
             "approachcontrol": [
@@ -12809,7 +13458,7 @@
                 false,
                 ""
             ],
-            "bbox": 586,
+            "bbox": 2012,
             "dccaspects": [
                 [
                     [
@@ -13129,7 +13778,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -13319,7 +13968,7 @@
             "itemtype": 1,
             "orientation": 180,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "7"
@@ -13476,12 +14125,12 @@
                     0
                 ]
             ],
-            "posx": 475,
-            "posy": 150,
+            "posx": 625.0,
+            "posy": 150.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -13553,9 +14202,9 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        1,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -13814,14 +14463,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                4,
+            "trackinterlock": [
                 [
                     1,
-                    0,
+                    26,
+                    27
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                4,
+                [
+                    [
+                        1,
+                        26,
+                        27
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -13832,25 +14528,25 @@
                 0,
                 0
             ],
-            "bbox": 592,
+            "bbox": 2018,
             "colour": "black",
-            "end1": 8949,
-            "end2": 8950,
-            "endx": 425,
-            "endy": 250,
+            "end1": 3057,
+            "end2": 3058,
+            "endx": 575.0,
+            "endy": 250.0,
             "item": "line",
             "itemid": 11,
-            "line": 8948,
-            "posx": 400,
-            "posy": 225,
-            "stop1": 8951,
-            "stop2": 8952,
+            "line": 3056,
+            "posx": 550.0,
+            "posy": 225.0,
+            "stop1": 3059,
+            "stop2": 3060,
             "tags": "line11"
         },
         "93063a54-5b09-4045-985b-7ba45650ff68": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 599,
+            "bbox": 2025,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -13860,7 +14556,7 @@
             "itemtype": 2,
             "orientation": 0,
             "posx": 225.0,
-            "posy": 525.0,
+            "posy": 600.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -13877,17 +14573,45 @@
             "tags": "point8"
         },
         "95c43eba-116d-461f-acf5-2942ee2de9a0": {
-            "bbox": 602,
+            "bbox": 2028,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 10,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 725,
-            "posy": 200,
+            "posx": 850.0,
+            "posy": 600.0,
             "state": false,
             "tags": "section10"
+        },
+        "97e058d0-9fc8-4595-a6c1-38b76dbc6930": {
+            "background": "grey85",
+            "bbox": 2031,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 957.0,
+            "posy": 311.0,
+            "tags": "97e058d0-9fc8-4595-a6c1-38b76dbc6930",
+            "text": "Section ahead or section behind tests\nNon distant/shunt-ahead signal types"
+        },
+        "97f92095-a77f-4a82-ac03-58020be13cda": {
+            "bbox": 2046,
+            "bellsound": "bell-ring-01.wav",
+            "item": "instrument",
+            "itemid": 2,
+            "itemtype": 1,
+            "keysound": "telegraph-key-01.wav",
+            "linkedto": "1",
+            "posx": 1125.0,
+            "posy": 75.0,
+            "tags": "instrument2"
         },
         "98514843-9b76-4a6f-b05f-8dc7879300a3": {
             "approachcontrol": [
@@ -13901,7 +14625,7 @@
                 false,
                 ""
             ],
-            "bbox": 633,
+            "bbox": 2077,
             "dccaspects": [
                 [
                     [
@@ -14221,7 +14945,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -14442,10 +15166,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "15",
@@ -14476,10 +15196,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -14487,10 +15203,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -14544,10 +15256,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "18",
@@ -14555,10 +15263,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -14926,16 +15630,105 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
+        },
+        "9a297b55-f32f-427e-97f3-d29601155e06": {
+            "bbox": 2080,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 24,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 775.0,
+            "posy": 250.0,
+            "state": false,
+            "tags": "section24"
+        },
+        "a168039e-a91a-4d28-8f9c-c9847dddcb6d": {
+            "background": "grey85",
+            "bbox": 2083,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 582.0,
+            "posy": 486.0,
+            "tags": "a168039e-a91a-4d28-8f9c-c9847dddcb6d",
+            "text": "Shunt-ahead signal route tests"
+        },
+        "a2a63569-61ec-4286-806c-3fb2b9669cae": {
+            "bbox": 2086,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 27,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 75.0,
+            "posy": 150.0,
+            "state": false,
+            "tags": "section27"
         },
         "a33a7333-532d-4c93-81db-e6a31aa66cac": {
             "arrowends": 0,
@@ -14944,25 +15737,41 @@
                 0,
                 0
             ],
-            "bbox": 639,
+            "bbox": 2092,
             "colour": "black",
-            "end1": 8991,
-            "end2": 8992,
-            "endx": 600,
-            "endy": 50,
+            "end1": 3119,
+            "end2": 3120,
+            "endx": 900.0,
+            "endy": 50.0,
             "item": "line",
             "itemid": 6,
-            "line": 8990,
-            "posx": 325,
-            "posy": 50,
-            "stop1": 8993,
-            "stop2": 8994,
+            "line": 3118,
+            "posx": 475.0,
+            "posy": 50.0,
+            "stop1": 3121,
+            "stop2": 3122,
             "tags": "line6"
+        },
+        "a37162c4-c2da-42a6-9d5d-2ded06f14cc5": {
+            "background": "grey85",
+            "bbox": 2095,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 257.0,
+            "posy": 286.0,
+            "tags": "a37162c4-c2da-42a6-9d5d-2ded06f14cc5",
+            "text": "Interlock/Override distant signal\non home signals ahead"
         },
         "a4a3951a-8365-413c-a29f-001a13e6ef21": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 646,
+            "bbox": 2102,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14971,8 +15780,8 @@
             "itemid": 6,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 1000.0,
-            "posy": 350.0,
+            "posx": 625.0,
+            "posy": 550.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -14989,32 +15798,32 @@
             "tags": "point6"
         },
         "a6510982-7180-4a78-a46e-55ef46497bef": {
-            "bbox": 649,
+            "bbox": 2105,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 6,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 550,
-            "posy": 50,
+            "posx": 700.0,
+            "posy": 50.0,
             "state": false,
             "tags": "section6"
         },
         "a7754934-0d4a-428d-ab57-5599d44e8d85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 656,
+            "bbox": 2112,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 1,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 250,
-            "posy": 150,
+            "posx": 400.0,
+            "posy": 150.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -15087,19 +15896,19 @@
                 0,
                 0
             ],
-            "bbox": 662,
+            "bbox": 2118,
             "colour": "black",
-            "end1": 9009,
-            "end2": 9010,
-            "endx": 325,
-            "endy": 150,
+            "end1": 3139,
+            "end2": 3140,
+            "endx": 475.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 4,
-            "line": 9008,
-            "posx": 275,
-            "posy": 150,
-            "stop1": 9011,
-            "stop2": 9012,
+            "line": 3138,
+            "posx": 425.0,
+            "posy": 150.0,
+            "stop1": 3141,
+            "stop2": 3142,
             "tags": "line4"
         },
         "a994fe0e-a4e6-48c3-bd42-b865c18f6624": {
@@ -15114,7 +15923,7 @@
                 false,
                 ""
             ],
-            "bbox": 690,
+            "bbox": 2146,
             "dccaspects": [
                 [
                     [
@@ -15434,7 +16243,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -15655,10 +16464,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "20",
@@ -15689,6 +16494,32 @@
                         [
                             0,
                             false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
                         ],
                         [
                             0,
@@ -15723,10 +16554,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -15734,44 +16561,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -16139,53 +16928,100 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
         },
         "aa85f250-0909-453e-9de0-fc5dd1ac977a": {
-            "bbox": 693,
+            "bbox": 2149,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 8,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 725,
-            "posy": 100,
+            "posx": 850.0,
+            "posy": 425.0,
             "state": false,
             "tags": "section8"
         },
         "ab1c75b8-5187-4e29-89aa-1ad8efff6e41": {
-            "bbox": 696,
+            "bbox": 2152,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 15,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 1075.0,
-            "posy": 400.0,
+            "posx": 700.0,
+            "posy": 600.0,
             "state": false,
             "tags": "section15"
         },
         "ab65202c-8dbc-4a49-9df4-b2a210d1b773": {
-            "bbox": 699,
+            "bbox": 2155,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 1,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 75,
-            "posy": 150,
+            "posx": 225.0,
+            "posy": 150.0,
             "state": false,
             "tags": "section1"
         },
@@ -16196,19 +17032,19 @@
                 0,
                 0
             ],
-            "bbox": 705,
+            "bbox": 2161,
             "colour": "black",
-            "end1": 9044,
-            "end2": 9045,
-            "endx": 1125.0,
-            "endy": 350.0,
+            "end1": 3174,
+            "end2": 3175,
+            "endx": 750.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 18,
-            "line": 9043,
-            "posx": 1025.0,
-            "posy": 350.0,
-            "stop1": 9046,
-            "stop2": 9047,
+            "line": 3173,
+            "posx": 650.0,
+            "posy": 550.0,
+            "stop1": 3176,
+            "stop2": 3177,
             "tags": "line18"
         },
         "aefa13ab-557e-4572-9b67-988243b51c6f": {
@@ -16223,7 +17059,7 @@
                 false,
                 ""
             ],
-            "bbox": 758,
+            "bbox": 2214,
             "dccaspects": [
                 [
                     [
@@ -16543,7 +17379,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -16764,10 +17600,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "17",
@@ -16798,6 +17630,32 @@
                         [
                             0,
                             false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
                         ],
                         [
                             0,
@@ -16832,10 +17690,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -16843,44 +17697,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -17248,21 +18064,81 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
                 ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
             ]
+        },
+        "afd35369-6f78-4dab-be3c-62460b51f8bd": {
+            "bbox": 2217,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 20,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 775.0,
+            "posy": 150.0,
+            "state": false,
+            "tags": "section20"
         },
         "b149ba67-d83f-4f67-ac37-6ac099d886d1": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 765,
+            "bbox": 2224,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17271,8 +18147,8 @@
             "itemid": 5,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 1025.0,
-            "posy": 125.0,
+            "posx": 1150.0,
+            "posy": 600.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -17320,7 +18196,7 @@
                 false,
                 ""
             ],
-            "bbox": 784,
+            "bbox": 2243,
             "dccaspects": [
                 [
                     [
@@ -17640,7 +18516,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -17830,7 +18706,7 @@
             "itemtype": 1,
             "orientation": 0,
             "overrideahead": false,
-            "overridesignal": false,
+            "overridesignal": true,
             "passedsensor": [
                 true,
                 "4"
@@ -17864,7 +18740,7 @@
                         ]
                     ],
                     "",
-                    0
+                    1
                 ],
                 [
                     [
@@ -17894,7 +18770,7 @@
                         ]
                     ],
                     "",
-                    0
+                    1
                 ],
                 [
                     [
@@ -17924,7 +18800,7 @@
                         ]
                     ],
                     "",
-                    0
+                    1
                 ],
                 [
                     [
@@ -17954,7 +18830,7 @@
                         ]
                     ],
                     "",
-                    0
+                    1
                 ],
                 [
                     [
@@ -17984,15 +18860,15 @@
                         ]
                     ],
                     "",
-                    0
+                    1
                 ]
             ],
-            "posx": 150,
-            "posy": 150,
+            "posx": 300.0,
+            "posy": 150.0,
             "sigarms": [
                 [
                     [
-                        false,
+                        true,
                         0
                     ],
                     [
@@ -18064,9 +18940,9 @@
             "siginterlock": [
                 [
                     [
-                        0,
+                        4,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -18106,9 +18982,9 @@
                 ],
                 [
                     [
-                        0,
+                        5,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -18148,9 +19024,9 @@
                 ],
                 [
                     [
-                        0,
+                        6,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -18190,9 +19066,9 @@
                 ],
                 [
                     [
-                        0,
+                        3,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -18232,9 +19108,9 @@
                 ],
                 [
                     [
-                        0,
+                        2,
                         [
-                            false,
+                            true,
                             false,
                             false,
                             false,
@@ -18325,14 +19201,61 @@
                     0
                 ]
             ],
+            "trackinterlock": [
+                [
+                    4,
+                    20,
+                    21
+                ],
+                [
+                    5,
+                    18,
+                    19
+                ],
+                [
+                    6,
+                    16,
+                    17
+                ],
+                [
+                    3,
+                    22,
+                    23
+                ],
+                [
+                    2,
+                    24,
+                    25
+                ]
+            ],
             "tracksections": [
                 1,
                 [
-                    4,
-                    5,
-                    6,
-                    3,
-                    2
+                    [
+                        4,
+                        20,
+                        21
+                    ],
+                    [
+                        5,
+                        18,
+                        19
+                    ],
+                    [
+                        6,
+                        16,
+                        17
+                    ],
+                    [
+                        3,
+                        22,
+                        23
+                    ],
+                    [
+                        2,
+                        24,
+                        25
+                    ]
                 ]
             ]
         },
@@ -18343,19 +19266,19 @@
                 0,
                 0
             ],
-            "bbox": 790,
+            "bbox": 2249,
             "colour": "black",
-            "end1": 9125,
-            "end2": 9126,
-            "endx": 975,
-            "endy": 100,
+            "end1": 3256,
+            "end2": 3257,
+            "endx": 1100.0,
+            "endy": 425.0,
             "item": "line",
             "itemid": 13,
-            "line": 9124,
-            "posx": 675,
-            "posy": 100,
-            "stop1": 9127,
-            "stop2": 9128,
+            "line": 3255,
+            "posx": 800.0,
+            "posy": 425.0,
+            "stop1": 3258,
+            "stop2": 3259,
             "tags": "line13"
         },
         "bc1c1e57-d938-4721-a8f1-4009975fc3fd": {
@@ -18365,31 +19288,31 @@
                 20,
                 5
             ],
-            "bbox": 796,
+            "bbox": 2255,
             "colour": "black",
-            "end1": 9130,
-            "end2": 9131,
+            "end1": 3261,
+            "end2": 3262,
             "endx": 250.0,
-            "endy": 475.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 27,
-            "line": 9129,
+            "line": 3260,
             "posx": 225.0,
-            "posy": 500.0,
-            "stop1": 9132,
-            "stop2": 9133,
+            "posy": 575.0,
+            "stop1": 3263,
+            "stop2": 3264,
             "tags": "line27"
         },
         "be3430e8-fa0a-4ed5-8e15-bbe161956db4": {
-            "bbox": 799,
+            "bbox": 2258,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 3,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 550,
-            "posy": 200,
+            "posx": 700.0,
+            "posy": 200.0,
             "state": false,
             "tags": "section3"
         },
@@ -18405,7 +19328,7 @@
                 false,
                 ""
             ],
-            "bbox": 827,
+            "bbox": 2286,
             "dccaspects": [
                 [
                     [
@@ -18725,7 +19648,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -18946,10 +19869,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "19",
@@ -18980,6 +19899,32 @@
                         [
                             0,
                             false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
                         ],
                         [
                             0,
@@ -19014,10 +19959,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -19025,44 +19966,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -19401,31 +20304,58 @@
             "timedsequences": [
                 [
                     false,
-                    18,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    18,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    18,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    18,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    18,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -19433,11 +20363,31 @@
             "tracksections": [
                 0,
                 [
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -19448,20 +20398,36 @@
                 0,
                 0
             ],
-            "bbox": 833,
+            "bbox": 2292,
             "colour": "black",
-            "end1": 9163,
-            "end2": 9164,
-            "endx": 1025.0,
-            "endy": 400.0,
+            "end1": 3294,
+            "end2": 3295,
+            "endx": 650.0,
+            "endy": 600.0,
             "item": "line",
             "itemid": 19,
-            "line": 9162,
-            "posx": 1000.0,
-            "posy": 375.0,
-            "stop1": 9165,
-            "stop2": 9166,
+            "line": 3293,
+            "posx": 625.0,
+            "posy": 575.0,
+            "stop1": 3296,
+            "stop2": 3297,
             "tags": "line19"
+        },
+        "c27d25b7-5b4c-44d3-bd35-e5a1449de1ec": {
+            "background": "grey85",
+            "bbox": 2295,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 10,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 232.0,
+            "posy": 486.0,
+            "tags": "c27d25b7-5b4c-44d3-bd35-e5a1449de1ec",
+            "text": "Override secondary distant arms\non distant signal ahead (i.e\n distant arms mirror distant ahead)"
         },
         "c4d97abd-b157-475f-a769-de173e501ee6": {
             "arrowends": 0,
@@ -19470,20 +20436,33 @@
                 0,
                 0
             ],
-            "bbox": 839,
+            "bbox": 2301,
             "colour": "black",
-            "end1": 9168,
-            "end2": 9169,
-            "endx": 775.0,
+            "end1": 3301,
+            "end2": 3302,
+            "endx": 750.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 23,
-            "line": 9167,
+            "line": 3300,
             "posx": 350.0,
             "posy": 400.0,
-            "stop1": 9170,
-            "stop2": 9171,
+            "stop1": 3303,
+            "stop2": 3304,
             "tags": "line23"
+        },
+        "c6bcd861-e896-4b6c-9d38-d472b7d12d67": {
+            "bbox": 2304,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 26,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 150.0,
+            "posy": 150.0,
+            "state": false,
+            "tags": "section26"
         },
         "c8b72001-7d62-44e6-aac0-44ad9f41c124": {
             "arrowends": 2,
@@ -19492,35 +20471,35 @@
                 20,
                 5
             ],
-            "bbox": 845,
+            "bbox": 2310,
             "colour": "black",
-            "end1": 9173,
-            "end2": 9174,
+            "end1": 3307,
+            "end2": 3308,
             "endx": 275.0,
-            "endy": 475.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 29,
-            "line": 9172,
+            "line": 3306,
             "posx": 325.0,
-            "posy": 475.0,
-            "stop1": 9175,
-            "stop2": 9176,
+            "posy": 550.0,
+            "stop1": 3309,
+            "stop2": 3310,
             "tags": "line29"
         },
         "cd84d65b-c1fb-48f9-abfe-e37d2799986c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 852,
+            "bbox": 2317,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 2,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 300,
-            "posy": 100,
+            "posx": 450.0,
+            "posy": 100.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -19563,35 +20542,35 @@
                 0,
                 0
             ],
-            "bbox": 858,
+            "bbox": 2323,
             "colour": "black",
-            "end1": 9184,
-            "end2": 9185,
-            "endx": 600,
-            "endy": 100,
+            "end1": 3318,
+            "end2": 3319,
+            "endx": 900.0,
+            "endy": 100.0,
             "item": "line",
             "itemid": 7,
-            "line": 9183,
-            "posx": 325,
-            "posy": 100,
-            "stop1": 9186,
-            "stop2": 9187,
+            "line": 3317,
+            "posx": 475.0,
+            "posy": 100.0,
+            "stop1": 3320,
+            "stop2": 3321,
             "tags": "line7"
         },
         "d210a466-1fdb-417c-b9a4-b190c54b8c0d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 865,
+            "bbox": 2330,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
-            "hasfpl": false,
+            "hasfpl": true,
             "item": "point",
             "itemid": 3,
             "itemtype": 1,
             "orientation": 0,
-            "posx": 350,
-            "posy": 150,
+            "posx": 500.0,
+            "posy": 150.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -19644,19 +20623,19 @@
                 0,
                 0
             ],
-            "bbox": 871,
+            "bbox": 2336,
             "colour": "black",
-            "end1": 9195,
-            "end2": 9196,
-            "endx": 600,
-            "endy": 250,
+            "end1": 3329,
+            "end2": 3330,
+            "endx": 900.0,
+            "endy": 250.0,
             "item": "line",
             "itemid": 10,
-            "line": 9194,
-            "posx": 425,
-            "posy": 250,
-            "stop1": 9197,
-            "stop2": 9198,
+            "line": 3328,
+            "posx": 575.0,
+            "posy": 250.0,
+            "stop1": 3331,
+            "stop2": 3332,
             "tags": "line10"
         },
         "d41f0e5f-13e5-4a7f-bc3e-3388254d6b8c": {
@@ -19671,7 +20650,7 @@
                 false,
                 ""
             ],
-            "bbox": 899,
+            "bbox": 2364,
             "dccaspects": [
                 [
                     [
@@ -19991,7 +20970,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -20338,8 +21317,8 @@
                     0
                 ]
             ],
-            "posx": 350.0,
-            "posy": 475.0,
+            "posx": 325.0,
+            "posy": 550.0,
             "sigarms": [
                 [
                     [
@@ -20676,14 +21655,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -20694,19 +21720,19 @@
                 0,
                 0
             ],
-            "bbox": 905,
+            "bbox": 2370,
             "colour": "black",
-            "end1": 9227,
-            "end2": 9228,
-            "endx": 225,
-            "endy": 150,
+            "end1": 3361,
+            "end2": 3362,
+            "endx": 375.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 1,
-            "line": 9226,
-            "posx": 25,
-            "posy": 150,
-            "stop1": 9229,
-            "stop2": 9230,
+            "line": 3360,
+            "posx": 25.0,
+            "posy": 150.0,
+            "stop1": 3363,
+            "stop2": 3364,
             "tags": "line1"
         },
         "da669646-6975-4489-9d20-5a5f4bcd2ed7": {
@@ -20721,7 +21747,7 @@
                 false,
                 ""
             ],
-            "bbox": 936,
+            "bbox": 2401,
             "dccaspects": [
                 [
                     [
@@ -21041,7 +22067,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -21262,10 +22288,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "14",
@@ -21296,10 +22318,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -21307,10 +22325,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -21364,10 +22378,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "14",
@@ -21375,10 +22385,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -21746,14 +22752,61 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         },
@@ -21764,20 +22817,33 @@
                 0,
                 0
             ],
-            "bbox": 942,
+            "bbox": 2407,
             "colour": "black",
-            "end1": 9262,
-            "end2": 9263,
-            "endx": 975.0,
-            "endy": 350.0,
+            "end1": 3396,
+            "end2": 3397,
+            "endx": 600.0,
+            "endy": 550.0,
             "item": "line",
             "itemid": 17,
-            "line": 9261,
-            "posx": 825.0,
-            "posy": 350.0,
-            "stop1": 9264,
-            "stop2": 9265,
+            "line": 3395,
+            "posx": 450.0,
+            "posy": 550.0,
+            "stop1": 3398,
+            "stop2": 3399,
             "tags": "line17"
+        },
+        "e1b0ee5f-12f4-45de-8fc6-7d4615c50a8d": {
+            "bbox": 2410,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 19,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 850.0,
+            "posy": 100.0,
+            "state": false,
+            "tags": "section19"
         },
         "e7c2c67b-3d0c-4455-b73e-059d766bda83": {
             "approachcontrol": [
@@ -21791,7 +22857,7 @@
                 false,
                 ""
             ],
-            "bbox": 970,
+            "bbox": 2438,
             "dccaspects": [
                 [
                     [
@@ -22332,10 +23398,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -22343,44 +23405,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -22434,10 +23458,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -22449,6 +23469,32 @@
                             0,
                             false
                         ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
                         [
                             0,
                             false
@@ -22772,7 +23818,7 @@
                 false
             ],
             "subroutes": [
-                true,
+                false,
                 false,
                 false,
                 false,
@@ -22787,31 +23833,58 @@
             "timedsequences": [
                 [
                     false,
-                    19,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    19,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    19,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    19,
+                    0,
                     0,
                     0
                 ],
                 [
                     false,
-                    19,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
                     0,
                     0
                 ]
@@ -22819,13 +23892,46 @@
             "tracksections": [
                 0,
                 [
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
+        },
+        "ea7fe3f2-f03e-46b4-b081-a9a7fd72c579": {
+            "bbox": 2441,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 22,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 775.0,
+            "posy": 200.0,
+            "state": false,
+            "tags": "section22"
         },
         "ebc7619b-2ac3-4539-9489-eee83460e329": {
             "arrowends": 0,
@@ -22834,25 +23940,25 @@
                 0,
                 0
             ],
-            "bbox": 976,
+            "bbox": 2447,
             "colour": "black",
-            "end1": 9294,
-            "end2": 9295,
-            "endx": 350,
-            "endy": 175,
+            "end1": 3430,
+            "end2": 3431,
+            "endx": 500.0,
+            "endy": 175.0,
             "item": "line",
             "itemid": 3,
-            "line": 9293,
-            "posx": 375,
-            "posy": 200,
-            "stop1": 9296,
-            "stop2": 9297,
+            "line": 3429,
+            "posx": 525.0,
+            "posy": 200.0,
+            "stop1": 3432,
+            "stop2": 3433,
             "tags": "line3"
         },
         "ecdbe7e9-941c-45d4-9054-be1fc4e9bf85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 983,
+            "bbox": 2454,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22895,20 +24001,33 @@
                 0,
                 0
             ],
-            "bbox": 989,
+            "bbox": 2460,
             "colour": "black",
-            "end1": 9305,
-            "end2": 9306,
-            "endx": 975,
-            "endy": 250,
+            "end1": 3441,
+            "end2": 3442,
+            "endx": 1100.0,
+            "endy": 650.0,
             "item": "line",
             "itemid": 16,
-            "line": 9304,
-            "posx": 675,
-            "posy": 250,
-            "stop1": 9307,
-            "stop2": 9308,
+            "line": 3440,
+            "posx": 800.0,
+            "posy": 650.0,
+            "stop1": 3443,
+            "stop2": 3444,
             "tags": "line16"
+        },
+        "ee1cb09a-869b-4445-a027-105f24cc1685": {
+            "bbox": 2463,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 17,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 850.0,
+            "posy": 50.0,
+            "state": false,
+            "tags": "section17"
         },
         "f4ef26af-7aeb-4d6f-beb8-cc383fa2b7f8": {
             "arrowends": 0,
@@ -22917,33 +24036,46 @@
                 0,
                 0
             ],
-            "bbox": 995,
+            "bbox": 2469,
             "colour": "black",
-            "end1": 9310,
-            "end2": 9311,
-            "endx": 775.0,
+            "end1": 3447,
+            "end2": 3448,
+            "endx": 750.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 22,
-            "line": 9309,
+            "line": 3446,
             "posx": 350.0,
             "posy": 350.0,
-            "stop1": 9312,
-            "stop2": 9313,
+            "stop1": 3449,
+            "stop2": 3450,
             "tags": "line22"
         },
         "f82bb5bd-b0b1-4fe1-bb06-3bb60e528e30": {
-            "bbox": 998,
+            "bbox": 2472,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 14,
             "label": "XXXXX",
             "mirror": "",
-            "posx": 1075.0,
-            "posy": 350.0,
+            "posx": 700.0,
+            "posy": 550.0,
             "state": false,
             "tags": "section14"
+        },
+        "f8dae4ee-8601-441b-8d76-7056a2289fa1": {
+            "bbox": 2475,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 16,
+            "label": "XXXXX",
+            "mirror": "",
+            "posx": 775.0,
+            "posy": 50.0,
+            "state": false,
+            "tags": "section16"
         },
         "fd6887bd-85d8-4f06-9845-f49b6b1dae8c": {
             "approachcontrol": [
@@ -22957,7 +24089,7 @@
                 false,
                 ""
             ],
-            "bbox": 1026,
+            "bbox": 2503,
             "dccaspects": [
                 [
                     [
@@ -23277,7 +24409,7 @@
             ],
             "dcctheatre": [
                 [
-                    "",
+                    "#",
                     [
                         [
                             0,
@@ -23498,10 +24630,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "16",
@@ -23532,6 +24660,32 @@
                         [
                             0,
                             false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
                         ],
                         [
                             0,
@@ -23566,10 +24720,6 @@
                         [
                             0,
                             false
-                        ],
-                        [
-                            0,
-                            false
                         ]
                     ],
                     "",
@@ -23577,44 +24727,6 @@
                 ],
                 [
                     [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
                         [
                             0,
                             false
@@ -23982,36 +25094,83 @@
                     0
                 ]
             ],
-            "tracksections": [
-                0,
+            "trackinterlock": [
                 [
                     0,
                     0,
+                    0
+                ],
+                [
                     0,
                     0,
                     0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
                 ]
             ]
         }
     },
     "points": {
         "1": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
         "2": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
         "3": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
         "4": {
-            "fpllock": false,
+            "fpllock": true,
             "locked": false,
             "switched": false
         },
@@ -24033,21 +25192,132 @@
         "8": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
-    "sections": {},
+    "sections": {
+        "1": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "10": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "11": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "12": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "13": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "14": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "15": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "16": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "17": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "18": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "19": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "2": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "20": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "21": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "22": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "23": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "24": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "25": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "26": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "27": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "3": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "4": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "5": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "6": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "7": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "8": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        },
+        "9": {
+            "labeltext": "XXXXX",
+            "occupied": false
+        }
+    },
     "settings": {
         "canvas": {
             "grid": 25,
-            "height": 650,
+            "height": 700,
+            "snaptogrid": true,
             "width": 1200
         },
         "general": {
-            "editmode": true,
-            "filename": "./run_layout_tests.sig",
+            "automation": true,
+            "editmode": false,
+            "filename": "/home/pi/model-railway-signalling/system_tests/test_run_layout.sig",
             "info": "Document your layout here",
-            "version": "Version 3.6"
+            "version": "Version 4.0.0"
         },
         "gpio": {
             "portmappings": [
@@ -24177,7 +25447,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -24230,7 +25500,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": true,
             "siglocked": false,
             "subclear": false,
@@ -24351,7 +25621,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,

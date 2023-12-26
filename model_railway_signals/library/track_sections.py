@@ -47,16 +47,7 @@
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
-#
-# subscribe_to_section_updates - Subscribe to section updates from another node on the network
-#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_track_section' instead
-#   Mandatory Parameters:
-#       node:str - The name of the node publishing the track section update feed
-#       sec_callback:name - Function to call when an update is received from the remote node
-#                Callback returns (item_identifier, section_callback_type.section_updated)
-#                item_identifier is a string in the following format "node_id-section_id"
-#       *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
-#       
+##       
 # subscribe_to_remote_section - Subscribes to a remote track section object
 #   Mandatory Parameters:
 #       remote_identifier:str - the remote identifier for the track section in the form 'node-id'
@@ -165,7 +156,7 @@ def update_identifier(section_id):
     # Set the new label for the section button and set the width to the width it was created with
     # If we get back an empty string then set the label back to the default (OCCUPIED)
     new_section_label =text_entry_box.get()
-    if new_section_label=="": new_section_label="OCCUPIED"
+    if new_section_label=="": new_section_label="XXXX"
     sections[str(section_id)]["labeltext"] = new_section_label
     sections[str(section_id)]["button1"]["text"] = new_section_label
     sections[str(section_id)]["button1"].config(width=sections[str(section_id)]["labellength"])
@@ -210,10 +201,11 @@ def open_entry_box(section_id):
     # Set the font size and length for the text entry box
     font_size = common.fontsize
     label_length = sections[str(section_id)]["labellength"]
-    # Create the entry box and bind the RETURN and ESCAPE events to it
+    # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
     text_entry_box = Tk.Entry(canvas,width=label_length,font=('Ariel',font_size,"normal"))
     text_entry_box.bind('<Return>', lambda event:update_identifier(section_id))
     text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
+    text_entry_box.bind('<FocusOut>', lambda event:update_identifier(section_id))
     # if the section button is already showing occupied then we EDIT the value
     if sections[str(section_id)]["occupied"]:
         text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
@@ -369,25 +361,6 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
 # Public API Function to "subscribe" to section updates published by remote MQTT "Node"
 #-----------------------------------------------------------------------------------------------
 
-def subscribe_to_section_updates (node:str,sec_callback,*sec_ids:int):    
-    global sections
-    logging.warning ("#######################################################################################################")
-    logging.warning ("The subscribe_to_section_updates function is DEPRECATED - use subscribe_to_remote_track_section instead")
-    logging.warning ("#######################################################################################################")
-    for sec_id in sec_ids:
-        # Create a dummy section object to hold the state of the remote track occupancy section
-        # The Identifier for a remote Section is a string combining the the Node-ID and Section-ID
-        section_identifier = mqtt_interface.create_remote_item_identifier(sec_id,node)
-        if not section_exists(section_identifier):
-            sections[section_identifier] = {}
-            sections[section_identifier]["occupied"] = False
-            sections[section_identifier]["labeltext"] = "OCCUPIED"
-            sections[section_identifier]["extcallback"] = sec_callback
-            # Subscribe to updates from the remote section
-            mqtt_interface.subscribe_to_mqtt_messages("section_updated_event",node,sec_id,
-                                                  handle_mqtt_section_updated_event)
-    return()
-
 def subscribe_to_remote_section (remote_identifier:str,section_callback):   
     global sections
     # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
@@ -399,7 +372,7 @@ def subscribe_to_remote_section (remote_identifier:str,section_callback):
             logging.warning("MQTT-Client: Section "+remote_identifier+" - has already been subscribed to via MQTT networking")
         sections[remote_identifier] = {}
         sections[remote_identifier]["occupied"] = False
-        sections[remote_identifier]["labeltext"] = "OCCUPIED"
+        sections[remote_identifier]["labeltext"] = "XXXX"
         sections[remote_identifier]["extcallback"] = section_callback
         # Subscribe to updates from the remote section
         [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)

@@ -20,8 +20,8 @@ from . import track_sensors
 # on the screen. This is to allow the appearance to be optimised for
 # particular window sizes/screen resolutions.
 fontsize = 9  # Used by the Signals, Points and sections modules
-xpadding = 4  # Used by the Signals, Points and sections modules
-ypadding = 3  # Used by the Signals, Points and sections modules
+xpadding = 2  # Used by the Signals, Points and sections modules
+ypadding = 0  # Used by the Signals, Points and sections modules
 bgraised = "grey85"   # Used by the Signals and Points modules
 bgsunken = "white"    # Used by the Signals and Points modules
 
@@ -35,37 +35,45 @@ shutdown_initiated = False
 #-------------------------------------------------------------------------
 # Function to catch the root window close event so we can perform an
 # orderly shutdown of the other threads running in the application
+# This calls file_interface.quit_application function to get confirmation
+# of quit from the user and/or let the user save the current state
+#-------------------------------------------------------------------------
+
+def on_closing():
+    if file_interface.save_state_and_quit(): shutdown()      
+    return()
+
+#-------------------------------------------------------------------------
+# Function to catch the root window close event so we can perform an
+# orderly shutdown of the other threads running in the application
 # The shutdown_initiated flag is used to tell the flash aspects and timed
 # signals functions to stop scheduling further "after" commands and exit 
 #-------------------------------------------------------------------------
 
-def on_closing(ask_to_save_state=True):
+def shutdown():
     global shutdown_initiated
-    if ask_to_save_state: confirm_quit = file_interface.save_state_and_quit()
-    else: confirm_quit = True 
-    if confirm_quit:       
-        logging.info ("Initiating Application Shutdown")
-        shutdown_initiated = True
-        # Clear out any retained messages and disconnect from broker
-        mqtt_interface.mqtt_shutdown()
-        # Turn off the DCC bus power and close the comms port
-        pi_sprog_interface.sprog_shutdown()
-        # Return the GPIO ports to their original configuration
-        track_sensors.gpio_shutdown()
-        # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-        # We need to put a timeout around this to deal with any ongoing timed signal sequences
-        # (although its unlikely the user would initiate a shut down until these have finished)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 30:
-            if root_window.tk.call('after','info') != "":
-                root_window.update()
-                time.sleep(0.01)
-            else:
-                logging.info ("Exiting Application")
-                break
-        if time.time() >= timeout_start + 30:
-            logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
-        root_window.destroy()
+    logging.info ("Initiating Application Shutdown")
+    shutdown_initiated = True
+    # Clear out any retained messages and disconnect from broker
+    mqtt_interface.mqtt_shutdown()
+    # Turn off the DCC bus power and close the comms port
+    pi_sprog_interface.sprog_shutdown()
+    # Return the GPIO ports to their original configuration
+    track_sensors.gpio_shutdown()
+    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
+    # We need to put a timeout around this to deal with any ongoing timed signal sequences
+    # (although its unlikely the user would initiate a shut down until these have finished)
+    timeout_start = time.time()
+    while time.time() < timeout_start + 30:
+        if root_window.tk.call('after','info') != "":
+            root_window.update()
+            time.sleep(0.01)
+        else:
+            logging.info ("Exiting Application")
+            break
+    if time.time() >= timeout_start + 30:
+        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+    root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------

@@ -39,6 +39,15 @@ from ..library import signals_colour_lights
 from ..library import signals_semaphores
 
 #------------------------------------------------------------------------------------
+# We maintain a global dictionary of open edit windows (where the key is the UUID
+# of the object being edited) to prevent duplicate windows being opened. If the user
+# tries to edit an object which is already being edited, then we just bring the
+# existing edit window to the front (expanding if necessary) and set focus on it
+#------------------------------------------------------------------------------------
+
+open_windows={}
+
+#------------------------------------------------------------------------------------
 # Helper function to find out if the signal has a subsidary (colour light or semaphore)
 #------------------------------------------------------------------------------------
 
@@ -181,155 +190,6 @@ def get_dist_routes(signal):
         # All other signal types do not support secondary distant arms
         routes = [False, False, False, False, False]
     return(routes)
-
-#------------------------------------------------------------------------------------
-# Function to load the initial UI state when the Edit window is created
-#------------------------------------------------------------------------------------
- 
-def load_state(signal):
-    object_id = signal.object_id
-    # Check the object we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        signal.window.destroy()
-    else:
-        # Label the edit window with the Signal ID
-        signal.window.title("Signal "+str(objects.schematic_objects[object_id]["itemid"]))
-        # Set the Initial UI state from the current object settings
-        signal.config.sigid.set_value(str(objects.schematic_objects[object_id]["itemid"]))
-        signal.config.sigtype.set_value(objects.schematic_objects[object_id]["itemtype"])
-        signal.config.subtype.set_value(objects.schematic_objects[object_id]["itemsubtype"])
-        signal.config.aspects.set_subsidary(objects.schematic_objects[object_id]["subsidary"])
-        signal.config.feathers.set_feathers(objects.schematic_objects[object_id]["feathers"])
-        signal.config.aspects.set_addresses(objects.schematic_objects[object_id]["dccaspects"])
-        signal.config.feathers.set_addresses(objects.schematic_objects[object_id]["dccfeathers"])
-        signal.config.theatre.set_theatre(objects.schematic_objects[object_id]["dcctheatre"])
-        signal.config.feathers.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-        signal.config.theatre.set_auto_inhibit(objects.schematic_objects[object_id]["dccautoinhibit"])
-        signal.config.semaphores.set_arms(objects.schematic_objects[object_id]["sigarms"])
-        signal.config.sig_routes.set_values(objects.schematic_objects[object_id]["sigroutes"])
-        signal.config.sub_routes.set_values(objects.schematic_objects[object_id]["subroutes"])
-        # These are the general settings for the signal
-        if objects.schematic_objects[object_id]["orientation"] == 180: rot = True
-        else:rot = False
-        signal.config.settings.set_value(rot)
-        # These elements are for the signal intelocking tab
-        signal.locking.interlocking.set_routes(objects.schematic_objects[object_id]["pointinterlock"])
-        signal.locking.conflicting_sigs.set_values(objects.schematic_objects[object_id]["siginterlock"])
-        signal.locking.interlock_ahead.set_value(objects.schematic_objects[object_id]["interlockahead"])
-        # These elements are for the Automation tab
-        signal.automation.track_sensors.approach.set_value(objects.schematic_objects[object_id]["approachsensor"][1])
-        signal.automation.track_sensors.passed.set_value(objects.schematic_objects[object_id]["passedsensor"][1])
-        signal.automation.track_occupancy.set_values(objects.schematic_objects[object_id]["tracksections"])
-        override = objects.schematic_objects[object_id]["overridesignal"]
-        main_auto = objects.schematic_objects[object_id]["fullyautomatic"]
-        dist_auto = objects.schematic_objects[object_id]["distautomatic"]
-        override_ahead = objects.schematic_objects[object_id]["overrideahead"]
-        signal.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
-        signal.automation.timed_signal.set_values(objects.schematic_objects[object_id]["timedsequences"])
-        signal.automation.approach_control.set_values(objects.schematic_objects[object_id]["approachcontrol"])
-        # Configure the initial Route indication selection
-        feathers = objects.schematic_objects[object_id]["feathers"]
-        if objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
-            if objects.schematic_objects[object_id]["theatreroute"]:
-                signal.config.routetype.set_value(3)
-            elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
-                signal.config.routetype.set_value(2)
-            else:
-                signal.config.routetype.set_value(1)      
-        elif objects.schematic_objects[object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
-            if objects.schematic_objects[object_id]["theatreroute"]:
-                signal.config.routetype.set_value(3)
-            elif has_route_arms(signal):
-                signal.config.routetype.set_value(4)
-            else:
-                signal.config.routetype.set_value(1)      
-        else:
-            signal.config.routetype.set_value(1)      
-        # Set the initial UI selections
-        update_tab1_signal_subtype_selections(signal)
-        update_tab1_signal_aspect_selections(signal)
-        update_tab1_route_selection_elements(signal)
-        update_tab1_signal_ui_elements(signal)
-        update_tab2_available_signal_routes(signal)
-        update_tab2_interlock_ahead_selection(signal)
-        update_tab3_track_section_ahead_routes(signal)
-        update_tab3_general_settings_selections(signal)
-        update_tab3_timed_signal_selections(signal)
-        update_tab3_approach_control_selections(signal)
-        update_tab3_signal_ui_elements(signal)
-        # Hide the validation error message
-        signal.validation_error.pack_forget()
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to commit all configuration changes (Apply/OK Button)
-#------------------------------------------------------------------------------------
- 
-def save_state(signal, close_window):
-    object_id = signal.object_id
-    # Check the object we are editing still exists (hasn't been deleted from the schematic)
-    # If it no longer exists then we just destroy the window and exit without saving
-    if object_id not in objects.schematic_objects.keys():
-        signal.window.destroy()
-    # Validate all user entries prior to applying the changes. Each of these would have
-    # been validated on entry, but changes to other objects may have been made since then
-    elif ( signal.config.sigid.validate() and signal.config.aspects.validate() and
-           signal.config.theatre.validate() and signal.config.feathers.validate() and
-           signal.config.semaphores.validate() and signal.locking.interlocking.validate() and
-           signal.locking.conflicting_sigs.validate() and signal.automation.track_sensors.validate() and
-           signal.automation.track_occupancy.validate() and signal.automation.timed_signal.validate() ):        
-        # Copy the original signal Configuration (elements get overwritten as required)
-        new_object_configuration = copy.deepcopy(objects.schematic_objects[object_id])
-        # Update the signal coniguration elements from the current user selections
-        new_object_configuration["itemid"] = signal.config.sigid.get_value()
-        new_object_configuration["itemtype"] = signal.config.sigtype.get_value()
-        new_object_configuration["itemsubtype"] = signal.config.subtype.get_value()
-        new_object_configuration["subsidary"] = signal.config.aspects.get_subsidary()
-        new_object_configuration["feathers"] = signal.config.feathers.get_feathers()
-        new_object_configuration["dccaspects"] = signal.config.aspects.get_addresses()
-        new_object_configuration["dccfeathers"] = signal.config.feathers.get_addresses()
-        new_object_configuration["dcctheatre"] = signal.config.theatre.get_theatre()
-        new_object_configuration["sigarms"] = signal.config.semaphores.get_arms()
-        new_object_configuration["sigroutes"] = get_sig_routes(signal)
-        new_object_configuration["subroutes"] = get_sub_routes(signal)
-        # These are the general settings for the signal
-        rot = signal.config.settings.get_value()
-        if rot: new_object_configuration["orientation"] = 180
-        else: new_object_configuration["orientation"] = 0
-        # Set the Theatre route indicator flag if that particular radio button is selected
-        if signal.config.routetype.get_value() == 3:
-            new_object_configuration["theatreroute"] = True
-            new_object_configuration["dccautoinhibit"] = signal.config.theatre.get_auto_inhibit()
-        else:
-            new_object_configuration["dccautoinhibit"] = signal.config.feathers.get_auto_inhibit()
-            new_object_configuration["theatreroute"] = False
-        # These elements are for the signal intelocking tab
-        new_object_configuration["pointinterlock"] = signal.locking.interlocking.get_routes()
-        new_object_configuration["siginterlock"] = signal.locking.conflicting_sigs.get_values()
-        new_object_configuration["interlockahead"] = signal.locking.interlock_ahead.get_value()
-        # These elements are for the Automation tab
-        new_object_configuration["passedsensor"][0] = True
-        new_object_configuration["passedsensor"][1] = signal.automation.track_sensors.passed.get_value()
-        new_object_configuration["approachsensor"][0] = signal.automation.approach_control.is_selected()
-        new_object_configuration["approachsensor"][1] = signal.automation.track_sensors.approach.get_value()
-        new_object_configuration["tracksections"] = signal.automation.track_occupancy.get_values()
-        override, main_auto, override_ahead, dist_auto = signal.automation.general_settings.get_values()
-        new_object_configuration["fullyautomatic"] = main_auto
-        new_object_configuration["distautomatic"] = dist_auto
-        new_object_configuration["overridesignal"] = override
-        new_object_configuration["overrideahead"] = override_ahead
-        new_object_configuration["timedsequences"] = signal.automation.timed_signal.get_values()
-        new_object_configuration["approachcontrol"] = signal.automation.approach_control.get_values()
-        # Save the updated configuration (and re-draw the object)
-        objects.update_object(object_id, new_object_configuration)
-        # Close window on "OK" or re-load UI for "apply"
-        if close_window: signal.window.destroy()
-        else: load_state(signal)
-    else:
-        # Display the validation error message
-        signal.validation_error.pack()
-    return()
 
 #------------------------------------------------------------------------------------
 # Hide/show the various route indication UI elements depending on what is selected
@@ -622,35 +482,44 @@ def update_tab2_available_signal_routes(signal):
     sub_routes = get_sub_routes(signal)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
+    signal.locking.interlocked_sections.main.enable_route()
     signal.locking.conflicting_sigs.main.enable_route()
     # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
+        signal.locking.interlocked_sections.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.enable_route()
         signal.locking.conflicting_sigs.lh1.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh1.disable_route()
+        signal.locking.interlocked_sections.lh1.disable_route()
         signal.locking.conflicting_sigs.lh1.disable_route()
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
+        signal.locking.interlocked_sections.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.enable_route()
         signal.locking.conflicting_sigs.lh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh2.disable_route()
+        signal.locking.interlocked_sections.lh2.disable_route()
         signal.locking.conflicting_sigs.lh2.disable_route()
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
+        signal.locking.interlocked_sections.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.enable_route()
         signal.locking.conflicting_sigs.rh1.frame.pack(padx=2, pady=2, fill='x')
     else: 
         signal.locking.interlocking.rh1.disable_route()
+        signal.locking.interlocked_sections.rh1.disable_route()
         signal.locking.conflicting_sigs.rh1.disable_route()
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
+        signal.locking.interlocked_sections.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.enable_route()
         signal.locking.conflicting_sigs.rh2.frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.rh2.disable_route()
+        signal.locking.interlocked_sections.rh2.disable_route()
         signal.locking.conflicting_sigs.rh2.disable_route()
     # Enable/disable the signal / block instrument ahead selections on signal type
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
@@ -872,49 +741,47 @@ def update_tab3_approach_control_selections(signal):
 
 class edit_signal:
     def __init__(self, root, object_id):
-        self.root=root
-        # This is the UUID for the object being edited
-        self.object_id = object_id
-        # Creatre the basic Top Level window
-        self.window = Tk.Toplevel(root)
-        self.window.attributes('-topmost',True)
-        # Create the Notebook (for the tabs) 
-        self.tabs = ttk.Notebook(self.window)
-        # When you change tabs tkinter focuses on the first entry box - we don't want this
-        # So we bind the tab changed event to a function which will focus on something else 
-        self.tabs.bind ('<<NotebookTabChanged>>', self.tab_changed)
-        # Create the Window tabs
-        self.tab1 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab1, text="Configration")
-        self.tab2 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab2, text="Interlocking")
-        self.tabs.pack()
-        self.tab3 = Tk.Frame(self.tabs)
-        self.tabs.add(self.tab3, text="Automation")
-        self.tabs.pack()
-        # The config tab needs references to all the 'config changed' callback functions
-        self.config = configure_signal_tab1.signal_configuration_tab(self.tab1,
-                self.sig_type_updated, self.sub_type_updated, self.route_type_updated,
-                self.route_selections_updated, self.sig_routes_updated,
-                self.sub_routes_updated, self.dist_routes_updated)
-        # The interlocking tab needs the parent object so the sig_id can be accessed for validation
-        self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
-        # The automation tab needs the parent object so the sig_id can be accessed for validation
-        self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
-        # Create the common Apply/OK/Reset/Cancel buttons for the window
-        self.controls = common.window_controls(self.window, self, load_state, save_state)
-        self.controls.frame.pack(padx=2, pady=2)
-        # Create the Validation error message (this gets packed/unpacked on apply/save)
-        self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
-        # load the initial UI state
-        load_state(self)
-        
-    def tab_changed(self,event):
-        # Focus on the top level window to remove focus from the first entry box
-        # THIS IS STILL NOT WORKING AS IT LEAVES THE ENTRY BOX HIGHLIGHTED
-        # self.window.focus()
-        pass
-        
+        global open_windows
+        # If there is already a  window open then we just make it jump to the top and exit
+        if object_id in open_windows.keys():
+            open_windows[object_id].lift()
+            open_windows[object_id].state('normal')
+            open_windows[object_id].focus_force()
+        else:
+            # This is the UUID for the object being edited
+            self.object_id = object_id
+            # Creatre the basic Top Level window
+            self.window = Tk.Toplevel(root)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            open_windows[object_id] = self.window
+            # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(side=Tk.BOTTOM, padx=2, pady=2)
+            # Create the Validation error message (this gets packed/unpacked on apply/save)
+            self.validation_error = Tk.Label(self.window, text="Errors on Form need correcting", fg="red")
+            # Create the Notebook (for the tabs) 
+            self.tabs = ttk.Notebook(self.window)
+            # Create the Window tabs
+            self.tab1 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab1, text="Configration")
+            self.tab2 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab2, text="Interlocking")
+            self.tabs.pack()
+            self.tab3 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab3, text="Automation")
+            self.tabs.pack()
+            # The config tab needs references to all the 'config changed' callback functions
+            self.config = configure_signal_tab1.signal_configuration_tab(self.tab1,
+                    self.sig_type_updated, self.sub_type_updated, self.route_type_updated,
+                    self.route_selections_updated, self.sig_routes_updated,
+                    self.sub_routes_updated, self.dist_routes_updated)
+            # The interlocking tab needs the parent object so the sig_id can be accessed for validation
+            self.locking = configure_signal_tab2.signal_interlocking_tab(self.tab2, self)
+            # The automation tab needs the parent object so the sig_id can be accessed for validation
+            self.automation = configure_signal_tab3.signal_automation_tab(self.tab3, self)
+            # load the initial UI state
+            self.load_state()
+                
     def sig_type_updated(self):
         # The signal type has been changed (colour-light/semaphore/ground-pos-ground-disc)
         self.config.subtype.set_value(1)
@@ -988,4 +855,163 @@ class edit_signal:
         update_tab2_interlock_ahead_selection(self)
         update_tab3_general_settings_selections(self)
 
+#------------------------------------------------------------------------------------
+# Load save and close class functions
+#------------------------------------------------------------------------------------
+ 
+    def load_state(self):
+        # Check the object we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Label the edit window with the Signal ID
+            self.window.title("Signal "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            # Set the Initial UI state from the current object settings
+            self.config.sigid.set_value(str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.config.sigtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
+            self.config.subtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
+            self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"])
+            self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
+            self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"])
+            self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"])
+            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
+            self.config.feathers.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
+            self.config.theatre.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
+            self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"])
+            self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
+            self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
+            # These are the general settings for the signal
+            if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
+            else:rot = False
+            self.config.settings.set_value(rot)
+            # These elements are for the signal intelocking tab
+            self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"])
+            self.locking.interlocked_sections.set_routes(objects.schematic_objects[self.object_id]["trackinterlock"])
+            self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
+            self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
+            # These elements are for the Automation tab
+            self.automation.track_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1])
+            self.automation.track_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1])
+            self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
+            override = objects.schematic_objects[self.object_id]["overridesignal"]
+            main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
+            dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
+            override_ahead = objects.schematic_objects[self.object_id]["overrideahead"]
+            self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
+            self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"])
+            self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
+            # Configure the initial Route indication selection
+            feathers = objects.schematic_objects[self.object_id]["feathers"]
+            if objects.schematic_objects[self.object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
+                if objects.schematic_objects[self.object_id]["theatreroute"]:
+                    self.config.routetype.set_value(3)
+                elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
+                    self.config.routetype.set_value(2)
+                else:
+                    self.config.routetype.set_value(1)      
+            elif objects.schematic_objects[self.object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
+                if objects.schematic_objects[self.object_id]["theatreroute"]:
+                    self.config.routetype.set_value(3)
+                elif has_route_arms(self):
+                    self.config.routetype.set_value(4)
+                else:
+                    self.config.routetype.set_value(1)      
+            else:
+                self.config.routetype.set_value(1)      
+            # Set the initial UI selections
+            update_tab1_signal_subtype_selections(self)
+            update_tab1_signal_aspect_selections(self)
+            update_tab1_route_selection_elements(self)
+            update_tab1_signal_ui_elements(self)
+            update_tab2_available_signal_routes(self)
+            update_tab2_interlock_ahead_selection(self)
+            update_tab3_track_section_ahead_routes(self)
+            update_tab3_general_settings_selections(self)
+            update_tab3_timed_signal_selections(self)
+            update_tab3_approach_control_selections(self)
+            update_tab3_signal_ui_elements(self)
+            # Hide the validation error message
+            self.validation_error.pack_forget()
+        return()
+     
+    def save_state(self, close_window):
+        # Check the object we are editing still exists (hasn't been deleted from the schematic)
+        # If it no longer exists then we just destroy the window and exit without saving
+        if self.object_id not in objects.schematic_objects.keys():
+            self.close_window()
+        else:
+            # Validate all user entries prior to applying the changes. Each of these would have
+            # been validated on entry, but changes to other objects may have been made since then
+            # Note that we validate ALL elements to ensure all UI elements are updated accordingly 
+            valid = True
+            if not self.config.sigid.validate(): valid = False
+            if not self.config.aspects.validate(): valid = False
+            if not self.config.theatre.validate(): valid = False
+            if not self.config.feathers.validate(): valid = False
+            if not self.config.semaphores.validate(): valid = False
+            if not self.locking.interlocking.validate(): valid = False
+            if not self.locking.interlocked_sections.validate(): valid = False
+            if not self.locking.conflicting_sigs.validate(): valid = False
+            if not self.automation.track_sensors.validate(): valid = False
+            if not self.automation.track_occupancy.validate(): valid = False
+            if not self.automation.timed_signal.validate(): valid = False
+            if valid:
+                # Copy the original signal Configuration (elements get overwritten as required)
+                new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
+                # Update the signal coniguration elements from the current user selections
+                new_object_configuration["itemid"] = self.config.sigid.get_value()
+                new_object_configuration["itemtype"] = self.config.sigtype.get_value()
+                new_object_configuration["itemsubtype"] = self.config.subtype.get_value()
+                new_object_configuration["subsidary"] = self.config.aspects.get_subsidary()
+                new_object_configuration["feathers"] = self.config.feathers.get_feathers()
+                new_object_configuration["dccaspects"] = self.config.aspects.get_addresses()
+                new_object_configuration["dccfeathers"] = self.config.feathers.get_addresses()
+                new_object_configuration["dcctheatre"] = self.config.theatre.get_theatre()
+                new_object_configuration["sigarms"] = self.config.semaphores.get_arms()
+                new_object_configuration["sigroutes"] = get_sig_routes(self)
+                new_object_configuration["subroutes"] = get_sub_routes(self)
+                # These are the general settings for the signal
+                rot = self.config.settings.get_value()
+                if rot: new_object_configuration["orientation"] = 180
+                else: new_object_configuration["orientation"] = 0
+                # Set the Theatre route indicator flag if that particular radio button is selected
+                if self.config.routetype.get_value() == 3:
+                    new_object_configuration["theatreroute"] = True
+                    new_object_configuration["dccautoinhibit"] = self.config.theatre.get_auto_inhibit()
+                else:
+                    new_object_configuration["dccautoinhibit"] = self.config.feathers.get_auto_inhibit()
+                    new_object_configuration["theatreroute"] = False
+                # These elements are for the signal intelocking tab
+                new_object_configuration["pointinterlock"] = self.locking.interlocking.get_routes()
+                new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()
+                new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
+                new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
+                # These elements are for the Automation tab
+                new_object_configuration["passedsensor"][0] = True
+                new_object_configuration["passedsensor"][1] = self.automation.track_sensors.passed.get_value()
+                new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
+                new_object_configuration["approachsensor"][1] = self.automation.track_sensors.approach.get_value()
+                new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
+                override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
+                new_object_configuration["fullyautomatic"] = main_auto
+                new_object_configuration["distautomatic"] = dist_auto
+                new_object_configuration["overridesignal"] = override
+                new_object_configuration["overrideahead"] = override_ahead
+                new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
+                new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
+                # Save the updated configuration (and re-draw the object)
+                objects.update_object(self.object_id, new_object_configuration)
+                # Close window on "OK" or re-load UI for "apply"
+                if close_window: self.close_window()
+                else: self.load_state()
+            else:
+                # Display the validation error message
+                self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
+        return()
+
+    def close_window(self):
+        self.window.destroy()
+        del open_windows[self.object_id]
+        
 #############################################################################################

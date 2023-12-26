@@ -224,7 +224,7 @@ def create_point(item_type):
     objects_common.point_index[str(item_id)] = object_id
     # Draw the object on the canvas
     redraw_point_object(object_id)
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to paste a copy of an existing point - returns the new Object ID

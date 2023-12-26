@@ -165,7 +165,7 @@ def create_line():
     objects_common.line_index[str(item_id)] = object_id 
     # Draw the Line on the canvas
     redraw_line_object(object_id)
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to paste a copy of an existing line - returns the new Object ID

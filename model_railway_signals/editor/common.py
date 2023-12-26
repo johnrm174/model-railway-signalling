@@ -16,6 +16,7 @@
 #    object_id_selection(Tk.integer_entry_box)
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
+#    signal_route_frame() - read only list of signal_route_selections()
 #    selection_buttons() - combines 5 RadioButtons
 #    colour_selection() - Allows the colour of an item to be changed
 #    window_controls() - apply/ok/reset/cancel
@@ -408,8 +409,9 @@ class entry_box(Tk.Entry):
 
 class integer_entry_box(entry_box):
     def __init__(self, parent_frame, width:int, min_value:int, max_value:int,
-                       tool_tip:str, callback=None, allow_empty:bool=True):
+            tool_tip:str, callback=None, allow_empty:bool=True, empty_equals_zero:bool=True):
         # Store the local instance configuration variables
+        self.empty_equals_zero = empty_equals_zero
         self.empty_allowed = allow_empty
         self.max_value = max_value
         self.min_value = min_value
@@ -442,15 +444,22 @@ class integer_entry_box(entry_box):
         return(valid)
     
     def set_value(self, value:int):
-        if value == 0 and self.empty_allowed: super().set_value("")
+        if self.empty_allowed and (value==None or (value==0 and self.empty_equals_zero)) :
+            super().set_value("")
+        elif value==None: super().set_value(str(0))
         else: super().set_value(str(value))
 
+
     def get_value(self):
-        if super().get_value() == "" or super().get_value() == "#": return(0)
+        if super().get_value() == "" or super().get_value() == "#":
+            if self.empty_equals_zero: return(0)
+            else: return(None)
         else: return(int(super().get_value()))
 
     def get_initial_value(self):
-        if super().get_initial_value() == "": return(0)
+        if self.empty_allowed and super().get_initial_value() == "":
+            if self.empty_equals_zero: return(0)
+            else: return(None)
         else: return(int(super().get_initial_value()))
 
 #------------------------------------------------------------------------------------
@@ -677,15 +686,20 @@ class scrollable_text_frame(Tk.Frame):
         # configure the window for editable or non-editable
         if not self.editable: self.text_box.config(state="disabled")
         # Set up the callback for auto re-size (if specified)
-        if self.auto_resize: self.text_box.bind("<Key>", self.resize_text_box)
+        if self.auto_resize: self.text_box.bind('<KeyRelease>', self.resize_text_box)
         # Set the initial size for the text box
         self.resize_text_box()
+        # Define the tags we are goint to use for justifying the text
+        self.text_box.tag_configure("justify_center", justify='center')
+        self.text_box.tag_configure("justify_left", justify='left')
+        self.text_box.tag_configure("justify_right", justify='right')
 
     def resize_text_box(self, event=None):
         # Calculate the height and width of the text
         self.text = self.text_box.get("1.0",Tk.END)
         list_of_lines = self.text.splitlines()
         number_of_lines = len(list_of_lines)
+        # Find the maximum line length (to set the width of the text box)
         max_line_length = 0
         for line in list_of_lines:
             if len(line) > max_line_length: max_line_length = len(line)
@@ -699,7 +713,7 @@ class scrollable_text_frame(Tk.Frame):
         if self.max_width is not None and max_line_length > self.max_width:
             max_line_length = self.max_width
         # re-size the text box
-        self.text_box.config(height=number_of_lines+1, width=max_line_length+1)
+        self.text_box.config(height=number_of_lines, width=max_line_length+1)
         
     def set_value(self, text:str):
         self.text = text
@@ -711,8 +725,23 @@ class scrollable_text_frame(Tk.Frame):
     
     def get_value(self):
         self.text = self.text_box.get("1.0",Tk.END)
+        # Remove the spurious new line (text widget always inserts one)
+        if self.text.endswith('\r\n'): self.text = self.text[:-2]  ## Windows
+        elif self.text.endswith('\n'): self.text = self.text[:-1]  ## Everything else
         return(self.text)
     
+    def set_justification(self, value:int):
+        # Define the tags we are goint to use for justifying the text
+        self.text_box.tag_remove("justify_left",1.0,Tk.END)
+        self.text_box.tag_remove("justify_center",1.0,Tk.END)
+        self.text_box.tag_remove("justify_right",1.0,Tk.END)
+        if value == 1: self.text_box.tag_add("justify_left",1.0,Tk.END)
+        if value == 2: self.text_box.tag_add("justify_center",1.0,Tk.END)
+        if value == 3: self.text_box.tag_add("justify_right",1.0,Tk.END)
+
+    def set_font(self, font:str, font_size:int, font_style:str):
+        self.text_box.configure(font=(font, font_size, font_style))
+
 #------------------------------------------------------------------------------------
 # Compound UI element for an object_id_selection LabelFrame - uses the integer_entry_box.
 # This is used across all object windows for displaying / changing the item ID.
@@ -904,21 +933,21 @@ class signal_route_selections():
                                           self.rh2.get_value() ] ])
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a signal route interlocking LabelFrame - creates a variable
-# number of instances of the signal_route_selection_element when "set_values" is called
-# (according to the length of the supplied list).Note that this is a 'read-only' element.
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
+# Compound UI Element for a "read only" signal_route_frame (LabelFrame) - creates a 
+# variable number of instances of the signal_route_selection_element when "set_values" 
+# is called (according to the length of the supplied list). Note the responsibility of
+# the instantiating func/class to 'pack' the Frame of the UI element.
 #
 # Public class instance methods provided by this class are:
-#    "set_values" - Populates the list of interlocked signals and their routes
+#    "set_values" - Populates the list of  signals and their routes
 #------------------------------------------------------------------------------------
 
-class signal_route_interlocking_frame():
-    def __init__(self, parent_frame):
+class signal_route_frame():
+    def __init__(self, parent_frame, label:str, tool_tip:str):
         # Create the Label Frame for the Signal Interlocking List 
-        self.frame = Tk.LabelFrame(parent_frame, text="Interlocking with signals")
+        self.frame = Tk.LabelFrame(parent_frame, text=label)
         # These are the lists that hold the references to the subframes and subclasses
+        self.tooltip = tool_tip
         self.sigelements = []
         self.subframe = None
 
@@ -934,12 +963,11 @@ class signal_route_interlocking_frame():
             for sig_interlocking_routes in sig_interlocking_frame:
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
-                self.sigelements.append(signal_route_selections(self.subframe,read_only=True,
-                        tool_tip="Edit the appropriate signals\nto configure interlocking"))
+                self.sigelements.append(signal_route_selections(self.subframe, read_only=True, tool_tip=self.tooltip))
                 self.sigelements[-1].frame.pack()
                 self.sigelements[-1].set_values (sig_interlocking_routes)
         else:
-            self.label = Tk.Label(self.subframe, text="No interlocked signals")
+            self.label = Tk.Label(self.subframe, text="Nothing configured")
             self.label.pack()
 
 #------------------------------------------------------------------------------------
@@ -999,7 +1027,7 @@ class selection_buttons():
 
     def set_value(self, value:int):
         self.value.set(value)
-
+        
     def get_value(self):
         return(self.value.get())
 
@@ -1014,16 +1042,16 @@ class selection_buttons():
 #------------------------------------------------------------------------------------
 
 class colour_selection():
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, label:str):
         # Variable to hold the currently selected colour:
         self.colour ='black'
         # Create a frame to hold the tkinter widgets
         # The parent class is responsible for packing the frame
-        self.frame = Tk.LabelFrame(parent_frame,text="Colour")
+        self.frame = Tk.LabelFrame(parent_frame,text=label)
         # Create a sub frame for the UI elements to centre them
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour)
+        self.label2 = Tk.Label(self.subframe, width=3, bg=self.colour, borderwidth=1, relief="solid")
         self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT2 = CreateToolTip(self.label2, "Currently selected colour")
         self.B1 = Tk.Button(self.subframe, text="Change", command=self.update)
@@ -1031,7 +1059,7 @@ class colour_selection():
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
         
     def update(self):
-        colour_code = colorchooser.askcolor(parent=self.frame, title ="Select Colour")
+        colour_code = colorchooser.askcolor(self.colour, parent=self.frame, title ="Select Colour")
         self.colour = colour_code[1]
         self.label2.config(bg=self.colour)
         
@@ -1050,12 +1078,12 @@ class colour_selection():
 #------------------------------------------------------------------------------------
 
 class window_controls():
-    def __init__(self, parent_window, parent_object, load_callback, save_callback):
+    def __init__(self, parent_window, load_callback, save_callback, cancel_callback):
         # Create the class instance variables
         self.window = parent_window
         self.save_callback = save_callback
         self.load_callback = load_callback
-        self.parent_object = parent_object
+        self.cancel_callback = cancel_callback
         self.frame = Tk.Frame(self.window)
         # Create the buttons and tooltips
         self.B1 = Tk.Button (self.frame, text = "Ok",command=self.ok)
@@ -1073,17 +1101,17 @@ class window_controls():
         
     def apply(self):
         self.window.focus()
-        self.save_callback(self.parent_object,False)
+        self.save_callback(False)
         
     def ok(self):
         self.window.focus()
-        self.save_callback(self.parent_object,True)
+        self.save_callback(True)
         
     def reset(self):
         self.window.focus()
-        self.load_callback(self.parent_object)
+        self.load_callback()
         
     def cancel(self):
-        self.window.destroy()
+        self.cancel_callback()
 
 ###########################################################################################

@@ -7,12 +7,13 @@
 #    schematic_callback(item_id,callback_type) - the callback for all schematic objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
+#    enable_automation() - Call when Automation is enabled (from Editor Module)
+#    disable_automation() - Call when Automation is disabled (from Editor Module)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
 #    objects.section(section_id) - To get the object_id for a given section_id
-#    <MORE COMING>
 #    
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -20,7 +21,6 @@
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.point_index - To iterate through all the point objects
 #    objects.section_index - To iterate through all the section objects
-#    <MORE COMING>
 #
 # Accesses the following external library objects directly:
 #    signals_common.route_type - for accessing the enum value
@@ -34,7 +34,6 @@
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
 #    signals_ground_position.ground_pos_sub_type - for accessing the enum value
 #    signals_ground_disc.ground_disc_sub_type - for accessing the enum value
-#    <MORE COMING>
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_state(sig_id) - For testing the current displayed aspect
@@ -58,7 +57,6 @@
 #    track_sections.set_section_occupied (section_id) - Set "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Clear "Occupied"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
-#    <MORE COMING>
 #
 #------------------------------------------------------------------------------------
 
@@ -80,14 +78,48 @@ from . import objects
 
 #------------------------------------------------------------------------------------
 # The Tkinter Canvas Object is saved as a global variable for easy referencing
-# The set_canvas function is called at application startup (on canvas creation)
+# The editing_enabled and automation_enabled flags control the behavior of run_layout
 #------------------------------------------------------------------------------------
 
 canvas = None
+editing_enabled = None
+automation_enabled = None
+
+#------------------------------------------------------------------------------------
+# The set_canvas function is called at application startup (on canvas creation)
+#------------------------------------------------------------------------------------
 
 def initialise(canvas_object):
     global canvas
     canvas = canvas_object
+    return()
+
+#------------------------------------------------------------------------------------
+# The behavior of the layout processing will change depending on what mode we are in
+#------------------------------------------------------------------------------------
+
+def enable_editing():
+    global editing_enabled
+    editing_enabled = True
+    initialise_layout()
+    return()
+
+def disable_editing():
+    global editing_enabled
+    editing_enabled = False
+    initialise_layout()
+    return()
+
+def enable_automation():
+    global automation_enabled
+    automation_enabled = True
+    initialise_layout()
+    return()
+
+def disable_automation():
+    global automation_enabled
+    automation_enabled = False
+    initialise_layout()
     return()
 
 #------------------------------------------------------------------------------------
@@ -428,9 +460,9 @@ def update_track_occupancy(int_signal_id:int):
     # signal ahead - it is perfectly valid to pass the distant at caution
     signal_route = find_signal_route(int_signal_id)
     if signal_route is not None:
-        int_section_ahead = signal_object["tracksections"][1][signal_route.value-1]
+        int_section_ahead = signal_object["tracksections"][1][signal_route.value-1][0]
     else:
-        int_section_ahead = signal_object["tracksections"][1][0]
+        int_section_ahead = signal_object["tracksections"][1][0][0]
     int_section_behind = signal_object["tracksections"][0]
     # Distant signals and shunt-ahead signals can be passed when ON so we need
     # to assume the direction of travel depending on which section on each side
@@ -532,6 +564,7 @@ def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id
 #------------------------------------------------------------------------------------
 
 def process_all_signal_interlocking():
+    global editing_enabled
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
         # Note that the ID of any associated distant signal is sig_id+100
@@ -585,6 +618,18 @@ def process_all_signal_interlocking():
                     # Must be a distant signal (colour light or semaphore)
                     if not signals.signal_clear(signal_object["itemid"]):
                         signal_can_be_unlocked = False
+            # Interlock against track sections on the route ahead - note that this is the
+            # one bit of interlocking functionality that we can only do in RUN mode as
+            # track section objects dont 'exist' as such in EDIT mode
+            if not editing_enabled:
+                interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
+                for section in interlocked_sections:
+                    if section > 0 and track_sections.section_occupied(section):
+                        # Only lock the signal if it is already ON (we always need to allow the
+                        # signalman to return the signal to ON if it is currently OFF
+                        if not signals.signal_clear(signal_object["itemid"]):
+                            signal_can_be_unlocked = False
+                            break
         # Interlock the main signal with the subsidary
         if signals.signal_clear(int_signal_id):
             subsidary_can_be_unlocked = False
@@ -641,27 +686,30 @@ def update_all_signal_overrides():
             signals.set_signal_override(int_signal_id)
             if has_distant_arms(int_signal_id):
                 signals.set_signal_override(int_signal_id + 100)
-                
+
     # Sub-function to Clear a signal override
     def clear_signal_override(int_signal_id:int):
         if objects.schematic_objects[objects.signal(int_signal_id)]["overridesignal"]:
             signals.clear_signal_override(int_signal_id)
             if has_distant_arms(int_signal_id):
                 signals.clear_signal_override(int_signal_id + 100)
-                
+
     # Start of main function
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
         signal_route = find_signal_route(int_signal_id)
         # Override/clear the current signal based on the section ahead
+        override_signal = False
         if signal_route is not None:
             signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-            section_ahead = signal_object["tracksections"][1][signal_route.value-1] 
-            if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
+            list_of_sections_ahead = signal_object["tracksections"][1][signal_route.value-1]
+            for section_ahead in list_of_sections_ahead:
+                if (section_ahead > 0 and track_sections.section_occupied(section_ahead)
                        and signal_object["sigroutes"][signal_route.value-1] ):
-                set_signal_override(int_signal_id)
-            else:
-                clear_signal_override(int_signal_id)
+                    override_signal = True
+                    break
+            if override_signal: set_signal_override(int_signal_id)
+            else: clear_signal_override(int_signal_id)
         else:
             clear_signal_override(int_signal_id)
     return()
@@ -731,6 +779,24 @@ def clear_all_signal_overrides():
         signals.clear_signal_override(int(str_signal_id))
     return()
 
+def clear_all_distant_overrides():
+    for str_signal_id in objects.signal_index:
+        signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
+        if signal_object["overrideahead"]:
+            if has_distant_arms(int(str_signal_id)):
+                signals.clear_signal_override_caution(int(str_signal_id)+100)
+            else:
+                signals.clear_signal_override_caution(int(str_signal_id))
+    return()
+
+def clear_all_approach_control():
+    for str_signal_id in objects.signal_index:
+        signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
+        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
+                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+            signals.clear_approach_control(int(str_signal_id))
+    return()
+
 #------------------------------------------------------------------------------------
 # Function to Process all route updates on the schematic (LOCAL signals only)
 #------------------------------------------------------------------------------------
@@ -745,8 +811,16 @@ def set_all_signal_routes():
 #------------------------------------------------------------------------------------
 
 def update_all_mirrored_sections():
-    for str_signal_id in objects.section_index:
-        update_mirrored_section(int(str_signal_id))
+    for str_section_id in objects.section_index:
+        update_mirrored_section(int(str_section_id))
+
+#------------------------------------------------------------------------------------
+# Function to Update all signal aspects (based on signals ahead)
+#------------------------------------------------------------------------------------
+
+def process_all_aspect_updates():
+    for str_signal_id in objects.signal_index:
+        process_aspect_updates(int(str_signal_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -757,35 +831,35 @@ def update_all_mirrored_sections():
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id:Union[int,str], callback_type):
-    global editing_enabled
+    global canvas, editing_enabled, automation_enabled
     logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-
     # Timed signal sequences can be triggered by 'signal_passed' events - LOCAL SIGNALS ONLY
-    if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id):
+    # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
+    if (callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
+           and not editing_enabled and automation_enabled):
         logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(int(item_id)) 
-            
     # 'signal_passed' events can trigger changes in track occupancy - LOCAL SIGNALS ONLY
-    # ONLY IN RUN MODE This is because Track section library objects only 'exist' in Run mode
+    # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
+    # in Run mode) - but remain enabled in Run Mode whether automation is Enabled or Disabled
     if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id) and not editing_enabled:
         logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
         update_track_occupancy(int(item_id))
-
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
+    # Route Setting is ENABLED in both Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched ):
         logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
-        
-    # 'Mirrored' track sections only need to be updated when a track section is manually
-    # changed (which implies we are in RUN Mode) or if track section occupancy has been
-    # updated in RUN Mode (i.e. following a signal passed event in RUN Mode) - this
-    # is important as Track sections (the library objects) only "exist" in run mode
-    # Note that this must handle local (int) or remote (str) Item IDs
+    # Any 'Mirrored' track sections are updated following changes to track occupancy as part of the
+    # 'update_track_occupancy' function call above. The 'section_updated' callback is generated when a
+    # track section is manually changed (only possible in RUN Mode) or if an update is received from
+    # a remote track section (which could happen in either Run and Edit Mode). As Track sections (the
+    # library objects) only "exist" in run mode this event is only processed in RUN mode, whether
+    # automation is Enabled or Disabled. Note that the Item ID could local (int) or remote (str).
     if callback_type == track_sections.section_callback_type.section_updated and not editing_enabled:
         logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_mirrored_section(item_id)   # Could be an int (local) or str (remote)
-
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
     # changes to signal overides (see above for events) or changes to the approach control state
@@ -802,29 +876,34 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated ):
-        # First we update all signal overrides based on track occupancy
-        # But only in RUN mode (as track sections only exist in RUN Mode)
-        logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
-        if not editing_enabled: update_all_signal_overrides()
-        # Approach control is made complex by the need to support the case of setting approach
-        # control on the state of home signals ahead (for layout automation). We therefore have
-        # to process these changes here (which also updates the aspects of all signals).
-        # Note that the item_id is only used in conjunction with the signal_passed event
-        # so the function will not 'break' if the item-id is an int or a str
-        logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
-        update_all_signal_approach_control(item_id, callback_type)
-        # Finally process any distant signal overrides on home signals ahead
-        # The editing_enabled flag is used by the function to determine whether all signal
-        # overrides have already been explicitly SET/CLEARED by the update_all_signal_overrides
-        # function (see above). If so, then the function will only additionally SET an override
-        # (any existing overrides will remain SET). If  not, then the function will either SET or
-        # CLEAR the override based solely on the state of the Home signals ahead
-        logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
-        update_all_distant_overrides()
-
+        if not editing_enabled and automation_enabled:
+            # First we update all signal overrides based on track occupancy, but ONLY IN RUN MODE
+            # (as track sections only exist in RUN Mode), if Automation is ENABLED
+            logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
+            update_all_signal_overrides()
+            # Approach control is made complex by the need to support the case of setting approach
+            # control on the state of home signals ahead (for layout automation). We therefore have
+            # to process these changes here (which also updates the aspects of all signals).
+            # Note that the item_id is only used in conjunction with the signal_passed event
+            # so the function will not 'break' if the item-id is an int or a str
+            # Approach Control is only ENABLED in RUN Mode if automation is ENABLED
+            logging.info("RUN LAYOUT - Updating Signal Approach Control to reflect Signals ahead:")
+            update_all_signal_approach_control(item_id, callback_type)
+            # Finally process any distant signal overrides on home signals ahead (walks the home signals
+            # ahead and will override the distant signal to CAUTION if any of the home signals are at DANGER
+            # This is a seperate override function to the main signal override (works an an OR function)
+            # Distant Overrides are only ENABLED in RUN Mode if automation is ENABLED
+            logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
+            update_all_distant_overrides()
+        else:    
+            # If we are in EDIT mode and/or Automation is DISABLED, we still want to update the
+            # signals to reflect the displayed aspects of the signal ahead
+            logging.info("RUN LAYOUT - Updating Signal Aspects to reflect Signals ahead:")
+            process_all_aspect_updates()
     # Signal interlocking is updated on point, signal or block instrument switched events
     # We also need to process signal interlocking on any event which may have changed the
     # displayed aspect of a signal (when interlocking signals against home signals ahead)
+    # Interlocking is ENABLED in Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
          callback_type == signals_common.sig_callback_type.sub_switched or
          callback_type == signals_common.sig_callback_type.sig_updated or
@@ -836,65 +915,70 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == track_sections.section_callback_type.section_updated  ):
         logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
-        
-    # Point interlocking is updated on signal changed events
+    # Point interlocking is updated on signal (or subsidary signal) switched events
+    # Interlocking is ENABLED in  Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == signals_common.sig_callback_type.sig_switched or
          callback_type == signals_common.sig_callback_type.sub_switched):
         logging.info("RUN LAYOUT - Updating Point Interlocking:")
         process_all_point_interlocking()
-        
     logging.info("**************************************************************************************")
-    
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
 
 #------------------------------------------------------------------------------------
-# Function to "initialise" the layout following a reset / re-load or item deletion
-# Also called after the configuration change of any layout object
+# Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
+# Enable/Disable, layout reset, layout load, object deletion (from the schematic) or
+# the configuration change of any schematic object
 #------------------------------------------------------------------------------------
 
 def initialise_layout():
-    global editing_enabled
+    global canvas, editing_enabled, automation_enabled
     logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
+    # We always process signal routes - for all modes whether automation is enabled/disabled
     logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
-    # Track sections (the library objects) only "exist" in run mode"
-    if editing_enabled:
-        logging.info("RUN LAYOUT - Clearing down any Signal Overrides (for edit mode):")
+    if not editing_enabled and not automation_enabled:
+        # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
+        # the process_all_aspect_updates function (as we are not making the other update calls)
+        logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
+        update_all_mirrored_sections()
+        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
-    else:
+        clear_all_distant_overrides()
+        logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
+        clear_all_approach_control()
+        logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
+        process_all_aspect_updates()
+    elif not editing_enabled and automation_enabled:
+        # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
+        # updated by update_all_signal_approach_control and update_all_distant_overrides
         logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
         update_all_mirrored_sections()
         logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
         update_all_signal_overrides()
-    logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
-    update_all_signal_approach_control()
-    logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
-    update_all_distant_overrides()    
+        logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
+        update_all_signal_approach_control()
+        logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
+        update_all_distant_overrides()        
+    else:
+        # Edit mode (automation disabled by default - we don't care about the user selection)
+        # Note that we need to call the process_all_aspect_updates function (see above)
+        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
+        clear_all_signal_overrides()
+        clear_all_distant_overrides()
+        logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
+        clear_all_approach_control()
+        logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
+        process_all_aspect_updates()
+    # We always process interlocking - for all modes whether automation is enabled/disabled
     logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
     logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
     logging.info("**************************************************************************************")
-    return()
-
-#------------------------------------------------------------------------------------
-# The behavior of the layout processing will change depending on what mode we are in
-#------------------------------------------------------------------------------------
-
-editing_enabled = None
-
-def enable_editing():
-    global editing_enabled
-    editing_enabled = True
-    initialise_layout()
-    return()
-
-def disable_editing():
-    global editing_enabled
-    editing_enabled = False
-    initialise_layout()
+    # Refocus back on the canvas to ensure that any keypress events function
+    canvas.focus_set()
     return()
 
 ########################################################################################

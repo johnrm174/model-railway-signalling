@@ -27,20 +27,6 @@
 # internet unless you are also using a SSL connection.
 #-----------------------------------------------------------------------------------------------
 #
-# configure_networking - Configures the local client and opens a connection to the MQTT broker
-#                    Returns whether the connection was successful (or timed out)
-#                    NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
-#                    Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
-#   Mandatory Parameters:
-#       broker_host:str - The name/IP address of the MQTT broker host to be used
-#       network_identifier:str - The name to use for this signalling network (any string)
-#       node_identifier:str - The name to use for this node on the network (can be any string)
-#   Optional Parameters:
-#       broker_port:int - The network port for the broker host (default = 1883)
-#       broker_username:str - the username to log into the MQTT Broker (default = None)
-#       broker_password:str - the password to log into the MQTT Broker (default = None)
-#       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
-#
 # configure_mqtt_client - Configures the local MQTT client and layout network node
 #   Mandatory Parameters:
 #       network_identifier:str - The name to use for this signalling network (any string)
@@ -197,54 +183,6 @@ def on_message(mqtt_client,obj,msg):
             common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
         else:
             process_message(msg)
-    return()
-
-#################################################################################################
-# DEPRECATED Public API Function to configure the networking for this particular network "Node"
-# Applications should use the configure_mqtt_client and mqtt_broker_connect functions instead
-#################################################################################################
-
-def configure_networking (broker_host:str,
-                          network_identifier:str,
-                          node_identifier:str,
-                          broker_port:int = 1883,
-                          broker_username:str = None,
-                          broker_password:str = None,
-                          mqtt_enhanced_debugging:bool = False):
-    global node_config
-    global mqtt_client
-    logging.warning ("###########################################################################################")
-    logging.warning ("MQTT Interface - The 'configure_networking' function is DEPRECATED - Use the seperate")
-    logging.warning ("MQTT Interface - configure_mqtt_client and mqtt_broker_connect functions instead")
-    logging.warning ("###########################################################################################")
-    # Configure this module (to enable subscriptions to be configured even if not connected
-    node_config["enhanced_debugging"] = mqtt_enhanced_debugging
-    node_config["network_identifier"] = network_identifier
-    node_config["node_identifier"] = node_identifier
-    # Create a new instance of the MQTT client and configure / connect
-    logging.info("MQTT-Client: Connecting to Broker \'"+broker_host+"\'")
-    mqtt_client = paho.mqtt.client.Client(clean_session=True)
-    mqtt_client.on_message = on_message    
-    mqtt_client.on_connect = on_connect    
-    mqtt_client.on_disconnect = on_disconnect    
-    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
-    if mqtt_enhanced_debugging: mqtt_client.on_log = on_log
-    if broker_username is not None: mqtt_client.username_pw_set(username=broker_username,password=broker_password)
-    node_config["network_configured"] = True
-    # Do some basic exception handling around opening the broker connection
-    try:
-        mqtt_client.connect_async(broker_host,port=broker_port,keepalive = 10)
-        mqtt_client.loop_start()
-    except Exception as exception:
-        logging.error("MQTT-Client: Error connecting to broker: "+str(exception)+" - No messages will be published/received")
-    else:
-        # Wait for connection acknowledgement (from on-connect callback function)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 5:
-            if node_config["connected_to_broker"]:
-                break
-        if not node_config["connected_to_broker"]:
-            logging.warning("MQTT-Client: Timeout connecting to broker - No messages will be published/received")
     return()
 
 #-----------------------------------------------------------------------------------------------

@@ -21,7 +21,6 @@
 #       block_callback - The function to call when the repeater indicator on our instrument has been
 #                        updated (i.e. the block changed on the linked instrument) - default: null
 #                        Note that the callback function returns (item_id, callback type)
-#       single_line:bool - DEPRECATED - use inst_type instead
 #       bell_sound_file:str - The filename of the soundfile (in the local package resources
 #                           folder) to use for the bell sound (default "bell-ring-01.wav")
 #       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
@@ -50,12 +49,6 @@
 # ------------------------------------------------------------------------------------------
 #
 # The following functions are associated with the MQTT networking Feature:
-#
-# subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network
-#       NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_instrument' instead
-#   Mandatory Parameters:
-#       node:str - The name of the node publishing the block instrument update feed
-#       *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
 #
 # subscribe_to_remote_instrument - Subscribes to a remote block instrument object
 #   Mandatory Parameters:
@@ -493,7 +486,6 @@ def create_block_instrument (canvas,
                              x:int, y:int,
                              inst_type:instrument_type = instrument_type.double_line,
                              block_callback = null_callback,
-                             single_line:bool = False, ############################################################
                              bell_sound_file:str = "bell-ring-01.wav",
                              telegraph_sound_file:str = "telegraph-key-01.wav",
                              linked_to:Union[int,str] = None):
@@ -515,30 +507,7 @@ def create_block_instrument (canvas,
     elif isinstance(linked_to_id,str) and mqtt_interface.split_remote_item_identifier(linked_to_id) is None:
         logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")
     else:
-        ####################################################################################################################
-        # DEPRECATED code to remove at a future release ####################################################################
-        ####################################################################################################################
-        if single_line:
-            logging.warning ("###########################################################################################")
-            logging.warning ("Block Instrument "+str(block_id)+": single_line flag is DEPRECATED - use inst_type")
-            logging.warning ("###########################################################################################")
-        else:
-            single_line = (inst_type == instrument_type.single_line)
-        # If the associated block instrument is associated with an external node (i.e. has a string-type
-        # compound identifier rather than an integer) then subscribe to updates from the remote node and
-        # publish the initial state of the local instrument (to be picked up by the remote node). State
-        # will only be published if the MQTT interface has been configured and we are connected to the broker
-        # Note that this function is DEPRECATED - you should always 'subscribe' to remote instruments beforehand
-        if isinstance(linked_to_id,str) and not instrument_exists(linked_to_id):
-            subscribe_to_remote_instrument(linked_to_id)
-            set_instruments_to_publish_state(block_id)
-            logging.warning ("###########################################################################################")
-            logging.warning ("Block Instrument "+str(block_id)+": Auto publish and subscribe is DEPRECATED - call the")
-            logging.warning ("'subscribe_to_instrument_updates'and 'set_instruments_to_publish_state' functions to")
-            logging.warning ("configure networking before creating the block instruments on the local schematic")
-            logging.warning ("###########################################################################################")
-        ####################################################################################################################
-            
+        single_line = (inst_type == instrument_type.single_line)            
         # Define the "Tag" for all drawing objects for this instrument instance
         block_id_tag = "instrument"+str(block_id)
         # Create the Instrument background - this will vary in size depending on single or double line
@@ -674,26 +643,6 @@ def set_instruments_to_publish_state(*inst_ids:int):
 # Note that no callback is specified in the function call - the default internal one is used
 # to set the repeater display on the local instrument (to mirror the remote instrument)
 #-----------------------------------------------------------------------------------------------
-
-def subscribe_to_instrument_updates (node:str,*inst_ids:int):
-    global instruments
-    logging.warning ("#######################################################################################################")
-    logging.warning ("The subscribe_to_instrument_updates function is DEPRECATED - use subscribe_to_remote_instrument instead")
-    logging.warning ("#######################################################################################################")
-    for inst_id in inst_ids:
-        instrument_identifier = mqtt_interface.create_remote_item_identifier(inst_id,node)
-        if not instrument_exists(instrument_identifier):
-            # Create a dummy instrument object to enable 'instrument_exists' validation checks
-            # Note that this does not hold state - as state is reflected on the local repeater indicator
-            # The Identifier for a remote instrument is a string combining the the Node-ID and Section-ID
-            instruments[instrument_identifier] = {}
-            instruments[instrument_identifier]["linkedto"] = None
-            # Subscribe to updates from the remote block instrument
-            mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",node,
-                                    inst_id,handle_mqtt_instrument_updated_event)
-            mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",node,
-                                    inst_id,handle_mqtt_ring_section_bell_event)
-    return()
 
 def subscribe_to_remote_instrument (remote_identifier:str):   
     global instruments

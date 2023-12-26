@@ -10,7 +10,7 @@
 #                     and enables the save of the current layout state to file on application quit.
 #                     If load is "cancelled" or "file not found" then the default state will be used.
 #    Optional Parameters:
-#       file_name:str - to load/save - default = None (will default to 'main-python-script.sig')
+#       requested_filename:str - to load/save - default = None (will default to 'main-python-script.sig')
 #       ask_to_load_state:bool - Asks the user if they want to load layout state - default = True
 #       load_file_dialog:bool - Opens a 'load file' dialog to select a file - default = False
 #       save_file_dialog:bool - Opens a 'save file' dialog on application quit - default = False
@@ -32,7 +32,7 @@ from . import common
 # Global variables to define what options are presented to the user on application quit
 #-------------------------------------------------------------------------------------------------
 
-filename_used_for_save = None
+last_fully_qualified_file_name = None
 filename_used_for_load = None
 save_as_option_enabled = False
 
@@ -76,96 +76,39 @@ def get_sig_file_config(get_sig_file_data:bool = False):
 #-------------------------------------------------------------------------------------------------
 # Public API function to load the initial layout state from File (and also configure what options
 # are presented to the user on quit of the application (i.e. options for saving layout state)
-# Returns the filename_used_for_load if the file was successfully loaded
+# Stores the filename_used_for_load as a global variable if the file was successfully loaded
 #-------------------------------------------------------------------------------------------------
 
 def load_layout_state(file_name:str=None,
                       load_file_dialog:bool=False,
                       save_file_dialog:bool=False,
                       ask_to_load_state:bool=True):
-    global filename_used_for_load
-    global save_as_option_enabled
-    global layout_state
-    # Get the name of the main python script as a string
-    script_name = (__main__.__file__)
-    default_file_name = script_name.rsplit('.',1)[0]+'.sig'
+    global filename_used_for_load    ## Set by this function ##
+    global save_as_option_enabled    ## Set by this function ##
+    #If the filename is None then we fall back to the default filename (based on the script name)
+    if file_name is None: file_name = (__main__.__file__).rsplit('.',1)[0]+'.sig'
     # If the 'save_file_dialog' option has been specified then we save this to a global variable
-    # to trigger the save file dialogue on quit of the application
+    # to trigger the save file dialogue when the user quits the application
     save_as_option_enabled = save_file_dialog
     # We always prompt for load state on startup unless this is inhibited
-    if ask_to_load_state:
-        load_state = tkinter.messagebox.askokcancel(parent=common.root_window,
-                title="Load State", message="Do you want to load the last layout state?")
-    else:
-        load_state = True
-    if not load_state:
+    # the value of save_application will be True for OK or False for CANCEL
+    if ask_to_load_state: load_confirmed = tkinter.messagebox.askokcancel(parent=common.root_window,
+                     title="Load State", message="Do you want to load the last layout state?")
+    else: load_confirmed = True
+    # we're good to go and (attempt to) load the state as long as the user hasn't cancelled
+    if load_confirmed:
+        filename_used_for_load = load_state(file_name, load_file_dialog)
+    if not load_state or filename_used_for_load is None:
         # if the user clicks on 'Cancel' then we still want to provide an option to save the layout
         # state on application quit - either using the filename passed to us or the default filename
         # derived from the name of the main python script (with a '.sig' extension)
         if file_name is not None: filename_used_for_load = file_name
-        else: filename_used_for_load = default_file_name
-        # Filename will remain as 'None' as nothing will be loaded
-        filename = None
-    else:
-        # If the 'load_file_dialog' option has been specified then we want to provide a default file
-        # to the user in the dialog. This will be the provided filename (if one has been specified)
-        # or a filename derived from the name of the main python script (with a '.sig' extension)
-        # In both cases we check to make sure the file exists on disk before providing as an option
-        if load_file_dialog:
-            if file_name is not None: default_file_to_load = file_name
-            else: default_file_to_load = default_file_name
-            if os.path.isfile (default_file_to_load):
-                filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
-                                    filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                    initialdir = '.', initialfile = default_file_to_load )
-            else:
-                filename = tkinter.filedialog.askopenfilename(title='Load Layout State',
-                                    filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                    initialdir = '.')
-            # If dialogue is cancelled then Filename will remain as 'None' as nothing will be loaded
-            if filename == () or filename == "": filename = None
-        # If the 'load_file_dialog' hasn't been specified but a filename has been provided then we use that
-        elif file_name is not None: filename = file_name
-        # Fall back to a filename derived from the name of the main python script (with a '.sig' extension)
-        else: filename = default_file_name
-        # if the user clicks on 'Cancel' in the load file dialog then we still want to provide an option
-        # to save the layout state on application quit - either using the filename passed to us or the
-        # default filename derived from the name of the main python script (with a '.sig' extension)
-        if filename is None:
-            logging.info("Load File - No file selected - Layout will remain in its default state")
-            if file_name: filename_used_for_load = file_name
-            else: filename_used_for_load = default_file_name
-        else:
-            # We have a valid filename so can proceed to try and open the file
-            logging.info("Load File - Loading layout configuration from '"+filename+"'")
-            try:
-                with open (filename,'r') as file:
-                    file_contents=file.read()
-                file.close
-            except Exception as exception:
-                logging.error("Load File - Error opening file - Layout will remain in its default state")
-                logging.error("Load File - Reported Exception: "+str(exception))
-                tkinter.messagebox.showerror(parent=common.root_window,
-                                title="File Load Error", message=str(exception))
-                filename = None
-            else:
-                # The file has been successfuly opened and loaded - Now convert it from the json format back
-                # into the dictionary of signals, points and sections - with exception handling in case it fails
-                try:
-                    layout_state = json.loads(file_contents)
-                except Exception as exception:
-                    logging.error("Load File - Couldn't read file - Layout will be created in its default state")
-                    logging.error("Load File - Reported exception: "+str(exception))
-                    tkinter.messagebox.showerror(parent=common.root_window,
-                                title="File Parse Error", message=str(exception))
-                    filename = None
-            # Store the filename that was loaded - to use on application quit
-            filename_used_for_load = filename
-    return(filename)
-
+        else: filename_used_for_load = (__main__.__file__).rsplit('.',1)[0]+'.sig'
+    return()
+        
 #-------------------------------------------------------------------------------------------------
 # Function called on application quit to save the current layout state to file. The actual options 
-# presented to the user will depend on the 'save_as_option_enabled' and 'filename' global variables
+# presented to the user will depend on the 'save_as_option_enabled' and 'filename_used_for_load'
 #
 # If the filename is 'None' then 'load_layout_state' was never called (i.e. the signalling application
 # isn't using this feature). In this case we just provide the user with an option to quit or cancel.
@@ -177,103 +120,215 @@ def load_layout_state(file_name:str=None,
 # the user selects to 'save & quit' or to 'quit without saving' - False if a dialog is cancelled
 #-------------------------------------------------------------------------------------------------
 
-def save_state_and_quit(quit_application:bool=True):
-    global filename_used_for_load
-    global save_as_option_enabled
-    global filename_used_for_save
-    global dictionary_to_save
-    # filename_used_for_save will be None if the user subsequently cancels the save
-    filename_used_for_save = None
-    # get the filename that was used/attempted to load state on application startup
-    filename = filename_used_for_load
-    # Only pester the user with additional dialogs on application shutdown
-    if quit_application:
-        # if the global variable 'filename' is "None" then file loading/saving hasn't been configured by
+def save_state_and_quit():
+    global save_as_option_enabled      ### Configured during file load ###
+    global filename_used_for_load      ### Set during file load (or None) ###
+    if filename_used_for_load is None:
+        # if the 'filename_used_for_load' is "None" then file loading/saving hasn't been configured by
         # the signalling application - we therefore just give the option to quit the application or cancel
-        if filename is None:
-            quit_application = tkinter.messagebox.askokcancel(parent=common.root_window,
+        quit_application = tkinter.messagebox.askokcancel(parent=common.root_window,
                             title="Quit", message="Do you want to quit the application?")
-            # the value of quit_application will be True for YES and False for NO
-            save_application = save_as_option_enabled
-        else:
-            # A filename has been configured - we need to give the option to save the current state
-            save_application = tkinter.messagebox.askyesnocancel(parent=common.root_window,
-                            title="Quit", message="Do you want to save the current layout state")
-            # the value of save_application will be True for YES, False for NO and None for CANCEL
-            if save_application == True or save_application == False:
-                quit_application = True
-            else:
-                quit_application = False
-                save_application = False
+        # the value of quit_application will be True for YES or False for CANCEL
+        save_application = save_as_option_enabled
     else:
-        save_application = True
-    # Save the application configuration         
-    if save_application:         
-        if save_as_option_enabled:
-            # The default file to save will be the file that was loaded (or attempted)
-            path,name = os.path.split(filename)
-            filename = tkinter.filedialog.asksaveasfilename(title='Save Layout State',
-                                filetypes=(('sig files','*.sig'),('all files','*.*')),
-                                initialfile = name)
-        if filename == () or filename == "":
-            # This is the case of the user pressing cancel in the file dialog.
-            # Assume that the user doesn't want to quit after all
+        # the 'filename_used_for_load' has been configured - we need to give the option to save the current state
+        save_application = tkinter.messagebox.askyesnocancel(parent=common.root_window,
+                        title="Quit", message="Do you want to save the current layout state")
+        # the value of save_application will be True, False or NONE for CANCEL
+        # If CANCEL we assume that this means the user no longer wants to quit
+        if save_application is None:
             quit_application = False
+            save_application = False
         else:
-            # Force the ".sig" extension
-            if not filename.endswith(".sig"): filename = filename+".sig"
-            # Note that the asksaveasfilename dialog returns the fully qualified filename
-            # (including the path) - we only need the name so strip out the path element
-            # This also makes it clearer to see the default filename in the file save dialog
-            path,name = os.path.split(filename)
-            filename_used_for_save = filename            
-            logging.info("Saving Layout Configuration as '"+name+"'")
-            dictionary_to_save["information"] = "Model Railway Signalling Configuration File"
-            # Retrieve the DEFINITION of all the data items we need to save to maintain state
-            # These are defined in a single function at the top of this source file. We also
-            # retrieve the source DATA we need to save from the various source dictionaries
-            layout_elements = get_sig_file_config(get_sig_file_data=True)
-            # Iterate through the main LAYOUT-ELEMENTS (e.g. signals, points, sections etc)
-            for layout_element in layout_elements:
-                # For each LAYOUT ELEMENT create a sub-dictionary to hold the individual ITEMS
-                # The individual ITEMS will be the individual points, signals, sections etc
-                dictionary_to_save[layout_element] = {}
-                # Get the dictionary containing the source data for this LAYOUT ELEMENT
-                source_data_dictionary = layout_elements[layout_element]["source"]
-                # Get the list of the ITEM ELEMENTS we need to save for this LAYOUT ELEMENT
-                item_elements_to_save = layout_elements[layout_element]["elements"]
-                # Iterate through the ITEMS that exist for this LAYOUT ELEMENT
-                # Each ITEM represents a specific signal, point, section etc
-                for item in source_data_dictionary:
-                    # For each ITEM, create a sub-dictionary to hold the individual ITEM ELEMENTS
-                    # Each ITEM ELEMENT represents a specific parameter for an ITEM (e.g."sigclear") 
-                    dictionary_to_save[layout_element][item] = {}
-                    # Iterate through the ITEM ELEMENTS to save for the specific ITEM
-                    for item_element in item_elements_to_save:
-                        # Value [0] is the element name, Value [1] is the element type
-                        if item_element[0] not in source_data_dictionary[item].keys():
-                            # if the element isn't present in the source dict then we save a NULL value
-                           dictionary_to_save[layout_element][item][item_element[0]] = None
-                        elif item_element[1]=="enum":
-                            # Enumeration values cannot be converted to json as is - we need to use the value
-                            parameter = source_data_dictionary[item][item_element[0]]
-                            dictionary_to_save[layout_element][item][item_element[0]] = parameter.value
-                        else:
-                            # The Json conversion should support all standard python types
-                            parameter = source_data_dictionary[item][item_element[0]]
-                            dictionary_to_save[layout_element][item][item_element[0]] = parameter
-            # convert the file to a human readable json format and save the file
-            file_contents = json.dumps(dictionary_to_save,indent=4,sort_keys=True)
+            quit_application = True
+    # Save the application if pre-configured (on load) or selected by the user
+    # Note we don't care about the returned filename the layout was saved as here
+    if save_application: save_state(filename_used_for_load, save_as_option_enabled)
+    # Return whether the "Quit application" action was confirmed or cancelled)
+    return(quit_application)
+
+#-------------------------------------------------------------------------------------------------
+# Non Public API functions to support the schematic editor - the 'save_schematic' function "adds"
+# the additional configuration information into the dictionary to save and then sets up the global
+# 'state' variables before calling the main 'save_state' function.
+# The 'load_schematic' function similarly calls the public 'load_state' function with the
+# appropriate parameters to open a file dialog and then returns the loaded dictionary in its
+# entirity, leaving the calling programme (the editor) to extract the required information
+# The purge_loaded_state_information function is called after the layout has been successfully
+# loaded to stop any subsequently created objects (with the same ID) erroneously inheriting state
+#-------------------------------------------------------------------------------------------------
+
+def save_schematic(settings:dict, objects:dict, filename:str, save_as:bool=False):
+    global dictionary_to_save
+    dictionary_to_save["settings"] = settings
+    dictionary_to_save["objects"] = objects
+    filename_used_for_save = save_state(filename, save_as)
+    return(filename_used_for_save)
+
+def load_schematic(filename=None):
+    global layout_state
+    filename_used_for_load= load_state(filename, (filename is None))
+    return(filename_used_for_load, layout_state)    
+
+def purge_loaded_state_information():
+    global layout_state
+    layout_state ={}
+    return()
+
+#-------------------------------------------------------------------------------------------------
+# Internal function to handle the actual loading of a schematic file. Used by both the external
+# API 'load_layout_state' function and the schematic editor 'load_schematic' function.
+# Returns the name of the loaded file if successfull (otherwise None)
+# Populates the global 'layout_state' dictonary with the loaded data
+#-------------------------------------------------------------------------------------------------
+
+def load_state(requested_filename:str, load_file_dialog:bool):
+    global last_fully_qualified_file_name     ## Set by 'load_state' and 'save_state' ##
+    global layout_state                       ## populated on successful file load ##
+    # If the 'load_file_dialog' option has been specified then we want to provide a default file
+    # to the user in the dialog. This will be the requested_filename (if this is a valid file)
+    # or the last loaded / saved file (if the requested_filename is not valid)
+    # If the 'load_file_dialog' option has not been specified (system test harness use case
+    # or specifying a file (on the command line) to load at application startup use case)
+    # then we will just try to load the specified requested_filename (if it fails, it fails)
+    if load_file_dialog:
+        if requested_filename is not None and os.path.isfile(requested_filename):
+            path, name = os.path.split(requested_filename)
+        elif last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
+            path, name = os.path.split(last_fully_qualified_file_name)
+        else:
+            path, name = ".", ""
+        filename_to_load = tkinter.filedialog.askopenfilename(title='Load Layout State',
+                            filetypes=(('sig files','*.sig'),('all files','*.*')),
+                            initialdir=path, initialfile=name)
+        # If dialogue is cancelled then Filename will remain as 'None' as nothing will be loaded
+        if filename_to_load == () or filename_to_load == "": filename_to_load = None
+    else:
+        filename_to_load = requested_filename
+    # if the user clicks on 'Cancel' in the load file dialog then there is nothing to load
+    if filename_to_load is None:
+        logging.info("Load File - No file selected - Layout will remain in its default state")
+    else:
+        # We have a valid filename so can proceed to try and open the file
+        logging.info("Load File - Loading layout configuration from '"+filename_to_load+"'")
+        try:
+            with open (filename_to_load,'r') as file:
+                file_contents=file.read()
+            file.close
+        except Exception as exception:
+            logging.error("Load File - Error opening file - Layout will remain in its default state")
+            logging.error("Load File - Reported Exception: "+str(exception))
+            tkinter.messagebox.showerror(parent=common.root_window,
+                            title="File Load Error", message=str(exception))
+            filename_to_load = None
+        else:
+            # The file has been successfuly opened and loaded - Now convert it from the json format back
+            # into the dictionary of signals, points and sections - with exception handling in case it fails
             try:
-                with open (filename_used_for_save,'w') as file:
-                    file.write(file_contents)
-                file.close
+                loaded_state = json.loads(file_contents)
             except Exception as exception:
-                logging.error("Save File - Error saving file - Reported exception: "+str(exception))
+                logging.error("Load File - Couldn't read file - Layout will be created in its default state")
+                logging.error("Load File - Reported exception: "+str(exception))
                 tkinter.messagebox.showerror(parent=common.root_window,
-                            title="File Save Error",message=str(exception))
-                quit_application = False
-    return (quit_application)
+                            title="File Parse Error", message=str(exception))
+                filename_to_load = None
+            else:
+                # File parsing was successful - we can populate the global dictionary and
+                # update the global 'last_fully_qualified_file_name' for the next save/load
+                layout_state = loaded_state
+                last_fully_qualified_file_name = filename_to_load
+        # Return the filename that was actually loaded (which will be None if the load failed)
+    return(filename_to_load)
+
+#-------------------------------------------------------------------------------------------------
+# Internal function to handle the actual saving of a schematic file. Used by both the library
+# 'quit_application' function (called on application quit if the library is being used standalone)
+# and the schematic editor 'save_schematic' function. Populates the global 'dictionary_to_save'
+# dictonary with the loaded data. Note that if called by the 'save_schematic' function, the
+# "settings" and "objects" elements of the dict will have already been populated.
+# Returns the name of the saved file if successfull (otherwise None)
+#-------------------------------------------------------------------------------------------------
+
+def save_state(requested_filename:str, save_file_dialog:bool):
+    global last_fully_qualified_file_name
+    global dictionary_to_save
+    # If the 'save_file_dialogue' option has been specified then we want to provide a default file
+    # to the user in the dialog. This will be the requested_filename (if this is a valid file)
+    # or the last loaded / saved file (if the requested_filename is not valid)
+    # If the 'save_file_dialogue' option has not been specified (sqave rather than save-as)
+    # then we will just try to save the specified requested_filename (if it fails, it fails)
+    if save_file_dialog:
+        if requested_filename is not None and os.path.isfile(requested_filename):
+            path, name = os.path.split(requested_filename)
+        elif last_fully_qualified_file_name is not None and os.path.isfile(last_fully_qualified_file_name):
+            path, name = os.path.split(last_fully_qualified_file_name)
+        else:
+            path, name = ".", ""
+        filename_to_save = tkinter.filedialog.asksaveasfilename(title='Save Layout State',
+                    filetypes=(('sig files','*.sig'),('all files','*.*')),
+                    initialfile=name, initialdir=path)
+        # If dialogue is cancelled then Filename will remain as 'None' as nothing will be saved
+        if filename_to_save == () or filename_to_save == "": filename_to_save = None
+    else:
+        filename_to_save = requested_filename
+    # if the user clicks on 'Cancel' in the load file dialog then there is nothing to load
+    if filename_to_save is None:
+        logging.info("Save File - No file selected")
+    else:
+        # We have a valid filename - Force the ".sig" extension
+        if not filename_to_save.endswith(".sig"): filename_to_save = filename_to_save+".sig"
+        # Note that the asksaveasfilename dialog returns the fully qualified filename
+        # (including the path) - we only need the name so strip out the path element
+        logging.info("Saving Layout Configuration as '"+filename_to_save+"'")
+        dictionary_to_save["information"] = "Model Railway Signalling Configuration File"
+        # Retrieve the DEFINITION of all the data items we need to save to maintain state
+        # These are defined in a single function at the top of this source file. We also
+        # retrieve the source DATA we need to save from the various source dictionaries
+        layout_elements = get_sig_file_config(get_sig_file_data=True)
+        # Iterate through the main LAYOUT-ELEMENTS (e.g. signals, points, sections etc)
+        for layout_element in layout_elements:
+            # For each LAYOUT ELEMENT create a sub-dictionary to hold the individual ITEMS
+            # The individual ITEMS will be the individual points, signals, sections etc
+            dictionary_to_save[layout_element] = {}
+            # Get the dictionary containing the source data for this LAYOUT ELEMENT
+            source_data_dictionary = layout_elements[layout_element]["source"]
+            # Get the list of the ITEM ELEMENTS we need to save for this LAYOUT ELEMENT
+            item_elements_to_save = layout_elements[layout_element]["elements"]
+            # Iterate through the ITEMS that exist for this LAYOUT ELEMENT
+            # Each ITEM represents a specific signal, point, section etc
+            for item in source_data_dictionary:
+                # For each ITEM, create a sub-dictionary to hold the individual ITEM ELEMENTS
+                # Each ITEM ELEMENT represents a specific parameter for an ITEM (e.g."sigclear") 
+                dictionary_to_save[layout_element][item] = {}
+                # Iterate through the ITEM ELEMENTS to save for the specific ITEM
+                for item_element in item_elements_to_save:
+                    # Value [0] is the element name, Value [1] is the element type
+                    if item_element[0] not in source_data_dictionary[item].keys():
+                        # if the element isn't present in the source dict then we save a NULL value
+                       dictionary_to_save[layout_element][item][item_element[0]] = None
+                    elif item_element[1]=="enum":
+                        # Enumeration values cannot be converted to json as is - we need to use the value
+                        parameter = source_data_dictionary[item][item_element[0]]
+                        dictionary_to_save[layout_element][item][item_element[0]] = parameter.value
+                    else:
+                        # The Json conversion should support all standard python types
+                        parameter = source_data_dictionary[item][item_element[0]]
+                        dictionary_to_save[layout_element][item][item_element[0]] = parameter
+        # convert the file to a human readable json format and save the file
+        file_contents = json.dumps(dictionary_to_save,indent=4,sort_keys=True)
+        try:
+            with open (filename_to_save,'w') as file:
+                file.write(file_contents)
+            file.close
+        except Exception as exception:
+            logging.error("Save File - Error saving file - Reported exception: "+str(exception))
+            tkinter.messagebox.showerror(parent=common.root_window,
+                        title="File Save Error",message=str(exception))
+            filename_to_save = None
+        else:
+            # File parsing was successful - update the global 'last_fully_qualified_file_name'
+            last_fully_qualified_file_name = filename_to_save
+    return (filename_to_save)
 
 #-------------------------------------------------------------------------------------------------
 # Function called on creation of a signal/point/section/instrument Object to return the initial state
@@ -332,43 +387,6 @@ def get_initial_item_state(layout_element:str,item_id:int):
                     else:
                         # Add the ITEM ELEMENT (and the loaded ITEM VALUE) to the dictionary
                         state_to_return[element_name] = element_value
-
     return(state_to_return)
-
-#-------------------------------------------------------------------------------------------------
-# Non Public API functions to support the schematic editor - the 'save_schematic' function "adds"
-# the additional configuration information into the dictionary to save and then sets up the global
-# 'state' variables before calling the main 'save_state_and_quit' function (with quit=False).
-# The 'load_schematic' function similarly calls the public 'load_layout_state' function with the
-# appropriate parameters to open a file dialog and then returns the loaded dictionary in its
-# entirity, leaving the calling programme (the editor) to extract the required information
-# The purge_loaded_state_information function is called after the layout has been successfully
-# loaded to stop any subsequently created objects (with the same ID) erroneously inheriting state
-#-------------------------------------------------------------------------------------------------
-
-def save_schematic(settings:dict, objects:dict, filename:str, save_as:bool=False):
-    global filename_used_for_load
-    global filename_used_for_save
-    global save_as_option_enabled
-    global dictionary_to_save
-    dictionary_to_save["settings"] = settings
-    dictionary_to_save["objects"] = objects
-    filename_used_for_load = filename
-    save_as_option_enabled = save_as
-    save_state_and_quit(quit_application=False)
-    return(filename_used_for_save)
-
-def load_schematic(filename=None):
-    global layout_state
-    if filename==None:
-        file_loaded = load_layout_state(file_name=None,load_file_dialog=True,ask_to_load_state=False)
-    else:
-        file_loaded = load_layout_state(file_name=filename,load_file_dialog=False,ask_to_load_state=False)
-    return(file_loaded, layout_state)    
-
-def purge_loaded_state_information():
-    global layout_state
-    layout_state ={}
-    return()
 
 ############################################################################################################

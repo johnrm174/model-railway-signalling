@@ -1,9 +1,13 @@
 # model-railway-signalling - Public API
 
-This file provides details of the public API for the model railway signalling package and is intended 
-for use by people who want to use the provided library functions to code their own signalling schemes.
+All of the functions for creating and managing 'signals', 'points', 'sections', 'sensors' and 'block instruments',
+were originally developed as a Python Package and a 'Public API' was maintained to allow these functions to be 
+re-used by others writing their own layout automation code. However, as the schematic editor application now 
+allows users to exploit 99% of the library features when creating and operating signalling schemes within the 
+editor, I feel it unlikely that anyone would consider re-using the library functions in their own code
+(although if this is not the case then please do tell me).
 
-![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API_screenshot1.png)
+The Public API is therefore DEPRECATED from Release 4.0
 
 ## Using the library functions
 
@@ -447,7 +451,6 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
       block_callback - The function to call when the repeater indicator on our instrument has been
                        updated (i.e. the block changed on the linked instrument) - default: null
                        Note that the callback function returns (item_id, callback type)
-      single_line:bool - DEPRECATED - use inst_type instead
       bell_sound_file:str - The filename of the soundfile (in the local package resources
                           folder) to use for the bell sound (default "bell-ring-01.wav" - other
                           options are "bell-ring-02.wav", "bell-ring-03.wav", "bell-ring-04.wav")
@@ -457,11 +460,6 @@ create_block_instrument - Creates a Block Section Instrument on the schematic
                           either as an integer (representing the ID of a Block Instrument on the
                           the local schematic), or a string representing a Block Instrument 
                           running on a remote node - see MQTT networking (default = None)
-
-Note that automatic MQTT networking publish/subscribe on instrument creation is now DEPRECATED.
-The 'set_instruments_to_publish_state' and 'subscribe_to_instrument_updates' functions should
-be called to configure networking prior to creating Block Instruments on the local schematic.
-This is to provide a level of consistency between other MQTT publish/subscribe functions.
 
 block_section_ahead_clear(block_id:int) - Returns the state of the ASSOCIATED block instrument
           (i.e. the linked instrument controlling the state of the block section ahead of ours)
@@ -631,6 +629,14 @@ initialise_pi_sprog - Opens/configures the serial comms port to the Pi Sprog and
       dcc_debug_mode:bool - Set to 'True' to log the CBUS commands being sent to the Pi-SPROG
         returns True - if communications with the Pi-Sprog have been established (otherwise False)
 
+service_mode_read_cv - Queries a CV in direct bit mode and waits for response
+                      (events are only sent if the track power is currently switched on)
+                      (request times out after 5 secs if the request was unsuccessful)
+   Mandatory Parameters:
+      cv:int - The CV (Configuration Variable) to be queried
+         returns the current value of the CV if a response is received
+         returns None - if the request fails or the request times out
+
 service_mode_write_cv - programmes a CV in direct bit mode and waits for response
                       (events are only sent if the track power is currently switched on)
                       (request times out after 5 secs if the request was unsuccessful)
@@ -748,63 +754,6 @@ set_sensors_to_publish_state- Enable the publication of state updates for track 
              All subsequent changes will be automatically published to remote subscribers
   Mandatory Parameters:
       *sensor_ids:int - The track sensors to publish (multiple Sensor IDs can be specified)      
-
-THE FOLLOWING FUNCTIONS ARE DEPRECATED:
-
-configure_networking - Configures the local client and opens a connection to the MQTT broker
-                   Returns whether the connection was successful (or timed out)
-                   NOTE THAT THE 'CONFIGURE_NETWORKING' FUNCTION IS NOW DEPRECATED
-                   Use the 'configure_mqtt_client' and 'mqtt_broker_connect' functions instead
-  Mandatory Parameters:
-      broker_host:str - The name/IP address of the MQTT broker host to be used
-      network_identifier:str - The name to use for this signalling network (any string)
-      node_identifier:str - The name to use for this node on the network (can be any string)
-  Optional Parameters:
-      broker_port:int - The network port for the broker host (default = 1883)
-      broker_username:str - the username to log into the MQTT Broker (default = None)
-      broker_password:str - the password to log into the MQTT Broker (default = None)
-      mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
-
-subscribe_to_section_updates - Subscribe to section updates from another node on the network
-      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_track_section' instead
-  Mandatory Parameters:
-      node:str - The name of the node publishing the track section update feed
-      sec_callback:name - Function to call when an update is received from the remote node
-               Callback returns (item_identifier, section_callback_type.section_updated)
-               item_identifier is a string in the following format "node_id-section_id"
-      *sec_ids:int - The sections to subscribe to (multiple Section_IDs can be specified)
-
-subscribe_to_signal_updates - Subscribe to signal updates from another node on the network 
-      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_signal' instead
-  Mandatory Parameters:
-      node:str - The name of the node publishing the signal state feed
-      sig_callback:name - Function to call when an update is received from the remote node
-               Callback returns (item_identifier, sig_callback_type.sig_updated)
-               Item Identifier is a string in the following format "node_id-signal_id"
-      *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
-
-subscribe_to_signal_passed_events  - Subscribe to signal passed events from another node  
-    NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
-    supported from release 4.0.0 (use track sections to achieve the required functionality)
-  Mandatory Parameters:
-      node:str - The name of the node publishing the signal passed event feed
-      sig_callback:name - Function to call when a signal passed event is received
-               Callback returns (item_identifier, sig_callback_type.sig_passed)
-               Item Identifier is a string in the following format "node_id-signal_id"
-      *sig_ids:int - The signals to subscribe to (multiple Signal_IDs can be specified)
-
-set_signals_to_publish_passed_events - Enable the publication of signal passed events.
-    NOTE THAT THIS FUNCTION IS NOW DEPRECATED - only pub/subscribe to signal state will be
-    supported from release 4.0.0 (use track sections to achieve the required functionality)
-               All subsequent events will be automatically published to remote subscribers
-  Mandatory Parameters:
-      *sig_ids:int - The signals to publish (multiple Signal_IDs can be specified)
-
-subscribe_to_instrument_updates - Subscribe to instrument updates from another node on the network
-      NOTE THAT THIS FUNCTION IS NOW DEPRECATED - use 'subscribe_to_remote_instrument' instead
-  Mandatory Parameters:
-      node:str - The name of the node publishing the block instrument update feed
-      *inst_ids:int - The instruments to subscribe to (multiple Instrument_IDs can be specified)
 </pre>
 
 ## Code examples

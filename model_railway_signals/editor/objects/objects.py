@@ -35,6 +35,13 @@
 #    objects_lines.delete_line_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_lines.redraw_line_object(object_id) - Redraw the object on the canvas following an update
 #    objects_lines.default_line_object - The dictionary of default values for the object
+#    objects_textboxes.create_textbox() - Create a default object on the schematic
+#    objects_textboxes.delete_textbox(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_textboxes.update_textbox(obj_id,new_obj) - Update the configuration of an existing textbox object
+#    objects_textboxes.paste_textbox(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    objects_textboxes.delete_textbox_object(object_id) - Soft delete the drawing object (prior to recreating))
+#    objects_textboxes.redraw_textbox_object(object_id) - Redraw the object on the canvas following an update
+#    objects_textboxes.default_textbox_object - The dictionary of default values for the object
 #    objects_points.create_point(type) - Create a default object on the schematic
 #    objects_points.delete_point(obj_id) - Hard Delete an object when deleted from the schematic
 #    objects_points.update_point(obj_id,new_obj) - Update the configuration of an existing point object
@@ -71,13 +78,17 @@ from . import objects_points
 from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
+from . import objects_textboxes
 
 from .. import run_layout
 
-##################################################################################
-### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-from .. import settings                                                  #########
-##################################################################################
+#######################################################################################################
+### Handle change of sensors being a configuration item in their own right from release 3.6.0 #########
+#######################################################################################################
+from .. import settings 
+#######################################################################################################
+################################## End of code to handle breaking changes #############################
+#######################################################################################################
 
 #------------------------------------------------------------------------------------
 # Internal function to bring all track sections to the front of the canvas
@@ -102,6 +113,8 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
         this_object_type = objects_common.schematic_objects[object_id]["item"]
         if this_object_type == objects_common.object_type.line:
             objects_lines.redraw_line_object(object_id)
+        elif this_object_type == objects_common.object_type.textbox:
+            objects_textboxes.redraw_textbox_object(object_id)
         elif this_object_type == objects_common.object_type.signal:                
             objects_signals.redraw_signal_object(object_id)
         elif this_object_type == objects_common.object_type.point:
@@ -125,7 +138,9 @@ def reset_all_schematic_indexes():
     for object_id in objects_common.schematic_objects:
         this_object_type = objects_common.schematic_objects[object_id]["item"]
         this_object_item_id = objects_common.schematic_objects[object_id]["itemid"]
-        if this_object_type == objects_common.object_type.signal:                
+        if this_object_type == objects_common.object_type.line:
+            objects_common.line_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.signal:                
             objects_common.signal_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.point:
             objects_common.point_index[str(this_object_item_id)] = object_id
@@ -133,8 +148,7 @@ def reset_all_schematic_indexes():
             objects_common.section_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.instrument:
             objects_common.instrument_index[str(this_object_item_id)] = object_id
-        elif this_object_type == objects_common.object_type.line:
-            objects_common.line_index[str(this_object_item_id)] = object_id
+        # Note that textboxes don't have an index as we don't track their IDs
     return()
 
 #------------------------------------------------------------------------------------
@@ -226,7 +240,11 @@ def reset_objects():
     # Soft delete all point, section, instrument and signal objects (keeping the bbox)
     for object_id in objects_common.schematic_objects:
         type_of_object = objects_common.schematic_objects[object_id]["item"]
-        if type_of_object == objects_common.object_type.signal:
+        if type_of_object == objects_common.object_type.line:
+            objects_lines.delete_line_object(object_id)
+        elif type_of_object == objects_common.object_type.textbox:
+            objects_textboxes.delete_textbox_object(object_id)
+        elif type_of_object == objects_common.object_type.signal:
             objects_signals.delete_signal_object(object_id)
         elif type_of_object == objects_common.object_type.point:
              objects_points.delete_point_object(object_id)
@@ -251,19 +269,23 @@ def reset_objects():
 
 def create_object(new_object_type, item_type=None, item_subtype=None):
     if new_object_type == objects_common.object_type.line:
-        objects_lines.create_line() 
+        object_id = objects_lines.create_line() 
+    elif new_object_type == objects_common.object_type.textbox:
+        object_id = objects_textboxes.create_textbox()
     elif new_object_type == objects_common.object_type.signal:
-        objects_signals.create_signal(item_type, item_subtype)
+        object_id = objects_signals.create_signal(item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
-         objects_points.create_point(item_type)
+         object_id = objects_points.create_point(item_type)
     elif new_object_type == objects_common.object_type.section:
-        objects_sections.create_section()
+        object_id = objects_sections.create_section()
     elif new_object_type == objects_common.object_type.instrument:
-        objects_instruments.create_instrument(item_type)
+        object_id = objects_instruments.create_instrument(item_type)
+    else:
+        object_id = None
     # save the current state (for undo/redo)
     save_schematic_state()
     # As we are creating 'new' objects we don't need to process layout changes
-    return()
+    return(object_id)
 
 #------------------------------------------------------------------------------------
 # Function to update the configuration of an existing schematic object and re-draw it
@@ -274,6 +296,8 @@ def update_object(object_id, new_object):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
         objects_lines.update_line(object_id, new_object)
+    elif type_of_object == objects_common.object_type.textbox:
+        objects_textboxes.update_textbox(object_id, new_object)
     elif type_of_object == objects_common.object_type.signal:
         objects_signals.update_signal(object_id, new_object)
     elif type_of_object == objects_common.object_type.point:
@@ -300,6 +324,8 @@ def delete_object(object_id):
     type_of_object = objects_common.schematic_objects[object_id]["item"]
     if type_of_object == objects_common.object_type.line:
         objects_lines.delete_line(object_id) 
+    elif type_of_object == objects_common.object_type.textbox:
+        objects_textboxes.delete_textbox(object_id) 
     elif type_of_object == objects_common.object_type.signal:
         objects_signals.delete_signal(object_id)
     elif type_of_object == objects_common.object_type.point:
@@ -382,7 +408,7 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                                 (objects_common.schematic_objects[object_id]["line"]))
             else:
                 objects_common.schematic_objects[object_id]["posx"] += xdiff1 
-                objects_common.schematic_objects[object_id]["posy"] += ydiff2
+                objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
         bring_track_sections_to_the_front()
         # save the current state (for undo/redo)
@@ -420,7 +446,9 @@ def paste_objects():
         type_of_object = object_to_paste["item"]
         if type_of_object == objects_common.object_type.line:
             new_object_id = objects_lines.paste_line(object_to_paste, deltax, deltay)
-        if type_of_object == objects_common.object_type.signal:
+        elif type_of_object == objects_common.object_type.textbox:
+            new_object_id = objects_textboxes.paste_textbox(object_to_paste, deltax, deltay)
+        elif type_of_object == objects_common.object_type.signal:
             new_object_id = objects_signals.paste_signal(object_to_paste, deltax, deltay)
         elif type_of_object == objects_common.object_type.point:
             new_object_id = objects_points.paste_point(object_to_paste, deltax, deltay)
@@ -448,13 +476,10 @@ def set_all(new_objects):
     ##################################################################################
     ### Code block to Handle breaking changes - see later in the code for details ####
     ##################################################################################
-    one_up_line_id = 1
     list_of_track_sensors_to_create =[]
     ##################################################################################
     ################ End of code block to handle breaking changes ####################
     ##################################################################################
-    # List of warning messages to report
-    warning_messages = []
     # For each loaded object, create a new default object of the same type
     # and then copy across each element in turn. This is defensive programming
     # to populate the objects gracefully whilst handling changes to an object
@@ -467,6 +492,8 @@ def set_all(new_objects):
         new_object_type = new_objects[object_id]["item"]
         if new_object_type == objects_common.object_type.line:
             default_object = objects_lines.default_line_object
+        elif new_object_type == objects_common.object_type.textbox:
+            default_object = objects_textboxes.default_textbox_object
         elif new_object_type == objects_common.object_type.signal:
             default_object = objects_signals.default_signal_object
         elif new_object_type == objects_common.object_type.point:
@@ -477,31 +504,32 @@ def set_all(new_objects):
             default_object = objects_instruments.default_instrument_object
         else:
             default_object = {}
-            warning_message = (new_object_type+" "+str(item_id)+
-                            " - Unrecognised object type - DISCARDED")
-            logging.warning("LOAD LAYOUT - "+warning_message)
-            warning_messages.append(warning_message)
+            logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Unrecognised object type - DISCARDED")
         # Populate each element at a time and report any elements not recognised
         if default_object != {}:
             objects_common.schematic_objects[object_id] = copy.deepcopy(default_object)
             for element in new_objects[object_id]:
                 if element not in default_object.keys():
-                    warning_message = (new_object_type+" "+str(item_id)+
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
-                    logging.warning("LOAD LAYOUT - "+warning_message)
-                    warning_messages.append(warning_message)
-                ##################################################################################
-                ### Handle breaking change of lines having Item IDs from Release 3.4.0 onwards ###
-                ##################################################################################
-                elif (new_object_type == objects_common.object_type.line and
-                          element == "itemid" and new_objects[object_id][element] is None):                    
-                    item_id = one_up_line_id
-                    objects_common.schematic_objects[object_id][element] = one_up_line_id
-                    warning_message = (new_object_type+
-                            " ? - Missing Item ID - assigning default ID '"+str(item_id)+"'")
-                    logging.warning("LOAD LAYOUT - "+warning_message)
-                    warning_messages.append(warning_message)
-                    one_up_line_id = one_up_line_id + 1
+                #################################################################################################
+                ## Handle breaking change of tracksections now a list of 3 sections from release 4.0.0 ##########
+                ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
+                ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
+                ## Before release 4.0.0, each route element was a single track section (integer value) ##########
+                ## From Release 4.0.0 onwards, each element comprises a list of track sections [T1, T2, T3] #####
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "tracksections":
+                    objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
+                    if type(new_objects[object_id][element][1][0]) == int:
+                        for index, route in enumerate(new_objects[object_id][element][1]):
+                            list_of_sections = [new_objects[object_id][element][1][index],0,0]
+                            objects_common.schematic_objects[object_id][element][1][index] = list_of_sections
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 4.0.0 breaking change to : '"+element+"'")
+                    else:
+                        objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
                 ##################################################################################
                 ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
                 ### This is something we can resolve without affecting the user so we resolve ####
@@ -512,39 +540,49 @@ def set_all(new_objects):
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if new_objects[object_id][element][1] == 0:
                         objects_common.schematic_objects[object_id][element][1] = ""
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     elif isinstance(new_objects[object_id][element][1],int):
                         objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
                         list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
                 elif new_object_type == objects_common.object_type.signal and element == "approachsensor":
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if new_objects[object_id][element][1] == 0:
                         objects_common.schematic_objects[object_id][element][1] = ""
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     elif isinstance(new_objects[object_id][element][1],int):
                         objects_common.schematic_objects[object_id][element][1] = str(new_objects[object_id][element][1])
                         list_of_track_sensors_to_create.append([new_objects[object_id][element][1],new_objects[object_id][element][1]])
+                        logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
+                                " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                ##################################################################################
-                ###################### End of code to handle breaking changes ####################
-                ##################################################################################
+                #############################################################################################
+                ## End of Handle breaking change for track sections and sensor IDs ##########################
+                #############################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             ##################################################################################
             ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-            if len(list_of_track_sensors_to_create) > 0:                             #########
-                settings.set_gpio(mappings = list_of_track_sensors_to_create)        #########
+            ##################################################################################
+            if len(list_of_track_sensors_to_create) > 0:
+                logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
+                settings.set_gpio(mappings = list_of_track_sensors_to_create)       
+            ##################################################################################
+            ## End of Handle breaking change for sensor IDs ##################################
             ##################################################################################
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
                 if element not in new_objects[object_id].keys():
                     default_value = objects_common.schematic_objects[object_id][element]
-                    warning_message = (new_object_type+" "+str(item_id)+" - Missing element: '"
+                    logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+" - Missing element: '"
                             +element+"' - Asigning default values: "+str(default_value))
-                    logging.warning("LOAD LAYOUT - "+warning_message)
-                    warning_messages.append(warning_message)
     # Reset the signal/point/section/instrument indexes
     reset_all_schematic_indexes()
     # Redraw (re-create) all items on the schematic with a new bbox
@@ -558,8 +596,7 @@ def set_all(new_objects):
     run_layout.initialise_layout()    
     # save the current state (for undo/redo) - deleting all previous history
     save_schematic_state(reset_pointer=True)
-    # Return the list of warning messages (for display to the user)
-    return(warning_messages)
+    return()
 
 #------------------------------------------------------------------------------------
 # Function get the current objects dictionary (for saving to file)

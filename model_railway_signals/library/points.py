@@ -358,7 +358,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         for other_point_id in points:
             if (points[other_point_id]["alsoswitch"] == point_id and
                    point_switched(other_point_id) != point_switched(point_id)):
-                points.toggle_point_state(point_id,True)
+                toggle_point_state(point_id,True)
         # Update any downstream points (configured to be 'autoswitched' by this point
         # but only if they have been created (allows them to be created after this point)
         if point_exists(points[str(point_id)]["alsoswitch"]): update_downstream_points(point_id)

@@ -44,6 +44,7 @@ from .. import run_layout
 
 class object_type():
     none:str = "none"
+    textbox:str = "textbox"
     line:str = "line"
     point:str = "point"
     signal:str = "signal"
@@ -159,18 +160,17 @@ def set_bbox(object_id:str,bbox:[int,int,int,int]):
 
 def find_initial_canvas_position():
     global schematic_objects
-    # Default position (top left) to try first
-    x, y = 50, 50
-    # Deltas to use for object spacing
-    deltax, deltay = canvas_grid*2, canvas_grid*2
+    # Default position (top left) to try first and Deltas to use for object spacing
+    startx, starty = 75, 50
+    deltax, deltay = 25, 50
     # Find an intial position not taken up with an existing object
+    x, y = startx, starty
     while True:
         posfree = True
         for object_id in schematic_objects:
+            # See if another object already exists at this position
             if (schematic_objects[object_id]["posx"] == x and
-                 schematic_objects[object_id]["posx"] == x):
-                # Another object already exists at this position
-                # No point trying the other schematic objects
+                 schematic_objects[object_id]["posy"] == y):
                 posfree = False
                 break
         # If the current x/y position is "free" now have iterated through all other
@@ -178,6 +178,8 @@ def find_initial_canvas_position():
         if posfree: break
         # Else, apply the deltas and try again
         x, y = x + deltax, y + deltay
+        # Take into account the size of the canvas (so nothing gets created "off scene"
+        if y > canvas_height - 50: y = starty
     return(x, y)
 
 #------------------------------------------------------------------------------------

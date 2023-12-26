@@ -320,7 +320,10 @@ class semaphore_signal_arms():
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
-        return ( [ self.main.get_route(),
+        # Note that the MAIN signal arm is always enabled (for semaphores)
+        main_route_with_signal_arm_enabled = self.main.get_route()
+        main_route_with_signal_arm_enabled[0][0] = True
+        return ( [ main_route_with_signal_arm_enabled,
                    self.lh1.get_route(),
                    self.lh2.get_route(),
                    self.rh1.get_route(),
@@ -705,7 +708,10 @@ class theatre_route_indications:
         # Each route element comprises: [character, DCC_command_sequence]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
-        return( [self.dark.get_theatre(),
+        # Note that the DARK aspect character is always present in the configuration
+        dark_theatre_configuration_enabled = self.dark.get_theatre()
+        dark_theatre_configuration_enabled[0]="#"
+        return( [dark_theatre_configuration_enabled,
                  self.main.get_theatre(),
                  self.lh1.get_theatre(),
                  self.lh2.get_theatre(),
