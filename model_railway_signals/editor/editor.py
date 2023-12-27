@@ -585,6 +585,7 @@ class main_menubar:
 #------------------------------------------------------------------------------------
 
 def run_editor():
+    print("Starting Model Railway Signalling application")
     # Create the Main Root Window
     root = Tk.Tk()
     # Configure Tkinter to not show hidden files in the file open/save dialogs
@@ -613,5 +614,6 @@ def run_editor():
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
         library_common.shutdown()
+    print("Exiting Model Railway Signalling application")
 
 ####################################################################################
