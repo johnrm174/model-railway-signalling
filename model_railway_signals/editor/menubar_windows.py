@@ -788,18 +788,18 @@ class mqtt_publish_tab():
 
 #------------------------------------------------------------------------------------
 # Class for the MQTT Configuration 'status' Tab showing a list of connected nodes
-#------------------------------------------------------------------------------------    
+#------------------------------------------------------------------------------------
 
 class mqtt_status_tab():
     def __init__(self, parent_tab):
-        # Create the list of connected nodes 
+        # Create the list of connected nodes
         self.frame1 = Tk.LabelFrame(parent_tab, text="Node Status")
         self.frame1.pack(padx=2, pady=2, fill='x')
         self.frame2 = None
         self.button = Tk.Button(parent_tab, text="Refresh display", command=self.refresh)
         self.button.pack(padx=2, pady=2,)
         self.refresh()
-        
+
     def refresh(self):
         # Get the list of currently connected nodes
         node_status = mqtt_interface.get_node_status()
