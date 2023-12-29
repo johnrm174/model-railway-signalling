@@ -121,7 +121,10 @@ def subsidary_button_event (sig_id:int):
 
 def reset_sig_passed_button (sig_id:int):
     if sig_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
-    
+
+def reset_sig_released_button (sig_id:int):
+    if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
+
 def sig_passed_button_event (sig_id:int):
     logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
     # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
@@ -138,10 +141,10 @@ def sig_passed_button_event (sig_id:int):
 
 def approach_release_button_event (sig_id:int):
     logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    # Pulse the approach release button to provide a visual indication
+    # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
     if not common.shutdown_initiated:
         signals[str(sig_id)]["releasebutton"].config(bg="red")
-        common.root_window.after(1000,lambda:signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised))
+        common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
     # Set the approach control 'released' state (if the signal supports approach control)
     if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
          signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
