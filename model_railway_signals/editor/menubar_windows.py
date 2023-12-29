@@ -56,6 +56,7 @@
 #
 # Uses the following library functions:
 #    track_sensors.get_list_of_available_ports() - to get a list of supported ports
+#    mqtt_interface.get_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -63,9 +64,13 @@ import webbrowser
 
 from tkinter import ttk
 
+import time
+import datetime
+
 from . import common
 from . import settings
 from ..library import track_sensors
+from ..library import mqtt_interface
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_box.
@@ -780,6 +785,47 @@ class mqtt_publish_tab():
         return (self.signals.validate() and self.sections.validate()
             and self.instruments.validate() and self.sensors.validate())
 
+
+#------------------------------------------------------------------------------------
+# Class for the MQTT Configuration 'status' Tab showing a list of connected nodes
+#------------------------------------------------------------------------------------    
+
+class mqtt_status_tab():
+    def __init__(self, parent_tab):
+        # Create the list of connected nodes 
+        self.frame1 = Tk.LabelFrame(parent_tab, text="Node Status")
+        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.frame2 = None
+        self.button = Tk.Button(parent_tab, text="Refresh display", command=self.refresh)
+        self.button.pack(padx=2, pady=2,)
+        self.refresh()
+        
+    def refresh(self):
+        # Get the list of currently connected nodes
+        node_status = mqtt_interface.get_node_status()
+        # Destroy the current frame (with all the entries) and re-create
+        if self.frame2 is not None: self.frame2.destroy()
+        self.frame2 = Tk.Frame(self.frame1)
+        self.frame2.pack()
+        # Populate the list of all nodes seen since application start
+        for node_id in node_status.keys():
+            subframe = Tk.Frame(self.frame2)
+            subframe.pack(padx=2, pady=2, fill='x')
+            node = Tk.Label(subframe,text=node_id)
+            node.pack(side=Tk.LEFT)
+            label = Tk.Label(subframe, text=" - Last seen: ")
+            label.pack(side=Tk.LEFT)
+            time_stamp = node_status[node_id]
+            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
+            last_time = Tk.Label(subframe, text=time_to_display)
+            last_time.pack(side=Tk.LEFT)
+            # Set the colour of the timestamp according to how long ago it was
+            if time.time() - time_stamp > 10: last_time.config(fg="red")
+            else: last_time.config(fg="green")
+        if node_status == {}:
+            label = Tk.Label(self.frame2, text="No nodes seen since application start")
+            label.pack(side=Tk.LEFT)
+
 #------------------------------------------------------------------------------------
 # Class for the MQTT Settings window (uses the classes above for each tab). Note that init
 # takes in callbacks for connecting to the broker and for applying the updated settings.
@@ -803,6 +849,7 @@ class edit_mqtt_settings():
             self.window = Tk.Toplevel(root_window)
             self.window.title("MQTT Networking")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             edit_mqtt_settings_window = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -818,11 +865,14 @@ class edit_mqtt_settings():
             self.tabs.add(self.tab2, text="Subscribe")
             self.tab3 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab3, text="Publish")
+            self.tab4 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab4, text="Status")
             self.tabs.pack()
             # Create the tabs themselves:
             self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
             self.subscribe = mqtt_subscribe_tab(self.tab2)
             self.publish = mqtt_publish_tab(self.tab3)
+            self.status = mqtt_status_tab(self.tab4)
             # Load the initial UI state
             self.load_state()
             

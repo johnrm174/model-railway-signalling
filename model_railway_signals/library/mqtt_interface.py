@@ -50,17 +50,20 @@ import json
 import logging
 import time
 import paho.mqtt.client
+import threading
 
 #-----------------------------------------------------------------------------------------------
 # Define an empty dictionary for holding the basic configuration information we need to track
 #-----------------------------------------------------------------------------------------------
 
 node_config: dict = {}
+node_config["heartbeat_frequency"] = 4.0 # Constant of 4 seconds
 node_config["network_identifier"] = ""
 node_config["node_identifier"] = ""   
 node_config["enhanced_debugging"] = False
 node_config["network_configured"] = False
 node_config["connected_to_broker"] = False
+node_config["heartbeat_thread_started"] = False
 node_config["list_of_published_topics"] = []
 node_config["list_of_subscribed_topics"] = []
 node_config["callbacks"] = {}
@@ -70,6 +73,38 @@ node_config["callbacks"] = {}
 #-----------------------------------------------------------------------------------------------
 
 mqtt_client = None
+
+#------------------------------------------------------------------------------
+# Internal dict to hold details of the heartbeats received from other nodes
+# Dict contains entries comprising ["node"]: time_stamp_of_last_heartbeat
+# Also an external function used buy the editor to get the list of connected nodes
+#------------------------------------------------------------------------------
+
+heartbeats = {}
+
+def get_node_status():
+    return (heartbeats)
+
+#------------------------------------------------------------------------------
+# Internal thread to send out heartbeat messages from the node when connected
+#------------------------------------------------------------------------------
+
+def thread_to_send_heartbeat_messages():
+    while True:
+        time.sleep(node_config["heartbeat_frequency"])
+        if node_config["connected_to_broker"]:
+            # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
+            topic = "heartbeat"+"/"+node_config["network_identifier"]
+            # Payload for the heartbeat message is a dictionary comprising the source node
+            heartbeat_message = {"node":node_config["node_identifier"]}
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing Heartbeat :"+str(heartbeat_message))
+            payload = json.dumps(heartbeat_message)
+            # the PAHO MQTT client is not thread safe so publish the message from the main Tkinter thread
+            if common.root_window is not None:
+                common.execute_function_in_tkinter_thread(lambda:mqtt_client.publish(topic,payload,retain=False,qos=1))
+            else:
+                mqtt_client.publish(topic,payload,retain=False,qos=1)
+    return()
 
 # ---------------------------------------------------------------------------------------------
 # Common Function to create a external item identifier from the Item_ID and the remote Node.
@@ -129,6 +164,9 @@ def on_connect(mqtt_client, userdata, flags, rc):
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["list_of_subscribed_topics"]:
                 mqtt_client.subscribe(topic)
+        # Re subscribe to all heartbeat messages on the specified network
+        # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
+        mqtt_client.subscribe("heartbeat"+"/"+node_config["network_identifier"])
         # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
         # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
         # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
@@ -149,16 +187,23 @@ def on_connect(mqtt_client, userdata, flags, rc):
 #--------------------------------------------------------------------------------------------------------
 
 def process_message(msg):
+    global heartbeats
     # Unpack the json message so we can extract the contents (with exception handling)
     try:
         unpacked_json = json.loads(msg.payload)
     except Exception as exception:
         logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
+        # If it is a heartbeat message then we just update the list of connected nodes
+        if msg.topic.startswith("heartbeat"):
+            time_stamp = int(time.time())
+            if node_config["enhanced_debugging"]:
+                logging.debug("MQTT-Client: Received Heartbeat: "+str(unpacked_json)+" at time: "+str(time_stamp))
+            heartbeats[unpacked_json["node"]] = time_stamp
         # Make the callback (that was registered when the calling programme subscribed to the feed)
         # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
-        if msg.topic in node_config["callbacks"]:
+        elif msg.topic in node_config["callbacks"]:
             logging.debug("MQTT-Client: Received: "+str(msg.topic)+"-"+str(unpacked_json))
             node_config["callbacks"][msg.topic] (unpacked_json)
         elif msg.topic.rpartition('/')[0]+"/+" in node_config["callbacks"]:
@@ -266,6 +311,15 @@ def mqtt_broker_connect (broker_host:str,
                 time.sleep(0.001)
             if not node_config["connected_to_broker"]:
                 logging.error("MQTT-Client: Timeout connecting to broker")
+            elif not node_config["heartbeat_thread_started"]:
+                # Start the heartbeat thread
+                heartbeat_thread = threading.Thread (target=thread_to_send_heartbeat_messages)
+                heartbeat_thread.setDaemon(True)
+                heartbeat_thread.start()
+                node_config["heartbeat_thread_started"] = True
+                # Subscribe to heartbeat messages from all nodes on the specified network
+                # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
+                mqtt_client.subscribe("heartbeat"+"/"+node_config["network_identifier"])
     return(node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
