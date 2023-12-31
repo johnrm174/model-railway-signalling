@@ -71,7 +71,7 @@
 import os
 import tkinter as Tk
 import logging
-from argparse import ArgumentParser
+import argparse
 
 from . import objects
 from . import settings
@@ -172,19 +172,28 @@ class main_menubar:
         # Flag to track whether the new configuration has been saved or not
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
-        # Initialise the schematic canvas
-        # Note that the Edit Mode flag is the 2nd param in the returned tuple from get_general
+        # Initialise the schematic - the Edit Mode flag is the 2nd param in the returned tuple from get_general
         width, height, grid, snap_to_grid = settings.get_canvas()
         edit_mode = settings.get_general()[1]
         schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, snap_to_grid, edit_mode)
-        # Initialise the editor configuration at startup
-        self.initialise_editor()
-        # Parse the command line arguments to get the filename (and load it)
-        # The version is the third parameter provided by 'get_general'
-        parser = ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2])
+        # Parse the command line arguments
+        parser = argparse.ArgumentParser(description =  "Model railway signalling "+settings.get_general()[2],
+                            formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=27))
         parser.add_argument("-d","--debug",dest="debug_mode",action='store_true',help="run editor with debug functions")
         parser.add_argument("-f","--file",dest="filename",metavar="FILE",help="schematic file to load on startup")
+        parser.add_argument("-l","--log",dest="log_level",metavar="LEVEL",
+                help="log level (DEBUG, INFO, WARNING, ERROR)")
         args = parser.parse_args()
+        # Set the log level (default unless one has been specified as a command line argument)
+        if args.log_level == "ERROR": settings.set_logging(1)
+        elif args.log_level == "WARNING": settings.set_logging(2)
+        elif args.log_level == "INFO": settings.set_logging(3)
+        elif args.log_level == "DEBUG": settings.set_logging(4)
+        self.logging_update()
+        # Initialise the editor configuration at startup (using the default settings)
+        self.initialise_editor()
+        # If a filename has been specified as a command line argument then load it. The loaded
+        # settings will overwrite the default settings and initialise_editor will be called again
         if args.filename is not None: self.load_schematic(args.filename)
         # The following code is to help with advanced debugging (start the app with the -d flag)
         if args.debug_mode:
@@ -247,8 +256,6 @@ class main_menubar:
         self.root.title(name)
         # Re-size the canvas to reflect the new schematic size
         self.canvas_update()
-        # Set the logging level before we start doing stuff
-        self.logging_update()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
         # The "connect" and "power" flags are the 4th and 5th parameter returned
