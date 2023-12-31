@@ -13,6 +13,8 @@ echo $logfilename >> /home/pi/.config/autostart/$logfilename 2>&1
 #
 # Modify the following to use the -f <filename> option to load a layout on startup
 # eg: python3 -m model_railway_signals -f /home/pi/my_layout.sig
+# You can also specify the logging level (DEBUG, INFO, WARNING or ERROR)
+# eg: python3 -m model_railway_signals -l DEBUG
 #
 python3 -m model_railway_signals >> /home/pi/.config/autostart/$logfilename 2>&1
 #
