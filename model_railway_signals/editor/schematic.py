@@ -102,9 +102,9 @@ popup2 = None
 # This global reference to the popup edit window class is maintained for test purposes
 edit_popup = None
 # The Frame holding the "add object" buttons (for pack/forget on enable/disable editing)
-# and the Tkinter PhotoImage labels for the buttons
 button_frame = None
-button_images = {}
+# The list of button images (which needs to be kept in scope)
+button_images = []
 
 #------------------------------------------------------------------------------------
 # Internal Function to return the absolute canvas coordinates for an event
@@ -884,7 +884,7 @@ def disable_editing():
 def initialise (root_window, event_callback, width:int, height:int, grid:int, snap_to_grid:bool, edit_mode:bool):
     global root, canvas, popup1, popup2
     global canvas_width, canvas_height, canvas_grid, canvas_grid_state, canvas_snap_to_grid
-    global button_frame, canvas_frame, buttons, images
+    global button_frame, canvas_frame, button_images
     global canvas_event_callback
     root = root_window
     canvas_event_callback = event_callback
@@ -949,24 +949,21 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["section", lambda:create_object(objects.object_type.section) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ] ]
-    # Create the buttons we need (adding the references to the buttons and images
-    # to a global list so they don't go out of scope and dont get garbage collected)
-    buttons = []
-    images = []
+    # Create the buttons we need (Note that the button images are added to a global
+    # list so they remain in scope (otherwise the buttons won't work)
     resource_folder = 'model_railway_signals.editor.resources'
     for index, button in enumerate (selections):
         file_name = selections[index][0]
         try:
             # Load the image file for the button if there is one
             with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                images.append(Tk.PhotoImage(file=file_path))
-                buttons.append(Tk.Button (button_frame, image=images[-1],
-                       command=selections[index][1]))
+                button_images.append(Tk.PhotoImage(file=file_path))
+                button = Tk.Button (button_frame, image=button_images[-1],command=selections[index][1])
+                button.pack(padx=2, pady=2, fill='x')
         except:
             # Else fall back to using a text label (filename) for the button
-            buttons.append(Tk.Button (button_frame, text=selections[index][0],
-                       command=selections[index][1], bg="grey85"))
-        buttons[-1].pack(padx=2, pady=2, fill='x')
+            button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
+            button.pack(padx=2, pady=2, fill='x')
     # Initialise the Objects package with the required parameters
     objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
     return()
