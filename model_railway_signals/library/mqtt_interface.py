@@ -61,6 +61,9 @@ node_config["heartbeat_frequency"] = 4.0 # Constant of 4 seconds
 node_config["network_identifier"] = ""
 node_config["node_identifier"] = ""   
 node_config["enhanced_debugging"] = False
+node_config["act_on_shutdown"] = False
+node_config["publish_shutdown"] = False
+node_config["shutdown_initiated"] = False
 node_config["network_configured"] = False
 node_config["connected_to_broker"] = False
 node_config["heartbeat_thread_started"] = False
@@ -87,12 +90,13 @@ def get_node_status():
 
 #------------------------------------------------------------------------------
 # Internal thread to send out heartbeat messages from the node when connected
+# and if application shutdown has not been initiated (otherwise no point)
 #------------------------------------------------------------------------------
 
 def thread_to_send_heartbeat_messages():
     while True:
         time.sleep(node_config["heartbeat_frequency"])
-        if node_config["connected_to_broker"]:
+        if node_config["connected_to_broker"] and not node_config["shutdown_initiated"]:
             # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
             topic = "heartbeat"+"/"+node_config["network_identifier"]
             # Payload for the heartbeat message is a dictionary comprising the source node
@@ -156,6 +160,11 @@ def on_connect(mqtt_client, userdata, flags, rc):
     global node_config
     if rc == 0:
         logging.info("MQTT-Client: Successfully connected to MQTT Broker")
+        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
+        # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
+        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
+        time.sleep(0.1)
+        node_config["connected_to_broker"] = True
         # As we set up our broker connection with 'cleansession=true' a disconnection will have removed
         # all client connection information from the broker (including knowledge of the topics we have
         # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
@@ -164,14 +173,10 @@ def on_connect(mqtt_client, userdata, flags, rc):
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["list_of_subscribed_topics"]:
                 mqtt_client.subscribe(topic)
-        # Re subscribe to all heartbeat messages on the specified network
-        # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
+        # Re subscribe to all heartbeat and shutdown messages on the specified network
+        # Topic format for these messages is: "<Message-Type>/<Network-ID>"
         mqtt_client.subscribe("heartbeat"+"/"+node_config["network_identifier"])
-        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
-        # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
-        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
-        time.sleep(0.1)
-        node_config["connected_to_broker"] = True
+        mqtt_client.subscribe("shutdown"+"/"+node_config["network_identifier"])
     elif rc == 1: logging.error("MQTT-Client: Connection refused – incorrect protocol version")
     elif rc == 2: logging.error("MQTT-Client: Connection refused – invalid client identifier")
     elif rc == 3: logging.error("MQTT-Client: Connection refused – server unavailable")
@@ -200,6 +205,14 @@ def process_message(msg):
             if node_config["enhanced_debugging"]:
                 logging.debug("MQTT-Client: Received Heartbeat: "+str(unpacked_json)+" at time: "+str(time_stamp))
             heartbeats[unpacked_json["node"]] = time_stamp
+        # If it is a shutdown message we only act on it if configured to do so
+        elif msg.topic.startswith("shutdown"):
+            if node_config["act_on_shutdown"]:
+                logging.info("MQTT-Client: Received Shutdown message: "+str(unpacked_json)+
+                             "- Triggering application shutdown")
+                common.shutdown()
+            elif node_config["enhanced_debugging"]:
+                logging.debug("MQTT-Client: Received Shutdown message: "+str(unpacked_json))
         # Make the callback (that was registered when the calling programme subscribed to the feed)
         # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
@@ -223,7 +236,8 @@ def on_message(mqtt_client,obj,msg):
     global node_config
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload:
+    # Also, only process the message if shutdown has not been initiated (otherwise no point)
+    if msg.payload and not node_config["shutdown_initiated"]:
         if common.root_window is not None:
             common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
         else:
@@ -236,13 +250,17 @@ def on_message(mqtt_client,obj,msg):
 
 def configure_mqtt_client (network_identifier:str,
                            node_identifier:str,
-                           enhanced_debugging:bool = False):
+                           enhanced_debugging:bool = False,
+                           publish_shutdown:bool = False,
+                           act_on_shutdown:bool = False):
     global node_config, mqtt_client
     logging.debug("MQTT-Client: Configuring MQTT Client for "+network_identifier+":"+node_identifier)
     # Configure this module (to enable subscriptions to be configured even if not connected)
     node_config["enhanced_debugging"] = enhanced_debugging
     node_config["network_identifier"] = network_identifier
     node_config["node_identifier"] = node_identifier
+    node_config["publish_shutdown"] = publish_shutdown
+    node_config["act_on_shutdown"] = act_on_shutdown
     node_config["network_configured"] = True
     return()
 
@@ -282,7 +300,7 @@ def mqtt_broker_connect (broker_host:str,
     global node_config
     global mqtt_client
     if not node_config["network_configured"]:
-        logging.error("MQTT-Client: Network not configured - Cannot connect to broker)")
+        logging.error("MQTT-Client: Network not configured - Cannot connect to broker")
     else:
         # Handle the case where we are already connected to the broker
         if node_config["connected_to_broker"]: mqtt_broker_disconnect()
@@ -317,9 +335,6 @@ def mqtt_broker_connect (broker_host:str,
                 heartbeat_thread.setDaemon(True)
                 heartbeat_thread.start()
                 node_config["heartbeat_thread_started"] = True
-                # Subscribe to heartbeat messages from all nodes on the specified network
-                # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
-                mqtt_client.subscribe("heartbeat"+"/"+node_config["network_identifier"])
     return(node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
@@ -355,11 +370,23 @@ def mqtt_broker_disconnect():
 #-----------------------------------------------------------------------------------------------
 # Externally called function to perform a gracefull shutdown of the MQTT networking
 # in terms of clearing out the publish topic queues (by sending null messages)
+# This function is intended to be called at application exit only
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
     global node_config
+    node_config["shutdown_initiated"] = True
     if node_config["connected_to_broker"]:
+        # Publish a shutdown command to other nodes if configured  to do so
+        if node_config["publish_shutdown"]:
+            # Topic format for the shutdown message: "<Message-Type>/<Network-ID>"
+            topic = "shutdown"+"/"+node_config["network_identifier"]
+            # Payload for the shutdown message is a dictionary comprising the source node
+            shutdown_message = {"node":node_config["node_identifier"]}
+            logging.info("MQTT-Client: Publishing Shutdown message to other nodes")
+            payload = json.dumps(shutdown_message)
+            mqtt_client.publish(topic,payload,retain=False,qos=1)
+            time.sleep(0.1)
         mqtt_broker_disconnect()
         node_config["network_configured"] = False
         node_config["connected_to_broker"] = False

@@ -75,6 +75,8 @@ default_settings["mqtt"]["username"] = ""
 default_settings["mqtt"]["password"] = ""
 default_settings["mqtt"]["debug"] = False
 default_settings["mqtt"]["startup"] = False
+default_settings["mqtt"]["pubshutdown"] = False
+default_settings["mqtt"]["subshutdown"] = False
 default_settings["mqtt"]["subdccnodes"] = []
 default_settings["mqtt"]["subsignals"] = []
 default_settings["mqtt"]["subsections"] = []
@@ -247,10 +249,13 @@ def get_mqtt():
     password = settings["mqtt"]["password"]
     debug = settings["mqtt"]["debug"]
     startup = settings["mqtt"]["startup"]
-    return (url, port, network, node, username, password, debug, startup)
+    pubshutdown = settings["mqtt"]["pubshutdown"]
+    subshutdown = settings["mqtt"]["subshutdown"]
+    return (url, port, network, node, username, password, debug, startup, pubshutdown, subshutdown)
 
 def set_mqtt(url:str=None, port:int=None, network:str=None, node:str=None,
-        username:str=None, password:str=None, debug:bool=None, startup:bool=None):
+        username:str=None, password:str=None, debug:bool=None, startup:bool=None,
+        publish_shutdown:bool=None, subscribe_shutdown:bool=None ):
     if url is not None: settings["mqtt"]["url"] = url
     if port is not None: settings["mqtt"]["port"] = port
     if network is not None: settings["mqtt"]["network"] = network
@@ -259,6 +264,8 @@ def set_mqtt(url:str=None, port:int=None, network:str=None, node:str=None,
     if password is not None: settings["mqtt"]["password"] = password
     if debug is not None: settings["mqtt"]["debug"] = debug
     if startup is not None: settings["mqtt"]["startup"] = startup
+    if publish_shutdown is not None: settings["mqtt"]["pubshutdown"] = publish_shutdown
+    if subscribe_shutdown is not None: settings["mqtt"]["subshutdown"] = subscribe_shutdown
     return()
 
 def get_pub_dcc(): return (settings["mqtt"]["pubdcc"])

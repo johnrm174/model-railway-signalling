@@ -593,12 +593,18 @@ class mqtt_configuration_tab():
                     "Specify a unique identifier for this node (signalling area) on the network")
         self.node.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
-        self.debug = common.check_box(self.frame2, label="Enhanced MQTT debug logging", width=28, 
+        self.debug = common.check_box(self.frame2, label="Enhanced MQTT debug logging", width=32, 
             tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
         self.debug.pack(padx=2, pady=2)
-        self.startup = common.check_box(self.frame2, label="Connect to Broker on layout load", width=28, 
+        self.startup = common.check_box(self.frame2, label="Connect to Broker on layout load", width=32, 
             tool_tip="Select to configure MQTT networking and connect to the broker following layout load")
         self.startup.pack(padx=2, pady=2)
+        self.pubshutdown = common.check_box(self.frame2, label="Publish shutdown on application exit", width=32, 
+            tool_tip="Select to publish a shutdown command to other network nodes when exiting this application")
+        self.pubshutdown.pack(padx=2, pady=2)
+        self.subshutdown = common.check_box(self.frame2, label="Quit application on reciept of shutdown", width=32, 
+            tool_tip="Select to shutdown and exit this application on reciept of a shutdown command published by another node")
+        self.subshutdown.pack(padx=2, pady=2)
         # Create the Button to test connectivity
         self.B1 = Tk.Button (parent_tab, text="Test Broker connectivity",command=self.test_connectivity)
         self.B1.pack(padx=2, pady=2)
@@ -622,7 +628,7 @@ class mqtt_configuration_tab():
         self. accept_all_entries()
         self.B1.focus()
         # Save the existing settings (as they haven't been "applied" yet)
-        s1, s2, s3, s4, s5, s6, s7, s8 = settings.get_mqtt()
+        current_settings = (settings.get_mqtt())
         # Apply the current settings (as they currently appear in the UI)
         url = self.url.get_value()
         port = self.port.get_value()
@@ -641,7 +647,7 @@ class mqtt_configuration_tab():
         else:
             self.status.config(text="MQTT connection failure", fg="red")
         # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_mqtt(s1, s2, s3, s4, s5, s6, s7, s8)
+        settings.set_mqtt(*current_settings)
 
 #------------------------------------------------------------------------------------
 # Base Class for a dynamic str_entry_box_grid.
@@ -881,7 +887,7 @@ class edit_mqtt_settings():
         self.config.status.config(text="")
         self.validation_error.pack_forget()
         # Populate the network configuration tab
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        url, port, network, node, username, password, debug, startup, pubshut, subshut = settings.get_mqtt()
         self.config.url.set_value(url)
         self.config.port.set_value(port)
         self.config.network.set_value(network)
@@ -890,6 +896,8 @@ class edit_mqtt_settings():
         self.config.password.set_value(password)
         self.config.debug.set_value(debug)
         self.config.startup.set_value(startup)
+        self.config.pubshutdown.set_value(pubshut)
+        self.config.subshutdown.set_value(subshut)
         # Populate the subscribe tab
         self.subscribe.dcc.set_values(settings.get_sub_dcc_nodes())
         self.subscribe.signals.set_values(settings.get_sub_signals())
@@ -917,9 +925,12 @@ class edit_mqtt_settings():
             password = self.config.password.get_value()
             debug = self.config.debug.get_value()
             startup = self.config.startup.get_value()
+            pubshut = self.config.pubshutdown.get_value()
+            subshut = self.config.subshutdown.get_value()
             # Save the updated settings
             settings.set_mqtt(url=url, port=port, network=network, node=node,
-                    username=username, password=password, debug=debug, startup=startup)
+                    username=username, password=password, debug=debug, startup=startup,
+                    publish_shutdown=pubshut, subscribe_shutdown=subshut)
             # Save the Subscribe settings
             settings.set_sub_dcc_nodes(self.subscribe.dcc.get_values())
             settings.set_sub_signals(self.subscribe.signals.get_values())

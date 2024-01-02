@@ -413,7 +413,10 @@ class main_menubar:
         return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
 
     def mqtt_connect(self, show_popup:bool=True):
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        url = settings.get_mqtt()[0]
+        port = settings.get_mqtt()[1]
+        username = settings.get_mqtt()[4]
+        password = settings.get_mqtt()[5]
         connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
         if connected:
             new_label = "MQTT:Connected"
@@ -445,8 +448,12 @@ class main_menubar:
         self.mqtt_reconfigure_pub_sub()
         
     def mqtt_reconfigure_client(self):
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
-        mqtt_interface.configure_mqtt_client(network, node, debug)
+        network = settings.get_mqtt()[2]
+        node = settings.get_mqtt()[3]
+        debug = settings.get_mqtt()[6]
+        publish_shutdown = settings.get_mqtt()[8]
+        act_on_shutdown = settings.get_mqtt()[9]
+        mqtt_interface.configure_mqtt_client(network, node, debug, publish_shutdown, act_on_shutdown)
         
     def mqtt_reconfigure_pub_sub(self):
         dcc_control.reset_mqtt_configuration()
