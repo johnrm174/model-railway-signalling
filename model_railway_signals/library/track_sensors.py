@@ -201,10 +201,7 @@ def make_track_sensor_callback(gpio_port):
         # Raise a callback - either in the main tkinter thread if we know the main root window or the current gpio thread
         sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
         callback = gpio_port_mappings[str(gpio_port)]["callback"]
-        if common.root_window is not None:
-            common.execute_function_in_tkinter_thread (lambda: callback(sensor_id,track_sensor_callback_type.sensor_triggered))
-        else: 
-            callback(sensor_id,track_sensor_callback_type.sensor_triggered)
+        common.execute_function_in_tkinter_thread (lambda: callback(sensor_id,track_sensor_callback_type.sensor_triggered))
     return()
 
 # -----------------------------------------------------------------------------------------------------------

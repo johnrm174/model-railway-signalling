@@ -52,28 +52,29 @@ def on_closing():
 
 def shutdown():
     global shutdown_initiated
-    logging.info ("Initiating Application Shutdown")
-    shutdown_initiated = True
-    # Clear out any retained messages and disconnect from broker
-    mqtt_interface.mqtt_shutdown()
-    # Turn off the DCC bus power and close the comms port
-    pi_sprog_interface.sprog_shutdown()
-    # Return the GPIO ports to their original configuration
-    track_sensors.gpio_shutdown()
-    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-    # We need to put a timeout around this to deal with any ongoing timed signal sequences
-    # (although its unlikely the user would initiate a shut down until these have finished)
-    timeout_start = time.time()
-    while time.time() < timeout_start + 30:
-        if root_window.tk.call('after','info') != "":
-            root_window.update()
-            time.sleep(0.01)
-        else:
-            logging.info ("Exiting Application")
-            break
-    if time.time() >= timeout_start + 30:
-        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
-    root_window.destroy()
+    if not shutdown_initiated:
+        logging.info ("Initiating Application Shutdown")
+        shutdown_initiated = True
+        # Clear out any retained messages and disconnect from broker
+        mqtt_interface.mqtt_shutdown()
+        # Turn off the DCC bus power and close the comms port
+        pi_sprog_interface.sprog_shutdown()
+        # Return the GPIO ports to their original configuration
+        track_sensors.gpio_shutdown()
+        # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
+        # We need to put a timeout around this to deal with any ongoing timed signal sequences
+        # (although its unlikely the user would initiate a shut down until these have finished)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 30:
+            if root_window.tk.call('after','info') != "":
+                root_window.update()
+                time.sleep(0.01)
+            else:
+                logging.info ("Exiting Application")
+                break
+        if time.time() >= timeout_start + 30:
+            logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+        root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------
@@ -110,17 +111,19 @@ def find_root_window (canvas):
 #-------------------------------------------------------------------------
 
 def handle_callback_in_tkinter_thread(*args):
-    while not event_queue.empty():
+    while not event_queue.empty() and not shutdown_initiated:
         callback = event_queue.get(False)
         callback()
     return()
-    
+
 def execute_function_in_tkinter_thread(callback_function):
-    if root_window is not None:
-        event_queue.put(callback_function)
-        root_window.event_generate("<<ExtCallback>>", when="tail")
-    else:
-        logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
+    if not shutdown_initiated:
+        if root_window is not None: 
+            event_queue.put(callback_function)
+            root_window.event_generate("<<ExtCallback>>", when="tail")
+        else:
+            logging.error ("Execute_function_in_tkinter_thread - root undefined - executing in current thread")
+            callback_function()
     return()
 
 # -------------------------------------------------------------------------

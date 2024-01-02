@@ -104,10 +104,7 @@ def thread_to_send_heartbeat_messages():
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing Heartbeat :"+str(heartbeat_message))
             payload = json.dumps(heartbeat_message)
             # the PAHO MQTT client is not thread safe so publish the message from the main Tkinter thread
-            if common.root_window is not None:
-                common.execute_function_in_tkinter_thread(lambda:mqtt_client.publish(topic,payload,retain=False,qos=1))
-            else:
-                mqtt_client.publish(topic,payload,retain=False,qos=1)
+            common.execute_function_in_tkinter_thread(lambda:mqtt_client.publish(topic,payload,retain=False,qos=1))
     return()
 
 # ---------------------------------------------------------------------------------------------
@@ -238,10 +235,7 @@ def on_message(mqtt_client,obj,msg):
     # a "null message" - sent to purge retained messages from the broker on application exit
     # Also, only process the message if shutdown has not been initiated (otherwise no point)
     if msg.payload and not node_config["shutdown_initiated"]:
-        if common.root_window is not None:
-            common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
-        else:
-            process_message(msg)
+        common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
     return()
 
 #-----------------------------------------------------------------------------------------------
