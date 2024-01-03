@@ -957,8 +957,9 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
         try:
             # Load the image file for the button if there is one
             with importlib.resources.path (resource_folder,(file_name+'.png')) as file_path:
-                button_images.append(Tk.PhotoImage(file=file_path))
-                button = Tk.Button (button_frame, image=button_images[-1],command=selections[index][1])
+                button_image = Tk.PhotoImage(file=file_path)
+                button_images.append(button_image)
+                button = Tk.Button (button_frame, image=button_image,command=selections[index][1])
                 button.pack(padx=2, pady=2, fill='x')
         except:
             # Else fall back to using a text label (filename) for the button
@@ -967,5 +968,17 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     # Initialise the Objects package with the required parameters
     objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
     return()
+
+# The following shutdown function is to overcome what seems to be a bug in TkInter where
+# (I think) Tkinter is trying to destroy the photo-image objects after closure of the
+# root window and this generates the following exception:
+#     Exception ignored in: <function Image.__del__ at 0xb57ce6a8>
+#     Traceback (most recent call last):
+#       File "/usr/lib/python3.7/tkinter/__init__.py", line 3508, in __del__
+#     TypeError: catching classes that do not inherit from BaseException is not allowed
+
+def shutdown():
+    global button_images
+    button_images = []
 
 ####################################################################################

@@ -491,6 +491,7 @@ class main_menubar:
         # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="Quit Schematic",
                 message="Are you sure you want to discard all changes and quit the application"):
+            schematic.shutdown()
             library_common.shutdown()
         return()
                 
