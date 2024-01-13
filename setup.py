@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="model-railway-signals",
-    version="4.0.0",
+    version="4.1.0",
     packages=find_packages(),
     include_package_data=True,
     description="Create your own DCC model railway signalling scheme",
@@ -25,6 +25,7 @@ setup(
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.11",
     ],
     install_requires=["pyserial","paho-mqtt"]
 
