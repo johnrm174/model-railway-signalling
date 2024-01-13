@@ -159,9 +159,6 @@ def select_object(object_id):
         canvas.itemconfigure(objects.schematic_objects[object_id]["end2"],state="normal")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="normal")
-    # Add the 'selected' tag to all associated canvas drawing objects
-    canvas.addtag_withtag('selected',objects.schematic_objects[object_id]["tags"])
-    canvas.addtag_withtag('selected',objects.schematic_objects[object_id]["bbox"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -178,9 +175,6 @@ def deselect_object(object_id):
         canvas.itemconfigure(objects.schematic_objects[object_id]["end2"],state="hidden")
     else:
         canvas.itemconfigure(objects.schematic_objects[object_id]["bbox"],state="hidden")
-    # Remove the 'selected' tag from all associated canvas drawing objects
-    canvas.dtag(objects.schematic_objects[object_id]["tags"],'selected')
-    canvas.dtag(objects.schematic_objects[object_id]["bbox"],'selected')
     return()
 
 #------------------------------------------------------------------------------------
@@ -305,7 +299,7 @@ def nudge_selected_objects(event=None):
         if event.keysym == 'Right': xdiff, ydiff = delta, 0
         if event.keysym == 'Up': xdiff, ydiff = 0, -delta
         if event.keysym == 'Down': xdiff, ydiff = 0, delta
-        canvas.move("selected",xdiff,ydiff)
+        move_selected_objects(xdiff,ydiff)
         objects.move_objects(schematic_state["selectedobjects"],xdiff1=xdiff, ydiff1=ydiff, xdiff2=xdiff, ydiff2=ydiff)
     canvas.after(50,enable_arrow_keypress_events)
     return()
@@ -360,6 +354,17 @@ def move_line_end_2(object_id, xdiff:int,ydiff:int):
     canvas.coords(objects.schematic_objects[object_id]["line"],end1x,end1y,(x1+x2)/2,(y1+y2)/2)
     # Update the position of the line end stops to reflect the new line geometry
     update_end_stops(object_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Internal function to move all selected objects on the canvas
+#------------------------------------------------------------------------------------
+        
+def move_selected_objects(xdiff:int,ydiff:int):
+    for object_id in schematic_state["selectedobjects"]:
+        # All drawing objects should be "tagged" apart from the bbox
+        canvas.move(objects.schematic_objects[object_id]["tags"],xdiff,ydiff)
+        canvas.move(objects.schematic_objects[object_id]["bbox"],xdiff,ydiff)
     return()
 
 #------------------------------------------------------------------------------------
@@ -596,7 +601,7 @@ def track_cursor(event):
         xdiff = canvas_x - schematic_state["lastx"]
         ydiff = canvas_y - schematic_state["lasty"]
         # Move all the objects that are selected
-        canvas.move("selected",xdiff,ydiff)
+        move_selected_objects(xdiff,ydiff)
         # Set the 'last' position for the next move event
         schematic_state["lastx"] += xdiff
         schematic_state["lasty"] += ydiff
@@ -630,7 +635,7 @@ def left_button_release(event):
         # out the xdiff and xdiff for one of the selected objects to get the diff
         xdiff,ydiff = snap_to_grid(schematic_state["lastx"]- schematic_state["startx"],
                                    schematic_state["lasty"]- schematic_state["starty"])
-        canvas.move("selected",xdiff,ydiff)
+        move_selected_objects(xdiff,ydiff)
         # Calculate the total deltas for the move (from the startposition)
         finalx = schematic_state["lastx"] - schematic_state["startx"] + xdiff
         finaly = schematic_state["lasty"] - schematic_state["starty"] + ydiff
@@ -685,7 +690,7 @@ def cancel_move_in_progress(event=None):
         # Undo the move by returning all objects to their start position
         xdiff = schematic_state["startx"] - schematic_state["lastx"]
         ydiff = schematic_state["starty"] - schematic_state["lasty"]
-        canvas.move("selected",xdiff,ydiff)
+        move_selected_objects(xdiff,ydiff)
         # Clear the "select object mode" - but leave all objects selected
         schematic_state["moveobjects"] = False
     elif schematic_state["editlineend1"] or  schematic_state["editlineend2"]:
