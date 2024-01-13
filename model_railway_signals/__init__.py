@@ -150,7 +150,7 @@ __all__ = [
         'subscribe_to_remote_sensor',
         'set_sensors_to_publish_state',
       # Public DCC control functions
-        'initialise_pi_sprog',
+        'sprog_connect',
         'service_mode_write_cv',
         'request_dcc_power_on',
         'request_dcc_power_off',
