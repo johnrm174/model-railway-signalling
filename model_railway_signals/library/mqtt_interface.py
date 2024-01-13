@@ -63,6 +63,7 @@ node_config: dict = {}
 node_config["heartbeat_frequency"] = 4.0 # Constant of 4 seconds
 node_config["network_identifier"] = ""
 node_config["node_identifier"] = ""   
+node_config["local_ip_address"] = ""   
 node_config["enhanced_debugging"] = False
 node_config["act_on_shutdown"] = False
 node_config["publish_shutdown"] = False
@@ -74,6 +75,23 @@ node_config["heartbeat_thread_started"] = False
 node_config["list_of_published_topics"] = []
 node_config["list_of_subscribed_topics"] = []
 node_config["callbacks"] = {}
+
+#-----------------------------------------------------------------------------------------------
+# Find the local IP address (to include in the heartbeat messages):
+# This will return the assigned IP address if we are connected to a network
+#-----------------------------------------------------------------------------------------------
+
+import socket
+test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+try:
+    test_socket.connect(('10.255.255.255', 1))
+    ip_address = test_socket.getsockname()[0]
+    node_config["local_ip_address"] = ip_address
+except:
+    logging.error("MQTT-Client: Could not retrieve local IP address")
+    node_config["local_ip_address"] = "<unknown>"
+finally:
+    test_socket.close()
 
 #-----------------------------------------------------------------------------------------------
 # The MQTT client is held globally:
@@ -104,7 +122,7 @@ def thread_to_send_heartbeat_messages():
             # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
             topic = "heartbeat"+"/"+node_config["network_identifier"]
             # Payload for the heartbeat message is a dictionary comprising the source node
-            heartbeat_message = {"node":node_config["node_identifier"]}
+            heartbeat_message = {"node":node_config["node_identifier"],"ip":node_config["local_ip_address"]}
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing Heartbeat :"+str(heartbeat_message))
             payload = json.dumps(heartbeat_message)
             # the PAHO MQTT client is not thread safe so publish the message from the main Tkinter thread
@@ -205,7 +223,7 @@ def process_message(msg):
             time_stamp = int(time.time())
             if node_config["enhanced_debugging"]:
                 logging.debug("MQTT-Client: Received Heartbeat: "+str(unpacked_json)+" at time: "+str(time_stamp))
-            heartbeats[unpacked_json["node"]] = time_stamp
+            heartbeats[unpacked_json["node"]] = [unpacked_json["ip"],time_stamp]
         # If it is a shutdown message we only act on it if configured to do so
         elif msg.topic.startswith("shutdown"):
             if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:

@@ -818,11 +818,20 @@ class mqtt_status_tab():
         for node_id in node_status.keys():
             subframe = Tk.Frame(self.frame2)
             subframe.pack(padx=2, pady=2, fill='x')
+            # User defined Node identifier
             node = Tk.Label(subframe,text=node_id)
             node.pack(side=Tk.LEFT)
-            label = Tk.Label(subframe, text=" - Last seen: ")
-            label.pack(side=Tk.LEFT)
-            time_stamp = node_status[node_id]
+            # Ip address (received in the heartbeat message)
+            ip_address = node_status[node_id][0]
+            label1 = Tk.Label(subframe, text=" - ip:")
+            label1.pack(side=Tk.LEFT)
+            ip_add = Tk.Label(subframe, text=ip_address)
+            ip_add.pack(side=Tk.LEFT)
+            # Timestamp (when the last heartbeat message was received)
+            time_stamp = node_status[node_id][1]
+            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
+            label2 = Tk.Label(subframe, text="- Last seen: ")
+            label2.pack(side=Tk.LEFT)
             time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
             last_time = Tk.Label(subframe, text=time_to_display)
             last_time.pack(side=Tk.LEFT)
