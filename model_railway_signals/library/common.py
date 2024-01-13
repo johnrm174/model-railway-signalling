@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # This module contains all of the parameters, funcions and classes that 
-# are used across multiple modules in the model_railway_signalling package
+# are used across multiple modules in the model_railway_signalling library
 # -------------------------------------------------------------------------
 
 import math
@@ -13,7 +13,7 @@ from . import pi_sprog_interface
 from . import track_sensors
 
 # -------------------------------------------------------------------------
-# Global variables used within the Common Module
+# Global variables used within the Library Common Module
 # -------------------------------------------------------------------------
 
 # Global variables for how the signals/points/sections buttons appear
@@ -33,21 +33,27 @@ event_queue = queue.Queue()
 shutdown_initiated = False
 
 #-------------------------------------------------------------------------
-# Function to catch the root window close event so we can perform an
-# orderly shutdown of the other threads running in the application
+# Function to catch the root close event for applications that use the API
 # This calls file_interface.quit_application function to get confirmation
 # of quit from the user and/or let the user save the current state
 #-------------------------------------------------------------------------
+
+##########################################################################
+# Note that this function is effectively DEPRECATED with the DEPRECATION
+# of the published library API as the editor module captures the root
+# window close event and asks the user to confirm application quit
+##########################################################################
 
 def on_closing():
     if file_interface.save_state_and_quit(): shutdown()      
     return()
 
 #-------------------------------------------------------------------------
-# Function to catch the root window close event so we can perform an
-# orderly shutdown of the other threads running in the application
-# The shutdown_initiated flag is used to tell the flash aspects and timed
-# signals functions to stop scheduling further "after" commands and exit 
+# Function to perfor an orderly shutdown of the library functions:
+#   MQTT Networking - clean up the published topics and disconnect
+#   SPROG interface - switch off the DCC power and close the serial port
+#   Track Sensors - revert all GPIO pins to their default states
+#   Finally - wait for all scheduled TKinter events to complete
 #-------------------------------------------------------------------------
 
 def shutdown():
@@ -86,6 +92,11 @@ def shutdown():
 # objects should be done from within the main tkinter thread.
 #-------------------------------------------------------------------------
 
+##########################################################################
+# Note that this function is effectively DEPRECATED with the editor as
+# the editor module sets the root_window reference direcly after creation
+##########################################################################
+
 def find_root_window (canvas):
     global root_window
     parent = canvas.master
@@ -100,6 +111,22 @@ def find_root_window (canvas):
     root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     # Bind the window close event so we can perform an orderly shutdown
     root_window.protocol("WM_DELETE_WINDOW",on_closing)
+    return(root_window)
+
+#-------------------------------------------------------------------------
+# Function to set the tkinter "root" window reference as this is used to
+# schedule callback events in the main tkinter event loop using the 'after' 
+# method and also for feeding custom callback functions into the main tkinter
+# thread. We do this as all the information out there on the internet concludes
+# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
+# objects should be done from within the main tkinter thread.
+#-------------------------------------------------------------------------
+
+def set_root_window (root):
+    global root_window
+    root_window = root
+    # bind the tkinter event for handling events raised in external threads
+    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
     return(root_window)
 
 #-------------------------------------------------------------------------
