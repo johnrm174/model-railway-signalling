@@ -33,6 +33,9 @@
 #       node_identifier:str - The name to use for this node on the network (can be any string)
 #   Optional Parameters:
 #       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+#       publish_shutdown:bool - Publish a shutdown message on appication exit (default = False)
+#       act_on_shutdown:bool - Make a callback if a shutdown message is received (default = False)
+#       shutdown_callback - Callback to make on reciept of a shutdown message (default = None)
 #
 # mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
 #                    Returns whether the connection was successful or not (True/False)
@@ -63,6 +66,7 @@ node_config["node_identifier"] = ""
 node_config["enhanced_debugging"] = False
 node_config["act_on_shutdown"] = False
 node_config["publish_shutdown"] = False
+node_config["shutdown_callback"] = None
 node_config["shutdown_initiated"] = False
 node_config["network_configured"] = False
 node_config["connected_to_broker"] = False
@@ -204,12 +208,12 @@ def process_message(msg):
             heartbeats[unpacked_json["node"]] = time_stamp
         # If it is a shutdown message we only act on it if configured to do so
         elif msg.topic.startswith("shutdown"):
-            if node_config["act_on_shutdown"]:
+            if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:
                 logging.info("MQTT-Client: Received Shutdown message: "+str(unpacked_json)+
                              "- Triggering application shutdown")
-                common.shutdown()
+                node_config["shutdown_callback"]()
             elif node_config["enhanced_debugging"]:
-                logging.debug("MQTT-Client: Received Shutdown message: "+str(unpacked_json))
+                logging.debug("MQTT-Client: Ignoring Received Shutdown message: "+str(unpacked_json))
         # Make the callback (that was registered when the calling programme subscribed to the feed)
         # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
@@ -246,7 +250,8 @@ def configure_mqtt_client (network_identifier:str,
                            node_identifier:str,
                            enhanced_debugging:bool = False,
                            publish_shutdown:bool = False,
-                           act_on_shutdown:bool = False):
+                           act_on_shutdown:bool = False,
+                           shutdown_callback=None):
     global node_config, mqtt_client
     logging.debug("MQTT-Client: Configuring MQTT Client for "+network_identifier+":"+node_identifier)
     # Configure this module (to enable subscriptions to be configured even if not connected)
@@ -255,11 +260,13 @@ def configure_mqtt_client (network_identifier:str,
     node_config["node_identifier"] = node_identifier
     node_config["publish_shutdown"] = publish_shutdown
     node_config["act_on_shutdown"] = act_on_shutdown
+    node_config["shutdown_callback"] = shutdown_callback
     node_config["network_configured"] = True
     return()
 
 #-----------------------------------------------------------------------------------------------
 # Public API Function to connect and/or re-connect to an external MQTT broker instance
+# Returns True if connection was successful
 #
 # A few notes about disconnecting and then re-connecting from the broker:
 #
@@ -333,6 +340,7 @@ def mqtt_broker_connect (broker_host:str,
 
 #-----------------------------------------------------------------------------------------------
 # Public API Function to disconnect from an external MQTT broker instance
+# Returns True if disconnection was successful
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_broker_disconnect():
@@ -359,7 +367,7 @@ def mqtt_broker_disconnect():
         else:
             mqtt_client.loop_stop()
             mqtt_client = None
-    return(node_config["connected_to_broker"])
+    return(not node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
 # Externally called function to perform a gracefull shutdown of the MQTT networking
