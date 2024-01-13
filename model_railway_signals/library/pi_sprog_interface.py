@@ -192,7 +192,7 @@ def thread_to_read_received_data ():
                     # Report Service Mode Status response (0x4C = 76 decimal) 
                     elif op_code == 76: process_sstat_message(byte_string)
                 except:
-                    logging.warning("Pi-SPROG: Couldn't decode CBUS Message: "+cbus_message.decode('Ascii')+"\r")
+                    logging.warning("Pi-SPROG: Couldn't decode CBUS Message: "+byte_string.decode('Ascii')+"\r")
         # Ensure the thread doesn't hog all the CPU time
         time.sleep(0.001)
     if debug: logging.debug("Pi-SPROG - Rx Thread exiting")
