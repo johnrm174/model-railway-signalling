@@ -256,17 +256,22 @@ class main_menubar:
         self.root.title(name)
         # Re-size the canvas to reflect the new schematic size
         self.canvas_update()
+        # Reset the SPROG and MQTT connecions to their default states - the MQTT and SPROG
+        # configuration settings in the loaded file may be completely different so we
+        # want to close down everything before re-opening everything from scratch
+        if self.power_label == "DCC Power:On": self.dcc_power_off()
+        if self.sprog_label == "SPROG:Connected":self.sprog_disconnect()
+        if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         # Initialise the SPROG (if configured). Note that we use the menubar functions
         # for connection and the DCC power so these are correctly reflected in the UI
         # The "connect" and "power" flags are the 4th and 5th parameter returned
-        if self.power_label == "DCC Power:On" and not settings.get_sprog()[4]: self.dcc_power_off()
-        if self.sprog_label == "SPROG:Connected" and not settings.get_sprog()[3]: self.sprog_disconnect()
-        if settings.get_sprog()[3]: self.sprog_connect()
-        if settings.get_sprog()[4]: self.dcc_power_on()
+        if settings.get_sprog()[3]:
+            sprog_connected = self.sprog_connect()
+            if sprog_connected and settings.get_sprog()[4]:
+                self.dcc_power_on()
         # Initialise the MQTT networking (if configured). Note that we use the menubar 
         # function for connection so the state is correctly reflected in the UI
         # The "connect on startup" flag is the 8th parameter returned
-        if self.mqtt_label == "MQTT:Connected": self.mqtt_disconnect()
         self.mqtt_reconfigure_client()
         if settings.get_mqtt()[7]: self.mqtt_connect()
         self.mqtt_reconfigure_pub_sub()
@@ -302,9 +307,9 @@ class main_menubar:
             if settings.get_general()[4]: self.automation_disable()
             else: self.automation_enable()
             
-    # --------------------------------------------------------------------------------------
-    # Callback functions to handle menubar selection events
-    # --------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------------
+    # Mode menubar functions
+    #------------------------------------------------------------------------------------------
         
     def automation_enable(self):
         new_label = "Automation:On"
@@ -312,7 +317,7 @@ class main_menubar:
         self.auto_label = new_label
         settings.set_general(automation=True)
         run_layout.enable_automation()
-            
+
     def automation_disable(self):
         new_label = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
@@ -329,7 +334,7 @@ class main_menubar:
             schematic.enable_editing()
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
-        new_label1 = "Automation:Off"
+        new_label1 = "Automation:N/A"
         self.mainmenubar.entryconfigure(self.auto_label, state="disabled")
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label1)
         self.auto_label = new_label1
@@ -358,29 +363,52 @@ class main_menubar:
                 objects.reset_objects()
         else:
             objects.reset_objects()
+            
+    #------------------------------------------------------------------------------------------
+    # SPROG menubar functions
+    #------------------------------------------------------------------------------------------
 
-    def sprog_connect(self, show_popup:bool=True):
-        port, baud, debug, startup, power = settings.get_sprog()
-        connected = pi_sprog_interface.initialise_pi_sprog(port, baud, debug)
+    def update_sprog_menubar_controls(self, desired_state:bool, connected:bool, show_popup:bool):
         if connected:
             new_label = "SPROG:Connected"
             self.mainmenubar.entryconfigure(self.power_label, state="normal")
+            if show_popup and connected != desired_state:
+                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="Error disconnecting from Serial Port - try rebooting")
         else:
             new_label = "SPROG:Disconnected"
             self.mainmenubar.entryconfigure(self.power_label, state="disabled")
-            if show_popup:
+            if show_popup and connected != desired_state:
                 Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="SPROG connection failure\nCheck SPROG settings")
+                    message="SPROG connection failure - Check SPROG settings")
         self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
         self.sprog_label = new_label
+
+    def update_power_menubar_controls(self, desired_state:bool, power_on:bool):
+        if power_on:
+            new_label = "DCC Power:On"
+            if power_on != desired_state:
+                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="DCC power off failed - Check SPROG settings")
+        else:
+            new_label = "DCC Power:Off"
+            if power_on != desired_state:
+                Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
+                    message="DCC power on failed - Check SPROG settings")
+        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
+        self.power_label = new_label
+
+    def sprog_connect(self, show_popup:bool=True):
+        # The connect request returns True if successful
+        port, baud, debug, startup, power = settings.get_sprog()
+        connected = pi_sprog_interface.sprog_connect(port, baud, debug)
+        self.update_sprog_menubar_controls(True, connected, show_popup)
         return(connected)
     
     def sprog_disconnect(self):
-        pi_sprog_interface.sprog_shutdown()
-        new_label = "SPROG:Disconnected"
-        self.mainmenubar.entryconfigure(self.power_label, state="disabled")
-        self.mainmenubar.entryconfigure(self.sprog_label, label=new_label)
-        self.sprog_label = new_label
+        # The disconnect request returns True if successful
+        connected = not pi_sprog_interface.sprog_disconnect()
+        self.update_sprog_menubar_controls(False, connected, True)
 
     def sprog_update(self):
         # Only update the configuration if we are already connected - otherwise 
@@ -389,57 +417,52 @@ class main_menubar:
 
     def dcc_power_off(self):
         # The power off request returns True if successful
-        if pi_sprog_interface.request_dcc_power_off():
-            new_label = "DCC Power:Off"
-        else:
-            new_label = "DCC Power:???"
-            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power off failed \nCheck SPROG settings")
-        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-        self.power_label = new_label
+        power_on = not pi_sprog_interface.request_dcc_power_off()
+        self.update_power_menubar_controls(False, power_on)
 
     def dcc_power_on(self):
-        # The power on request returns True if successful 
-        if pi_sprog_interface.request_dcc_power_on():
-            new_label = "DCC Power:On"
-        else:
-            new_label = "DCC Power:???"
-            Tk.messagebox.showerror(parent=self.root, title="SPROG Error",
-                    message="DCC power on failed \nCheck SPROG settings")
-        self.mainmenubar.entryconfigure(self.power_label, label=new_label)
-        self.power_label = new_label
+        # The power on request returns True if successful
+        power_on = pi_sprog_interface.request_dcc_power_on()
+        self.update_power_menubar_controls(True, power_on)
 
     def dcc_programming_enabled(self):
         return (self.power_label=="DCC Power:On" and self.sprog_label=="SPROG:Connected")
+
+    #------------------------------------------------------------------------------------------
+    # MQTT menubar functions
+    #------------------------------------------------------------------------------------------
+
+    def update_mqtt_menubar_controls(self, desired_state:bool, connected:bool, show_popup:bool):
+        if connected:
+            new_label = "MQTT:Connected"
+            if show_popup and connected != desired_state:
+                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
+                    message="Broker disconnection failure - try rebooting")
+        else:
+            new_label = "MQTT:Disconnected"
+            if show_popup and connected != desired_state:
+                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
+                    message="Broker connection failure- Check MQTT settings")
+        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
+        self.mqtt_label = new_label
 
     def mqtt_connect(self, show_popup:bool=True):
         url = settings.get_mqtt()[0]
         port = settings.get_mqtt()[1]
         username = settings.get_mqtt()[4]
         password = settings.get_mqtt()[5]
+        # The connect request returns True if successful
         connected = mqtt_interface.mqtt_broker_connect(url, port, username, password)
-        if connected:
-            new_label = "MQTT:Connected"
-        else:
-            new_label = "MQTT:Disconnected"
-            if show_popup:
-                Tk.messagebox.showerror(parent=self.root, title="MQTT Error",
-                    message="Broker connection failure\nCheck MQTT settings")
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
+        self.update_mqtt_menubar_controls(True, connected, show_popup)
         return(connected)
     
     def mqtt_disconnect(self):
-        connected = mqtt_interface.mqtt_broker_disconnect()
-        if connected:
-            new_label = "MQTT:Connected"
-        else:
-            new_label = "MQTT:Disconnected"
-        self.mainmenubar.entryconfigure(self.mqtt_label, label=new_label)
-        self.mqtt_label = new_label
+        # The disconnect request returns True if successful
+        connected = not mqtt_interface.mqtt_broker_disconnect()
+        self.update_mqtt_menubar_controls(False, connected, True)
 
     def mqtt_update(self):
-        # Apply the new broker settings (host, port, username, password)
+        # Apply the new signalling network confguration
         self.mqtt_reconfigure_client()
         # Only reset the broker connection if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
@@ -453,7 +476,8 @@ class main_menubar:
         debug = settings.get_mqtt()[6]
         publish_shutdown = settings.get_mqtt()[8]
         act_on_shutdown = settings.get_mqtt()[9]
-        mqtt_interface.configure_mqtt_client(network, node, debug, publish_shutdown, act_on_shutdown)
+        mqtt_interface.configure_mqtt_client(network, node, debug, publish_shutdown, act_on_shutdown,
+                        shutdown_callback = lambda:self.quit_schematic(ask_for_confirm=False))
         
     def mqtt_reconfigure_pub_sub(self):
         dcc_control.reset_mqtt_configuration()
@@ -463,7 +487,11 @@ class main_menubar:
         objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
         objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
-        
+
+    #------------------------------------------------------------------------------------------
+    # OTHER menubar functions
+    #------------------------------------------------------------------------------------------
+
     def canvas_update(self):
         width, height, grid, snap_to_grid = settings.get_canvas()
         schematic.update_canvas(width, height, grid, snap_to_grid)
@@ -485,12 +513,21 @@ class main_menubar:
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
         objects.update_local_sensors(trigger, timeout, mappings)
 
+    #------------------------------------------------------------------------------------------
+    # FILE menubar functions
+    #------------------------------------------------------------------------------------------
+
     def quit_schematic(self, ask_for_confirm:bool=True):
         # Note that 'confirmation' is defaulted to 'True' for normal use (i.e. when this function
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         # 'confirmation' is False (system_test_harness use case) then the dialogue is surpressed
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="Quit Schematic",
                 message="Are you sure you want to discard all changes and quit the application"):
+            # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
+            # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
+            # power and disconnect from the serial port, Revert all GPIO ports to their default states
+            # and then wait until all scheduled Tkinter tasks have completed before destroying root
+            schematic.shutdown()
             library_common.shutdown()
         return()
                 
@@ -499,13 +536,11 @@ class main_menubar:
         # is called as a result of a menubar selection) to enforce the confirmation dialog. If
         if not ask_for_confirm or Tk.messagebox.askokcancel(parent=self.root, title="New Schematic",
                 message="Are you sure you want to discard all changes and create a new blank schematic"):
-            # Delete all existing objects
+            # Delete all existing objects, restore the default settings and re-initialise the editor
             schematic.delete_all_objects()
-            # Restore the default settings and update the editor config
             settings.restore_defaults()
-            # Re-initialise the editor for the new settings to take effect
             self.initialise_editor()
-            # save the current state (for undo/redo) - deleting all previous history
+            # Save the current state (for undo/redo) - deleting all previous history
             objects.save_schematic_state(reset_pointer=True)
             # Set the file saved flag back to false (to force a "save as" on next save)
             self.file_has_been_saved = False
@@ -617,16 +652,21 @@ def run_editor():
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()-30
     root.maxsize(screen_width,screen_height)
+    # Store the root window reference for use by the library functions
+    library_common.set_root_window(root)
     # Create the menubar and editor canvas (canvas size will be set on creation)
     main_window_menubar = main_menubar(root)
-    # Use the signals Lib function to find/store the root window reference
-    # And then re-bind the close window event to the editor quit function
-    library_common.find_root_window(main_window_menubar.mainmenubar)
+    # Bind the close window event to the editor quit function to perform an orderly shutdown
     root.protocol("WM_DELETE_WINDOW", main_window_menubar.quit_schematic)
     # Enter the TKinter main loop (with exception handling for keyboardinterrupt)
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
+        # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
+        # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
+        # power and disconnect from the serial port, Revert all GPIO ports to their default states
+        # and then wait until all scheduled Tkinter tasks have completed before destroying root
+        schematic.shutdown()
         library_common.shutdown()
     print("Exiting Model Railway Signalling application")
 
