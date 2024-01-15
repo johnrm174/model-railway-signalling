@@ -84,6 +84,7 @@ from . import objects
 canvas = None
 editing_enabled = None
 automation_enabled = None
+enhanced_debugging = False  # Switch this on to enable 'info'
 
 #------------------------------------------------------------------------------------
 # The set_canvas function is called at application startup (on canvas creation)
@@ -832,24 +833,24 @@ def process_all_aspect_updates():
 
 def schematic_callback(item_id:Union[int,str], callback_type):
     global canvas, editing_enabled, automation_enabled
-    logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
+    if enhanced_debugging: logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     # Timed signal sequences can be triggered by 'signal_passed' events - LOCAL SIGNALS ONLY
     # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
     if (callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
            and not editing_enabled and automation_enabled):
-        logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(int(item_id)) 
     # 'signal_passed' events can trigger changes in track occupancy - LOCAL SIGNALS ONLY
     # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
     # in Run mode) - but remain enabled in Run Mode whether automation is Enabled or Disabled
     if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id) and not editing_enabled:
-        logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
         update_track_occupancy(int(item_id))
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
     # Route Setting is ENABLED in both Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched ):
-        logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
     # Any 'Mirrored' track sections are updated following changes to track occupancy as part of the
     # 'update_track_occupancy' function call above. The 'section_updated' callback is generated when a
@@ -858,7 +859,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # library objects) only "exist" in run mode this event is only processed in RUN mode, whether
     # automation is Enabled or Disabled. Note that the Item ID could local (int) or remote (str).
     if callback_type == track_sections.section_callback_type.section_updated and not editing_enabled:
-        logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_mirrored_section(item_id)   # Could be an int (local) or str (remote)
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
@@ -879,7 +880,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
         if not editing_enabled and automation_enabled:
             # First we update all signal overrides based on track occupancy, but ONLY IN RUN MODE
             # (as track sections only exist in RUN Mode), if Automation is ENABLED
-            logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
+            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
             update_all_signal_overrides()
             # Approach control is made complex by the need to support the case of setting approach
             # control on the state of home signals ahead (for layout automation). We therefore have
@@ -887,18 +888,18 @@ def schematic_callback(item_id:Union[int,str], callback_type):
             # Note that the item_id is only used in conjunction with the signal_passed event
             # so the function will not 'break' if the item-id is an int or a str
             # Approach Control is only ENABLED in RUN Mode if automation is ENABLED
-            logging.info("RUN LAYOUT - Updating Signal Approach Control to reflect Signals ahead:")
+            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control to reflect Signals ahead:")
             update_all_signal_approach_control(item_id, callback_type)
             # Finally process any distant signal overrides on home signals ahead (walks the home signals
             # ahead and will override the distant signal to CAUTION if any of the home signals are at DANGER
             # This is a seperate override function to the main signal override (works an an OR function)
             # Distant Overrides are only ENABLED in RUN Mode if automation is ENABLED
-            logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
+            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
             update_all_distant_overrides()
         else:    
             # If we are in EDIT mode and/or Automation is DISABLED, we still want to update the
             # signals to reflect the displayed aspects of the signal ahead
-            logging.info("RUN LAYOUT - Updating Signal Aspects to reflect Signals ahead:")
+            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Aspects to reflect Signals ahead:")
             process_all_aspect_updates()
     # Signal interlocking is updated on point, signal or block instrument switched events
     # We also need to process signal interlocking on any event which may have changed the
@@ -913,15 +914,15 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated  ):
-        logging.info("RUN LAYOUT - Updating Signal Interlocking:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
     # Point interlocking is updated on signal (or subsidary signal) switched events
     # Interlocking is ENABLED in  Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == signals_common.sig_callback_type.sig_switched or
          callback_type == signals_common.sig_callback_type.sub_switched):
-        logging.info("RUN LAYOUT - Updating Point Interlocking:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Point Interlocking:")
         process_all_point_interlocking()
-    logging.info("**************************************************************************************")
+    if enhanced_debugging: logging.info("**************************************************************************************")
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
@@ -934,49 +935,49 @@ def schematic_callback(item_id:Union[int,str], callback_type):
 
 def initialise_layout():
     global canvas, editing_enabled, automation_enabled
-    logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
+    if enhanced_debugging: logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
     # We always process signal routes - for all modes whether automation is enabled/disabled
-    logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
+    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
     if not editing_enabled and not automation_enabled:
         # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
         # the process_all_aspect_updates function (as we are not making the other update calls)
-        logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
         update_all_mirrored_sections()
-        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
         clear_all_distant_overrides()
-        logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
         clear_all_approach_control()
-        logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
     elif not editing_enabled and automation_enabled:
         # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
         # updated by update_all_signal_approach_control and update_all_distant_overrides
-        logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
         update_all_mirrored_sections()
-        logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
         update_all_signal_overrides()
-        logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
         update_all_signal_approach_control()
-        logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
         update_all_distant_overrides()        
     else:
         # Edit mode (automation disabled by default - we don't care about the user selection)
         # Note that we need to call the process_all_aspect_updates function (see above)
-        logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
         clear_all_distant_overrides()
-        logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
         clear_all_approach_control()
-        logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
     # We always process interlocking - for all modes whether automation is enabled/disabled
-    logging.info("RUN LAYOUT - Updating Signal Interlocking:")
+    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
-    logging.info("RUN LAYOUT - Updating Point Interlocking:")
+    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
-    logging.info("**************************************************************************************")
+    if enhanced_debugging: logging.info("**************************************************************************************")
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
