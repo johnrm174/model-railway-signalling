@@ -82,12 +82,12 @@ raspberry_pi = is_raspberrypi()
 # ----------------------------------------------------------------------------------------------------------------------------
 # Public API function to return a list of available ports. This is provided to make the software extensible
 # as and when I get around to adding support for add-on GPIO HATs (to provide additional inputs)
-# We don't use GPIO 14 or 15 as these are used for UART comms with the PI-SPROG-3
+# We don't use GPIO 14, 15, 16 or 17  as these are used for UART comms with the PI-SPROG-3 (Tx, Rx, CTS, RTS)
 # We don't use GPIO 0, 1, 2, 3 as these are the I2C (which we might want to use later)
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def get_list_of_available_ports():
-    return ([4,5,6,7,8,9,10,11,12,13,16,17,18,19,20,21,22,23,24,25,26])
+    return ([4,5,6,7,8,9,10,11,12,13,18,19,20,21,22,23,24,25,26])
 
 # -----------------------------------------------------------------------------------------------------------
 # Gpio port mappings are stored in a global dictionary when created with the key beign the GPIO sensor ID
@@ -292,7 +292,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         logging.error ("Sensor "+str(sensor_id)+": GPIO port "+str(gpio_channel)+" is already mapped to another Sensor")
     elif gpio_channel not in get_list_of_available_ports():
         logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Port "+str(gpio_channel)
-                        + " - (GPIO port must be between 4 and 26 - also 14 & 15 are reserved)")
+                        + " - (GPIO port must be between 4 and 26 - also 14, 15, 16 and 17 are reserved)")
     elif signal_passed > 0 and signal_approach > 0:
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
