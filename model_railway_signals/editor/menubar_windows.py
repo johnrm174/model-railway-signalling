@@ -141,11 +141,13 @@ class display_help():
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
             help_window = self.window
             # Create the link to the Quickstart Guide
-            self.frame = Tk.LabelFrame(self.window, text="Application quickstart guide (view and/or download)" )
-            self.frame.pack(padx=5, pady=5, fill='x')
-            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling/blob/main/user_guide/quickstart_guide.pdf"
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack(padx=5, pady=5)
+            self.label1=Tk.Label(self.frame, text="Application quickstart guide can be downloaded from: ")
+            self.label1.pack(side=Tk.LEFT, pady=5)
+            self.hyperlink = "https://www.model-railway-signalling.co.uk/"
             self.label2 = Tk.Label(self.frame, text=self.hyperlink, fg="blue", cursor="hand2")
-            self.label2.pack(padx=5, pady=5)
+            self.label2.pack(side=Tk.LEFT, pady=5)
             self.label2.bind("<Button-1>", self.callback)
             # Create the srollable textbox to display the help text. We only specify
             # the max height (in case the help text grows in the future) leaving
@@ -205,7 +207,7 @@ class display_about():
             # Create the Help text and hyperlink
             self.label1 = Tk.Label(self.window, text=about_text)
             self.label1.pack(padx=5, pady=5)
-            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+            self.hyperlink = "https://www.model-railway-signalling.co.uk/"
             self.label2 = Tk.Label(self.window, text=self.hyperlink, fg="blue", cursor="hand2")
             self.label2.pack(padx=5, pady=5)
             self.label2.bind("<Button-1>", self.callback)
