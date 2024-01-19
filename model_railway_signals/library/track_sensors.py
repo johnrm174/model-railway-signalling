@@ -87,7 +87,7 @@ raspberry_pi = is_raspberrypi()
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def get_list_of_available_ports():
-    return ([4,5,6,7,8,9,10,11,12,13,18,19,20,21,22,23,24,25,26])
+    return ([4,5,6,12,13,18,19,20,21,22,23,24,25,26,27])
 
 # -----------------------------------------------------------------------------------------------------------
 # Gpio port mappings are stored in a global dictionary when created with the key beign the GPIO sensor ID
@@ -292,7 +292,7 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         logging.error ("Sensor "+str(sensor_id)+": GPIO port "+str(gpio_channel)+" is already mapped to another Sensor")
     elif gpio_channel not in get_list_of_available_ports():
         logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Port "+str(gpio_channel)
-                        + " - (GPIO port must be between 4 and 26 - also 14, 15, 16 and 17 are reserved)")
+                        + " - Supported GPIO ports are: " + str(get_list_of_available_ports()))
     elif signal_passed > 0 and signal_approach > 0:
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:

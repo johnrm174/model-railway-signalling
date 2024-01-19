@@ -996,7 +996,7 @@ class gpio_port_entry_frame():
             self.list_of_subframes.append(Tk.Frame(self.frame))
             self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
             # Create the entry_boxes for the row
-            for value in range (7):
+            for value in range (5):
                 if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
                 label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
                 tool_tip = "Enter a Sensor ID to be associated with this GPIO port (or leave blank)"
