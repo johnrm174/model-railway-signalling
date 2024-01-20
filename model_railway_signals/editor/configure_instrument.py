@@ -134,6 +134,8 @@ class linked_to_selection(common.str_int_item_id_entry_box):
 
 class sound_file_element(common.entry_box):
     def __init__(self, parent_frame, label:str, tool_tip:str):
+        # Flag to test if a load file or error dialog is open or not
+        self.child_windows_open = False
         # Create a Frame to hold the various elements
         self.frame = Tk.Frame(parent_frame)
         # Only enable the audio file selections if simpleaudio is installed
@@ -156,6 +158,7 @@ class sound_file_element(common.entry_box):
         self.TT1 = common.CreateToolTip(self.B1, button_tool_tip)
         
     def load(self):
+        self.child_windows_open = True
         # Use the library resources folder for the initial path for the file dialog
         # But the user can navigate away and use another sound file from somewhere else
         with importlib.resources.path ('model_railway_signals.library', 'resources') as initial_path:
@@ -176,7 +179,11 @@ class sound_file_element(common.entry_box):
                     if os.path.split(filename)[0] == str(initial_path):
                         filename = os.path.split(filename)[1]
                     self.full_filename = filename
+        self.child_windows_open = False
 
+    def is_open(self):
+        return(self.child_windows_open)
+    
 #------------------------------------------------------------------------------------
 # Class for the Sound file selections element - uses 2 instances of the element above)
 # Class instance methods provided by this class are:
@@ -203,6 +210,10 @@ class sound_file_selections():
     def get_values(self):
         return ( self.bell.full_filename,
                  self.key.full_filename)
+
+    def is_open(self):
+        child_windows_open = self.bell.is_open() or self.key.is_open()
+        return (child_windows_open)
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Block Instrument Configuration Tab
@@ -332,7 +343,10 @@ class edit_instrument():
         return()
 
     def close_window(self):
-        self.window.destroy()
-        del open_windows[self.object_id]
+        # Prevent the dialog being closed if the file picker or a warning window is still
+        # open as for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.config.sounds.is_open():
+            self.window.destroy()
+            del open_windows[self.object_id]
     
 #############################################################################################
