@@ -1814,7 +1814,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "21"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -2902,7 +2902,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "9"
+                "18"
             ],
             "pointinterlock": [
                 [
@@ -3977,7 +3977,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "11"
+                "21"
             ],
             "pointinterlock": [
                 [
@@ -6127,7 +6127,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "18"
+                "26"
             ],
             "pointinterlock": [
                 [
@@ -8277,7 +8277,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "24"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -9434,7 +9434,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "25"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -10544,7 +10544,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "13"
+                "23"
             ],
             "pointinterlock": [
                 [
@@ -11619,7 +11619,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "17"
+                "25"
             ],
             "pointinterlock": [
                 [
@@ -12732,7 +12732,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "10"
+                "20"
             ],
             "pointinterlock": [
                 [
@@ -13807,7 +13807,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "12"
+                "22"
             ],
             "pointinterlock": [
                 [
@@ -15070,7 +15070,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "20"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -17319,7 +17319,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "22"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -18407,7 +18407,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "23"
+                ""
             ],
             "pointinterlock": [
                 [
@@ -19011,7 +19011,7 @@
             ],
             "approachsensor": [
                 true,
-                "7"
+                "13"
             ],
             "bbox": 593,
             "dccaspects": [
@@ -19526,7 +19526,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "8"
+                "12"
             ],
             "pointinterlock": [
                 [
@@ -20601,7 +20601,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "16"
+                "24"
             ],
             "pointinterlock": [
                 [
@@ -21184,68 +21184,7 @@
             "switched": false
         }
     },
-    "sections": {
-        "1": {
-            "labeltext": "15",
-            "occupied": false
-        },
-        "10": {
-            "labeltext": "15",
-            "occupied": false
-        },
-        "11": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "12": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "13": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "14": {
-            "labeltext": "14",
-            "occupied": false
-        },
-        "15": {
-            "labeltext": "14",
-            "occupied": false
-        },
-        "2": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "3": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "4": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "5": {
-            "labeltext": "15",
-            "occupied": false
-        },
-        "6": {
-            "labeltext": "14",
-            "occupied": false
-        },
-        "7": {
-            "labeltext": "14",
-            "occupied": false
-        },
-        "8": {
-            "labeltext": "16",
-            "occupied": false
-        },
-        "9": {
-            "labeltext": "14",
-            "occupied": false
-        }
-    },
+    "sections": {},
     "settings": {
         "canvas": {
             "grid": 25,
@@ -21255,7 +21194,7 @@
         },
         "general": {
             "automation": true,
-            "editmode": false,
+            "editmode": true,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
             "version": "Version 4.1.0"
@@ -21273,26 +21212,6 @@
                 [
                     6,
                     6
-                ],
-                [
-                    7,
-                    7
-                ],
-                [
-                    8,
-                    8
-                ],
-                [
-                    9,
-                    9
-                ],
-                [
-                    10,
-                    10
-                ],
-                [
-                    11,
-                    11
                 ],
                 [
                     12,
@@ -21333,6 +21252,14 @@
                 [
                     25,
                     25
+                ],
+                [
+                    26,
+                    26
+                ],
+                [
+                    27,
+                    27
                 ]
             ],
             "timeoutperiod": 1.0,
