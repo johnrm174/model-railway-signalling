@@ -248,7 +248,7 @@ class edit_layout_info():
             # Create the srollable textbox to display the text. We specify
             # the max height/width (in case the text grows in the future) and also
             # the min height/width (to give the user something to start with)
-            self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
+            self.text = common.scrollable_text_frame(self.window, max_height=40,max_width=100,
                     min_height=10, min_width=40, editable=True, auto_resize=True)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
