@@ -297,6 +297,7 @@ class edit_point():
             # Creatre the basic Top Level window
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -389,7 +390,10 @@ class edit_point():
         return()
 
     def close_window(self):
-        self.window.destroy()
-        del open_windows[self.object_id]
+        # Prevent the dialog being closed if the colour chooser is still open as
+        # for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.config.colour.is_open():
+            self.window.destroy()
+            del open_windows[self.object_id]
         
 #############################################################################################

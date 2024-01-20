@@ -213,7 +213,10 @@ class edit_line():
         return()
 
     def close_window(self):
-        self.window.destroy()
-        del open_windows[self.object_id]
+        # Prevent the dialog being closed if the colour chooser is still open as
+        # for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.colour.is_open():
+            self.window.destroy()
+            del open_windows[self.object_id]
         
 #############################################################################################

@@ -1039,10 +1039,13 @@ class selection_buttons():
 # Class instance functions to use externally are:
 #    "set_value" - will set the current value (colour code string)
 #    "get_value" - will return the last "valid" value (colour code string)
+#    "is_open" - Test if the colour chooser is still open
 #------------------------------------------------------------------------------------
 
 class colour_selection():
     def __init__(self, parent_frame, label:str):
+        # Flag to test if a colour chooser window is open or not
+        self.colour_chooser_open = False
         # Variable to hold the currently selected colour:
         self.colour ='black'
         # Create a frame to hold the tkinter widgets
@@ -1059,9 +1062,11 @@ class colour_selection():
         self.TT2 = CreateToolTip(self.B1, "Open colour chooser dialog")
         
     def update(self):
+        self.colour_chooser_open = True
         colour_code = colorchooser.askcolor(self.colour, parent=self.frame, title ="Select Colour")
         self.colour = colour_code[1]
         self.label2.config(bg=self.colour)
+        self.colour_chooser_open = False
         
     def get_value(self):
         return(self.colour)
@@ -1069,6 +1074,9 @@ class colour_selection():
     def set_value(self,colour:str):
         self.colour = colour
         self.label2.config(bg=self.colour)
+        
+    def is_open(self):
+        return(self.colour_chooser_open)
 
 #------------------------------------------------------------------------------------
 # Compound UI element for the Apply/OK/Reset/Cancel Buttons - will make callbacks

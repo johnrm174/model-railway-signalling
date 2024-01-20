@@ -101,6 +101,7 @@ class edit_textbox():
             # Creatre the basic Top Level window
             self.window = Tk.Toplevel(root)
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             open_windows[object_id] = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -113,7 +114,7 @@ class edit_textbox():
             self.main_frame.pack(fill='both', expand=True)
             self.frame1 = Tk.Frame(self.main_frame)
             self.frame1.pack(padx=2, pady=2, fill='both', expand=True)
-            self.text = common.scrollable_text_frame(self.frame1, max_height=5,max_width=30,
+            self.text = common.scrollable_text_frame(self.frame1, max_height=15,max_width=50,
                     min_height=1, min_width=10, editable=True, auto_resize=True)
             self.text.pack(padx=2, pady=2, fill='both', expand=True)
             # Create a Frame for the colour selections
@@ -200,7 +201,10 @@ class edit_textbox():
         return()
 
     def close_window(self):
-        self.window.destroy()
-        del open_windows[self.object_id]
+        # Prevent the dialog being closed if the colour chooser is still open as
+        # for some reason this doesn't get destroyed when the parent is destroyed
+        if not self.colour.is_open() and not self.background.is_open():
+            self.window.destroy()
+            del open_windows[self.object_id]
         
 #############################################################################################
