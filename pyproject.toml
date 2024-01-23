@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "model-railway-signals"
+version = "4.1.0"
+authors = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
+maintainers = [ { name="johnrm174", email="johnrm17418@gmail.com" }, ]
+description = "Create your own DCC model railway signalling scheme"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Operating System :: OS Independent",
+]
+dependencies = [ "pyserial", "paho-mqtt", ]
+
+[tool.hatch.build.targets.sdist]
+include = [ "/model_railway_signals", "/user_guide", "/configuration_examples", "/system_tests", ]
+
+[project.urls]
+Homepage = "https://github.com/johnrm174/model-railway-signalling"
+Issues = "https://github.com/johnrm174/model-railway-signalling/issues"
+Website = "https://www.model-railway-signalling.co.uk/"
+
+

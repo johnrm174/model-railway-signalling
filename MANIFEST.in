@@ -1,2 +1,0 @@
-recursive-include model_railway_signals/library/resources *.wav
-recursive-include model_railway_signals/editor/resources *.png
