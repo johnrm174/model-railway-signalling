@@ -621,8 +621,8 @@ the minimum set needed to support the driving of signals and points via a select
 DCC Accessory decoders. Basic CV Programming is also supported - primarily as an aid to testing,  
 but for full decoder programming the recommendation is to use JRMI DecoderPro or similar.
 <pre>
-initialise_pi_sprog - Opens/configures the serial comms port to the Pi Sprog and issues
-                      a 'Request Command Station Status' command to confirm connectivity
+sprog_connect - Open and configures the serial comms port to the Pi Sprog and issues
+                a Request Command Station Status command to confirm connectivity
    Optional Parameters:
       port_name:str - The serial port to use for the Pi-SPROG 3 - Default="/dev/serial0",
       baud_rate:int - The baud rate to use for the serial port - Default = 115200,
@@ -690,6 +690,9 @@ configure_mqtt_client - Configures the local MQTT client and layout network node
       node_identifier:str - The name to use for this node on the network (can be any string)
   Optional Parameters:
       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+      publish_shutdown:bool - Publish a shutdown message on appication exit (default = False)
+      act_on_shutdown:bool - Make a callback if a shutdown message is received (default = False)
+      shutdown_callback - Callback to make on reciept of a shutdown message (default = None)
 
 mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
                    Returns whether the connection was successful or not (True/False)

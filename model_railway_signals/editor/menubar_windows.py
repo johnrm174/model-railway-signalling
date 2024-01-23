@@ -56,6 +56,7 @@
 #
 # Uses the following library functions:
 #    track_sensors.get_list_of_available_ports() - to get a list of supported ports
+#    mqtt_interface.get_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -63,9 +64,13 @@ import webbrowser
 
 from tkinter import ttk
 
+import time
+import datetime
+
 from . import common
 from . import settings
 from ..library import track_sensors
+from ..library import mqtt_interface
 
 #------------------------------------------------------------------------------------
 # Class for the "Help" window - Uses the common.scrollable_text_box.
@@ -136,11 +141,13 @@ class display_help():
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
             help_window = self.window
             # Create the link to the Quickstart Guide
-            self.frame = Tk.LabelFrame(self.window, text="Application quickstart guide (view and/or download)" )
-            self.frame.pack(padx=5, pady=5, fill='x')
-            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling/blob/main/user_guide/quickstart_guide.pdf"
+            self.frame = Tk.Frame(self.window)
+            self.frame.pack(padx=5, pady=5)
+            self.label1=Tk.Label(self.frame, text="Application quickstart guide can be downloaded from: ")
+            self.label1.pack(side=Tk.LEFT, pady=5)
+            self.hyperlink = "https://www.model-railway-signalling.co.uk/"
             self.label2 = Tk.Label(self.frame, text=self.hyperlink, fg="blue", cursor="hand2")
-            self.label2.pack(padx=5, pady=5)
+            self.label2.pack(side=Tk.LEFT, pady=5)
             self.label2.bind("<Button-1>", self.callback)
             # Create the srollable textbox to display the help text. We only specify
             # the max height (in case the help text grows in the future) leaving
@@ -200,7 +207,7 @@ class display_about():
             # Create the Help text and hyperlink
             self.label1 = Tk.Label(self.window, text=about_text)
             self.label1.pack(padx=5, pady=5)
-            self.hyperlink = "https://github.com/johnrm174/model-railway-signalling"
+            self.hyperlink = "https://www.model-railway-signalling.co.uk/"
             self.label2 = Tk.Label(self.window, text=self.hyperlink, fg="blue", cursor="hand2")
             self.label2.pack(padx=5, pady=5)
             self.label2.bind("<Button-1>", self.callback)
@@ -241,7 +248,7 @@ class edit_layout_info():
             # Create the srollable textbox to display the text. We specify
             # the max height/width (in case the text grows in the future) and also
             # the min height/width (to give the user something to start with)
-            self.text = common.scrollable_text_frame(self.window, max_height=30,max_width=150,
+            self.text = common.scrollable_text_frame(self.window, max_height=40,max_width=100,
                     min_height=10, min_width=40, editable=True, auto_resize=True)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -384,16 +391,17 @@ class edit_sprog_settings():
             self.label1 = Tk.Label(self.frame1, text="Port:")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
             self.port = common.entry_box(self.frame1, width=15,tool_tip="Specify "+
-                            "the serial port to use for communicating with the SPROG")
+                        "the serial port to use for communicating with the SPROG")
             self.port.pack(side=Tk.LEFT, padx=2, pady=2)
             self.label2 = Tk.Label(self.frame1, text="Baud:")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-            self.options = ['300','600','1200','1800','2400','4800','9600','19200','38400','57600','115200']
+            self.options = ['115200','460800']
             self.baud_selection = Tk.StringVar(self.window, "")
             self.baud = Tk.OptionMenu(self.frame1, self.baud_selection, *self.options)
             menu_width = len(max(self.options, key=len))
             self.baud.config(width=menu_width)
-            common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port")
+            common.CreateToolTip(self.baud, "Select the baud rate to use for the serial port "
+                                            +"(115200 for Pi-SPROG3 or 460800 for Pi-SPROG3 v2)")
             self.baud.pack(side=Tk.LEFT, padx=2, pady=2)
             # Create the remaining UI elements
             self.debug = common.check_box(self.window, label="Enhanced SPROG debug logging", width=28, 
@@ -588,12 +596,18 @@ class mqtt_configuration_tab():
                     "Specify a unique identifier for this node (signalling area) on the network")
         self.node.pack(side=Tk.LEFT, padx=2, pady=2)
         # Create the remaining UI elements
-        self.debug = common.check_box(self.frame2, label="Enhanced MQTT debug logging", width=28, 
+        self.debug = common.check_box(self.frame2, label="Enhanced MQTT debug logging", width=32, 
             tool_tip="Select to enable enhanced debug logging (Layout log level must also be set to 'debug')")
         self.debug.pack(padx=2, pady=2)
-        self.startup = common.check_box(self.frame2, label="Connect to Broker on layout load", width=28, 
+        self.startup = common.check_box(self.frame2, label="Connect to Broker on layout load", width=32, 
             tool_tip="Select to configure MQTT networking and connect to the broker following layout load")
         self.startup.pack(padx=2, pady=2)
+        self.pubshutdown = common.check_box(self.frame2, label="Publish shutdown on application exit", width=32, 
+            tool_tip="Select to publish a shutdown command to other network nodes when exiting this application")
+        self.pubshutdown.pack(padx=2, pady=2)
+        self.subshutdown = common.check_box(self.frame2, label="Quit application on reciept of shutdown", width=32, 
+            tool_tip="Select to shutdown and exit this application on reciept of a shutdown command published by another node")
+        self.subshutdown.pack(padx=2, pady=2)
         # Create the Button to test connectivity
         self.B1 = Tk.Button (parent_tab, text="Test Broker connectivity",command=self.test_connectivity)
         self.B1.pack(padx=2, pady=2)
@@ -617,7 +631,7 @@ class mqtt_configuration_tab():
         self. accept_all_entries()
         self.B1.focus()
         # Save the existing settings (as they haven't been "applied" yet)
-        s1, s2, s3, s4, s5, s6, s7, s8 = settings.get_mqtt()
+        current_settings = (settings.get_mqtt())
         # Apply the current settings (as they currently appear in the UI)
         url = self.url.get_value()
         port = self.port.get_value()
@@ -636,7 +650,7 @@ class mqtt_configuration_tab():
         else:
             self.status.config(text="MQTT connection failure", fg="red")
         # Now restore the existing settings (as they haven't been "applied" yet)
-        settings.set_mqtt(s1, s2, s3, s4, s5, s6, s7, s8)
+        settings.set_mqtt(*current_settings)
 
 #------------------------------------------------------------------------------------
 # Base Class for a dynamic str_entry_box_grid.
@@ -780,6 +794,56 @@ class mqtt_publish_tab():
         return (self.signals.validate() and self.sections.validate()
             and self.instruments.validate() and self.sensors.validate())
 
+
+#------------------------------------------------------------------------------------
+# Class for the MQTT Configuration 'status' Tab showing a list of connected nodes
+#------------------------------------------------------------------------------------
+
+class mqtt_status_tab():
+    def __init__(self, parent_tab):
+        # Create the list of connected nodes
+        self.frame1 = Tk.LabelFrame(parent_tab, text="Node Status")
+        self.frame1.pack(padx=2, pady=2, fill='x')
+        self.frame2 = None
+        self.button = Tk.Button(parent_tab, text="Refresh display", command=self.refresh)
+        self.button.pack(padx=2, pady=2,)
+        self.refresh()
+
+    def refresh(self):
+        # Get the list of currently connected nodes
+        node_status = mqtt_interface.get_node_status()
+        # Destroy the current frame (with all the entries) and re-create
+        if self.frame2 is not None: self.frame2.destroy()
+        self.frame2 = Tk.Frame(self.frame1)
+        self.frame2.pack()
+        # Populate the list of all nodes seen since application start
+        for node_id in node_status.keys():
+            subframe = Tk.Frame(self.frame2)
+            subframe.pack(padx=2, pady=2, fill='x')
+            # User defined Node identifier
+            node = Tk.Label(subframe,text=node_id)
+            node.pack(side=Tk.LEFT)
+            # Ip address (received in the heartbeat message)
+            ip_address = node_status[node_id][0]
+            label1 = Tk.Label(subframe, text=" - ip:")
+            label1.pack(side=Tk.LEFT)
+            ip_add = Tk.Label(subframe, text=ip_address)
+            ip_add.pack(side=Tk.LEFT)
+            # Timestamp (when the last heartbeat message was received)
+            time_stamp = node_status[node_id][1]
+            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
+            label2 = Tk.Label(subframe, text="- Last seen: ")
+            label2.pack(side=Tk.LEFT)
+            time_to_display = datetime.datetime.fromtimestamp(time_stamp).strftime('%H:%M:%S')
+            last_time = Tk.Label(subframe, text=time_to_display)
+            last_time.pack(side=Tk.LEFT)
+            # Set the colour of the timestamp according to how long ago it was
+            if time.time() - time_stamp > 10: last_time.config(fg="red")
+            else: last_time.config(fg="green")
+        if node_status == {}:
+            label = Tk.Label(self.frame2, text="No nodes seen since application start")
+            label.pack(side=Tk.LEFT)
+
 #------------------------------------------------------------------------------------
 # Class for the MQTT Settings window (uses the classes above for each tab). Note that init
 # takes in callbacks for connecting to the broker and for applying the updated settings.
@@ -803,6 +867,7 @@ class edit_mqtt_settings():
             self.window = Tk.Toplevel(root_window)
             self.window.title("MQTT Networking")
             self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
             edit_mqtt_settings_window = self.window
             # Create the common Apply/OK/Reset/Cancel buttons for the window (packed first to remain visible)
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
@@ -818,11 +883,14 @@ class edit_mqtt_settings():
             self.tabs.add(self.tab2, text="Subscribe")
             self.tab3 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab3, text="Publish")
+            self.tab4 = Tk.Frame(self.tabs)
+            self.tabs.add(self.tab4, text="Status")
             self.tabs.pack()
             # Create the tabs themselves:
             self.config = mqtt_configuration_tab(self.tab1, self.connect_function)
             self.subscribe = mqtt_subscribe_tab(self.tab2)
             self.publish = mqtt_publish_tab(self.tab3)
+            self.status = mqtt_status_tab(self.tab4)
             # Load the initial UI state
             self.load_state()
             
@@ -831,7 +899,7 @@ class edit_mqtt_settings():
         self.config.status.config(text="")
         self.validation_error.pack_forget()
         # Populate the network configuration tab
-        url, port, network, node, username, password, debug, startup = settings.get_mqtt()
+        url, port, network, node, username, password, debug, startup, pubshut, subshut = settings.get_mqtt()
         self.config.url.set_value(url)
         self.config.port.set_value(port)
         self.config.network.set_value(network)
@@ -840,6 +908,8 @@ class edit_mqtt_settings():
         self.config.password.set_value(password)
         self.config.debug.set_value(debug)
         self.config.startup.set_value(startup)
+        self.config.pubshutdown.set_value(pubshut)
+        self.config.subshutdown.set_value(subshut)
         # Populate the subscribe tab
         self.subscribe.dcc.set_values(settings.get_sub_dcc_nodes())
         self.subscribe.signals.set_values(settings.get_sub_signals())
@@ -867,9 +937,12 @@ class edit_mqtt_settings():
             password = self.config.password.get_value()
             debug = self.config.debug.get_value()
             startup = self.config.startup.get_value()
+            pubshut = self.config.pubshutdown.get_value()
+            subshut = self.config.subshutdown.get_value()
             # Save the updated settings
             settings.set_mqtt(url=url, port=port, network=network, node=node,
-                    username=username, password=password, debug=debug, startup=startup)
+                    username=username, password=password, debug=debug, startup=startup,
+                    publish_shutdown=pubshut, subscribe_shutdown=subshut)
             # Save the Subscribe settings
             settings.set_sub_dcc_nodes(self.subscribe.dcc.get_values())
             settings.set_sub_signals(self.subscribe.signals.get_values())
@@ -923,7 +996,7 @@ class gpio_port_entry_frame():
             self.list_of_subframes.append(Tk.Frame(self.frame))
             self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
             # Create the entry_boxes for the row
-            for value in range (7):
+            for value in range (5):
                 if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
                 label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
                 tool_tip = "Enter a Sensor ID to be associated with this GPIO port (or leave blank)"

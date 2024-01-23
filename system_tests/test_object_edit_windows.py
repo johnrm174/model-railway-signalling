@@ -99,7 +99,8 @@ def test_all_window_controls(delay:float=0.0):
 # This does partially duplicate the above but we run it for all layout examples as well
 #-----------------------------------------------------------------------------------
 
-def test_all_object_edit_windows(delay:float=0.0):
+def really_do_test_all_object_edit_windows(delay:float=0.0):
+    print("Testing all object edit windows")
     object_types=(objects.object_type.line, objects.object_type.textbox, objects.object_type.point,
         objects.object_type.section, objects.object_type.instrument, objects.object_type.signal)
     for object_type in object_types:
@@ -132,7 +133,13 @@ def test_all_object_edit_windows(delay:float=0.0):
                 run_function(lambda:schematic.close_edit_window(ok=True))
                 sleep(1.0)
                 assert_object_configuration(object_id,configuration)        
+    return()
 
+# This is the easy way to shorten the tests - miss out the object window tests
+def test_all_object_edit_windows(delay:float=0.0):
+    really_do_test_all_object_edit_windows(delay)
+    pass
+                
 ######################################################################################################
 
 def run_all_configuration_window_tests(delay:float=0.0, shutdown:bool=False):

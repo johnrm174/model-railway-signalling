@@ -61,7 +61,7 @@ from .library.track_sensors import track_sensor_active
 from .library.track_sensors import subscribe_to_remote_sensor
 from .library.track_sensors import set_sensors_to_publish_state
 
-from .library.pi_sprog_interface import initialise_pi_sprog
+from .library.pi_sprog_interface import sprog_connect
 from .library.pi_sprog_interface import service_mode_write_cv
 from .library.pi_sprog_interface import request_dcc_power_on
 from .library.pi_sprog_interface import request_dcc_power_off
@@ -150,7 +150,7 @@ __all__ = [
         'subscribe_to_remote_sensor',
         'set_sensors_to_publish_state',
       # Public DCC control functions
-        'initialise_pi_sprog',
+        'sprog_connect',
         'service_mode_write_cv',
         'request_dcc_power_on',
         'request_dcc_power_off',

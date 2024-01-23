@@ -9,23 +9,23 @@
                 1,
                 1
             ],
-            "bbox": 128,
+            "bbox": 3377,
             "colour": "black",
-            "end1": 124,
-            "end2": 125,
+            "end1": 3373,
+            "end2": 3374,
             "endx": 525.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 4,
-            "line": 123,
+            "line": 3372,
             "posx": 300.0,
             "posy": 200.0,
-            "stop1": 126,
-            "stop2": 127,
+            "stop1": 3375,
+            "stop2": 3376,
             "tags": "line4"
         },
         "338a06f5-049d-454e-9e8f-e032ab9ca9cb": {
-            "bbox": 131,
+            "bbox": 3380,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -39,7 +39,7 @@
         },
         "3495a936-bc8d-4393-9abe-3520edcb0d9d": {
             "background": "#18bbd9",
-            "bbox": 134,
+            "bbox": 3383,
             "border": 1,
             "colour": "black",
             "font": "Courier",
@@ -55,7 +55,7 @@
         },
         "40efa244-6879-4bbd-b880-9eeb70373504": {
             "background": "grey85",
-            "bbox": 137,
+            "bbox": 3386,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -71,7 +71,7 @@
         },
         "43fd9649-cff7-437a-b405-2811fc777a5f": {
             "background": "grey85",
-            "bbox": 140,
+            "bbox": 3389,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -87,7 +87,7 @@
         },
         "4576da32-1464-4dad-92d8-5e3e06ee59e3": {
             "background": "#18bbd9",
-            "bbox": 143,
+            "bbox": 3392,
             "border": 1,
             "colour": "black",
             "font": "Courier",
@@ -113,7 +113,7 @@
                 false,
                 ""
             ],
-            "bbox": 162,
+            "bbox": 3411,
             "dccaspects": [
                 [
                     [
@@ -1183,23 +1183,23 @@
                 20,
                 5
             ],
-            "bbox": 168,
+            "bbox": 3417,
             "colour": "black",
-            "end1": 164,
-            "end2": 165,
+            "end1": 3413,
+            "end2": 3414,
             "endx": 525.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 1,
-            "line": 163,
+            "line": 3412,
             "posx": 175.0,
             "posy": 250.0,
-            "stop1": 166,
-            "stop2": 167,
+            "stop1": 3415,
+            "stop2": 3416,
             "tags": "line1"
         },
         "6788feaa-a049-4d62-978c-faa6f4dfd967": {
-            "bbox": 171,
+            "bbox": 3420,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1213,7 +1213,7 @@
         },
         "87f435df-8da5-4999-b3ef-e7ea67977c03": {
             "background": "grey85",
-            "bbox": 174,
+            "bbox": 3423,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1234,23 +1234,23 @@
                 1,
                 1
             ],
-            "bbox": 180,
+            "bbox": 3429,
             "colour": "black",
-            "end1": 176,
-            "end2": 177,
+            "end1": 3425,
+            "end2": 3426,
             "endx": 875.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 3,
-            "line": 175,
+            "line": 3424,
             "posx": 575.0,
             "posy": 250.0,
-            "stop1": 178,
-            "stop2": 179,
+            "stop1": 3427,
+            "stop2": 3428,
             "tags": "line3"
         },
         "970e8948-a116-4023-847b-2e9269c0fa74": {
-            "bbox": 183,
+            "bbox": 3432,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1265,7 +1265,7 @@
         "990769c5-58eb-435b-befb-21b9263321b4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 190,
+            "bbox": 3439,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1292,7 +1292,7 @@
                 false,
                 ""
             ],
-            "bbox": 202,
+            "bbox": 3451,
             "dccaspects": [
                 [
                     [
@@ -2356,7 +2356,7 @@
             ]
         },
         "abc1ad1d-e1b2-4129-a1eb-e33844a0166d": {
-            "bbox": 205,
+            "bbox": 3454,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2380,7 +2380,7 @@
                 false,
                 ""
             ],
-            "bbox": 225,
+            "bbox": 3474,
             "dccaspects": [
                 [
                     [
@@ -3446,7 +3446,7 @@
         "b3241207-0377-4e6e-aeac-6cb08691c888": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 232,
+            "bbox": 3481,
             "colour": "black",
             "dccaddress": 1000,
             "dccreversed": false,
@@ -3524,7 +3524,7 @@
                 false,
                 ""
             ],
-            "bbox": 251,
+            "bbox": 3500,
             "dccaspects": [
                 [
                     [
@@ -4599,7 +4599,7 @@
                 false,
                 ""
             ],
-            "bbox": 270,
+            "bbox": 3519,
             "dccaspects": [
                 [
                     [
@@ -5669,23 +5669,23 @@
                 1,
                 1
             ],
-            "bbox": 276,
+            "bbox": 3525,
             "colour": "black",
-            "end1": 272,
-            "end2": 273,
+            "end1": 3521,
+            "end2": 3522,
             "endx": 875.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 2,
-            "line": 271,
+            "line": 3520,
             "posx": 575.0,
             "posy": 200.0,
-            "stop1": 274,
-            "stop2": 275,
+            "stop1": 3523,
+            "stop2": 3524,
             "tags": "line2"
         },
         "fc5c18e4-b05c-4941-9c64-476d0ae651a2": {
-            "bbox": 279,
+            "bbox": 3528,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5710,28 +5710,7 @@
             "switched": false
         }
     },
-    "sections": {
-        "1": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "2": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "3": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "4": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "5": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        }
-    },
+    "sections": {},
     "settings": {
         "canvas": {
             "grid": 25,
@@ -5741,10 +5720,10 @@
         },
         "general": {
             "automation": true,
-            "editmode": false,
+            "editmode": true,
             "filename": "/home/pi/model-railway-signalling/user_guide/quickstart_example1.sig",
             "info": "Document your layout here",
-            "version": "Version 4.0.0"
+            "version": "Version 4.1.0"
         },
         "gpio": {
             "portmappings": [
@@ -5762,11 +5741,11 @@
                 ],
                 [
                     4,
-                    7
+                    12
                 ],
                 [
                     5,
-                    8
+                    13
                 ]
             ],
             "timeoutperiod": 1.0,
@@ -5785,18 +5764,20 @@
             "pubinstruments": [],
             "pubsections": [],
             "pubsensors": [],
+            "pubshutdown": false,
             "pubsignals": [],
             "startup": false,
             "subdccnodes": [],
             "subinstruments": [],
             "subsections": [],
             "subsensors": [],
+            "subshutdown": false,
             "subsignals": [],
             "url": "",
             "username": ""
         },
         "sprog": {
-            "baud": 115200,
+            "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
             "power": false,

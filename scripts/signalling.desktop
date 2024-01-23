@@ -1,0 +1,10 @@
+# Example desktop entry for running up the autostart script (signalling.sh)
+# File should be saved as: /home/pi/.config/autostart/signalling.desktop
+# This will then autostart the application on Pi startup (user login)
+# Useful for remote nodes being used to publish networked track sensors
+#
+[Desktop Entry]
+Type=Application
+Name=Signalling
+Terminal=false
+Exec=sh /home/pi/.config/autostart/signalling.sh

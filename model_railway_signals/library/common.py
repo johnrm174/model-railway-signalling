@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # This module contains all of the parameters, funcions and classes that 
-# are used across multiple modules in the model_railway_signalling package
+# are used across multiple modules in the model_railway_signalling library
 # -------------------------------------------------------------------------
 
 import math
@@ -13,7 +13,7 @@ from . import pi_sprog_interface
 from . import track_sensors
 
 # -------------------------------------------------------------------------
-# Global variables used within the Common Module
+# Global variables used within the Library Common Module
 # -------------------------------------------------------------------------
 
 # Global variables for how the signals/points/sections buttons appear
@@ -33,47 +33,54 @@ event_queue = queue.Queue()
 shutdown_initiated = False
 
 #-------------------------------------------------------------------------
-# Function to catch the root window close event so we can perform an
-# orderly shutdown of the other threads running in the application
+# Function to catch the root close event for applications that use the API
 # This calls file_interface.quit_application function to get confirmation
 # of quit from the user and/or let the user save the current state
 #-------------------------------------------------------------------------
+
+##########################################################################
+# Note that this function is effectively DEPRECATED with the DEPRECATION
+# of the published library API as the editor module captures the root
+# window close event and asks the user to confirm application quit
+##########################################################################
 
 def on_closing():
     if file_interface.save_state_and_quit(): shutdown()      
     return()
 
 #-------------------------------------------------------------------------
-# Function to catch the root window close event so we can perform an
-# orderly shutdown of the other threads running in the application
-# The shutdown_initiated flag is used to tell the flash aspects and timed
-# signals functions to stop scheduling further "after" commands and exit 
+# Function to perfor an orderly shutdown of the library functions:
+#   MQTT Networking - clean up the published topics and disconnect
+#   SPROG interface - switch off the DCC power and close the serial port
+#   Track Sensors - revert all GPIO pins to their default states
+#   Finally - wait for all scheduled TKinter events to complete
 #-------------------------------------------------------------------------
 
 def shutdown():
     global shutdown_initiated
-    logging.info ("Initiating Application Shutdown")
-    shutdown_initiated = True
-    # Clear out any retained messages and disconnect from broker
-    mqtt_interface.mqtt_shutdown()
-    # Turn off the DCC bus power and close the comms port
-    pi_sprog_interface.sprog_shutdown()
-    # Return the GPIO ports to their original configuration
-    track_sensors.gpio_shutdown()
-    # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
-    # We need to put a timeout around this to deal with any ongoing timed signal sequences
-    # (although its unlikely the user would initiate a shut down until these have finished)
-    timeout_start = time.time()
-    while time.time() < timeout_start + 30:
-        if root_window.tk.call('after','info') != "":
-            root_window.update()
-            time.sleep(0.01)
-        else:
-            logging.info ("Exiting Application")
-            break
-    if time.time() >= timeout_start + 30:
-        logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
-    root_window.destroy()
+    if not shutdown_initiated:
+        logging.info ("Initiating Application Shutdown")
+        shutdown_initiated = True
+        # Clear out any retained messages and disconnect from broker
+        mqtt_interface.mqtt_shutdown()
+        # Turn off the DCC bus power and close the comms port
+        pi_sprog_interface.sprog_shutdown()
+        # Return the GPIO ports to their original configuration
+        track_sensors.gpio_shutdown()
+        # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
+        # We need to put a timeout around this to deal with any ongoing timed signal sequences
+        # (although its unlikely the user would initiate a shut down until these have finished)
+        timeout_start = time.time()
+        while time.time() < timeout_start + 30:
+            if root_window.tk.call('after','info') != "":
+                root_window.update()
+                time.sleep(0.01)
+            else:
+                logging.info ("Exiting Application")
+                break
+        if time.time() >= timeout_start + 30:
+            logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
+        root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------
@@ -84,6 +91,11 @@ def shutdown():
 # tkinter isn't fully thread safe and so all manipulation of tkinter drawing
 # objects should be done from within the main tkinter thread.
 #-------------------------------------------------------------------------
+
+##########################################################################
+# Note that this function is effectively DEPRECATED with the editor as
+# the editor module sets the root_window reference direcly after creation
+##########################################################################
 
 def find_root_window (canvas):
     global root_window
@@ -102,6 +114,22 @@ def find_root_window (canvas):
     return(root_window)
 
 #-------------------------------------------------------------------------
+# Function to set the tkinter "root" window reference as this is used to
+# schedule callback events in the main tkinter event loop using the 'after' 
+# method and also for feeding custom callback functions into the main tkinter
+# thread. We do this as all the information out there on the internet concludes
+# tkinter isn't fully thread safe and so all manipulation of tkinter drawing
+# objects should be done from within the main tkinter thread.
+#-------------------------------------------------------------------------
+
+def set_root_window (root):
+    global root_window
+    root_window = root
+    # bind the tkinter event for handling events raised in external threads
+    root_window.bind("<<ExtCallback>>", handle_callback_in_tkinter_thread)
+    return(root_window)
+
+#-------------------------------------------------------------------------
 # Functions to allow custom callback functions to be passed in (from an external
 # thread) and then handled in the main Tkinter thread (to keep everything threadsafe).
 # We use the tkinter event_generate method to generate a custom event in the main
@@ -110,17 +138,19 @@ def find_root_window (canvas):
 #-------------------------------------------------------------------------
 
 def handle_callback_in_tkinter_thread(*args):
-    while not event_queue.empty():
+    while not event_queue.empty() and not shutdown_initiated:
         callback = event_queue.get(False)
         callback()
     return()
-    
+
 def execute_function_in_tkinter_thread(callback_function):
-    if root_window is not None:
-        event_queue.put(callback_function)
-        root_window.event_generate("<<ExtCallback>>", when="tail")
-    else:
-        logging.error ("execute_function_in_tkinter_thread - cannot execute callback function as root window is undefined")
+    if not shutdown_initiated:
+        if root_window is not None: 
+            event_queue.put(callback_function)
+            root_window.event_generate("<<ExtCallback>>", when="tail")
+        else:
+            logging.error ("Execute_function_in_tkinter_thread - root undefined - executing in current thread")
+            callback_function()
     return()
 
 # -------------------------------------------------------------------------

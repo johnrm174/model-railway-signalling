@@ -776,7 +776,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # MAIN route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(7)
+    if test_sensors: simulate_gpio_triggered(12)
     else: trigger_signals_passed(4)
     sleep(delay)
     if not edit_mode:
@@ -785,7 +785,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # Train will be passed if signal is OFF
     set_signals_off(4)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(7)
+    if test_sensors: simulate_gpio_triggered(12)
     else: trigger_signals_passed(4)
     sleep(delay)
     if not edit_mode:
@@ -823,7 +823,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # LH1 route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(8)
+    if test_sensors: simulate_gpio_triggered(13)
     else: trigger_signals_passed(5)
     sleep(delay)
     if not edit_mode:
@@ -832,7 +832,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # Train will be passed if signal is OFF
     set_signals_off(5)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(8)
+    if test_sensors: simulate_gpio_triggered(13)
     else: trigger_signals_passed(5)
     sleep(delay)
     if not edit_mode:
@@ -870,7 +870,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # LH2 route - back
     # No change to track occupancy if signal is ON
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(9)
+    if test_sensors: simulate_gpio_triggered(18)
     else: trigger_signals_passed(6)
     sleep(delay)
     if not edit_mode:
@@ -879,7 +879,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     # Train will be passed if signal is OFF
     set_signals_off(6)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(9)
+    if test_sensors: simulate_gpio_triggered(18)
     else: trigger_signals_passed(6)
     sleep(delay)
     if not edit_mode:
@@ -965,7 +965,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     # RH2 route - back
     # No change to track occupancy if signal is ON
-    if test_sensors: simulate_gpio_triggered(7)
+    if test_sensors: simulate_gpio_triggered(12)
     else: trigger_signals_passed(2)
     sleep(delay)
     if not edit_mode:
@@ -1000,25 +1000,25 @@ def subtest_sections_ahead_behind_3(delay:float, edit_mode:bool, test_sensors:bo
     reset_layout()
     # No change to track occupancy if signal is ON
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(10)
+    if test_sensors: simulate_gpio_triggered(19)
     else: trigger_signals_passed(7)
     if not edit_mode: assert_sections_clear(7)
     # Section will be set to occupied if signal is off
     sleep(delay)
     set_signals_off(7)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(10)
+    if test_sensors: simulate_gpio_triggered(19)
     else: trigger_signals_passed(7)
     if not edit_mode: assert_sections_occupied(7)
     # Check the train doesn't get passed back
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(10)
+    if test_sensors: simulate_gpio_triggered(19)
     else: trigger_signals_passed(7)
     if not edit_mode: assert_sections_occupied(7)
     sleep(delay)
     set_signals_on(7)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(10)
+    if test_sensors: simulate_gpio_triggered(19)
     else: trigger_signals_passed(7)
     if not edit_mode: assert_sections_occupied(7)
     # Track occupancy tests for non-distant signals - section behind signal only
@@ -1026,25 +1026,25 @@ def subtest_sections_ahead_behind_3(delay:float, edit_mode:bool, test_sensors:bo
     if not edit_mode: set_sections_occupied(8)
     # No change to track occupancy if signal is ON
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(11)
+    if test_sensors: simulate_gpio_triggered(20)
     else: trigger_signals_passed(8)
     if not edit_mode: assert_sections_occupied(8)
     # Section will be cleared if signal is off
     sleep(delay)
     set_signals_off(8)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(11)
+    if test_sensors: simulate_gpio_triggered(20)
     else: trigger_signals_passed(8)
     if not edit_mode: assert_sections_clear(8)
     # Check the train doesn't get passed back
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(11)
+    if test_sensors: simulate_gpio_triggered(20)
     else: trigger_signals_passed(8)
     if not edit_mode: assert_sections_clear(8)
     sleep(delay)
     set_signals_on(8)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(11)
+    if test_sensors: simulate_gpio_triggered(20)
     else: trigger_signals_passed(8)
     if not edit_mode: assert_sections_clear(8)
     return()
@@ -1058,7 +1058,7 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     # Track occupancy tests --- section ahead of signal only
     # Section will be set to occupied if signal is on
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(12)
+    if test_sensors: simulate_gpio_triggered(21)
     else: trigger_signals_passed(9)
     if not edit_mode: assert_sections_occupied(9)
     sleep(delay)
@@ -1067,19 +1067,19 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     set_signals_off(9)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(12)
+    if test_sensors: simulate_gpio_triggered(21)
     else: trigger_signals_passed(9)
     if not edit_mode: assert_sections_occupied(9)
     # Check the train gets passed back the other way
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(12)
+    if test_sensors: simulate_gpio_triggered(21)
     else: trigger_signals_passed(9)
     if not edit_mode: assert_sections_clear(9)
     sleep(delay)
     set_signals_on(9)
     sleep(delay)
     if not edit_mode: set_sections_occupied(9)
-    if test_sensors: simulate_gpio_triggered(12)
+    if test_sensors: simulate_gpio_triggered(21)
     else: trigger_signals_passed(9)
     if not edit_mode: assert_sections_clear(9)
     # Track occupancy tests --- section behind signal only
@@ -1089,7 +1089,7 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     if not edit_mode: set_sections_occupied(10)
     # Section will be Cleared if signal is on
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(13)
+    if test_sensors: simulate_gpio_triggered(22)
     else: trigger_signals_passed(10)
     if not edit_mode: assert_sections_clear(10)
     sleep(delay)
@@ -1098,19 +1098,19 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     set_signals_off(10)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(13)
+    if test_sensors: simulate_gpio_triggered(22)
     else: trigger_signals_passed(10)
     if not edit_mode: assert_sections_clear(10)
     # Check the train gets passed back the other way
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(13)
+    if test_sensors: simulate_gpio_triggered(22)
     else: trigger_signals_passed(10)
     if not edit_mode: assert_sections_occupied(10)
     sleep(delay)
     set_signals_on(10)
     sleep(delay)
     if not edit_mode: set_sections_clear(10)
-    if test_sensors: simulate_gpio_triggered(13)
+    if test_sensors: simulate_gpio_triggered(22)
     else: trigger_signals_passed(10)
     if not edit_mode: assert_sections_occupied(10)
     # Track occupancy tests --- sections ahead of and behind signal
@@ -1118,14 +1118,14 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     if not edit_mode: set_sections_occupied(11)
     # Train will be passed forward if signal is on
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(16)
+    if test_sensors: simulate_gpio_triggered(23)
     else: trigger_signals_passed(11)
     if not edit_mode:
         assert_sections_occupied(12)
         assert_sections_clear(11)
     # Check the train gets passed back the other way
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(16)
+    if test_sensors: simulate_gpio_triggered(23)
     else: trigger_signals_passed(11)
     if not edit_mode:
         assert_sections_occupied(11)
@@ -1134,14 +1134,14 @@ def subtest_sections_ahead_behind_1(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     set_signals_off(11)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(16)
+    if test_sensors: simulate_gpio_triggered(23)
     else: trigger_signals_passed(11)
     if not edit_mode:
         assert_sections_occupied(12)
         assert_sections_clear(11)
     # Check the train gets passed back the other way
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(16)
+    if test_sensors: simulate_gpio_triggered(23)
     else: trigger_signals_passed(11)
     if not edit_mode:
         assert_sections_occupied(11)
@@ -1234,13 +1234,13 @@ def subtest_shunt_ahead_signal_routes_1(delay:float, edit_mode:bool, test_sensor
         set_sections_occupied(13)
         assert_sections_clear(14,15)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(17)
+    if test_sensors: simulate_gpio_triggered(24)
     else: trigger_signals_passed(12)
     if not edit_mode:
         assert_sections_occupied(14)
         assert_sections_clear(13,15)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(17)
+    if test_sensors: simulate_gpio_triggered(24)
     else: trigger_signals_passed(12)
     if not edit_mode:
         assert_sections_occupied(13)
@@ -1248,13 +1248,13 @@ def subtest_shunt_ahead_signal_routes_1(delay:float, edit_mode:bool, test_sensor
     sleep(delay)
     set_points_switched(6)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(17)
+    if test_sensors: simulate_gpio_triggered(24)
     else: trigger_signals_passed(12)
     if not edit_mode:
         assert_sections_occupied(15)
         assert_sections_clear(13,14)
     sleep(delay)
-    if test_sensors: simulate_gpio_triggered(17)
+    if test_sensors: simulate_gpio_triggered(24)
     else: trigger_signals_passed(12)
     if not edit_mode:
         assert_sections_occupied(13)

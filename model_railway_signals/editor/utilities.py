@@ -43,7 +43,7 @@ class cv_programming_entry():
                     allow_empty=True, empty_equals_zero=False, callback=self.value_updated,
                     tool_tip="Enter the new value to set (select 'write' to program)")
         self.value_to_set.grid(column=2, row=row)
-        self.notes = common.entry_box(parent_frame, width=15,
+        self.notes = common.entry_box(parent_frame, width=30,
                     tool_tip="Add notes for this CV / value")
         self.notes.grid(column=3, row=row, sticky="ew")
 
@@ -355,6 +355,7 @@ class dcc_programming():
             self.window = Tk.Toplevel(root_window)
             self.window.title("DCC Programming")
             self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.resizable(False, False)
             dcc_programming_window = self.window
             # Create the ok/close button and tooltip - pack first so it remains visible on re-sizing
             self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)

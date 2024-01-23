@@ -33,6 +33,9 @@
 #       node_identifier:str - The name to use for this node on the network (can be any string)
 #   Optional Parameters:
 #       mqtt_enhanced_debugging:bool - 'True' to enable additional debug logging (default = False)
+#       publish_shutdown:bool - Publish a shutdown message on appication exit (default = False)
+#       act_on_shutdown:bool - Make a callback if a shutdown message is received (default = False)
+#       shutdown_callback - Callback to make on reciept of a shutdown message (default = None)
 #
 # mqtt_broker_connect - Opens a connection to a local or remote MQTT broker
 #                    Returns whether the connection was successful or not (True/False)
@@ -50,17 +53,26 @@ import json
 import logging
 import time
 import paho.mqtt.client
+import threading
+import socket
 
 #-----------------------------------------------------------------------------------------------
 # Define an empty dictionary for holding the basic configuration information we need to track
 #-----------------------------------------------------------------------------------------------
 
 node_config: dict = {}
-node_config["network_identifier"] = ""
-node_config["node_identifier"] = ""   
-node_config["enhanced_debugging"] = False
-node_config["network_configured"] = False
-node_config["connected_to_broker"] = False
+node_config["mqtt_client_debug"] = False                # Set to True to debug the PAHO MQTT client
+node_config["heartbeat_frequency"] = 4.0                # Constant of 4 seconds
+node_config["network_identifier"] = ""                  # Set by configure_mqtt_client (user defined)
+node_config["node_identifier"] = ""                     # Set by configure_mqtt_client (user defined)
+node_config["enhanced_debugging"] = False               # Set by configure_mqtt_client (user defined)
+node_config["act_on_shutdown"] = False                  # Set by configure_mqtt_client (user defined)
+node_config["publish_shutdown"] = False                 # Set by configure_mqtt_client (user defined)
+node_config["shutdown_callback"] = None                 # Set by configure_mqtt_client (user defined)
+node_config["local_ip_address"] = ""                    # Set by the 'on_connect' function
+node_config["connected_to_broker"] = False              # Set by the 'on_connect' / 'on_disconnect functions
+node_config["disconnect_initiated"] = False             # Used to coordinate disconnect between threads
+node_config["heartbeat_thread_terminated"] = True       # Used to coordinate disconnect between threads
 node_config["list_of_published_topics"] = []
 node_config["list_of_subscribed_topics"] = []
 node_config["callbacks"] = {}
@@ -70,6 +82,86 @@ node_config["callbacks"] = {}
 #-----------------------------------------------------------------------------------------------
 
 mqtt_client = None
+
+#------------------------------------------------------------------------------
+# Internal dict to hold details of the heartbeats received from other nodes
+# Dict contains entries comprising ["node"]: time_stamp_of_last_heartbeat
+# Also an external function used by the editor to get the list of connected nodes
+#------------------------------------------------------------------------------
+
+heartbeats = {}
+
+def get_node_status():
+    return (heartbeats)
+
+#------------------------------------------------------------------------------
+# Common function used by the main thread to wait for responses in other threads.
+# When the specified function returns True, the function exits and returns True.
+#------------------------------------------------------------------------------
+
+def wait_for_response(timeout:float,test_for_response_function):
+    response_received = False
+    timeout_start = time.time()
+    while time.time() < timeout_start + timeout:
+        response_received = test_for_response_function()
+        if response_received: break
+        time.sleep(0.001)
+    return(response_received)
+
+#-----------------------------------------------------------------------------------------------
+# Find the local IP address (to include in the heartbeat messages):
+# This will return the assigned IP address if we are connected to a network
+#-----------------------------------------------------------------------------------------------
+
+def find_local_ip_address():
+    test_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        test_socket.connect(('10.255.255.255', 1))
+        ip_address = test_socket.getsockname()[0]
+        logging.debug("MQTT-Client: local IP address is "+ip_address)
+    except:
+        logging.error("MQTT-Client: Could not retrieve local IP address")
+        ip_address = "<unknown>"
+    finally:
+        test_socket.close()
+    return(ip_address)
+
+#------------------------------------------------------------------------------
+# Internal thread to send out heartbeat messages from the node when connected
+# and if application shutdown has not been initiated (otherwise no point)
+#------------------------------------------------------------------------------
+
+def publish_heartbeat_message():
+    if node_config["connected_to_broker"]:
+        # Topic format for the heartbeat message: "<Message-Type>/<Network-ID>"
+        topic = "heartbeat"+"/"+node_config["network_identifier"]
+        # Payload for the heartbeat message is a dictionary comprising the source node
+        heartbeat_message = {"node":node_config["node_identifier"],"ip":node_config["local_ip_address"]}
+        payload = json.dumps(heartbeat_message)
+        # The PAHO MQTT client may not be thread safe so publish the message from the main Tkinter thread
+        try:
+            mqtt_client.publish(topic,payload,retain=False,qos=1)
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
+        except Exception as exception:
+            logging.error("MQTT-Client: Error publishing Heartbeat message - "+str(exception))
+    else:
+        logging.warning("MQTT-Client: Cannot Publish Heartbeat message- disconnected from broker")
+    return()
+
+def thread_to_send_heartbeat_messages():
+    global node_config
+    node_config["heartbeat_thread_terminated"] = False
+    while not node_config["disconnect_initiated"]:
+        # The PAHO MQTT client may not be thread safe so publish the message from the main Tkinter thread
+        common.execute_function_in_tkinter_thread(publish_heartbeat_message)
+        # Wait before we send out the next heartbeat
+        last_heartbeat_time = time.time()
+        while time.time() < last_heartbeat_time + node_config["heartbeat_frequency"]:
+            time.sleep(0.1)
+            if node_config["disconnect_initiated"]: break
+    if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Heartbeat Thread - exiting")
+    node_config["heartbeat_thread_terminated"] = True
+    return()
 
 # ---------------------------------------------------------------------------------------------
 # Common Function to create a external item identifier from the Item_ID and the remote Node.
@@ -99,7 +191,7 @@ def split_remote_item_identifier(item_identifier:str):
 #-----------------------------------------------------------------------------------------------
 
 def on_log(mqtt_client, obj, level, mqtt_log_message):
-    if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: "+mqtt_log_message)
+    if node_config["mqtt_client_debug"]: logging.debug("MQTT-Client: "+mqtt_log_message)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -108,6 +200,7 @@ def on_log(mqtt_client, obj, level, mqtt_log_message):
 
 def on_disconnect(mqtt_client, userdata, rc):
     global node_config
+    node_config["connected_to_broker"] = False
     if rc==0: logging.info("MQTT-Client: Broker connection successfully terminated")
     else: logging.warning("MQTT-Client: Unexpected disconnection from broker")
     node_config["connected_to_broker"] = False
@@ -120,7 +213,14 @@ def on_disconnect(mqtt_client, userdata, rc):
 def on_connect(mqtt_client, userdata, flags, rc):
     global node_config
     if rc == 0:
+        node_config["connected_to_broker"] = True
         logging.info("MQTT-Client: Successfully connected to MQTT Broker")
+        # find the assigned IP address of the machine we are running on (for the heartbeat messages)
+        node_config["local_ip_address"] = find_local_ip_address()
+        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
+        # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
+        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
+        time.sleep(0.1)
         # As we set up our broker connection with 'cleansession=true' a disconnection will have removed
         # all client connection information from the broker (including knowledge of the topics we have
         # subscribed to) - we therefore need to re-subscribe to all topics with this new connection
@@ -128,12 +228,16 @@ def on_connect(mqtt_client, userdata, flags, rc):
         if len(node_config["list_of_subscribed_topics"]) > 0:
             logging.debug("MQTT-Client: Re-subscribing to all MQTT broker topics")
             for topic in node_config["list_of_subscribed_topics"]:
+                if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Subscribing to: "+topic)
                 mqtt_client.subscribe(topic)
-        # Pause just to ensure that MQTT is all fully up and running before we continue (and allow the client
-        # to set up any subscriptions or publish any messages to the broker). We shouldn't need to do this but
-        # I've experienced problems running on a Windows 10 platform if we don't include a short sleep
-        time.sleep(0.1)
-        node_config["connected_to_broker"] = True
+        # Re subscribe to all heartbeat and shutdown messages on the specified network
+        # Topic format for these messages is: "<Message-Type>/<Network-ID>"
+        heartbeat_topic = "heartbeat"+"/"+node_config["network_identifier"]
+        if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Subscribing to: "+heartbeat_topic)
+        mqtt_client.subscribe(heartbeat_topic)
+        shutdown_topic = "shutdown"+"/"+node_config["network_identifier"]
+        if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Subscribing to: "+shutdown_topic)
+        mqtt_client.subscribe(shutdown_topic)
     elif rc == 1: logging.error("MQTT-Client: Connection refused – incorrect protocol version")
     elif rc == 2: logging.error("MQTT-Client: Connection refused – invalid client identifier")
     elif rc == 3: logging.error("MQTT-Client: Connection refused – server unavailable")
@@ -149,20 +253,34 @@ def on_connect(mqtt_client, userdata, flags, rc):
 #--------------------------------------------------------------------------------------------------------
 
 def process_message(msg):
+    global heartbeats
     # Unpack the json message so we can extract the contents (with exception handling)
     try:
         unpacked_json = json.loads(msg.payload)
     except Exception as exception:
         logging.error("MQTT-Client: Exception unpacking json - "+str(exception))
     else:
+        if node_config["enhanced_debugging"]:
+            logging.debug("MQTT-Client: Received: "+str(msg.topic)+str(unpacked_json))
+        # If it is a heartbeat message then we just update the list of connected nodes
+        if msg.topic.startswith("heartbeat"):
+            time_stamp = int(time.time())
+            if node_config["enhanced_debugging"]:
+                logging.debug("MQTT-Client: Received Heartbeat message at time: "+str(time_stamp))
+            heartbeats[unpacked_json["node"]] = [unpacked_json["ip"],time_stamp]
+        # If it is a shutdown message we only act on it if configured to do so
+        elif msg.topic.startswith("shutdown"):
+            if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:
+                logging.info("MQTT-Client: Shutdown message received - Triggering application shutdown")
+                node_config["shutdown_callback"]()
+            elif node_config["enhanced_debugging"]:
+                logging.debug("MQTT-Client: Ignoring Shutdown message (not configured to shutdown)")
         # Make the callback (that was registered when the calling programme subscribed to the feed)
         # Note that we also need to test to see if the the topic is a partial match to cover the
         # case of subscribing to all subtopics for an specified item (with the '+' wildcard)
-        if msg.topic in node_config["callbacks"]:
-            logging.debug("MQTT-Client: Received: "+str(msg.topic)+"-"+str(unpacked_json))
+        elif msg.topic in node_config["callbacks"]:
             node_config["callbacks"][msg.topic] (unpacked_json)
         elif msg.topic.rpartition('/')[0]+"/+" in node_config["callbacks"]:
-            logging.debug("MQTT-Client: Received: "+str(msg.topic)+"-"+str(unpacked_json))
             node_config["callbacks"][msg.topic.rpartition('/')[0]+"/+"] (unpacked_json)
         else:
             logging.warning("MQTT-Client: unhandled message topic: "+str(msg.topic))
@@ -178,11 +296,9 @@ def on_message(mqtt_client,obj,msg):
     global node_config
     # Only process the message if there is a payload - If there is no payload then the message is
     # a "null message" - sent to purge retained messages from the broker on application exit
-    if msg.payload:
-        if common.root_window is not None:
-            common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
-        else:
-            process_message(msg)
+    # Also, only process the message if shutdown has not been initiated (otherwise no point)
+    if msg.payload and not node_config["disconnect_initiated"]:
+        common.execute_function_in_tkinter_thread (lambda:process_message(msg)) 
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -191,18 +307,24 @@ def on_message(mqtt_client,obj,msg):
 
 def configure_mqtt_client (network_identifier:str,
                            node_identifier:str,
-                           enhanced_debugging:bool = False):
+                           enhanced_debugging:bool = False,
+                           publish_shutdown:bool = False,
+                           act_on_shutdown:bool = False,
+                           shutdown_callback=None):
     global node_config, mqtt_client
     logging.debug("MQTT-Client: Configuring MQTT Client for "+network_identifier+":"+node_identifier)
     # Configure this module (to enable subscriptions to be configured even if not connected)
     node_config["enhanced_debugging"] = enhanced_debugging
     node_config["network_identifier"] = network_identifier
     node_config["node_identifier"] = node_identifier
-    node_config["network_configured"] = True
+    node_config["publish_shutdown"] = publish_shutdown
+    node_config["act_on_shutdown"] = act_on_shutdown
+    node_config["shutdown_callback"] = shutdown_callback
     return()
 
 #-----------------------------------------------------------------------------------------------
 # Public API Function to connect and/or re-connect to an external MQTT broker instance
+# Returns True if connection was successful
 #
 # A few notes about disconnecting and then re-connecting from the broker:
 #
@@ -236,79 +358,97 @@ def mqtt_broker_connect (broker_host:str,
                          broker_password:str = None):
     global node_config
     global mqtt_client
-    if not node_config["network_configured"]:
-        logging.error("MQTT-Client: Network not configured - Cannot connect to broker)")
+    def connect_acknowledgement(): return (node_config["connected_to_broker"])
+    # Handle the case where we are already connected to the broker
+    if node_config["connected_to_broker"]: mqtt_broker_disconnect()
+    # Do some basic exception handling around opening the broker connection
+    logging.debug("MQTT-Client: Connecting to Broker "+broker_host+":"+str(broker_port))
+    # Create a new mqtt broker instance
+    if mqtt_client is None: mqtt_client = paho.mqtt.client.Client(clean_session=True)
+    mqtt_client.on_message = on_message    
+    mqtt_client.on_connect = on_connect    
+    mqtt_client.on_disconnect = on_disconnect    
+    mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
+    mqtt_client.on_log = on_log
+    # Configure the basic username/password authentication (if required)
+    if broker_username is not None:
+        mqtt_client.username_pw_set(username=broker_username,password=broker_password)
+    try:
+        mqtt_client.connect_async(broker_host,port=broker_port,keepalive = 10)
+        mqtt_client.loop_start()
+    except Exception as exception:
+        logging.error("MQTT-Client: Error connecting to broker: "+str(exception))
     else:
-        # Handle the case where we are already connected to the broker
-        if node_config["connected_to_broker"]: mqtt_broker_disconnect()
-        # Do some basic exception handling around opening the broker connection
-        logging.debug("MQTT-Client: Connecting to Broker "+broker_host+":"+str(broker_port))
-        # Create a new mqtt broker instance
-        if mqtt_client is None: mqtt_client = paho.mqtt.client.Client(clean_session=True)
-        mqtt_client.on_message = on_message    
-        mqtt_client.on_connect = on_connect    
-        mqtt_client.on_disconnect = on_disconnect    
-        mqtt_client.reconnect_delay_set(min_delay=1, max_delay=10)
-        mqtt_client.on_log = on_log
-        # Configure the basic username/password authentication (if required)
-        if broker_username is not None:
-            mqtt_client.username_pw_set(username=broker_username,password=broker_password)
-        try:
-            mqtt_client.connect_async(broker_host,port=broker_port,keepalive = 10)
-            mqtt_client.loop_start()
-        except Exception as exception:
-            logging.error("MQTT-Client: Error connecting to broker: "+str(exception))
+        # Wait for connection acknowledgement (from on-connect callback function)
+        if wait_for_response(1.0, connect_acknowledgement):
+            if node_config["heartbeat_thread_terminated"]:
+                if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Starting heartbeat thread")
+                # Start the heartbeat thread
+                heartbeat_thread = threading.Thread (target=thread_to_send_heartbeat_messages)
+                heartbeat_thread.setDaemon(True)
+                heartbeat_thread.start()
         else:
-            # Wait for connection acknowledgement (from on-connect callback function)
-            timeout_start = time.time()
-            while time.time() < timeout_start + 2:
-                if node_config["connected_to_broker"]: break
-                time.sleep(0.001)
-            if not node_config["connected_to_broker"]:
-                logging.error("MQTT-Client: Timeout connecting to broker")
+            logging.error("MQTT-Client: Timeout connecting to broker")
     return(node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
 # Public API Function to disconnect from an external MQTT broker instance
+# Returns True if disconnection was successful
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_broker_disconnect():
     global node_config
     global mqtt_client
+    def disconnect_acknowledgement(): return (not node_config["connected_to_broker"])
+    def heartbeat_thread_terminated(): return (node_config["heartbeat_thread_terminated"])
     if node_config["connected_to_broker"]:
-        logging.debug("MQTT-Client: Clearing message queues before disconnect")
+        node_config["disconnect_initiated"] = True
+        logging.debug("MQTT-Client: Initiating broker disconnect")
+        # Wait until we get confirmation the Heartbeat thread has terminated
+        logging.debug("MQTT-Client: Shutting down Heartbeat thread")
+        if not wait_for_response(0.5, heartbeat_thread_terminated):
+            logging.error("MQTT-Client: Heartbeat thread failed to terminate")        
         # Clean out the message queues on the broker by publishing null messages (empty strings)
         # to each of the topics that we have sent messages to during the lifetime of the session
+        logging.debug("MQTT-Client: Clearing message queues before disconnect")
         for topic in node_config["list_of_published_topics"]:
-            logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
             mqtt_client.publish(topic,payload=None,retain=True,qos=1)
         # Wait for everything to be published to the broker (with a sleep) and disconnect
+        # I'd rather use a PAHO MQTT check and timeout but there doesn't seem to be one
         time.sleep(0.25)
         logging.debug("MQTT-Client: Disconnecting from broker")
         mqtt_client.disconnect()
         # Wait for disconnection acknowledgement (from on-disconnect callback function)
-        timeout_start = time.time()
-        while time.time() < timeout_start + 2:
-            if not node_config["connected_to_broker"]: break
-            time.sleep(0.001)
-        if node_config["connected_to_broker"]:
-            logging.error("MQTT-Client: Timeout disconnecting from broker")
-        else:
+        if wait_for_response(1.0, disconnect_acknowledgement):
             mqtt_client.loop_stop()
             mqtt_client = None
-    return(node_config["connected_to_broker"])
+        else:
+            logging.error("MQTT-Client: Timeout disconnecting from broker")
+        # Reset the disconnect_initiated flag (ready for the next time)
+        node_config["disconnect_initiated"] = False
+    return(not node_config["connected_to_broker"])
 
 #-----------------------------------------------------------------------------------------------
 # Externally called function to perform a gracefull shutdown of the MQTT networking
 # in terms of clearing out the publish topic queues (by sending null messages)
+# This function is intended to be called at application exit only
 #-----------------------------------------------------------------------------------------------
 
 def mqtt_shutdown():
     global node_config
     if node_config["connected_to_broker"]:
+        # Publish a shutdown command to other nodes if configured  to do so
+        if node_config["publish_shutdown"]:
+            # Topic format for the shutdown message: "<Message-Type>/<Network-ID>"
+            topic = "shutdown"+"/"+node_config["network_identifier"]
+            # Payload for the shutdown message is a dictionary comprising the source node
+            shutdown_message = {"node":node_config["node_identifier"]}
+            payload = json.dumps(shutdown_message)
+            if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
+            mqtt_client.publish(topic,payload,retain=False,qos=1)
+            time.sleep(0.1)
         mqtt_broker_disconnect()
-        node_config["network_configured"] = False
-        node_config["connected_to_broker"] = False
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -356,7 +496,7 @@ def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=No
         payload = json.dumps(data)
         if log_message is not None: logging.debug(log_message)
         if node_config["enhanced_debugging"]:
-            logging.debug("MQTT-Client: Publishing: "+str(topic)+"-"+str(payload))
+            logging.debug("MQTT-Client: Publishing: "+str(topic)+str(payload))
         # Publish the message to the broker
         mqtt_client.publish(topic,payload,retain=retain,qos=1)
         # Add to the list of published topics so we can 'Clean up'

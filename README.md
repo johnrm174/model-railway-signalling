@@ -13,21 +13,17 @@ without some of the Raspberry-Pi specific interfacing functions).
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
-## What's new for Release 4.0:
+Configured / pre-installed systems are now available to purchase from:
+[https://www.model-railway-signalling.co.uk/](https://www.model-railway-signalling.co.uk/)
 
-* Application documentation in the form of a 'quick-start' guide (see below for link)
-* 'Arrow keys' will 'nudge' objects in edit mode (or scroll canvas if nothing selected)
-* 'Escape' key can be used to cancel 'in progress' object moves and area selections
-* 'Cntl-r' will reset the main window to fit the specified canvas size (after user re-sizing)
-* 'Cntl-m' is now the keyboard shortcut for toggling Edit/Run mode (for consistency)
-* Improvements to layout load - errors/warnings simplified (no more spam messages)
-* Text boxes - Ability to add/edit text boxes on the schematic to annotate the layout
-* Canvas configuration - Ability to change the grid size and toggle 'snap-to-grid'
-* Toggle signal automation - Be an active signalman or just watch the trains go by
-* Signals can be overridden (to DANGER) on up to 3 track sections ahead
-* Signals can be interlocked with up to 3 occupied track sections ahead
-* Basic DCC Programming - 'one touch' and Configuration Variable (CV) programming
-* Consolidation of library functions (deprecated library API functions removed)
+## What's new for Release 4.1.0:
+
+* Hidden files and folders now supressed in file load and save dialogs
+* Network heartbeats and monitering to check the status of other network nodes
+* Ability to trigger application shutdown of connected network nodes on application exit
+* Support for the Pi-SPROG3 V2 DCC Programmer / Controller (higher baud rate)
+* Quickstart guide updated to reflect settings changes for the Pi-SPROG3 V2
+* BREAKING CHANGE - GPIO Ports 16 and 17 no longer selectable for track sensors
 * Minor bugfixes and application enhancements to improve the overall user experience
 
 Bug reports and feedback are welcome and appreciated:
@@ -60,9 +56,13 @@ The python package should be run as a module (note underscores):
 <pre>
 $ python3 -m model_railway_signals
 </pre>
-If required, a layout schematic can be loaded at startup
+If required, a layout schematic can be loaded at startup:
 <pre>
 $ python3 -m model_railway_signals -f layout_file.sig
+</pre>
+If required, the logging level can be specified at startup (ERROR, WARNING, INFO or DEBUG)
+<pre>
+$ python3 -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
 Documentation, in the form of a Quick-Start guide can be found in the 'user_guide' folder: 

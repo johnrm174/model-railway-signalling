@@ -23,7 +23,7 @@
                 false,
                 ""
             ],
-            "bbox": 2987,
+            "bbox": 3002,
             "dccaspects": [
                 [
                     [
@@ -1098,7 +1098,7 @@
                 false,
                 ""
             ],
-            "bbox": 3015,
+            "bbox": 3030,
             "dccaspects": [
                 [
                     [
@@ -2162,7 +2162,7 @@
             ]
         },
         "0b251a10-3b3a-44be-89e2-f6954d641b29": {
-            "bbox": 3017,
+            "bbox": 3032,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2186,7 +2186,7 @@
                 false,
                 ""
             ],
-            "bbox": 3048,
+            "bbox": 3063,
             "dccaspects": [
                 [
                     [
@@ -3261,7 +3261,7 @@
                 false,
                 ""
             ],
-            "bbox": 3076,
+            "bbox": 3091,
             "dccaspects": [
                 [
                     [
@@ -4336,7 +4336,7 @@
                 false,
                 ""
             ],
-            "bbox": 3107,
+            "bbox": 3122,
             "dccaspects": [
                 [
                     [
@@ -5411,7 +5411,7 @@
                 false,
                 ""
             ],
-            "bbox": 3138,
+            "bbox": 3153,
             "dccaspects": [
                 [
                     [
@@ -6486,7 +6486,7 @@
                 false,
                 ""
             ],
-            "bbox": 3166,
+            "bbox": 3181,
             "dccaspects": [
                 [
                     [
@@ -7556,23 +7556,23 @@
                 0,
                 0
             ],
-            "bbox": 3172,
+            "bbox": 3187,
             "colour": "black",
-            "end1": 3168,
-            "end2": 3169,
+            "end1": 3183,
+            "end2": 3184,
             "endx": 1400,
             "endy": 100,
             "item": "line",
             "itemid": 1,
-            "line": 3167,
+            "line": 3182,
             "posx": 1200,
             "posy": 100,
-            "stop1": 3170,
-            "stop2": 3171,
+            "stop1": 3185,
+            "stop2": 3186,
             "tags": "line1"
         },
         "8b2daea0-c49c-4dc2-880e-73ec00bb4a7d": {
-            "bbox": 3174,
+            "bbox": 3189,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7585,7 +7585,7 @@
             "tags": "section3"
         },
         "8cd209c0-9f73-42bd-ac04-e555e25372e5": {
-            "bbox": 3189,
+            "bbox": 3204,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -7603,19 +7603,19 @@
                 0,
                 0
             ],
-            "bbox": 3195,
+            "bbox": 3210,
             "colour": "black",
-            "end1": 3191,
-            "end2": 3192,
+            "end1": 3206,
+            "end2": 3207,
             "endx": 200,
             "endy": 150,
             "item": "line",
             "itemid": 2,
-            "line": 3190,
+            "line": 3205,
             "posx": 0,
             "posy": 150,
-            "stop1": 3193,
-            "stop2": 3194,
+            "stop1": 3208,
+            "stop2": 3209,
             "tags": "line2"
         },
         "99a82c21-0fb5-493a-a165-4e580ca22b53": {
@@ -7630,7 +7630,7 @@
                 false,
                 ""
             ],
-            "bbox": 3226,
+            "bbox": 3241,
             "dccaspects": [
                 [
                     [
@@ -8694,7 +8694,7 @@
             ]
         },
         "9f0084b0-536d-4ba4-8429-d507dfe749f3": {
-            "bbox": 3241,
+            "bbox": 3256,
             "bellsound": "bell-ring-04.wav",
             "item": "instrument",
             "itemid": 2,
@@ -8706,7 +8706,7 @@
             "tags": "instrument2"
         },
         "a00e5871-328c-4d71-a1df-a464efe5cce4": {
-            "bbox": 3243,
+            "bbox": 3258,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8721,7 +8721,7 @@
         "a26a7440-68cc-4d3a-8186-dda77da27e7a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3250,
+            "bbox": 3265,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8778,7 +8778,7 @@
             "tags": "point1"
         },
         "a6aaaf9c-ad0e-40dc-adda-60b9daabc3a9": {
-            "bbox": 3252,
+            "bbox": 3267,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8797,23 +8797,23 @@
                 0,
                 0
             ],
-            "bbox": 3258,
+            "bbox": 3273,
             "colour": "black",
-            "end1": 3254,
-            "end2": 3255,
+            "end1": 3269,
+            "end2": 3270,
             "endx": 1200,
             "endy": 100,
             "item": "line",
             "itemid": 3,
-            "line": 3253,
+            "line": 3268,
             "posx": 1175,
             "posy": 125,
-            "stop1": 3256,
-            "stop2": 3257,
+            "stop1": 3271,
+            "stop2": 3272,
             "tags": "line3"
         },
         "b9d8ab0e-cd28-4590-ba49-36393b716aee": {
-            "bbox": 3260,
+            "bbox": 3275,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8832,19 +8832,19 @@
                 0,
                 0
             ],
-            "bbox": 3266,
+            "bbox": 3281,
             "colour": "black",
-            "end1": 3262,
-            "end2": 3263,
+            "end1": 3277,
+            "end2": 3278,
             "endx": 200,
             "endy": 100,
             "item": "line",
             "itemid": 4,
-            "line": 3261,
+            "line": 3276,
             "posx": 0,
             "posy": 100,
-            "stop1": 3264,
-            "stop2": 3265,
+            "stop1": 3279,
+            "stop2": 3280,
             "tags": "line4"
         },
         "c3fc3d01-76e5-4626-a536-ac7e18d5aab1": {
@@ -8854,19 +8854,19 @@
                 0,
                 0
             ],
-            "bbox": 3272,
+            "bbox": 3287,
             "colour": "black",
-            "end1": 3268,
-            "end2": 3269,
+            "end1": 3283,
+            "end2": 3284,
             "endx": 225,
             "endy": 125,
             "item": "line",
             "itemid": 5,
-            "line": 3267,
+            "line": 3282,
             "posx": 200,
             "posy": 100,
-            "stop1": 3270,
-            "stop2": 3271,
+            "stop1": 3285,
+            "stop2": 3286,
             "tags": "line5"
         },
         "ccc40157-3a05-43e0-90a3-bfa0441f9d7f": {
@@ -8876,23 +8876,23 @@
                 0,
                 0
             ],
-            "bbox": 3278,
+            "bbox": 3293,
             "colour": "black",
-            "end1": 3274,
-            "end2": 3275,
+            "end1": 3289,
+            "end2": 3290,
             "endx": 1400,
             "endy": 150,
             "item": "line",
             "itemid": 6,
-            "line": 3273,
+            "line": 3288,
             "posx": 1200,
             "posy": 150,
-            "stop1": 3276,
-            "stop2": 3277,
+            "stop1": 3291,
+            "stop2": 3292,
             "tags": "line6"
         },
         "cd47274b-172c-4b41-b8be-6c3d73d17084": {
-            "bbox": 3280,
+            "bbox": 3295,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8907,7 +8907,7 @@
         "d79d5363-5db2-49c7-bb7a-197d8f798b69": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3287,
+            "bbox": 3302,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8964,7 +8964,7 @@
             "tags": "point2"
         },
         "e1580065-8556-4f74-924e-9a88db52729d": {
-            "bbox": 3289,
+            "bbox": 3304,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -8983,19 +8983,19 @@
                 0,
                 0
             ],
-            "bbox": 3295,
+            "bbox": 3310,
             "colour": "black",
-            "end1": 3291,
-            "end2": 3292,
+            "end1": 3306,
+            "end2": 3307,
             "endx": 1150,
             "endy": 150,
             "item": "line",
             "itemid": 7,
-            "line": 3290,
+            "line": 3305,
             "posx": 250,
             "posy": 150,
-            "stop1": 3293,
-            "stop2": 3294,
+            "stop1": 3308,
+            "stop2": 3309,
             "tags": "line7"
         }
     },
@@ -9053,7 +9053,7 @@
             "editmode": false,
             "filename": "/home/pi/model-railway-signalling/configuration_examples/single_line_semaphore_example.sig",
             "info": "This layout is an example of a single line between two 'block sections', with the points and signals in\nin each block section interlocked - e.g. signal 1 is interlocked with point 2 and opposing signals 3 & 4.\nThe distant signals are also interlocked with the home signals ahead - e.g. signal 4 can only be cleared\nif signal 3 has already been cleared - note it can be returned to 'on' at any time.\n\nBlock instruments are used to coordinate train movements between the two block sections and allow \ncommunication via bell codes (right click on the 'Telegraph' button to bring up a list of common bell \ncodes). In this example, the 'starter' signals for each block section have been interlocked with their \nrespective instruments (and the instruments linked together) - so signals 1/2 can only be cleared when\ninstrument 2 (on the right hand side) has been set to 'line clear' and signals 5/6 can only be cleared \nwhen instrument 1 (on the left hand side) has been set to 'line clear'.\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' on the layout).\n\nTrack sections have bene included on the schematic to provide a mimic display of track occupancy (when\na train passes a signal (signal is 'off') it gets passed from the section behind to the section ahead).\nThe desired behavior is again configured via the 'automation' tab of each signal. For example, signal 3\ncontrols two 'routes' so when passed, section 3 will be cleared and either section 1 or 2 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change from 'off' to 'on' when passed (section ahead is occupied) \nand then revert to'off' as soon as the section ahead is cleared.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. \n\nSignalman 1 - Right click the top left track section and enter a train designation code of your choice \n(this sets the track section to 'occupied'). Unlock, switch and re-lock point 2. On the LH instrument,\nuse the telegraph key to call attention and ask if the line is clear (just for a bit of fun). \n\nSignalman 2 - Set the RH instrument to 'clear' (this will finally unlock signal 1), set signal 7 to \n'off' and then set signal 8 to 'off' to set the route through the block section \n\nSignalman 1 - Set Signal 1 to 'off' and move the train through the schematic, clicking the 'signal \npassed' button at the base of each signal along the route in turn (don't forget to telegraph 'train \nentering section' so signalman 2 knows they need to set their instrument to 'occupied'). \n\nSignalman 2 - When the train has cleared the home signal, telegraph 'train arrived' and revert the \nRH instrument back to 'line blocked, in readiness for the next movement.\n\nThe use of block instruments in this example may seem like overkill (this is only a single application\nwith a single user after all) but with MQTT networking you can create and configure any number of linked\napplication instances. Only the application instance acting as the DCC command station needs to be run\nup on the R-Pi (other instances can be run up on Windows, iOS, linux or any other platform / operating\nsystem combiination that supports python). This provides the potential for splitting large layouts into \ndifferent signalling areas each with a signalman responsible for their area\nDocument your layout here\n\n",
-            "version": "Version 4.0.0"
+            "version": "Version 4.1.0"
         },
         "gpio": {
             "portmappings": [],
@@ -9073,18 +9073,20 @@
             "pubinstruments": [],
             "pubsections": [],
             "pubsensors": [],
+            "pubshutdown": false,
             "pubsignals": [],
             "startup": false,
             "subdccnodes": [],
             "subinstruments": [],
             "subsections": [],
             "subsensors": [],
+            "subshutdown": false,
             "subsignals": [],
             "url": "",
             "username": ""
         },
         "sprog": {
-            "baud": 115200,
+            "baud": 460800,
             "debug": false,
             "port": "/dev/serial0",
             "power": false,
