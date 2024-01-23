@@ -16,7 +16,7 @@ without some of the Raspberry-Pi specific interfacing functions).
 Configured / pre-installed systems are now available to purchase from:
 [https://www.model-railway-signalling.co.uk/](https://www.model-railway-signalling.co.uk/)
 
-## What's new for Release 4.0:
+## What's new for Release 4.1.0:
 
 * Hidden files and folders now supressed in file load and save dialogs
 * Network heartbeats and monitering to check the status of other network nodes
