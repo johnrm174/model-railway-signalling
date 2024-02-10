@@ -499,7 +499,6 @@ def query_command_station_status():
             # Query the status of the command station to confirm connectivity (0x0C = 12 decimal)
             logging.debug ("Pi-SPROG: Sending RSTAT command (Request Command Station Status)")
             send_cbus_command (mj_pri=2, min_pri=2, op_code=12)
-            timeout_start = time.time()
             # Wait for the response (with a 1 second timeout)
             if wait_for_response(1.0, response_received): break
             attempts = attempts + 1
