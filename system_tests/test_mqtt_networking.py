@@ -275,7 +275,7 @@ def run_remote_track_sensor_tests(delay:float=0.0):
     sleep(network_delay)
     assert_sections_occupied(8)
     assert_sections_clear(5,6,7,9)
-    simulate_gpio_triggered(12)
+    simulate_gpio_triggered(7)
     sleep(delay)
     sleep(network_delay)
     assert_sections_occupied(9)

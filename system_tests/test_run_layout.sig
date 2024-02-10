@@ -2,12 +2,12 @@
     "information": "Model Railway Signalling Configuration File",
     "instruments": {
         "1": {
-            "repeaterstate": true,
+            "repeaterstate": null,
             "sectionstate": null
         },
         "2": {
             "repeaterstate": null,
-            "sectionstate": true
+            "sectionstate": null
         }
     },
     "objects": {
@@ -598,7 +598,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "20"
+                "11"
             ],
             "pointinterlock": [
                 [
@@ -2929,7 +2929,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "22"
+                "13"
             ],
             "pointinterlock": [
                 [
@@ -4039,7 +4039,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "23"
+                "18"
             ],
             "pointinterlock": [
                 [
@@ -6189,7 +6189,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "21"
+                "12"
             ],
             "pointinterlock": [
                 [
@@ -7264,7 +7264,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "19"
+                "10"
             ],
             "pointinterlock": [
                 [
@@ -8377,7 +8377,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "18"
+                "9"
             ],
             "pointinterlock": [
                 [
@@ -9452,7 +9452,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                "24"
+                "19"
             ],
             "pointinterlock": [
                 [
@@ -10562,7 +10562,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "13"
+                "8"
             ],
             "pointinterlock": [
                 [
@@ -13971,7 +13971,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                "12"
+                "7"
             ],
             "pointinterlock": [
                 [
@@ -25192,119 +25192,10 @@
         "8": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
-    "sections": {
-        "1": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "10": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "11": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "12": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "13": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "14": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "15": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "16": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "17": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "18": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "19": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "2": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "20": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "21": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "22": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "23": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "24": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "25": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "26": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "27": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "3": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "4": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "5": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "6": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "7": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "8": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        },
-        "9": {
-            "labeltext": "XXXXX",
-            "occupied": false
-        }
-    },
+    "sections": {},
     "settings": {
         "canvas": {
             "grid": 25,
@@ -25314,8 +25205,8 @@
         },
         "general": {
             "automation": true,
-            "editmode": false,
-            "filename": "/home/pi/model-railway-signalling/system_tests/test_run_layout.sig",
+            "editmode": true,
+            "filename": "/home/pi/Software/model-railway-signalling/system_tests/test_run_layout.sig",
             "info": "Document your layout here",
             "version": "Version 4.1.0"
         },
@@ -25332,6 +25223,26 @@
                 [
                     6,
                     6
+                ],
+                [
+                    7,
+                    7
+                ],
+                [
+                    8,
+                    8
+                ],
+                [
+                    9,
+                    9
+                ],
+                [
+                    10,
+                    10
+                ],
+                [
+                    11,
+                    11
                 ],
                 [
                     12,
@@ -25382,7 +25293,7 @@
                     27
                 ]
             ],
-            "timeoutperiod": 1.0,
+            "timeoutperiod": 0.0,
             "triggerdelay": 0.001
         },
         "logging": {
@@ -25425,7 +25336,7 @@
             "releaseonyel": false,
             "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": "NONE"
@@ -25478,7 +25389,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": true,
             "siglocked": false,
             "subclear": false,
@@ -25599,7 +25510,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
