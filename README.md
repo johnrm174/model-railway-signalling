@@ -51,7 +51,7 @@ $ python3 -m pip install simpleaudio
 </pre>
 Note that if you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
 <pre>
-sudo apt-get install libasound2-dev
+$ sudo apt-get install libasound2-dev
 </pre>
 
 ## Running the application
@@ -74,4 +74,17 @@ Documentation, in the form of a Quick-Start guide can be found in the 'user_guid
 
 Some example layout configuration files can be found in the 'configuration_examples' folder:
 [https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
+
+And finally, a top tip for running the application on the latest Debian Bookworm release which uses Wayland as the GUI backend
+rather than X11 (which was the backend for previous Debian releases). I found that with Wayland, the Tkinter GUI performance
+was terrible for some reason (not just my application - python/Tkinter performance in general) - and that was running on a
+Raspberry Pi 5 which I would have expected to improve overall performance. Anyway, I found that the fix is to switch the GUI
+backend of the Raspberry Pi back to X11 - performance of the user interface is now lightning quick!
+
+To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 'Wayland' and select X11.
+
+An additional benifit was that some of the other applications I use (such as the kazam video capture software)
+will now work as normal on the Raspberry Pi 5.
+
+
 
