@@ -49,6 +49,10 @@ If 'simpleaudio' is not installed then the software will still function correctl
 <pre>
 $ python3 -m pip install simpleaudio
 </pre>
+Note that if you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
+<pre>
+sudo apt-get install libasound2-dev
+</pre>
 
 ## Running the application
 
