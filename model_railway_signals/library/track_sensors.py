@@ -62,19 +62,18 @@ class track_sensor_callback_type(enum.Enum):
     sensor_triggered = 31   # The sensor has been triggered (FALLING Event)
 
 # ----------------------------------------------------------------------------------------------------------------------------
-# We can only use GPIO interface if we're running on a Raspberry Pi. Other Platforms don't include
-# the RPi specific GPIO package so this is a quick and dirty way of detecting it on startup.
+# We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
+# include the RPi specific GPIO package so this is a quick and dirty way of detecting it on startup.
 # The result (True or False) is maintained in the global 'raspberry_pi' variable
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def is_raspberrypi():
-    global GPIO
+    global gpiozero
     try:
-        import RPi.GPIO as GPIO
-        GPIO.setwarnings(False)
-        GPIO.setmode(GPIO.BCM)     # We want to refer to the ports by port number and not physical pin number
+        import gpiozero
         return (True)
-    except Exception: pass
+    except Exception:
+        logging.warning("GPIO: Not running on a Raspberry Pi so track sensors will be inoperative")
     return (False)
 
 raspberry_pi = is_raspberrypi()
@@ -147,27 +146,6 @@ def sensor_exists(sensor_id:Union[int,str]):
     return(None)
 
 # -----------------------------------------------------------------------------------------------------------
-# Internal Test functions to simulate local GPIO events (support for system test harness
-# -----------------------------------------------------------------------------------------------------------
-
-def simulate_sensor_triggered(gpio_port:int):
-    global gpio_port_mappings
-    gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
-    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-    logging.info("Sensor "+str(sensor_id)+": Simulated Trigger Event ***********************************************")
-    send_mqtt_track_sensor_updated_event(sensor_id)
-    make_track_sensor_callback(gpio_port)
-    return()
-    
-def simulate_sensor_reset(gpio_port:int):
-    global gpio_port_mappings
-    gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
-    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-    logging.debug("Sensor "+str(sensor_id)+": Simulated Reset Event *************************************************")
-    send_mqtt_track_sensor_updated_event(sensor_id)
-    return()
-
-# -----------------------------------------------------------------------------------------------------------
 # Internal Function to make the appropriate callback (callback or signal approach/passed event)
 # for both local track sensors and remote (subscribed to via MQTT networking) track sensors
 # Note that we call into the main tkinter thread to process the callback. We do this as all the
@@ -205,71 +183,71 @@ def make_track_sensor_callback(gpio_port):
     return()
 
 # -----------------------------------------------------------------------------------------------------------
-# Internal function called each time a RISING or FALLING event is detected for the external GPIO port.
-# We wait for the trigger_delay period and then check the sensor is still in the same state before raising
-# the specified callback event (to alow any spurious "spikes" on the GPIO inputs to be filtered out).
-# We also apply a timeout period for each event to prevent re-triggering until the timeout has completed.
+# Thread to "lock" the sensor for the specified timeout period after track_sensor_triggered
+# Any re-triggers during this period are ignored (they just extend the timeout period)
+# -----------------------------------------------------------------------------------------------------------
+
+def thread_to_timeout_sensor (gpio_port):
+    global gpio_port_mappings
+    while time.time() <  (gpio_port_mappings[str(gpio_port)]["timeout_start"]
+                          + gpio_port_mappings[str(gpio_port)]["timeout_value"]):
+        time.sleep(0.0001)
+    # Reset the sensor at the end of the timeout period
+    gpio_port_mappings[str(gpio_port)]["timeout_active"] = False
+    if raspberry_pi and not gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed:
+        track_sensor_released(gpio_port)
+    return()
+
+# -----------------------------------------------------------------------------------------------------------
+# Internal function called whenever a "Button Press" event is detected for the external GPIO port.
+# A timeout is applied to the button press event to prevent re-triggering until the timeout has completed.
 # This is to handle optical sensors which might Fall and then Rise when each carrage/waggon passes over.
 # If the sensor is still within the timeout period (from the last time it was triggered) then the timeout
 # will effectively be extended. Only if we are not in the timout period will the external callback be made.
-# -----------------------------------------------------------------------------------------------------------
-
-def track_sensor_triggered (gpio_port:int):
-
-    # Common Thread function to "lock" the sensor for the specified timeout period
-    # Used by both the track_sensor_triggered and track_sensor_reset functions
-    def thread_to_timeout_sensor (gpio_port):
-        global gpio_port_mappings
-        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-        gpio_port_mappings[str(gpio_port)]["timeout_active"] = True
-        while time.time() < gpio_port_mappings[str(gpio_port)]["timeout_start"] + gpio_port_mappings[str(gpio_port)]["timeout_value"]:
-            time.sleep(0.0001)
-        gpio_port_mappings[str(gpio_port)]["timeout_active"] = False
-        # Set the internal state back to the current state at completion of the timeout
-        # Don't forget the state of the track sensor is the reverse of the port state
-        if gpio_port_mappings[str(gpio_port)]["sensor_state"] == GPIO.input(gpio_port):
-            gpio_port_mappings[str(gpio_port)]["sensor_state"] = not GPIO.input(gpio_port)
-            send_mqtt_track_sensor_updated_event(sensor_id)
-        return()
-    
-    # The main code starts here
+# -----------------------------------------------------------------------------------------------------------        
+                
+def track_sensor_triggered(gpio_port):
     global gpio_port_mappings
-    if not gpio_port_is_configured (gpio_port):
-        logging.error ("GPIO Port "+str(gpio_port)+": Is not configured")
+    # If we are still in the timeout period then ignore the trigger event (but Reset the timeout period)
+    if gpio_port_mappings[str(gpio_port)]["timeout_active"]:
+        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
     else:
-        # Get the current state of the port (immediately after the trigger)
-        gpio_state = GPIO.input(gpio_port)
-        # Wait for the trigger delay period and then check the sensor is still in the same state
-        # We do this to provide 'debounce - i.e. filter out spurious "spikes" on the GPIO inputs
-        time.sleep (gpio_port_mappings[str(gpio_port)]["trigger_period"])
-        if gpio_state == GPIO.input(gpio_port):
-            # If we are still in the timeout period then ignore the event (RISING or FALLING)
-            # But Reset the timeout period if it is a FALLING Event (i.e. track sensor triggered)
-            if gpio_port_mappings[str(gpio_port)]["timeout_active"]:
-                if not gpio_state: gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-            elif gpio_state:
-                # Maintain the state locally (so it can be queried without querying the GPIO port)
-                # We do this for consistency with how remote (MQTT) track sensors are handled
-                gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
-                # Transmit the state via MQTT networking (will only be sent if configured to publish). Note that
-                # we do not make any callbacks when the sensor is reset as we only use the RISING event to update
-                # the internally-held track sensor state and update any remote nodes via MQTT networking.
-                sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-                send_mqtt_track_sensor_updated_event(sensor_id)
-            else:
-                # Maintain the state locally (so it can be queried without querying the GPIO port
-                # We do this for consistency with how remote  (MQTT) track sensors are handled
-                gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
-                # Start a new timeout thread
-                timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_port,))
-                timeout_thread.start()
-                # Transmit the state via MQTT networking (will only be sent if configured to publish) and 
-                # Make the appropriate callback (triggered callback or signal approach/passed event)
-                sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-                logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
-                send_mqtt_track_sensor_updated_event(sensor_id)
-                make_track_sensor_callback(gpio_port)
-    return()            
+        # Start a new timeout thread
+        gpio_port_mappings[str(gpio_port)]["timeout_active"] = True
+        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
+        timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_port,))
+        timeout_thread.start()
+        # Maintain the state locally (so it can be queried without querying the GPIO port
+        # We do this for consistency with how remote (MQTT) track sensors are handled
+        gpio_port_mappings[str(gpio_port)]["sensor_state"] = True
+        # Transmit the state via MQTT networking (will only be sent if configured to publish) and 
+        # Make the appropriate callback (triggered callback or signal approach/passed event)
+        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+        logging.info("Sensor "+str(sensor_id)+": Triggered Event **************************************************")
+        send_mqtt_track_sensor_updated_event(sensor_id)
+        make_track_sensor_callback(gpio_port)
+    return()
+
+# -----------------------------------------------------------------------------------------------------------
+# Internal function called whenever a "Button Release" event is detected for the external GPIO port.
+# Note that if the sensor is still within the timeout period (after triggering) the event is ignored
+# but the function will be called again at the end of the timeout period to 'reset the sensor.
+# -----------------------------------------------------------------------------------------------------------        
+
+def track_sensor_released(gpio_port):
+    global gpio_port_mappings
+    # If we are still in the timeout period then ignore the release event
+    if not gpio_port_mappings[str(gpio_port)]["timeout_active"]:
+        # Maintain the state locally (so it can be queried without querying the GPIO port)
+        # We do this for consistency with how remote (MQTT) track sensors are handled
+        gpio_port_mappings[str(gpio_port)]["sensor_state"] = False
+        # Transmit the state via MQTT networking (will only be sent if configured to publish). Note that
+        # we do not make any callbacks when the sensor is reset as we only use the RISING event to update
+        # the internally-held track sensor state and update any remote nodes via MQTT networking.
+        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+        logging.debug("Sensor "+str(sensor_id)+": Released Event ***************************************************")
+        send_mqtt_track_sensor_updated_event(sensor_id)
+    return()
 
 # -----------------------------------------------------------------------------------------------------------
 # Public API function to create a sensor object (mapped to a GPIO channel)
@@ -301,24 +279,28 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
         logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to GPIO Port "+mapped_gpio_port(sensor_id))
     else:
         # We're good to go and create the sensor mapping, but we only configure the GPIO if running on a Pi
+        # Note we now use the internal software debounce mechanism rather than doing it ourselves
         if raspberry_pi:
-            GPIO.setup(gpio_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(gpio_channel, GPIO.BOTH, callback=track_sensor_triggered)
+            sensor_device = gpiozero.Button(gpio_channel, bounce_time=trigger_period)
+            sensor_device.when_pressed = lambda:track_sensor_triggered(gpio_channel)
+            sensor_device.when_released = lambda:track_sensor_released(gpio_channel)
         else:
+            sensor_device = None
             logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
         # Add the to the dictionaries of sensors and channels
         gpio_port_mappings[str(gpio_channel)] = {"sensor_id"       : sensor_id,
+                                                 "sensor_device"   : sensor_device,
                                                  "callback"        : sensor_callback,
                                                  "signal_approach" : signal_approach,
                                                  "signal_passed"   : signal_passed,
-                                                 "trigger_period"  : trigger_period,
                                                  "timeout_start"   : time.time(),
                                                  "timeout_value"   : sensor_timeout,
                                                  "timeout_active"  : False,
                                                  "sensor_state"    : False}
         # Read the initial state for the Sensor and send via MQTT networking (only if configured to publish)
         # Note that as we are using "pull down" the state is the reverse of what we read from the port
-        if raspberry_pi: gpio_port_mappings[str(gpio_channel)]["sensor_state"] = not GPIO.input(gpio_channel)
+        if raspberry_pi:
+            gpio_port_mappings[str(gpio_channel)]["sensor_state"] = sensor_device.is_pressed
         send_mqtt_track_sensor_updated_event(sensor_id)
     return() 
 
@@ -424,7 +406,8 @@ def send_mqtt_track_sensor_updated_event(sensor_id:int):
 def gpio_shutdown():
     if raspberry_pi:
         logging.info ("GPIO: Restoring default settings")
-        GPIO.cleanup()
+        for gpio_port in gpio_port_mappings:
+            if gpio_port.isdigit(): gpio_port_mappings[gpio_port]["sensor_device"].close()
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -465,7 +448,7 @@ def delete_all_local_track_sensors():
     new_gpio_port_mappings = {}
     for gpio_port in gpio_port_mappings:
         if not gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
-        elif raspberry_pi: GPIO.remove_event_detect(int(gpio_port))
+        elif raspberry_pi: gpio_port_mappings[gpio_port]["sensor_device"].close()
     gpio_port_mappings = new_gpio_port_mappings
     return()
 
