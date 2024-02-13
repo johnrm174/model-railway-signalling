@@ -736,7 +736,7 @@ def update_tab3_approach_control_selections(signal):
     return() 
 
 #------------------------------------------------------------------------------------
-# Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 
+# Top level Edit signal class (Has 3 tabs - Configuration, Interlocking and Automation 
 #------------------------------------------------------------------------------------
 
 class edit_signal:
@@ -764,7 +764,7 @@ class edit_signal:
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
             self.tab1 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab1, text="Configration")
+            self.tabs.add(self.tab1, text="Configuration")
             self.tab2 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab2, text="Interlocking")
             self.tabs.pack()

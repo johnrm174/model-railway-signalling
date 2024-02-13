@@ -277,7 +277,7 @@ class edit_instrument():
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
             self.tab1 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab1, text="Configration")
+            self.tabs.add(self.tab1, text="Configuration")
             self.tab2 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab2, text="Interlocking")
             self.tabs.pack()
