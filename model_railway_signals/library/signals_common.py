@@ -62,8 +62,8 @@ class sig_type(enum.Enum):
     remote_signal = 0
     colour_light = 1
     ground_position = 2
-    semaphore = 3                 
-    ground_disc = 4          
+    semaphore = 3
+    ground_disc = 4
 
 # -------------------------------------------------------------------------
 # Signals are to be added to a global dictionary when created
