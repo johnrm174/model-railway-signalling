@@ -453,6 +453,7 @@ def update_signal(object_id, new_object_configuration):
     old_item_id = objects_common.schematic_objects[object_id]["itemid"]
     new_item_id = new_object_configuration["itemid"]    
     # Delete the existing signal object, copy across the new configuration and redraw
+    # Note that the delete_signal_object function will also delete any DCC or sensor mappings
     delete_signal_object(object_id)
     objects_common.schematic_objects[object_id] = copy.deepcopy(new_object_configuration)
     redraw_signal_object(object_id)                
@@ -721,8 +722,10 @@ def delete_signal_object(object_id):
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
-    track_sensors.remove_sensor_callbacks(objects_common.schematic_objects[object_id]["itemid"]*10)
-    track_sensors.remove_sensor_callbacks(objects_common.schematic_objects[object_id]["itemid"]*10+1)
+    passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
+    approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
+    track_sensors.remove_sensor_callbacks(passed_sensor)
+    track_sensors.remove_sensor_callbacks(approach_sensor)
     # Delete the associated distant signal (if there is one)
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
