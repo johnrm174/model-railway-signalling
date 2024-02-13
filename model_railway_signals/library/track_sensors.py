@@ -6,6 +6,7 @@
 # 
 # sensor_callback_type (tells the calling program what has triggered the callback):
 #     track_sensor_callback_type.sensor_triggered - The external sensor has been triggered
+#     track_sensor_callback_type.sensor_reset - The external sensor has been reset
 # 
 # create_sensor - Creates a sensor object
 #   Mandatory Parameters:
@@ -50,6 +51,7 @@ import time
 import threading
 import logging
 from typing import Union
+
 from . import common
 from . import signals_common
 from . import mqtt_interface
@@ -59,7 +61,7 @@ from . import mqtt_interface
 # -----------------------------------------------------------------------------------------------------------
     
 class track_sensor_callback_type(enum.Enum):
-    sensor_triggered = 31   # The sensor has been triggered (FALLING Event)
+    sensor_triggered = 31   # The sensor has been triggered
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
@@ -95,9 +97,9 @@ def get_list_of_available_ports():
 # "callback"        : The callback to make when a sensor is triggered (if not mapped to a signal event)
 # "signal_approach" : The signal ID to generate a 'signal approached' event for when triggered
 # "signal_passed"   : The signal ID to generate a 'signal passed' event for when triggered
-# "trigger_period"  : The period during which the sensor must remain active before triggering
-# "timeout_start"   : The time the sensor was triggered (after the trigger_period)
 # "timeout_value"   : Time period (from timeout_start) for ignoring further triggers
+# "sensor_device"   : the reference to the gpiozero button object that represents our sensor
+# "timeout_start"   : The time the sensor was triggered (after the trigger_period)
 # "timeout_active"  : Flag for whether the sensor is still within the timeout period
 # "sensor_state"    : Flag for whether the sensor is 'on' (triggered) or 'off' (reset)
 # -----------------------------------------------------------------------------------------------------------
@@ -111,8 +113,7 @@ gpio_port_mappings: dict = {}
 list_of_track_sensors_to_publish=[]
 
 # -----------------------------------------------------------------------------------------------------------
-# The default "External" callback function for the sensor
-# This is called on events if an external callback hasn't neen specified
+# Default callback function for a sensor - called on events if an external callback wasn't specified
 # -----------------------------------------------------------------------------------------------------------
 
 def null_callback(sensor_id:int,callback_type):
@@ -179,7 +180,8 @@ def make_track_sensor_callback(gpio_port):
         # Raise a callback - either in the main tkinter thread if we know the main root window or the current gpio thread
         sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
         callback = gpio_port_mappings[str(gpio_port)]["callback"]
-        common.execute_function_in_tkinter_thread (lambda: callback(sensor_id,track_sensor_callback_type.sensor_triggered))
+        callback_type = track_sensor_callback_type.sensor_triggered
+        common.execute_function_in_tkinter_thread (lambda: callback(sensor_id,callback_type))
     return()
 
 # -----------------------------------------------------------------------------------------------------------
@@ -266,11 +268,11 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
     logging.info ("Sensor "+str(sensor_id)+": Creating track sensor mapping for GPIO "+str(gpio_channel))
     if not isinstance(sensor_id, int) or sensor_id < 1:
         logging.error ("Sensor "+str(sensor_id)+": Sensor ID must be an integer greater than zero")
-    elif gpio_port_is_configured(gpio_channel):
-        logging.error ("Sensor "+str(sensor_id)+": GPIO port "+str(gpio_channel)+" is already mapped to another Sensor")
     elif gpio_channel not in get_list_of_available_ports():
         logging.error ("Sensor "+str(sensor_id)+": Invalid GPIO Port "+str(gpio_channel)
                         + " - Supported GPIO ports are: " + str(get_list_of_available_ports()))
+    elif gpio_port_is_configured(gpio_channel):
+        logging.error ("Sensor "+str(sensor_id)+": GPIO port "+str(gpio_channel)+" is already mapped to another Sensor")
     elif signal_passed > 0 and signal_approach > 0:
         logging.error ("Sensor "+str(sensor_id)+": Can only map to a signal_passed event OR a signal_approach event")
     elif (signal_passed > 0 or signal_approach) > 0 and sensor_callback != null_callback:
@@ -278,29 +280,25 @@ def create_track_sensor (sensor_id:int, gpio_channel:int,
     elif sensor_exists(sensor_id):
         logging.error ("Sensor "+str(sensor_id)+": Sensor already exists - mapped to GPIO Port "+mapped_gpio_port(sensor_id))
     else:
-        # We're good to go and create the sensor mapping, but we only configure the GPIO if running on a Pi
-        # Note we now use the internal software debounce mechanism rather than doing it ourselves
+        # Create the track sensor entry in the dictionary of gpio_port_mappings
+        gpio_port_mappings[str(gpio_channel)] = {"sensor_id"       : sensor_id,
+                                                 "callback"        : sensor_callback,
+                                                 "signal_approach" : signal_approach,
+                                                 "signal_passed"   : signal_passed,
+                                                 "timeout_value"   : sensor_timeout,
+                                                 "sensor_device"   : None,
+                                                 "timeout_start"   : None,
+                                                 "timeout_active"  : False,
+                                                 "sensor_state"    : False}
+        # We only create the gpiozero sensor device if we are running on a raspberry pi
+        # The internal gpiozero software debounce mechanism is used for the trigger period
         if raspberry_pi:
             sensor_device = gpiozero.Button(gpio_channel, bounce_time=trigger_period)
             sensor_device.when_pressed = lambda:track_sensor_triggered(gpio_channel)
             sensor_device.when_released = lambda:track_sensor_released(gpio_channel)
-        else:
-            sensor_device = None
-            logging.warning ("Sensor "+str(sensor_id)+": Not running on a Raspberry Pi - GPIO inputs will be non-functional")
-        # Add the to the dictionaries of sensors and channels
-        gpio_port_mappings[str(gpio_channel)] = {"sensor_id"       : sensor_id,
-                                                 "sensor_device"   : sensor_device,
-                                                 "callback"        : sensor_callback,
-                                                 "signal_approach" : signal_approach,
-                                                 "signal_passed"   : signal_passed,
-                                                 "timeout_start"   : time.time(),
-                                                 "timeout_value"   : sensor_timeout,
-                                                 "timeout_active"  : False,
-                                                 "sensor_state"    : False}
-        # Read the initial state for the Sensor and send via MQTT networking (only if configured to publish)
-        # Note that as we are using "pull down" the state is the reverse of what we read from the port
-        if raspberry_pi:
+            gpio_port_mappings[str(gpio_channel)]["sensor_device"] = sensor_device
             gpio_port_mappings[str(gpio_channel)]["sensor_state"] = sensor_device.is_pressed
+        # Send out the initial state of the sensor via MQTT networking (only if configured to publish)
         send_mqtt_track_sensor_updated_event(sensor_id)
     return() 
 
@@ -411,33 +409,46 @@ def gpio_shutdown():
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
-# Non-Public API Functions to update the callback behavior for existing track sensors (local or remote)
-# This is called by the Schematic Editor application everytime a signal is updated if the signal has a
-# mapped "passed" or "approached" sensor mapping to make the required callback association. If the
-# sensor does not exist then the call will fail silently (this use case is where a signal has been
-# mapped to a sensor but the sensor has then been unmapped - and the user won't know until they
-# next open the signal configuration dialog and see that the entry is now invalid
+# Non-Public API Function to update the callback behavior for existing track sensors (local or remote). This function
+# is called by the Editor every time a signal configuration or an 'intermediate track section' configuration is updated
+# (where the mapped track sensor may have changed). If the sensor does not exist (i.e is not mapped to a GPIO port)
+# then the call will fail silently. This use case is where a signal or 'intermediate track section' has been mapped to
+# a sensor but then the sensor has subsequently been unmapped from its GPIO port (via a track sensor configuration update).
+# This case should never occur (as the configuration is validated by the editor to ensure the sections exist on Apply)
+# but I'll leave the check in here for defensive programming purposes. 
 # ------------------------------------------------------------------------------------------------------------------
 
-def update_sensor_callback (sensor_identifier:Union[int,str], signal_passed:int=0, signal_approach:int=0):
+def update_sensor_callback (sensor_id:Union[int,str], signal_passed:int=0, signal_approach:int=0, callback=null_callback):
     global gpio_port_mappings
-    if sensor_exists(sensor_identifier):
-        str_gpio_port = mapped_gpio_port(sensor_identifier)
+    if sensor_exists(sensor_id):
+        str_gpio_port = mapped_gpio_port(sensor_id)
         gpio_port_mappings[str_gpio_port]["signal_approach"] = signal_approach
         gpio_port_mappings[str_gpio_port]["signal_passed"] = signal_passed
+        gpio_port_mappings[str_gpio_port]["callback"] = callback
 
-def remove_sensor_callbacks (signal_id:int):
+# ------------------------------------------------------------------------------------------------------------------
+# Non-Public API Function to remove the callback behavior for existing track sensors (local or remote). This function
+# is called by the Editor every time a signal or an 'intermediate track section' object is deleted from the schematic
+# or when a signal configuration or an 'intermediate track section' configuration is updated (where the allocated track
+# sensors may have changed or been deleted). The track sensor itself will still 'exist' as it will still be mapped to a
+# GPIO input - and can then be re-allocated to another signal or to another 'intermediate track section' as required.
+# If the sensor no longer exists then the call will fail silently (this use case is where a sensor has been unmapped
+# from its GPIO port (via a track sensor configuration update which removed the GPIO port / sensor mapping)
+# ------------------------------------------------------------------------------------------------------------------
+
+def remove_sensor_callbacks(sensor_id:int=0):
     global gpio_port_mappings
-    for gpio_port in gpio_port_mappings:
-        if gpio_port_mappings[gpio_port]["signal_approach"] == signal_id:
-            gpio_port_mappings[gpio_port]["signal_approach"] = 0
-        if gpio_port_mappings[gpio_port]["signal_passed"] == signal_id:
-            gpio_port_mappings[gpio_port]["signal_passed"] = 0
+    if sensor_exists(sensor_id):
+        str_gpio_port = mapped_gpio_port(sensor_id)
+        gpio_port_mappings[str_gpio_port]["signal_approach"] = 0
+        gpio_port_mappings[str_gpio_port]["signal_passed"] = 0
+        gpio_port_mappings[str_gpio_port]["callback"] = null_callback
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
-# Non public API function for deleting all LOCAL sensor mappings - This is used by the
-# schematic editor for deleting all existing GPIO mappings (before creating new ones)
+# Non public API function to delete all LOCAL track sensor mappings. Called when the sensor mappings have been
+# updated and re-applied by the editor (on 'apply' of the track sensor mappings). The editor will then go on to
+# re-create all LOCAL track sensors (that have a GPIO mapping defined) with their updated mappings.
 # ------------------------------------------------------------------------------------------------------------------
 
 def delete_all_local_track_sensors():
@@ -453,9 +464,9 @@ def delete_all_local_track_sensors():
     return()
 
 # ------------------------------------------------------------------------------------------------------------------
-# Non public API function to reset the list of published/subscribed track sensors. Used
-# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
-# via the set_track_sensors_to_publish_state and subscribe_to_track_sensor_updates functions
+# Non public API function to reset the list of published/subscribed track sensors. Used by the schematic editor
+# for re-setting the MQTT configuration (on apply of the new publish/subscribe settings) prior to applying the
+# new configuration via the set_track_sensors_to_publish_state and subscribe_to_track_sensor_updates functions.
 # ------------------------------------------------------------------------------------------------------------------
 
 def reset_mqtt_configuration():
@@ -474,4 +485,4 @@ def reset_mqtt_configuration():
     gpio_port_mappings = new_gpio_port_mappings
     return()
 
-############################################################################
+####################################################################################################################
