@@ -606,8 +606,6 @@ def publish_signal_state(sig_id:int):
 
 def delete_signal(sig_id:int):
     global signals
-    global list_of_signals_to_publish_state_changes
-    global list_of_signals_to_publish_passed_events
     if sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
         signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
