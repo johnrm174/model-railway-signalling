@@ -44,7 +44,7 @@ class signal_sensor(common.str_int_item_id_entry_box):
         self.parent_object = parent_object 
         self.label = Tk.Label(parent_frame, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        # The this function will return true if the track sensor exists
+        # The this function will return true if the GPIO sensor exists
         exists_function = gpio_sensors.gpio_sensor_exists
         super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -59,14 +59,14 @@ class signal_sensor(common.str_int_item_id_entry_box):
                 if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
                      ( signal_object["passedsensor"][1] == self.entry.get() or
                           signal_object["approachsensor"][1] == self.entry.get() ) ):
-                    self.TT.text = ("Track Sensor "+str(self.entry.get())+" is already assigned to signal "
+                    self.TT.text = ("GPIO Sensor "+str(self.entry.get())+" is already assigned to signal "
                                     +str(signal_object["itemid"]))
                     valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
 #------------------------------------------------------------------------------------
-# Class for the Signal Passed Sensor Frame - uses the Track Sensor Entry Box class
+# Class for the Signal Passed Sensor Frame - uses the Signal Sensor Entry Box class
 # Public Class instance methods used from the base classes are
 #    "approach.enable" - disables/blanks the checkbox and entry box 
 #    "approach.disable" - enables/loads the checkbox and entry box
@@ -82,11 +82,11 @@ class signal_passed_sensor_frame:
     def __init__(self, parent_frame, parent_object):
         # The child class instances need the reference to the parent object so they can call
         # the sibling class method to get the current value of the Signal ID for validation
-        self.frame = Tk.LabelFrame(parent_frame, text="Track sensors to associate with signal")
+        self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
         # Create the elements in a subframe so they are centered
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        tool_tip = ("Specify the ID of the associated Track Sensor (or leave blank) - This "+
+        tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
                     "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
                     "which has been subscribed to via MQTT networking")
         self.passed = signal_sensor(self.subframe, parent_object, callback=self.validate,
@@ -96,7 +96,7 @@ class signal_passed_sensor_frame:
         
     def validate(self):
         if self.passed.entry.get() != "" and self.passed.entry.get() == self.approach.entry.get():
-            error_text = "Cannot assign the same track sensor for both signal 'passed' and signal 'approached' events"
+            error_text = "Cannot assign the same GPIO sensor for both signal 'passed' and signal 'approached' events"
             self.passed.TT.text = error_text
             self.approach.TT.text = error_text
             self.passed.set_validation_status(False)

@@ -999,7 +999,7 @@ class gpio_port_entry_frame():
             for value in range (5):
                 if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
                 label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
-                tool_tip = "Enter a Sensor ID to be associated with this GPIO port (or leave blank)"
+                tool_tip = "Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)"
                 self.list_of_entry_boxes.append(gpio_port_entry_box(self.list_of_subframes[-1],
                                             label=label, tool_tip=tool_tip, callback=self.validate))
                 
@@ -1074,7 +1074,7 @@ class edit_gpio_settings():
             self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
-                tool_tip="Enter the delay period (before track sensor events will be triggered) in milliseconds (0-1000)")
+                tool_tip="Enter the delay period (before GPIO sensor events will be triggered) in milliseconds (0-1000)")
             self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
