@@ -10,7 +10,7 @@ import time
 from . import mqtt_interface
 from . import file_interface
 from . import pi_sprog_interface
-from . import track_sensors
+from . import gpio_sensors
 
 # -------------------------------------------------------------------------
 # Global variables used within the Library Common Module
@@ -66,7 +66,7 @@ def shutdown():
         # Turn off the DCC bus power and close the comms port
         pi_sprog_interface.sprog_shutdown()
         # Return the GPIO ports to their original configuration
-        track_sensors.gpio_shutdown()
+        gpio_sensors.gpio_shutdown()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
         # We need to put a timeout around this to deal with any ongoing timed signal sequences
         # (although its unlikely the user would initiate a shut down until these have finished)

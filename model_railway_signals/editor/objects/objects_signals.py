@@ -59,13 +59,13 @@
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
-#    track_sensors.update_sensor_callback - For managing track sensor objects
-#    track_sensors.remove_sensor_callbacks - For managing track sensor objects
-#    track_sensors.delete_all_local_track_sensors - For managing track sensor objects
-#    track_sensors.reset_mqtt_configuration - For managing track sensor objects
-#    track_sensors.set_sensors_to_publish_state - For managing track sensor objects
-#    track_sensors.subscribe_to_remote_sensor - For managing track sensor objects
-#    track_sensors.create_track_sensor - For managing track sensor objects
+#    gpio_sensors.update_gpio_sensor_callback - For managing track sensor objects
+#    gpio_sensors.remove_gpio_sensor_callbacks - For managing track sensor objects
+#    gpio_sensors.delete_all_local_gpio_sensors - For managing track sensor objects
+#    gpio_sensors.reset_mqtt_configuration - For managing track sensor objects
+#    gpio_sensors.set_gpio_sensors_to_publish_state - For managing track sensor objects
+#    gpio_sensors.subscribe_to_remote_gpio_sensor - For managing track sensor objects
+#    gpio_sensors.create_gpio_sensor - For managing track sensor objects
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -78,7 +78,7 @@ from ...library import signals_semaphores
 from ...library import signals_ground_position
 from ...library import signals_ground_disc
 from ...library import dcc_control
-from ...library import track_sensors
+from ...library import gpio_sensors
 
 from . import objects_common
 from . import objects_points
@@ -478,10 +478,10 @@ def redraw_signal_object(object_id):
     sig_type = signals_common.sig_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Update the sensor mapping callbacks for the signal (if any have been specified)
     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
-        track_sensors.update_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
                                     signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
     if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
-        track_sensors.update_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
                                     signal_approach = objects_common.schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
@@ -724,8 +724,8 @@ def delete_signal_object(object_id):
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    track_sensors.remove_sensor_callbacks(passed_sensor)
-    track_sensors.remove_sensor_callbacks(approach_sensor)
+    gpio_sensors.remove_gpio_sensor_callbacks(passed_sensor)
+    gpio_sensors.remove_gpio_sensor_callbacks(approach_sensor)
     # Delete the associated distant signal (if there is one)
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
@@ -774,7 +774,7 @@ def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
 
 def update_local_sensors(trigger:float, timeout:float, mappings:list):
     # Delete all track sensor objects and then re-create from the updated settings
-    track_sensors.delete_all_local_track_sensors()
+    gpio_sensors.delete_all_local_gpio_sensors()
     # Iterate through the sensor mappings to create each (new) track sensor objectin turn
     for mapping in mappings:
         sensor_id, gpio_port = mapping[0], mapping[1]
@@ -790,7 +790,7 @@ def update_local_sensors(trigger:float, timeout:float, mappings:list):
             if signal_object["approachsensor"][1] == str(sensor_id):
                 signal_approach = int(signal_id)
                 break
-        track_sensors.create_track_sensor(sensor_id, gpio_port, signal_passed=signal_passed,
+        gpio_sensors.create_gpio_sensor(sensor_id, gpio_port, signal_passed=signal_passed,
                     signal_approach=signal_approach, trigger_period=trigger, sensor_timeout=timeout)
     return()
 
@@ -801,8 +801,8 @@ def update_local_sensors(trigger:float, timeout:float, mappings:list):
 
 def mqtt_update_sensors(pub_sensors:list,sub_sensors:list):
     # Delete all publish/subscribe configuration prior to re-creating
-    track_sensors.reset_mqtt_configuration()
-    track_sensors.set_sensors_to_publish_state(*pub_sensors)
+    gpio_sensors.reset_mqtt_configuration()
+    gpio_sensors.set_gpio_sensors_to_publish_state(*pub_sensors)
     # Iterate through the list of sensors to subscribe to - to create each (new) subscription in turn
     for remote_identifier in sub_sensors:
         signal_passed, signal_approach = 0, 0
@@ -817,7 +817,7 @@ def mqtt_update_sensors(pub_sensors:list,sub_sensors:list):
             if signal_object["approachsensor"][1] == remote_identifier:
                 signal_approach = int(signal_id)
                 break
-        track_sensors.subscribe_to_remote_sensor(remote_identifier,
+        gpio_sensors.subscribe_to_remote_gpio_sensor(remote_identifier,
                     signal_passed=signal_passed, signal_approach=signal_approach)
     return()
 

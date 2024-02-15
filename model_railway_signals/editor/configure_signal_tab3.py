@@ -11,7 +11,7 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
-#    track_sensors.sensor_exists(id) - To see if the track_sensor exists (local or remote)
+#    gpio_sensors.gpio_sensor_exists(id) - To see if the track_sensor exists (local or remote)
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -26,7 +26,7 @@ import tkinter as Tk
 from . import common
 from . import objects
 
-from ..library import track_sensors
+from ..library import gpio_sensors
 
 #------------------------------------------------------------------------------------
 # Class for a Signal Sensor Entry Box - based on the str_int_item_id_entry_box class
@@ -45,7 +45,7 @@ class signal_sensor(common.str_int_item_id_entry_box):
         self.label = Tk.Label(parent_frame, text=label)
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         # The this function will return true if the track sensor exists
-        exists_function = track_sensors.sensor_exists
+        exists_function = gpio_sensors.gpio_sensor_exists
         super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
             
@@ -693,8 +693,8 @@ class approach_control_frame():
 class signal_automation_tab():
     def __init__(self, parent_tab, parent_object):
         # Create the signal sensor frame (always packed)
-        self.track_sensors = signal_passed_sensor_frame(parent_tab, parent_object)
-        self.track_sensors.frame.pack(padx=2, pady=2, fill='x')
+        self.gpio_sensors = signal_passed_sensor_frame(parent_tab, parent_object)
+        self.gpio_sensors.frame.pack(padx=2, pady=2, fill='x')
         # Create a Frame for the track occupancy and general settings (always packed)
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')

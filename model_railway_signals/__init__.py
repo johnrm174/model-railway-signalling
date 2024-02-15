@@ -55,11 +55,11 @@ from .library.track_sections import clear_section_occupied
 from .library.track_sections import subscribe_to_remote_section
 from .library.track_sections import set_sections_to_publish_state
 
-from .library.track_sensors import track_sensor_callback_type
-from .library.track_sensors import create_track_sensor
-from .library.track_sensors import track_sensor_active 
-from .library.track_sensors import subscribe_to_remote_sensor
-from .library.track_sensors import set_sensors_to_publish_state
+from .library.gpio_sensors import gpio_sensor_callback_type
+from .library.gpio_sensors import create_gpio_sensor
+from .library.gpio_sensors import gpio_sensor_active
+from .library.gpio_sensors import subscribe_to_remote_gpio_sensor
+from .library.gpio_sensors import set_gpio_sensors_to_publish_state
 
 from .library.pi_sprog_interface import sprog_connect
 from .library.pi_sprog_interface import service_mode_write_cv

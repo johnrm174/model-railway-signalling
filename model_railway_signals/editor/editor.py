@@ -59,12 +59,7 @@
 #    dcc_control.reset_mqtt_configuration - reset all publish/subscribe
 #    dcc_control.set_node_to_publish_dcc_commands - set note to publish DCC
 #    dcc_control.subscribe_to_dcc_command_feed - subscribe to DCC from other nodes
-#    track_sensors.raspberry_pi - To see if the application is running on a Raspberry Pi
-#    track_sensors.create_sensor - Create Track sensor objects (GPIO mappings)
-#    track_sensors.delete_all_local_track_sensors - Delete all GPIO mappings
-#    track_sensors.reset_mqtt_configuration() - configure MQTT networking
-#    track_sensors.set_sensors_to_publish_state(*ids) - configure MQTT networking
-#    track_sensors.subscribe_to_remote_sensor(id) - configure MQTT networking
+#    gpio_sensors.running_on_raspberry_pi - is the app running on a Raspberry Pi
 #
 #------------------------------------------------------------------------------------
 
@@ -82,7 +77,7 @@ from . import utilities
 from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
-from ..library import track_sensors
+from ..library import gpio_sensors
 from ..library import dcc_control
 from ..library import common as library_common
 
@@ -506,7 +501,7 @@ class main_menubar:
     def gpio_update(self):
         trigger, timeout, mappings = settings.get_gpio()
         # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
-        if len(mappings)>0 and not track_sensors.raspberry_pi:
+        if len(mappings)>0 and not gpio_sensors.running_on_raspberry_pi:
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
                     message="Not running on Raspberry Pi - no track sensors will be active")
         # Delete all track sensor objects and then re-create from the updated settings - we do this

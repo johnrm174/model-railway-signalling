@@ -721,7 +721,7 @@ def update_tab3_approach_control_selections(signal):
         if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
         else: signal.automation.approach_control.rh2.disable_route()
         # Enable the Approach sensor entry box
-        signal.automation.track_sensors.approach.enable()
+        signal.automation.gpio_sensors.approach.enable()
     else:
         signal.automation.approach_control.main.disable_route()
         signal.automation.approach_control.lh1.disable_route()
@@ -732,7 +732,7 @@ def update_tab3_approach_control_selections(signal):
         signal.automation.approach_control.disable_release_on_red()
         signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # Disable the Approach sensor entry box
-        signal.automation.track_sensors.approach.disable()
+        signal.automation.gpio_sensors.approach.disable()
     return() 
 
 #------------------------------------------------------------------------------------
@@ -892,8 +892,8 @@ class edit_signal:
             self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
             # These elements are for the Automation tab
-            self.automation.track_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1])
-            self.automation.track_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1])
+            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1])
+            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1])
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
@@ -954,7 +954,7 @@ class edit_signal:
             if not self.locking.interlocking.validate(): valid = False
             if not self.locking.interlocked_sections.validate(): valid = False
             if not self.locking.conflicting_sigs.validate(): valid = False
-            if not self.automation.track_sensors.validate(): valid = False
+            if not self.automation.gpio_sensors.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
             if not self.automation.timed_signal.validate(): valid = False
             if valid:
@@ -990,9 +990,9 @@ class edit_signal:
                 new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
                 # These elements are for the Automation tab
                 new_object_configuration["passedsensor"][0] = True
-                new_object_configuration["passedsensor"][1] = self.automation.track_sensors.passed.get_value()
+                new_object_configuration["passedsensor"][1] = self.automation.gpio_sensors.passed.get_value()
                 new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
-                new_object_configuration["approachsensor"][1] = self.automation.track_sensors.approach.get_value()
+                new_object_configuration["approachsensor"][1] = self.automation.gpio_sensors.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
                 override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto
