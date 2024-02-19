@@ -92,11 +92,12 @@ from .objects_common import instrument_index
 from .objects_common import line_index
 
 from .objects_lines import get_endstop_offsets
-from .objects_signals import update_local_sensors
-from .objects_signals import mqtt_update_sensors
 from .objects_signals import mqtt_update_signals
 from .objects_sections import mqtt_update_sections
 from .objects_instruments import mqtt_update_instruments
+
+from .objects_gpio import update_local_gpio_sensors
+from .objects_gpio import mqtt_update_gpio_sensors
 
 # The following code does nothing apart from suppressing
 # the spurious pyflakes warnings for unused imports
@@ -130,8 +131,8 @@ assert instrument_exists
 assert line_exists
 assert object_type
 assert get_endstop_offsets
-assert update_local_sensors
-assert mqtt_update_sensors
+assert update_local_gpio_sensors
+assert mqtt_update_gpio_sensors
 assert mqtt_update_signals
 assert mqtt_update_sections
 assert mqtt_update_instruments
