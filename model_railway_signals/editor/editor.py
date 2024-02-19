@@ -478,7 +478,7 @@ class main_menubar:
         dcc_control.reset_mqtt_configuration()
         dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
         dcc_control.subscribe_to_dcc_command_feed(*settings.get_sub_dcc_nodes())
-        objects.mqtt_update_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
+        objects.mqtt_update_gpio_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
         objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
         objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
         objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
@@ -506,7 +506,7 @@ class main_menubar:
                     message="Not running on Raspberry Pi - no track sensors will be active")
         # Delete all track sensor objects and then re-create from the updated settings - we do this
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
-        objects.update_local_sensors(trigger, timeout, mappings)
+        objects.update_local_gpio_sensors(trigger, timeout, mappings)
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions
