@@ -53,15 +53,22 @@ class signal_sensor(common.str_int_item_id_entry_box):
         # Do the basic integer validation first (is it a valid ID and does it exist (or has been subscribed to)
         valid = super().validate(update_validation_status=False)
         # Next we need to validate it isn't already assigned to another signal appropach or passed event
-        if valid and self.entry.get() != "":                
-            for signal_id in objects.signal_index:
-                signal_object = objects.schematic_objects[objects.signal(signal_id)]
-                if ( signal_object["itemid"] != self.parent_object.config.sigid.get_initial_value() and
-                     ( signal_object["passedsensor"][1] == self.entry.get() or
-                          signal_object["approachsensor"][1] == self.entry.get() ) ):
-                    self.TT.text = ("GPIO Sensor "+str(self.entry.get())+" is already assigned to signal "
-                                    +str(signal_object["itemid"]))
-                    valid = False
+        if valid and self.entry.get() != "":
+            sensor_id = self.entry.get()
+            signal_id = self.parent_object.config.sigid.get_initial_value()
+            event_mappings = gpio_sensors.get_gpio_sensor_callback(sensor_id)
+            if event_mappings[0] > 0 and event_mappings[0] != signal_id:
+                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
+                valid = False
+            elif event_mappings[1] > 0 and event_mappings[1] != signal_id:
+                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
+                valid = False
+            elif event_mappings[2] > 0:
+                self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
+                valid = False
+            elif gpio_sensors.is_set_to_publish_state(sensor_id):
+                self.TT.text = ("GPIO Sensor "+sensor_id+" is already configued to publish events to MQTT broker")
+                valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
 
