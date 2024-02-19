@@ -126,34 +126,40 @@ def reset_sig_released_button (sig_id:int):
     if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
 
 def sig_passed_button_event (sig_id:int):
-    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
-    if not common.shutdown_initiated:
-        signals[str(sig_id)]["passedbutton"].config(bg="red")
-        common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
-    # Reset the approach control 'released' state (if the signal supports approach control)
-    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
-        signals[str(sig_id)]["released"] = False
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
+    if not sig_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
+    else:
+        logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
+        # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
+        if not common.shutdown_initiated:
+            signals[str(sig_id)]["passedbutton"].config(bg="red")
+            common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
+        # Reset the approach control 'released' state (if the signal supports approach control)
+        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+            signals[str(sig_id)]["released"] = False
+        # Make the external callback (if one was specified at signal creation time)
+        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id:int):
-    logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
-    if not common.shutdown_initiated:
-        signals[str(sig_id)]["releasebutton"].config(bg="red")
-        common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
-    # Set the approach control 'released' state (if the signal supports approach control)
-    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
-        signals[str(sig_id)]["released"] = True
-    # Clear the approach control and refresh the signal
-    clear_approach_control(sig_id)
-    auto_refresh_signal(sig_id)
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
+    if not sig_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not exist")
+    else:
+        logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
+        # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
+        if not common.shutdown_initiated:
+            signals[str(sig_id)]["releasebutton"].config(bg="red")
+            common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
+        # Set the approach control 'released' state (if the signal supports approach control)
+        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+            signals[str(sig_id)]["released"] = True
+        # Clear the approach control and refresh the signal
+        clear_approach_control(sig_id)
+        auto_refresh_signal(sig_id)
+        # Make the external callback (if one was specified at signal creation time)
+        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
