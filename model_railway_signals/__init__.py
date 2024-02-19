@@ -55,9 +55,7 @@ from .library.track_sections import clear_section_occupied
 from .library.track_sections import subscribe_to_remote_section
 from .library.track_sections import set_sections_to_publish_state
 
-from .library.gpio_sensors import gpio_sensor_callback_type
 from .library.gpio_sensors import create_gpio_sensor
-from .library.gpio_sensors import gpio_sensor_active
 from .library.gpio_sensors import subscribe_to_remote_gpio_sensor
 from .library.gpio_sensors import set_gpio_sensors_to_publish_state
 
@@ -142,13 +140,10 @@ __all__ = [
         'clear_section_occupied',
         'subscribe_to_remote_section',
         'set_sections_to_publish_state', 
-      # public track_sensor types
-        'track_sensor_callback_type',
       # public track_sensor functions
-        'create_track_sensor',
-        'track_sensor_active',
-        'subscribe_to_remote_sensor',
-        'set_sensors_to_publish_state',
+        'create_gpio_sensor',
+        'subscribe_to_remote_gpio_sensor',
+        'set_gpio_sensors_to_publish_state',
       # Public DCC control functions
         'sprog_connect',
         'service_mode_write_cv',
