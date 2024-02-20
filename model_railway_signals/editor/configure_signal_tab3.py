@@ -11,7 +11,8 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
-#    gpio_sensors.gpio_sensor_exists(id) - To see if the track_sensor exists (local or remote)
+#    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
+#    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -65,9 +66,6 @@ class signal_sensor(common.str_int_item_id_entry_box):
                 valid = False
             elif event_mappings[2] > 0:
                 self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
-                valid = False
-            elif gpio_sensors.is_set_to_publish_state(sensor_id):
-                self.TT.text = ("GPIO Sensor "+sensor_id+" is already configued to publish events to MQTT broker")
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)

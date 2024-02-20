@@ -66,8 +66,6 @@
 #         signal_passed:int   - Configure a "signal passed" event for a Signal ID (default = 0)
 #         signal_approach:int - Configure a "approach release" event for a Signal ID (default = 0
 #         sensor_passed:int   - Configure a "Track Sensor passed" event for a Track Sensor ID (default = 0)
-#
-#   is_set_to_publish_state(sensor_ids:int) - Returns True if the sensor is configured to publish
 # 
 # External API - classes and functions (used by the other library modules):
 #
@@ -507,18 +505,5 @@ def subscribe_to_remote_gpio_sensor (remote_id:str, signal_passed:int=0,
             mqtt_interface.subscribe_to_mqtt_messages("gpio_sensor_event", node_id, item_id,
                                                     handle_mqtt_gpio_sensor_triggered_event)
     return()
-
-#---------------------------------------------------------------------------------------------------
-# API Function to test if a local GPIO sensor is configured to publish state - used by the editor
-# to validate GPIO Sensor assignments - the sensor cannot be mapped to a Signal or Track Sensor
-# object if it is configured to publish state to the MQTT broker
-#---------------------------------------------------------------------------------------------------
-
-def is_set_to_publish_state(sensor_id:Union[int,str]):
-    if sensor_id.isdigit():
-        set_to_publish = int(sensor_id) in list_of_track_sensors_to_publish
-    else:
-        set_to_publish = False
-    return(set_to_publish)
 
 ####################################################################################################

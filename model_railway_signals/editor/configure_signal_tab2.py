@@ -16,6 +16,7 @@
 #    common.int_item_id_entry_box
 #    common.str_int_item_id_entry_box
 #    common.signal_route_selections
+#    common.point_interlocking_entry
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -25,58 +26,10 @@ from . import objects
 
 from ..library import signals_common
 from ..library import block_instruments
-
-#------------------------------------------------------------------------------------
-# Class for a point interlocking entry element (point_id + point_state)
-# Uses the common int_item_id_entry_box and state_box classes
-# Public class instance methods provided are:
-#    "validate" - validate the current entry box value and return True/false
-#    "set_value" - will set the current value [point_id:int, state:bool]
-#    "get_value" - will return the last "valid" value [point_id:int, state:bool]
-#    "disable" - disables/blanks the entry box (and associated state button)
-#    "enable"  enables/loads the entry box (and associated state button)
-#------------------------------------------------------------------------------------
-
-class point_interlocking_entry():
-    def __init__(self, parent_frame, point_exists_function):
-        # Create the point ID entry box and associated state box (packed in the parent frame)
-        self.EB = common.int_item_id_entry_box(parent_frame, exists_function=point_exists_function,
-                    tool_tip = "Specify any points that need to be set and locked before the "+
-                        "signal can be cleared for the route", callback=self.eb_updated)
-        self.EB.pack(side=Tk.LEFT)
-        self.CB = common.state_box(parent_frame, label_off=u"\u2192", label_on="\u2191", width=2,
-                    tool_tip="Select the required state for the point (normal or switched)")
-        self.CB.pack(side=Tk.LEFT)
-                            
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else: self.CB.enable()
-        
-    def validate(self):
-        return (self.EB.validate())
-    
-    def enable(self):
-        self.EB.enable()
-        self.eb_updated()
-        
-    def disable(self):
-        self.EB.disable()
-        self.eb_updated()
-        
-    def set_value(self, point:[int, bool]):
-        # A Point comprises a 2 element list of [Point_id, Point_state]
-        self.EB.set_value(point[0])
-        self.CB.set_value(point[1])
-        self.eb_updated()
-        
-    def get_value(self):
-        # Returns a 2 element list of [Point_id, Point_state]
-        return([self.EB.get_value(), self.CB.get_value()])          
                 
 #------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 6 points, a signal and an instrument)
-# Uses the point_interlocking_entry class from above for each point entry
+# Uses the common point_interlocking_entry class for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_route" - will set theroute elements (points & signal)
@@ -106,12 +59,13 @@ class interlocking_route_group:
         # packed LEFT in the frame by the parent class when created)
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
-        self.p1 = point_interlocking_entry(self.frame, point_exists_function)
-        self.p2 = point_interlocking_entry(self.frame, point_exists_function)
-        self.p3 = point_interlocking_entry(self.frame, point_exists_function)
-        self.p4 = point_interlocking_entry(self.frame, point_exists_function)
-        self.p5 = point_interlocking_entry(self.frame, point_exists_function)
-        self.p6 = point_interlocking_entry(self.frame, point_exists_function)
+        tool_tip = "Specify any points that need to be set and locked before the signal can be cleared for the route"
+        self.p1 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p2 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p3 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p4 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p5 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
+        self.p6 = common.point_interlocking_entry(self.frame, point_exists_function, tool_tip)
         # Create the signal ahead and instrument ahead elements (always packed)
         self.label1 = Tk.Label(self.frame, text=" Sig:")
         self.label1.pack(side=Tk.LEFT)

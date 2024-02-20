@@ -14,6 +14,7 @@
 #
 # Provides the following 'compound' UI elements for the application
 #    object_id_selection(Tk.integer_entry_box)
+#    point_interlocking_entry()
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
 #    signal_route_frame() - read only list of signal_route_selections()
@@ -786,6 +787,53 @@ class object_id_selection(integer_entry_box):
                 valid = False
         self.set_validation_status(valid)
         return(valid)
+
+#------------------------------------------------------------------------------------
+# Class for a point interlocking entry element (point_id + point_state)
+# Uses the common int_item_id_entry_box and state_box classes
+# Public class instance methods provided are:
+#    "validate" - validate the current entry box value and return True/false
+#    "set_value" - will set the current value [point_id:int, state:bool]
+#    "get_value" - will return the last "valid" value [point_id:int, state:bool]
+#    "disable" - disables/blanks the entry box (and associated state button)
+#    "enable"  enables/loads the entry box (and associated state button)
+#------------------------------------------------------------------------------------
+
+class point_interlocking_entry():
+    def __init__(self, parent_frame, point_exists_function, tool_tip:str):
+        # Create the point ID entry box and associated state box (packed in the parent frame)
+        self.EB = int_item_id_entry_box(parent_frame, exists_function=point_exists_function,
+                                    tool_tip = tool_tip, callback=self.eb_updated)
+        self.EB.pack(side=Tk.LEFT)
+        self.CB = state_box(parent_frame, label_off=u"\u2192", label_on="\u2191", width=2,
+                    tool_tip="Select the required state for the point (normal or switched)")
+        self.CB.pack(side=Tk.LEFT)
+
+    def eb_updated(self):
+        if self.EB.entry.get() == "":
+            self.CB.disable()
+        else: self.CB.enable()
+
+    def validate(self):
+        return (self.EB.validate())
+
+    def enable(self):
+        self.EB.enable()
+        self.eb_updated()
+
+    def disable(self):
+        self.EB.disable()
+        self.eb_updated()
+
+    def set_value(self, point:[int, bool]):
+        # A Point comprises a 2 element list of [Point_id, Point_state]
+        self.EB.set_value(point[0])
+        self.CB.set_value(point[1])
+        self.eb_updated()
+
+    def get_value(self):
+        # Returns a 2 element list of [Point_id, Point_state]
+        return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a dcc_command_entry (address + command logic).
