@@ -68,7 +68,7 @@ def delete_references_to_sensors_that_no_longer_exist():
     for sensor_id in objects_common.track_sensor_index:
         object_id = objects_common.track_sensor(sensor_id)
         if not gpio_sensors.gpio_sensor_exists(objects_common.schematic_objects[object_id]["passedsensor"]):
-            objects_common.schematic_objects[object_id]["approachsensor"][1] = ""
+            objects_common.schematic_objects[object_id]["passedsensor"] = ""
     return()
 
 #-------------------------------------------------------------------------------------------------------------

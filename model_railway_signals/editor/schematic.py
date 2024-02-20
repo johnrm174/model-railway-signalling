@@ -27,6 +27,7 @@
 #    configure_instrument.edit_instrument(root,object_id) - Open inst edit window (on double click)
 #    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
 #    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
+#    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -60,6 +61,7 @@ from . import configure_section
 from . import configure_instrument
 from . import configure_line
 from . import configure_textbox
+from . import configure_track_sensor
 
 import importlib.resources
 import math
@@ -238,6 +240,8 @@ def edit_selected_object():
         edit_popup = configure_section.edit_section(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
         edit_popup = configure_instrument.edit_instrument(root,object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.track_sensor:
+        edit_popup = configure_track_sensor.edit_track_sensor(root,object_id)
     return()
 
 # The following function is for test purposes only - to close the windows opened above by the system tests
@@ -947,6 +951,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["rhpoint", lambda:create_object(objects.object_type.point,
                                         points.point_type.RH.value) ],
                    ["section", lambda:create_object(objects.object_type.section) ],
+                   ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ] ]
     # Create the buttons we need (Note that the button images are added to a global
@@ -966,7 +971,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
     # Initialise the Objects package with the required parameters
-    objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
+    objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
     return()
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where

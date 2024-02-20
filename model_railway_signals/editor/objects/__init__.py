@@ -15,6 +15,7 @@
 #    section_exists(item_id:int) - Common function to see if a given item exists
 #    instrument_exists(item_id:int) - Common function to see if a given item exists
 #    line_exists (item_id:int) - Common function to see if a given item exists
+#    track_sensor_exists (item_id:int) - Common function to see if a given item exists
 #    update_local_sensors(trigger,timeout,mappings) - configure local track sections
 #    mqtt_update_sensors(pub_list, sub_list) - configure MQTT publish/subscribe
 #    mqtt_update_signals(pub_list, sub_list) - configure MQTT publish/subscribe
@@ -77,11 +78,13 @@ from .objects_common import point
 from .objects_common import section
 from .objects_common import instrument
 from .objects_common import line
+from .objects_common import track_sensor
 from .objects_common import signal_exists
 from .objects_common import point_exists
 from .objects_common import section_exists
 from .objects_common import instrument_exists
 from .objects_common import line_exists
+from .objects_common import track_sensor_exists
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -90,12 +93,12 @@ from .objects_common import point_index
 from .objects_common import section_index 
 from .objects_common import instrument_index
 from .objects_common import line_index
+from .objects_common import track_sensor_index
 
 from .objects_lines import get_endstop_offsets
 from .objects_signals import mqtt_update_signals
 from .objects_sections import mqtt_update_sections
 from .objects_instruments import mqtt_update_instruments
-
 from .objects_gpio import update_local_gpio_sensors
 from .objects_gpio import mqtt_update_gpio_sensors
 
@@ -124,11 +127,13 @@ assert point
 assert section
 assert instrument
 assert line
+assert track_sensor
 assert signal_exists
 assert point_exists
 assert section_exists
 assert instrument_exists
 assert line_exists
+assert track_sensor_exists
 assert object_type
 assert get_endstop_offsets
 assert update_local_gpio_sensors
@@ -142,5 +147,6 @@ assert type(point_index)
 assert type(section_index)
 assert type(instrument_index)
 assert type(line_index)
+assert type(track_sensor_index)
 
 ##########################################################################################################################
