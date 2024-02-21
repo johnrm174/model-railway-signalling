@@ -10,11 +10,10 @@
 #    delete_track_sensor_object(object_id) - Soft delete - delete the library objects (prior to recreating)
 #    redraw_track_sensor_object(object_id) - Create the associated library objects
 #    default_track_sensor_object - The dictionary of default configuration values
-#
-########################################################################################################
-################## TO DO - Remove Sections and Points from configuration when they are deleted #########
-################## TO DO - Update Sections and Points in configuration when their IDs change ###########
-########################################################################################################
+#    remove_references_to_section (sec_id) - remove section references from the interlocking tables
+#    update_references_to_section (old_id, new_id) - update section_id in the interlocking tables#
+#    remove_references_to_point (point_id) - remove point references from the interlocking tables
+#    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.schematic_callback - the callback specified when creating the library objects
@@ -54,7 +53,7 @@ from . import objects_common
 default_track_sensor_object = copy.deepcopy(objects_common.default_object)
 default_track_sensor_object["item"] = objects_common.object_type.track_sensor
 default_track_sensor_object["passedsensor"] = ""
-# An track_sensor_route_frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# The "routeahead" element comprises a list of routes: [main, lh1, lh2, rh1, rh2]
 # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
 # Each point element in the point list comprises [point_id, point_state]
 default_track_sensor_object["routeahead"] = [
@@ -69,6 +68,120 @@ default_track_sensor_object["routebehind"] = [
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0],
         [[[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]],0] ]
+
+#------------------------------------------------------------------------------------
+# Function to remove all references to a point from both of the Track Sensor's
+# route tables (the "routeahead" and "routebehind" dictionary elements).
+# Each route table comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+# Each point element in the point list comprises [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+def remove_references_to_point(point_id:int):
+    remove_points_from_route_table(point_id, "routeahead")
+    remove_points_from_route_table(point_id, "routebehind")
+    return()
+
+def remove_points_from_route_table(point_id:int, dict_key:str):
+    # Iterate through all the track sensors on the schematic
+    for track_sensor_id in objects_common.track_sensor_index:
+        # Get the Object ID of the track sensor
+        sensor_object = objects_common.track_sensor(track_sensor_id)
+        # Iterate through each route in the route table
+        route_table = objects_common.schematic_objects[sensor_object][dict_key]
+        for index1, route in enumerate(route_table):
+            list_of_points = route[0]
+            # Create a new 'blank' list for copying the points (that haven't been deleted) across
+            # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by the point removal)
+            new_list_of_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
+            index2 = 0
+            # Iterate through each point in the route to build up the new list of (retained) points
+            for point_entry in list_of_points:
+                if point_entry[0] != point_id:
+                    new_list_of_points[index2] = point_entry
+                    index2 = index2 +1
+            # Replace the list of points for the route
+            objects_common.schematic_objects[sensor_object][dict_key][index1][0] = new_list_of_points
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update all references to a point in both of the Track Sensor's
+# route tables (the "routeahead" and "routebehind" dictionary elements)
+# Each route table  comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+# Each point element in the point list comprises [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+def update_references_to_point(old_point_id:int, new_point_id:int):
+    update_point_in_route_table(old_point_id, new_point_id, "routeahead")
+    update_point_in_route_table(old_point_id, new_point_id, "routebehind")
+    return()
+
+def update_point_in_route_table(old_point_id:int, new_point_id:int, dict_key:str):
+    # Iterate through all the Track Sections on the schematic
+    for track_sensor_id in objects_common.track_sensor_index:
+        # Get the Object ID of the signal
+        sensor_object = objects_common.track_sensor(track_sensor_id)
+        # Iterate through each route in the interlocking table and then the points on each route
+        route_table = objects_common.schematic_objects[sensor_object][dict_key]
+        for index1, route in enumerate(route_table):
+            list_of_points = route[0]
+            for index2, point_entry in enumerate(list_of_points):
+                if point_entry[0] == old_point_id:
+                    objects_common.schematic_objects[sensor_object][dict_key][index1][0][index2][0] = new_point_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Track Section from both of the Track Sensor's
+# route tables (the "routeahead" and "routebehind" dictionary elements).
+# Each route table  comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+# Each point element in the point list comprises [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+def remove_references_to_section(section_id:int):
+    remove_sections_from_route_table(section_id, "routeahead")
+    remove_sections_from_route_table(section_id, "routebehind")
+    return()
+
+def remove_sections_from_route_table(section_id:int, dict_key:str):
+    # Iterate through all the track sensors on the schematic
+    for track_sensor_id in objects_common.track_sensor_index:
+        # Get the Object ID of the track sensor
+        sensor_object = objects_common.track_sensor(track_sensor_id)
+        # Iterate through each route in the route table
+        route_table = objects_common.schematic_objects[sensor_object][dict_key]
+        for index1, route in enumerate(route_table):
+            # If we find a match then remove the track section reference
+            if route[1] == section_id:
+                objects_common.schematic_objects[sensor_object][dict_key][index1][1] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Track Section in both of the Track Sensor's
+# route tables (the "routeahead" and "routebehind" dictionary elements).
+# Each route table  comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+# Each point element in the point list comprises [point_id, point_state]
+#------------------------------------------------------------------------------------
+
+def update_references_to_section(old_section_id:int, new_section_id:int):
+    update_section_in_route_table(old_section_id, new_section_id, "routeahead")
+    update_section_in_route_table(old_section_id, new_section_id, "routebehind")
+    return()
+
+def update_section_in_route_table(old_section_id:int, new_section_id:int, dict_key:str):
+    # Iterate through all the track sensors on the schematic
+    for track_sensor_id in objects_common.track_sensor_index:
+        # Get the Object ID of the track sensor
+        sensor_object = objects_common.track_sensor(track_sensor_id)
+        # Iterate through each route in the route table
+        route_table = objects_common.schematic_objects[sensor_object][dict_key]
+        for index1, route in enumerate(route_table):
+            # If we find a match then update the track section reference
+            if route[1] == old_section_id:
+                objects_common.schematic_objects[sensor_object][dict_key][index1][1] = new_section_id
+    return()
 
 #-------------------------------------------------------------------------------------------------------------
 # Function to to update an object's configuration (and delete/create the associated library objects)
@@ -169,7 +282,7 @@ def delete_track_sensor_object(object_id):
     track_sensors.delete_track_sensor(item_id)
     # Delete the track sensor mapping for the intermediate sensor (if any)
     linked_gpio_sensor = objects_common.schematic_objects[object_id]["passedsensor"]
-    gpio_sensors.remove_gpio_sensor_callback(linked_gpio_sensor)
+    if linked_gpio_sensor != "": gpio_sensors.remove_gpio_sensor_callback(linked_gpio_sensor)
     return()
 
 #------------------------------------------------------------------------------------------------------------------
