@@ -73,6 +73,7 @@
 #
 #---------------------------------------------------------------------------------------------------
 
+from pathlib import Path
 import time
 import threading
 import logging
@@ -84,13 +85,18 @@ from . import track_sensors
 from . import mqtt_interface
 
 #---------------------------------------------------------------------------------------------------
+# Global flag to signal to any ongoing threads that shutdown has been initiated
+#---------------------------------------------------------------------------------------------------
+
+shutdown_initiated = False
+
+#---------------------------------------------------------------------------------------------------
 # We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
 # include the RPi specific GPIO package so this is a quick and dirty way of detecting it on startup.
 # The result (True or False) is maintained in the global 'running_on_raspberry_pi' variable
 #---------------------------------------------------------------------------------------------------
 
 def is_running_on_raspberry_pi():
-    ######################## TO DO - Improve this function ##################################
     global gpiozero
     try:
         import gpiozero
@@ -124,6 +130,7 @@ def get_list_of_available_ports():
 # "signal_approach" : The signal ID (to raise a 'signal approached' event when triggered) - int
 # "signal_passed"   : The signal ID (to raise a 'signal passed' event for when triggered) - int
 # "sensor_passed"   : The Track Sensor ID (to raise a 'sensor passed' event when triggered) - int
+# "trigger_delay"   : Time that the GPIO port must remain active to raise a trigger event - float
 # "timeout_value"   : Time period (from initial trigger event) for ignoring further triggers - float
 # "sensor_device"   : The reference to the gpiozero button object mapped to the GPIO port
 # "timeout_start"   : The time the sensor was triggered (after any 'debounce period) - time
@@ -164,18 +171,24 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
 #---------------------------------------------------------------------------------------------------
 # Thread to "lock" the sensor for the specified timeout period after gpio_sensor_triggered
 # Any re-triggers during this period are ignored (they just extend the timeout period)
+# Note that the thread_to_timeout_sensor would normally only get run for 'real' GPIO events
+# where the gpiozero device would exist and would be released during the timeout period.
+# We therefore have to provide a specific "testing" flag to enable the code to be tested.
 #---------------------------------------------------------------------------------------------------
 
-def thread_to_timeout_sensor(gpio_port):
+def thread_to_timeout_sensor(gpio_port:int, testing:bool):
     global gpio_port_mappings
-    # Wait for the timeout period to expire (note that if the sensor is triggered
-    # again within the timeout period then the timeout will just be extended
-    while time.time() <  (gpio_port_mappings[str(gpio_port)]["timeout_start"]
-                          + gpio_port_mappings[str(gpio_port)]["timeout_value"]):
-        time.sleep(0.0001)
+    # Wait for the timeout period to expire (if the sensor is released and triggered again within the
+    # timeout period then the timeout will just be extended). Note that the loop will immediately exit
+    # if the shutdown has been initiated (which will delete the gpio zero button objects)
+    while (time.time() <  (gpio_port_mappings[str(gpio_port)]["timeout_start"]
+            + gpio_port_mappings[str(gpio_port)]["timeout_value"]) and not shutdown_initiated):
+        # We also wait for the button to be released before trporting the Event release.
+        while not testing and not shutdown_initiated and gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed:
+            time.sleep(0.0001)
     # Reset the sensor at the end of the timeout period
     sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-    logging.debug("GPIO Sensor "+str(sensor_id)+": Event timeout *******************************************")
+    logging.debug("GPIO Sensor "+str(sensor_id)+": Event Reset **********************************************")
     gpio_port_mappings[str(gpio_port)]["timeout_active"] = False
     return()
 
@@ -185,25 +198,33 @@ def thread_to_timeout_sensor(gpio_port):
 # This is to handle optical sensors which might Fall and then Rise when each carrage/waggon passes over.
 # If the sensor is still within the timeout period (from the last time it was triggered) then the timeout
 # will effectively be extended - otherwise a new timeout period will be started and the callback made.
+# Note that the gpio_sensor_triggered function would normally only get triggered for 'real' GPIO events
+# where the gpiozero device would exist and would still be pressed at the end of the trigger period.
+# We therefore have to provide a specific "testing" flag to enable the code to be tested.
 #---------------------------------------------------------------------------------------------------
                 
-def gpio_sensor_triggered(gpio_port:int):
+def gpio_sensor_triggered(gpio_port:int, testing:bool=False):
     global gpio_port_mappings
-    # If we are still in the timeout period then ignore the trigger event (but Reset the timeout period)
-    if gpio_port_mappings[str(gpio_port)]["timeout_active"]:
-        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-    else:
-        # Start a new timeout thread
-        gpio_port_mappings[str(gpio_port)]["timeout_active"] = True
-        gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
-        timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_port,))
-        timeout_thread.start()
-        # Transmit the state via MQTT networking (will only be sent if configured to publish) and 
-        # Make the appropriate callback (triggered callback or signal approach/passed event)
-        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-        logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
-        send_mqtt_gpio_sensor_triggered_event(sensor_id)
-        make_gpio_sensor_triggered_callback(sensor_id)
+    # Wait for the trigger period to complete
+    time.sleep(gpio_port_mappings[str(gpio_port)]["trigger_period"])
+    # Only process the event if shutdown has not been not initiated and the trigger is still active
+    if not shutdown_initiated and (testing or gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed):
+        # If we are still in the timeout period then ignore the trigger event (but Reset the timeout period)
+        if gpio_port_mappings[str(gpio_port)]["timeout_active"]:
+            gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
+        else:
+            # Start a new timeout thread
+            gpio_port_mappings[str(gpio_port)]["timeout_active"] = True
+            gpio_port_mappings[str(gpio_port)]["timeout_start"] = time.time()
+            timeout_thread = threading.Thread (target=thread_to_timeout_sensor, args=(gpio_port,testing,))
+            timeout_thread.setDaemon(True)
+            timeout_thread.start()
+            # Transmit the state via MQTT networking (will only be sent if configured to publish) and 
+            # Make the appropriate callback (triggered callback or signal approach/passed event)
+            sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+            logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
+            send_mqtt_gpio_sensor_triggered_event(sensor_id)
+            make_gpio_sensor_triggered_callback(sensor_id)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -222,17 +243,15 @@ def send_mqtt_gpio_sensor_triggered_event(sensor_id:int):
 #---------------------------------------------------------------------------------------------------
 
 def handle_mqtt_gpio_sensor_triggered_event(message):
-    if "sourceidentifier" in message.keys():
-        sensor_identifier = message["sourceidentifier"]
-        # Defensive programming - just in case we get a spurious message
-        if not gpio_sensor_exists(sensor_identifier):
-            logging.warning("GPIO Sensor "+sensor_identifier+": handle_mqtt_gpio_sensor_triggered_event - Sensor ID does not exist")
-        else:
-            # Only make the callback (or raise signal approach/passed event) for 'triggered' events
-            # note that the remote sensor object was created with the sensor_identifier as the
-            # 'key' to the dict of gpio_port_mappings rather than the GPIO port number
-            logging.info("GPIO Sensor "+sensor_identifier+": Remote GPIO sensor has been triggered *********************")
-            make_gpio_sensor_triggered_callback(sensor_identifier)
+    if "sourceidentifier" not in message.keys():
+        logging.warning("GPIO Interface: Unhandled MQTT message - "+str(message))
+    elif not gpio_sensor_exists(message["sourceidentifier"]):
+        logging.warning("GPIO Sensor "+message["sourceidentifier"]+": handle_mqtt_gpio_sensor_triggered_event - Sensor does not exist")
+    else:
+        # Nte that the remote sensor object would have been created with the sensor_identifier 
+        # as the 'key' to the dict of gpio_port_mappings rather than the GPIO port number
+        logging.info("GPIO Sensor "+message["sourceidentifier"]+": Remote GPIO sensor has been triggered *********************")
+        make_gpio_sensor_triggered_callback(message["sourceidentifier"])
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -254,7 +273,6 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
         sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
         common.execute_function_in_tkinter_thread(lambda:track_sensors.track_sensor_triggered(sensor_id))
     return()
-
 
 #---------------------------------------------------------------------------------------------------
 # Public API function to create a sensor object (mapped to a GPIO channel)
@@ -285,8 +303,12 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int,
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Multiple linked events specified")
     elif not isinstance(sensor_timeout,float):
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor timeout must be a float")
+    elif sensor_timeout < 0.0:
+        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor timeout must be >= 0.0 seconds")
     elif not isinstance(trigger_period,float):
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Trigger period must be a float")
+    elif trigger_period < 0.0:
+        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Trigger period must be >= 0.0 seconds")
     elif not isinstance(gpio_channel,int):
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port must be integer")
     elif gpio_channel not in get_list_of_available_ports():
@@ -294,21 +316,25 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int,
     elif str(gpio_channel) in gpio_port_mappings.keys():
         logging.error ("GPIO Sensor "+str(sensor_id)+": create_track_sensor - GPIO port "+str(gpio_channel)+" is already mapped")
     else:
-        logging.debug("GPIO Sensor "+str(sensor_id)+": Mapping sensor to GPIO Port "+str(gpio_channel))
+        if signal_passed > 0: message = " - will trigger Signal "+str(signal_passed)+ " 'passed' event"
+        elif signal_approach > 0: message = " - will trigger Signal "+str(signal_approach)+ " 'approach' event"
+        elif sensor_passed > 0: message = " - will trigger Track Section "+str(sensor_passed)+ " 'passed' event"
+        else: message = " - No trigger event callbacks specified"
+        logging.debug("GPIO Sensor "+str(sensor_id)+": Mapping sensor to GPIO Port "+str(gpio_channel)+message)
         # Create the track sensor entry in the dictionary of gpio_port_mappings
         gpio_port_mappings[str(gpio_channel)] = {"sensor_id"       : sensor_id,
                                                  "signal_approach" : signal_approach,
                                                  "signal_passed"   : signal_passed,
                                                  "sensor_passed"   : sensor_passed,
+                                                 "trigger_period"  : trigger_period,
                                                  "timeout_value"   : sensor_timeout,
                                                  "sensor_device"   : None,
                                                  "timeout_start"   : None,
                                                  "timeout_active"  : False,
                                                  "sensor_state"    : False}
         # We only create the gpiozero sensor device if we are running on a raspberry pi
-        # The internal gpiozero software debounce mechanism is used for the trigger period
         if running_on_raspberry_pi:
-            sensor_device = gpiozero.Button(gpio_channel, bounce_time=trigger_period)
+            sensor_device = gpiozero.Button(gpio_channel)
             sensor_device.when_pressed = lambda:gpio_sensor_triggered(gpio_channel)
             gpio_port_mappings[str(gpio_channel)]["sensor_device"] = sensor_device
     return() 
@@ -342,7 +368,7 @@ def get_gpio_sensor_callback(sensor_id:Union[int,str]):
     if not isinstance(sensor_id,int) and not isinstance(sensor_id,str):
         logging.error("GPIO Sensor "+str(sensor_id)+": get_gpio_sensor_callback - Sensor ID must be an integer or string")
     elif not gpio_sensor_exists(sensor_id):
-        logging.error("GPIO Sensor "+str(sensor_id)+": get_gpio_sensor_callback - Sensor ID does not exist")
+        logging.error("GPIO Sensor "+str(sensor_id)+": get_gpio_sensor_callback - Sensor does not exist")
     else:
         str_gpio_port = mapped_gpio_port(sensor_id)
         signal_passed = gpio_port_mappings[str_gpio_port]["signal_passed"]
@@ -368,7 +394,9 @@ def remove_gpio_sensor_callback(sensor_id:Union[int,str]):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sensor_id,int) and not isinstance(sensor_id,str):
         logging.error("GPIO Sensor "+str(sensor_id)+": remove_gpio_sensor_callback - Sensor ID must be an integer or string")
-    elif gpio_sensor_exists(sensor_id):
+    elif not gpio_sensor_exists(sensor_id):
+        logging.error("GPIO Sensor "+str(sensor_id)+": remove_gpio_sensor_callback - Sensor does not exist")
+    else:
         logging.debug("GPIO Sensor "+str(sensor_id)+": Removing all trigger events for GPIO sensor")
         str_gpio_port = mapped_gpio_port(sensor_id)
         gpio_port_mappings[str_gpio_port]["signal_approach"] = 0
@@ -399,22 +427,26 @@ def add_gpio_sensor_callback (sensor_id:Union[int,str], signal_passed:int=0,
         # Add the appropriate callback event to the GPIO Sensor configuration
         str_gpio_port = mapped_gpio_port(sensor_id)
         if signal_passed > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'signal passed' event for Signal "+str(signal_passed))
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'passed' event for Signal "+str(signal_passed))
         elif signal_approach > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'signal approach' event for Signal "+str(signal_approach))
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'approach' event for Signal "+str(signal_approach))
         elif sensor_passed > 0:
-            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'sensor passed' event for Track Section "+str(sensor_passed))
+            logging.debug("GPIO Sensor "+str(sensor_id)+": Adding 'passed' event for Track Section "+str(sensor_passed))
         gpio_port_mappings[str_gpio_port]["signal_passed"] = signal_passed
         gpio_port_mappings[str_gpio_port]["signal_approach"] = signal_approach
         gpio_port_mappings[str_gpio_port]["sensor_passed"] = sensor_passed
     return()
 
 #---------------------------------------------------------------------------------------------------
-# Function called on shutdown to set the GPIO ports back to their default states
+# Function called on shutdown to set the GPIO ports back to their default states - sets a 
+# global 'shutdown_initiated' flag to signal to any ongoing threads to exit and terminate
 #---------------------------------------------------------------------------------------------------
 
 def gpio_shutdown():
+    global shutdown_initiated
     if running_on_raspberry_pi:
+        shutdown_initiated = True
+        time.sleep(0.001)   # Allow any threads to terminate gracefully
         logging.debug("GPIO Interface: Restoring default settings")
         # Close all the gpiozero Button objects to reset the GPIO interface
         for gpio_port in gpio_port_mappings:
@@ -489,6 +521,11 @@ def subscribe_to_remote_gpio_sensor (remote_id:str, signal_passed:int=0,
                        or (signal_approach > 0 and sensor_passed > 0) ):
         logging.error("GPIO Sensor "+remote_id+": subscribe_to_remote_gpio_sensor - More than one trigger event specified")
     else:
+        if signal_passed > 0: event = " - will trigger Signal "+str(signal_passed)+ " 'passed' event"
+        elif signal_approach > 0: event = " - will trigger Signal "+str(signal_approach)+ " 'approach' event"
+        elif sensor_passed > 0: event = " - will trigger Track Section "+str(sensor_passed)+ " 'passed' event"
+        else: event = " - No trigger event callbacks specified"
+        logging.debug("GPIO Sensor "+str(remote_id)+": Subscribing to remote GPIO sensor"+event)
         sensor_already_subscribed = gpio_sensor_exists(remote_id)
         # Create (or update) the dummy GPIO port mapping to hold the callback information for the remote sensor
         # Rather than use the mapped GPIO port number as the dictionary key we will use the remote Sensor ID
@@ -500,7 +537,6 @@ def subscribe_to_remote_gpio_sensor (remote_id:str, signal_passed:int=0,
         if sensor_already_subscribed:
             logging.warning("GPIO Sensor "+remote_id+": subscribe_to_remote_gpio_sensor - Already subscribed")
         else:
-            logging.debug("GPIO Sensor "+str(remote_id)+": Subscribing to remote GPIO sensor via MQTT network")
             [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
             mqtt_interface.subscribe_to_mqtt_messages("gpio_sensor_event", node_id, item_id,
                                                     handle_mqtt_gpio_sensor_triggered_event)
