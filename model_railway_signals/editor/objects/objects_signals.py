@@ -60,7 +60,7 @@
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
 #    gpio_sensors.add_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
-#    gpio_sensors.remove_gpio_sensor_callbacks - To remove any GPIO Sensor triggered callbacks
+#    gpio_sensors.remove_gpio_sensor_callback - To remove any GPIO Sensor triggered callbacks
 #
 #------------------------------------------------------------------------------------
 
@@ -720,8 +720,8 @@ def delete_signal_object(object_id):
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    gpio_sensors.remove_gpio_sensor_callback(passed_sensor)
-    gpio_sensors.remove_gpio_sensor_callback(approach_sensor)
+    if passed_sensor != "": gpio_sensors.remove_gpio_sensor_callback(passed_sensor)
+    if approach_sensor != "": gpio_sensors.remove_gpio_sensor_callback(approach_sensor)
     # Delete the associated distant signal (if there is one)
     signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
