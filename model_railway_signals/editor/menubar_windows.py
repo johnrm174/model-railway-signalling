@@ -982,6 +982,9 @@ class gpio_port_entry_box(common.int_item_id_entry_box):
         self.label.pack(side=Tk.LEFT)
         super().__init__(self.frame, tool_tip=tool_tip, callback=callback)
         super().pack(side=Tk.LEFT)
+        # Create the Signal/Track sensor 'mapping' label
+        self.mapping = Tk.Label(self.frame, width=12, anchor='w')
+        self.mapping.pack(side=Tk.LEFT,padx=5)
     
 class gpio_port_entry_frame():
     def __init__(self, parent_frame):
@@ -996,7 +999,7 @@ class gpio_port_entry_frame():
             self.list_of_subframes.append(Tk.Frame(self.frame))
             self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
             # Create the entry_boxes for the row
-            for value in range (5):
+            for value in range (10):
                 if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
                 label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
                 tool_tip = "Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)"
@@ -1032,11 +1035,17 @@ class gpio_port_entry_frame():
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
             self.list_of_entry_boxes[index].set_value(None)
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
-        for mapping in list_of_mappings:
-            for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-                if gpio_port == mapping[1]:
-                    self.list_of_entry_boxes[index].set_value(mapping[0])
-                    break        
+        for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
+            self.list_of_entry_boxes[index].mapping.config(text="----------------------")
+            for gpio_mapping in list_of_mappings:
+                if gpio_port == gpio_mapping[1]:
+                    event_mappings = gpio_sensors.get_gpio_sensor_callback(gpio_mapping[0])
+                    if event_mappings[0] > 0: mapping_text = "Signal "+str(event_mappings[0])
+                    elif event_mappings[1] > 0: mapping_text = "Signal "+str(event_mappings[1])
+                    elif event_mappings[2] > 0: mapping_text = "Track Sensor "+str(event_mappings[2])
+                    else: mapping_text="----------------------"
+                    self.list_of_entry_boxes[index].set_value(gpio_mapping[1])
+                    self.list_of_entry_boxes[index].mapping.config(text=mapping_text)
 
 #------------------------------------------------------------------------------------
 # Class for the "Sensors" window - Uses the classes above. Note the init function takes
@@ -1108,8 +1117,9 @@ class edit_gpio_settings():
             settings.set_gpio(trigger, timeout, mappings)
             # Make the callback to apply the updated settings
             self.update_function()
-            # close the window (on OK)
-            if close_window: self.close_window() 
+            # Close the window (on OK) or refresh the display (on APPLY)
+            if close_window: self.close_window()
+            else: self.load_state()
         else:
             # Display the validation error message
             self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
