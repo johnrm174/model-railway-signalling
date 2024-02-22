@@ -24,6 +24,7 @@
 #
 #-------------------------------------------------------------------------------------------------------------
 
+from typing import Union
 from ...library import gpio_sensors
 from . import objects_common
 
@@ -33,22 +34,22 @@ from . import objects_common
 # following any update to the MQTT publish/subscribe configuration or the GPIO local port mappings
 #-------------------------------------------------------------------------------------------------------------
 
-def find_existing_callback_mapping(sensor_id):
+def find_existing_callback_mapping(gpio_sensor_id:Union[int,str]):
     signal_passed, signal_approach, sensor_passed = 0, 0, 0
     # Iterate through the signals to find if the GPIO sensor has been mapped to an approach/passed event
     for signal_id in objects_common.signal_index:
         signal_object =  objects_common.schematic_objects[objects_common.signal(signal_id)]
-        if signal_object["passedsensor"][1] == str(sensor_id):
+        if signal_object["passedsensor"][1] == str(gpio_sensor_id):
             signal_passed = int(signal_id)
             break
-        if signal_object["approachsensor"][1] == str(sensor_id):
+        if signal_object["approachsensor"][1] == str(gpio_sensor_id):
             signal_approach = int(signal_id)
             break
     # Iterate through the track sensors to find if the GPIO sensor has been mapped to a passed event
-    for sensor_id in objects_common.track_sensor_index:
-        sensor_object =  objects_common.schematic_objects[objects_common.track_sensor(sensor_id)]
-        if sensor_object["passedsensor"] == str(sensor_id):
-            sensor_passed = int(sensor_id)
+    for track_sensor_id in objects_common.track_sensor_index:
+        track_sensor_object =  objects_common.schematic_objects[objects_common.track_sensor(track_sensor_id)]
+        if track_sensor_object["passedsensor"] == str(gpio_sensor_id):
+            sensor_passed = int(track_sensor_id)
             break
     return(signal_passed, signal_approach, sensor_passed)
 
