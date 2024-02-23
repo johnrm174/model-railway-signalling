@@ -562,7 +562,7 @@ class str_item_id_entry_box (entry_box):
         if entered_value == "":
             # Entered value is blank - this is valid
             valid = True
-        elif node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 99:
+        elif node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 100:
             # We know that the entered value is a valid remote item identifier so now we need to
             # do the optional validation that the item exists (i.e. has been subscribed to)
             if self.exists_function is not None and not self.exists_function(entered_value):
@@ -620,8 +620,8 @@ class str_int_item_id_entry_box (entry_box):
         if entered_value == "":
             # Entered value is blank - this is valid
             valid = True
-        elif ( (entered_value.isdigit() and int(entered_value) > 0 and int(entered_value) < 99) or
-               (node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 99) ):
+        elif ( (entered_value.isdigit() and int(entered_value) > 0 and int(entered_value) < 100) or
+               (node_id !="" and item_id.isdigit() and int(item_id) > 0 and int(item_id) < 100) ):
             # The entered value is a valid local or remote item identifier. but we still need to perform
             # the optional validation that the item exists on the schematic (or has been subscribed to)
             if self.exists_function is not None and not self.exists_function(entered_value):
