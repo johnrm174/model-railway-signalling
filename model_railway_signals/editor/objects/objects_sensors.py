@@ -9,18 +9,18 @@
 #    paste_track_sensor(object) - Create a copy of an object (and create the associated library objects)
 #    delete_track_sensor_object(object_id) - Soft delete - delete the library objects (prior to recreating)
 #    redraw_track_sensor_object(object_id) - Create the associated library objects
-#    default_track_sensor_object - The dictionary of default configuration values
-#    remove_references_to_section (sec_id) - remove section references from the interlocking tables
-#    update_references_to_section (old_id, new_id) - update section_id in the interlocking tables#
-#    remove_references_to_point (point_id) - remove point references from the interlocking tables
-#    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
+#    default_track_sensor_object - The dictionary of default baseline configuration values
+#    remove_references_to_section (sec_id) - remove section references from the route tables
+#    update_references_to_section (old_id, new_id) - update section_id in the route tables
+#    remove_references_to_point (point_id) - remove point references from the route tables
+#    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the route tables
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.schematic_callback - the callback specified when creating the library objects
 #    objects_common.set_bbox - to create/update the boundary box for the canvas drawing objects
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
-#    objects_common.track_sensor_exists - to find out if the specified Item ID already exists
+#    objects_common.track_sensor - to find the object_id from a given item_id
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -32,6 +32,7 @@
 # Makes the following external API calls to library modules:
 #    track_sensors.create_track_sensor(id) - Create the library object
 #    track_sensors.delete_track_sensor(id) - Delete the library object
+#    track_sensors.track_sensor_exists - to find out if the specified Item ID already exists
 #    gpio_sensors.add_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
 #    gpio_sensors.remove_gpio_sensor_callbacks - To remove any GPIO Sensor triggered callbacks
 #
@@ -252,7 +253,7 @@ def paste_track_sensor(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=objects_common.track_sensor_exists)
+    new_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.track_sensor_index[str(new_id)] = new_object_id
     # Add the specific elements for this particular instance of the object

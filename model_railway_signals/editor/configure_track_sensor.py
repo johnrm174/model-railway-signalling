@@ -7,20 +7,25 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
+#########################################################################################################
+# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+# function will not work in edit mode as the Track Section library objects don't exist in edit mode
+# To be addressed in a future software update when the Track Sections functionality is re-factored
+#    objects.section_exists(id) - To see if the Track Section exists
+#########################################################################################################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
-#    objects.point_exists(id) - To see if the point exists (this will be local)
-#    objects.section_exists(id) - To see if the Track Section exists (this will be local)
-#    objects.track_sensor_exists(id) - To see if the track sensor exists (this will be local)
 #
 # Makes the following external API calls to library modules:
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
+#    track_sensors.track_sensor_exists(id) - To see if the track sensor exists
+#    points.point_exists(id) - To see if the point exists
 #
 # Inherits the following common editor base classes (from common):
+#    common.str_int_item_id_entry_box
 #    common.int_item_id_entry_box
-#    common.str_item_id_entry_box
 #    common.point_interlocking_entry
 #    common.object_id_selection
 #    common.window_controls
@@ -33,7 +38,10 @@ import tkinter as Tk
 from . import common
 from . import objects
 
+from ..library import points
 from ..library import gpio_sensors
+from ..library import track_sensors
+from ..library import track_sections
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -45,19 +53,20 @@ from ..library import gpio_sensors
 open_windows={}
 
 #------------------------------------------------------------------------------------
-# Class for a gpio_sensor_selection frame - based on the str_int_item_id_entry_box class
+# Class for a gpio_sensor_selection frame - based on the str_int_item_id_entry_box
 # Public Class instance methods (inherited from the str_int_item_id_entry_box) are
 #    "set_value" - will set the current value (string)
 #    "get_value" - will return the last "valid" value (string)
 # Overridden Public Class instance methods provided by this class:
-#    "validate" - Must be a valid GPIO Sensor ID and not already mapped
+#    "validate" - Must 'exist' (or subscribed to) and not already mapped
+# New Public class instance methods:
+#    "set_item_id" - Sets the current GPIO sensor ID (used for validation)
 #------------------------------------------------------------------------------------
 
 class gpio_sensor_selection(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame, parent_object):
-        # We need the reference to the parent object so we can call the sibling
-        # class method to get the current value of the Signal ID for validation
-        self.parent_object = parent_object
+    def __init__(self, parent_frame):
+        # The reference to the current Item ID (set by "set_item_id")
+        self.item_id = None
         # Create a labelframe to hold the various UI elements
         self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
         # Create a subframe to centre the UI elements
@@ -65,7 +74,7 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
         self.subframe.pack()
         self.label = Tk.Label(self.subframe, text="  Track Sensor 'passed' sensor:")
         self.label.pack(side=Tk.LEFT, padx=2, pady=2)
-        # The this function will return true if the GPIO sensor exists
+        # The 'exists' function will return true if the GPIO sensor exists
         exists_function = gpio_sensors.gpio_sensor_exists
         tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
                     "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
@@ -74,12 +83,11 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
         self.pack(side=Tk.LEFT, padx=2, pady=2)
             
     def validate(self, update_validation_status=True):
-        # Do the basic integer validation first (ID is valid and exists / has been subscribed to)
+        # Do the basic validation first - ID is valid and 'exists'
         valid = super().validate(update_validation_status=False)
         # Validate it isn't already mapped to another Signal or Track Sensor event
         if valid and self.entry.get() != "":
             gpio_sensor_id = self.entry.get()
-            track_sensor_id = self.parent_object.sensorid.get_initial_value()
             event_mappings = gpio_sensors.get_gpio_sensor_callback(gpio_sensor_id)
             if event_mappings[0] > 0:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
@@ -87,19 +95,22 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
             elif event_mappings[1] > 0:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
-            elif event_mappings[2] > 0 and event_mappings[2] != track_sensor_id:
+            elif event_mappings[2] > 0 and event_mappings[2] != self.item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
+
+    def set_item_id(self, item_id:int):
+        self.item_id = item_id
 
 #------------------------------------------------------------------------------------
 # Class for a track_sensor_route_group (comprising 6 points, and a track section)
 # Uses the common point_interlocking_entry class for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
-#    "set_route" - will set theroute elements (points & signal)
-#    "get_route" - returns the last "valid" values (points & signal)
+#    "set_route" - will set the route elements (Points & Track Section)
+#    "get_route" - returns the last "valid" values (Points & Track Section)
 #------------------------------------------------------------------------------------
 
 class track_sensor_route_group(): 
@@ -111,15 +122,20 @@ class track_sensor_route_group():
         self.label = Tk.Label(self.frame, anchor='w', width=5, text=label)
         self.label.pack(side = Tk.LEFT)
         tool_tip = "Specify the points that need to be configured for the route"
-        self.p1 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
-        self.p2 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
-        self.p3 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
-        self.p4 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
-        self.p5 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
-        self.p6 = common.point_interlocking_entry(self.frame, objects.point_exists, tool_tip)
+        self.p1 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p2 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p3 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p4 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p5 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
+        self.p6 = common.point_interlocking_entry(self.frame, points.point_exists, tool_tip)
         # Create the Track Section element (always packed)
         self.label = Tk.Label(self.frame, text="  Section:")
         self.label.pack(side=Tk.LEFT)
+        #########################################################################################################
+        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
+        # To be addressed in a future software update when the Track Sections functionality is re-factored
+        #########################################################################################################
         self.section = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists,
                         tool_tip = "Specify the next track section on the specified route (or leave blank)")
         self.section.pack(side=Tk.LEFT)
@@ -171,7 +187,7 @@ class track_sensor_route_frame():
     def __init__(self, parent_window, label:str):
         # Create a Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_window, text= label)
-        # Create an element for each route - these are packed in class instances
+        # Create an element for each route - these are packed in the class instances
         self.main = track_sensor_route_group(self.frame, "  Main")
         self.lh1 = track_sensor_route_group(self.frame, "  LH1")
         self.lh2 = track_sensor_route_group(self.frame, "  LH2")
@@ -189,7 +205,7 @@ class track_sensor_route_frame():
         return(valid)
 
     def set_routes(self, track_section_routes:[[[[int,bool],],int]]):
-        # An track_sensor_route_frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+        # A track_section_routes table comprises a list of routes: [main, lh1, lh2, rh1, rh2]
         # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
         # Each point element in the point list comprises [point_id, point_state]
         self.main.set_route(track_section_routes[0])
@@ -199,7 +215,7 @@ class track_sensor_route_frame():
         self.rh2.set_route(track_section_routes[4])
         
     def get_routes(self):
-        # An track_sensor_route_frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+        # An track_section_routes table comprises a list of routes: [main, lh1, lh2, rh1, rh2]
         # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
         # Each point element in the point list comprises [point_id, point_state]
         return ( [ self.main.get_route(),
@@ -231,12 +247,14 @@ class edit_track_sensor():
             # Create a Frame to hold the Item ID and GPIO Sensor UI elements
             self.frame = Tk.Frame(self.window)
             self.frame.pack(padx=2, pady=2, fill='x')
-            # Create the UI Element for Item ID selection
+            # Create the UI Element for Item ID selection. Note that although the track_sections.track_sensor_exists
+            # function will match both local and remote Section IDs, the object_id_selection only allows integers to
+            # be selected - so we can safely use this function here for consistency.
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
-                                exists_function = objects.track_sensor_exists) 
+                                exists_function = track_sensors.track_sensor_exists)
             self.sensorid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
-            # Create the UI Element for the GPIO Sensor selection
-            self.gpiosensor = gpio_sensor_selection(self.frame, self)
+            # Create the UI Element for the GPIO Sensor selection.
+            self.gpiosensor = gpio_sensor_selection(self.frame)
             self.gpiosensor.frame.pack(padx=2, pady=2, fill='x')
             # Create the UI Elements for the track sensor route elements
             self.ahead = track_sensor_route_frame(self.window,label="Routes/Sections behind Track Sensor")
@@ -265,6 +283,7 @@ class edit_track_sensor():
             self.window.title("Track Sensor "+str(objects.schematic_objects[self.object_id]["itemid"]))
             # Set the Initial UI state from the current object settings
             self.sensorid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.gpiosensor.set_item_id(objects.schematic_objects[self.object_id]["itemid"])
             self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"])
             self.ahead.set_routes(objects.schematic_objects[self.object_id]["routeahead"])
             self.behind.set_routes(objects.schematic_objects[self.object_id]["routebehind"])
