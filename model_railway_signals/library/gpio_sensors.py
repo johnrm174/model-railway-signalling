@@ -73,7 +73,6 @@
 #
 #---------------------------------------------------------------------------------------------------
 
-from pathlib import Path
 import time
 import threading
 import logging
