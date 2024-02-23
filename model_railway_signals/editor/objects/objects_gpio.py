@@ -16,6 +16,7 @@
 #    objects_common.track_sensor_index - The Index of Track Sensor Objects (for iterating)
 #
 # Makes the following external API calls to library modules:
+#    gpio_sensors.gpio_sensor_exists - find if a GPIO sensor of a given ID already exists
 #    gpio_sensors.delete_all_local_gpio_sensors - Delete all GPIO sensors prior to re-creating
 #    gpio_sensors.reset_mqtt_configuration - Clear down the GPIO sensor publish/subscribe configuration
 #    gpio_sensors.set_gpio_sensors_to_publish_state - Configure GPIO sensors to publish triggered events
