@@ -105,7 +105,7 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
         sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"))
         sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
         canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
-        canvas.create_oval(x-10, y-10, x+10, y+10, outline="grey60", tags=canvas_tag)
+        canvas.create_oval(x-15, y-15, x+15, y+15, outline="grey60", tags=canvas_tag)
         # Store the details of the Track Sensor Object in the dictionary of Track Sensors
         track_sensors[str(sensor_id)] = {}
         track_sensors[str(sensor_id)]['canvas'] = canvas
