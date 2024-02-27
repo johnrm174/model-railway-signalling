@@ -258,7 +258,7 @@ def reset_objects():
         elif type_of_object == objects_common.object_type.instrument:
             objects_instruments.delete_instrument_object(object_id)
         elif type_of_object == objects_common.object_type.track_sensor:
-            objects_sensors.redraw_track_sensor(object_id)
+            objects_sensors.delete_track_sensor_object(object_id)
     # Redraw all point, section, instrument and signal objects in their default state
     # We don't need to create a new bbox as soft_delete keeps the tkinter object
     redraw_all_objects(create_new_bbox=False, reset_state=True)
