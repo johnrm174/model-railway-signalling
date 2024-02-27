@@ -413,7 +413,7 @@ def mqtt_broker_disconnect():
         logging.debug("MQTT-Client: Clearing message queues before disconnect")
         for topic in node_config["list_of_published_topics"]:
             if node_config["enhanced_debugging"]: logging.debug("MQTT-Client: Publishing: "+str(topic)+"-NULL")
-            mqtt_client.publish(topic,payload=None,retain=True,qos=1)
+            mqtt_client.publish(topic,payload=None,retain=False,qos=1)
         # Wait for everything to be published to the broker (with a sleep) and disconnect
         # I'd rather use a PAHO MQTT check and timeout but there doesn't seem to be one
         time.sleep(0.25)
