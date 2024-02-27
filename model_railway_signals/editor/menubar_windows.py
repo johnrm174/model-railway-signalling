@@ -989,7 +989,7 @@ class gpio_port_entry_box(common.int_item_id_entry_box):
 class gpio_port_entry_frame():
     def __init__(self, parent_frame):
         # Create the Label frame for the GPIO port assignments 
-        self.frame = Tk.LabelFrame(parent_frame, text="Track Sensors")
+        self.frame = Tk.LabelFrame(parent_frame, text="GPIO port to GPIO Sensor mappings")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                
