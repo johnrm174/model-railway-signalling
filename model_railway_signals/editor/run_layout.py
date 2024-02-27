@@ -34,6 +34,7 @@
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
 #    signals_ground_position.ground_pos_sub_type - for accessing the enum value
 #    signals_ground_disc.ground_disc_sub_type - for accessing the enum value
+#    track_sensors.track_sensor_callback_type - for accessing the enum value
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_state(sig_id) - For testing the current displayed aspect
@@ -44,14 +45,11 @@
 #    signals.unlock_signal(sig_id) - To unlock a signal
 #    signals.lock_subsidary(sig_id) - To lock a subsidary signal
 #    signals.unlock_subsidary(sig_id) - To unlock a subsidary signal
-#    signals.toggle_signal(sig_id) - To toggle a signal state
-#    signals.toggle_subsidary(sig_id) - To toggle a subsidary signal state
 #    signals.set_route(sig_id, sig_route, theatre) - To set the route for the signal
 #    signals.trigger_timed_signal(sig_id, T1, T2) - Trigger timed signal sequence
 #    points.fpl_active(point_id) - To test if a facing point lock is active
 #    points.toggle_fpl(point_id) - To toggle the state of the point FPL
 #    points.point_switched(point_id) - To test if a point is switched
-#    points.toggle_point(point_id) - To toggle the state of the point
 #    points.lock_point(point_id) - To intelock a point
 #    points.unlock_point(point_id) - To intelock a point
 #    track_sections.set_section_occupied (section_id) - Set "Occupied"
@@ -73,18 +71,19 @@ from ..library import signals_colour_lights
 from ..library import signals_ground_position
 from ..library import signals_ground_disc
 from ..library import track_sections
+from ..library import track_sensors
 
 from . import objects
 
 #------------------------------------------------------------------------------------
 # The Tkinter Canvas Object is saved as a global variable for easy referencing
-# The editing_enabled and automation_enabled flags control the behavior of run_layout
+# The editing_enabled and run_mode flags control the behavior of run_layout
 #------------------------------------------------------------------------------------
 
 canvas = None
-editing_enabled = None
+run_mode = None
 automation_enabled = None
-enhanced_debugging = False  # Switch this on to enable 'info'
+enhanced_debugging = True  # Switch this on to enable 'info'
 
 #------------------------------------------------------------------------------------
 # The set_canvas function is called at application startup (on canvas creation)
@@ -100,14 +99,14 @@ def initialise(canvas_object):
 #------------------------------------------------------------------------------------
 
 def enable_editing():
-    global editing_enabled
-    editing_enabled = True
+    global run_mode
+    run_mode = False
     initialise_layout()
     return()
 
 def disable_editing():
-    global editing_enabled
-    editing_enabled = False
+    global run_mode
+    run_mode = True
     initialise_layout()
     return()
 
@@ -196,34 +195,51 @@ def is_shunt_ahead_signal(int_signal_id:int):
               signal_object["itemsubtype"] == signals_ground_disc.ground_disc_sub_type.shunt_ahead.value ) )
 
 #------------------------------------------------------------------------------------
-# Internal common Function to find the first set/cleared route for a signal object
-# Note the function should only be called for local signals (sig ID is an integer)
+# Common Function to find the first valid route (all points set correctly) for a Signal or Track Sensor
+# The 'locked' flag is also returned to signify whether all facing point locks or active. This allows
+# most functions to use just the returned route - the interlocking functions care about the FPLs.
+# For both signals and track sensors, a route table comprises a list of routes: [MAIN, LH1, LH2, RH1, RH2]
+# For a signal, each route entry comprises: [[p1, p2, p3, p4, p5, p6, p7] signal_id, block_inst_id]
+# For a Track Sensor, each route entry comprises: [[p1, p2, p3, p4, p5, p6, p7] section_id]
+# Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
+# Each point element comprises [point_id, point_state]
 #------------------------------------------------------------------------------------
 
-def find_signal_route(int_signal_id:int):
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    signal_route = None
-    # Iterate through all possible routes supported by the signal
-    # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
-    # Each point element comprises [point_id, point_state]
-    for index, interlocked_route in enumerate(signal_object["pointinterlock"]):
-        route_set_and_locked = True
-        route_has_points = False
-        # Iterate through the route to see if the points are set correctly 
-        for interlocked_point in interlocked_route[0]:
-            if interlocked_point[0] > 0:
+def find_route(object_id, dict_key:str):
+    route_to_return = None
+    # Iterate through each route in the specified table 
+    for index, route_entry in enumerate(objects.schematic_objects[object_id][dict_key]):
+        route_has_points, valid_route, points_locked = False, True, True
+        # Iterate through the points to see if they are set and locked for the route 
+        for point_entry in route_entry[0]:
+            if point_entry[0] > 0:
                 route_has_points = True
-                if (not points.fpl_active(interlocked_point[0]) or not
-                      points.point_switched(interlocked_point[0]) == interlocked_point[1] ):
-                    # If the point is not set/locked correctly then break straight away
-                    route_set_and_locked = False
-                    break
+                if not points.point_switched(point_entry[0]) == point_entry[1]:
+                    valid_route = False
+                if not points.fpl_active(point_entry[0]):
+                    points_locked = False
+                if not valid_route: break
         # Valid route if all points on the route are set and locked correctly
         # Or if the route is MAIN and no points have been specified for the route
-        if (index == 0 and not route_has_points) or (route_has_points and route_set_and_locked):
-            signal_route = signals_common.route_type(index+1)
+        if (index == 0 and not route_has_points) or (route_has_points and valid_route):
+            route_to_return = signals_common.route_type(index+1)
             break
-    return(signal_route)
+    return(route_to_return, points_locked)
+
+#------------------------------------------------------------------------------------
+# The following two functions build on the above. The first function just returns the route
+# and is used by most of the Run Layout functions. The second function only returns the route
+# if all FPLs for the route are active. This is used by the interlocking functions
+#------------------------------------------------------------------------------------
+
+def find_valid_route(object_id, dict_key:str):
+    route, locked = find_route(object_id, dict_key)
+    return (route)
+
+def find_locked_route(object_id, dict_key:str):
+    route, locked = find_route(object_id, dict_key)
+    if not locked: route = None
+    return (route)
 
 #------------------------------------------------------------------------------------
 # Internal common Function to find the 'signal ahead' of a signal object (based on
@@ -236,7 +252,7 @@ def find_signal_route(int_signal_id:int):
 
 def find_signal_ahead(int_signal_id:int):
     str_signal_ahead_id = None
-    signal_route = find_signal_route(int_signal_id)
+    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
     if signal_route is not None:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         str_signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
@@ -365,7 +381,7 @@ def process_aspect_updates(int_signal_id:int):
 #------------------------------------------------------------------------------------
 
 def set_signal_route(int_signal_id:int):
-    signal_route = find_signal_route(int_signal_id)
+    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
     if signal_route is not None:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         # Set the Route (and any associated route indication) for the signal
@@ -385,7 +401,7 @@ def set_signal_route(int_signal_id:int):
 #------------------------------------------------------------------------------------
 
 def trigger_timed_sequence(int_signal_id:int):
-    signal_route = find_signal_route(int_signal_id)
+    signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
     if signals.signal_clear(int_signal_id) and signal_route is not None:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         # Get the details of the timed signal sequence to initiate
@@ -418,7 +434,7 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
                  signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
-            signal_route = find_signal_route(int_signal_id)
+            signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
             if signal_route is not None:
                 # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
                 # Each element represents the approach control mode that has been set
@@ -444,84 +460,207 @@ def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_
     return()
 
 #------------------------------------------------------------------------------------
-# Function to Update track occupancy (from the signal 'passed' event) - Note that we
-# have to use "signal clear" to assume the direction of travel. i.e. if the signal
-# sensor is triggered and the signal is CLEAR we assume the direction of travel
-# is towards the signal. If the signal is NOT CLEAR then we assume the direction of
-# travel is in the other direction (e.g. bi-directional line) and so take no action
-# Note the function should only be called for local signals (sig ID is an integer)
+# Functions to Update track occupancy (from the signal or Track Sensor 'passed' events)
+#
+# For signals, we ignore secondary 'signal passed' events - This is the case of a train passing
+# a signal (and getting passed from one Track Section to another) and then immediately passing an
+# opposing signal on the route ahead (where we don't want to erroneously pass the train back)
+# To enable this, all train movements (from one track section to the next) are stored in the
+# global list_of_movements and then deleted once a secondary 'signal passed' event occurs
 #------------------------------------------------------------------------------------
 
-def update_track_occupancy(int_signal_id:int):
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    # Find the section ahead and section behind the signal (0 = No section)
-    # If the returned route is none we assume the default route of MAIN to
-    # cater for passing distant signals where the route (controlling the
-    # distant route aspect) may not be set and locked ahead of the home
-    # signal ahead - it is perfectly valid to pass the distant at caution
-    signal_route = find_signal_route(int_signal_id)
-    if signal_route is not None:
-        int_section_ahead = signal_object["tracksections"][1][signal_route.value-1][0]
+list_of_movements = []
+
+#------------------------------------------------------------------------------------
+# For both Signals and Track Sensors, we also ignore any events where we can't find a valid route
+# in the signal / Track Sensor configuration to identify the Track Sections either side
+#
+# Common logic that applies to all Signals and Track Sensor Types:
+#   - Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
+#   - Section BEHIND = OCCUPIED and section AHEAD = CLEAR - Pass train from BEHIND to AHEAD
+#   -       (but raise SPAD warning if passing a signal and signal is displaying DANGER)
+#   - Section AHEAD = CLEAR - section BEHIND doesn't exist - set section AHEAD to OCCUPIED
+#   -       (but raise SPAD warning if passing a signal and signal is displaying DANGER)
+#   - Section BEHIND = CLEAR - section AHEAD doesn't exist - set section BEHIND to OCCUPIED
+#   - Section AHEAD = OCCUPIED - section BEHIND doesn't exist - set section AHEAD to CLEAR
+#   - Section BEHIND = OCCUPIED - section AHEAD doesn't exist -set section BEHIND to CLEAR
+#   -       (but raise SPAD warning if passing a signal and signal is displaying DANGER)
+#   - Section AHEAD = CLEAR and section BEHIND = CLEAR - No action (but raise a warning)
+#   - Section AHEAD = OCCUPIED and section BEHIND = OCCUPIED
+#          - If passing a Signal that is CLEAR - Pass train from BEHIND to AHEAD
+#          - Otherwise, no action (no idea) - but raise a warning
+#   - Section BEHIND doesn't exist and section AHEAD doesn't exist - No action
+#
+#------------------------------------------------------------------------------------
+
+def update_track_occupancy(object_id):
+    schematic_object = objects.schematic_objects[object_id]
+    item_type = schematic_object["item"]
+    # The track occupancy logic to apply will depend on the item type (and if a signal, its state)
+    if item_type == objects.object_type.signal:
+        update_track_occupancy_for_signal(object_id)
+        logging.debug("Updating track occupancy for signal") ######################################################################
+    elif item_type == objects.object_type.track_sensor:
+        update_track_occupancy_for_track_sensor(object_id)
+        logging.debug("Updating track occupancy for track sensor") ###############################################################
+    return()
+
+#------------------------------------------------------------------------------------
+# Signal specific logic for track occupancy updates
+#------------------------------------------------------------------------------------
+
+def update_track_occupancy_for_signal(object_id):
+    global list_of_movements
+    schematic_object = objects.schematic_objects[object_id]
+    item_id = schematic_object["itemid"]
+    item_text = "Signal "+str(item_id)
+    # Find the section ahead and section behind the signal (0 = No section). If the returned route is
+    # None for a semaphore distant signal then we assume a default route of MAIN. This is to cater for a
+    # train passing the semaphore distant where the route (controlling the distant arms) may not be set
+    # and locked for the home signal ahead - it is still perfectly valid to pass the distant at caution
+    section_behind = schematic_object["tracksections"][0]
+    route = find_valid_route(object_id, "pointinterlock")
+    if route is not None:
+        section_ahead = schematic_object["tracksections"][1][route.value-1][0]
+    elif is_distant_signal(item_id):
+        route = signals_common.route_type.MAIN
+        section_ahead = schematic_object["tracksections"][1][0][0]
     else:
-        int_section_ahead = signal_object["tracksections"][1][0][0]
-    int_section_behind = signal_object["tracksections"][0]
-    # Distant signals and shunt-ahead signals can be passed when ON so we need
-    # to assume the direction of travel depending on which section on each side
-    # of the signal is CLEAR and which is OCCUPIED. If both sections are CLEAR
-    # or both sections are OCCUPIED when the signal passed event is generated
-    # then we cannot infer or assume anything - and therefore take no action
-    if is_distant_signal(int_signal_id) or is_shunt_ahead_signal(int_signal_id):
-        if ( int_section_ahead > 0 and track_sections.section_occupied(int_section_ahead) and
-             int_section_behind > 0 and not track_sections.section_occupied(int_section_behind) ):
-            # Section ahead of signal is OCCUPIED and section behind is CLEAR
-            # Assume Direction of travel 'against' the signal (and 'pass' the train)
-            track_sections.set_section_occupied (int_section_behind,
-                   track_sections.clear_section_occupied(int_section_ahead))
-        elif ( int_section_ahead > 0 and not track_sections.section_occupied(int_section_ahead) and
-             int_section_behind > 0 and track_sections.section_occupied(int_section_behind) ):
-            # Section behind signal is OCCUPIED and section ahead is CLEAR
-            # Assume Direction of travel 'with' the signal (and 'pass' the train)
-            track_sections.set_section_occupied (int_section_ahead,
-                   track_sections.clear_section_occupied(int_section_behind))
-        elif int_section_ahead > 0 and not track_sections.section_occupied(int_section_ahead):
-            # Section ahead of signal is CLEAR - section behind doesn't exist
-            # Assume Direction of travel 'with' the signal - set section ahead to OCCUPIED
-            track_sections.set_section_occupied(int_section_ahead)
-        elif int_section_behind > 0 and not track_sections.section_occupied(int_section_behind):
-            # Section behind signal is CLEAR - section ahead doesn't exist
-            # Assume Direction of travel 'against' the signal - set section behind to OCCUPIED
-           track_sections.set_section_occupied(int_section_behind)
-        elif int_section_ahead > 0 and track_sections.section_occupied(int_section_ahead):
-            # Section ahead of signal is OCCUPIED - section behind doesn't exist
-            # Assume Direction of travel 'against' the signal - set section ahead to CLEAR
-            track_sections.clear_section_occupied(int_section_ahead)
-        elif int_section_behind > 0 and track_sections.section_occupied(int_section_behind):
-            # Section behind signal is OCCUPIED - section ahead doesn't exist
-            # Assume Direction of travel 'with' the signal - set section behind to CLEAR
-            track_sections.clear_section_occupied(int_section_behind)
-    # Non-distant signals can only be passed when CLEAR (as long as the driver is
-    # doing their job properly) so we assume direction of travel is 'with' the signal
-    # This is also important to cater for the case of opposing signals protecting
-    # points (with no track sections in between) - in this case, both signals will
-    # generate 'passed' events but we only act on the route that has been cleared
-    elif ( signals.signal_clear(int_signal_id) or ( has_subsidary(int_signal_id)
-                    and signals.subsidary_clear(int_signal_id) ) ):
-        if int_section_ahead > 0 and int_section_behind > 0:
-            # Sections ahead of and behind the signal both exist ('pass' the train)
-            track_sections.set_section_occupied (int_section_ahead,
-                   track_sections.clear_section_occupied(int_section_behind))
-        elif int_section_ahead > 0:
-            # Only the section ahead of the signal exists - set to OCCUPIED
-            # Assume Direction of travel 'against' the signal (and 'pass' train)
-            track_sections.set_section_occupied(int_section_ahead)
-        elif int_section_behind > 0:
-            # Only the section behind the signal exists - set to CLEAR
-            track_sections.clear_section_occupied(int_section_behind)
-    # Propagate changes to any mirrored track sections
-    if int_section_ahead > 0:
-        update_mirrored_section(int_section_ahead)
-    if int_section_behind > 0:
-        update_mirrored_section(int_section_behind)
+        # There is no valid route for the signal so we cannot make any assumptions about the train movement.
+        section_ahead = 0
+        # However, note that the movement may be a possible "secondary event" - e.g. A train passes a signal
+        # protecting a trailing crossover (the primary event) and then the opposing signal controlling a
+        # movement back over the crossover (the secondary event). It may be that the second signal is only
+        # configured for the crossover move (there is no valid signal route back down the main line). In this
+        # case we don't want to raise a warning to the user - so we fail silently if the 'section_behind'
+        # matches a 'section_ahead' in the list of movements.
+        if True in list(element[1] == section_behind for element in list_of_movements):
+            logging.debug("RUN LAYOUT: "+item_text+" 'passed' - no valid route ahead of the Signal "+
+                        "but ignoring as this is a possible secondary event")
+        else:
+            logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
+                        "movement as there is no valid route ahead of the Signal")
+    # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
+    # case of a train passing a signal and then immediately passing an opposing signal on the route ahead
+    # The second event should be ignored as we don't want to pass the train back to the previous section.
+    is_secondary_event = False
+    if section_ahead > 0 and section_behind > 0:
+        if [section_ahead, section_behind] in list_of_movements:
+            list_of_movements.remove([section_ahead, section_behind])
+            is_secondary_event = True
+        elif [section_behind, section_ahead] not in list_of_movements:
+            list_of_movements.append([section_behind, section_ahead])
+    # Establish the state of the signal - if the subsidary aspect is clear or the main aspect not showing
+    # DANGER then we can assume any movement from the sectiion_behind to the section_ahead is valid.
+    # Otherwise we may need to raise a Signal Passed at Danger warning later on in the code
+    if ( (signals.signal_state(item_id) != signals_common.signal_state_type.DANGER) or
+         (has_subsidary(item_id) and signals.subsidary_clear(item_id)) ):
+        signal_clear = True
+    else:
+        signal_clear = False
+    # We now have all the information we need to process the track occupancy changes
+    logging_string = str(section_ahead)+"-"+str(section_behind)+"-"+str(route)+"-"+str(signal_clear) ################################################
+    logging.debug(str(logging_string)) ########################################################################################################
+    if route is not None and not is_secondary_event:
+        process_track_occupancy(section_ahead, section_behind, item_text, True, signal_clear)
+    return()
+
+#------------------------------------------------------------------------------------
+# Track Sensor specific logic for track occupancy updates
+#------------------------------------------------------------------------------------
+
+def update_track_occupancy_for_track_sensor(object_id):
+    schematic_object = objects.schematic_objects[object_id]
+    item_id = schematic_object["itemid"]
+    item_text = "Track Sensor "+str(item_id)
+    # Find the section ahead and section behind the Track Sensor (0 = No section). If either of
+    # the returned routes are None we can't really assume anything so don't process any changes.
+    route_ahead = find_valid_route(object_id, "routeahead")
+    if route_ahead is None:
+        logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
+                        "movement as there is no valid route ahead of the Track Sensor")
+    else:
+        section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
+    route_behind = find_valid_route(object_id, "routebehind")
+    if route_behind is  None:
+        logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
+                        "movement as there is no valid route behind of the Track Sensor")
+    else:
+        section_behind = schematic_object["routebehind"][route_behind.value-1][1]
+    if route_ahead is not None and route_behind is not None:
+        process_track_occupancy(section_ahead, section_behind, item_text, False, False)
+    return()
+
+#------------------------------------------------------------------------------------
+# Common Track Occupancy logic - Track Sensors and Signals
+#------------------------------------------------------------------------------------
+
+def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, is_signal:bool, is_clear:bool):
+    if ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
+         section_behind > 0 and not track_sections.section_occupied(section_behind) ):
+        # Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
+        train_descriptor = track_sections.clear_section_occupied(section_ahead)
+        track_sections.set_section_occupied (section_behind, train_descriptor)
+    elif ( section_ahead > 0 and not track_sections.section_occupied(section_ahead) and
+         section_behind > 0 and track_sections.section_occupied(section_behind) ):
+        # Section BEHIND = OCCUPIED and section AHEAD = CLEAR - Pass train from BEHIND to AHEAD
+        train_descriptor = track_sections.clear_section_occupied(section_behind)
+        track_sections.set_section_occupied (section_ahead, train_descriptor)
+        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+    elif section_ahead > 0 and section_behind == 0 and not track_sections.section_occupied(section_ahead):
+        # Section AHEAD = CLEAR - section BEHIND doesn't exist - set section ahead to OCCUPIED
+        track_sections.set_section_occupied(section_ahead)
+        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+    elif section_behind > 0 and section_ahead == 0 and not track_sections.section_occupied(section_behind):
+        # Section BEHIND = CLEAR - section AHEAD doesn't exist - set section behind to OCCUPIED
+       track_sections.set_section_occupied(section_behind)
+    elif section_ahead > 0 and section_behind == 0 and track_sections.section_occupied(section_ahead):
+        #  Section AHEAD = OCCUPIED - section BEHIND doesn't exist - set section ahead to CLEAR
+        track_sections.clear_section_occupied(section_ahead)
+    elif section_behind > 0 and section_ahead == 0 and track_sections.section_occupied(section_behind):
+        # Section BEHIND = OCCUPIED - section AHEAD doesn't exist -set section behind to CLEAR
+        track_sections.clear_section_occupied(section_behind)
+        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+    elif ( section_ahead > 0 and not track_sections.section_occupied(section_ahead) and
+           section_behind > 0 and not track_sections.section_occupied(section_behind) ):
+        # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
+        log_text = " 'passed' but unable to determine train movement as Track Sections ahead and behind are both CLEAR"
+        logging.warning("RUN LAYOUT: "+item_text+log_text)
+    elif ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
+           section_behind > 0 and track_sections.section_occupied(section_behind) ):
+        # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
+        if is_signal and is_clear:
+            # Assume that the train BEHIND the signal will move into the section AHEAD
+            train_descriptor = track_sections.clear_section_occupied(section_behind)
+            track_sections.set_section_occupied (section_ahead, train_descriptor)
+            log_text = " 'passed' at CLEAR - Assume Trains coupling - Check and update Train Descriptor"
+        else:
+            # We have no idea what train has passed the Signal / Track Section
+            log_text = " 'passed' but unable to determine train movement as Track Sections ahead and behind are both OCCUPIED"
+        logging.warning("RUN LAYOUT: "+item_text+log_text)
+    ############################################################################################
+    # Propagate changes to any mirrored track sections - To move into Library eventually #######
+    ############################################################################################
+    if section_ahead > 0: update_mirrored_section(section_ahead)
+    if section_behind > 0: update_mirrored_section(section_behind)
+    ############################################################################################
+    return()
+
+#------------------------------------------------------------------------------------
+# Track Occupancy logic - Non-Distant / Shunt Ahead Signals that are OFF
+#------------------------------------------------------------------------------------
+
+def process_track_occupancy_2(section_ahead:int, section_behind:int, item_text:str):
+    if section_ahead > 0 and section_behind > 0:
+        # Sections AHEAD and BEHIND exist both exist  - pass from section BEHIND to section AHEAD
+        track_sections.set_section_occupied (section_ahead,
+               track_sections.clear_section_occupied(section_behind))
+    elif section_ahead > 0:
+        # Only section AHEAD exists - set the section AHEAD to OCCUPIED
+        track_sections.set_section_occupied(section_ahead)
+    elif section_behind > 0:
+        # Only section BEHIND exists - set the section BEHIND to CLEAR
+        track_sections.clear_section_occupied(section_behind)
     return()
 
 #------------------------------------------------------------------------------------
@@ -565,7 +704,6 @@ def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id
 #------------------------------------------------------------------------------------
 
 def process_all_signal_interlocking():
-    global editing_enabled
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
         # Note that the ID of any associated distant signal is sig_id+100
@@ -573,8 +711,8 @@ def process_all_signal_interlocking():
         distant_arms_can_be_unlocked = has_distant_arms(int_signal_id)
         signal_can_be_unlocked = False
         subsidary_can_be_unlocked = False
-        # Find the route (where points are set/cleared)
-        signal_route = find_signal_route(int_signal_id)
+        # Find the signal route (all points are set and locked by their FPLs)
+        signal_route = find_locked_route(objects.signal(int_signal_id),"pointinterlock")
         # If there is a set/locked route then the signal/subsidary can be unlocked
         if signal_route is not None:
             signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
@@ -622,7 +760,7 @@ def process_all_signal_interlocking():
             # Interlock against track sections on the route ahead - note that this is the
             # one bit of interlocking functionality that we can only do in RUN mode as
             # track section objects dont 'exist' as such in EDIT mode
-            if not editing_enabled:
+            if run_mode:
                 interlocked_sections = signal_object["trackinterlock"][signal_route.value-1]
                 for section in interlocked_sections:
                     if section > 0 and track_sections.section_occupied(section):
@@ -698,7 +836,7 @@ def update_all_signal_overrides():
     # Start of main function
     for str_signal_id in objects.signal_index:
         int_signal_id = int(str_signal_id)
-        signal_route = find_signal_route(int_signal_id)
+        signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
         # Override/clear the current signal based on the section ahead
         override_signal = False
         if signal_route is not None:
@@ -832,20 +970,24 @@ def process_all_aspect_updates():
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id:Union[int,str], callback_type):
-    global canvas, editing_enabled, automation_enabled
     if enhanced_debugging: logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
-    # Timed signal sequences can be triggered by 'signal_passed' events - LOCAL SIGNALS ONLY
+    # 'signal_passed' events (from LOCAL SIGNALS) can trigger changes in track occupancy 
+    # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
+    # in Run mode) - and are enabled in RUN MODE whether automation is ENABLED or DISABLED
+    if callback_type == signals_common.sig_callback_type.sig_passed and run_mode:
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
+        update_track_occupancy(objects.signal(item_id))
+    # Timed signal sequences can be triggered by 'signal_passed' events (from LOCAL SIGNALS) 
     # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
-    if (callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id)
-           and not editing_enabled and automation_enabled):
+    if (callback_type == signals_common.sig_callback_type.sig_passed and run_mode and automation_enabled):
         if enhanced_debugging: logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
-        trigger_timed_sequence(int(item_id)) 
-    # 'signal_passed' events can trigger changes in track occupancy - LOCAL SIGNALS ONLY
+        trigger_timed_sequence(item_id) 
+    # 'sensor_passed' events can trigger changes in track occupancy - LOCAL TRACK SENSORS ONLY
     # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
     # in Run mode) - but remain enabled in Run Mode whether automation is Enabled or Disabled
-    if callback_type == signals_common.sig_callback_type.sig_passed and is_local_id(item_id) and not editing_enabled:
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
-        update_track_occupancy(int(item_id))
+    if callback_type == track_sensors.track_sensor_callback_type.sensor_triggered and run_mode:
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (Track Sensor passed event):")
+        update_track_occupancy(objects.track_sensor(item_id))
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
     # Route Setting is ENABLED in both Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == points.point_callback_type.point_switched or
@@ -858,7 +1000,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # a remote track section (which could happen in either Run and Edit Mode). As Track sections (the
     # library objects) only "exist" in run mode this event is only processed in RUN mode, whether
     # automation is Enabled or Disabled. Note that the Item ID could local (int) or remote (str).
-    if callback_type == track_sections.section_callback_type.section_updated and not editing_enabled:
+    if callback_type == track_sections.section_callback_type.section_updated and run_mode:
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
         update_mirrored_section(item_id)   # Could be an int (local) or str (remote)
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
@@ -877,7 +1019,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated ):
-        if not editing_enabled and automation_enabled:
+        if run_mode and automation_enabled:
             # First we update all signal overrides based on track occupancy, but ONLY IN RUN MODE
             # (as track sections only exist in RUN Mode), if Automation is ENABLED
             if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
@@ -934,12 +1076,14 @@ def schematic_callback(item_id:Union[int,str], callback_type):
 #------------------------------------------------------------------------------------
 
 def initialise_layout():
-    global canvas, editing_enabled, automation_enabled
+    global list_of_movements
     if enhanced_debugging: logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
+    # Reset the list of track occupancy movements
+    list_of_movements = []
     # We always process signal routes - for all modes whether automation is enabled/disabled
     if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
-    if not editing_enabled and not automation_enabled:
+    if run_mode and not automation_enabled:
         # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
         # the process_all_aspect_updates function (as we are not making the other update calls)
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
@@ -951,7 +1095,7 @@ def initialise_layout():
         clear_all_approach_control()
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
-    elif not editing_enabled and automation_enabled:
+    elif run_mode and automation_enabled:
         # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
         # updated by update_all_signal_approach_control and update_all_distant_overrides
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
