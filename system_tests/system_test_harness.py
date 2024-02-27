@@ -23,6 +23,7 @@
 #    set_secondary_dists_off(*sigids) - Semaphore only
 #    trigger_signals_passed(*sigids)
 #    trigger_signals_released(*sigids)
+#    trigger_sensors_passed(*sigids)
 #    set_points_switched(*pointids)
 #    set_points_normal(*pointids
 #    set_fpls_on(*pointids)
@@ -35,7 +36,6 @@
 #    set_instrument_clear(*instrumentids)
 #    click_telegraph_key(*instrumentids)
 #    simulate_gpio_triggered(*gpioids)
-#    simulate_gpio_reset(*gpioids)
 #
 # Supported Schematic test assertions:
 #    assert_points_locked(*pointids)
@@ -150,6 +150,7 @@ from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
+from model_railway_signals.library import gpio_sensors
 
 thread_delay_time = 0.150
 tkinter_thread_started = False
@@ -341,7 +342,14 @@ def trigger_signals_released(*sigids):
             raise_test_warning ("trigger_signals_released - Signal: "+str(sigid)+" does not exist")
         else:
             run_function(lambda:signals_common.approach_release_button_event(sigid) )                             
-    
+
+def trigger_sensors_passed(*sensorids):
+    for sensorid in sensorids:
+        if str(sensorids) not in track_sensors.track_sensors.keys():
+            raise_test_warning ("trigger_sensors_passed - Track Sensor: "+str(sensorid)+" does not exist")
+        else:
+            run_function(lambda:track_sensors.track_sensor_triggered(sensorid))
+
 def set_points_switched(*pointids):
     for pointid in pointids:
         if str(pointid) not in points.points.keys():
@@ -444,17 +452,10 @@ def click_telegraph_key(*instrumentids):
 
 def simulate_gpio_triggered(*gpioids):
     for gpioid in gpioids:
-        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
+        if str(gpioid) not in gpio_sensors.gpio_port_mappings.keys():
             raise_test_warning ("simulate_gpio_triggered - GPIO: "+str(gpioid)+" has not been mapped")
         else:
-            run_function(lambda:track_sensors.track_sensor_triggered(gpioid))
-
-def simulate_gpio_reset(*gpioids):
-    for gpioid in gpioids:
-        if str(gpioid) not in track_sensors.gpio_port_mappings.keys():
-            raise_test_warning ("simulate_gpio_reset - GPIO: "+str(gpioid)+" does not exist")
-        else:
-            run_function(lambda:track_sensors.track_sensor_released(gpioid))
+            run_function(lambda:gpio_sensors.gpio_sensor_triggered(gpioid,testing=True))
 
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
@@ -777,7 +778,12 @@ def create_line():
     run_function(lambda:schematic.create_object(objects.object_type.line))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
-    
+
+def create_track_sensor():
+    run_function(lambda:schematic.create_object(objects.object_type.track_sensor))
+    object_id = list(objects.schematic_objects)[-1]
+    return(object_id)
+
 def create_colour_light_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
                         signals_common.sig_type.colour_light.value,

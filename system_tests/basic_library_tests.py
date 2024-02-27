@@ -43,6 +43,7 @@ def run_track_sensor_library_tests():
     track_sensors.delete_track_sensor(101)
     track_sensors.delete_track_sensor(100)
     assert not track_sensors.track_sensor_exists(100)
+    track_sensors.track_sensor_triggered(100)
     logging.getLogger().setLevel(logging.WARNING)
     return()
 

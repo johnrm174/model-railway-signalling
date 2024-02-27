@@ -15,18 +15,20 @@ from model_railway_signals.editor import schematic
 
 def test_all_configuration_windows(delay:float=0.0):
     # Create new default objects on the schematic
+    b1 = create_block_instrument()
+    select_and_move_objects(b1,500,200,delay=delay)
     create_line()
     create_colour_light_signal()
     create_semaphore_signal()
     create_ground_position_signal()
     create_ground_disc_signal()
     create_track_section()
-    create_block_instrument()
     create_left_hand_point()
     create_right_hand_point()
     create_textbox()
+    create_track_sensor()
     # Test the configuration remains unchanged with Edit/Save
-    test_all_object_edit_windows(delay)
+    really_do_test_all_object_edit_windows(delay)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -35,12 +37,14 @@ def test_all_configuration_windows(delay:float=0.0):
 
 def test_all_window_controls(delay:float=0.0):
     # Create new default objects on the schematic
+    b1 = create_block_instrument()
+    select_and_move_objects(b1,500,200,delay=delay)
     create_line()
     create_colour_light_signal()
     create_track_section()
-    create_block_instrument()
     create_right_hand_point()
     create_textbox()
+    create_track_sensor()
     # Excersise the various window controls
     object_types=(objects.object_type.line, objects.object_type.textbox, objects.object_type.point,
         objects.object_type.section, objects.object_type.instrument, objects.object_type.signal)
@@ -137,7 +141,7 @@ def really_do_test_all_object_edit_windows(delay:float=0.0):
 
 # This is the easy way to shorten the tests - miss out the object window tests
 def test_all_object_edit_windows(delay:float=0.0):
-    really_do_test_all_object_edit_windows(delay)
+#    really_do_test_all_object_edit_windows(delay)
     pass
                 
 ######################################################################################################
