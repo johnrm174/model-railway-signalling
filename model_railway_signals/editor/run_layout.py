@@ -181,20 +181,6 @@ def is_distant_signal(int_signal_id:int):
               signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
 
 #------------------------------------------------------------------------------------
-# Internal helper Function to find if a signal is a shunt-ahead ground signal
-# Note the function should only be called for local signals (sig ID is an integer)
-#------------------------------------------------------------------------------------
-
-def is_shunt_ahead_signal(int_signal_id:int):
-    signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return( ( signal_object["itemtype"]  == signals_common.sig_type.ground_position.value and
-              signal_object["itemsubtype"] == signals_ground_position.ground_pos_sub_type.shunt_ahead.value ) or
-            ( signal_object["itemtype"] == signals_common.sig_type.ground_position.value and
-              signal_object["itemsubtype"] == signals_ground_position.ground_pos_sub_type.early_shunt_ahead.value ) or
-            ( signal_object["itemtype"] == signals_common.sig_type.ground_disc.value and
-              signal_object["itemsubtype"] == signals_ground_disc.ground_disc_sub_type.shunt_ahead.value ) )
-
-#------------------------------------------------------------------------------------
 # Common Function to find the first valid route (all points set correctly) for a Signal or Track Sensor
 # The 'locked' flag is also returned to signify whether all facing point locks or active. This allows
 # most functions to use just the returned route - the interlocking functions care about the FPLs.
@@ -294,7 +280,8 @@ def home_signal_ahead_at_danger(int_signal_id:int, recursion_level:int=0):
         str_signal_ahead_id = find_signal_ahead(int_signal_id)
         if str_signal_ahead_id is not None and is_local_id(str_signal_ahead_id):
             int_signal_ahead_id = int(str_signal_ahead_id)
-            if is_home_signal(int_signal_ahead_id) and signals.signal_state(int_signal_ahead_id) == signals_common.signal_state_type.DANGER:
+            if ( is_home_signal(int_signal_ahead_id) and
+                 signals.signal_state(int_signal_ahead_id) == signals_common.signal_state_type.DANGER):
                 home_signal_at_danger = True
             elif is_home_signal(int_signal_ahead_id) and not has_distant_arms(int_signal_ahead_id):
                 # Call the function recursively to find the next signal ahead
@@ -499,10 +486,8 @@ def update_track_occupancy(object_id):
     # The track occupancy logic to apply will depend on the item type (and if a signal, its state)
     if item_type == objects.object_type.signal:
         update_track_occupancy_for_signal(object_id)
-        logging.debug("Updating track occupancy for signal") ######################################################################
     elif item_type == objects.object_type.track_sensor:
         update_track_occupancy_for_track_sensor(object_id)
-        logging.debug("Updating track occupancy for track sensor") ###############################################################
     return()
 
 #------------------------------------------------------------------------------------
@@ -558,9 +543,6 @@ def update_track_occupancy_for_signal(object_id):
         signal_clear = True
     else:
         signal_clear = False
-    # We now have all the information we need to process the track occupancy changes
-    logging_string = str(section_ahead)+"-"+str(section_behind)+"-"+str(route)+"-"+str(signal_clear) ################################################
-    logging.debug(str(logging_string)) ########################################################################################################
     if route is not None and not is_secondary_event:
         process_track_occupancy(section_ahead, section_behind, item_text, True, signal_clear)
     return()
@@ -644,23 +626,6 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
     if section_ahead > 0: update_mirrored_section(section_ahead)
     if section_behind > 0: update_mirrored_section(section_behind)
     ############################################################################################
-    return()
-
-#------------------------------------------------------------------------------------
-# Track Occupancy logic - Non-Distant / Shunt Ahead Signals that are OFF
-#------------------------------------------------------------------------------------
-
-def process_track_occupancy_2(section_ahead:int, section_behind:int, item_text:str):
-    if section_ahead > 0 and section_behind > 0:
-        # Sections AHEAD and BEHIND exist both exist  - pass from section BEHIND to section AHEAD
-        track_sections.set_section_occupied (section_ahead,
-               track_sections.clear_section_occupied(section_behind))
-    elif section_ahead > 0:
-        # Only section AHEAD exists - set the section AHEAD to OCCUPIED
-        track_sections.set_section_occupied(section_ahead)
-    elif section_behind > 0:
-        # Only section BEHIND exists - set the section BEHIND to CLEAR
-        track_sections.clear_section_occupied(section_behind)
     return()
 
 #------------------------------------------------------------------------------------
