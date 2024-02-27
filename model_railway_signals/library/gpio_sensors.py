@@ -223,7 +223,9 @@ def gpio_sensor_triggered(gpio_port:int, testing:bool=False):
             sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
             logging.info("GPIO Sensor "+str(sensor_id)+": Triggered Event *******************************************")
             send_mqtt_gpio_sensor_triggered_event(sensor_id)
-            make_gpio_sensor_triggered_callback(sensor_id)
+            # Note that this function will be running in a different thread to the main Tkinter thread
+            # We therefore callback into the main Tkinter thread to process the event
+            common.execute_function_in_tkinter_thread(lambda:make_gpio_sensor_triggered_callback(sensor_id))
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -234,11 +236,12 @@ def send_mqtt_gpio_sensor_triggered_event(sensor_id:int):
     if sensor_id in list_of_track_sensors_to_publish:
         log_message = "GPIO Sensor "+str(sensor_id)+": Publishing 'sensor triggered' event to MQTT Broker"
         # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
-        mqtt_interface.send_mqtt_message("gpio_sensor_event",sensor_id,data={},log_message=log_message,retain=True)
+        mqtt_interface.send_mqtt_message("gpio_sensor_event",sensor_id,data={},log_message=log_message,retain=False)
     return()
 
 #---------------------------------------------------------------------------------------------------
 # API callback function for handling received MQTT messages from a remote track sensor
+# Note that this function will already be running in the main Tkinter thread
 #---------------------------------------------------------------------------------------------------
 
 def handle_mqtt_gpio_sensor_triggered_event(message):
@@ -247,16 +250,18 @@ def handle_mqtt_gpio_sensor_triggered_event(message):
     elif not gpio_sensor_exists(message["sourceidentifier"]):
         logging.warning("GPIO Sensor "+message["sourceidentifier"]+": handle_mqtt_gpio_sensor_triggered_event - Sensor does not exist")
     else:
-        # Nte that the remote sensor object would have been created with the sensor_identifier 
+        # Note that the remote sensor object would have been created with the sensor_identifier 
         # as the 'key' to the dict of gpio_port_mappings rather than the GPIO port number
         logging.info("GPIO Sensor "+message["sourceidentifier"]+": Remote GPIO sensor has been triggered *********************")
+        # We are already running in the main Tkinter thread so just call the function to make the callback
         make_gpio_sensor_triggered_callback(message["sourceidentifier"])
     return()
 
 #---------------------------------------------------------------------------------------------------
 # Internal Function to raise the appropriate event ('signal passed', 'signal approached' or
-# 'track sensor passed') - by calling in to the appropriate library module. Note that the event
-# is raised in the main tkinter thread as tkinter almost certainly isn't thread safe.
+# 'track sensor passed') - by calling in to the appropriate library module. Note that this
+# function will be called from within the main Tkinter thread so the callback we make
+# will also be executed in the main Tkinter Thread
 #---------------------------------------------------------------------------------------------------
 
 def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
@@ -264,13 +269,13 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
     str_gpio_port = mapped_gpio_port(sensor_id)
     if gpio_port_mappings[str_gpio_port]["signal_passed"] > 0:
         sig_id = gpio_port_mappings[str_gpio_port]["signal_passed"]
-        common.execute_function_in_tkinter_thread(lambda:signals_common.sig_passed_button_event(sig_id))
+        signals_common.sig_passed_button_event(sig_id)
     elif gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
         sig_id = gpio_port_mappings[str_gpio_port]["signal_approach"]
-        common.execute_function_in_tkinter_thread(lambda:signals_common.approach_release_button_event(sig_id))
+        signals_common.approach_release_button_event(sig_id)
     elif gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
         sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
-        common.execute_function_in_tkinter_thread(lambda:track_sensors.track_sensor_triggered(sensor_id))
+        track_sensors.track_sensor_triggered(sensor_id)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -286,6 +291,7 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int,
                         sensor_timeout:float = 3.0,
                         trigger_period:float = 0.001):
     global gpio_port_mappings
+    global shutdown_initiated
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sensor_id,int) or sensor_id < 1:
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be a positive integer")
@@ -336,6 +342,9 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int,
             sensor_device = gpiozero.Button(gpio_channel)
             sensor_device.when_pressed = lambda:gpio_sensor_triggered(gpio_channel)
             gpio_port_mappings[str(gpio_channel)]["sensor_device"] = sensor_device
+        # Reset the shutdown_initiated flag - this is primarily to support testing
+        # Where we might test the shutdown function and then go on to do other things
+        shutdown_initiated = False
     return() 
 
 #---------------------------------------------------------------------------------------------------
