@@ -66,7 +66,6 @@ from .library.pi_sprog_interface import request_dcc_power_off
 
 from .library.dcc_control import map_dcc_signal
 from .library.dcc_control import map_semaphore_signal
-from .library.dcc_control import map_traintech_signal
 from .library.dcc_control import map_dcc_point
 from .library.dcc_control import subscribe_to_dcc_command_feed
 from .library.dcc_control import set_node_to_publish_dcc_commands
@@ -83,7 +82,6 @@ from .library.block_instruments import subscribe_to_remote_instrument
 
 from .library.file_interface import load_schematic
 from .library.file_interface import save_schematic
-from .library.file_interface import purge_loaded_state_information
 
 from .library.track_sensors import track_sensor_callback_type
 from .library.track_sensors import create_track_sensor
@@ -140,6 +138,7 @@ __all__ = [
         'subscribe_to_remote_signal',
         'set_signals_to_publish_state',
       # Public track_section types/functions
+        'section_callback_type',
         'create_section',
         'section_occupied',
         'section_label',
@@ -157,7 +156,6 @@ __all__ = [
         'request_dcc_power_on',
         'request_dcc_power_off',
         'map_dcc_signal',
-        'map_traintech_signal',
         'map_semaphore_signal',
         'map_dcc_point',
         'subscribe_to_dcc_command_feed',

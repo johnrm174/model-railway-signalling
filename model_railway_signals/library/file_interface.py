@@ -35,7 +35,6 @@
 
 import os
 import json
-import __main__
 import logging
 import tkinter.messagebox
 import tkinter.filedialog
