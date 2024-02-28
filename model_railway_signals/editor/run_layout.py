@@ -4,7 +4,7 @@
 # External API functions intended for use by other editor modules:
 #    initialise(canvas) - sets a global reference to the tkinter canvas object
 #    initialise_layout() - call after object changes/deletions or load of a new schematic
-#    schematic_callback(item_id,callback_type) - the callback for all schematic objects
+#    schematic_callback(item_id,callback_type) - the callback for all library objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
 #    enable_automation() - Call when Automation is enabled (from Editor Module)
@@ -14,6 +14,7 @@
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
 #    objects.point(point_id) - To get the object_id for a given point_id
 #    objects.section(section_id) - To get the object_id for a given section_id
+#    objects.track_sensor(sensor_id) - To get the object_id for a given sensor_id
 #    
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -25,15 +26,13 @@
 # Accesses the following external library objects directly:
 #    signals_common.route_type - for accessing the enum value
 #    signals_common.sig_type - for accessing the enum value
+#    signals_common.signal_state_type - for accessing the enum value
 #    signals_common.sig_callback_type - for accessing the enum value
 #    points.point_callback_type - for accessing the enum value
 #    track_sections.section_callback_type - for accessing the enum value
 #    block_instruments.block_callback_type - for accessing the enum value
-#    block_instruments.block_section_ahead_clear - for interlocking
 #    signals_colour_lights.signal_sub_type - for accessing the enum value
 #    signals_semaphores.semaphore_sub_type - for accessing the enum value
-#    signals_ground_position.ground_pos_sub_type - for accessing the enum value
-#    signals_ground_disc.ground_disc_sub_type - for accessing the enum value
 #    track_sensors.track_sensor_callback_type - for accessing the enum value
 #
 # Makes the following external API calls to library modules:
@@ -45,17 +44,23 @@
 #    signals.unlock_signal(sig_id) - To unlock a signal
 #    signals.lock_subsidary(sig_id) - To lock a subsidary signal
 #    signals.unlock_subsidary(sig_id) - To unlock a subsidary signal
+#    signals.set_approach_control - Enable approach control mode for the signal
+#    signals.clear_approach_control - Clear approach control mode for the signal
 #    signals.set_route(sig_id, sig_route, theatre) - To set the route for the signal
 #    signals.trigger_timed_signal(sig_id, T1, T2) - Trigger timed signal sequence
-#    points.fpl_active(point_id) - To test if a facing point lock is active
-#    points.toggle_fpl(point_id) - To toggle the state of the point FPL
-#    points.point_switched(point_id) - To test if a point is switched
-#    points.lock_point(point_id) - To intelock a point
-#    points.unlock_point(point_id) - To intelock a point
-#    track_sections.set_section_occupied (section_id) - Set "Occupied"
-#    track_sections.clear_section_occupied (section_id) - Clear "Occupied"
+#    signals.set_signal_override - Override the signal to DANGER
+#    signals.clear_signal_override - Clear the Signal override DANGER mode
+#    signals.set_signal_override_caution - Override the signal to CAUTION
+#    signals.clear_signal_override_caution - Clear the Signal override CAUTION mode
+#    points.fpl_active(point_id) - Test if the FPL is active (for interlocking)
+#    points.point_switched(point_id) - Test if the point is switched (for interlocking)
+#    points.lock_point(point_id) - Lock a point (for interlocking)
+#    points.unlock_point(point_id) - Unlock a point (for interlocking)
+#    block_instruments.block_section_ahead_clear(inst_id) - Get the state (for interlocking)
+#    track_sections.set_section_occupied (section_id) - Set Track Section to "Occupied"
+#    track_sections.clear_section_occupied (section_id) - Set Track Section to "Clear"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
-#
+#    track_sections.section_label - get the current label (for updating mirrored sections) ################################
 #------------------------------------------------------------------------------------
 
 import logging
@@ -68,8 +73,6 @@ from ..library import block_instruments
 from ..library import signals_common
 from ..library import signals_semaphores
 from ..library import signals_colour_lights
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
 from ..library import track_sections
 from ..library import track_sensors
 
@@ -220,12 +223,12 @@ def find_route(object_id, dict_key:str):
 
 def find_valid_route(object_id, dict_key:str):
     route, locked = find_route(object_id, dict_key)
-    return (route)
+    return(route)
 
 def find_locked_route(object_id, dict_key:str):
     route, locked = find_route(object_id, dict_key)
     if not locked: route = None
-    return (route)
+    return(route)
 
 #------------------------------------------------------------------------------------
 # Internal common Function to find the 'signal ahead' of a signal object (based on
@@ -233,7 +236,6 @@ def find_locked_route(object_id, dict_key:str):
 # Note the function should only be called for local signals (sig ID is an integer)
 # but can return either local or remote IDs (int or str) - both returned as a str
 # If no route is set/locked or no sig ahead is specified then 'None' is returned
-# Note the function should only be called for local signals (sig ID is an integer)
 #------------------------------------------------------------------------------------
 
 def find_signal_ahead(int_signal_id:int):
@@ -243,7 +245,6 @@ def find_signal_ahead(int_signal_id:int):
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
         str_signal_ahead_id = signal_object["pointinterlock"][signal_route.value-1][1]
         if str_signal_ahead_id == "": str_signal_ahead_id = None
-        if not signals_common.sig_exists(str_signal_ahead_id): str_signal_ahead_id = None
     return(str_signal_ahead_id)
 
 #------------------------------------------------------------------------------------
@@ -628,10 +629,10 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
     ############################################################################################
     return()
 
-#------------------------------------------------------------------------------------
-# Function to Update any mirrored track sections on a change to one track section
-# Note that the Track Section ID is a string (local or remote)
-#------------------------------------------------------------------------------------
+################################################################################################
+# Function to Update a mirrored track sections on a change to one track section. Note ##########
+# the Track Section ID is a string (local or remote) - To move into Library eventually #########
+################################################################################################
 
 def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id_just_set:str="0", recursion_level:int=0):
     if recursion_level < 20:
@@ -661,6 +662,8 @@ def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id
     else:
         logging.error("RUN LAYOUT - Update Mirrored Section - Maximum recursion level reached")
     return()
+
+################################################################################################
 
 #-------------------------------------------------------------------------------------
 # Function to update the Signal interlocking (against points & instruments). Called on
@@ -910,13 +913,15 @@ def set_all_signal_routes():
         set_signal_route(int(str_signal_id))
     return()
 
-#------------------------------------------------------------------------------------
-# Function to Update all mirrored track sections (LOCAL track sections only)
-#------------------------------------------------------------------------------------
+################################################################################################
+# Function to Update all LOCAL mirrored track sections - To move into Library eventually #######
+################################################################################################
 
 def update_all_mirrored_sections():
     for str_section_id in objects.section_index:
         update_mirrored_section(int(str_section_id))
+
+################################################################################################
 
 #------------------------------------------------------------------------------------
 # Function to Update all signal aspects (based on signals ahead)
@@ -967,7 +972,7 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # automation is Enabled or Disabled. Note that the Item ID could local (int) or remote (str).
     if callback_type == track_sections.section_callback_type.section_updated and run_mode:
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
-        update_mirrored_section(item_id)   # Could be an int (local) or str (remote)
+        update_mirrored_section(item_id)   # Could be an int (local) or str (remote) ####################################################
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
     # changes to signal overides (see above for events) or changes to the approach control state
@@ -1051,8 +1056,8 @@ def initialise_layout():
     if run_mode and not automation_enabled:
         # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
         # the process_all_aspect_updates function (as we are not making the other update calls)
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
-        update_all_mirrored_sections()
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:") ####################################
+        update_all_mirrored_sections() ###############################################################################################
         if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
         clear_all_distant_overrides()
@@ -1063,8 +1068,8 @@ def initialise_layout():
     elif run_mode and automation_enabled:
         # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
         # updated by update_all_signal_approach_control and update_all_distant_overrides
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:")
-        update_all_mirrored_sections()
+        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:") ####################################
+        update_all_mirrored_sections() ###############################################################################################
         if enhanced_debugging: logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
         update_all_signal_overrides()
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
