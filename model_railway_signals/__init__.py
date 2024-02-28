@@ -74,8 +74,6 @@ from .library.dcc_control import set_node_to_publish_dcc_commands
 from .library.mqtt_interface import configure_mqtt_client
 from .library.mqtt_interface import mqtt_broker_connect
 
-from .library.file_interface import load_layout_state
-
 from .library.block_instruments import instrument_type
 from .library.block_instruments import block_callback_type
 from .library.block_instruments import create_block_instrument
@@ -83,13 +81,25 @@ from .library.block_instruments import block_section_ahead_clear
 from .library.block_instruments import set_instruments_to_publish_state
 from .library.block_instruments import subscribe_to_remote_instrument
 
+from .library.file_interface import load_schematic
+from .library.file_interface import save_schematic
+from .library.file_interface import purge_loaded_state_information
+
+from .library.track_sensors import track_sensor_callback_type
+from .library.track_sensors import create_track_sensor
+
+from .library.common import set_root_window
+from .library.common import shutdown
+
 from .editor.editor import run_editor
 
 __all__ = [
-      # Public point types
+      # Public common functions
+        'set_root_window',
+        'shutdown',
+      # Public point types/functions
         'point_type',
         'point_callback_type',
-      # Public point functions
         'create_point',
         'lock_point',
         'unlock_point',
@@ -97,7 +107,7 @@ __all__ = [
         'fpl_active',
         'toggle_point',
         'toggle_fpl',
-      # Public signal types
+      # Public signal types/functions
         'route_type',
         'signal_sub_type',
         'semaphore_sub_type',
@@ -105,7 +115,6 @@ __all__ = [
         'ground_disc_sub_type',
         'sig_callback_type',
         'signal_state_type',
-      # Public signal functions
         'create_colour_light_signal',
         'create_semaphore_signal',
         'create_ground_position_signal',
@@ -130,9 +139,7 @@ __all__ = [
         'trigger_timed_signal',
         'subscribe_to_remote_signal',
         'set_signals_to_publish_state',
-      # Public track_section types
-        'section_callback_type',
-      # Public track_section functions
+      # Public track_section types/functions
         'create_section',
         'section_occupied',
         'section_label',
@@ -140,7 +147,7 @@ __all__ = [
         'clear_section_occupied',
         'subscribe_to_remote_section',
         'set_sections_to_publish_state', 
-      # public track_sensor functions
+      # public gpio sensor functions
         'create_gpio_sensor',
         'subscribe_to_remote_gpio_sensor',
         'set_gpio_sensors_to_publish_state',
@@ -158,16 +165,19 @@ __all__ = [
       # Public networking functions
         'configure_mqtt_client',
         'mqtt_broker_connect',
-      # Public File load/save functions
-        'load_layout_state',
-      # public block instrument types
+      # public block instrument types/functions
         'block_callback_type',
         'instrument_type',
-      # Public block instrument functions
         'create_block_instrument',
         'block_section_ahead_clear',
         'subscribe_to_remote_instrument',
         'set_instruments_to_publish_state',
+      # public track sensor types/functions
+        'track_sensor_callback_type',
+        'create_track_sensor',
+      # Public file interface functions
+        'save_schematic',
+        'load_schematic',
       # Public function to run editor
         'run_editor'
            ]

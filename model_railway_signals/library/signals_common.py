@@ -393,8 +393,6 @@ def create_common_signal_elements (canvas,
                                    distant_button_offset:int=0,
                                    tag:str=""):
     global signals
-    # Find and store the root window (when the first signal is created)
-    if common.root_window is None: common.find_root_window(canvas)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
     # Assign the button labels. if a distant_button_offset has been defined then this represents the 

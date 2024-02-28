@@ -492,8 +492,6 @@ def create_block_instrument (canvas,
     global instruments
     global list_of_instruments_to_publish
     logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
-    # Find and store the root window (when the first block instrument is created)
-    if common.root_window is None: common.find_root_window(canvas)
     # Establish whether the ID is a local or remote ID and set the type accordingly
     # We need to do this for the editor as the editor will give us an int as a string
     linked_to_id = set_item_id_type(linked_to)
