@@ -766,19 +766,19 @@ def test_route(sig1, sig2, gpio1, gpio2, sec1, sec2, test_sensors, delay, edit_m
         assert_sections_clear(sec1)
     return
 
-def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bool=False):
+def run_signal_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bool=False):
     reset_layout()
     sleep(delay)
+    if test_sensors: print("Signal Track occupancy changes -  simulated GPIO events")
+    else: print("Signal Track occupancy changes - user-generated (button push) events")
     # Set the block instrument to CLEAR (so it doesn't lock signal 1)
     set_instrument_clear(2)
     sleep(delay)
     if not edit_mode: set_sections_occupied(1)
     sleep(delay)
     
-    if test_sensors: print("Track occupancy changes (on signal passed events) - Main route - simulated GPIO events")
-    else: print("Track occupancy changes (on signal passed events) - Main route - user-generated events")
     # Test MAIN route forward and back with signals at DANGER - train should still be passed but with warnings generated
-    if not edit_mode: print("Signals Passed at danger - 2 warnings should be generated:")
+    if not edit_mode: print("Signal Track occupancy changes - Signals Passed at danger - 2 warnings should be generated:")
     test_route(sig1=1, sig2=4, gpio1=4, gpio2=7, sec1=1, sec2=4, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     test_route(sig1=4, sig2=1, gpio1=7, gpio2=4, sec1=4, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     # Test MAIN route forward and back with signals CLEAR
@@ -793,16 +793,14 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     set_signals_on(4)
     sleep(delay)
     
-    if test_sensors: print("Track occupancy changes (on signal passed events) - LH1 route - simulated GPIO events")
-    else: print("Track occupancy changes (on signal passed events) - LH1 route - user-generated events")
+    # Test LH1 route forward and back with signals at DANGER - train should still be passed but with warnings generated
     set_fpls_off(1)
     sleep(delay)
     set_points_switched(1)
     sleep(delay)
     set_fpls_on(1)
     sleep(delay)
-    # Test LH1 route forward and back with signals at DANGER - train should still be passed but with warnings generated
-    if not edit_mode: print("Signals Passed at danger - 2 warnings should be generated:")
+    if not edit_mode: print("Signal Track occupancy changes - Signals Passed at danger - 2 warnings should be generated:")
     test_route(sig1=1, sig2=5, gpio1=4, gpio2=8, sec1=1, sec2=5, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     test_route(sig1=5, sig2=1, gpio1=8, gpio2=4, sec1=5, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     # Test LH1 route forward and back with signals CLEAR
@@ -817,16 +815,14 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     set_signals_on(5)
     sleep(delay)
 
-    if test_sensors: print("Track occupancy changes (on signal passed events) - LH2 route - simulated GPIO events")
-    else: print("Track occupancy changes (on signal passed events) - LH2 route - user-generated events")
+    # Test LH2 route forward and back with signals at DANGER - train should still be passed but with warnings generated
     set_fpls_off(2)
     sleep(delay)
     set_points_switched(2)
     sleep(delay)
     set_fpls_on(2)
     sleep(delay)
-    # Test LH2 route forward and back with signals at DANGER - train should still be passed but with warnings generated
-    if not edit_mode: print("Signals Passed at danger - 2 warnings should be generated:")
+    if not edit_mode: print("Signal Track occupancy changes - Signals Passed at danger - 2 warnings should be generated:")
     test_route(sig1=1, sig2=6, gpio1=4, gpio2=9, sec1=1, sec2=6, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     test_route(sig1=6, sig2=1, gpio1=9, gpio2=4, sec1=6, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     # Test LH2 route forward and back with signals CLEAR
@@ -841,8 +837,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     set_signals_on(6)
     sleep(delay)
     
-    if test_sensors: print("Track occupancy changes (on signal passed events) - RH1 route - simulated GPIO events")
-    else: print("Track occupancy changes (on signal passed events) - RH1 route - user-generated events")
+    # Test RH1 route forward and back with signals at DANGER - train should still be passed but with warnings generated
     set_fpls_off(1,3)
     sleep(delay)
     set_points_switched(3)
@@ -850,8 +845,7 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     set_fpls_on(1,3)
     sleep(delay)
-    # Test RH1 route forward and back with signals at DANGER - train should still be passed but with warnings generated
-    if not edit_mode: print("Signals Passed at danger - 2 warnings should be generated:")
+    if not edit_mode: print("Signal Track occupancy changes - Signals Passed at danger - 2 warnings should be generated:")
     test_route(sig1=1, sig2=3, gpio1=4, gpio2=6, sec1=1, sec2=3, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     test_route(sig1=3, sig2=1, gpio1=6, gpio2=4, sec1=3, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     # Test RH1 route forward and back with signals CLEAR
@@ -866,15 +860,13 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     set_signals_on(3)
     sleep(delay)
     
-    if test_sensors: print("Track occupancy changes (on signal passed events) - RH2 route - simulated GPIO events")
-    else: print("Track occupancy changes (on signal passed events) - RH2 route - user-generated events")
+    # Test RH2 route forward and back with signals at DANGER - train should still be passed but with warnings generated
     set_fpls_off(4)
     sleep(delay)
     set_points_switched(4)
     set_fpls_on(4)
     sleep(delay)
-    # Test RH2 route forward and back with signals at DANGER - train should still be passed but with warnings generated
-    if not edit_mode: print("Signals Passed at danger - 2 warnings should be generated:")
+    if not edit_mode: print("Signal Track occupancy changes - Signals Passed at danger - 2 warnings should be generated:")
     test_route(sig1=1, sig2=2, gpio1=4, gpio2=5, sec1=1, sec2=2, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     test_route(sig1=2, sig2=1, gpio1=5, gpio2=4, sec1=2, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     # Test RH2 route forward and back with signals CLEAR
@@ -887,7 +879,216 @@ def run_basic_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bo
     sleep(delay)
     test_route(sig1=2, sig2=1, gpio1=5, gpio2=4, sec1=2, sec2=1, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
     set_signals_on(2)
-    sleep(delay)        
+    sleep(delay)
+    
+    if not edit_mode: print("Signal Track occupancy changes - Edge case tests - 3 warnings should be generated:")
+    # Test Both sections occupied - and signal is CLEAR - Train should be passed (with warning)
+    set_subsidaries_off(1)
+    sleep(delay)
+    gpio_trigger_delay = 0.2
+    if not edit_mode:
+        set_sections_occupied(2)
+        sleep(delay)
+        assert_sections_occupied(1,2)
+    if test_sensors:
+        simulate_gpio_triggered(4)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_signals_passed(1)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_occupied(2)
+        assert_sections_clear(1)
+    # Test Both sections occupied - and signal is at DANGER - Negative Test
+    set_subsidaries_on(1)
+    sleep(delay)
+    if not edit_mode:
+        set_sections_occupied(1)
+        sleep(delay)
+        assert_sections_occupied(1,2)
+    if test_sensors:
+        simulate_gpio_triggered(4)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_signals_passed(1)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_occupied(1,2)
+    # Test Both sections clear - and signal is at DANGER - Negative Test
+    sleep(delay)
+    if not edit_mode:
+        set_sections_clear(1,2)
+        sleep(delay)
+    if test_sensors:
+        simulate_gpio_triggered(4)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_signals_passed(1)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_clear(1,2)
+    return()
+
+#-----------------------------------------------------------------------------------
+# These test the changes to track occupancy on Track Sensor passed events. This test
+# case has track sections both ahead of and behind the Track Section. Track occupancy
+# changes are operational only in RUN Mode (automation either on or off)
+#-----------------------------------------------------------------------------------
+
+def test_route_sensors(sen1, gpio1, sec1, sec2, test_sensors, delay, edit_mode):
+    # We need to introduce a delay after triggering of the remote GPIO sensors
+    # as these are configured with a timeout period of 0.1 seconds (this means that
+    # any additional triggers received within the 0.1 seconds will be ignored
+    gpio_trigger_delay = 0.2
+    # Test the route forward
+    if not edit_mode:
+        assert_sections_occupied(sec1)
+        assert_sections_clear(sec2)
+    if test_sensors:
+        simulate_gpio_triggered(gpio1)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(sen1)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_occupied(sec2)
+        assert_sections_clear(sec1)
+    return
+
+def run_track_sensor_occupancy_tests(delay:float, edit_mode:bool, test_sensors:bool=False):
+    reset_layout()
+    sleep(delay)
+    if test_sensors: print("Track Sensor occupancy changes - simulated GPIO events")
+    else: print("Track Sensoroccupancy changes - user-generated (button push) events")
+    if not edit_mode: set_sections_occupied(34)
+    sleep(delay)
+    
+    # Test MAIN route forward and back
+    test_route_sensors(sen1=1, gpio1=22,sec1=34, sec2=29, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    test_route_sensors(sen1=1, gpio1=22,sec1=29, sec2=34, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test Main => LH1
+    set_points_switched(10)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=34, sec2=30, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test LH1 <= LH1
+    set_points_switched(15)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=30, sec2=37, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test LH1 => LH2
+    set_points_switched(11)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=37, sec2=31, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test LH2 <= LH2
+    set_points_switched(16)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=31, sec2=33, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test LH2 => RH1
+    set_points_switched(12)
+    set_points_normal(10)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=33, sec2=32, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test RH1 <= RH1
+    set_points_switched(13)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=32, sec2=35, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test RH1 => RH2
+    set_points_switched(9)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=35, sec2=28, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test RH2 <=RH2
+    set_points_switched(14)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=28, sec2=36, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    
+    # Test the Track Sections both occupied (negative test coverage)
+    gpio_trigger_delay = 0.2
+    if not edit_mode:
+        print("Track Sensor occupancy changes - negative tests - 4 warnings should be generated:")
+        set_sections_occupied(28)
+        assert_sections_occupied(28,36)
+    if test_sensors:
+        simulate_gpio_triggered(22)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(1)
+        sleep(delay)
+    if not edit_mode: assert_sections_occupied(28,36)
+    # Test the Track Sections both clear (negative test coverage)
+    if not edit_mode:
+        set_sections_clear(28,36)
+        sleep(delay)
+    if test_sensors:
+        simulate_gpio_triggered(22)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(1)
+        sleep(delay)
+    if not edit_mode: assert_sections_clear(28,36)
+    # Test the case of route not locked - track occupancy will still change
+    if not edit_mode: set_sections_occupied(28)
+    set_fpls_off(17,18)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=28, sec2=36, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+    # Test the case of no route existing before the sensor (negative test coverage)
+    set_points_switched(18)
+    sleep(delay)
+    if test_sensors:
+        simulate_gpio_triggered(22)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(1)
+        sleep(delay)
+    # Test the case of no route existing after the sensor (negative test coverage)
+    set_points_normal(18)
+    set_points_switched(17)
+    sleep(delay)
+    if test_sensors:
+        simulate_gpio_triggered(22)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(1)
+        sleep(delay)
+    set_points_normal(17)
+    sleep(delay)
+    test_route_sensors(sen1=1, gpio1=22,sec1=36, sec2=28, test_sensors=test_sensors, delay=delay, edit_mode=edit_mode)
+
+    if not edit_mode: print("Track Sensor occupancy changes - Section Ahead or Section Behind Tests")
+    # Section ahead of Track Sensor only - Section should change to OCCUPIED
+    if test_sensors:
+        simulate_gpio_triggered(23)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(2)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_occupied(38)
+    # Section ahead of Track Sensor only - Section should change to CLEAR
+    if test_sensors:
+        simulate_gpio_triggered(23)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(2)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_clear(38)
+    # Section behind of Track Sensor only - Section should change to OCCUPIED
+    if test_sensors:
+        simulate_gpio_triggered(24)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(3)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_occupied(39)
+    # Section behind of Track Sensor only - Section should change to CLEAR
+    if test_sensors:
+        simulate_gpio_triggered(24)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_sensors_passed(3)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_clear(39)
     return()
 
 #-----------------------------------------------------------------------------------
@@ -1117,9 +1318,9 @@ def subtest_sections_ahead_behind_2(delay:float, edit_mode:bool, route_valid:boo
     s9 = get_object_id("signal",9)
     s10 = get_object_id("signal",10)
     s11 = get_object_id("signal",11)
-    # Test with semaphore distants
+    # Test with semaphore & Colour light distants - If the route is not valid the MAIN route will be assumed
     if test_sensors: print("Section ahead/behind tests - Colour Light Distant Signals - simulated GPIO events"+text)        
-    else: print("Section ahead/behind tests - Colour Light Distant Signals - user-generated events"+text)        
+    else: print("Section ahead/behind tests - Colour Light Distant Signals - user-generated events"+text)
     update_object_configuration(s9, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s10, {"itemtype":1, "itemsubtype":2} )
     update_object_configuration(s11, {"itemtype":1, "itemsubtype":2} )
@@ -1162,7 +1363,7 @@ def subtest_sections_ahead_behind_2(delay:float, edit_mode:bool, route_valid:boo
 # still be legitimately passed at CAUTION (and move to the track section ahead)
 #-----------------------------------------------------------------------------------
 
-def test_sections_ahead_and_behind(delay:float, edit_mode:bool, test_sensors:bool=False):
+def signals_sections_ahead_and_behind(delay:float, edit_mode:bool, test_sensors:bool=False):
     sleep(delay)
     reset_layout()
     # Signals 9,10,11 have a valid route
@@ -1179,6 +1380,7 @@ def test_sections_ahead_and_behind(delay:float, edit_mode:bool, test_sensors:boo
 
 #-----------------------------------------------------------------------------------
 # This function tests the correct behavior for shunt ahead signals (can be passed whilst ON)
+# No Signal Passed at Danger warnings should be generated
 #-----------------------------------------------------------------------------------
 
 def subtest_shunt_ahead_signal_routes_1(delay:float, edit_mode:bool, test_sensors:bool=False):
@@ -1408,13 +1610,16 @@ def override_on_distant_signal_ahead_tests(delay:float, edit_mode:bool, automati
     sleep(delay)
     # Main route
     assert_signals_DANGER(23)
+    assert_signals_CAUTION(21)
     sleep(delay)
     set_signals_off(23)
     assert_signals_PROCEED(23)
+    assert_signals_CAUTION(21)
     sleep(delay)
     set_signals_on(23)
     sleep(delay)
     assert_signals_DANGER(23)
+    assert_signals_CAUTION(21)
     # diverting route - secondary distant overridden by distant ahead
     # Override on distant aheads only active in RUN mode with automation enabled
     set_points_switched(8)
@@ -1440,10 +1645,12 @@ def override_on_distant_signal_ahead_tests(delay:float, edit_mode:bool, automati
 
 def run_layout_tests(delay:float, edit_mode:bool, automation_enabled:bool):
     run_interlocking_tests(delay, edit_mode=edit_mode, automation_enabled=automation_enabled)
-    run_basic_track_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=False)
-    run_basic_track_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=True)
-    test_sections_ahead_and_behind(delay, edit_mode=edit_mode, test_sensors=False)
-    test_sections_ahead_and_behind(delay, edit_mode=edit_mode, test_sensors=True)
+    run_signal_track_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=False)
+    run_signal_track_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=True)
+    run_track_sensor_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=False)
+    run_track_sensor_occupancy_tests(delay, edit_mode=edit_mode, test_sensors=True)
+    signals_sections_ahead_and_behind(delay, edit_mode=edit_mode, test_sensors=False)
+    signals_sections_ahead_and_behind(delay, edit_mode=edit_mode, test_sensors=True)
     shunt_ahead_signal_route_tests(delay, edit_mode=edit_mode, test_sensors=False)
     shunt_ahead_signal_route_tests(delay, edit_mode=edit_mode, test_sensors=True)
     override_on_home_signal_ahead_tests(delay, edit_mode=edit_mode, automation_enabled=automation_enabled)
@@ -1453,6 +1660,7 @@ def run_layout_tests(delay:float, edit_mode:bool, automation_enabled:bool):
 
 def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness(filename="./test_run_layout.sig")
+    # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
     test_object_edit_windows.test_all_object_edit_windows(delay)

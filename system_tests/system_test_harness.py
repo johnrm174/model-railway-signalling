@@ -191,7 +191,7 @@ def start_application(callback_function):
     main_menubar = editor.main_menubar(root)
     # Use the signals Lib function to find/store the root window reference
     # And then re-bind the close window event to the editor quit function
-    common.find_root_window(main_menubar.mainmenubar)
+    common.set_root_window(root)
     root.protocol("WM_DELETE_WINDOW", main_menubar.quit_schematic)
     # Start the test harness thread
     test_thread = threading.Thread (target=lambda:test_harness_thread(callback_function))
@@ -345,7 +345,7 @@ def trigger_signals_released(*sigids):
 
 def trigger_sensors_passed(*sensorids):
     for sensorid in sensorids:
-        if str(sensorids) not in track_sensors.track_sensors.keys():
+        if str(sensorid) not in track_sensors.track_sensors.keys():
             raise_test_warning ("trigger_sensors_passed - Track Sensor: "+str(sensorid)+" does not exist")
         else:
             run_function(lambda:track_sensors.track_sensor_triggered(sensorid))
