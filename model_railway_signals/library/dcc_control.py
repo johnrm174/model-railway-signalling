@@ -195,17 +195,17 @@ dcc_point_mappings:dict = {}
 publish_dcc_commands_to_mqtt_broker:bool = False
 
 # List of DCC Mappings - The key is the address, with each element a list of [item,item_id]
+# Note that we use the DCC Address as an INTEGER for the key - so we can sort on the key
 # Item - either "Signal" or "Point" to identify the type of item the address is mapped to
 # Item ID - the ID of the Signal or Point that the DCC address is mapped to
 dcc_address_mappings:dict = {}
 
 #----------------------------------------------------------------------------------------------------
-# API function to return a sorted list of all DCC Address mappings (to signals/points)
+# API function to return a dictionary of all DCC Address mappings (to signals/points)
 #----------------------------------------------------------------------------------------------------
 
 def get_dcc_address_mappings():
-    sorted_mappings = dict(sorted(dcc_address_mappings.items()))
-    return(sorted_mappings)
+    return(dcc_address_mappings)
 
 #----------------------------------------------------------------------------------------------------
 # API function to return an existing DCC address mapping if one exists (otherwise None)
@@ -215,10 +215,10 @@ def dcc_address_mapping(dcc_address:int):
     if not isinstance(dcc_address, int) or dcc_address < 0 or dcc_address > 2047:
         logging.error("DCC Control: dcc_address_mapping - Invalid DCC Address "+str(dcc_address))
         dcc_address_mapping = None
-    elif str(dcc_address) not in dcc_address_mappings.keys():
+    elif dcc_address not in dcc_address_mappings.keys():
         dcc_address_mapping = None
     else:
-        dcc_address_mapping = dcc_address_mappings[str(dcc_address)]
+        dcc_address_mapping = dcc_address_mappings[dcc_address]
     return(dcc_address_mapping)
         
 #----------------------------------------------------------------------------------------------------
@@ -311,10 +311,10 @@ def map_dcc_signal(sig_id:int,
                 str(signals_common.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
                 str(signals_common.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-            # Update the DCC mappings dictionary
+            # Update the DCC mappings dictionary (note the key is an INTEGER)
             for entry in addresses:
-                if entry[0] > 0 and str(entry[0]) not in dcc_address_mappings.keys():
-                    dcc_address_mappings[str(entry[0])] = ["Signal",sig_id]
+                if entry[0] > 0 and entry[0] not in dcc_address_mappings.keys():
+                    dcc_address_mappings[int(entry[0])] = ["Signal",sig_id]
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -394,10 +394,10 @@ def map_semaphore_signal(sig_id:int,
                 "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
                 "rh2_subsidary" : rh2_subsidary }            # Finally save the DCC mapping into the dictionary of mappings 
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-            # Update the DCC mappings dictionary
+            # Update the DCC mappings dictionary (note the key is an INTEGER)
             for entry in addresses:
-                if entry > 0 and str(entry) not in dcc_address_mappings.keys():
-                    dcc_address_mappings[str(entry)] = ["Signal",sig_id]
+                if entry > 0 and entry not in dcc_address_mappings.keys():
+                    dcc_address_mappings[int(entry)] = ["Signal",sig_id]
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -426,8 +426,8 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
             "address"  : address,
             "reversed" : state_reversed }
         dcc_point_mappings[str(point_id)] = new_dcc_mapping
-        # Update the DCC mappings dictionary
-        if address > 0: dcc_address_mappings[str(address)] = ["Point",point_id]
+        # Update the DCC mappings dictionary (note the key is an INTEGER)
+        if address > 0: dcc_address_mappings[int(address)] = ["Point",point_id]
     return()
 
 #----------------------------------------------------------------------------------------------------
@@ -625,9 +625,9 @@ def delete_point_mapping(point_id:int):
     else:
         # Retrieve the DCC mapping address for the Point
         dcc_address = dcc_point_mappings[str(point_id)]["address"]
-        # Remove the DCC address from the dcc_address_mappings dictionary
-        if str(dcc_address) in dcc_address_mappings.keys():
-            del dcc_address_mappings[str(dcc_address)]
+        # Remove the DCC address from the dcc_address_mappings dictionary (note the key is an INTEGER)
+        if dcc_address in dcc_address_mappings.keys():
+            del dcc_address_mappings[int(dcc_address)]
         # Now delete the point mapping from the dcc_point_mappings dictionary
         del dcc_point_mappings[str(point_id)]
     return()
@@ -669,9 +669,10 @@ def delete_signal_mapping(sig_id:int):
             for theatre_route_element in dcc_signal_mapping["THEATRE"]:
                 dcc_command_list.extend(theatre_route_element[1])
             # List is now complete - remove all DCC addresses from the dcc_address_mappings dictionary
+            # Note that the dictionary key is an INTEGER
             for dcc_command in dcc_command_list:
-                if str(dcc_command[0]) in dcc_address_mappings.keys():
-                 del dcc_address_mappings[str(dcc_command[0])]
+                if dcc_command[0] in dcc_address_mappings.keys():
+                 del dcc_address_mappings[int(dcc_command[0])]
         # Semaphors Signal mappings
         elif dcc_signal_mapping["mapping_type"] == mapping_type.SEMAPHORE:
             # Compile a list of all DCC addresses associated with the signal (signal arms)
@@ -690,9 +691,10 @@ def delete_signal_mapping(sig_id:int):
                 for dcc_command in theatre_route_element[1]:
                     dcc_address_list.extend([dcc_command[0]])
             # List is now complete - remove all DCC addresses from the dcc_address_mappings dictionary
+            # Note that the dictionary key is an INTEGER
             for dcc_address in dcc_address_list:
-                if str(dcc_address) in dcc_address_mappings.keys():
-                 del dcc_address_mappings[str(dcc_address)]
+                if dcc_address in dcc_address_mappings.keys():
+                 del dcc_address_mappings[int(dcc_address)]
         # Now delete the signal mapping from the dcc_signal_mappings dictionary
         del dcc_signal_mappings[str(sig_id)]
     return()

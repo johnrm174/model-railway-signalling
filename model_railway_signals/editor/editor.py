@@ -42,6 +42,7 @@
 #    menubar_windows.display_about(parent_window) - opens the config window
 #    menubar_windows.edit_layout_info(parent_window) - opens the config window
 #    utilities.dcc_programming(root, dcc_power_off_callback, dcc_power_on_callback)
+#    utilities.dcc_mappings(root)
 #
 # Makes the following external API calls to library modules:
 #    library_common.find_root_window (widget) - To set the root window
@@ -144,6 +145,8 @@ class main_menubar:
         self.utilities_menu.add_command(label =" DCC Programming...",
                 command=lambda:utilities.dcc_programming(self.root, self.dcc_programming_enabled,
                                                          self.dcc_power_off, self.dcc_power_on))
+        self.utilities_menu.add_command(label =" DCC Mappings...",
+                command=lambda:utilities.dcc_mappings(self.root))
         self.mainmenubar.add_cascade(label = "Utilities", menu=self.utilities_menu)
         # Create the various menubar items for the Settings Dropdown
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)

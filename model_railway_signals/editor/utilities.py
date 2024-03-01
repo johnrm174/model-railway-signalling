@@ -3,6 +3,7 @@
 #
 # Classes (pop up windows) called from the main editor module menubar selections
 #    dcc_programming(root, dcc_programming_enabled_function, dcc_power_on_function, dcc_power_off_function)
+#    dcc_mappings(root)
 #
 # Uses the following library functions:
 #    pi_sprog_interface.service_mode_read_cv(cv_to_read)
@@ -10,10 +11,12 @@
 #    pi_sprog_interface.send_accessory_short_event(address, state)
 #    pi_sprog_interface.request_dcc_power_off()
 #    pi_sprog_interface.request_dcc_power_on()
+#    dcc_control.get_dcc_address_mappings()
 #
 # Uses the following common editor UI elements:
 #    common.entry_box
 #    common.integer_entry_box
+#    common.scrollable_text_frame
 #    common.CreateToolTip
 #    common.dcc_entry_box
 #------------------------------------------------------------------------------------
@@ -23,6 +26,7 @@ import json
 import os
 
 from ..library import pi_sprog_interface
+from ..library import dcc_control
 from . import common
 
 #------------------------------------------------------------------------------------
@@ -378,5 +382,80 @@ class dcc_programming():
         global dcc_programming_window
         dcc_programming_window = None
         self.window.destroy()
+        
+#------------------------------------------------------------------------------------
+# Class for the "DCC Mappings" window 
+# Note that if a window is already open then we just raise it and exit
+#------------------------------------------------------------------------------------
+
+dcc_mappings_window = None
+
+class dcc_mappings():
+    def __init__(self, root_window):
+        global dcc_mappings_window
+        # If there is already a window open then we just make it jump to the top and exit
+        if dcc_mappings_window is not None:
+            dcc_mappings_window.lift()
+            dcc_mappings_window.state('normal')
+            dcc_mappings_window.focus_force()
+        else:
+            # Create the top level window 
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("DCC Mappings")
+            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.resizable(False, False)
+            dcc_mappings_window = self.window
+            # Create the ok/close and refresh buttons - pack first so they remain visible on re-sizing
+            self.frame1 = Tk.Frame(self.window)
+            self.frame1.pack(fill='x', expand=True, side=Tk.BOTTOM)
+            # Create a subframe to center the buttons in
+            self.subframe = Tk.Frame(self.frame1)
+            self.subframe.pack()
+            self.B1 = Tk.Button (self.subframe, text = "Ok / Close",command=self.ok)
+            self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B1, "Close window")
+            self.B2 = Tk.Button (self.subframe, text = "Refresh",command=self.refresh_display)
+            self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.TT1 = common.CreateToolTip(self.B2, "Reload the current DCC address mappings")
+            # Create an overall frame to pack everything else in
+            self.mappings_frame = None
+            self.refresh_display()
+        
+    def ok(self):
+        global dcc_mappings_window
+        dcc_mappings_window = None
+        self.window.destroy()
+    
+    def refresh_display(self):
+        # Create a frame to hold the mappings (destroy the old one first if needed)
+        if self.mappings_frame is not None:
+            self.mappings_frame.destroy()
+        self.mappings_frame = Tk.Frame(self.window)
+        self.mappings_frame.pack(fill='both', expand=True)
+        #create a subframe 
+        # Retrieve the sorted dictionary of DCC address mappings
+        dcc_address_mappings = dcc_control.get_dcc_address_mappings()
+        # If there are no mappings then just display a warning
+        if len(dcc_address_mappings) == 0:
+            label = Tk.Label(self.mappings_frame, text="No DCC address mappings defined")
+            label.pack(padx=20, pady=20)
+        else:
+            # Build the table of DCC mappings
+            row_index = 0
+            for dcc_address in dict(sorted(dcc_address_mappings.items())):
+                if row_index == 0:
+                    column_frame = Tk.LabelFrame(self.mappings_frame, text="DCC addresses")
+                    column_frame.pack(side=Tk.LEFT, pady=2, padx=2, fill='both', expand=True, anchor='n')
+                # Create a subframe for the row (pack in the column frame)
+                row_frame = Tk.Frame(column_frame)
+                row_frame.pack(fill='x')
+                # Create the labels with the DCC mapping text (pack in the row subframe)
+                mapping_text = u"\u2192"+" "+dcc_address_mappings[dcc_address][0]+" "+str(dcc_address_mappings[dcc_address][1])
+                label1 = Tk.Label(row_frame, width=5, text=dcc_address, anchor="e")
+                label1.pack(side=Tk.LEFT)
+                label2 = Tk.Label(row_frame, width=10, text=mapping_text, anchor="w")
+                label2.pack(side=Tk.LEFT)
+                row_index = row_index + 1
+                if row_index >= 20: row_index = 0
 
 #############################################################################################
