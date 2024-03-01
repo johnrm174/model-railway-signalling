@@ -1,61 +1,133 @@
 #----------------------------------------------------------------------------------------------------
-# These functions provide the means to map the signals and points on the layout to the series of DCC 
-# commands needed to control them.
+# This module enables DCC mappings to be created for the Signal and Point library objects, which
+# are then processed on signal/route changes to send out the required DCC commands for the layout
+#----------------------------------------------------------------------------------------------------
 # 
-# For the main signal aspects, either "Truth Table" or "Event Driven" mappings can be defined
-# The "Event Driven" mapping uses a single dcc command (address/state) to change the signal to 
-# the required aspect - as used by the TrainTech DCC signals. The "Truth Table" mapping provides
-# maximum flexibility for commanding DCC Signals as each "led" can either be controlled individually 
-# (i.e. Each LED of the signal is controlled via its own individual address) or via a "Truth Table" 
-# (where the displayed aspect will depend on the binary "code" written to 2 or more DCC addresses)
-# This has been successfully tested with the Harman Signallist SC1 DCC Decoder in various modes
-# 
-# "Truth Table" or "Event Driven" mappings can alos be defined for the Route indications supported by
-# the signal (feathers or theatre). If the signal has a subsidary associated with it, this is always
-# mapped to a single DCC address.
+# For Colour Light signals, either "Event Driven" or "Command Sequence" mappings can be defined.
+# An "Event Driven" mapping would send out a single DCC command (address/state) to change the signal
+# to the required aspect (as used by the TrainTech DCC signals). A "Command Sequence" mapping would
+# send out a sequence of DCC commands (address/state), which the signal would then map to the required
+# aspect to display (as used by signal decoders such as the Signalist SC1). Note that if the signal
+# has a subsidary aspect then the subsidary aspect is mapped to its own unique DCC address.
+#
+# Semaphore signal mappings are more straightforward as each semaphore arm on the signal is mapped
+# to its own unique DCC address (to switch the arm either ON or OFF)
+#
+# The feather route indications (Colour Light Signals only) or Theatre Route indications (supported by
+# Semaphore or colour light signals also support "Event Driven" or "Command Sequence" mappings.
+#
+# Points mappings consist of a single DCC address (either 'Switched' or 'Normal') although this logic
+# can be reversed at mapping creation time if required.
 # 
 # Not all signals/points that exist on the layout need to have a DCC Mapping configured - If no DCC mapping 
 # has been defined, then no DCC commands will be sent. This provides flexibility for including signals on the 
-# schematic which are "off scene" or for progressively "working up" the signalling scheme for a layout.
+# schematic which are "off-scene" or for progressively "working up" the signalling scheme for a layout.
+# 
 #----------------------------------------------------------------------------------------------------
+#
+# External API - the classes and functions (used by the Schematic Editor):
+#
+#   get_dcc_address_mappings() - returns a sorted dictionary of DCC addresses and details of their mappings
+#      Keys are DCC addresses, Each element comprises [item, item_id] - item is either 'Signal' or 'Point'
+#
+#   dcc_address_mapping(dcc_address:int) - Reteturns an existing DCC address mapping if one exists (otherwise None)
+#      If not None, the returned value is [item, item_id] - item is either 'Signal' or 'Point'
+#
+#   map_dcc_signal - Generate DCC mappings for a semaphore signal
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to create a DCC mapping for
+#      Optional Parameters:
+#         auto_route_inhibit:bool (default = False)   - does the signal inhibit route indications at DANGER?
+#         proceed[[add:int,state:bool],]              - List of DCC Commands for "Green"
+#         danger [[add:int,state:bool],]              - List of DCC Commands for "Red"
+#         caution[[add:int,state:bool],]              - List of DCC Commands for "Yellow"
+#         prelim_caution[[add:int,state:bool],]       - List of DCC Commands for "Double Yellow"
+#         flash_caution[[add:int,state:bool],]        - List of DCC Commands for "Flashing Yellow"
+#         flash_prelim_caution[[add:int,state:bool],] - List of DCC Commands for "Flashing Double Yellow"
+#         LH1[[add:int,state:bool],]                  - List of DCC Commands for the LH1 Feather
+#         LH2[[add:int,state:bool],]                  - List of DCC Commands for the LH2 Feather
+#         RH1[[add:int,state:bool],]                  - List of DCC Commands for the RH1 Feather
+#         RH2[[add:int,state:bool],]                  - List of DCC Commands for the RH2 Feather
+#         MAIN[[add:int,state:bool],]                 - List of DCC Commands for the MAIN Feather
+#         NONE[[add:int,state:bool],]                 - List of DCC Commands to inhibit all Feathers
+#         THEATRE[["char",[add:int,state:bool],],]    - List of Theatre states and their DCC command sequences
+#         subsidary:int                               - DCC address for the "subsidary" signal
 # 
-# Public types and functions:
+#   map_semaphore_signal - Generate DCC mappings for a semaphore signal
+#      Mandatory Parameters:
+#         sig_id:int - The ID for the signal to create a DCC mapping for
+#         main_signal:int     - DCC address for the main signal arm
+#      Optional Parameters:
+#         main_subsidary:int                       - DCC address for main subsidary arm
+#         lh1_signal:int                           - DCC address for LH1 signal arm
+#         lh1_subsidary:int                        - DCC address for LH1 subsidary arm
+#         lh2_signal:int                           - DCC address for LH2 signal arm 
+#         lh2_subsidary:int                        - DCC address for LH2 subsidary arm
+#         rh1_signal:int                           - DCC address for RH1 signal arm
+#         rh1_subsidary:int                        - DCC address for RH1 subsidary arm
+#         rh2_signal:int                           - DCC address for RH2 signal arm
+#         rh2_subsidary:int                        - DCC address for RH2 subsidary arm
+#         THEATRE[["char",[add:int,state:bool],],] - List of Theatre states and their DCC command sequences
+#
+#   map_dcc_point - Generate DCC mappings for a point
+#      Mandatory Parameters:
+#         point_id:int - The ID for the point to create a DCC mapping for
+#         address:int - the single DCC address to use for the point
+#      Optional Parameters:
+#         state_reversed:bool - Set to True to reverse the DCC logic (default = false)
+#
+#   delete_point_mapping(point_id:int) - Delete a DCC mapping (called when the Point is deleted)
+#
+#   delete_signal_mapping(sig_id:int) - Delete a DCC mapping (called when the Signal is deleted)
+#
+# The following API functions are for configuring the pub/sub of DCC command feeds. The functions are called
+# by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# the existing pub/sub configuration, followed by 'set_node_to_publish_dcc_commands' (either True or False)
+# and 'subscribe_to_dcc_command_feed' for each REMOTE DCC Node (DCC Command feed subscribed).
+#
+#   reset_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
+#
+#   set_node_to_publish_dcc_commands(publish_dcc_commands:bool) - Enable publishing of DCC command feed
+#           All DCC commands wil lthen be published to the MQTT broker for consumption by other nodes
 # 
-# map_dcc_signal - Map a signal to one or more DCC Addresses
-#    Mandatory Parameters:
-#       sig_id:int - The ID for the signal to create a DCC mapping for
-#    Optional Parameters:
-#       auto_route_inhibit:bool - If signal inhibits route indication at DANGER (default=False)
-#       proceed[[add:int,state:bool],] -  DCC addresses/states (default = no mapping)
-#       danger [[add:int,state:bool],] - DCC addresses/states (default = No mapping)
-#       caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
-#       prelim_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
-#       flash_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
-#       flash_prelim_caution[[add:int,state:bool],] - DCC addresses/states (default = No mapping)
-#       LH1[[add:int,state:bool],] - DCC addresses/states for "LH45" (default = No Mapping)
-#       LH2[[add:int,state:bool],] - DCC addresses/states for "LH90" (default = No Mapping)
-#       RH1[[add:int,state:bool],] - DCC addresses/states for "RH45" (default = No Mapping)
-#       RH2[[add:int,state:bool],] - DCC addresses/states for "RH90" (default = No Mapping)
-#       MAIN[[add:int,state:bool],] - DCC addresses/states for "MAIN" (default = No Mapping)
-#       NONE[[add:int,state:bool],] - DCC addresses/states to inhibit the route indication when 
-#               the signal is displaying DANGER - unless the DCC signal automatically inhibits
-#               route indications (see auto_route_inhibit flag above) - Default = None
-#       THEATRE[["char",[add:int,state:bool],],] - list of theatre states (default = No Mapping)
-#               Each entry comprises the "char" and the associated list of DCC addresses/states
-#               that need to be sent to get the theatre indicator to display that character.
-#               "#" is a special character - which means inhibit all indications (when signal 
-#               is at danger). You should ALWAYS provide mappings for '#' if you are using a 
-#               theatre indicator unless the signal automatically inhibits route indications.
-#       subsidary:int - Single DCC address for the "subsidary" signal (default = No Mapping)
+#   subscribe_to_dcc_command_feed(*nodes:str) - Subcribes to DCC command feeds from other nodes on the network.
+#           All received DCC commands will then be automatically forwarded to the local Pi-Sprog interface.
+#
+# External API - classes and functions (used by the other library modules):
+#
+#   update_dcc_point(point_id:int,state:bool) - Called on state change of a point
+#
+#   update_dcc_signal_aspects(sig_id: int) - called on state change of a Colour Light Signal
+#
+#   update_dcc_signal_element(sig_id:int,state:bool,element:str)- called on update of a Semaphore Signal
+#       (also called for Colour Light signals to change the 'main_subsidary' element when this changes)
+#
+#   update_dcc_signal_route(sig_id:int,route:signals_common.route_type,signal_change:bool=False,sig_at_danger:bool=False)
+#
+#   update_dcc_signal_theatre(sig_id:int,character_to_display:str,signal_change:bool=False,sig_at_danger:bool=False):
+#
+#   handle_mqtt_dcc_accessory_short_event(message) - Called on reciept of a 'dcc_accessory_short_events' message
+#
+#----------------------------------------------------------------------------------------------------
+# DCC Mapping Examples
+#
+# An "Event Driven" example - a 4 aspect signal, where 2 addresses are used (the base address
+# to select the Red or Green aspect and the base+1 address to set the Yellow or Double Yellow
+# Aspect). A single DCC command is then used to change the signal to the required state
+#
+#            map_dcc_signal(sig_id = 2,
+#                 danger = [[1,False]],
+#                 proceed = [[1,True]],
+#                 caution = [[2,True]],
+#                 prelim_caution = [[2,False]])
+#
+# An example mapping for a Signalist SC1 decoder with a base address of 1 is included below. This assumes
+# the decoder is configured in "8 individual output" Mode (CV38=8). In this example we are using outputs
+# A,B,C,D to drive our signal with E & F each driving a route feather. The Signallist SC1 uses 8 consecutive
+# addresses in total (which equate to DCC addresses 1 to 8 for this example). The DCC addresses for each LED
+# are therefore : RED = 1, Green = 2, YELLOW1 = 3, YELLOW2 = 4, Feather1 = 5, Feather2 = 6.
 # 
-#     An example mapping for a  Signalist SC1 decoder with a base address of 1 (CV1=5) is included
-#     below. This assumes the decoder is configured in "8 individual output" Mode (CV38=8). In this
-#     example we are using outputs A,B,C,D to drive our signal with E & F each driving a feather 
-#     indication. The Signallist SC1 uses 8 consecutive addresses in total (which equate to DCC 
-#     addresses 1 to 8 for this example). The DCC addresses for each LED are: RED = 1, Green = 2, 
-#     YELLOW1 = 3, YELLOW2 = 4, Feather1 = 5, Feather2 = 6.
-# 
-#            map_dcc_signal (sig_id = 2,
+#            map_dcc_signal(sig_id = 2,
 #                 danger = [[1,True],[2,False],[3,False],[4,False]],
 #                 proceed = [[1,False],[2,True],[3,False],[4,False]],
 #                 caution = [[1,False],[2,False],[3,True],[4,False]],
@@ -64,13 +136,11 @@
 #                 MAIN = [[6,True],[5,False]], 
 #                 NONE = [[5,False],[6,False]] )
 # 
-#      A second example DCC mapping, but this time with a Feather Route Indication, is shown below. 
-#      In this case, the main signal aspects are configured identically to the first example, the
-#      only difference being the THEATRE mapping - where a display of "1" is enabled by DCC Address
-#      5 and "2" by DCC Address 6. Note the special "#" character mapping - which defines the DCC 
-#      commands that need to be sent to inhibit the theatre display.
+#   A another example DCC mapping, but this time with a Theatre Route Indication, is shown below. The main signal
+#   aspects are configured in the same way to the example above, the only difference being the THEATRE mapping,
+#   where a display of "A" is enabled by DCC Address 5 and "B" by DCC Address 6.
 # 
-#             map_dcc_signal (sig_id = 2,
+#             map_dcc_signal(sig_id = 2,
 #                 danger = [[1,True],[2,False],[3,False],[4,False]],
 #                 proceed = [[1,False],[2,True],[3,False],[4,False]],
 #                 caution = [[1,False],[2,False],[3,True],[4,False]],
@@ -78,67 +148,22 @@
 #                 THEATRE = [ ["#",[[5,False],[6,False]]],
 #                             ["1",[[6,False],[5,True]]],
 #                             ["2",[[5,False],[6,True]]]  ] )
-# 
-# map_traintech_signal - Generate the mappings for a TrainTech signal
-#    Mandatory Parameters:
-#       sig_id:int - The ID for the signal to create a DCC mapping for
-#       base_address:int - Base address of signal (the signal will take 4 consecutive addresses)
-#    Optional Parameters:
-#       route_address:int - Address for the route indicator - Default = 0 (no indicator)
-#       theatre_route:str - Char to be associated with the Theartre - Default = "NONE" (no Text)
-#       feather_route:route_type - Route to be associated with feather - Default = NONE (no route)
-# 
-# map_semaphore_signal - Generate mappings for a semaphore signal (DCC address mapped to each arm)
-#    Mandatory Parameters:
-#       sig_id:int - The ID for the signal to create a DCC mapping for
-#       main_signal:int     - DCC address for the main signal arm (default = No Mapping)
-#    Optional Parameters:
-#       main_subsidary:int  - DCC address for main subsidary arm (default = No Mapping)
-#       lh1_signal:int      - DCC address for LH1 signal arm (default = No Mapping)
-#       lh1_subsidary:int   - DCC address for LH1 subsidary arm (default = No Mapping)
-#       lh2_signal:int      - DCC address for LH2 signal arm (default = No Mapping)
-#       lh2_subsidary:int   - DCC address for LH2 subsidary arm (default = No Mapping)
-#       rh1_signal:int      - DCC address for RH1 signal arm  (default = No Mapping)
-#       rh1_subsidary:int   - DCC address for RH1 subsidary arm (default = No Mapping)
-#       rh2_signal:int      - DCC address for RH2 signal arm  (default = No Mapping)
-#       rh2_subsidary:int   - DCC address for RH2 subsidary arm (default = No Mapping)
-#       THEATRE[["char",[add:int,state:bool],],] - list of theatre states (default = No Mapping)
-#               Each entry comprises the "char" and the associated list of DCC addresses/states
-#               that need to be sent to get the theatre indicator to display that character.
-#               "#" is a special character - which means inhibit all indications (when signal 
-#               is at danger). You should ALWAYS provide mappings for '#' if you are using a 
-#               theatre indicator unless the signal automatically inhibits route indications.
-# 
-#      Semaphore signal DCC mappings assume that each main/subsidary signal arm is mapped to a 
-#      seperate DCC address. In this example, we are mapping a signal with MAIN and LH signal 
-#      arms and a subsidary arm for the MAIN route. Note that if the semaphore signal had a
-#      theatre type route indication, then this would be mapped in exactly the same was as for
-#      the Colour Light Signal example (above).
-# 
-#            map_semaphore_signal (sig_id = 2, 
-#                                  main_signal = 1 , 
-#                                  lh1_signal = 2 , 
-#                                  main_subsidary = 3)
-# 
-# map_dcc_point
-#    Mandatory Parameters:
-#       point_id:int - The ID for the point to create a DCC mapping for
-#       address:int - the single DCC address to use for the point
-#    Optional Parameters:
-#       state_reversed:bool - Set to True to reverse the DCC logic (default = false)
 #
-#----------------------------------------------------------------------------------------------------
+#   For the Theatre Route indicator, Each entry comprises the character to display and the list of DCC Commands
+#   [address,state] needed to get the theatre indicator to display the character. Note that "#" is a special
+#   character - which means inhibit all route indications. You should ALWAYS provide mappings for '#' unless
+#   the signal automatically inhibits route indications when at DANGER (see 'auto_route_inhibit' flag above).
 #
-# The following functions are associated with the MQTT networking Feature:
+#   Similarly, if you are using route feathers, you should ALWAYS provide mappings for 'NONE' unless
+#   the signal automatically inhibits route indications when at DANGER.
 #
-# set_node_to_publish_dcc_commands - Enables publishing of DCC commands to other network nodes
-#   Optional Parameters:
-#       publish_dcc_commands:bool - 'True' to Publish / 'False' to stop publishing (default=False)
+#   Semaphore signal DCC mappings assume that each main/subsidary signal arm is mapped to its own DCC address.
+#   In this example, we are mapping a signal with MAIN and LH signal arms and a subsidary arm for the MAIN route.
 # 
-# subscribe_to_dcc_command_feed - Subcribes to DCC command feed from another node on the network.
-#           All received DCC commands are automatically forwarded to the local Pi-Sprog interface.
-#   Mandatory Parameters:
-#       *nodes:str - The name of the node publishing the feed (multiple nodes can be specified)
+#            map_semaphore_signal(sig_id = 2, 
+#                              main_signal = 1 , 
+#                              lh1_signal = 2 , 
+#                              main_subsidary = 3)
 #
 #----------------------------------------------------------------------------------------------------
 
@@ -149,106 +174,123 @@ from . import mqtt_interface
 import enum
 import logging
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Global definitions
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 
 # Define the internal Type for the DCC Signal mappings
 class mapping_type(enum.Enum):
-    SEMAPHORE = 1   # One to one mapping of DCC Addresses to each signal element 
+    SEMAPHORE = 1      # One to one mapping of single DCC Addresses to each signal element 
     COLOUR_LIGHT = 2   # Each aspect is mapped to a sequence of one or more DCC Addresses/states
 
-# Define empty dictionaries for the mappings and dcc addresses
+# The DCC commands for Signals and Points are held in global dictionaries where the dictionary
+# 'key' is the ID of the signal or point. Each entry is another dictionary, with each element
+# holding the DCC commands (or sequences) needed to put the signal/point into the desired state.
+# Note that the mappings are completely different for Colour Light or Semaphore signals, so the
+# common 'mapping_type' value is used by the software to differentiate between the two types
 dcc_signal_mappings:dict = {}
 dcc_point_mappings:dict = {}
 
-# Define the Flag for whether DCC Commands are published to the MQTT Broker or not
+# Define the Flag to control whether DCC Commands are published to the MQTT Broker
 publish_dcc_commands_to_mqtt_broker:bool = False
 
-#-----------------------------------------------------------------------------------------
-# Internal function to test if a mapping exists for a signal
-#-----------------------------------------------------------------------------------------
+# List of DCC Mappings - The key is the address, with each element a list of [item,item_id]
+# Item - either "Signal" or "Point" to identify the type of item the address is mapped to
+# Item ID - the ID of the Signal or Point that the DCC address is mapped to
+dcc_address_mappings:dict = {}
 
-def sig_mapped(sig_id):
-    return (str(sig_id) in dcc_signal_mappings.keys() )
+#----------------------------------------------------------------------------------------------------
+# API function to return a sorted list of all DCC Address mappings (to signals/points)
+#----------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------
-# Internal function to test if a mapping exists for a point
-#-----------------------------------------------------------------------------------------
+def get_dcc_address_mappings():
+    sorted_mappings = dict(sorted(dcc_address_mappings.items()))
+    return(sorted_mappings)
 
-def point_mapped(point_id):
-    return (str(point_id) in dcc_point_mappings.keys() )
+#----------------------------------------------------------------------------------------------------
+# API function to return an existing DCC address mapping if one exists (otherwise None)
+#----------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------
-# Function to "map" a particular signal object to a series of DCC addresses/commands
-#
-#    Truth Table example - a 4 aspect signal, where each LED is mapped to a single DCC
-#    Address (Red=5, Green=6, Yel1 =7, Yel2 =8) would be configured as below.
-#    This example also includes an example configuration for a theatre route indication
-#    which we will use to display "1" or "2" for divergent routes and an empty string
-#    (therefore blank) for the main route. Note that we also need to include a mapping
-#    for the "special" character "#" which represents the mappings to apply when the
-#    theatre indicator is inhibited (when the signal is set to RED)
-#
-#        map_dcc_signal (sig_id = 10,
-#                        danger = [[5,True],[6,False],[7,False],[8,False]],
-#                        proceed = [[5,False],[6,True],[7,False],[8,False]],
-#                        caution = [[5,False],[6,False],[7,True],[8,False]],
-#                        prelim_caution = [[5,False],[6,False],[7,True],[8,True]],
-#                        THEATRE = [ ["#", [[9,False],[10,False]]],
-#                                    ["",[[9,False],[10,False]]],
-#                                    ["1",[[9,False],[10,True]]],
-#                                    ["2",[[9,True],[10,False]]] ]   )
-#
-#    Event Driven example - a 4 aspect signal, where 2 addresses are used (the base address
-#    to select the Red or Green aspect and the base+1 address to set the Yellow or Double Yellow
-#    Aspect. A single DCC command is then used to change the signal to the required state
-#
-#        map_dcc_signal (sig_id = 2,
-#                        danger = [[1,False]],
-#                        proceed = [[1,True]],
-#                        caution = [[2,True]],
-#                        prelim_caution = [[2,False]])
-#-----------------------------------------------------------------------------------------
-
-def map_dcc_signal (sig_id:int,
-                    auto_route_inhibit:bool = False,
-                    danger = [[0,False],],
-                    proceed = [[0,False],],
-                    caution = [[0,False],],
-                    prelim_caution = [[0,False],],
-                    flash_caution = [[0,False],],
-                    flash_prelim_caution = [[0,False],],
-                    LH1 = [[0,False],],
-                    LH2 = [[0,False],],
-                    RH1 = [[0,False],],
-                    RH2 = [[0,False],],
-                    MAIN = [[0,False],],
-                    NONE = [[0,False],],
-                    THEATRE = [["#", [[0,False],]],],
-                    subsidary:int=0):
-    # Do some basic validation on the parameters we have been given
-    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a colour light signal")
-    if sig_mapped(sig_id):
-        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
-    elif sig_id < 1:
-        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
+def dcc_address_mapping(dcc_address:int):
+    if not isinstance(dcc_address, int) or dcc_address < 0 or dcc_address > 2047:
+        logging.error("DCC Control: dcc_address_mapping - Invalid DCC Address "+str(dcc_address))
+        dcc_address_mapping = None
+    elif str(dcc_address) not in dcc_address_mappings.keys():
+        dcc_address_mapping = None
     else:
-        # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
-        # within the valid DCC accessory address range od 1 and 2047
+        dcc_address_mapping = dcc_address_mappings[str(dcc_address)]
+    return(dcc_address_mapping)
+        
+#----------------------------------------------------------------------------------------------------
+# Internal function to test if a DCC mapping already exists for a signal
+#----------------------------------------------------------------------------------------------------
+
+def sig_mapped(sig_id:int):
+    return (str(sig_id) in dcc_signal_mappings.keys())
+
+#----------------------------------------------------------------------------------------------------
+# Internal function to test if a DCC mapping already exists for a point
+#----------------------------------------------------------------------------------------------------
+
+def point_mapped(point_id:int):
+    return (str(point_id) in dcc_point_mappings.keys())
+
+#----------------------------------------------------------------------------------------------------
+# Function to "map" a Colour Light signal object to a series of DCC addresses/command sequences
+#----------------------------------------------------------------------------------------------------
+
+def map_dcc_signal(sig_id:int,
+                auto_route_inhibit:bool = False,
+                danger = [[0,False],],
+                proceed = [[0,False],],
+                caution = [[0,False],],
+                prelim_caution = [[0,False],],
+                flash_caution = [[0,False],],
+                flash_prelim_caution = [[0,False],],
+                LH1 = [[0,False],],
+                LH2 = [[0,False],],
+                RH1 = [[0,False],],
+                RH2 = [[0,False],],
+                MAIN = [[0,False],],
+                NONE = [[0,False],],
+                THEATRE = [["#", [[0,False],]],],
+                subsidary:int=0):
+    global dcc_signal_mappings
+    global dcc_address_mappings
+    # Do some basic validation on the parameters we have been given
+    if not isinstance(sig_id,int) or sig_id < 1:
+        logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Signal ID must be a positive integer")
+    if sig_mapped(sig_id):
+        logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - already has a DCC mapping")
+    else:
+        # Create a list of DCC addresses [address,state] to validate
         addresses = ( danger + proceed + caution + prelim_caution + flash_caution +
                       flash_prelim_caution + LH1 + LH2 + RH1 + RH2 + MAIN + NONE )
+        # Add the Theatre route indicator addresses - these are the form [char,[[address,state],]]
         for theatre_state in THEATRE:
             addresses = addresses + theatre_state[1]
+        # Add the subsidary signal DCC address into the list (this is a single DCC address)
+        addresses = addresses + [[subsidary,True]]
+        # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
+        # within the valid DCC accessory address range of 1 and 2047.
         addresses_valid = True
         for entry in addresses:
-            if entry[0] < 0 or entry[0] > 2047:
-                logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry[0])+" - must be between 1 and 2047")
+            if not isinstance(entry,list) or not len(entry) == 2:
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC command")
                 addresses_valid = False
-        if (subsidary < 0 or subsidary > 2047):
-            logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for subsidary "+str(subsidary)+" - must be between 1 and 2047")
-            addresses_valid = False
+            elif not isinstance(entry[1],bool):
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state")
+                addresses_valid = False
+            elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
+                addresses_valid = False
+            elif dcc_address_mapping(entry[0]) is not None:
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry[0])+
+                    " is already assigned to "+dcc_address_mapping(entry[0])[0]+" "+str(dcc_address_mapping(entry[0])[1]))
+                addresses_valid = False
+        # We now know if all the DCC addresses we have been given are valid
         if addresses_valid:
+            logging.debug ("DCC Control - Creating DCC Address mapping for Colour Light Signal "+str(sig_id))
             # Create the DCC Mapping entry for the signal
             new_dcc_mapping = {
                 "mapping_type" : mapping_type.COLOUR_LIGHT,                                        # Common to Colour_Light & Semaphore Mappings
@@ -269,113 +311,79 @@ def map_dcc_signal (sig_id:int,
                 str(signals_common.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
                 str(signals_common.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-    return ()
+            # Update the DCC mappings dictionary
+            for entry in addresses:
+                if entry[0] > 0 and str(entry[0]) not in dcc_address_mappings.keys():
+                    dcc_address_mappings[str(entry[0])] = ["Signal",sig_id]
+    return()
 
-#-----------------------------------------------------------------------------------------
-# Function to "map" a TrainTech" Event-driven signal to the appropriate DCC addresses/commands
-# This function provided to simplify the calling code - i.e. this does all the hard work for you
-#-----------------------------------------------------------------------------------------
-
-def map_traintech_signal (sig_id:int,
-                          base_address:int,
-                          route_address:int = 0,
-                          theatre_route = "NONE",
-                          feather_route = signals_common.route_type.NONE):
-    # Do some basic validation on the parameters we have been given
-    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Train Tech Signal")
-    if sig_mapped(sig_id):
-        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
-    elif sig_id < 1:
-        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
-    elif base_address < 0 or base_address > 2047:
-        logging.error ("Signal "+str(sig_id)+": Invalid DCC Base Address for signal "+str(base_address)+" - must be between 1 and 2047")
-    elif route_address < 0 or route_address > 2047:
-        logging.error ("Signal "+str(sig_id)+": Invalid DCC Address for route indication "+str(route_address)+" - must be between 1 and 2047")
-    elif theatre_route != "NONE" and feather_route != signals_common.route_type.NONE:
-        logging.error ("Signal "+str(sig_id)+": Signal can only support Feather or Theatre - not both")
-    else:
-        # We only need to map the address for the feather OR the theatre (can't have both)
-        theatre_address = route_address
-        if feather_route is signals_common.route_type.NONE: route_address = 0
-        else: theatre_address = 0
-        # Create the DCC Mapping entry for the signal
-        new_dcc_mapping = {
-                "mapping_type" : mapping_type.COLOUR_LIGHT,                                           # Common to Colour_Light & Semaphore Mappings
-                "auto_route_inhibit" : True,                                                          # Common to Colour_Light & Semaphore Mappings
-                "main_subsidary" : 0,                                                                 # Common to Colour_Light & Semaphore Mappings 
-                "THEATRE" : [ [str(theatre_route), [[theatre_address,True],]],                        # Common to Colour_Light & Semaphore Mappings
-                              ["#", [[theatre_address,False],]],
-                              ["", [[theatre_address,False],]]    ],
-                str(signals_common.signal_state_type.DANGER) : [[base_address,False]],                 # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.PROCEED) : [[base_address,True]],                 # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.CAUTION) : [[base_address+1,True]],               # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.CAUTION_APP_CNTL) : [[base_address+1,True]],      # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.PRELIM_CAUTION) : [[base_address+1,False]],       # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.FLASH_CAUTION) : [[base_address+3,True]],         # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : [[base_address+3,False]], # Specific to Colour_Light Mappings
-                str(signals_common.route_type.LH1) : [[route_address,False]],                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.LH2) : [[route_address,False]],                          # Specific to Colour_Light Mappingss
-                str(signals_common.route_type.RH1) : [[route_address,False]],                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.RH2) : [[route_address,False]],                          # Specific to Colour_Light Mappingss
-                str(signals_common.route_type.MAIN) : [[route_address,False]],                         # Specific to Colour_Light Mappings 
-                str(signals_common.route_type.NONE) : [[route_address,False]] }                        # Specific to Colour_Light Mappings
-        # Configure the DCC Command  for the feather route indicator that we want to configured
-        new_dcc_mapping[str(feather_route)] = [[route_address,True]]
-        # Finally save the DCC mapping into the dictionary of mappings 
-        dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-    return ()
-
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Function to "map" a semaphore signal to the appropriate DCC addresses/commands using
-# a simple one-to-one mapping of each signal arm with a DCC accessory address apart from
-# the theatre route display where we send can send either a signle DCC command or a
-# series of DCC commands to put the theatre route indicator into the correct state
-#
-#    Simple Example - a semaphore signal with main and subsidary arms for the primary route
-#    and a RH bracket with just a main signal arm, would be configured as below.
-#
-#        map_semaphore_signal (sig_id = 10,
-#                              main_signal_arm = 21,
-#                              main_subsidary_arm = 22
-#                              rh1_signal_arm = 23  )
-#-----------------------------------------------------------------------------------------
+# a simple one-to-one mapping of each signal arm to a single DCC accessory address (apart
+# from the theatre route display where we send a sequence of DCC commands)
+#----------------------------------------------------------------------------------------------------
 
-def map_semaphore_signal (sig_id:int,
-                          main_signal:int = 0,
-                          lh1_signal:int = 0,
-                          lh2_signal:int = 0,
-                          rh1_signal:int = 0,
-                          rh2_signal:int = 0,
-                          main_subsidary:int = 0,
-                          lh1_subsidary:int = 0,
-                          lh2_subsidary:int = 0,
-                          rh1_subsidary:int = 0,
-                          rh2_subsidary:int = 0,
-                          THEATRE = [["#", [[0,False],]],]):
+def map_semaphore_signal(sig_id:int,
+                        main_signal:int = 0,
+                        lh1_signal:int = 0,
+                        lh2_signal:int = 0,
+                        rh1_signal:int = 0,
+                        rh2_signal:int = 0,
+                        main_subsidary:int = 0,
+                        lh1_subsidary:int = 0,
+                        lh2_subsidary:int = 0,
+                        rh1_subsidary:int = 0,
+                        rh2_subsidary:int = 0,
+                        THEATRE = [["#", [[0,False],]],]):
+    global dcc_signal_mappings
+    global dcc_address_mappings
     # Do some basic validation on the parameters we have been given
-    logging.info ("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
-    if sig_mapped(sig_id):
-        logging.error ("Signal "+str(sig_id)+": Signal already has a DCC Address mapping")
-    elif sig_id < 1:
-        logging.error ("Signal "+str(sig_id)+": Signal ID for DCC Mapping must be greater than zero")
+    if not isinstance(sig_id,int) or sig_id < 1:
+        logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Signal ID must be a positive integer")
+    elif sig_mapped(sig_id):
+        logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - already has a DCC Address mapping")
     else: 
+        # Create a list of DCC addresses to validate
         addresses = [main_signal,main_subsidary,lh1_signal,lh1_subsidary,rh1_signal,rh1_subsidary,
                      lh2_signal,lh2_subsidary,rh2_signal,rh2_subsidary]
-        for theatre_state in THEATRE:
-            for dcc_address in theatre_state[1]:
-                addresses = addresses + [dcc_address[0]]
+        # Validate the DCC Addresses we have been given are either 0 (i.e. don't send anything) or
+        # within the valid DCC accessory address range of 1 and 2047.
         addresses_valid = True
         for entry in addresses:
-            if entry < 0 or entry > 2047:
-                logging.error ("Signal "+str(sig_id)+": Invalid DCC Address "+str(entry)+" - must be between 1 and 2047")
+            if not isinstance(entry,int) or entry < 0 or entry > 2047:
+                logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
                 addresses_valid = False
+            elif dcc_address_mapping(entry) is not None:
+                logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry)+
+                        " is already assigned to "+dcc_address_mapping(entry)[0]+" "+str(dcc_address_mapping(entry)[1]))
+                addresses_valid = False
+        # Validate the Theatre route indicator addresses - these are the form [char,[address,state]
+        for theatre_state in THEATRE:
+            for entry in theatre_state[1]:
+                if not isinstance(entry,list) or not len(entry) == 2:
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC command")
+                    addresses_valid = False
+                elif not isinstance(entry[1],bool):
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC state")
+                    addresses_valid = False
+                elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
+                    addresses_valid = False
+                elif dcc_address_mapping(entry[0]) is not None:
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry[0])+
+                        " is already assigned to "+dcc_address_mapping(entry[0])[0]+" "+str(dcc_address_mapping(entry[0])[1]))
+                    addresses_valid = False
+                # Add to the list of addresses (so we can add to the mappings later on)
+                addresses.append(entry[0])
+        # We now know if all the DCC addresses we have been given are valid
         if addresses_valid:
+            logging.debug("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
             # Create the DCC Mapping entry for the signal.
             new_dcc_mapping = {
                 "mapping_type" : mapping_type.SEMAPHORE,     # Common to Colour_Light & Semaphore Mappings
                 "auto_route_inhibit" : False,                # Common to Colour_Light & Semaphore Mappings
                 "main_subsidary" :  main_subsidary,          # Common to Colour_Light & Semaphore Mappings 
-                "THEATRE"       : THEATRE,                   # Common to Colour_Light & Semaphore Mappings                                      str(signals_common.signal_state_type.DANGER)         :       [[0,False],],     # Specific to Colour Light Signal Mappings
+                "THEATRE"       : THEATRE,                   # Common to Colour_Light & Semaphore Mappings
                 "main_signal"   : main_signal,               # Specific to Semaphore Signal Mappings
                 "lh1_signal"    : lh1_signal,                # Specific to Semaphore Signal Mappings
                 "lh1_subsidary" : lh1_subsidary,             # Specific to Semaphore Signal Mappings
@@ -386,53 +394,63 @@ def map_semaphore_signal (sig_id:int,
                 "rh2_signal"    : rh2_signal,                # Specific to Semaphore Signal Mappings
                 "rh2_subsidary" : rh2_subsidary }            # Finally save the DCC mapping into the dictionary of mappings 
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
-    return ()
+            # Update the DCC mappings dictionary
+            for entry in addresses:
+                if entry > 0 and str(entry) not in dcc_address_mappings.keys():
+                    dcc_address_mappings[str(entry)] = ["Signal",sig_id]
+    return()
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Externally called unction to "map" a particular point object to a DCC address/command
 # This is much simpler than the signals as we only need to map a signle DCC address for
 # each point to be controlled - with an appropriate state (either switched or not_switched)
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 
-def map_dcc_point (point_id:int, address:int, state_reversed:bool = False):
-    logging.info ("Point "+str(point_id)+": Creating DCC Address mapping")
+def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
     # Do some basic validation on the parameters we have been given
-    if point_mapped(point_id):
-        logging.error ("Point "+str(point_id)+": Point already has a DCC Address mapping")
-    elif point_id < 1:
-        logging.error ("Point "+str(point_id)+": Point ID for DCC Mapping must be greater than zero")
-    elif (address < 1 or address > 2047):
-        logging.error ("Point "+str(point_id)+": Invalid DCC Address "+str(address)+" - must be between 1 and 2047")
+    if not isinstance(point_id,int) or point_id < 1:
+        logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Point ID must be a positive integer")
+    elif point_mapped(point_id):
+        logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - already has a DCC Address mapping")
+    elif not isinstance(address,int) or address < 0 or address > 2047:
+        logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid DCC address "+str(address))
+    elif not isinstance(state_reversed,bool):
+        logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid state_reversed flag")
+    elif dcc_address_mapping(address) is not None:
+        logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - DCC Address "+str(address)+
+            " is already assigned to "+dcc_address_mapping(address)[0]+" "+str(dcc_address_mapping(address)[1]))
     else:
+        logging.debug("Point "+str(point_id)+": Creating DCC Address mapping for Point")
         # Create the DCC Mapping entry for the point
         new_dcc_mapping = {
             "address"  : address,
             "reversed" : state_reversed }
         dcc_point_mappings[str(point_id)] = new_dcc_mapping
-    return ()
+        # Update the DCC mappings dictionary
+        if address > 0: dcc_address_mappings[str(address)] = ["Point",point_id]
+    return()
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC command to set the state of a DCC Point
-#------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 
 def update_dcc_point(point_id:int, state:bool):    
     if point_mapped(point_id):
         logging.debug ("Point "+str(point_id)+": Generating DCC Bus commands to switch point")
-        # Retrieve the DCC mappings for our point
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
         if dcc_mapping["address"] > 0:
             # Send the DCC commands to change the state
             pi_sprog_interface.send_accessory_short_event (dcc_mapping["address"],state)        
             # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-            # Note that the commands will only be published if networking is configured and
-            # the node this software is running on is not configured as a "pi-sprog" node
+            # Commands will only be published if networking is configured and publishing is enabled
             publish_accessory_short_event(dcc_mapping["address"],state)        
-    return ()
+    return()
 
-#-----------------------------------------------------------------------------------------
-# Function to send the appropriate DCC commands to set the state of a DCC Signal
-#------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# Function to send the appropriate DCC commands to set the state of a DCC Colour Light 
+# Signal. The commands to be sent will depend on the displayed aspect of the signal.
+#----------------------------------------------------------------------------------------------------
 
 def update_dcc_signal_aspects(sig_id: int):
     if sig_mapped(sig_id):
@@ -443,26 +461,24 @@ def update_dcc_signal_aspects(sig_id: int):
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
         else:
             logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
-            # Send the DCC commands to change the state
             for entry in dcc_mapping[str(signals_common.signals[str(sig_id)]["sigstate"])]:
                 if entry[0] > 0:
                     # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                     # Note that the commands will only be sent if the pi-sprog interface is configured
                     pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
                     # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-                    # Note that the commands will only be published if networking is configured and
-                    # the node this software is running on is not configured as a "pi-sprog" node
+                    # Commands will only be published if networking is configured and publishing is enabled
                     publish_accessory_short_event(entry[0],entry[1])        
     return()
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to change a single element of a signal
 # This function primarily used for semaphore signals where each signal "arm" is normally
 # mapped to a single DCC address. Also used for the subsidary aspect of main colour light
 # signals where this subsidary aspect is normally mapped to a single DCC Address
-#------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
             
-def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidary"):    
+def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidary"):    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for anything other than the "main_subsidary" for Semaphore Signal Types
@@ -471,18 +487,16 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
         else:
             logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
-            # Send the DCC commands to change the state 
             if dcc_mapping[element] > 0:
                 # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                 # Note that the commands will only be sent if the pi-sprog interface is configured
                 pi_sprog_interface.send_accessory_short_event(dcc_mapping[element],state)
                 # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-                # Note that the commands will only be published if networking is configured and
-                # the node this software is running on is not configured as a "pi-sprog" node
+                # Commands will only be published if networking is configured and publishing is enabled
                 publish_accessory_short_event(dcc_mapping[element],state)       
     return()
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to change the route indication
 # Whether we need to send out DCC commands to actually change the route indication will
 # depend on the DCC signal type and WHY we are changing the route indication - Some DCC
@@ -491,9 +505,9 @@ def update_dcc_signal_element (sig_id:int,state:bool, element:str="main_subsidar
 # For signals that don't do this, we need to send out commands every time we need to change
 # the route display - i.e. on all Signal Changes (to/from DANGER) to enable/disable the
 # display, and for all ROUTE changes when the signal is not at DANGER
-#------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
             
-def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
+def update_dcc_signal_route(sig_id:int,route:signals_common.route_type,
                               signal_change:bool=False,sig_at_danger:bool=False):
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
@@ -510,19 +524,17 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
                  (not dcc_mapping["auto_route_inhibit"] and signal_change) or
                  (not sig_at_danger and not signal_change) ):
                 logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
-                # Send the DCC commands to change the state if required
                 for entry in dcc_mapping[str(route)]:
                     if entry[0] > 0:
                         # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                         # Note that the commands will only be sent if the pi-sprog interface is configured
                         pi_sprog_interface.send_accessory_short_event(entry[0],entry[1])
                         # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-                        # Note that the commands will only be published if networking is configured and
-                        # the node this software is running on is not configured as a "pi-sprog" node
+                        # Commands will only be published if networking is configured and publishing is enabled
                         publish_accessory_short_event(entry[0],entry[1])       
     return()
 
-#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Function to send the appropriate DCC commands to change the Theatre indication
 # Whether we need to send out DCC commands to actually change the route indication will
 # depend on the DCC signal type and WHY we are changing the route indication - Some DCC
@@ -531,10 +543,10 @@ def update_dcc_signal_route (sig_id:int,route:signals_common.route_type,
 # For signals that don't do this, we need to send out commands every time we need to change
 # the route display - i.e. on all Signal Changes (to/from DANGER) to enable/disable the
 # display, and for all ROUTE changes when the signal is not at DANGER
-#------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
             
-def update_dcc_signal_theatre (sig_id:int, character_to_display, 
-                               signal_change:bool=False,sig_at_danger:bool=False):    
+def update_dcc_signal_theatre(sig_id:int, character_to_display:str, 
+                        signal_change:bool=False, sig_at_danger:bool=False):    
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal. We don't need to validate the mapping type
         # as Theatre route displays are supported by both Colour Light and Semaphore signal types 
@@ -556,40 +568,19 @@ def update_dcc_signal_theatre (sig_id:int, character_to_display,
                             # Note that the commands will only be sent if the pi-sprog interface is configured
                             pi_sprog_interface.send_accessory_short_event(command[0],command[1])
                             # Publish the DCC commands to a remote pi-sprog "node" via an external MQTT broker.
-                            # Note that the commands will only be published if networking is configured and
-                            # the node this software is running on is not configured as a "pi-sprog" node
+                            # Commands will only be published if networking is configured and publishing is enabled
                             publish_accessory_short_event(command[0],command[1])       
     return()
 
-#-----------------------------------------------------------------------------------------------
-# Public API Function to set this node to publish all DCC commands to the broker
-#-----------------------------------------------------------------------------------------------
-
-def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
-    global publish_dcc_commands_to_mqtt_broker
-    if publish_dcc_commands: logging.info("MQTT-Client: Configuring Application to publish DCC Commands to MQTT broker")
-    else: logging.info("MQTT-Client: Configuring Application NOT to publish DCC Commands to MQTT broker")
-    publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
-    return()
-
-#-----------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to the published DCC commands from another "Node"
-#-----------------------------------------------------------------------------------------------
-
-def subscribe_to_dcc_command_feed (*nodes:str):
-    for node in nodes:
-        # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
-        # as each DCC address will appear on a different topic from the remote MQTT node 
-        mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events",node,0,
-                                    handle_mqtt_dcc_accessory_short_event,subtopics=True)
-    return() 
-
-#-----------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Callback for handling received MQTT messages from a remote DCC-command-producer Node
-#-----------------------------------------------------------------------------------------------
+# Note that this function will already be running in the main Tkinter thread
+#----------------------------------------------------------------------------------------------------
 
-def handle_mqtt_dcc_accessory_short_event (message):    
-    if "sourceidentifier" in message.keys() and "dccaddress" in message.keys() and "dccstate" in message.keys():
+def handle_mqtt_dcc_accessory_short_event(message):
+    if "sourceidentifier" not in message.keys() or "dccaddress" not in message.keys() or "dccstate" not in message.keys():
+        logging.error ("DCC Control: Unhandled MQTT Message - "+str(message))
+    else:
         source_node = message["sourceidentifier"]
         dcc_address = message["dccaddress"]
         dcc_state = message["dccstate"]
@@ -601,10 +592,10 @@ def handle_mqtt_dcc_accessory_short_event (message):
         pi_sprog_interface.send_accessory_short_event(dcc_address,dcc_state)
     return()
 
-# --------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 # Internal function for building and sending MQTT messages - but only if this
 # particular node has been configured to publish DCC commands viathe mqtt broker
-# --------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
 
 def publish_accessory_short_event(address:int,active:bool):
     if publish_dcc_commands_to_mqtt_broker:
@@ -618,10 +609,99 @@ def publish_accessory_short_event(address:int,active:bool):
                             log_message=log_message,subtopic = str(address),retain=True)
     return()
 
-# ------------------------------------------------------------------------------------------
-# Non public API function to reset the list of subscribed Topics. Used by the schematic editor
-# for re-setting the MQTT configuration prior to re-configuring
-# ------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# API function for deleting a DCC Point mapping and removing the DCC address
+# associated with the point from the dcc_address_mappings. This is used by the
+# schematic editor for deleting existing DCC mappings (before creating new ones)
+#----------------------------------------------------------------------------------------------------
+
+def delete_point_mapping(point_id:int):
+    global dcc_point_mappings
+    global dcc_address_mappings
+    if not isinstance(point_id, int):
+        logging.error("DCC Control: delete_point_mapping - Point "+str(point_id)+" - Point ID must be an integer")
+    elif not point_mapped(point_id):
+        logging.error("DCC Control: delete_point_mapping - Point "+str(point_id)+" - DCC Mapping does not exist")
+    else:
+        # Retrieve the DCC mapping address for the Point
+        dcc_address = dcc_point_mappings[str(point_id)]["address"]
+        # Remove the DCC address from the dcc_address_mappings dictionary
+        if str(dcc_address) in dcc_address_mappings.keys():
+            del dcc_address_mappings[str(dcc_address)]
+        # Now delete the point mapping from the dcc_point_mappings dictionary
+        del dcc_point_mappings[str(point_id)]
+    return()
+
+#----------------------------------------------------------------------------------------------------
+# API function for deleting a DCC signal mapping and removing all DCC addresses
+# associated with the signal from the dcc_address_mappings. This is used by the
+# schematic editor for deleting existing DCC mappings (before creating new ones)
+#----------------------------------------------------------------------------------------------------
+
+def delete_signal_mapping(sig_id:int):
+    global dcc_signal_mappings
+    global dcc_address_mappings
+    if not isinstance(sig_id, int):
+        logging.error("DCC Control: delete_signal_mapping - Signal "+str(sig_id)+" - Signal ID must be an integer")
+    elif not sig_mapped(sig_id):
+        logging.error("DCC Control: delete_signal_mapping - Signal "+str(sig_id)+" - DCC Mapping does not exist")
+    else:
+        # Retrieve the DCC mappings for the signal and determine the mapping type
+        dcc_signal_mapping = dcc_signal_mappings[str(sig_id)]
+        # Colour Light Signal mappings
+        if dcc_signal_mapping["mapping_type"] == mapping_type.COLOUR_LIGHT:
+            # Compile a list of all DCC commands associated with the signal (aspects, feathers)
+            # Note we don't need to add the 'CAUTION_APP_CNTL' list as this is the same as CAUTION
+            dcc_command_list = [[dcc_signal_mapping["main_subsidary"],True]]
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.DANGER)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.PROCEED)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.PRELIM_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.FLASH_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.NONE)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.MAIN)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.LH1)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.LH2)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.RH1)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.RH2)])
+            # Add the Theatre route indicator addresses - Each Route Element is [char,[[address,state],]]
+            for theatre_route_element in dcc_signal_mapping["THEATRE"]:
+                dcc_command_list.extend(theatre_route_element[1])
+            # List is now complete - remove all DCC addresses from the dcc_address_mappings dictionary
+            for dcc_command in dcc_command_list:
+                if str(dcc_command[0]) in dcc_address_mappings.keys():
+                 del dcc_address_mappings[str(dcc_command[0])]
+        # Semaphors Signal mappings
+        elif dcc_signal_mapping["mapping_type"] == mapping_type.SEMAPHORE:
+            # Compile a list of all DCC addresses associated with the signal (signal arms)
+            dcc_address_list = [dcc_signal_mapping["main_signal"]]
+            dcc_address_list.extend([dcc_signal_mapping["lh1_signal"]])
+            dcc_address_list.extend([dcc_signal_mapping["lh2_signal"]])
+            dcc_address_list.extend([dcc_signal_mapping["rh1_signal"]])
+            dcc_address_list.extend([dcc_signal_mapping["rh2_signal"]])
+            dcc_address_list.extend([dcc_signal_mapping["main_subsidary"]])
+            dcc_address_list.extend([dcc_signal_mapping["lh1_subsidary"]])
+            dcc_address_list.extend([dcc_signal_mapping["lh2_subsidary"]])
+            dcc_address_list.extend([dcc_signal_mapping["rh1_subsidary"]])
+            dcc_address_list.extend([dcc_signal_mapping["rh2_subsidary"]])
+            # Add the Theatre route indicator addresses - Each Route Element is [char,[[address,state],]]
+            for theatre_route_element in dcc_signal_mapping["THEATRE"]:
+                for dcc_command in theatre_route_element[1]:
+                    dcc_address_list.extend([dcc_command[0]])
+            # List is now complete - remove all DCC addresses from the dcc_address_mappings dictionary
+            for dcc_address in dcc_address_list:
+                if str(dcc_address) in dcc_address_mappings.keys():
+                 del dcc_address_mappings[str(dcc_address)]
+        # Now delete the signal mapping from the dcc_signal_mappings dictionary
+        del dcc_signal_mappings[str(sig_id)]
+    return()
+
+#----------------------------------------------------------------------------------------------------
+# API function to reset the published/subscribed DCC command feeds. This function is called by
+# the editor on 'Apply' of the MQTT pub/sub configuration prior to applying the new configuration
+# via the 'subscribe_to_dcc_command_feed' & 'set_node_to_publish_dcc_commands' functions.
+#----------------------------------------------------------------------------------------------------
 
 def reset_mqtt_configuration():
     global publish_dcc_commands_to_mqtt_broker
@@ -629,24 +709,35 @@ def reset_mqtt_configuration():
     mqtt_interface.unsubscribe_from_message_type("dcc_accessory_short_events")
     return()
 
-# --------------------------------------------------------------------------------
-# Non public API function for deleting a point mapping - This is used by the
-# schematic editor for deleting existing DCC mappings (before creating new ones)
-# --------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# API Function to set this Signalling node to publish all DCC commands to remote MQTT
+# nodes. This function is called by the editor on 'Apply' of the MQTT pub/sub configuration.
+#----------------------------------------------------------------------------------------------------
 
-def delete_point_mapping(point_id:int):
-    if point_mapped(point_id):
-        del dcc_point_mappings[str(point_id)]
+def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
+    global publish_dcc_commands_to_mqtt_broker
+    if not isinstance(publish_dcc_commands, bool):
+        logging.error("DCC Control: set_node_to_publish_dcc_commands - invalid publish_dcc_commands flag")
+    else:
+        if publish_dcc_commands: logging.debug("DCC Control: Configuring Application to publish DCC Commands to MQTT broker")
+        else: logging.info("DCC Control: Configuring Application NOT to publish DCC Commands to MQTT broker")
+        publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
 
-# --------------------------------------------------------------------------------
-# Non public API function for deleting a signal mapping - This is used by the
-# schematic editor for deleting existing DCC mappings (before creating new ones)
-# --------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# API Function to "subscribe" to the published DCC command feed from other remote MQTT nodes
+# This function is called by the editor on "Apply' of the MQTT pub/sub configuration.
+#----------------------------------------------------------------------------------------------------
 
-def delete_signal_mapping(sig_id:int):
-    if sig_mapped(sig_id):
-        del dcc_signal_mappings[str(sig_id)]
-    return()
+def subscribe_to_dcc_command_feed (*nodes:str):
+    for node in nodes:
+        if not isinstance(node, str):
+            logging.error("DCC Control: subscribe_to_dcc_command_feed - invalid node "+str(node))
+        else:
+            # For DCC addresses we need to subscribe to the optional Subtopics (with a wildcard)
+            # as each DCC address will appear on a different topic from the remote MQTT node 
+            mqtt_interface.subscribe_to_mqtt_messages("dcc_accessory_short_events",node,0,
+                                        handle_mqtt_dcc_accessory_short_event,subtopics=True)
+    return() 
 
-#######################################################################################
+#####################################################################################################

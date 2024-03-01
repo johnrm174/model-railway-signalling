@@ -7,21 +7,25 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.point_exists(point_id) - To see if a specified point ID exists (local)
 #    objects.point(point_id) - To get the object_id for a given point_id
 #
 # Accesses the following external editor objects directly:
 #    objects.point_index - To iterate through all the point objects
 #    objects.schematic_objects - To load/save the object configuration
 #
+# Makes the following external API calls to library modules:
+#    points.point_exists(point_id) - To see if a specified point ID exists (local)
+#    dcc_control.dcc_address_mapping - To see if a DCC address is already mapped
+#
 # Inherits the following common editor base classes (from common):
 #    common.int_item_id_entry_box
+#    common.Createtool_tip
 #    common.check_box
 #    common.dcc_entry_box
 #    common.object_id_selection
 #    common.selection_buttons
 #    common.signal_route_frame
-#    common.colour_selector
+#    common.colour_selection
 #    common.window_controls
 #
 #------------------------------------------------------------------------------------
@@ -33,6 +37,9 @@ from tkinter import ttk
 
 from . import common
 from . import objects
+
+from ..library import points
+from ..library import dcc_control
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -66,18 +73,16 @@ def switched_with_point(object_id):
 # Class instance methods inherited/used from the parent classes are:
 #    "set_value" - will set the current value of the entry box (int)
 #    "get_value" - will return the last "valid" value of the entry box (int)
-#    "get_initial_value" - will return the original value of the entry box (int)
 # Class instance methods provided by this class are:
 #    "validate" - Also validate the point is automatic and not switched by another point
 #    "set_switched_with" - to set the read-only value for the "switched_with" point
+#    "set_point_id" - to set the read only value for the current point id (for validation)
 #------------------------------------------------------------------------------------
 
 class also_switch_selection(common.int_item_id_entry_box):
-    def __init__(self, parent_frame, parent_object):
-        # These are the functions used to validate that the entered signal ID
-        # exists on the schematic and is different to the current signal ID
-        exists_function = objects.point_exists
-        current_id_function = parent_object.pointid.get_value
+    def __init__(self, parent_frame):
+        # We need to know the current Point ID (for validation)
+        self.point_id = 0
         # Create the Label Frame for the "also switch" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Automatic switching")
         # Call the common base class init function to create the EB
@@ -85,7 +90,7 @@ class also_switch_selection(common.int_item_id_entry_box):
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         super().__init__(self.frame, tool_tip = "Enter the ID of another (fully "+
                 "automatic) point to be switched with this point (or leave blank)",
-                exists_function=exists_function, current_id_function=current_id_function)
+                exists_function=points.point_exists, current_id_function=self.get_point_id)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
         # This is the read-only element for the point this point is switched with
         self.switched_with = Tk.StringVar(parent_frame, "")
@@ -96,6 +101,11 @@ class also_switch_selection(common.int_item_id_entry_box):
         self.switched_eb.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.switched_eb, "ID of the point that "+
                                        "will automatically switch this point")
+    
+    def get_point_id(self):
+        # Note that this is an internal function for validation
+        return(self.point_id)
+        
     def validate(self):
         # Do the basic item validation first (exists and not current item ID)
         valid = super().validate(update_validation_status=False)
@@ -121,22 +131,24 @@ class also_switch_selection(common.int_item_id_entry_box):
     def set_switched_with(self, point_id:int):
         if point_id > 0: self.switched_with.set(str(point_id))
         else: self.switched_with.set("")
-            
+
+    def set_point_id(self,point_id):
+        self.point_id = point_id
+
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element.
 # Class instance methods provided by this class:
 #     "validate" - validate the current settings and return True/false
-#     "set_values" - will set the checkbox states (rot, rev, auto, fpl)
+#     "set_values" - will set the checkbox states (rot, rev, auto, fpl, point_id)
 #     "get_values" - will return the checkbox states (rot, rev, auto, fpl)
 # Validation on "Automatic" checkbox only - Invalid if 'fully automatic' is
 # unchecked when another point is configured to "auto switch" this point
 #------------------------------------------------------------------------------------
 
 class general_settings():
-    def __init__(self, parent_frame, parent_object):
-        # We need the reference to the parent object so we can call the sibling
-        # class method to get the current value of the Point ID for validation
-        self.parent_object = parent_object
+    def __init__(self, parent_frame):
+        # We need to know the current Point ID for validation
+        self.point_id = 0
         # Create a Label frame to hold the general settings
         self.frame = Tk.LabelFrame(parent_frame,text="General configuration")
         # Create a subframe to hold the first 2 buttons
@@ -173,7 +185,7 @@ class general_settings():
             # Ensure the point isn't configured to "auto switch" with another point
             for point_id in objects.point_index:
                 other_autoswitch = objects.schematic_objects[objects.point(point_id)]["alsoswitch"]
-                if other_autoswitch == self.parent_object.pointid.get_initial_value():
+                if other_autoswitch == self.point_id:
                     self.CB4.TT.text = ("Point is configured to switch with point " +
                                            point_id + " so must remain 'fully automatic'")
                     self.CB4.config(fg="red")
@@ -184,11 +196,12 @@ class general_settings():
             self.CB4.config(fg="black")
         return(valid)
     
-    def set_values(self, rot:bool, rev:bool, auto:bool, fpl:bool):
+    def set_values(self, rot:bool, rev:bool, auto:bool, fpl:bool, point_id:int):
         self.CB1.set_value(rot)
         self.CB2.set_value(fpl)
         self.CB3.set_value(rev)
         self.CB4.set_value(auto)
+        self.point_id = point_id
         # Set the initial state (Enabled/Disabled) of the FPL selection
         self.automatic_updated()
         
@@ -197,27 +210,56 @@ class general_settings():
                 self.CB4.get_value(), self.CB2.get_value())
 
 #------------------------------------------------------------------------------------
-# Class for the DCC Address Settings - uses  the DCC Entry Box class
-# Class instance methods provided by this class:
-#    "validate" - validate the current DCC entry box value and return True/false
-#    "set_values" - will set the entry/checkbox states [address:int, reversed:bool]
-#    "get_values" - will return the entry/checkbox states (address:int, reversed:bool]
+# Class for a point_dcc_entry_box - builds on the common DCC Entry Box class
+# Class instance methods inherited from the parent class are:
+#    "set_values" - will set the entry box value  (dcc address)
+#    "get_values" - will return the last valid entry box value (dcc address)
+# Public class instance methods provided by this child class are
+#    "set_point_id" - sets the current point ID (for validation) 
+#    "validate" - Validates the DCC address is not mapped to another item
 #------------------------------------------------------------------------------------
 
-class dcc_address_settings(common.dcc_entry_box):
+class point_dcc_entry_box(common.dcc_entry_box):
+    def __init__(self, parent_frame, callback):
+        # We need the current Point ID to validate the DCC Address entry
+        self.point_id = 0
+        super().__init__(parent_frame, callback=callback)
+        
+    def validate(self):
+        # Do the basic item validation first (exists and not current item ID)
+        valid = super().validate(update_validation_status=False)
+        if valid and self.entry.get() != "":
+            # Ensure the address is not mapped to another signal or point
+            dcc_address = int(self.entry.get())
+            dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
+            if dcc_mapping is not None and (dcc_mapping[0] != "Point" or dcc_mapping[1] != self.point_id):
+                # We need to correct the mapped signal ID for secondary distants
+                if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 99: dcc_mapping[1] = dcc_mapping[1] - 100
+                self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
+                valid = False
+        self.set_validation_status(valid)
+        return(valid)
+    
+    def set_point_id(self,point_id):
+        self.point_id = point_id
+
+#------------------------------------------------------------------------------------
+# Class for the point DCC Address settings UI element - provides the following functions
+#    "set_values" - will set the entry/checkboxes (address:int, reversed:bool, point_id:int)
+#    "get_values" - will return the entry/checkboxes (address:int, reversed:bool]
+#    "validate" - Ensure the DCC address is valid and not mapped to another item
+#------------------------------------------------------------------------------------
+
+class dcc_address_settings():
     def __init__(self, parent_frame):
         # Create a Label frame to hold the DCC Address settings
         self.frame = Tk.LabelFrame(parent_frame,text="DCC Address and command logic")
-        # Create the Tkinter Boolean vars to hold the DCC reversed selection
-        self.dccreversed = Tk.BooleanVar(self.frame,False)
-        # Create a DCC Address element and checkbox for the "reversed" selection
-        # Call the common base class init function to create the EB. These are
-        # created in a seperate subframe so they are centered
+        # Create a DCC Address element and a checkbox for the "reversed" selection
+        # These are created in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        self.EB = common.dcc_entry_box(self.subframe, callback=self.entry_updated)
+        self.EB = point_dcc_entry_box(self.subframe, callback=self.entry_updated)
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
-        # Create the checkbox for the DCC reversed selection
         self.CB = common.check_box(self.subframe, label="Reversed",
                     tool_tip="Select to reverse the DCC command logic")
         self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
@@ -229,9 +271,10 @@ class dcc_address_settings(common.dcc_entry_box):
     def validate(self):
         return(self.EB.validate())
         
-    def set_values(self, add:int, rev:bool):
+    def set_values(self, add:int, rev:bool, point_id:int):
         self.EB.set_value(add)
         self.CB.set_value(rev)
+        self.EB.set_point_id(point_id)
         self.entry_updated()
         
     def get_values(self):
@@ -248,7 +291,7 @@ class point_configuration_tab():
         self.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Point ID selection
         self.pointid = common.object_id_selection(self.frame, "Point ID",
-                                exists_function = objects.point_exists) 
+                                exists_function = points.point_exists) 
         self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
@@ -258,12 +301,10 @@ class point_configuration_tab():
         self.colour = common.colour_selection(self.frame, label="Colour")
         self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
         # Create the UI element for the general settings
-        # Note that the class needs the parent object (to reference siblings)
-        self.settings = general_settings(parent_tab, self)
+        self.settings = general_settings(parent_tab)
         self.settings.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the "Also Switch" entry 
-        # Note that the class needs the parent object (to reference siblings)
-        self.alsoswitch = also_switch_selection(parent_tab, self)
+        self.alsoswitch = also_switch_selection(parent_tab)
         self.alsoswitch.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the DCC Settings 
         self.dccsettings = dcc_address_settings(parent_tab)
@@ -330,22 +371,24 @@ class edit_point():
             # Label the edit window with the Point ID
             self.window.title("Point "+str(objects.schematic_objects[self.object_id]["itemid"]))
             # Set the Initial UI state from the current object settings
+            # Note the alsoswitch element needs the current point ID
             self.config.pointid.set_value(objects.schematic_objects[self.object_id]["itemid"])
             self.config.alsoswitch.set_value(objects.schematic_objects[self.object_id]["alsoswitch"])
+            self.config.alsoswitch.set_point_id(objects.schematic_objects[self.object_id]["itemid"])
             self.config.alsoswitch.set_switched_with(switched_with_point(self.object_id))
             self.config.pointtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
-            # These are the general settings for the point
+            # These are the general settings for the point (note the function also needs the current point id)
             auto = objects.schematic_objects[self.object_id]["automatic"]
             rev = objects.schematic_objects[self.object_id]["reverse"]
             fpl = objects.schematic_objects[self.object_id]["hasfpl"]
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
-            self.config.settings.set_values(rot, rev, auto, fpl)
-            # Set the initial DCC address values
+            self.config.settings.set_values(rot, rev, auto, fpl, objects.schematic_objects[self.object_id]["itemid"])
+            # Set the initial DCC address values (note the function also needs the current point id)
             add = objects.schematic_objects[self.object_id]["dccaddress"]
             rev = objects.schematic_objects[self.object_id]["dccreversed"]
-            self.config.dccsettings.set_values (add, rev)
+            self.config.dccsettings.set_values (add, rev, objects.schematic_objects[self.object_id]["itemid"])
             # Set the read only list of Interlocked signals
             self.locking.signals.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
             # Hide the validation error message

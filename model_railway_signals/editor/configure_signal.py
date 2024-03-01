@@ -868,18 +868,23 @@ class edit_signal:
         else:
             # Label the edit window with the Signal ID
             self.window.title("Signal "+str(objects.schematic_objects[self.object_id]["itemid"]))
-            # Set the Initial UI state from the current object settings
+            # Set the Initial UI state from the current object settings. Note that several
+            # of the elements need the current signal ID to validate the DCC addresses
             self.config.sigid.set_value(str(objects.schematic_objects[self.object_id]["itemid"]))
             self.config.sigtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.subtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
             self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"])
-            self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
             self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"])
+            self.config.aspects.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
             self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"])
-            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
+            self.config.feathers.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
             self.config.feathers.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
-            self.config.theatre.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
+            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
+            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
+            self.config.theatre.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
             self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"])
+            self.config.semaphores.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
             # These are the general settings for the signal

@@ -723,8 +723,9 @@ def delete_signal_object(object_id):
     if passed_sensor != "": gpio_sensors.remove_gpio_sensor_callback(passed_sensor)
     if approach_sensor != "": gpio_sensors.remove_gpio_sensor_callback(approach_sensor)
     # Delete the associated distant signal (if there is one)
-    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
-    dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
+    if has_associated_distant(object_id):
+        signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
+        dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
     return()
 
 #------------------------------------------------------------------------------------

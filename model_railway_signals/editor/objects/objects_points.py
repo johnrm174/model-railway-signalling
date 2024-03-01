@@ -183,10 +183,9 @@ def update_point(object_id, new_object_configuration):
 
 def redraw_point_object(object_id):
     # Create the new DCC Mapping for the point
-    if objects_common.schematic_objects[object_id]["dccaddress"] > 0:
-        dcc_control.map_dcc_point (objects_common.schematic_objects[object_id]["itemid"],
-                                   objects_common.schematic_objects[object_id]["dccaddress"],
-                                   objects_common.schematic_objects[object_id]["dccreversed"])
+    dcc_control.map_dcc_point (objects_common.schematic_objects[object_id]["itemid"],
+                               objects_common.schematic_objects[object_id]["dccaddress"],
+                               objects_common.schematic_objects[object_id]["dccreversed"])
     # Turn the point type value back into the required enumeration type
     point_type = points.point_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the new point object

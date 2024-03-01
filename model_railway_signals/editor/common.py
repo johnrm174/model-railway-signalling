@@ -836,61 +836,6 @@ class point_interlocking_entry():
         return([self.EB.get_value(), self.CB.get_value()])
 
 #------------------------------------------------------------------------------------
-# Compound UI element for a dcc_command_entry (address + command logic).
-# Uses the common dcc_entry_box and state_box classes. Note that the state_box
-# is only enabled when a valid DCC address has been entered into the entry_box.
-# This is used across all object windows for displaying / changing the item ID.
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
-#
-# Public class instance methods provided by this class are
-#    "validate" - validate the current entry_box value and return True/false
-#    "set_value" - will set the current value [address:int, state:bool]
-#    "get_value" - will return the last "valid" value [address:int, state:bool]
-#    "disable" - disables/blanks the entry_box (and associated state button)
-#    "enable"  enables/loads the entry_box (and associated state button)
-#------------------------------------------------------------------------------------
-
-class dcc_command_entry():
-    def __init__(self, parent_frame):
-        # create a frame to pack the two elements into
-        self.frame = Tk.Frame(parent_frame)
-        # Create the address entry box and the associated dcc state box
-        self.EB = dcc_entry_box(self.frame, callback=self.eb_updated)
-        self.EB.pack(side=Tk.LEFT)
-        self.CB = state_box(self.frame, label_off="OFF", label_on="ON",
-                    width=4, tool_tip="Set the DCC logic for the command")
-        self.CB.pack(side=Tk.LEFT)
-    
-    def eb_updated(self):
-        if self.EB.entry.get() == "":
-            self.CB.disable()
-        else: self.CB.enable()
-
-    def validate(self):
-        return (self.EB.validate())
-
-    def enable(self):
-        self.EB.enable()
-        self.eb_updated()
-        
-    def disable(self):
-        self.EB.disable()
-        self.eb_updated()
-        
-    def set_value(self, dcc_command:[int, bool]):
-        # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
-        self.EB.set_value(dcc_command[0])
-        self.CB.set_value(dcc_command[1])
-        self.eb_updated()
-
-    def get_value(self):
-        # Returns a 2 element list of [DCC_Address, DCC_State]
-        # When disabled (or empty) will always return [0, False]
-        # When invalid will return [last valid address, current state]
-        return([self.EB.get_value(), self.CB.get_value()])
-
-#------------------------------------------------------------------------------------
 # Compound UI Element for a signal route selections (Sig ID EB + route selection CBs)
 # Note the responsibility of the instantiating func/class to 'pack' the Frame of
 # the UI element - i.e. '<class_instance>.frame.pack()'
