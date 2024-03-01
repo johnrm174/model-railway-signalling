@@ -246,7 +246,7 @@ def send_mqtt_gpio_sensor_triggered_event(sensor_id:int):
 
 def handle_mqtt_gpio_sensor_triggered_event(message):
     if "sourceidentifier" not in message.keys():
-        logging.warning("GPIO Interface: Unhandled MQTT message - "+str(message))
+        logging.warning("GPIO Interface: handle_mqtt_dcc_accessory_short_event - Unhandled MQTT message - "+str(message))
     elif not gpio_sensor_exists(message["sourceidentifier"]):
         logging.warning("GPIO Sensor "+message["sourceidentifier"]+": handle_mqtt_gpio_sensor_triggered_event - Sensor does not exist")
     else:
