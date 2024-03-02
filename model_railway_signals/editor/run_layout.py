@@ -86,7 +86,7 @@ from . import objects
 canvas = None
 run_mode = None
 automation_enabled = None
-enhanced_debugging = True  # Switch this on to enable 'info'
+enhanced_debugging = False  # Switch this on to enable 'info'
 
 #------------------------------------------------------------------------------------
 # The set_canvas function is called at application startup (on canvas creation)
