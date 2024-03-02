@@ -242,9 +242,9 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         # position of the signal button to "deconflict" with the buttons of the home signal
         if associated_home > 0:
             if signals_common.signals[str(associated_home)]["hassubsidary"]:
-                button_offset = -65
+                button_offset = -58
             else:
-                button_offset = -45
+                button_offset = -40
         else:
             button_offset = 0
             

@@ -243,7 +243,9 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # Define the "Tag" for all drawing objects for this point instance
         point_id_tag = "point"+str(point_id)
         # Create the button objects and their callbacks
-        point_button = Tk.Button (canvas, text=str(point_id), state="normal", relief="raised",
+        if point_id < 10: main_button_text = "0" + str(point_id)
+        else: main_button_text = str(point_id)
+        point_button = Tk.Button (canvas, text=main_button_text, state="normal", relief="raised",
                     font=('Courier',common.fontsize,"normal"),bg= "grey85",
                     padx=common.xpadding, pady=common.ypadding,
                     command = lambda:change_button_event(point_id))
@@ -267,19 +269,19 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             # Create the button windows in the correct relative positions for a Right Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
-                point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,window=point_button,state='hidden',tags=point_id_tag) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
+                point_coords = common.rotate_point (x,y,-3,-15,orientation)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,state='hidden',tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,state='hidden',tags=point_id_tag)
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
-                point_coords = common.rotate_point (x,y,-10,-20,orientation)
+                point_coords = common.rotate_point (x,y,-3,-15,orientation)
                 canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
                 canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
-                point_coords = common.rotate_point (x,y,-10,-20,orientation)
-                canvas.create_window (point_coords,window=point_button,tags=point_id_tag) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
+                point_coords = common.rotate_point (x,y,-3,-15,orientation)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,state='hidden',tags=point_id_tag)
 
         else: 
             # Draw the lines representing a Left Hand point
@@ -294,19 +296,19 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             # Create the button windows in the correct relative positions for a Left Hand Point
             if auto:
                 # point is completely automatic - both buttons are "hidden"
-                point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,window=point_button,state='hidden',tags=point_id_tag) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
+                point_coords = common.rotate_point (x,y,-3,+15,orientation)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,state='hidden',tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,state='hidden',tags=point_id_tag)
             elif fpl:
                 # If the point has FPL then both the change and fpl buttons are displayed
-                point_coords = common.rotate_point (x,y,-10,+20,orientation)
+                point_coords = common.rotate_point (x,y,-3,+15,orientation)
                 canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
                 canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=point_id_tag)
             else:
                 # Point has no FPL so the FPL button is "hidden"
-                point_coords = common.rotate_point (x,y,-10,+20,orientation)
-                canvas.create_window (point_coords,window=point_button,tags=point_id_tag) 
-                canvas.create_window (point_coords,window=fpl_button,state='hidden',tags=point_id_tag)
+                point_coords = common.rotate_point (x,y,-3,+15,orientation)
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=point_id_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,state='hidden',tags=point_id_tag)
                 
         # The "normal" state of the point is the straight through route by default
         # With reverse set to True, the divergent route becomes the "normal" state

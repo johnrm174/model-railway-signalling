@@ -419,17 +419,17 @@ def create_common_signal_elements (canvas,
     # created on the same post as a semaphore home signal. In this case (signified by a
     # distant_button_offset), we apply the offset to deconflict with the home signal buttons.
     if distant_button_offset != 0:
-        button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
+        button_position = common.rotate_point (x,y,distant_button_offset,-20,orientation)
         if not automatic: canvas.create_window(button_position,window=sig_button,tags=tag)
         else: canvas.create_window(button_position,window=sig_button,state='hidden',tags=tag)
         canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     elif subsidary:
-        if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
-        else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
+        if orientation == 0: button_position = common.rotate_point (x,y,-25,-20,orientation) 
+        else: button_position = common.rotate_point (x,y,-35,-20,orientation) 
         canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=tag)
         canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=tag)          
     else:
-        button_position = common.rotate_point (x,y,-20,-25,orientation) 
+        button_position = common.rotate_point (x,y,-20,-20,orientation) 
         canvas.create_window(button_position,window=sig_button,tags=tag)
         canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     # Signal passed button is created on the track at the base of the signal
