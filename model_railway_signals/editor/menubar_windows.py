@@ -983,7 +983,7 @@ class gpio_port_entry_box(common.int_item_id_entry_box):
         super().__init__(self.frame, tool_tip=tool_tip, callback=callback)
         super().pack(side=Tk.LEFT)
         # Create the Signal/Track sensor 'mapping' label
-        self.mapping = Tk.Label(self.frame, width=12, anchor='w')
+        self.mapping = Tk.Label(self.frame, width=16, anchor='w')
         self.mapping.pack(side=Tk.LEFT,padx=5)
     
 class gpio_port_entry_frame():
@@ -1036,14 +1036,14 @@ class gpio_port_entry_frame():
             self.list_of_entry_boxes[index].set_value(None)
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-            self.list_of_entry_boxes[index].mapping.config(text="----------------------")
+            self.list_of_entry_boxes[index].mapping.config(text="-------------------------")
             for gpio_mapping in list_of_mappings:
                 if gpio_port == gpio_mapping[1]:
                     event_mappings = gpio_sensors.get_gpio_sensor_callback(gpio_mapping[0])
-                    if event_mappings[0] > 0: mapping_text = "Signal "+str(event_mappings[0])
-                    elif event_mappings[1] > 0: mapping_text = "Signal "+str(event_mappings[1])
-                    elif event_mappings[2] > 0: mapping_text = "Track Sensor "+str(event_mappings[2])
-                    else: mapping_text="----------------------"
+                    if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
+                    elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
+                    elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
+                    else: mapping_text="-----------------------"
                     self.list_of_entry_boxes[index].set_value(gpio_mapping[0])
                     self.list_of_entry_boxes[index].mapping.config(text=mapping_text)
 
