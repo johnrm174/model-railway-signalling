@@ -7,7 +7,8 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.signal(signal_id) - To get the object_id for a given section ID
+#    objects.signal(signal_id) - To get the object_id for a given signal ID
+#    objects.track_sensor(sensor_id) - To get the object_id for a given sensor ID
 #########################################################################################################
 # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
 # function will not work in edit mode as the Track Section library objects don't exist in edit mode
@@ -16,6 +17,7 @@
 #    objects.section_exists(id) - To see if the Track Section exists  ###################################
 #
 # Accesses the following external editor objects directly:
+#    objects.track_sensor_index - To iterate through all the track sensor objects
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.schematic_objects - To load/save the object configuration
 #
@@ -84,6 +86,38 @@ def get_signal_routes(object_id):
                sig_routes[2] or sub_routes[2],
                sig_routes[3] or sub_routes[3],
                sig_routes[4] or sub_routes[4] ] )
+
+#------------------------------------------------------------------------------------
+# Function to return the read-only "sensors ahead" and "sensors_behind" elements.
+# These are the back-references to the track sensors that are configured to either
+# set or clear the track section when the track sensor is 'passed'
+#------------------------------------------------------------------------------------
+
+def find_sensor_routes(track_section_id:int, sensor_routes:list):
+    matched_routes = [False, False, False, False, False]
+    one_or_more_routes_matched = False
+    # "sensor_routes" comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+    # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+    # We need to iterate through the routes to find all matches on the section_id
+    for index1, sensor_route in enumerate(sensor_routes):
+        if sensor_route[1] == track_section_id:
+            matched_routes[index1] = True
+            one_or_more_routes_matched = True
+    return( [one_or_more_routes_matched, matched_routes] )
+
+def track_sensors_behind_and_ahead(object_id):
+    track_section_id = int(objects.schematic_objects[object_id]["itemid"])
+    list_of_track_sensors_ahead = []
+    list_of_track_sensors_behind = []
+    # Iterate through all track sensor objects to see if the track section appears in the configuration
+    for track_sensor_id in objects.track_sensor_index:
+        routes_ahead = objects.schematic_objects[objects.track_sensor(track_sensor_id)]["routeahead"]
+        route_matches = find_sensor_routes(track_section_id, routes_ahead)
+        if route_matches[0]: list_of_track_sensors_ahead.append([track_sensor_id, route_matches[1]])
+        routes_behind = objects.schematic_objects[objects.track_sensor(track_sensor_id)]["routebehind"]
+        route_matches = find_sensor_routes(track_section_id, routes_behind)
+        if route_matches[0]: list_of_track_sensors_behind.append([track_sensor_id, route_matches[1]])
+    return(list_of_track_sensors_behind, list_of_track_sensors_ahead)
 
 #------------------------------------------------------------------------------------
 # Function to return the read-only "signals ahead" element. This is the back-reference
@@ -255,7 +289,13 @@ class section_automation_tab():
         self.ahead = common.signal_route_frame (parent_tab, label="Signals controlling access out of section",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.ahead.frame.pack(padx=2, pady=2, fill='x')
-        self.override = common.signal_route_frame (parent_tab, label="Signals overridden when section occupied",
+        self.sensors1 = common.signal_route_frame (parent_tab, label="Sensors controlling access into section",
+                                tool_tip="Edit the appropriate track sensors to configure automation")
+        self.sensors1.frame.pack(padx=2, pady=2, fill='x')
+        self.sensors2 = common.signal_route_frame (parent_tab, label="Sensors controlling access out of section",
+                                tool_tip="Edit the appropriate track sensors to configure automation")
+        self.sensors2.frame.pack(padx=2, pady=2, fill='x')
+        self.override = common.signal_route_frame (parent_tab, label="Sigs overridden when section occupied",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.override.frame.pack(padx=2, pady=2, fill='x')
         
@@ -327,6 +367,9 @@ class edit_section():
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
             self.automation.behind.set_values(signals_behind)
             self.automation.override.set_values(signals_overridden)
+            sensors_behind, sensors_ahead = track_sensors_behind_and_ahead(self.object_id)
+            self.automation.sensors1.set_values(sensors_behind)
+            self.automation.sensors2.set_values(sensors_ahead)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()
