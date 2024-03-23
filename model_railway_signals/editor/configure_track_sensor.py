@@ -252,9 +252,9 @@ class edit_track_sensor():
             self.gpiosensor = gpio_sensor_selection(self.frame)
             self.gpiosensor.frame.pack(padx=2, pady=2, fill='x')
             # Create the UI Elements for the track sensor route elements
-            self.ahead = track_sensor_route_frame(self.window,label="Routes/Sections behind Track Sensor")
+            self.ahead = track_sensor_route_frame(self.window,label="Routes / Track Sections 'behind' Track Sensor")
             self.ahead.frame.pack(padx=2, pady=2, fill='x')
-            self.behind = track_sensor_route_frame(self.window,label="Routes/Sections ahead of Track Sensor")
+            self.behind = track_sensor_route_frame(self.window,label="Routes/ Track Sections 'ahead of' Track Sensor")
             self.behind.frame.pack(padx=2, pady=2, fill='x')
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
