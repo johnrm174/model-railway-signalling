@@ -60,11 +60,11 @@
 #    track_sections.set_section_occupied (section_id) - Set Track Section to "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Set Track Section to "Clear"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
-#    track_sections.section_label - get the current label (for updating mirrored sections) ################################
+#    track_sections.section_label - get the current label for an occupied section
 #------------------------------------------------------------------------------------
 
 import logging
-
+import tkinter as Tk
 from typing import Union
 
 from ..library import signals
@@ -545,7 +545,8 @@ def update_track_occupancy_for_signal(object_id):
     else:
         signal_clear = False
     if route is not None and not is_secondary_event:
-        process_track_occupancy(section_ahead, section_behind, item_text, True, signal_clear)
+        spad_popups = schematic_object["spadwarnings"]
+        process_track_occupancy(section_ahead, section_behind, item_text, signal_clear, spad_popups)
     return()
 
 #------------------------------------------------------------------------------------
@@ -571,14 +572,16 @@ def update_track_occupancy_for_track_sensor(object_id):
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
     if route_ahead is not None and route_behind is not None:
-        process_track_occupancy(section_ahead, section_behind, item_text, False, False)
+        process_track_occupancy(section_ahead, section_behind, item_text)
     return()
 
 #------------------------------------------------------------------------------------
-# Common Track Occupancy logic - Track Sensors and Signals
+# Common Track Occupancy logic - Track Sensors and Signals. If this function is
+# called for a track sensor then the sig_clear will default to None
 #------------------------------------------------------------------------------------
 
-def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, is_signal:bool, is_clear:bool):
+def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str,
+                             sig_clear:bool=None, spad_popups:bool=False):
     if ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
          section_behind > 0 and not track_sections.section_occupied(section_behind) ):
         # Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
@@ -589,11 +592,17 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
         # Section BEHIND = OCCUPIED and section AHEAD = CLEAR - Pass train from BEHIND to AHEAD
         train_descriptor = track_sections.clear_section_occupied(section_behind)
         track_sections.set_section_occupied (section_ahead, train_descriptor)
-        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+        if sig_clear == False:
+            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
+                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
     elif section_ahead > 0 and section_behind == 0 and not track_sections.section_occupied(section_ahead):
         # Section AHEAD = CLEAR - section BEHIND doesn't exist - set section ahead to OCCUPIED
         track_sections.set_section_occupied(section_ahead)
-        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+        if sig_clear == False:
+            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+            if spad_popups:  Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
+                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
     elif section_behind > 0 and section_ahead == 0 and not track_sections.section_occupied(section_behind):
         # Section BEHIND = CLEAR - section AHEAD doesn't exist - set section behind to OCCUPIED
        track_sections.set_section_occupied(section_behind)
@@ -603,7 +612,10 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
     elif section_behind > 0 and section_ahead == 0 and track_sections.section_occupied(section_behind):
         # Section BEHIND = OCCUPIED - section AHEAD doesn't exist -set section behind to CLEAR
         track_sections.clear_section_occupied(section_behind)
-        if is_signal and not is_clear: logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+        if sig_clear == False:
+            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
+                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
     elif ( section_ahead > 0 and not track_sections.section_occupied(section_ahead) and
            section_behind > 0 and not track_sections.section_occupied(section_behind) ):
         # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
@@ -612,11 +624,16 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
     elif ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
            section_behind > 0 and track_sections.section_occupied(section_behind) ):
         # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
-        if is_signal and is_clear:
+        if sig_clear == True:
             # Assume that the train BEHIND the signal will move into the section AHEAD
             train_descriptor = track_sections.clear_section_occupied(section_behind)
+            train_ahead_descriptor = track_sections.section_label(section_ahead)
             track_sections.set_section_occupied (section_ahead, train_descriptor)
             log_text = " 'passed' at CLEAR - Assume Trains coupling - Check and update Train Descriptor"
+            if spad_popups: Tk.messagebox.showinfo(parent=canvas, title="Train entering occupied section",
+                           message=item_text+" has been Passed at Clear by '"+train_descriptor+
+                                   "' and is entering Section occupied by '"+train_ahead_descriptor+
+                                   "'. Check and update train descriptor as required" )
         else:
             # We have no idea what train has passed the Signal / Track Section
             log_text = " 'passed' but unable to determine train movement as Track Sections ahead and behind are both OCCUPIED"

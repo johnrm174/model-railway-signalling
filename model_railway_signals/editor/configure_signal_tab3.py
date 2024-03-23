@@ -141,7 +141,7 @@ class section_behind_element(common.int_item_id_entry_box):
         tool_tip = "Sepecify the track section 'in the rear of' this signal to be cleared when the signal is passed"
         super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
         self.pack(side=Tk.LEFT)
-        self.label = Tk.Label(self.frame, text="=>")
+        self.label = Tk.Label(self.frame, text=" "+u"\u2192")
         self.label.pack(side=Tk.LEFT)
 
 class section_ahead_element():
@@ -194,11 +194,11 @@ class section_ahead_element():
 
 class section_ahead_frame():
     def __init__(self, parent_frame):
-        self.main = section_ahead_element(parent_frame, label="MAIN =>")
-        self.lh1 = section_ahead_element(parent_frame, label="LH1 =>")
-        self.lh2 = section_ahead_element(parent_frame, label="LH2 =>")
-        self.rh1 = section_ahead_element(parent_frame, label="RH1 =>")
-        self.rh2 = section_ahead_element(parent_frame, label="RH2 =>")
+        self.main = section_ahead_element(parent_frame, label="MAIN "+u"\u2192")
+        self.lh1 = section_ahead_element(parent_frame, label="LH1 "+u"\u2192")
+        self.lh2 = section_ahead_element(parent_frame, label="LH2 "+u"\u2192")
+        self.rh1 = section_ahead_element(parent_frame, label="RH1 "+u"\u2192")
+        self.rh2 = section_ahead_element(parent_frame, label="RH2 "+u"\u2192")
         
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -285,35 +285,42 @@ class general_settings_frame():
                     tool_tip="Select to create without a main signal button "+
                     "(signal will have a default signal state of OFF, but can be "+
                         "overridden to ON via the selections below)")
-        self.automatic.pack(pady=2)
+        self.automatic.pack()
         self.distant_automatic = common.check_box(self.frame, width=39,
                     label="Fully automatic distant arms (no control button)",
                     tool_tip="Select to create without a distant signal button "+
                     "(distant arms will have a default signal state of OFF, but can "+
                         "be overridden to CAUTION via the selections below)")
-        self.distant_automatic.pack(pady=2)
+        self.distant_automatic.pack()
         self.override = common.check_box(self.frame, width=39,
                     label="Override signal to ON if section(s) ahead occupied",
                     tool_tip="Select to override the signal to ON if the track "+
                     "sections ahead of the signal (specified on the left) are occupied")
-        self.override.pack(pady=2)
+        self.override.pack()
         self.override_ahead = common.check_box(self.frame, width=39,
                     label="Override to CAUTION to reflect home signals ahead",
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
-        self.override_ahead.pack(pady=2)
+        self.override_ahead.pack()
+        self.spad_warnings = common.check_box(self.frame, width=39,
+                    label="Popup warnings when Signal is Passed At Danger",
+                    tool_tip="Select to enable Pop-up warnings if the system "+
+                    "detects that the signal has been passed at danger (SPAD)")
+        self.spad_warnings.pack()
                         
-    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
+    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool, spad_warnings:bool):
         self.override.set_value(override)
         self.automatic.set_value(main_auto)
         self.override_ahead.set_value(override_ahead)
         self.distant_automatic.set_value(dist_auto)
+        self.spad_warnings.set_value(spad_warnings)
 
     def get_values(self):
         return ( self.override.get_value(),
                  self.automatic.get_value(),
                  self.override_ahead.get_value(),
-                 self.distant_automatic.get_value() )
+                 self.distant_automatic.get_value(),
+                 self.spad_warnings.get_value() )
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route element comprising a route selection checkbox, a

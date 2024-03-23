@@ -196,6 +196,7 @@ default_signal_object["fullyautomatic"] = False # Main signal is automatic (no b
 default_signal_object["distautomatic"] = False # Semaphore associated distant is automatic
 default_signal_object["overrideahead"] = False
 default_signal_object["overridesignal"] = False
+default_signal_object["spadwarnings"] = False
 # Approach_Control comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
 # Each element represents the approach control mode that has been set
 # release_on_red=1, release_on_yel=2, released_on_red_home_ahead=3

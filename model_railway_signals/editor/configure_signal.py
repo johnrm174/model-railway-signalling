@@ -903,7 +903,8 @@ class edit_signal:
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
             dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
             override_ahead = objects.schematic_objects[self.object_id]["overrideahead"]
-            self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
+            spad_warnings = objects.schematic_objects[self.object_id]["spadwarnings"]
+            self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto, spad_warnings)
             self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"], item_id)
             self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
             # Configure the initial Route indication selection
@@ -998,11 +999,12 @@ class edit_signal:
                 new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
                 new_object_configuration["approachsensor"][1] = self.automation.gpio_sensors.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
-                override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
+                override, main_auto, override_ahead, dist_auto, spad_warnings = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto
                 new_object_configuration["distautomatic"] = dist_auto
                 new_object_configuration["overridesignal"] = override
                 new_object_configuration["overrideahead"] = override_ahead
+                new_object_configuration["spadwarnings"] = spad_warnings
                 new_object_configuration["timedsequences"] = self.automation.timed_signal.get_values()
                 new_object_configuration["approachcontrol"] = self.automation.approach_control.get_values()
                 # Save the updated configuration (and re-draw the object)
