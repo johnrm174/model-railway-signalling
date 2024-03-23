@@ -91,10 +91,12 @@ def redraw_textbox_object(object_id):
 #------------------------------------------------------------------------------------
         
 def create_textbox():
-    # Generate a new object from the default configuration with a new UUID 
+    # Generate a new object from the default configuration with a new UUID
+    # Note that we don't need to assign the 'itemID' as textboxes are just
+    # for annotating the schematic (not used in layout configuration/automation)
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_textbox_object)
-    # Find the initial canvas position for the new object and assign the item ID
+    # Find the initial canvas position
     x, y = objects_common.find_initial_canvas_position()
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["posx"] = x

@@ -79,12 +79,9 @@ from .objects_common import section
 from .objects_common import instrument
 from .objects_common import line
 from .objects_common import track_sensor
-from .objects_common import signal_exists
-from .objects_common import point_exists
-from .objects_common import section_exists
-from .objects_common import instrument_exists
-from .objects_common import line_exists
-from .objects_common import track_sensor_exists
+
+from .objects_common import section_exists  ####################
+from .objects_common import line_exists  #######################
 
 from .objects_common import object_type
 from .objects_common import schematic_objects 
@@ -128,12 +125,8 @@ assert section
 assert instrument
 assert line
 assert track_sensor
-assert signal_exists
-assert point_exists
-assert section_exists
-assert instrument_exists
-assert line_exists
-assert track_sensor_exists
+assert section_exists  #######################
+assert line_exists  ##########################
 assert object_type
 assert get_endstop_offsets
 assert update_local_gpio_sensors

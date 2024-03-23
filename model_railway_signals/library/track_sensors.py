@@ -19,7 +19,7 @@
 #
 #    delete_track_sensor(sensor_id:int) - To delete the specified track sensor from the schematic
 #
-# External API - classes and functions (used by the other library modules):
+# Classes and functions used by the other library modules:
 #
 #   track_sensor_triggered (sensor_id:int, callback_type=None) - Called on gpio_sensor trigger
 #         events if the gpio_sensor has been configured to generate a "track sensor passed" event

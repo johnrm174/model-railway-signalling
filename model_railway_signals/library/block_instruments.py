@@ -3,63 +3,69 @@
 # and twin line instruments are supported. Sound files credited to https://www.soundjay.com/tos.html
 # -----------------------------------------------------------------------------------------------
 #
-# Public types and functions: 
+# External API - classes and functions (used by the Schematic Editor):
 # 
-# block_callback_type (tells the calling program what has triggered the callback)
-#     block_section_ahead_updated - The block section AHEAD of our block section has been updated
-#                             (i.e. the block section state represented by the Repeater indicator)
+#   instrument_type (use when creating instruments)
+#      instrument_type.single_line
+#      instrument_type.double_line
 #
-# instrument_type - enumeration type - single_line or double_line
+#   block_callback_type (tells the calling program what has triggered the callback)
+#      block_callback_type. block_section_ahead_updated - The block section AHEAD has been updated
+#                               (i.e. the block section state of the linked block instrument)
 # 
-# create_block_instrument - Creates a Block Section Instrument on the schematic
-#   Mandatory Parameters:
-#       Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
-#       block_id:int - The local identifier to be used for the Block Instrument 
-#       x:int, y:int - Position of the instrument on the canvas (in pixels)
-#   Optional Parameters:
-#       inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
-#       block_callback - The function to call when the repeater indicator on our instrument has been
-#                        updated (i.e. the block changed on the linked instrument) - default: null
-#                        Note that the callback function returns (item_id, callback type)
-#       bell_sound_file:str - The filename of the soundfile (in the local package resources
-#                           folder) to use for the bell sound (default "bell-ring-01.wav")
-#       telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
-#                           to use for the Telegraph key sound (default "telegraph-key-01.wav")
-#       linked_to:int/str - the identifier for the "paired" block instrument - can be specified
-#                           either as an integer (representing the ID of a Block Instrument on the
-#                           the local schematic), or a string representing a Block Instrument 
-#                           running on a remote node - see MQTT networking (default = None)
+#   create_block_instrument - Creates an instrument and returns the "tag" for all tkinter canvas drawing objects 
+#                           This allows the editor to move the point object on the schematic as required
+#      Mandatory Parameters:
+#        Canvas - The Tkinter Drawing canvas on which the instrument is to be displayed
+#        inst_id:int - The local identifier to be used for the Block Instrument 
+#        inst_type:instrument_type - either instrument_type.single_line or instrument_type.double_line
+#        x:int, y:int - Position of the instrument on the canvas (in pixels)
+#        callback - The function to call on block section ahead updated events
+#                   Note that the callback function returns (item_id, callback type)
+#      Optional Parameters:
+#        bell_sound_file:str - The filename of the soundfile (in the local package resources
+#                             folder) to use for the bell sound (default "bell-ring-01.wav")
+#        telegraph_sound_file:str - The filename of the soundfile (in the local package resources)
+#                             to use for the Telegraph key sound (default "telegraph-key-01.wav")
+#        linked_to:int/str - the identifier for the "paired" block instrument - can be specified
+#                            either as an integer (representing the ID of a Block Instrument on the
+#                            the local schematic), or a string representing a Block Instrument 
+#                            running on a remote node - see MQTT networking (default = None)
 # 
-# Note that automatic MQTT networking publish/subscribe on instrument creation is now DEPRECATED.
-# The 'set_instruments_to_publish_state' and 'subscribe_to_instrument_updates' functions should
-# be called to configure networking prior to creating Block Instruments on the local schematic.
-# This is to provide a level of consistency between other MQTT publish/subscribe functions.
-# 
-# block_section_ahead_clear(block_id:int) - Returns the state of the ASSOCIATED block instrument
-#           (i.e. the linked instrument controlling the state of the block section ahead of ours)
-#           This can be used to implement full interlocking of the Starter signal in our section
-#           (i.e. signal locked at danger until the box ahead sets their instrument to LINE-CLEAR)
-#           Returned state is: True = LINE-CLEAR, False = LINE-BLOCKED or TRAIN-ON-LINE
+#   instrument_exists(inst_id:int/str) - returns true if the Block Instrument 'exists' (either a block instrument
+#        has been created on the local schematic or the block_instrument has been subscribed to via MQTT networking)
 #
-# If you want to use Block Instruments with full sound enabled (bell rings and telegraph key sounds)
-# then you will also need to install the 'simpleaudio' package. Note that for Windows it has a dependency 
-# on Microsoft Visual C++ 14.0 or greater (so you will need to ensure Visual Studio 2015 is installed first)
-# If 'simpleaudio' is not installed then the software will still function correctly (just without sound)
+#   update_linked_instrument(inst_id:int, linked_to_id:str) - updated the linked instrument in a block Instrument
+#                            configuration (updating the repeater on the new linked instrument as required)
+#
+#   delete_instrument(inst_id:int) - To delete the specified Block Instrument from the schematic
+#
+#   block_section_ahead_clear(inst_id:int) - Returns the state of the ASSOCIATED block instrument
+#                       (i.e. the linked instrument controlling the state of the block section ahead)
+#
+# The following API functions are for configuring the pub/sub of Block Instrument events. The functions are
+# called by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# the existing pub/sub configuration, followed by 'set_instruments_to_publish_state' (with the list of LOCAL Block
+# Instruments to publish) and 'subscribe_to_remote_instrument' for each REMOTE Block Instrument that has been subscribed.
+#
+#   reset_mqtt_configuration() - Clears down the current Block Instrument pub/sub configuration
+# 
+#   set_instruments_to_publish_state (*sensor_ids:int) - Enable the publication of Block Instrument events.
+#
+#   subscribe_to_remote_instrument(remote_id:str) - Subscribes to a remote Block Instrument
+#
+# Classes and functions used by the other library modules:
+#
+#   handle_mqtt_instrument_updated_event(message) - called on receipt of a remote 'instrument_updated' event
+#
+#   handle_mqtt_ring_section_bell_event(message) - called on receipt of a remote 'telegraph key' event
 #
 # ------------------------------------------------------------------------------------------
-#
-# The following functions are associated with the MQTT networking Feature:
-#
-# subscribe_to_remote_instrument - Subscribes to a remote block instrument object
-#   Mandatory Parameters:
-#       remote_identifier:str - the remote identifier for the block instrument in the form 'node-id'
-#
-# set_instruments_to_publish_state - Enable the publication of state updates for block instruments.
-#                All subsequent changes will be automatically published to remote subscribers
-#   Mandatory Parameters:
-#       *inst_ids:int - The block instruments to publish (multiple Instrument_IDs can be specified)
-#
-# -----------------------------------------------------------------------------------------------
+# To use Block Instruments with full sound enabled (bell rings and telegraph key sounds) then
+# the 'simpleaudio' package will need to be installed. Note that for Windows it has a dependency 
+# on Microsoft Visual C++ 14.0 or greater (so Visual Studio 2015 should be installed first)
+# If 'simpleaudio' is not installed then the software will function without sound.
+# ------------------------------------------------------------------------------------------
 
 from . import common
 from . import mqtt_interface
@@ -71,11 +77,13 @@ import os
 import logging
 import importlib.resources
 
+# -------------------------------------------------------------------------
 # We can only use audio for the block instruments if 'simpleaudio' is installed
 # Although this package is supported across different platforms, for Windows
 # it has a dependency on Visual C++ 14.0. As this is quite a faff to install I
 # haven't made audio a hard and fast dependency for the 'model_railway_signals'
-# pack age as a whole - its up to the user to install if required
+# package as a whole - its up to the user to install if required
+# -------------------------------------------------------------------------
 
 def is_simpleaudio_installed():
     global simpleaudio
@@ -114,27 +122,6 @@ bell_code_hints_open = False
 # --------------------------------------------------------------------------------
 
 list_of_instruments_to_publish = []
-
-# -------------------------------------------------------------------------
-# The default "External" callback for Block Instruments if one isn't specified
-# -------------------------------------------------------------------------
-
-def null_callback(block_id:int, callback_type):
-    return(block_id, callback_type)
-
-# -------------------------------------------------------------------------
-# Helper function to return an instrument ID ofthe right python Type - depending
-# on whether it is a local (int) or remote (str) ID. We need to do this for the
-# editor as the editor will give us both local and remote IDs as a string
-# -------------------------------------------------------------------------
-
-def set_item_id_type(input_id:Union[int,str]):
-    if input_id is None or input_id == "":
-        output_id = None
-    else:
-        try: output_id = int(input_id)
-        except: output_id = str(input_id)
-    return(output_id)
 
 # --------------------------------------------------------------------------------
 # Internal Function to Open a window containing a list of common signal box bell
@@ -189,49 +176,53 @@ def open_bell_code_hints():
     return()
 
 # --------------------------------------------------------------------------------
-# Internal Function to check if a Block Instrument exists in the list of Instruments
+# API Function to check if a Block Instrument exists in the list of Instruments
 # Used in most externally-called functions to validate the Block instrument ID
 # Note the function will take in either local or (subscribed to) remote IDs
 # --------------------------------------------------------------------------------
 
-def instrument_exists(block_id:Union[int,str]):
-    return (str(block_id) in instruments.keys() )
+def instrument_exists(inst_id:Union[int,str]):
+    if not isinstance(inst_id, int) and not isinstance(inst_id, str):
+        logging.error("Instrument "+str(inst_id)+": instrument_exists - Instrument ID must be an int or str")
+        instrument_exists = False
+    else:
+        instrument_exists = str(inst_id) in instruments.keys()
+    return(instrument_exists)
 
 # --------------------------------------------------------------------------------
-# Callbacks for handling button push events
+# Internal Callbacks for handling button push events
 # --------------------------------------------------------------------------------
 
-def occup_button_event (block_id:int):
-    logging.info ("Block Instrument "+str(block_id)+": Occup button event ***********************************************")
-    set_section_occupied(block_id)
+def occup_button_event(inst_id:int):
+    logging.info ("Instrument "+str(inst_id)+": Occup button event ***********************************************")
+    set_section_occupied(inst_id)
     return()
 
-def clear_button_event (block_id:int):
-    logging.info ("Block Instrument "+str(block_id)+": Clear button event ***********************************************")
-    set_section_clear(block_id)
+def clear_button_event(inst_id:int):
+    logging.info ("Instrument "+str(inst_id)+": Clear button event ***********************************************")
+    set_section_clear(inst_id)
     return()
 
-def blocked_button_event (block_id:int):
-    logging.info ("Block Instrument "+str(block_id)+": Blocked button event *********************************************")
-    set_section_blocked(block_id)
+def blocked_button_event(inst_id:int):
+    logging.info ("Instrument "+str(inst_id)+": Blocked button event *********************************************")
+    set_section_blocked(inst_id)
     return()
 
-def telegraph_key_button (block_id:int):
-    logging.debug ("Block Instrument "+str(block_id)+": Telegraph key operated ************************************")
+def telegraph_key_button(inst_id:int):
+    logging.debug ("Instrument "+str(inst_id)+": Telegraph key operated ************************************")
     # Provide a visual indication of the key being pressed
-    instruments[str(block_id)]["bellbutton"].config(relief="sunken")
-    common.root_window.after(10,lambda:instruments[str(block_id)]["bellbutton"].config(relief="raised"))
+    instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
+    common.root_window.after(10,lambda:instruments[str(inst_id)]["bellbutton"].config(relief="raised"))
     # Sound the "clack" of the telegraph key - We put exception handling around this as the function can raise
     # exceptions if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
-    if instruments[str(block_id)]["telegraphsound"] is not None:
-        try: instruments[str(block_id)]["telegraphsound"].play()
+    if instruments[str(inst_id)]["telegraphsound"] is not None:
+        try: instruments[str(inst_id)]["telegraphsound"].play()
         except: pass
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
-    if instruments[str(block_id)]["linkedto"] is not None:
-        if isinstance(instruments[str(block_id)]["linkedto"],str): send_mqtt_ring_section_bell_event(block_id)
-        else: ring_section_bell(instruments[str(block_id)]["linkedto"])
+    if instruments[str(inst_id)]["linkedto"].isdigit(): ring_section_bell(instruments[str(inst_id)]["linkedto"])
+    elif instruments[str(inst_id)]["linkedto"] != "": send_mqtt_ring_section_bell_event(inst_id)
     return()
 
 # --------------------------------------------------------------------------------
@@ -239,103 +230,157 @@ def telegraph_key_button (block_id:int):
 # sound a bell "ting" on the local instrument (with a visual indication)
 # --------------------------------------------------------------------------------
 
-def ring_section_bell (block_id:int):
-    logging.debug ("Block Instrument "+str(block_id)+": Ringing Bell")
-    # Provide a visual indication of an incoming bell
-    instruments[str(block_id)]["bellbutton"].config(bg="yellow")
-    common.root_window.after(100,lambda:instruments[str(block_id)]["bellbutton"].config(bg="black"))
-    # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
-    # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
-    if instruments[str(block_id)]["bellsound"] is not None:
-        try: instruments[str(block_id)]["bellsound"].play()
-        except: pass
+def reset_telegraph_button (inst_id:int):
+    if instrument_exists(inst_id): instruments[str(inst_id)]["bellbutton"].config(bg="black")
+
+def ring_section_bell(inst_id:int):
+    logging.debug ("Instrument "+str(inst_id)+": Ringing Bell")
+    # Provide a visual indication and sound the bell (not if shutdown has been initiated)
+    if not common.shutdown_initiated:
+        instruments[str(inst_id)]["bellbutton"].config(bg="yellow")
+        common.root_window.after(100,lambda:reset_telegraph_button(inst_id))
+        # Sound the Bell - We put exception handling around this as I've seen this function raise exceptions
+        # if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
+        if instruments[str(inst_id)]["bellsound"] is not None:
+            try: instruments[str(inst_id)]["bellsound"].play()
+            except: pass
     return()
 
 # --------------------------------------------------------------------------------
-# Function to set the repeater indicator (linked to another block section)
+# API callback function for handling received MQTT messages from a remote instrument
+# Note that this function will already be running in the main Tkinter thread
+# --------------------------------------------------------------------------------
+
+def handle_mqtt_instrument_updated_event(message):
+    if "sourceidentifier" not in message.keys() or "sectionstate" not in message.keys() or not instrument_exists(message["sourceidentifier"]):
+        logging.warning("Instruments: handle_mqtt_instrument_updated_event - Unhandled MQTT message - "+str(message))
+    else:
+        node_id, inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        if instrument_exists(inst_id):
+            logging.info("Instrument "+str(inst_id)+": State update from linked instrument "+
+                                        message["sourceidentifier"]+" ********************")
+            if message["sectionstate"] == True: set_repeater_clear(inst_id)
+            elif message["sectionstate"] == False: set_repeater_occupied(inst_id)
+            elif message["sectionstate"] == None: set_repeater_blocked(inst_id)
+        # Note that if the specified block instrument does not exist then we fail silently for the instrument updated event.
+        # This could arise from either layout misconfiguration (a non existant 'linked instrument' specified for the Block
+        # instrument on the oither network node), or the race condition that will arise when loading the layouts (one of the
+        # layouts will always be created first and will therefore end up sending the initial block instrument state message
+        # before the linked instrument (on the other layout) has been created. We therefore accept this as a limitation.
+    return()
+
+def handle_mqtt_ring_section_bell_event(message):
+    if "sourceidentifier" not in message.keys() or "instrumentid" not in message.keys() or not instrument_exists(message["sourceidentifier"]):
+        logging.warning("Instruments: handle_mqtt_ring_section_bell_event - Unhandled MQTT message - "+str(message))
+    else:
+        node_id, inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        if instrument_exists(inst_id):
+            logging.debug("Instrument "+str(inst_id)+": Telegraph key event from linked instrument"+
+                                        message["sourceidentifier"]+" ********************")
+            ring_section_bell(inst_id)
+        else:
+            logging.warning("Instruments: handle_mqtt_ring_section_bell_event - Unhandled MQTT message - "+str(message))
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal functions for building and publishing MQTT messages (to a remote instrument)
+# --------------------------------------------------------------------------------
+
+def send_mqtt_instrument_updated_event(inst_id:int):
+    if inst_id in list_of_instruments_to_publish:
+        data = {}
+        data["instrumentid"] = instruments[str(inst_id)]["linkedto"]
+        data["sectionstate"] = instruments[str(inst_id)]["sectionstate"]
+        log_message = "Instrument "+str(inst_id)+": Publishing instrument state to MQTT Broker"
+        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        mqtt_interface.send_mqtt_message("instrument_updated_event", inst_id, data=data, log_message=log_message, retain=True)
+    return()
+
+def send_mqtt_ring_section_bell_event(inst_id:int):
+    if inst_id in list_of_instruments_to_publish:
+        data = {}
+        data["instrumentid"] = instruments[str(inst_id)]["linkedto"]
+        log_message = "Instrument "+str(inst_id)+": Publishing telegraph key event to MQTT Broker"
+        # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
+        mqtt_interface.send_mqtt_message("instrument_telegraph_event", inst_id, data=data, log_message=log_message, retain=False)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal Function to set the repeater indicator (linked to another block section)
 # to BLOCKED - if its a single line instrument then we set the main indication
 # --------------------------------------------------------------------------------
 
-def set_repeater_blocked (block_id:int,make_callback:bool=True):
+def set_repeater_blocked(inst_id:int,make_callback:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists(block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE BLOCKED - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["repeaterstate"] is not None:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to LINE BLOCKED")
+    if instruments[str(inst_id)]["repeaterstate"] is not None:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section repeater to LINE BLOCKED")
         # Set the internal repeater state and the repeater indicator to BLOCKED
-        instruments[str(block_id)]["repeaterstate"] = None
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "normal")
+        instruments[str(inst_id)]["repeaterstate"] = None
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatoroccup"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorclear"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorblock"],state = "normal")
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also enable the local buttons (as the remote instrument has been returned to LINE BLOCKED)
-        if instruments[str(block_id)]["singleline"]:
-            instruments[str(block_id)]["blockbutton"].config(state="normal",relief="sunken",bg=common.bgsunken)
-            instruments[str(block_id)]["clearbutton"].config(state="normal",relief="raised",bg=common.bgraised)
-            instruments[str(block_id)]["occupbutton"].config(state="normal",relief="raised",bg=common.bgraised)
+        if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
+            instruments[str(inst_id)]["blockbutton"].config(state="normal",relief="sunken",bg=common.bgsunken)
+            instruments[str(inst_id)]["clearbutton"].config(state="normal",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["occupbutton"].config(state="normal",relief="raised",bg=common.bgraised)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
-# Function to set the repeater indicator (linked to another block section)
+# Internal Function to set the repeater indicator (linked to another block section)
 # to LINE CLEAR - if its a single line instrument then we set the main indication
 # --------------------------------------------------------------------------------
 
-def set_repeater_clear (block_id:int,make_callback:bool=True):
+def set_repeater_clear(inst_id:int,make_callback:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to LINE CLEAR - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["repeaterstate"] != True:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to LINE CLEAR")
+    if instruments[str(inst_id)]["repeaterstate"] != True:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section repeater to LINE CLEAR")
         # Set the internal repeater state and the repeater indicator to CLEAR
-        instruments[str(block_id)]["repeaterstate"] = True
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "normal")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "hidden")
+        instruments[str(inst_id)]["repeaterstate"] = True
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatoroccup"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorclear"],state = "normal")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorblock"],state = "hidden")
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
-        if instruments[str(block_id)]["singleline"]:
-            instruments[str(block_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(block_id)]["clearbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
-            instruments[str(block_id)]["occupbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+        if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
+            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
+            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
-# Function to set the repeater indicator (linked to another block section)
+# Internal Function to set the repeater indicator (linked to another block section)
 # to OCCUPIED - if its a single line instrument then we set the main indication
 # --------------------------------------------------------------------------------
 
-def set_repeater_occupied (block_id:int,make_callback:bool=True):
+def set_repeater_occupied(inst_id:int,make_callback:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set repeater to TRAIN ON LINE - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["repeaterstate"] != False:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section repeater to TRAIN ON LINE")
+    if instruments[str(inst_id)]["repeaterstate"] != False:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section repeater to TRAIN ON LINE")
         # Set the internal repeater state and the repeater indicator to OCCUPIED
-        instruments[str(block_id)]["repeaterstate"] = False
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatoroccup"],state = "normal")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorclear"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["repeatindicatorblock"],state = "hidden")
+        instruments[str(inst_id)]["repeaterstate"] = False
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatoroccup"],state = "normal")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorclear"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["repeatindicatorblock"],state = "hidden")
         # For single line instruments we set the local instrument buttons to mirror the remote instrument
         # and also inhibit the local buttons (until the remote instrument is returned to LINE BLOCKED)
-        if instruments[str(block_id)]["singleline"]:
-            instruments[str(block_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(block_id)]["clearbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
-            instruments[str(block_id)]["occupbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
+        if instruments[str(inst_id)]["insttype"] == instrument_type.single_line:
+            instruments[str(inst_id)]["blockbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["clearbutton"].config(state="disabled",relief="raised",bg=common.bgraised)
+            instruments[str(inst_id)]["occupbutton"].config(state="disabled",relief="sunken",bg=common.bgsunken)
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(block_id)]["extcallback"] (block_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -345,29 +390,23 @@ def set_repeater_occupied (block_id:int,make_callback:bool=True):
 # following a state change of the linked remote block instrument
 # --------------------------------------------------------------------------------
 
-def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
+def set_section_blocked(inst_id:int,update_remote_instrument:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE BLOCKED - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["sectionstate"] is not None:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE BLOCKED")
+    if instruments[str(inst_id)]["sectionstate"] is not None:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to LINE BLOCKED")
         # Set the state of the buttons accordingly
-        instruments[str(block_id)]["blockbutton"].config(relief="sunken",bg=common.bgsunken)
-        instruments[str(block_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(block_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["blockbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
         # Set the internal state of the block instrument and the local indicator
-        instruments[str(block_id)]["sectionstate"] = None
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "normal")
+        instruments[str(inst_id)]["sectionstate"] = None
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorclear"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorblock"],state = "normal")
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-            linked_to_id = instruments[str(block_id)]["linkedto"]
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-            elif instrument_exists(linked_to_id): set_repeater_blocked(linked_to_id)
+        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
     return ()
 
 # --------------------------------------------------------------------------------
@@ -377,29 +416,23 @@ def set_section_blocked (block_id:int,update_remote_instrument:bool=True):
 # following a state change of the linked remote block instrument
 # --------------------------------------------------------------------------------
 
-def set_section_clear (block_id:int,update_remote_instrument:bool=True):
+def set_section_clear(inst_id:int,update_remote_instrument:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set section to LINE CLEAR - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["sectionstate"] != True:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to LINE CLEAR")
+    if instruments[str(inst_id)]["sectionstate"] != True:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to LINE CLEAR")
         # Set the state of the buttons accordingly
-        instruments[str(block_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(block_id)]["clearbutton"].config(relief="sunken",bg=common.bgsunken)
-        instruments[str(block_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["clearbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(inst_id)]["occupbutton"].config(relief="raised",bg=common.bgraised)
         # Set the internal state of the block instrument and the local indicator
-        instruments[str(block_id)]["sectionstate"] = True
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "normal")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
+        instruments[str(inst_id)]["sectionstate"] = True
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorclear"],state = "normal")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorblock"],state = "hidden")
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-            linked_to_id = instruments[str(block_id)]["linkedto"]
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-            elif instrument_exists(linked_to_id): set_repeater_clear(linked_to_id)
+        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
     return ()
 
 # --------------------------------------------------------------------------------
@@ -409,45 +442,56 @@ def set_section_clear (block_id:int,update_remote_instrument:bool=True):
 # following a state change of the linked remote block instrument
 # --------------------------------------------------------------------------------
 
-def set_section_occupied (block_id:int,update_remote_instrument:bool=True):
+def set_section_occupied(inst_id:int,update_remote_instrument:bool=True):
     global instruments
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Can't set section to TRAIN ON LINE - Block instrument doesn't exist")
-    elif instruments[str(block_id)]["sectionstate"] != False:
-        logging.info ("Block Instrument "+str(block_id)+": Changing block section indicator to TRAIN ON LINE")
+    if instruments[str(inst_id)]["sectionstate"] != False:
+        logging.info ("Instrument "+str(inst_id)+": Changing block section indicator to TRAIN ON LINE")
         # Set the state of the buttons accordingly
-        instruments[str(block_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(block_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
-        instruments[str(block_id)]["occupbutton"].config(relief="sunken",bg=common.bgsunken)
+        instruments[str(inst_id)]["blockbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["clearbutton"].config(relief="raised",bg=common.bgraised)
+        instruments[str(inst_id)]["occupbutton"].config(relief="sunken",bg=common.bgsunken)
         # Set the internal state of the block instrument and the local indicator
-        instruments[str(block_id)]["sectionstate"] = False
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatoroccup"],state = "normal")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorclear"],state = "hidden")
-        instruments[str(block_id)]["canvas"].itemconfigure(instruments[str(block_id)]["myindicatorblock"],state = "hidden")
+        instruments[str(inst_id)]["sectionstate"] = False
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatoroccup"],state = "normal")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorclear"],state = "hidden")
+        instruments[str(inst_id)]["canvas"].itemconfigure(instruments[str(inst_id)]["myindicatorblock"],state = "hidden")
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument and instruments[str(block_id)]["linkedto"] is not None:
-            linked_to_id = instruments[str(block_id)]["linkedto"]
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(block_id)
-            elif instrument_exists(linked_to_id): set_repeater_occupied(linked_to_id)
+        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
     return ()
+
+# --------------------------------------------------------------------------------
+# Internal function to update the REPEATER display on a linked block instrument
+# --------------------------------------------------------------------------------
+
+def refresh_linked_instrument(inst_id:int, linked_to_id:str):
+    # Block State is as follows: True = Line Clear, False = Train On Line, None = Line Blocked
+    if instruments[str(inst_id)]["sectionstate"] == True:
+        if linked_to_id.isdigit() and instrument_exists(linked_to_id): set_repeater_clear(linked_to_id)
+        elif linked_to_id != "": send_mqtt_instrument_updated_event(inst_id)
+    elif instruments[str(inst_id)]["sectionstate"] == False:
+        if linked_to_id.isdigit() and instrument_exists(linked_to_id): set_repeater_occupied(linked_to_id)
+        elif linked_to_id != "": send_mqtt_instrument_updated_event(inst_id)
+    else:
+        if linked_to_id.isdigit() and instrument_exists(linked_to_id): set_repeater_blocked(linked_to_id)
+        elif linked_to_id != "": send_mqtt_instrument_updated_event(inst_id)
+    return()
 
 # --------------------------------------------------------------------------------
 # Internal function to create the Indicator component of a Block Instrument
 # --------------------------------------------------------------------------------
 
-def create_block_indicator(canvas:int, x:int, y:int, block_id_tag):
-    canvas.create_rectangle (x-50, y-10, x+50, y+45, fill="gray90", outline='black', width=1, tags=block_id_tag)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='tomato', outline='black', start=-150, extent=40, width=0, tags=block_id_tag)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='yellow', outline='black', start=-110, extent=40, width=0, tags=block_id_tag)
-    canvas.create_arc(x-40, y-40, x+40, y+40, fill='green yellow', outline='black', start=-70, extent=40, width=0, tags=block_id_tag)
-    canvas.create_arc(x-20, y-20, x+20, y+20, fill='gray90', outline="gray90", start=-155, extent=130, width=0, tags=block_id_tag)
-    canvas.create_oval(x-5, y-5, x+5, y+5, fill='black', outline="black", width=0, tags=block_id_tag)
-    block = canvas.create_line (x+0, y-5, x+0,  y + 35, fill='black', width = 3, state='normal', tags=block_id_tag)
-    clear = canvas.create_line (x-3, y-3, x+25, y + 25, fill='black', width = 3, state='hidden', tags=block_id_tag)
-    occup = canvas.create_line (x+3, y-3, x-25, y + 25, fill='black', width = 3 , state='hidden', tags=block_id_tag)
+def create_block_indicator(canvas:int, x:int, y:int, canvas_tag):
+    canvas.create_rectangle (x-40, y-10, x+40, y+45, fill="gray90", outline='black', width=1, tags=canvas_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='tomato', outline='black', start=-150, extent=40, width=0, tags=canvas_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='yellow', outline='black', start=-110, extent=40, width=0, tags=canvas_tag)
+    canvas.create_arc(x-40, y-40, x+40, y+40, fill='green yellow', outline='black', start=-70, extent=40, width=0, tags=canvas_tag)
+    canvas.create_arc(x-20, y-20, x+20, y+20, fill='gray90', outline="gray90", start=-155, extent=130, width=0, tags=canvas_tag)
+    canvas.create_oval(x-5, y-5, x+5, y+5, fill='black', outline="black", width=0, tags=canvas_tag)
+    block = canvas.create_line (x+0, y-5, x+0,  y + 35, fill='black', width = 3, state='normal', tags=canvas_tag)
+    clear = canvas.create_line (x-3, y-3, x+25, y + 25, fill='black', width = 3, state='hidden', tags=canvas_tag)
+    occup = canvas.create_line (x+3, y-3, x-25, y + 25, fill='black', width = 3 , state='hidden', tags=canvas_tag)
     return (block, clear, occup)
 
 # --------------------------------------------------------------------------------
@@ -465,7 +509,7 @@ def load_audio_file(audio_filename):
         except Exception as exception:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio resource file '"+str(audio_filename)+"'")
-            logging.error ("Block Instruments - Error loading audio resource file '"+str(audio_filename)+"'"+
+            logging.error ("Instruments - Error loading audio resource file '"+str(audio_filename)+"'"+
                            " \nReported Exception: "+str(exception))       
     else:        
         try:
@@ -473,7 +517,7 @@ def load_audio_file(audio_filename):
         except Exception as exception:
             Tk.messagebox.showerror(parent=common.root_window, title="Load Error",
                             message="Error loading audio file '"+str(audio_filename)+"'")
-            logging.error ("Block Instruments - Error loading audio file '"+str(audio_filename)+"'"+
+            logging.error ("Instruments - Error loading audio file '"+str(audio_filename)+"'"+
                            " \nReported Exception: "+str(exception))       
     return(audio_object)
 
@@ -481,260 +525,161 @@ def load_audio_file(audio_filename):
 # Public API function to create a Block  Instrument (drawing objects and internal state)
 # --------------------------------------------------------------------------------
 
-def create_block_instrument (canvas,
-                             block_id:int,
-                             x:int, y:int,
-                             inst_type:instrument_type = instrument_type.double_line,
-                             block_callback = null_callback,
-                             bell_sound_file:str = "bell-ring-01.wav",
-                             telegraph_sound_file:str = "telegraph-key-01.wav",
-                             linked_to:Union[int,str] = None):
+def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:int, callback,
+                       bell_sound_file:str = "bell-ring-01.wav",
+                       telegraph_sound_file:str = "telegraph-key-01.wav",
+                       linked_to:str = ""):
     global instruments
-    global list_of_instruments_to_publish
-    logging.info ("Block Instrument "+str(block_id)+": Creating Block Instrument")
-    # Establish whether the ID is a local or remote ID and set the type accordingly
-    # We need to do this for the editor as the editor will give us an int as a string
-    linked_to_id = set_item_id_type(linked_to)
-    # Do some basic validation on the parameters we have been given
-    if instrument_exists(block_id):
-        logging.error ("Block Instrument "+str(block_id)+": Instrument already exists")
-    elif block_id < 1:
-        logging.error ("Block Instrument "+str(block_id)+": Block ID must be greater than zero")
-    elif linked_to_id == block_id:
-        logging.error ("Block Instrument "+str(block_id)+": ID for linked instrument is the same as the instrument to create")
-    elif isinstance(linked_to_id,str) and mqtt_interface.split_remote_item_identifier(linked_to_id) is None:
-        logging.error ("Block Instrument "+str(block_id)+": Compound ID for remote-node instrument is invalid")
+    # Set a unique 'tag' to reference the tkinter drawing objects
+    canvas_tag = "instrument"+str(inst_id)
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int) or inst_id < 1:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be a positive integer")
+    elif instrument_exists(inst_id):
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID already exists")
+    elif not isinstance(linked_to, str):
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID must be a str")
+    elif linked_to == str(inst_id):
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID is the same as the Instrument ID")
+    elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
     else:
-        single_line = (inst_type == instrument_type.single_line)            
-        # Define the "Tag" for all drawing objects for this instrument instance
-        block_id_tag = "instrument"+str(block_id)
         # Create the Instrument background - this will vary in size depending on single or double line
-        if single_line: canvas.create_rectangle (x-60, y-20, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
-        else: canvas.create_rectangle (x-60, y-80, x+60, y+150, fill = "saddle brown",tags=block_id_tag)
+        if inst_type == instrument_type.single_line:
+            canvas.create_rectangle (x-48, y-18, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
+        else:
+            canvas.create_rectangle (x-48, y-73, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
         # Create the button objects and their callbacks
         occup_button = Tk.Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                    bg=common.bgraised, command = lambda:occup_button_event(block_id))
+                    bg=common.bgraised, command = lambda:occup_button_event(inst_id))
         clear_button = Tk.Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
-                    bg=common.bgraised, command = lambda:clear_button_event(block_id))
+                    bg=common.bgraised, command = lambda:clear_button_event(inst_id))
         block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="sunken", font=('Courier',common.fontsize,"normal"),
-                    bg=common.bgsunken, command = lambda:blocked_button_event(block_id))
+                    bg=common.bgsunken, command = lambda:blocked_button_event(inst_id))
         bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
                     state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
                     bg="black", fg="white", activebackground="black", activeforeground="white",
-                    command = lambda:telegraph_key_button(block_id))
+                    command = lambda:telegraph_key_button(inst_id))
         # Bind a right click on the Telegraph button to open the bell code hints
         bell_button.bind('<Button-2>', lambda event:open_bell_code_hints())
         bell_button.bind('<Button-3>', lambda event:open_bell_code_hints())
         # Create the windows (on the canvas) for the buttons
-        canvas.create_window(x, y+80, window=occup_button, anchor=Tk.SE, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=clear_button, anchor=Tk.SW, tags=block_id_tag)
-        canvas.create_window(x, y+80, window=block_button, anchor=Tk.N, tags=block_id_tag)
-        canvas.create_window(x, y+115, window=bell_button, anchor=Tk.N, tags=block_id_tag)
+        canvas.create_window(x, y+70, window=occup_button, anchor=Tk.SE, tags=canvas_tag)
+        canvas.create_window(x, y+70, window=clear_button, anchor=Tk.SW, tags=canvas_tag)
+        canvas.create_window(x, y+70, window=block_button, anchor=Tk.N, tags=canvas_tag)
+        canvas.create_window(x, y+95, window=bell_button, anchor=Tk.N, tags=canvas_tag)
         # Create the main block section indicator for our instrument
-        my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator (canvas, x, y, block_id_tag)
+        my_ind_block, my_ind_clear, my_ind_occup = create_block_indicator(canvas, x, y, canvas_tag)
         # If this is a double line indicator then create the repeater indicator
         # For a single line indicator, we use the main indicator as the repeater
-        if single_line: rep_ind_block, rep_ind_clear, rep_ind_occup = my_ind_block, my_ind_clear, my_ind_occup
-        else: rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator (canvas, x, y-55, block_id_tag)
+        if inst_type == instrument_type.single_line:
+            rep_ind_block, rep_ind_clear, rep_ind_occup = my_ind_block, my_ind_clear, my_ind_occup
+        else:
+            rep_ind_block, rep_ind_clear, rep_ind_occup = create_block_indicator(canvas, x, y-55, canvas_tag)
         # Try to Load the specified audio files for the bell rings and telegraph key if audio is enabled
         # if these fail to load for any reason then no sounds will be produced on these events
         if audio_enabled:
             bell_audio = load_audio_file(bell_sound_file)
             telegraph_audio = load_audio_file(telegraph_sound_file)
         else:
-            logging.warning ("Block Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
+            logging.warning ("Instruments - Audio is not enabled - To enable: 'python3 -m pip install simpleaudio'")
             bell_audio = None
             telegraph_audio = None
         # Create the dictionary of elements that we need to track
-        instruments[str(block_id)] = {}
-        instruments[str(block_id)]["canvas"] = canvas                         # Tkinter drawing canvas
-        instruments[str(block_id)]["extcallback"] = block_callback            # External callback to make
-        instruments[str(block_id)]["linkedto"] = linked_to_id                 # Id of the instrument this one is linked to
-        instruments[str(block_id)]["singleline"] = single_line                # Single line (bi-directional) instrument
-        instruments[str(block_id)]["sectionstate"] = None                     # State of this instrument (None = "BLOCKED")
-        instruments[str(block_id)]["repeaterstate"] = None                    # State of repeater display (None = "BLOCKED")
-        instruments[str(block_id)]["blockbutton"] = block_button              # Tkinter Button object
-        instruments[str(block_id)]["clearbutton"] = clear_button              # Tkinter Button object
-        instruments[str(block_id)]["occupbutton"] = occup_button              # Tkinter Button object
-        instruments[str(block_id)]["bellbutton"] = bell_button                # Tkinter Button object
-        instruments[str(block_id)]["myindicatorclear"] = my_ind_clear         # Tkinter Drawing object
-        instruments[str(block_id)]["myindicatoroccup"] = my_ind_occup         # Tkinter Drawing object
-        instruments[str(block_id)]["myindicatorblock"] = my_ind_block         # Tkinter Drawing object
-        instruments[str(block_id)]["repeatindicatorclear"] = rep_ind_clear    # Tkinter Drawing object
-        instruments[str(block_id)]["repeatindicatoroccup"] = rep_ind_occup    # Tkinter Drawing object
-        instruments[str(block_id)]["repeatindicatorblock"] = rep_ind_block    # Tkinter Drawing object
-        instruments[str(block_id)]["telegraphsound"] = telegraph_audio        # Sound file for the telegraph "clack"
-        instruments[str(block_id)]["bellsound"] = bell_audio                  # Sound file for the bell "Ting"
+        instruments[str(inst_id)] = {}
+        instruments[str(inst_id)]["canvas"] = canvas                         # Tkinter drawing canvas
+        instruments[str(inst_id)]["extcallback"] = callback                  # External callback to make
+        instruments[str(inst_id)]["linkedto"] = linked_to                    # Id of the instrument this one is linked to
+        instruments[str(inst_id)]["insttype"] = inst_type                    # Block Instrument Type
+        instruments[str(inst_id)]["sectionstate"] = None                     # State of this instrument (None = "BLOCKED")
+        instruments[str(inst_id)]["repeaterstate"] = None                    # State of repeater display (None = "BLOCKED")
+        instruments[str(inst_id)]["blockbutton"] = block_button              # Tkinter Button object
+        instruments[str(inst_id)]["clearbutton"] = clear_button              # Tkinter Button object
+        instruments[str(inst_id)]["occupbutton"] = occup_button              # Tkinter Button object
+        instruments[str(inst_id)]["bellbutton"] = bell_button                # Tkinter Button object
+        instruments[str(inst_id)]["myindicatorclear"] = my_ind_clear         # Tkinter Drawing object
+        instruments[str(inst_id)]["myindicatoroccup"] = my_ind_occup         # Tkinter Drawing object
+        instruments[str(inst_id)]["myindicatorblock"] = my_ind_block         # Tkinter Drawing object
+        instruments[str(inst_id)]["repeatindicatorclear"] = rep_ind_clear    # Tkinter Drawing object
+        instruments[str(inst_id)]["repeatindicatoroccup"] = rep_ind_occup    # Tkinter Drawing object
+        instruments[str(inst_id)]["repeatindicatorblock"] = rep_ind_block    # Tkinter Drawing object
+        instruments[str(inst_id)]["telegraphsound"] = telegraph_audio        # Sound file for the telegraph "clack"
+        instruments[str(inst_id)]["bellsound"] = bell_audio                  # Sound file for the bell "Ting"
+        instruments[str(inst_id)]["tags"] = canvas_tag                       # Canvas Tags for all drawing objects
         # Get the initial state for the instrument (if layout state has been loaded)
         # if nothing has been loaded then the default state (of LINE BLOCKED) will be applied
-        loaded_state = file_interface.get_initial_item_state("instruments",block_id)
+        loaded_state = file_interface.get_initial_item_state("instruments",inst_id)
         # Set the initial block-state for the instrument (values will be 'None' for No state loaded)
-        if loaded_state["sectionstate"] == True: set_section_clear(block_id, update_remote_instrument=False)
-        elif loaded_state["sectionstate"] == False: set_section_occupied(block_id, update_remote_instrument=False)
-        else: set_section_blocked(block_id, update_remote_instrument=False)
+        if loaded_state["sectionstate"] == True: set_section_clear(inst_id, update_remote_instrument=False)
+        elif loaded_state["sectionstate"] == False: set_section_occupied(inst_id, update_remote_instrument=False)
+        else: set_section_blocked(inst_id, update_remote_instrument=False)
         # Set the initial repeater state (values will be 'None' for No state loaded)
-        if loaded_state["repeaterstate"] == True: set_repeater_clear(block_id,make_callback=False)
-        elif loaded_state["repeaterstate"] == False: set_repeater_occupied(block_id,make_callback=False)
-        else: set_repeater_blocked(block_id,make_callback=False)
+        if loaded_state["repeaterstate"] == True: set_repeater_clear(inst_id, make_callback=False)
+        elif loaded_state["repeaterstate"] == False: set_repeater_occupied(inst_id, make_callback=False)
+        else: set_repeater_blocked(inst_id, make_callback=False)
         # Update the repeater display of the linked instrument (if one is specified). This will update
-        # local instruments (block_id is an int) if they have already been created on the schematic or
-        # send an MQTT event to update remote instruments (block_id is a str) if the current instrument
+        # local instruments (inst_id is an int) if they have already been created on the schematic or
+        # send an MQTT event to update remote instruments (inst_id is a str) if the current instrument
         # has already been configured to publish state to the MQTT broker.
-        update_linked_to(block_id,linked_to_id)
+        refresh_linked_instrument(inst_id, linked_to)
         # If an instrument already exists that is already linked to this instrument then we need
         # to set the repeater display of this instrument to reflect the state of that instrument.
         # Note that when a remote instrument is subscribed to a 'dummy' instrument is created with
         # a 'linked_to' element of None - so the we don't get an exception whilst iterating
-        for inst_id in instruments:
-            if instruments[inst_id]['linkedto'] == block_id:
-                # As we've got a match we know the inst_id must be local (an integer)
-                update_linked_to(int(inst_id), block_id)
-                # Raise a warning if the current instrument is not configured to point to that instrument
-                if instruments[str(block_id)]['linkedto'] != int(inst_id):
-                    logging.error ("Block Instrument "+str(block_id)+": linked instrument is"+str(linked_to_id)+
-                                   " but instrument "+inst_id+" is linked back to this instrument ")
-    return ()
+        for other_instrument in instruments:
+            if instruments[other_instrument]['linkedto'] == str(inst_id):
+                # We've found an instrument already 'linked to' the instrument we have just created
+                # So we now need to update the repeater display of 'our instrument' accordingly
+                refresh_linked_instrument(int(other_instrument), str(inst_id))
+                # Raise a warning if the 'our instrument' is not configured to point to the other instrument
+                if instruments[str(inst_id)]['linkedto'] != other_instrument:
+                    logging.warning("Instrument "+str(inst_id)+": linked instrument is "+str(linked_to)+
+                                   " but instrument "+other_instrument+" is already linked back to this instrument ")
+    return(canvas_tag)
 
 # --------------------------------------------------------------------------------
 # Public API function to find out if the block section ahead is clear.
 # This is represented by the current status of the REPEATER Indicator
 # --------------------------------------------------------------------------------
 
-def block_section_ahead_clear(block_id:int):
-    # do some basic validation on the block ID we've been given
-    if not instrument_exists (block_id):
-        logging.error ("Block Instrument "+str(block_id)+": block_section_ahead_clear - Block instrument doesn't exist")
+def block_section_ahead_clear(inst_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int) :
+        logging.error("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID must be an integer")
         section_ahead_clear = False
-    elif instruments[str(block_id)]["repeaterstate"] == True:
-        section_ahead_clear = True
+    if not instrument_exists(inst_id):
+        logging.error ("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID does not exist")
+        section_ahead_clear = False
     else:
-        section_ahead_clear = False
+        section_ahead_clear = instruments[str(inst_id)]["repeaterstate"]
     return(section_ahead_clear)
 
-#-----------------------------------------------------------------------------------------------
-# Public API Function to configure instruments to publish state changes to remote MQTT nodes
-# (i.e. effectively publish state changes to the local SECTION indicator)
-# Note that this function should be called BEFORE creating block instruments
-#-----------------------------------------------------------------------------------------------
-
-def set_instruments_to_publish_state(*inst_ids:int):
-    global list_of_instruments_to_publish
-    for inst_id in inst_ids:
-        logging.debug("MQTT-Client: Configuring instrument "+str(inst_id)+" to publish state changes via MQTT broker")
-        if inst_id in list_of_instruments_to_publish:
-            logging.warning("MQTT-Client: Instrument "+str(inst_id)+" - is already configured to publish state changes")
-        else:
-            list_of_instruments_to_publish.append(inst_id)
-            # Publish the initial state now this has been added to the list of instruments to publish
-            # This allows the publish/subscribe functions to be configured after instrument creation
-            if str(inst_id) in instruments.keys():
-                linked_to_id = instruments[str(inst_id)]['linkedto']
-                if linked_to_id is not None and isinstance(instruments[str(inst_id)]['linkedto'],str):
-                    send_mqtt_instrument_updated_event(inst_id)
-    return()
-
-#-----------------------------------------------------------------------------------------------
-# Public API Function to "subscribe" to instrument updates published by remote MQTT "Node"
-# Note that no callback is specified in the function call - the default internal one is used
-# to set the repeater display on the local instrument (to mirror the remote instrument)
-#-----------------------------------------------------------------------------------------------
-
-def subscribe_to_remote_instrument (remote_identifier:str):   
-    global instruments
-    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
-    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
-        logging.error ("MQTT-Client: Instrument "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
-        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
-    else:
-        if instrument_exists(remote_identifier):
-            logging.warning("MQTT-Client: Instrument "+str(remote_identifier)+" - has already been subscribed to via MQTT networking")
-        # Create a dummy instrument object to enable 'instrument_exists' validation checks
-        # Note that this does not hold state - as state is reflected on the local repeater indicator
-        instruments[remote_identifier] = {}
-        instruments[remote_identifier]["linkedto"] = None
-        # Subscribe to updates from the remote block instrument
-        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
-        mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event",node_id,
-                                    item_id,handle_mqtt_instrument_updated_event)
-        mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event",node_id,
-                                    item_id,handle_mqtt_ring_section_bell_event)
-    return()
-
-
-# --------------------------------------------------------------------------------
-# Callbacks for handling received MQTT messages (from a remote Instrument)
-# --------------------------------------------------------------------------------
-
-def handle_mqtt_instrument_updated_event(message):
-    if "instrumentid" in message.keys() and "sectionstate" in message.keys():
-        block_identifier = message["instrumentid"]
-        section_state = message["sectionstate"]
-        if block_identifier is not None:
-            node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
-            if instrument_exists(block_id):
-                logging.info("Block Instrument "+str(block_id)+": State update from remote instrument ********************")
-                if section_state == True: set_repeater_clear(block_id)
-                elif section_state == False: set_repeater_occupied(block_id)
-                else: set_repeater_blocked(block_id)
-    return()
-
-def handle_mqtt_ring_section_bell_event(message):
-    if "instrumentid" in message.keys() :
-        block_identifier = message["instrumentid"]
-        if block_identifier is not None:
-            node_id, block_id = mqtt_interface.split_remote_item_identifier(block_identifier)
-            if instrument_exists(block_id):
-                logging.debug("Block Instrument "+str(block_id)+": Telegraph key event from remote instrument ************")
-                ring_section_bell(block_id)
-    return()
-
-# --------------------------------------------------------------------------------
-# Internal functions for building and publishing MQTT messages (to a remote instrument)
-# --------------------------------------------------------------------------------
-
-def send_mqtt_instrument_updated_event(block_id:int):
-    if block_id in list_of_instruments_to_publish:
-        data = {}
-        data["instrumentid"] = instruments[str(block_id)]["linkedto"]
-        data["sectionstate"] = instruments[str(block_id)]["sectionstate"]
-        log_message = "Block Instrument "+str(block_id)+": Publishing instrument state to MQTT Broker"
-        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
-        mqtt_interface.send_mqtt_message("instrument_updated_event",block_id,data=data,log_message=log_message,retain=True)
-    return()
-
-def send_mqtt_ring_section_bell_event(block_id:int):
-    if block_id in list_of_instruments_to_publish:
-        data = {}
-        data["instrumentid"] = instruments[str(block_id)]["linkedto"]
-        log_message = "Block Instrument "+str(block_id)+": Publishing telegraph key event to MQTT Broker"
-        # These are transitory events so we do not publish as "retained" messages (if they get missed, they get missed)
-        mqtt_interface.send_mqtt_message("instrument_telegraph_event",block_id,data=data,log_message=log_message,retain=False)
-    return()
-
 # ------------------------------------------------------------------------------------------
-# Non public API function for deleting an instrument object (including all the drawing objects)
+# API function for deleting an instrument library object (including all the drawing objects)
 # This is used by the schematic editor for changing instrument types where we delete the existing
-# instrument with all its data and then recreate it (with the same ID) in its new configuration
-# Note that we don't delete the instrument from the list_of_instruments_to_publish (via MQTT) as
-# the MQTT configuration can be set completely asynchronously from create/delete instruments
+# instrument with all its data and then recreate it (with the same ID) in its new configuration.
 # ------------------------------------------------------------------------------------------
 
-def delete_instrument(block_id:int):
+def delete_instrument(inst_id:int):
     global instruments
-    global list_of_instruments_to_publish
-    if instrument_exists(block_id):
-        # Delete all the tkinter canvas drawing objects associated with the signal
-        instruments[str(block_id)]["canvas"].delete("instrument"+str(block_id))
-        # Delete all the tkinter button objects created for the signal
-        instruments[str(block_id)]["blockbutton"].destroy()
-        instruments[str(block_id)]["clearbutton"].destroy()
-        instruments[str(block_id)]["occupbutton"].destroy()
-        instruments[str(block_id)]["bellbutton"].destroy()
-        # Finally, delete the entry from the dictionary of instruments
-        del instruments[str(block_id)]
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int):
+        logging.error("Instrument "+str(inst_id)+": delete_instrument - Instrument ID must be an integer")    
+    elif not instrument_exists(inst_id):
+        logging.error("Instrument "+str(inst_id)+": delete_instrument - Instrument ID does not exist")
+    else:
+        logging.debug("Instrument "+str(inst_id)+": Deleting library object from the schematic")
+        # Delete all the tkinter drawing objects associated with the instrument
+        instruments[str(inst_id)]["canvas"].delete(instruments[str(inst_id)]["tags"])
+        instruments[str(inst_id)]["blockbutton"].destroy()
+        instruments[str(inst_id)]["clearbutton"].destroy()
+        instruments[str(inst_id)]["occupbutton"].destroy()
+        instruments[str(inst_id)]["bellbutton"].destroy()
+        # Delete the instrument entry from the dictionary of instruments
+        del instruments[str(inst_id)]
     return()
 
 # ------------------------------------------------------------------------------------------
@@ -745,39 +690,33 @@ def delete_instrument(block_id:int):
 # main tkinter loop as this can lead to problems with artefacts persisting on the canvas
 # ------------------------------------------------------------------------------------------
 
-def update_linked_to(inst_id:int, linked_to:Union[int,str]):
-    # Establish whether the ID is a local or remote ID and set the type accordingly
-    # We need to do this for the editor as the editor will give us an int as a string
-    linked_to_id = set_item_id_type(linked_to)
-    instruments[str(inst_id)]["linkedto"] = linked_to_id
-    if linked_to_id is not None:
-        if instruments[str(inst_id)]["sectionstate"] == True:
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(inst_id)
-            elif instrument_exists(linked_to_id): set_repeater_clear(linked_to_id,make_callback=False)
-        elif instruments[str(inst_id)]["sectionstate"] == False:
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(inst_id)
-            elif instrument_exists(linked_to_id): set_repeater_occupied(linked_to_id,make_callback=False)
-        else:
-            if isinstance(linked_to_id,str): send_mqtt_instrument_updated_event(inst_id)
-            elif instrument_exists(linked_to_id): set_repeater_blocked(linked_to_id,make_callback=False)
+def update_linked_instrument(inst_id:int, linked_to_id:str):
+    global instruments
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID must be an integer")
+    elif not instrument_exists(inst_id):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID does not exist")
+    if not isinstance(linked_to_id, str):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked ID must be a string")
+    else:
+        logging.debug("Instrument "+str(inst_id)+": is now linked to Instrument "+linked_to_id)
+        # Update the "linkedto" element of the Instrument configuration
+        instruments[str(inst_id)]["linkedto"] = linked_to_id
+        # Ensure the repeater on the new linked instrument reflects the state of our instrument
+        refresh_linked_instrument(inst_id, linked_to_id)
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function to return the tkinter canvas 'tags' for the block instrument
-# ------------------------------------------------------------------------------------------
-
-def get_tags(block_id:int):
-    return("instrument"+str(block_id))
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to reset the list of published/subscribed instruments. Used
-# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
-# via the subscribe_to_instrument_updates and subscribe_to_instrument_updates functions
+# API function to reset the list of published/subscribed Instruments. This function is called by
+# the editor on 'Apply' of the MQTT pub/sub configuration prior to applying the new configuration
+# via the 'set_instruments_to_publish_state' & 'subscribe_to_remote_instrument' functions.
 # ------------------------------------------------------------------------------------------
 
 def reset_mqtt_configuration():
     global instruments
     global list_of_instruments_to_publish
+    logging.debug("Block Instruments: Resetting MQTT publish and subscribe configuration")
     # We only need to clear the list to stop any further instrument events being published
     list_of_instruments_to_publish.clear()
     # For subscriptions we unsubscribe from all topics associated with the message_type
@@ -790,6 +729,59 @@ def reset_mqtt_configuration():
     for key in instruments:
         if key.isdigit(): new_instruments[key] = instruments[key]
     instruments = new_instruments
+    return()
+
+#-----------------------------------------------------------------------------------------------
+# API function to configure local Block Instruments to publish state changes to remote MQTT
+# nodes. This function is called by the editor on 'Apply' of the MQTT pub/sub configuration.
+# Note the configuration can be applied independently to whether the gpio sensors 'exist' or not.
+#-----------------------------------------------------------------------------------------------
+
+def set_instruments_to_publish_state(*inst_ids:int):
+    global list_of_instruments_to_publish
+    for inst_id in inst_ids:
+        # Validate the parameters we have been given as this is a library API function
+        if not isinstance(inst_id, int) or inst_id < 1:
+            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be a positive integer")
+        elif inst_id in list_of_instruments_to_publish:
+            logging.warning("Instrument "+str(inst_id)+": set_instruments_to_publish_state -"
+                                +" Instrument is already configured to publish state to MQTT broker")
+        else:
+            logging.debug("Instrument "+str(inst_id)+": Configuring to publish state changes and telegraph events to MQTT broker")
+            list_of_instruments_to_publish.append(inst_id)
+            # Publish the initial state now this has been added to the list of instruments to publish
+            # This allows the pub/sub config to be configured independently to instrument creation
+            if instrument_exists(inst_id): send_mqtt_instrument_updated_event(inst_id)
+    return()
+
+#---------------------------------------------------------------------------------------------------
+# API Function to "subscribe" to remote Block Instrument events (published by other MQTT Nodes)
+# and map the appropriate internal callback (for the linked block instrument object on the local
+# schematic). This function is called by the editor on "Apply' of the MQTT pub/sub configuration
+# for all subscribed Block Instruments.
+#---------------------------------------------------------------------------------------------------
+
+def subscribe_to_remote_instrument(remote_id:str):   
+    global instruments
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(remote_id,str):
+        logging.error("Instrument "+str(remote_id)+": subscribe_to_remote_instrument - Remote ID must be a string")
+    elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
+        logging.error("Instrument "+remote_id+": subscribe_to_remote_instrument - Remote ID is an invalid format")
+    elif instrument_exists(remote_id):
+        logging.warning("Instrument "+remote_id+": subscribe_to_remote_instrument - Already subscribed")
+    else:
+        logging.debug("Instrument "+remote_id+": Subscribing to remote Block Instrument")
+        # Create a dummy instrument object to enable 'instrument_exists' validation checks
+        # Note that this does not hold state - as state is reflected on the local repeater indicator
+        instruments[remote_id] = {}
+        instruments[remote_id]["linkedto"] = "0"
+        # Subscribe to updates from the remote block instrument
+        [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
+        mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event", node_id,
+                                    item_id, handle_mqtt_instrument_updated_event)
+        mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event", node_id,
+                                    item_id, handle_mqtt_ring_section_bell_event)
     return()
 
 ###############################################################################

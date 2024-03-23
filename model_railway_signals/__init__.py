@@ -75,7 +75,7 @@ from .library.mqtt_interface import mqtt_broker_connect
 
 from .library.block_instruments import instrument_type
 from .library.block_instruments import block_callback_type
-from .library.block_instruments import create_block_instrument
+from .library.block_instruments import create_instrument
 from .library.block_instruments import block_section_ahead_clear
 from .library.block_instruments import set_instruments_to_publish_state
 from .library.block_instruments import subscribe_to_remote_instrument
@@ -166,7 +166,7 @@ __all__ = [
       # public block instrument types/functions
         'block_callback_type',
         'instrument_type',
-        'create_block_instrument',
+        'create_instrument',
         'block_section_ahead_clear',
         'subscribe_to_remote_instrument',
         'set_instruments_to_publish_state',

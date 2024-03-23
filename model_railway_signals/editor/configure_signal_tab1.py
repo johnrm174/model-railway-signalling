@@ -6,12 +6,13 @@
 #    dcc_control.dcc_address_mapping(address) - To see if an address is already mapped
 #
 # Inherits the following common editor base classes (from common):
-#    common.entry_box
+#    common.dcc_entry_box
 #    common.state_box
 #    common.check_box
-#    common.dcc_entry_box
+#    common.entry_box
 #    common.object_id_selection
 #    common.selection_buttons
+#
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
@@ -23,17 +24,17 @@ from ..library import dcc_control
 #------------------------------------------------------------------------------------
 # Class for a signal_dcc_entry_box - builds on the common DCC Entry Box class
 # Class instance methods inherited from the parent class are:
-#    "set_values" - will set the entry box value  (dcc address)
-#    "get_values" - will return the last valid entry box value (dcc address)
+#    "get_value" - will return the last valid entry box value (dcc address)
 # Public class instance methods provided by this child class are
-#    "set_signal_id" - sets the current signal ID (for validation) 
+#    "set_value" - set the initial value of the dcc_entry_box (int) - Also
+#                  sets the current item ID (int) for validation purposes
 #    "validate" - Validates the DCC address is not mapped to another item
 #------------------------------------------------------------------------------------
 
 class signal_dcc_entry_box(common.dcc_entry_box):
     def __init__(self, parent_frame, callback=None):
         # We need the current Signal ID to validate the DCC Address entry
-        self.signal_id = 0
+        self.current_item_id = 0
         super().__init__(parent_frame, callback=callback)
         
     def validate(self):
@@ -45,7 +46,7 @@ class signal_dcc_entry_box(common.dcc_entry_box):
             dcc_address = int(self.entry.get())
             dcc_mapping = dcc_control.dcc_address_mapping(dcc_address)
             if dcc_mapping is not None and (dcc_mapping[0] != "Signal" or
-                    (dcc_mapping[1] != self.signal_id and dcc_mapping[1] != self.signal_id + 100)):
+                    (dcc_mapping[1] != self.current_item_id and dcc_mapping[1] != self.current_item_id + 100)):
                 # We need to correct the mapped signal ID for secondary distants
                 if dcc_mapping[0] == "Signal" and dcc_mapping[1] > 99: dcc_mapping[1] = dcc_mapping[1] - 100
                 self.TT.text = ("DCC address is already mapped to "+dcc_mapping[0]+" "+str(dcc_mapping[1]))
@@ -53,8 +54,9 @@ class signal_dcc_entry_box(common.dcc_entry_box):
         self.set_validation_status(valid)
         return(valid)
     
-    def set_signal_id(self, signal_id):
-        self.signal_id = signal_id
+    def set_value(self, value:int, item_id:int):
+        self.current_item_id = item_id
+        super().set_value(value)
 
 #------------------------------------------------------------------------------------
 # Compound UI element for a signal_dcc_command_entry (address + command logic).
@@ -65,11 +67,11 @@ class signal_dcc_entry_box(common.dcc_entry_box):
 #
 # Public class instance methods provided by this class are
 #    "validate" - validate the current entry_box value and return True/false
-#    "set_value" - will set the current value [address:int, state:bool]
+#    "set_value" - will set the current value [address:int, state:bool] - Also
+#                  sets the current item ID (int) for validation purposes
 #    "get_value" - will return the last "valid" value [address:int, state:bool]
 #    "disable" - disables/blanks the entry_box (and associated state button)
 #    "enable"  enables/loads the entry_box (and associated state button)
-#    "set_signal_id" - sets the current signal ID (for validation) 
 #------------------------------------------------------------------------------------
 
 class signal_dcc_command_entry():
@@ -99,9 +101,9 @@ class signal_dcc_command_entry():
         self.EB.disable()
         self.eb_updated()
         
-    def set_value(self, dcc_command:[int, bool]):
+    def set_value(self, dcc_command:[int, bool], item_id:int):
         # A DCC Command comprises a 2 element list of [DCC_Address, DCC_State]
-        self.EB.set_value(dcc_command[0])
+        self.EB.set_value(dcc_command[0], item_id)
         self.CB.set_value(dcc_command[1])
         self.eb_updated()
 
@@ -111,9 +113,6 @@ class signal_dcc_command_entry():
         # When invalid will return [last valid address, current state]
         return([self.EB.get_value(), self.CB.get_value()])
     
-    def set_signal_id(self, signal_id):
-        self.EB.set_signal_id(signal_id)
-
 #------------------------------------------------------------------------------------
 # Class for the General Settings UI Element - Builds on the common checkbox class
 # Public class instance methods inherited from the base check box class are:
@@ -138,8 +137,8 @@ class general_settings(common.check_box):
 #    "enable" - disables/blanks the checkbox and entry box
 #    "disable" - enables/loads the checkbox and entry box
 #    "set_element" - will set the element [enabled/disabled, address]
+#              Also sets the current item ID (int) for validation purposes
 #    "get_element" - returns the last "valid" value [enabled/disabled, address]
-#    "set_signal_id" - sets the current signal ID (for validation) 
 #------------------------------------------------------------------------------------
 
 class semaphore_route_element():
@@ -192,18 +191,15 @@ class semaphore_route_element():
         self.CB.disable2()
         self.update_eb_state()
         
-    def set_element(self, signal_arm:[bool,int]):
+    def set_element(self, signal_arm:[bool,int], item_id:int):
         # Each signal element comprises [enabled/disabled, address]
         self.CB.set_value(signal_arm[0])
-        self.EB.set_value(signal_arm[1])
+        self.EB.set_value(signal_arm[1], item_id)
         self.update_eb_state()
         
     def get_element(self):
         # Each signal element comprises [enabled/disabled, address]
         return( [self.CB.get_value(), self.EB.get_value()] )
-    
-    def set_signal_id(self, signal_id:int):
-        self.EB.set_signal_id(signal_id)
         
 #------------------------------------------------------------------------------------
 # Class for a semaphore route arm group (comprising main, subsidary, and distant arms)
@@ -214,8 +210,8 @@ class semaphore_route_element():
 #    "disable_route" - enables/loads all checkboxes and entry boxes
 #    "enable_distant" - enables/loads the distant checkbox and entry box
 #    "set_route" - will set the element [enabled/disabled, address]
+#           Also sets the current item ID (int) for validation purposes
 #    "get_route" - returns the last "valid" value [enabled/disabled, address]
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # The callbacks are made when the signal arms are selected or deselected
 #------------------------------------------------------------------------------------
 
@@ -290,12 +286,12 @@ class semaphore_route_group():
     def disable_distant(self):
         self.dist.disable2()
 
-    def set_route(self, signal_elements:[[bool,int],]):
+    def set_route(self, signal_elements:[[bool,int],], item_id:int):
         # Signal Group comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
-        self.sig.set_element(signal_elements[0])
-        self.sub.set_element(signal_elements[1])
-        self.dist.set_element(signal_elements[2])
+        self.sig.set_element(signal_elements[0], item_id)
+        self.sub.set_element(signal_elements[1], item_id)
+        self.dist.set_element(signal_elements[2], item_id)
         self.enable_disable_distant_arms()
         
     def get_route(self):
@@ -304,11 +300,6 @@ class semaphore_route_group():
         return ( [ self.sig.get_element(),
                    self.sub.get_element(),
                    self.dist.get_element() ] )
-
-    def set_signal_id(self, signal_id:int):
-        self.sig.set_signal_id(signal_id)
-        self.sub.set_signal_id(signal_id)
-        self.dist.set_signal_id(signal_id)
 
 #------------------------------------------------------------------------------------
 # Class for the semaphore signal arms (comprising all possible signal arm combinations)
@@ -322,8 +313,8 @@ class semaphore_route_group():
 #    "disable_subsidaries" - disables/blanks all subsidary checkboxes and entry boxes
 #    "enable_subsidaries" - enables/loads all subsidary checkboxes and entry boxes
 #    "set_arms" - will set all ui elements (enabled/disabled, addresses)
+#            Also sets the current item ID (int) for validation purposes
 #    "get_arms" - returns the last "valid" values (enabled/disabled, addresses)
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # The callbacks are made when the signal arms are selected or deselected
 #------------------------------------------------------------------------------------
 
@@ -412,15 +403,15 @@ class semaphore_signal_arms():
         self.rh1.disable_distant()
         self.rh2.disable_distant()
 
-    def set_arms(self, signal_arms:[[[bool,int],],]):
+    def set_arms(self, signal_arms:[[[bool,int],],], item_id:int):
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
         # Each Route element comprises: [signal, subsidary, distant]
         # Each signal element comprises [enabled/disabled, address]
-        self.main.set_route(signal_arms[0])
-        self.lh1.set_route(signal_arms[1])
-        self.lh2.set_route(signal_arms[2])
-        self.rh1.set_route(signal_arms[3])
-        self.rh2.set_route(signal_arms[4])
+        self.main.set_route(signal_arms[0], item_id)
+        self.lh1.set_route(signal_arms[1], item_id)
+        self.lh2.set_route(signal_arms[2], item_id)
+        self.rh1.set_route(signal_arms[3], item_id)
+        self.rh2.set_route(signal_arms[4], item_id)
         
     def get_arms(self):
         # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
@@ -434,14 +425,7 @@ class semaphore_signal_arms():
                    self.lh2.get_route(),
                    self.rh1.get_route(),
                    self.rh2.get_route() ] )
-    
-    def set_signal_id(self, signal_id:int):
-        self.main.set_signal_id(signal_id)
-        self.lh1.set_signal_id(signal_id)
-        self.lh2.set_signal_id(signal_id)
-        self.rh1.set_signal_id(signal_id)
-        self.rh2.set_signal_id(signal_id)
-        
+            
 #------------------------------------------------------------------------------------
 # Class to create a sequence of DCC selection boxes - for colour light signal aspects,
 # feather route indications and theatre route indications
@@ -450,8 +434,8 @@ class semaphore_signal_arms():
 #    "enable_addresses" - disables/blanks all entry boxes (and state buttons)
 #    "disable_addresses"  enables/loads all entry box (and state buttona)
 #    "set_addresses" - will set the values of the entry boxes (pass in a list)
+#                  Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - will return a list of the last "valid" entries
-#    "set_signal_id" - sets the current signal ID (for validation) 
 #------------------------------------------------------------------------------------
 
 class dcc_entry_boxes:
@@ -478,15 +462,15 @@ class dcc_entry_boxes:
                  self.dcc5.validate() and
                  self.dcc6.validate() )
     
-    def set_addresses(self, address_list:[[int,bool],]):
+    def set_addresses(self, address_list:[[int,bool],], item_id:int):
         # DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each dcc command element comprises: [dcc_address, dcc_state]
-        self.dcc1.set_value(address_list[0])
-        self.dcc2.set_value(address_list[1])
-        self.dcc3.set_value(address_list[2])
-        self.dcc4.set_value(address_list[3])
-        self.dcc5.set_value(address_list[4])
-        self.dcc6.set_value(address_list[5])
+        self.dcc1.set_value(address_list[0], item_id)
+        self.dcc2.set_value(address_list[1], item_id)
+        self.dcc3.set_value(address_list[2], item_id)
+        self.dcc4.set_value(address_list[3], item_id)
+        self.dcc5.set_value(address_list[4], item_id)
+        self.dcc6.set_value(address_list[5], item_id)
         
     def get_addresses(self):
         # DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
@@ -513,15 +497,7 @@ class dcc_entry_boxes:
         self.dcc4.disable()
         self.dcc5.disable()
         self.dcc6.disable()
-    
-    def set_signal_id(self, signal_id:int):
-        self.dcc1.set_signal_id(signal_id)
-        self.dcc2.set_signal_id(signal_id)
-        self.dcc3.set_signal_id(signal_id)
-        self.dcc4.set_signal_id(signal_id)
-        self.dcc5.set_signal_id(signal_id)
-        self.dcc6.set_signal_id(signal_id)
-        
+            
 #------------------------------------------------------------------------------------
 # Classes to create the DCC Entry boxes for a colour light signal aspect
 # Builds on the common dcc_entry_boxes class above.
@@ -530,8 +506,8 @@ class dcc_entry_boxes:
 #    "enable_addresses" - disables/blanks all entry boxes (and state buttons)
 #    "disable_addresses"  enables/loads all entry box (and state buttona)
 #    "set_addresses" - will set the values of the entry boxes (pass in a list)
+#                    Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - will return a list of the last "valid" entries
-#    "set_signal_id" - sets the current signal ID (for validation) 
 #------------------------------------------------------------------------------------
 
 class colour_light_aspect(dcc_entry_boxes):
@@ -551,14 +527,15 @@ class colour_light_aspect(dcc_entry_boxes):
 # Class instance methods to use externally are:
 #    "validate" - validate all current DCC entry box values
 #    "set_addresses" - set the DCC command sequences for the aspects (pass in a list)
+#                    Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - return a list of the "validated" DCC command sequences
 #    "set_subsidary" - set the subsidary signal status [has_subsidary, dcc_address]
+#                    Also sets the current item ID (int) for validation purposes
 #    "get_subsidary" - return the subsidary signal status [has_subsidary, dcc_address]
 #    "enable_subsidary" - enables/loads the subsidary signal selection (CB/address)
 #    "disable_subsidary" - disables/clears the subsidary signal selection (CB/address)
 #    "enable_aspects" - enables/loads the dcc command sequences for all aspects
 #    "disable_aspects" - disables/clears the dcc command sequences for all aspects
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # The callback is made when the subsidary signal selection is updated
 #------------------------------------------------------------------------------------
 
@@ -582,7 +559,7 @@ class colour_light_aspects():
         self.CB = common.check_box(self.subframe, label="Subsidary signal",   
                     tool_tip="Select to add a seperate calling on aspect",callback=self.sub_updated)
         self.CB.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB = common.dcc_entry_box(self.subframe)
+        self.EB = signal_dcc_entry_box(self.subframe)
         self.EB.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def sub_updated(self):
@@ -602,16 +579,16 @@ class colour_light_aspects():
                  self.fdylw.validate_addresses() and
                  self.EB.validate() )
     
-    def set_addresses(self, addresses:[[[int,bool],],]):
+    def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Colour Light Aspects command sequences are: [grn, red, ylw, dylw, fylw, fdylw]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
-        self.grn.set_addresses(addresses[0])
-        self.red.set_addresses(addresses[1])
-        self.ylw.set_addresses(addresses[2])
-        self.dylw.set_addresses(addresses[3])
-        self.fylw.set_addresses(addresses[4])
-        self.fdylw.set_addresses(addresses[5])
+        self.grn.set_addresses(addresses[0], item_id)
+        self.red.set_addresses(addresses[1], item_id)
+        self.ylw.set_addresses(addresses[2], item_id)
+        self.dylw.set_addresses(addresses[3], item_id)
+        self.fylw.set_addresses(addresses[4], item_id)
+        self.fdylw.set_addresses(addresses[5], item_id)
         
     def get_addresses(self):
         # The Colour Light Aspects command sequences are: [grn, red, ylw, dylw, fylw, fdylw]
@@ -624,10 +601,10 @@ class colour_light_aspects():
                  self.fylw.get_addresses(),
                  self.fdylw.get_addresses() ] )
     
-    def set_subsidary(self, subsidary:[bool,int]):
+    def set_subsidary(self, subsidary:[bool,int], item_id:int):
         # Subsidary is defined as [has_subsidary, dcc_address]
         self.CB.set_value(subsidary[0])
-        self.EB.set_value(subsidary[1])
+        self.EB.set_value(subsidary[1], item_id)
         self.update_eb_state()
 
     def get_subsidary(self):
@@ -657,14 +634,6 @@ class colour_light_aspects():
         self.dylw.disable_addresses()
         self.fylw.disable_addresses()
         self.fdylw.disable_addresses()
-
-    def set_signal_id(self, signal_id:int):
-        self.grn.set_signal_id(signal_id)
-        self.red.set_signal_id(signal_id)
-        self.ylw.set_signal_id(signal_id)
-        self.dylw.set_signal_id(signal_id)
-        self.fylw.set_signal_id(signal_id)
-        self.fdylw.set_signal_id(signal_id)
 
 #------------------------------------------------------------------------------------
 # Class for a Theatre Route character entry Box - uses base common.entry_box class
@@ -699,12 +668,12 @@ class theatre_route_entry_box(common.entry_box):
 # Inherited Class instance methods are:
 #    "enable_addresses" - disables/blanks all entry boxes (and state buttons)
 #    "disable_addresses"  enables/loads all entry box (and state buttona)
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # Additional Class instance functions are:
 #    "validate" - validate all current entry boxes (theatre character and dcc addresses)
 #    "enable_selection" - disables/blanks the theatre entry box & DCC command list
 #    "disable_selection"  enables/loads the theatre entry box & DCC command list
 #    "set_theatre" - set the values (character & dcc commands) for the theatre
+#                  Also sets the current item ID (int) for validation purposes
 #    "get_theatre" - return the values (character & dcc commands) for the theatre
 #------------------------------------------------------------------------------------
 
@@ -744,12 +713,12 @@ class theatre_route_element(dcc_entry_boxes):
         # Validate the Theatre character EB and all DCC Address EBs
         return (self.EB.validate() and self.validate_addresses())
                     
-    def set_theatre(self,theatre:[str,[[int,bool],]]):
+    def set_theatre(self,theatre:[str,[[int,bool],]], item_id:int):
         # Each route element comprises: [character, DCC_command_sequence]
         # Each DCC command sequence comprises: [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command element comprises: [dcc_address, dcc_state]
         self.EB.set_value(theatre[0])
-        self.set_addresses(theatre[1])
+        self.set_addresses(theatre[1], item_id)
         self.update_addresses()
     
     def get_theatre(self):
@@ -771,12 +740,12 @@ class theatre_route_element(dcc_entry_boxes):
 # Class instance functions to use externally are:
 #    "validate" - validate the entry box values (theatre character and dcc addresses)
 #    "set_theatre" - set the characters/addresses for the theatre [main,lh1,lh2,rh1,rh2]
+#                       Also sets the current item ID (int) for validation purposes
 #    "get_theatre" - get the characters/addresses for the theatre [main,lh1,lh2,rh1,rh2]
 #    "set_auto_inhibit" - set the "auto inhibit on DANGER" flag for the DCC route indications
 #    "get_auto_inhibit" - get the "auto inhibit on DANGER" flag for the DCC route indications
 #    "enable_selection" - enables all entries
 #    "disable_selection" - disables all entries
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # The Callback will be made on route selection change (theatre character EB change)
 #------------------------------------------------------------------------------------
 
@@ -824,17 +793,17 @@ class theatre_route_indications:
                  self.rh1.validate() and
                  self.rh2.validate() )
                 
-    def set_theatre(self, theatre:[[str,[[int,bool],],],]):
+    def set_theatre(self, theatre:[[str,[[int,bool],],],], item_id:int):
         # The Theatre route list comprises: [dark, main, lh1, lh2, rh1, rh2]
         # Each route element comprises: [character, DCC_command_sequence]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
-        self.dark.set_theatre(theatre[0])
-        self.main.set_theatre(theatre[1])
-        self.lh1.set_theatre(theatre[2])
-        self.lh2.set_theatre(theatre[3])
-        self.rh1.set_theatre(theatre[4])
-        self.rh2.set_theatre(theatre[5])
+        self.dark.set_theatre(theatre[0], item_id)
+        self.main.set_theatre(theatre[1], item_id)
+        self.lh1.set_theatre(theatre[2], item_id)
+        self.lh2.set_theatre(theatre[3], item_id)
+        self.rh1.set_theatre(theatre[4], item_id)
+        self.rh2.set_theatre(theatre[5], item_id)
         self.auto_inhibit_update()
 
     def get_theatre(self):
@@ -886,23 +855,15 @@ class theatre_route_indications:
     def get_auto_inhibit(self):
         return(self.CB.get_value())
 
-    def set_signal_id(self, signal_id:int):
-        self.dark.set_signal_id(signal_id)
-        self.main.set_signal_id(signal_id)
-        self.lh1.set_signal_id(signal_id)
-        self.lh2.set_signal_id(signal_id)
-        self.rh1.set_signal_id(signal_id)
-        self.rh2.set_signal_id(signal_id)
-
 #------------------------------------------------------------------------------------
 # Class to create Feather route indication with a check box to enable the route indication
 # and the associated DCC command sequence. Inherits from the dcc_entry_boxes class (above)
 # Classes inherited from the parent class are:
 #    "set_addresses" - will set the values of the entry boxes (pass in a list)
+#                  Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - will return a list of the last "valid" entries
 #    "enable_addresses" - disables/blanks all entry boxes (and state buttons)
 #    "disable_addresses"  enables/loads all entry box (and state buttona)
-#    "set_signal_id" - sets the current signal ID (for validation) 
 # Additional Class instance functions are:
 #    "validate" - validate all current entry box values and return True/false
 #    "enable_selection" - disables/blanks the route selection check box
@@ -967,6 +928,7 @@ class feather_route_element(dcc_entry_boxes):
 # Class instance functions to use externally are:
 #    "validate" - validate the current entry box values and return True/false
 #    "set_addresses" - set the values of the DCC addresses/states (pass in a list)
+#                   Also sets the current item ID (int) for validation purposes
 #    "get_addresses" - return a list of the "validated" DCC addresses/states
 #    "set_feathers" - set the state of the feathers [main,lh1,lh2,rh1,rh2]
 #    "get_feathers" - get the state of the feathers [main,lh1,lh2,rh1,rh2]
@@ -1022,17 +984,17 @@ class feather_route_indications:
                  self.rh1.validate() and
                  self.rh2.validate() )
     
-    def set_addresses(self, addresses:[[[int,bool],],]):
+    def set_addresses(self, addresses:[[[int,bool],],], item_id:int):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
         # Each route element comprises: [DCC_command_sequence]
         # Each DCC command sequence comprises [dcc1, dcc2, dcc3, dcc4, dcc5, dcc6]
         # Each DCC command comprises: [dcc_address, dcc_state]
-        self.dark.set_addresses(addresses[0])
-        self.main.set_addresses(addresses[1])
-        self.lh1.set_addresses(addresses[2])
-        self.lh2.set_addresses(addresses[3])
-        self.rh1.set_addresses(addresses[4])
-        self.rh2.set_addresses(addresses[5])
+        self.dark.set_addresses(addresses[0], item_id)
+        self.main.set_addresses(addresses[1], item_id)
+        self.lh1.set_addresses(addresses[2], item_id)
+        self.lh2.set_addresses(addresses[3], item_id)
+        self.rh1.set_addresses(addresses[4], item_id)
+        self.rh2.set_addresses(addresses[5], item_id)
         
     def get_addresses(self):
         # The Feather Route address list comprises: [dark, main, lh1, lh2, rh1, rh2]
@@ -1098,15 +1060,7 @@ class feather_route_indications:
         
     def get_auto_inhibit(self):
         return(self.CB.get_value())
-
-    def set_signal_id(self, signal_id:int):
-        self.dark.set_signal_id(signal_id)
-        self.main.set_signal_id(signal_id)
-        self.lh1.set_signal_id(signal_id)
-        self.lh2.set_signal_id(signal_id)
-        self.rh1.set_signal_id(signal_id)
-        self.rh2.set_signal_id(signal_id)
-
+    
 #------------------------------------------------------------------------------------
 # Class for the 'basic' route selections UI Element for the main signal (if no specific
 # route indications are selected) and the subsidary signal (if one exists). If the class
@@ -1182,11 +1136,12 @@ class signal_configuration_tab:
     def __init__(self, parent_tab, sig_type_updated, sub_type_updated,
                 route_type_updated, route_selections_updated, sig_routes_updated,
                 sub_routes_updated, dist_routes_updated):
-        # Create a Frame for the Sig ID and Signal Type Selections (always packed)
-        # Note that for the Sig ID selection we use the signal_exists function 
-        # from the objects module - as we are only interested in local signals
+        # Create a Frame to hold the Signal ID and Signal Type Selections
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
+        # Create the UI Element for Item ID selection. Note that although the signals_common.sig_exists
+        # function will match both local and remote Signal IDs, the object_id_selection only allows integers to
+        # be selected - so we can safely use this function here for consistency.
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",
                                 exists_function = signals_common.sig_exists)
         self.sigid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')

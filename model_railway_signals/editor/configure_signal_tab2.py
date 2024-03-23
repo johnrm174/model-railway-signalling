@@ -2,40 +2,48 @@
 # Functions and sub Classes for the Edit Signal "Interlocking" Tab
 #
 # Makes the following external API calls to other editor modules:
-#    objects.point_exists(id) - To see if the point exists (local)
-#    objects.signal_exists(id) - To see if the point exists (local)
-#    objects.section_exists(id) - To see if the track section exists (local)
+#########################################################################################################
+# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+# function will not work in edit mode as the Track Section library objects don't exist in edit mode
+# To be addressed in a future software update when the Track Sections functionality is re-factored
+#########################################################################################################
+#    objects.section_exists(id) - To see if the track section exists (local)   ##########################
 #
 # Makes the following external API calls to library modules:
 #    signals_common.sig_exists(id) - To see if the instrument exists (local or remote)
+#    points.point_exists(id) - To see if the point exists (local)
 #    block_instruments.instrument_exists(id) - To see if the instrument exists (local or remote)
+#    track_sections.section_exists(id) - To see if the track section exists       ####################
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
-#    common.state_box
 #    common.int_item_id_entry_box
 #    common.str_int_item_id_entry_box
 #    common.signal_route_selections
 #    common.point_interlocking_entry
+#
 #------------------------------------------------------------------------------------
 
 import tkinter as Tk
 
 from . import common
-from . import objects
+from . import objects ##################################################################################
 
+from ..library import points
 from ..library import signals_common
 from ..library import block_instruments
+from ..library import track_sections
                 
 #------------------------------------------------------------------------------------
 # Class for a route interlocking group (comprising 6 points, a signal and an instrument)
 # Uses the common point_interlocking_entry class for each point entry
 # Public class instance methods provided are:
 #    "validate" - validate the current entry box values and return True/false
-#    "set_route" - will set theroute elements (points & signal)
-#    "get_route" - returns the last "valid" values (points & signal)
-#    "enable_route" - enables the point selections (and sig/block selections if enabled)
-#    "disable_route" - disables all route selections (points, sig ahead, instrument)
+#    "set_route" - will set the route elements (points, sig_ahead and inst_ahead)
+#          Note that we  also need the current item id for validation of the sig_ahead
+#    "get_route" - returns the last "valid" values (points, sig_ahead and inst_ahead)
+#    "enable_route" - enables all points, sig_ahead and inst_ahead selections
+#    "disable_route" - disables all points, sig_ahead and inst_ahead selections
 #    "enable_sig_ahead" - enables the Sig ahead selections (if the route is enabled)
 #    "disable_sig_ahead" - disables the Sig ahead selections
 #    "enable_block_ahead" - enables the block ahead selections (if the route is enabled)
@@ -43,15 +51,11 @@ from ..library import block_instruments
 #------------------------------------------------------------------------------------
 
 class interlocking_route_group: 
-    def __init__(self, parent_frame, parent_object, label:str):
-        # Note that for the interlocked point selections we validate using the point_exists function 
-        # from the objects module - as we are only interested in local points. For the signal ahead
-        # and block instrument ahead selections, we use the exists function from the library modules
-        # as to validate the items exist on the schematic or have been subscribed to via MQTT networking
+    def __init__(self, parent_frame, label:str):
+        # These are the 'item exists' functions for validation
         signal_exists_function = signals_common.sig_exists
-        current_id_function = parent_object.config.sigid.get_value
         instrument_exists_function = block_instruments.instrument_exists
-        point_exists_function = objects.point_exists
+        point_exists_function = points.point_exists
         # Create a frame for this UI element (always packed into the parent frame)
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
@@ -72,8 +76,7 @@ class interlocking_route_group:
         self.sig = common.str_int_item_id_entry_box(self.frame, exists_function=signal_exists_function,
                         tool_tip = "Specify the next signal along the specified route - This "+
                         "can be a local signal ID or a remote signal ID (in the form 'Node-ID') "+
-                        " which has been subscribed to via MQTT networking",
-                        current_id_function = current_id_function)
+                        " which has been subscribed to via MQTT networking")
         self.sig.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self.frame, text=" Blk:")
         self.label2.pack(side=Tk.LEFT)
@@ -127,7 +130,7 @@ class interlocking_route_group:
         self.sig.disable()
         self.block.disable()
 
-    def set_route(self, interlocking_route:[[int,bool],str,int]):
+    def set_route(self, interlocking_route:[[int,bool],str,int], item_id:int):
         # A route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
         # Each point element in the point list comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
@@ -137,7 +140,8 @@ class interlocking_route_group:
         self.p4.set_value(interlocking_route[0][3])
         self.p5.set_value(interlocking_route[0][4])
         self.p6.set_value(interlocking_route[0][5])
-        self.sig.set_value(interlocking_route[1])
+        # Note we pass in the current signal_id for validation (to prevent selection)
+        self.sig.set_value(interlocking_route[1], item_id)
         self.block.set_value(interlocking_route[2])
         
     def get_route(self):
@@ -158,8 +162,9 @@ class interlocking_route_group:
 # Class for a route interlocking frame 
 # Uses the base interlocking_route_group class from above
 #    "validate" - validate the current entry box values and return True/false
-#    "set_routes" - will set all ui elements (enabled/disabled, addresses)
-#    "get_routes" - returns the last "valid" values (enabled/disabled, addresses)
+#    "set_routes" - will set all route selections (points, sigs_ahead & insts_ahead)
+#          Note that we  also need the current item id for validation of the sig_ahead
+#    "get_routes" - returns the last "valid" values (points, sigs_ahead & insts_ahead)
 #    "enable_sig_ahead" - enables the Sig ahead selections (if the route is enabled)
 #    "disable_sig_ahead" - disables the Sig ahead selections
 #    "enable_block_ahead" - enables the block ahead selections (if the route is enabled)
@@ -171,11 +176,11 @@ class interlocking_route_frame:
         # Create a Label Frame for the UI element (packed by the creating function/class)
         self.frame = Tk.LabelFrame(parent_window, text= "Signal routes and point interlocking")
         # Create the route elements (sign, sub, dist) - these are packed in class instancees
-        self.main = interlocking_route_group(self.frame, parent_object, "Main")
-        self.lh1 = interlocking_route_group(self.frame, parent_object, "LH1")
-        self.lh2 = interlocking_route_group(self.frame, parent_object, "LH2")
-        self.rh1 = interlocking_route_group(self.frame, parent_object, "RH1")
-        self.rh2 = interlocking_route_group(self.frame, parent_object, "RH2")
+        self.main = interlocking_route_group(self.frame, "Main")
+        self.lh1 = interlocking_route_group(self.frame, "LH1")
+        self.lh2 = interlocking_route_group(self.frame, "LH2")
+        self.rh1 = interlocking_route_group(self.frame, "RH1")
+        self.rh2 = interlocking_route_group(self.frame, "RH2")
 
     def validate(self):
         # Validate everything - to highlight ALL validation errors in the UI
@@ -187,16 +192,17 @@ class interlocking_route_frame:
         if not self.rh2.validate(): valid = False
         return(valid)
 
-    def set_routes(self, interlocking_frame:[[[[int,bool],],str,int]]):
+    def set_routes(self, interlocking_frame:[[[[int,bool],],str,int]], item_id:int):
         # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
         # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7], sig_id, instrument_id]
         # Each point element in the point list comprises [point_id, point_state]
         # Note that the sig ID can be a local or remote Signal (so a string)
-        self.main.set_route(interlocking_frame[0])
-        self.lh1.set_route(interlocking_frame[1])
-        self.lh2.set_route(interlocking_frame[2])
-        self.rh1.set_route(interlocking_frame[3])
-        self.rh2.set_route(interlocking_frame[4])
+        # Note also we pass in the current signal_id for validation (to prevent selection)
+        self.main.set_route(interlocking_frame[0], item_id)
+        self.lh1.set_route(interlocking_frame[1], item_id)
+        self.lh2.set_route(interlocking_frame[2], item_id)
+        self.rh1.set_route(interlocking_frame[3], item_id)
+        self.rh2.set_route(interlocking_frame[4], item_id)
         
     def get_routes(self):
         # An interlocking frame comprises a list of routes: [main, lh1, lh2, rh1, rh2]
@@ -242,6 +248,7 @@ class interlocking_route_frame:
 # uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the list of interlocked signals and their routes 
+#          Note that we  also need the current item id for validation
 #    "get_values" - Returns the list of interlocked signals and their routes
 #    "enable_route" - Enables/loads all selections for the route
 #    "disable_route" - Disables/blanks all selections for the route
@@ -250,12 +257,8 @@ class interlocking_route_frame:
 
 class conflicting_signals_element():
     def __init__(self, parent_frame, parent_object, label:str):
-        # These are the functions used to validate that the entered signal ID  exists on the
-        # schematic and is different to the current signal ID - note that we only allow
-        # interlocking with signals on the local schematic - so we use the signal_exists
-        # function from the objects module
-        exists_function = objects.signal_exists
-        current_id_function = parent_object.config.sigid.get_value
+        # Theis is the functions used to validate that the entered signal ID exists
+        exists_function = signals_common.sig_exists
         # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
         self.frame = Tk.LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')
@@ -265,17 +268,17 @@ class conflicting_signals_element():
         self.subframe2 = Tk.Frame(self.frame)
         self.subframe2.pack()
         tool_tip = "Specify any signals/routes that would conflict with this signal route"
-        self.sig1 = common.signal_route_selections(self.subframe1, read_only=False, tool_tip = tool_tip,
-                    exists_function=exists_function, current_id_function=current_id_function)
+        self.sig1 = common.signal_route_selections(self.subframe1, read_only=False,
+                            tool_tip = tool_tip,exists_function=exists_function)
         self.sig1.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig2 = common.signal_route_selections(self.subframe1, read_only=False, tool_tip = tool_tip,
-                    exists_function=exists_function, current_id_function=current_id_function)
+        self.sig2 = common.signal_route_selections(self.subframe1, read_only=False,
+                            tool_tip = tool_tip, exists_function=exists_function)
         self.sig2.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig3 = common.signal_route_selections(self.subframe2, read_only=False, tool_tip = tool_tip,
-                    exists_function=exists_function, current_id_function=current_id_function)
+        self.sig3 = common.signal_route_selections(self.subframe2, read_only=False,
+                            tool_tip = tool_tip, exists_function=exists_function)
         self.sig3.frame.pack(side=Tk.LEFT, padx=5)
-        self.sig4 = common.signal_route_selections(self.subframe2, read_only=False, tool_tip = tool_tip,
-                    exists_function=exists_function, current_id_function=current_id_function)
+        self.sig4 = common.signal_route_selections(self.subframe2, read_only=False,
+                            tool_tip = tool_tip, exists_function=exists_function)
         self.sig4.frame.pack(side=Tk.LEFT, padx=5)
 
     def validate(self):
@@ -299,14 +302,14 @@ class conflicting_signals_element():
         self.sig3.disable()
         self.sig4.disable()
 
-    def set_values(self, sig_route:[[int,[bool,bool,bool,bool,bool]],]):
+    def set_values(self, sig_route:[[int,[bool,bool,bool,bool,bool]],], item_id):
         # each sig_route comprises [sig1, sig2, sig3, sig4]
         # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # Where each route element is a boolean value (True or False)
-        self.sig1.set_values(sig_route[0])
-        self.sig2.set_values(sig_route[1])
-        self.sig3.set_values(sig_route[2])
-        self.sig4.set_values(sig_route[3])
+        self.sig1.set_values(sig_route[0], item_id)
+        self.sig2.set_values(sig_route[1], item_id)
+        self.sig3.set_values(sig_route[2], item_id)
+        self.sig4.set_values(sig_route[3], item_id)
 
     def get_values(self):
         # each sig_route comprises [sig1, sig2, sig3, sig4]
@@ -322,6 +325,7 @@ class conflicting_signals_element():
 # uses multiple instances of the common signal_route_selection_element
 # Public class instance methods provided by this class are:
 #    "set_values" - Populates the table of interlocked signal routes
+#          Note that we  also need the current item id for validation
 #    "get_values" - Returns the table of interlocked signal routes
 #    "validate" - Validates all entries (Signals exist and not the current ID)
 #------------------------------------------------------------------------------------
@@ -346,16 +350,16 @@ class conflicting_signals_frame():
         if not self.rh2.validate(): valid = False
         return(valid)
 
-    def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],]):
+    def set_values(self, sig_interlocking_routes:[[[int,[bool,bool,bool,bool,bool]],],], item_id:int):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
         # each sig_route comprises a list of interlocked signals [sig1, sig2, sig3, sig4]
         # each interlocked signal entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
         # sig_id is the interlocked signal and the interlocked routes are True/False
-        self.main.set_values(sig_interlocking_routes[0])
-        self.lh1.set_values(sig_interlocking_routes[1])
-        self.lh2.set_values(sig_interlocking_routes[2])
-        self.rh1.set_values(sig_interlocking_routes[3])
-        self.rh2.set_values(sig_interlocking_routes[4])
+        self.main.set_values(sig_interlocking_routes[0], item_id)
+        self.lh1.set_values(sig_interlocking_routes[1], item_id)
+        self.lh2.set_values(sig_interlocking_routes[2], item_id)
+        self.rh1.set_values(sig_interlocking_routes[3], item_id)
+        self.rh2.set_values(sig_interlocking_routes[4], item_id)
 
     def get_values(self):
         # sig_interlocking_routes comprises a list of sig_routes [main,lh1,lh2,rh1,rh2]
@@ -384,6 +388,11 @@ class interlocked_sections_group:
         self.frame = Tk.LabelFrame(parent_frame, text=label)
         self.frame.pack(side=Tk.LEFT, padx=8, pady=2)
         tool_tip = "Specify any track sections along the route that will lock this signal when occupied by another train"
+        #########################################################################################################
+        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
+        # To be addressed in a future software update when the Track Sections functionality is re-factored
+        #########################################################################################################
         self.t1 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
         self.t1.pack(side = Tk.LEFT)
         self.t2 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
@@ -448,11 +457,11 @@ class interlocked_sections_frame():
     def validate(self):
         # Validate everything - to highlight ALL validation failures in the UI
         valid = True
-        if not self.main.validate(): valid =False
-        if not self.lh1.validate(): valid =False
-        if not self.lh2.validate(): valid =False
-        if not self.rh1.validate(): valid =False
-        if not self.rh2.validate(): valid =False
+        if not self.main.validate(): valid = False
+        if not self.lh1.validate(): valid = False
+        if not self.lh2.validate(): valid = False
+        if not self.rh1.validate(): valid = False
+        if not self.rh2.validate(): valid = False
         return(valid)
 
     def set_routes(self, interlocked_sections):

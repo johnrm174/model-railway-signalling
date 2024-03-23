@@ -11,8 +11,8 @@
 # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
 # function will not work in edit mode as the Track Section library objects don't exist in edit mode
 # To be addressed in a future software update when the Track Sections functionality is re-factored
-#    objects.section_exists(id) - To see if the Track Section exists
 #########################################################################################################
+#    objects.section_exists(id) - To see if the Track Section exists  ###################################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
@@ -21,6 +21,7 @@
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
 #    track_sensors.track_sensor_exists(id) - To see if the track sensor exists
+#    track_sections.section_exists(id) - To see if the track section exists       ####################
 #    points.point_exists(id) - To see if the point exists
 #
 # Inherits the following common editor base classes (from common):
@@ -55,18 +56,16 @@ open_windows={}
 #------------------------------------------------------------------------------------
 # Class for a gpio_sensor_selection frame - based on the str_int_item_id_entry_box
 # Public Class instance methods (inherited from the str_int_item_id_entry_box) are
-#    "set_value" - will set the current value (string)
 #    "get_value" - will return the last "valid" value (string)
+#    "set_value" - set the initial value of the entry_box (str) - Also sets the
+#                  current track sensor item ID (int) for validation purposes
 # Overridden Public Class instance methods provided by this class:
 #    "validate" - Must 'exist' (or subscribed to) and not already mapped
-# New Public class instance methods:
-#    "set_item_id" - Sets the current GPIO sensor ID (used for validation)
+# Note that we use the current_item_id variable (from the base class) for validation.
 #------------------------------------------------------------------------------------
 
 class gpio_sensor_selection(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame):
-        # The reference to the current Item ID (set by "set_item_id")
-        self.item_id = None
         # Create a labelframe to hold the various UI elements
         self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
         # Create a subframe to centre the UI elements
@@ -85,7 +84,8 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
     def validate(self, update_validation_status=True):
         # Do the basic validation first - ID is valid and 'exists'
         valid = super().validate(update_validation_status=False)
-        # Validate it isn't already mapped to another Signal or Track Sensor event
+        # Validate it isn't already mapped to another Signal or Track Sensor event. Note that we use the
+        # current_item_id variable (from the base str_int_item_id_entry_box class) for validation.
         if valid and self.entry.get() != "":
             gpio_sensor_id = self.entry.get()
             event_mappings = gpio_sensors.get_gpio_sensor_callback(gpio_sensor_id)
@@ -95,15 +95,12 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
             elif event_mappings[1] > 0:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
-            elif event_mappings[2] > 0 and event_mappings[2] != self.item_id:
+            elif event_mappings[2] > 0 and event_mappings[2] != self.current_item_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
-
-    def set_item_id(self, item_id:int):
-        self.item_id = item_id
-
+    
 #------------------------------------------------------------------------------------
 # Class for a track_sensor_route_group (comprising 6 points, and a track section)
 # Uses the common point_interlocking_entry class for each point entry
@@ -247,9 +244,7 @@ class edit_track_sensor():
             # Create a Frame to hold the Item ID and GPIO Sensor UI elements
             self.frame = Tk.Frame(self.window)
             self.frame.pack(padx=2, pady=2, fill='x')
-            # Create the UI Element for Item ID selection. Note that although the track_sections.track_sensor_exists
-            # function will match both local and remote Section IDs, the object_id_selection only allows integers to
-            # be selected - so we can safely use this function here for consistency.
+            # Create the UI Element for Item ID selection
             self.sensorid = common.object_id_selection(self.frame, "Track Sensor ID",
                                 exists_function = track_sensors.track_sensor_exists)
             self.sensorid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
@@ -279,12 +274,12 @@ class edit_track_sensor():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Item ID
-            self.window.title("Track Sensor "+str(objects.schematic_objects[self.object_id]["itemid"]))
-            # Set the Initial UI state from the current object settings
-            self.sensorid.set_value(objects.schematic_objects[self.object_id]["itemid"])
-            self.gpiosensor.set_item_id(objects.schematic_objects[self.object_id]["itemid"])
-            self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"])
+            self.window.title("Track Sensor "+str(item_id))
+            # Set the Initial UI state (note the 'gpiosensor' element also needs the current item id)
+            self.sensorid.set_value(item_id)
+            self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.ahead.set_routes(objects.schematic_objects[self.object_id]["routeahead"])
             self.behind.set_routes(objects.schematic_objects[self.object_id]["routebehind"])
             # Hide the validation error message

@@ -233,7 +233,7 @@ def create_track_sensor():
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_track_sensor_object)
     # Find the initial canvas position for the new object
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=objects_common.track_sensor_exists)
+    item_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x

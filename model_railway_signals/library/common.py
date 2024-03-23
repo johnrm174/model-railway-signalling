@@ -1,7 +1,7 @@
 # -------------------------------------------------------------------------
 # This module contains all of the parameters, funcions and classes that 
 # are used across multiple modules in the model_railway_signalling library
-#
+#--------------------------------------------------------------------------
 #
 # External API - classes and functions (used by the Schematic Editor):
 #
@@ -32,7 +32,7 @@ from . import gpio_sensors
 # Global variables for how the signals/points/sections buttons appear
 # on the screen. This is to allow the appearance to be optimised for
 # particular window sizes/screen resolutions.
-fontsize = 9  # Used by the Signals, Points and sections modules
+fontsize = 8  # Used by the Signals, Points and sections modules
 xpadding = 2  # Used by the Signals, Points and sections modules
 ypadding = -1  # Used by the Signals, Points and sections modules
 bgraised = "grey85"   # Used by the Signals and Points modules

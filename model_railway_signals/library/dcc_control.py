@@ -436,7 +436,7 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
 
 def update_dcc_point(point_id:int, state:bool):    
     if point_mapped(point_id):
-        logging.debug ("Point "+str(point_id)+": Generating DCC Bus commands to switch point")
+        logging.debug ("Point "+str(point_id)+": Looking up DCC commands to switch point")
         dcc_mapping = dcc_point_mappings[str(point_id)]
         if dcc_mapping["reversed"]: state = not state
         if dcc_mapping["address"] > 0:
@@ -460,7 +460,7 @@ def update_dcc_signal_aspects(sig_id: int):
         if dcc_mapping["mapping_type"] != mapping_type.COLOUR_LIGHT:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
         else:
-            logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change main signal aspect")
+            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change main signal aspect")
             for entry in dcc_mapping[str(signals_common.signals[str(sig_id)]["sigstate"])]:
                 if entry[0] > 0:
                     # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
@@ -486,7 +486,7 @@ def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidar
         if element != "main_subsidary" and dcc_mapping["mapping_type"] != mapping_type.SEMAPHORE:
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Semaphore signal")
         else:
-            logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change \'"+element+"\' ")
+            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change \'"+element+"\' ")
             if dcc_mapping[element] > 0:
                 # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                 # Note that the commands will only be sent if the pi-sprog interface is configured
@@ -523,7 +523,7 @@ def update_dcc_signal_route(sig_id:int,route:signals_common.route_type,
             if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
                  (not dcc_mapping["auto_route_inhibit"] and signal_change) or
                  (not sig_at_danger and not signal_change) ):
-                logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change route display")
+                logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change route display")
                 for entry in dcc_mapping[str(route)]:
                     if entry[0] > 0:
                         # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
@@ -558,7 +558,7 @@ def update_dcc_signal_theatre(sig_id:int, character_to_display:str,
         if ( (dcc_mapping["auto_route_inhibit"] and not signal_change) or
              (not dcc_mapping["auto_route_inhibit"] and signal_change) or
              (not sig_at_danger and not signal_change) ):
-            logging.debug ("Signal "+str(sig_id)+": Generating DCC Bus commands to change Theatre display")
+            logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change Theatre display")
             # Send the DCC commands to change the state if required
             for entry in dcc_mapping["THEATRE"]:
                 if entry[0] == character_to_display:
@@ -707,6 +707,7 @@ def delete_signal_mapping(sig_id:int):
 
 def reset_mqtt_configuration():
     global publish_dcc_commands_to_mqtt_broker
+    logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_commands_to_mqtt_broker = False
     mqtt_interface.unsubscribe_from_message_type("dcc_accessory_short_events")
     return()

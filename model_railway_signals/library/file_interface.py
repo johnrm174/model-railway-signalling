@@ -204,7 +204,7 @@ def save_schematic(settings:dict, objects:dict, requested_filename:str, save_as:
         if not filename_to_save.endswith(".sig"): filename_to_save = filename_to_save+".sig"
         # Note that the asksaveasfilename dialog returns the fully qualified filename
         # (including the path) - we only need the name so strip out the path element
-        logging.info("Saving Layout Configuration as '"+filename_to_save+"'")
+        logging.info("Save File - Saving Layout Configuration as '"+filename_to_save+"'")
         dictionary_to_save["information"] = "Model Railway Signalling Configuration File"
         # Retrieve the DEFINITION of all the data items we need to save to maintain state
         # These are defined in a single function at the top of this source file. We also

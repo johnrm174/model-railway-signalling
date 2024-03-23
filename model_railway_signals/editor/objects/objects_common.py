@@ -10,12 +10,8 @@
 #    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #
-#    signal_exists (item_id:int) - Common function to see if a given item exists
-#    point_exists (item_id:int) - Common function to see if a given item exists
-#    section_exists (item_id:int) - Common function to see if a given item exists
-#    instrument_exists (item_id:int) - Common function to see if a given item exists
-#    line_exists (item_id:int) - Common function to see if a given item exists
-#    track_sensor_exists (item_id:int) - Common function to see if a given item exists
+#    section_exists (item_id:int) - Common function to see if a given item exists  #####################
+#    line_exists (item_id:int) - Common function to see if a given item exists  ########################
 #
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
@@ -96,12 +92,8 @@ def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 # Simple functions to test if a particular item_id already exists (for an item_type)
 #------------------------------------------------------------------------------------
 
-def signal_exists(ID:int): return (str(ID) in signal_index.keys())
-def point_exists(ID:int): return (str(ID) in point_index.keys())
-def instrument_exists(ID:int): return (str(ID) in instrument_index.keys())
-def section_exists(ID:int): return (str(ID) in section_index.keys())
-def line_exists(ID:int): return (str(ID) in line_index.keys())
-def track_sensor_exists(ID:int): return (str(ID) in track_sensor_index.keys())
+def section_exists(ID:int): return (str(ID) in section_index.keys())  ####################
+def line_exists(ID:int): return (str(ID) in line_index.keys())  ##########################
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)

@@ -8,6 +8,7 @@ import logging
 from system_test_harness import *
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
+from model_railway_signals.library import points
 from model_railway_signals.editor import schematic
 
 #---------------------------------------------------------------------------------------------------------
@@ -15,7 +16,8 @@ from model_railway_signals.editor import schematic
 #---------------------------------------------------------------------------------------------------------
 
 def track_sensor_callback(sensor_id, callback_type):
-    print ("Track Sensor Callback:",sensor_id,"-",callback_type)
+    logging_string="Track Sensor Callback from Sensor "+str(sensor_id)+"-"+str(callback_type)
+    logging.info(logging_string)
     
 def run_track_sensor_library_tests():
     # Test all functions - including negative tests for parameter validation
@@ -23,28 +25,36 @@ def run_track_sensor_library_tests():
     canvas = schematic.canvas
     logging.getLogger().setLevel(logging.DEBUG)
     # create_track_sensor
-    assert len(track_sensors.track_sensors) == 0
+    assert len(track_sensors.track_sensors) == 0    
     track_sensors.create_track_sensor(canvas, sensor_id=100, x=100, y=100, callback=track_sensor_callback)
-    track_sensors.create_track_sensor(canvas, sensor_id="ABC", x=100, y=100, callback=track_sensor_callback)
+    track_sensors.create_track_sensor(canvas, sensor_id=0, x=100, y=100, callback=track_sensor_callback)
+    track_sensors.create_track_sensor(canvas, sensor_id="101", x=100, y=100, callback=track_sensor_callback)
     track_sensors.create_track_sensor(canvas, sensor_id=100, x=100, y=100, callback=track_sensor_callback)
+    assert len(track_sensors.track_sensors) == 1
     # track_sensor_exists
     assert track_sensors.track_sensor_exists(100)
+    print("Library Tests - track_sensor_exists - will generate 1 error:")
+    assert not track_sensors.track_sensor_exists(0)
     assert not track_sensors.track_sensor_exists(101)
-    assert not track_sensors.track_sensor_exists("ABC")
+    assert not track_sensors.track_sensor_exists("100")
     # track_sensor_triggered (pulse the button and generate callback)
-    track_sensors.track_sensor_triggered("ABC")
+    print("Library Tests - track_sensor_triggered - will generate 2 errors:")
+    track_sensors.track_sensor_triggered("101")
     track_sensors.track_sensor_triggered(101)
+    print("Library Tests - track_sensor_triggered - Triggering 2 track sensor passed events:")
     track_sensors.track_sensor_triggered(100)
     sleep(1.5)
     # track_sensor_triggered (pulse the button and generate callback)
     track_sensors.track_sensor_triggered(100)
     # delete_track_sensor - reset_sensor_button function should not generate any exceptions
-    track_sensors.delete_track_sensor("ABC")
+    print("Library Tests - delete_track_sensor - will generate 2 errors:")
+    track_sensors.delete_track_sensor("101")
     track_sensors.delete_track_sensor(101)
     track_sensors.delete_track_sensor(100)
+    assert len(track_sensors.track_sensors) == 0
     assert not track_sensors.track_sensor_exists(100)
-    track_sensors.track_sensor_triggered(100)
     logging.getLogger().setLevel(logging.WARNING)
+    print("----------------------------------------------------------------------------------------")
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -285,14 +295,190 @@ def run_gpio_sensor_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test Point Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def point_callback(point_id, callback_type):
+    logging_string="Point Callback from Point "+str(point_id)+"-"+str(callback_type)
+    logging.info(logging_string)
+    
+def run_point_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Point Objects")
+    canvas = schematic.canvas
+    logging.getLogger().setLevel(logging.DEBUG)
+    # create_point
+    assert len(points.points) == 0
+    # Point ID and point_type combinations
+    print("Library Tests - create_point - will generate 7 errors:")
+    points.create_point(canvas, 100, points.point_type.RH, 100, 100, point_callback) # Valid
+    points.create_point(canvas, 101, points.point_type.LH, 200, 100, point_callback, auto=True) # Valid
+    points.create_point(canvas, 102, points.point_type.RH, 300, 100, point_callback, also_switch=101) # Valid
+    points.create_point(canvas, 103, points.point_type.LH, 400, 100, point_callback, auto=True) # Valid
+    points.create_point(canvas, 104, points.point_type.LH, 500, 100, point_callback, fpl=True) # Valid
+    points.create_point(canvas, 0, points.point_type.RH, 100, 100, point_callback)
+    points.create_point(canvas, "100", points.point_type.RH,100, 100, point_callback)
+    points.create_point(canvas, 100, points.point_type.RH, 100, 100, point_callback)
+    points.create_point(canvas, 105, "random-type", 100, 100, point_callback)
+    # Alsoswitch combinations
+    points.create_point(canvas, 106, points.point_type.LH, 100, 100, point_callback, also_switch="100")
+    points.create_point(canvas, 107, points.point_type.LH, 100, 100, point_callback, also_switch=107)
+    # Automatic and FPL combinations
+    points.create_point(canvas, 108, points.point_type.LH, 100, 100, point_callback, auto=True, fpl=True)
+    assert len(points.points) == 5
+    # point_exists
+    print("Library Tests - point_exists - will generate 1 error:")
+    assert points.point_exists(100)
+    assert points.point_exists(101)
+    assert points.point_exists(102)
+    assert points.point_exists(103)
+    assert points.point_exists(104)
+    assert not points.point_exists(105)
+    assert not points.point_exists(106)
+    assert not points.point_exists(107)
+    assert not points.point_exists(108)
+    assert not points.point_exists("100") # Invalid
+    # toggle_point and point/fpl state
+    print("Library Tests - point_switched - will generate 2 errors:")
+    assert not points.point_switched(100)
+    assert not points.point_switched(101)
+    assert not points.point_switched(102)
+    assert not points.point_switched(103)   
+    assert not points.point_switched(104)
+    assert not points.point_switched("100") # Invalid
+    assert not points.point_switched(105)   # Does not exist
+    print("Library Tests - fpl_active - will generate 2 errors:")
+    assert points.fpl_active(100)
+    assert points.fpl_active(101)
+    assert points.fpl_active(102)
+    assert points.fpl_active(103)
+    assert points.fpl_active(104)
+    assert not points.fpl_active("100") # Invalid
+    assert not points.fpl_active(105)   # Does not exist
+    print("Library Tests - toggle_point to 'switched' - will generate 3 errors and 1 warning:")
+    points.toggle_point(100)
+    points.toggle_point(102)   # 102 will autoswitch 101
+    points.toggle_point(104)   # 104 has FPL so will generate warning
+    points.toggle_point(103)   # 103 is auto so will generate error
+    points.toggle_point("100") # Invalid
+    points.toggle_point(105)   # Does not exist
+    print("Library Tests - toggle_point to 'normal' - will generate 1 error and 2 warnings:")
+    assert points.point_switched(100)
+    assert points.point_switched(101)
+    assert points.point_switched(102)
+    assert not points.point_switched(103)
+    assert points.point_switched(104)
+    points.lock_point(104)
+    points.toggle_point(100)
+    points.toggle_point(102) # 102 will autoswitch 101
+    points.toggle_point(103) # 103 is auto so will generate error
+    points.toggle_point(104) # 104 has FPL so will generate warning
+    points.unlock_point(104)
+    assert not points.point_switched(100)
+    assert not points.point_switched(101)
+    assert not points.point_switched(102)
+    assert not points.point_switched(103)
+    assert not points.point_switched(104)
+    # FPL specific tests
+    print("Library Tests - toggle_fpl - will generate 3 errors and 2 warnings:")
+    points.toggle_fpl("100") # Invalid
+    points.toggle_fpl(100)   # No FPL
+    points.toggle_fpl(105)   # Does not exist
+    assert points.fpl_active(104)
+    points.toggle_fpl(104)   # Has FPL - toggle off FPL
+    assert not points.fpl_active(104)
+    points.toggle_point(104) # Has FPL - switch point
+    assert points.point_switched(104)
+    points.toggle_point(104) # Has FPL - switch pointback to 'normal'
+    assert not points.point_switched(104)
+    points.lock_point(104)   # Will activate FPL with a warning
+    points.toggle_fpl(104)   # Toggle FPL to OFF with point locked - will generate warning
+    assert not points.fpl_active(104)
+    points.unlock_point(104)
+    # Test the button callback functions
+    print("Library Tests - Point button callback functions:")
+    assert not points.fpl_active(104)
+    points.change_button_event(104) # Has FPL - switch point
+    assert points.point_switched(104)
+    points.change_button_event(104) # Has FPL - switch pointback to 'normal'
+    assert not points.point_switched(104)
+    points.fpl_button_event(104)   # Has FPL - toggle on FPL
+    assert points.fpl_active(104)
+    # Note we leave the FPL off for the next tests to generate warnings
+    points.fpl_button_event(104)   # Has FPL - toggle off FPL
+    # Lock Point
+    print("Library Tests - lock_point - will generate 2 errors and 1 warning:")
+    assert points.points[str(100)]['locked']==False
+    assert points.points[str(104)]['locked']==False
+    points.lock_point("100") # Invalid
+    points.lock_point(105)   # Does not exist
+    points.lock_point(100)
+    points.lock_point(104)
+    points.lock_point(104)
+    assert points.points[str(100)]['locked']==True
+    assert points.points[str(104)]['locked']==True
+    print("Library Tests - unlock_point - will generate 2 errors:")
+    points.unlock_point("100") # Invalid
+    points.unlock_point(105)   # Does not exist
+    points.unlock_point(100)
+    points.unlock_point(104)
+    points.unlock_point(104)
+    assert points.points[str(100)]['locked']==False
+    assert points.points[str(104)]['locked']==False
+    # Update autoswitch
+    print("Library Tests - update_autoswitch - will generate 4 errors:")
+    points.update_autoswitch("100", 103)
+    points.update_autoswitch(105, 103)   # Point 105 does not exist
+    points.update_autoswitch(102, "109")
+    points.update_autoswitch(102, 105)
+    points.toggle_point(102) # 102 was autoswitching 101
+    assert points.point_switched(102)
+    assert not points.point_switched(103)
+    points.update_autoswitch(102, 103)  
+    assert points.point_switched(102)
+    assert points.point_switched(103)
+    points.toggle_point(102)
+    assert not points.point_switched(102)
+    assert not points.point_switched(103)
+    print("Library Tests - update_autoswitch to a non-auto point - will generate 2 errors:")
+    points.update_autoswitch(102, 100)  
+    points.toggle_point(102)
+    assert points.point_switched(102)
+    assert not points.point_switched(100)
+    # delete point    
+    print("Library Tests - delete_point - will generate 2 errors:")
+    assert len(points.points) == 5
+    points.delete_point("100")
+    points.delete_point(105)   # Point 105 does not exist
+    points.delete_point(100)
+    points.delete_point(101)
+    points.delete_point(103)
+    points.delete_point(104)
+    assert not points.point_exists(100)
+    assert not points.point_exists(101)
+    assert not points.point_exists(103)
+    assert not points.point_exists(104)
+    assert len(points.points) == 1
+    print("Library Tests - autoswitch a deleted point - will generate 1 error:")
+    points.toggle_point(102)
+    points.delete_point(102)
+    assert not points.point_exists(102)
+    assert len(points.points) == 0
+    print("----------------------------------------------------------------------------------------")
+    logging.getLogger().setLevel(logging.WARNING)
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
-def run_all_basic_library_tests():
+def run_all_basic_library_tests(shutdown:bool=False):
     run_track_sensor_library_tests()
     run_gpio_sensor_library_tests()
+    run_point_library_tests()
+    if shutdown: report_results()
 
 if __name__ == "__main__":
-    start_application(lambda:run_all_basic_library_tests())
+    start_application(lambda:run_all_basic_library_tests(shutdown=True))
 
 ###############################################################################################################################

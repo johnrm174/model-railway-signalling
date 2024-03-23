@@ -7,16 +7,18 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.line_exists(item_id) - to see if a line of that ID already exists
+#    objects.line_exists(item_id) - to see if a line of that ID already exists  ###################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Inherits the following common editor base classes (from common):
+#    common.Createtool_tip
 #    common.window_controls
 #    common.colour_selection
 #    common.object_id_selection
 #    common.check_box
+#
 #------------------------------------------------------------------------------------
 
 import copy
@@ -174,10 +176,11 @@ class edit_line():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window
-            self.window.title("Line "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.window.title("Line "+str(item_id))
             # Set the Initial UI state from the current object settings
-            self.lineid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.lineid.set_value(item_id)
             self.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
             arrow_type = objects.schematic_objects[self.object_id]["arrowtype"]
             arrow_ends = objects.schematic_objects[self.object_id]["arrowends"]

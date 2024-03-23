@@ -2,22 +2,24 @@
 # Functions and sub Classes for the Edit Signal "Automation" Tab
 #
 # Makes the following external API calls to other editor modules:
-#    objects.section_exists(id) - To see if the section exists (local)
-#    objects.signal_exists(id) - To see if the signal exists (local)
-#    objects.signal(id) - to get the object ID of a given item ID
-#
-# Accesses the following external editor objects directly:
-#    objects.signal_index - To iterate through all the signal objects
-#    objects.schematic_objects - To load/save the object configuration
+#########################################################################################################
+# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+# function will not work in edit mode as the Track Section library objects don't exist in edit mode
+# To be addressed in a future software update when the Track Sections functionality is re-factored
+#########################################################################################################
+#    objects.section_exists(id) - To see if the section exists (local) ##################################
 #
 # Makes the following external API calls to library modules:
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
+#    signals_common.sig_exists(id) - To see if the signal exists (local)
+#    track_sections.section_exists(id) - To see if the track section exists       ####################
 #
 # Inherits the following common editor base classes (from common):
+#    common.str_int_item_id_entry_box
+#    common.int_item_id_entry_box
 #    common.check_box
 #    common.integer_entry_box
-#    common.int_item_id_entry_box
 #    common.CreateToolTip
 #
 #------------------------------------------------------------------------------------
@@ -25,28 +27,30 @@
 import tkinter as Tk
 
 from . import common
-from . import objects
+from . import objects ############################################################################
 
 from ..library import gpio_sensors
+from ..library import signals_common
+from ..library import track_sections
 
 #------------------------------------------------------------------------------------
 # Class for a Signal Sensor Entry Box - based on the str_int_item_id_entry_box class
 # Public Class instance methods (inherited from the integer_entry_box) are
-#    "set_value" - will set the current value (integer)
+#    "set_value" - will set the current value for the GPIO Sensor ID (integer)
+#         - Also sets the current item ID (int) for validation purposes
 #    "get_value" - will return the last "valid" value (integer)
 # Overridden Public Class instance methods provided by this class:
 #    "validate" - Must be a valid Sensor ID and not already assigned
+# Note that we use the current_item_id variable (from the base class) for validation.
 #------------------------------------------------------------------------------------
 
 class signal_sensor(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame, parent_object, callback, label:str, tool_tip:str):
-        # We need the reference to the parent object so we can call the sibling
-        # class method to get the current value of the Signal ID for validation
-        self.parent_object = parent_object 
-        self.label = Tk.Label(parent_frame, text=label)
-        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
+    def __init__(self, parent_frame, callback, label:str, tool_tip:str):
         # The this function will return true if the GPIO sensor exists
         exists_function = gpio_sensors.gpio_sensor_exists
+        # Create the label and entry box UI elements
+        self.label = Tk.Label(parent_frame, text=label)
+        self.label.pack(side=Tk.LEFT, padx=2, pady=2)
         super().__init__(parent_frame, callback = callback, tool_tip=tool_tip, exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
             
@@ -56,12 +60,11 @@ class signal_sensor(common.str_int_item_id_entry_box):
         # Next we need to validate it isn't already assigned to another signal appropach or passed event
         if valid and self.entry.get() != "":
             sensor_id = self.entry.get()
-            signal_id = self.parent_object.config.sigid.get_initial_value()
             event_mappings = gpio_sensors.get_gpio_sensor_callback(sensor_id)
-            if event_mappings[0] > 0 and event_mappings[0] != signal_id:
+            if event_mappings[0] > 0 and event_mappings[0] != self.current_item_id:
                 self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
                 valid = False
-            elif event_mappings[1] > 0 and event_mappings[1] != signal_id:
+            elif event_mappings[1] > 0 and event_mappings[1] != self.current_item_id:
                 self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
             elif event_mappings[2] > 0:
@@ -69,15 +72,17 @@ class signal_sensor(common.str_int_item_id_entry_box):
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
-
+        
 #------------------------------------------------------------------------------------
 # Class for the Signal Passed Sensor Frame - uses the Signal Sensor Entry Box class
 # Public Class instance methods used from the base classes are
 #    "approach.enable" - disables/blanks the checkbox and entry box 
 #    "approach.disable" - enables/loads the checkbox and entry box
 #    "approach.set_value" - will set the current value (int)
+#         - Also sets the current item ID (int) for validation purposes
 #    "approach.get_value" - returns the last "valid" value (int)
 #    "passed.set_value" - will set the current value (int)
+#         - Also sets the current item ID (int) for validation purposes
 #    "passed.get_value" - returns the last "valid" value (int)
 # Public Class instance methods provided by this class:
 #    "validate" - validate both entry box values and return True/false
@@ -94,9 +99,9 @@ class signal_passed_sensor_frame:
         tool_tip = ("Specify the ID of a GPIO Sensor (or leave blank) - This "+
                     "can be a local sensor ID or a remote sensor ID (in the form 'Node-ID') "+
                     "which has been subscribed to via MQTT networking")
-        self.passed = signal_sensor(self.subframe, parent_object, callback=self.validate,
+        self.passed = signal_sensor(self.subframe, callback=self.validate,
                 label="  Signal 'passed' sensor:", tool_tip = tool_tip)
-        self.approach = signal_sensor(self.subframe, parent_object, callback=self.validate,
+        self.approach = signal_sensor(self.subframe, callback=self.validate,
                 label="  Signal 'approached' sensor:", tool_tip = tool_tip)
         
     def validate(self):
@@ -316,22 +321,19 @@ class general_settings_frame():
 # Public class instance methods provided by this class are 
 #    "disable" - disables/blanks all checkboxes and selection boxes 
 #    "enable"  enables/loads all checkboxes and selection boxes
-#    "set_values" - set the initial values for the check box and entry boxes) 
+#    "set_values" - set the initial values for the check box and entry boxes)
+#               Note this class also needs the current signal ID for validation
 #    "get_values" - get the last "validated" values of the check box and entry boxes
 #
-# Note that the software only supports triggering of signals on the local schematic
-# so we use the signal_exists function from the objects module for entry validation
+# ote that although the signals.sig_exists function will match both local and remote
+# Signal IDs, the int_item_id_entry_box only allows integers to be selected - so we
+# can safely use this function here for consistency.
 #------------------------------------------------------------------------------------
-
-#####################################################################################
-# TODO - consider better validation of the timed signal selections, namely:
-# 1) Should only be able to select a main semaphore or colour light signal type
-# 2) If triggering the current signal then the start delay should be Zero
-# Low priority enhancement as these things get handled gracefully at run time
-#####################################################################################
 
 class timed_signal_route_element():
     def __init__(self, parent_frame, parent_object, label:str):
+        # We need to know the current Signal ID for validation purposes
+        self.current_item_id = 0
         # This is the parent object (the signal instance)
         self.parent_object = parent_object
         # Create a frame for the route element
@@ -340,13 +342,13 @@ class timed_signal_route_element():
         # Create the route element (selection, sig ID, start delay, aspect change delay)
         self.label1 = Tk.Label(self.frame, width=5, text=label, anchor='w')
         self.label1.pack(side=Tk.LEFT)
-        self.route = common.check_box(self.frame, label="", callback=self.route_selected,
-                tool_tip="Select to trigger a timed signal sequence for this route when the signal is passed")
+        self.route = common.check_box(self.frame, label="", callback=self.route_updated,
+                tool_tip="Select to trigger a timed sequence (for this route) when the current signal is passed")
         self.route.pack(side=Tk.LEFT)
         self.label2 = Tk.Label(self.frame, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
-        self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False,
-                exists_function=objects.signal_exists, tool_tip="Enter the ID of the signal to "+
+        self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False, callback=self.signal_updated,
+                exists_function=signals_common.sig_exists, tool_tip="Enter the ID of the signal to "+
                    "trigger. This can be the current signal or another semaphore / colour light "+
                             "signal (on the route ahead of the current signal)")
         self.sig.pack(side=Tk.LEFT)
@@ -354,32 +356,34 @@ class timed_signal_route_element():
         self.label3.pack(side=Tk.LEFT)
         self.start = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
                             allow_empty=False, tool_tip="Specify the time delay (in seconds) "+
-                            "before triggering the timed sequence (if triggering the current signal " +
-                            " then this should be set to zero to trigger when the signal is passed)")
+                            "before triggering the timed sequence (if triggering the same " +
+                            "signal then this will be zero)")
         self.start.pack(side=Tk.LEFT)
         self.label4 = Tk.Label(self.frame, text="  Time delay:")
         self.label4.pack(side=Tk.LEFT)
-        self.delay = common.integer_entry_box(self.frame, width=3, min_value=0, max_value=60,
+        self.delay = common.integer_entry_box(self.frame, width=3, min_value=1, max_value=60,
                             allow_empty=False, tool_tip="Specify the time period (in seconds) "+
                                                         "between signal aspect changes")
         self.delay.pack(side=Tk.LEFT)
 
-    def route_selected(self):
+    def signal_updated(self):
+        # Only enable the start delay if the current signal ID is not selected
+        if self.sig.get() == str(self.current_item_id):
+            self.start.disable2()
+            self.start.TT.text = "Start delay will be zero when triggering the current signal"
+        else:
+            self.start.enable2()
+
+    def route_updated(self):
         if self.route.get_value():
             self.sig.enable1()
             self.start.enable1()
             self.delay.enable1()
-            # If no siganl ID is configured then set the ID to the current Signal ID
-            # So we start off with a valid configuration for the user to edit
-            if self.sig.get_value() == 0:
-                self.sig.set_value(self.parent_object.config.sigid.get_initial_value())
-            # Start delays of zero are OK but timed delays of zero just aren't sensible
-            # We therefore always set a default of 5 seconds to provide a starting point
-            if self.delay.get_value() == 0: self.delay.set_value(5)
         else:
             self.sig.disable1()
             self.start.disable1()
             self.delay.disable1()
+        self.signal_updated()
     
     def enable(self):
         self.route.enable()
@@ -393,13 +397,20 @@ class timed_signal_route_element():
         self.start.disable()
         self.delay.disable()
 
-    def set_values(self, route:[bool,int,int,int]):
-        # A route comprises a list of [selected, sig_id,start_delay, time_delay)
+    def set_values(self, route:[bool,int,int,int], item_id:int):
+        # A route comprises a list of [selected, sig_id, start_delay, time_delay)
+        # If signal to trigger is '0' (no selection) then we set the current signal ID
+        # to give us a valid default configuration (for the user to edit as required)
+        # Similarly, we set a default of 5 seconds for the time delay
+        self.current_item_id = item_id
         self.route.set_value(route[0])
-        self.sig.set_value(route[1])
+        if route[1] == 0: self.sig.set_value(item_id)
+        else:self.sig.set_value(route[1])
         self.start.set_value(route[2])
-        self.delay.set_value(route[3])
-        self.route_selected()
+        if route[3] == 0: self.delay.set_value(5)
+        else: self.delay.set_value(route[3])
+        # Enable/disable the various route elements as required
+        self.route_updated()
         
     def get_values(self):
         # A route comprises a list of [selected, sig_id,start_delay, time_delay)
@@ -421,6 +432,7 @@ class timed_signal_route_element():
 # Public class instance methods provided by this class are: 
 #    "set_values" - set the initial values for the check box and entry boxes
 #    "get_values" - get the last "validated" values of the check box and entry boxes
+#               Note this class also needs the current signal ID for validation
 # Note that no overall enable/disable functions are provided - External functions 
 # should call the individual enable/disable functions for each route element
 #------------------------------------------------------------------------------------
@@ -443,14 +455,14 @@ class timed_signal_frame():
         self.rh1=timed_signal_route_element(self.subframe2, parent_object, label="RH1")
         self.rh2=timed_signal_route_element(self.subframe2, parent_object, label="RH2")
         
-    def set_values(self, timed_sequence:[[bool,int,int,int],]):
+    def set_values(self, timed_sequence:[[bool,int,int,int],], item_id:int):
         # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]
         # Each route comprises a list of [selected, sig_id,start_delay, time_delay)
-        self.main.set_values(timed_sequence[0])
-        self.lh1.set_values(timed_sequence[1])
-        self.lh2.set_values(timed_sequence[2])
-        self.rh1.set_values(timed_sequence[3])
-        self.rh2.set_values(timed_sequence[4])
+        self.main.set_values(timed_sequence[0], item_id)
+        self.lh1.set_values(timed_sequence[1], item_id)
+        self.lh2.set_values(timed_sequence[2], item_id)
+        self.rh1.set_values(timed_sequence[3], item_id)
+        self.rh2.set_values(timed_sequence[4], item_id)
 
     def get_values(self):
         # A timed_sequence comprises a list of routes [MAIN, LH1, LH2, RH1, RH2]

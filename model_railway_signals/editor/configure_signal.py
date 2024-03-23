@@ -21,6 +21,7 @@
 #    configure_signal_tab2 - Point and signal interlocking
 #    configure_signal_tab3 - signal automation
 #    common.window_controls - the common load/save/cancel/OK controls
+#
 #------------------------------------------------------------------------------------
 
 import copy
@@ -866,46 +867,44 @@ class edit_signal:
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Signal ID
-            self.window.title("Signal "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.window.title("Signal "+str(item_id))
             # Set the Initial UI state from the current object settings. Note that several
             # of the elements need the current signal ID to validate the DCC addresses
-            self.config.sigid.set_value(str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.config.sigid.set_value(item_id)
             self.config.sigtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.subtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
-            self.config.aspects.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
-            self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"])
-            self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"])
-            self.config.feathers.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"], item_id)
+            self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"], item_id)
             self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
-            self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"])
+            self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"], item_id)
             self.config.feathers.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
-            self.config.theatre.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
-            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
-            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
-            self.config.semaphores.set_signal_id(objects.schematic_objects[self.object_id]["itemid"])
-            self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"])
+            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"], item_id)
+            self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"], item_id)
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
             # These are the general settings for the signal
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
             self.config.settings.set_value(rot)
-            # These elements are for the signal intelocking tab
-            self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"])
+            # These elements are for the signal intelocking tab. Note that several of 
+            # the elements need the current signal ID to validate the signal entries
+            self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"], item_id)
             self.locking.interlocked_sections.set_routes(objects.schematic_objects[self.object_id]["trackinterlock"])
-            self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
+            self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"], item_id)
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
-            # These elements are for the Automation tab
-            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1])
-            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1])
+            # These elements are for the Automation tab. Note that several elements 
+            # need the current signal IDfor validation purposes
+            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1], item_id)
+            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
             dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
             override_ahead = objects.schematic_objects[self.object_id]["overrideahead"]
             self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
-            self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"])
+            self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"], item_id)
             self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
             # Configure the initial Route indication selection
             feathers = objects.schematic_objects[self.object_id]["feathers"]

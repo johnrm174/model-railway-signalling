@@ -18,7 +18,6 @@
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.point - To get The Object_ID for a given Item_ID
 #    objects_common.signal - To get The Object_ID for a given Item_ID
-#    objects_common.point_exists - Common function to see if a given item exists
 #    objects_signals.update_references_to_point - called when the point ID is changed
 #    objects_signals.remove_references_to_point - called when the point is deleted
 #    objects_sensors.update_references_to_point - called when the point ID is changed
@@ -37,6 +36,7 @@
 #    points.point_type - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
+#    points.point_exists - Common function to see if a given item exists
 #    points.delete_point(id) - delete library drawing object (part of soft delete)
 #    points.create_point(id) -  To create the library object (create or redraw)
 #    points.update_autoswitch(id,autoswitch_id) - to change the config of an existing point
@@ -131,7 +131,7 @@ def update_references_to_point(old_point_id:int, new_point_id:int):
         point_object = objects_common.point(point_id)
         if objects_common.schematic_objects[point_object]["alsoswitch"] == old_point_id:
             objects_common.schematic_objects[point_object]["alsoswitch"] = new_point_id
-            points.update_autoswitch(point_id=point_id, autoswitch_id=new_point_id)
+            points.update_autoswitch(point_id=int(point_id), autoswitch_id=new_point_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ def remove_references_to_point(deleted_point_id:int):
         point_object = objects_common.point(point_id)
         if objects_common.schematic_objects[point_object]["alsoswitch"] == deleted_point_id:
             objects_common.schematic_objects[point_object]["alsoswitch"] = 0
-            points.update_autoswitch(point_id=point_id, autoswitch_id=0)
+            points.update_autoswitch(point_id=int(point_id), autoswitch_id=0)
     return()
 
 #------------------------------------------------------------------------------------
@@ -189,22 +189,22 @@ def redraw_point_object(object_id):
     # Turn the point type value back into the required enumeration type
     point_type = points.point_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the new point object
-    points.create_point (
+    canvas_tags = points.create_point (
                 canvas = objects_common.canvas,
                 point_id = objects_common.schematic_objects[object_id]["itemid"],
                 pointtype = point_type,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
+                callback = run_layout.schematic_callback,
                 colour = objects_common.schematic_objects[object_id]["colour"],
                 orientation = objects_common.schematic_objects[object_id]["orientation"],
-                point_callback = run_layout.schematic_callback,
                 also_switch = objects_common.schematic_objects[object_id]["alsoswitch"],
                 reverse = objects_common.schematic_objects[object_id]["reverse"],
                 auto = objects_common.schematic_objects[object_id]["automatic"],
                 fpl = objects_common.schematic_objects[object_id]["hasfpl"])
     # Create/update the canvas "tags" and selection rectangle for the point
-    objects_common.schematic_objects[object_id]["tags"] = points.get_tags(objects_common.schematic_objects[object_id]["itemid"])
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
+    objects_common.schematic_objects[object_id]["tags"] = canvas_tags
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(canvas_tags))         
     return()
 
 #------------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ def create_point(item_type):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_point_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=objects_common.point_exists)
+    item_id = objects_common.new_item_id(exists_function=points.point_exists)
     # Add the specific elements for this particular instance of the point
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -241,7 +241,7 @@ def paste_point(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=objects_common.point_exists)
+    new_id = objects_common.new_item_id(exists_function=points.point_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.point_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
