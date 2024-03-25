@@ -1118,17 +1118,17 @@
             ],
             "bbox": 181,
             "colour": "black",
-            "end1": 177,
-            "end2": 178,
+            "end1": 750,
+            "end2": 751,
             "endx": 1675,
             "endy": 275,
             "item": "line",
             "itemid": 1,
-            "line": 176,
+            "line": 749,
             "posx": 1300.0,
             "posy": 275.0,
-            "stop1": 179,
-            "stop2": 180,
+            "stop1": 752,
+            "stop2": 753,
             "tags": "line1"
         },
         "147bdac0-2cb4-4de7-a45d-a87b46155eab": {
@@ -1201,23 +1201,23 @@
             ],
             "bbox": 199,
             "colour": "black",
-            "end1": 195,
-            "end2": 196,
+            "end1": 763,
+            "end2": 764,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 2,
-            "line": 194,
+            "line": 762,
             "posx": 1250.0,
             "posy": 275.0,
-            "stop1": 197,
-            "stop2": 198,
+            "stop1": 765,
+            "stop2": 766,
             "tags": "line2"
         },
         "36c92467-cd2d-4608-bd3d-1ae2fe2fb9b0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 206,
+            "bbox": 205,
             "colour": "black",
             "dccaddress": 1005,
             "dccreversed": false,
@@ -1295,7 +1295,7 @@
                 false,
                 ""
             ],
-            "bbox": 225,
+            "bbox": 224,
             "dccaspects": [
                 [
                     [
@@ -2360,7 +2360,7 @@
         },
         "3d9905d7-3a8c-42d0-ada6-e78748273374": {
             "background": "grey85",
-            "bbox": 228,
+            "bbox": 227,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2381,19 +2381,19 @@
                 0,
                 0
             ],
-            "bbox": 234,
+            "bbox": 233,
             "colour": "black",
-            "end1": 230,
-            "end2": 231,
+            "end1": 793,
+            "end2": 794,
             "endx": 1300.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 3,
-            "line": 229,
+            "line": 792,
             "posx": 1675,
             "posy": 225,
-            "stop1": 232,
-            "stop2": 233,
+            "stop1": 795,
+            "stop2": 796,
             "tags": "line3"
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
@@ -2408,7 +2408,7 @@
                 false,
                 ""
             ],
-            "bbox": 246,
+            "bbox": 245,
             "dccaspects": [
                 [
                     [
@@ -3473,7 +3473,7 @@
         },
         "4c400af8-bf96-447e-85f4-9928287360c5": {
             "background": "grey85",
-            "bbox": 249,
+            "bbox": 248,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3489,7 +3489,7 @@
         },
         "500f7750-b750-4d33-b9fe-1e6373da674d": {
             "background": "grey85",
-            "bbox": 252,
+            "bbox": 251,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -3504,7 +3504,7 @@
             "text": "TT-DS5HS"
         },
         "5424b00f-f0ad-4900-8b9c-7d858a2e05d0": {
-            "bbox": 255,
+            "bbox": 254,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -3528,7 +3528,7 @@
                 false,
                 ""
             ],
-            "bbox": 275,
+            "bbox": 274,
             "dccaspects": [
                 [
                     [
@@ -4603,7 +4603,7 @@
                 false,
                 ""
             ],
-            "bbox": 294,
+            "bbox": 293,
             "dccaspects": [
                 [
                     [
@@ -5678,7 +5678,7 @@
                 false,
                 ""
             ],
-            "bbox": 313,
+            "bbox": 312,
             "dccaspects": [
                 [
                     [
@@ -6753,7 +6753,7 @@
                 false,
                 ""
             ],
-            "bbox": 332,
+            "bbox": 331,
             "dccaspects": [
                 [
                     [
@@ -7818,7 +7818,7 @@
         },
         "632a3066-6bfb-4269-81f1-c73b4b294ae9": {
             "background": "grey85",
-            "bbox": 335,
+            "bbox": 334,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -7844,7 +7844,7 @@
                 false,
                 ""
             ],
-            "bbox": 354,
+            "bbox": 353,
             "dccaspects": [
                 [
                     [
@@ -8919,7 +8919,7 @@
                 false,
                 ""
             ],
-            "bbox": 366,
+            "bbox": 365,
             "dccaspects": [
                 [
                     [
@@ -9985,7 +9985,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 373,
+            "bbox": 370,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -10002,7 +10002,7 @@
         },
         "6df4e851-8669-4940-8dc9-fec3e1873294": {
             "background": "grey85",
-            "bbox": 376,
+            "bbox": 373,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -10018,7 +10018,7 @@
         },
         "709c0d2f-3d16-4669-b53f-38614ef26ea2": {
             "background": "grey85",
-            "bbox": 379,
+            "bbox": 376,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -10034,7 +10034,7 @@
         },
         "75eb7e1b-08a6-4223-8ed8-f31381186102": {
             "background": "grey85",
-            "bbox": 382,
+            "bbox": 379,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -10049,7 +10049,7 @@
             "text": "TT-DS10"
         },
         "7648db7c-97c7-41f3-beee-e60656b9173a": {
-            "bbox": 385,
+            "bbox": 382,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -10062,7 +10062,7 @@
             "tags": "section14"
         },
         "768c5e02-b80c-4025-a27a-ab5a225ae105": {
-            "bbox": 388,
+            "bbox": 385,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -10076,7 +10076,7 @@
         },
         "7b1d99fb-c02e-48be-9c48-c5645301eb85": {
             "background": "grey85",
-            "bbox": 391,
+            "bbox": 388,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -10097,19 +10097,19 @@
                 0,
                 0
             ],
-            "bbox": 397,
+            "bbox": 394,
             "colour": "black",
-            "end1": 393,
-            "end2": 394,
+            "end1": 935,
+            "end2": 936,
             "endx": 800.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 4,
-            "line": 392,
+            "line": 934,
             "posx": 1200.0,
             "posy": 225.0,
-            "stop1": 395,
-            "stop2": 396,
+            "stop1": 937,
+            "stop2": 938,
             "tags": "line4"
         },
         "82685c46-2db9-4145-a0f8-7111098f16ec": {
@@ -10124,7 +10124,7 @@
                 false,
                 ""
             ],
-            "bbox": 409,
+            "bbox": 406,
             "dccaspects": [
                 [
                     [
@@ -11189,7 +11189,7 @@
         },
         "8c773174-1179-4350-946c-4e8548569e33": {
             "background": "grey85",
-            "bbox": 412,
+            "bbox": 409,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11210,24 +11210,24 @@
                 0,
                 0
             ],
-            "bbox": 418,
+            "bbox": 415,
             "colour": "black",
-            "end1": 414,
-            "end2": 415,
+            "end1": 953,
+            "end2": 954,
             "endx": 1200.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 5,
-            "line": 413,
+            "line": 952,
             "posx": 800.0,
             "posy": 175.0,
-            "stop1": 416,
-            "stop2": 417,
+            "stop1": 955,
+            "stop2": 956,
             "tags": "line5"
         },
         "956e68f3-b5ca-4869-9be5-186c3b2b2663": {
             "background": "grey85",
-            "bbox": 421,
+            "bbox": 418,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11243,7 +11243,7 @@
         },
         "9754f858-e3bb-4c96-a3a6-d70b3cc8287f": {
             "background": "grey85",
-            "bbox": 424,
+            "bbox": 421,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11259,7 +11259,7 @@
         },
         "9a537d13-0794-4f88-8386-67b76bbd39d7": {
             "background": "grey85",
-            "bbox": 427,
+            "bbox": 424,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11275,7 +11275,7 @@
         },
         "9f0bd8e5-accc-4abc-8491-8db955715941": {
             "background": "grey85",
-            "bbox": 430,
+            "bbox": 427,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -11290,7 +11290,7 @@
             "text": "TT-DS10 - Train Tech 4 aspect DCC signal\nTT-DS5HS - Train Tech 4 aspect DCC signal with flashing aspects\nAA-4Awpl - Absolute Aspects 4 aspect signal with position light\nAA-4wpl&lhf - Absolute Asp'ts 4 asp signal with pos light & LH Feather"
         },
         "a19e74b3-1746-478b-92c3-2ae4183b4c71": {
-            "bbox": 433,
+            "bbox": 430,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11314,7 +11314,7 @@
                 false,
                 ""
             ],
-            "bbox": 452,
+            "bbox": 449,
             "dccaspects": [
                 [
                     [
@@ -12389,7 +12389,7 @@
                 false,
                 ""
             ],
-            "bbox": 471,
+            "bbox": 468,
             "dccaspects": [
                 [
                     [
@@ -13459,24 +13459,24 @@
                 1,
                 1
             ],
-            "bbox": 477,
+            "bbox": 474,
             "colour": "black",
-            "end1": 473,
-            "end2": 474,
+            "end1": 1004,
+            "end2": 1005,
             "endx": 1250.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 6,
-            "line": 472,
+            "line": 1003,
             "posx": 1525.0,
             "posy": 175.0,
-            "stop1": 475,
-            "stop2": 476,
+            "stop1": 1006,
+            "stop2": 1007,
             "tags": "line6"
         },
         "abd81429-2c2a-4b04-bc62-81a103da6e24": {
             "background": "#76d0d9",
-            "bbox": 480,
+            "bbox": 477,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -13502,7 +13502,7 @@
                 false,
                 ""
             ],
-            "bbox": 499,
+            "bbox": 496,
             "dccaspects": [
                 [
                     [
@@ -14567,7 +14567,7 @@
         },
         "b31a2cd1-3494-4f09-95b8-f50e6708bdeb": {
             "background": "grey85",
-            "bbox": 502,
+            "bbox": 499,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -14582,7 +14582,7 @@
             "text": "TT-DS10"
         },
         "b3b255c4-744a-4476-a7d0-3535e718fac1": {
-            "bbox": 505,
+            "bbox": 502,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14595,7 +14595,7 @@
             "tags": "section3"
         },
         "b55de778-8bb5-4d62-965e-d62ca9aa136d": {
-            "bbox": 508,
+            "bbox": 505,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14609,7 +14609,7 @@
         },
         "b778ffd2-cf39-4c24-b299-58e6131ff2d2": {
             "background": "grey85",
-            "bbox": 511,
+            "bbox": 508,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -14626,7 +14626,7 @@
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 518,
+            "bbox": 515,
             "colour": "black",
             "dccaddress": 1003,
             "dccreversed": false,
@@ -14689,25 +14689,25 @@
                 0,
                 0
             ],
-            "bbox": 524,
+            "bbox": 521,
             "colour": "black",
-            "end1": 520,
-            "end2": 521,
+            "end1": 1043,
+            "end2": 1044,
             "endx": -50.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 7,
-            "line": 519,
+            "line": 1042,
             "posx": 750.0,
             "posy": 225.0,
-            "stop1": 522,
-            "stop2": 523,
+            "stop1": 1045,
+            "stop2": 1046,
             "tags": "line7"
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 531,
+            "bbox": 528,
             "colour": "black",
             "dccaddress": 1002,
             "dccreversed": false,
@@ -14770,19 +14770,19 @@
                 1,
                 1
             ],
-            "bbox": 537,
+            "bbox": 534,
             "colour": "black",
-            "end1": 533,
-            "end2": 534,
+            "end1": 1054,
+            "end2": 1055,
             "endx": 525.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 8,
-            "line": 532,
+            "line": 1053,
             "posx": 750.0,
             "posy": 175.0,
-            "stop1": 535,
-            "stop2": 536,
+            "stop1": 1056,
+            "stop2": 1057,
             "tags": "line8"
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
@@ -14797,7 +14797,7 @@
                 false,
                 ""
             ],
-            "bbox": 549,
+            "bbox": 546,
             "dccaspects": [
                 [
                     [
@@ -15861,7 +15861,7 @@
             ]
         },
         "cf7ab31e-b781-435b-8b96-0398da28e8f1": {
-            "bbox": 552,
+            "bbox": 549,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15874,7 +15874,7 @@
             "tags": "section7"
         },
         "d2c6a4dd-630c-4836-ad26-52269177edcc": {
-            "bbox": 555,
+            "bbox": 552,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15887,7 +15887,7 @@
             "tags": "section1"
         },
         "d53174a7-e4e9-425d-94a8-80507bd85a04": {
-            "bbox": 558,
+            "bbox": 555,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15900,7 +15900,7 @@
             "tags": "section5"
         },
         "d5d3aa4e-cc00-4d66-a1c6-8b52bb7b1a92": {
-            "bbox": 561,
+            "bbox": 558,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15924,7 +15924,7 @@
                 false,
                 ""
             ],
-            "bbox": 580,
+            "bbox": 577,
             "dccaspects": [
                 [
                     [
@@ -16990,7 +16990,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 587,
+            "bbox": 582,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17006,7 +17006,7 @@
             "tags": "point1"
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
-            "bbox": 590,
+            "bbox": 585,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -17020,7 +17020,7 @@
         },
         "e4853677-978f-4fc5-b03d-c92d0bb216ea": {
             "background": "#76d0d9",
-            "bbox": 593,
+            "bbox": 588,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -17036,7 +17036,7 @@
         },
         "e54253c4-ec5b-4a4a-835d-5e3b5eb4e183": {
             "background": "grey85",
-            "bbox": 596,
+            "bbox": 591,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -17062,7 +17062,7 @@
                 false,
                 ""
             ],
-            "bbox": 608,
+            "bbox": 603,
             "dccaspects": [
                 [
                     [
@@ -18126,7 +18126,7 @@
             ]
         },
         "ee774c2b-3946-44aa-9254-a31f2bebecb8": {
-            "bbox": 611,
+            "bbox": 606,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -18150,7 +18150,7 @@
                 false,
                 ""
             ],
-            "bbox": 623,
+            "bbox": 618,
             "dccaspects": [
                 [
                     [
@@ -19214,7 +19214,7 @@
             ]
         },
         "f1dbf1a3-0d5b-43e2-a476-18ccb8b0b920": {
-            "bbox": 626,
+            "bbox": 621,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -19229,7 +19229,7 @@
         "f2b7d2d9-eb4d-4e55-859f-100131262fe2": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 633,
+            "bbox": 626,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -19246,7 +19246,7 @@
         },
         "f514300f-50b5-477c-9673-8cacdaac0c5b": {
             "background": "grey85",
-            "bbox": 636,
+            "bbox": 629,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -19261,7 +19261,7 @@
             "text": "Ground Signals 5, 6 & 15\nControlled by a single\nSignalist SC1 Decoder\nBase Address = 609"
         },
         "f771894a-e7a8-4e26-a9d0-d316f9aff774": {
-            "bbox": 639,
+            "bbox": 632,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -19275,7 +19275,7 @@
         },
         "f7dc96fe-3f96-4f6b-8a63-8589f6b82d33": {
             "background": "grey85",
-            "bbox": 642,
+            "bbox": 635,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -19301,7 +19301,7 @@
                 true,
                 "8"
             ],
-            "bbox": 662,
+            "bbox": 655,
             "dccaspects": [
                 [
                     [
@@ -20376,7 +20376,7 @@
                 false,
                 ""
             ],
-            "bbox": 681,
+            "bbox": 674,
             "dccaspects": [
                 [
                     [
@@ -21441,7 +21441,7 @@
         },
         "ff661e89-2111-4e98-8191-9fe3d3e39471": {
             "background": "grey85",
-            "bbox": 684,
+            "bbox": 677,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -21457,7 +21457,7 @@
         },
         "ffc65294-6626-4af4-9a43-305530b7f891": {
             "background": "grey85",
-            "bbox": 687,
+            "bbox": 680,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -21517,7 +21517,8 @@
             "editmode": true,
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
-            "version": "Version 4.1.0"
+            "spadpopups": false,
+            "version": "Version 4.2.0"
         },
         "gpio": {
             "portmappings": [
