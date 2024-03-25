@@ -144,7 +144,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED")
-            points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
+        points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
         points[str(point_id)]["switched"] = True
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
@@ -154,7 +154,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to NORMAL")
-            points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
+        points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
         points[str(point_id)]["switched"] = False
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
@@ -248,8 +248,6 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                                 command = lambda:fpl_button_event(point_id))
         # Disable the change button if the point has FPL (default state = FPL active)
         if fpl: point_button.config(state="disabled")
-        # Disable the main point button if the point is automatic
-        if auto: point_button.config(state="disabled",relief="sunken",bg=common.bgraised, bd=0)
         # Create the Tkinter drawing objects for the point
         if pointtype==point_type.RH:
             # Draw the lines representing a Right Hand point
@@ -263,7 +261,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
             # Create the button windows in the correct relative positions for a Right Hand Point
             point_coords = common.rotate_point (x,y,-3,-13,orientation)
-            canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
             if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
         else: 
             # Draw the lines representing a Left Hand point
@@ -277,7 +275,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
             # Create the button windows in the correct relative positions for a Left Hand Point
             point_coords = common.rotate_point (x,y,-3,+13,orientation)
-            canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
             if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
         # The "normal" state of the point is the straight through route by default
         # With reverse set to True, the divergent route becomes the "normal" state
