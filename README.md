@@ -10,7 +10,7 @@ without some of the Raspberry-Pi specific interfacing functions).
 * Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout.
 * Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation.
 * Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts.
-* Provides a Public API [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) to enable integration with custom layout interfaces.
+* Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) to support custom layout control interfaces.
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
@@ -86,6 +86,3 @@ To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 
 
 An additional benifit was that some of the other applications I use (such as the kazam video capture software)
 will now work as normal on the Raspberry Pi 5.
-
-
-
