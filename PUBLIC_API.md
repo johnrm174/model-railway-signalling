@@ -21,14 +21,14 @@ for other Languages / MQTT Clients should be broadly similar - if in doubt read 
 
 ## Subscribing to the DCC Command Feed in your application
 
-The format of the DCC command feed 'Topic' is: 
+The format of the DCC command feed subscription 'Topic' is: 
 <pre>
 dcc_accessory_short_events/network_identifier/node_identifier-0/+
 </pre>
 * The network_identifier is the name you have given to your signalling network.
 * The node_identifier will be the name you have given to the main Model Railway Signalling node.
 
-As an example, for a signalling network name of "layout1" and the a node name (for the main Model Railway 
+As an example, for a signalling network name of "layout1" and a node name (for the main Model Railway 
 Signalling application) of "box1", the subscription would be:
 <pre>
 mqtt_client.subscribe("dcc_accessory_short_events/layout1/box1-0/+")
@@ -39,8 +39,8 @@ mqtt_client.subscribe("dcc_accessory_short_events/layout1/box1-0/+")
 Once subscribed, the paho MQTT client will make a callback for every message received (the following
 example assumes we have registered this callback as our 'on_message' function).
 
-To decode the DCC command you just need to unpack the json message (to convert this into a python dict in order
-to access the individual elements). Note that your application should always handle the case of empty payloads 
+To decode the DCC command you just need to convert the json message into a python dict to access the
+individual message elements. Note that your application should always handle the case of empty payloads 
 as the Model Railway Signalling application will publish 'Null' messages to this topic on shutdown.
 <pre>
 def on_message(mqtt_client, userdata, message):
@@ -53,12 +53,12 @@ def on_message(mqtt_client, userdata, message):
 
 ## Publishing GPIO sensor events from your application
 
-The format of the GPIO Sensor Event 'Topic' is: 
+Each individual GPIO sensor should be published to its own 'Topic'. The format of a GPIO Sensor Event topic is: 
 <pre>
 gpio_sensor_event/network_identifier/item_identifier 
 </pre>
 * The network_identifier is the name you have given to your signalling network.
-* The item_identifier is the unique identifier for each 'GPIO sensor' you want to 'publish' in the format 'node_identifier-sensor_id'
+* The item_identifier is the unique identifier for each individual GPIO sensor in the format 'node_identifier-sensor_id'
 
 As an example, for a signalling network name of "layout1" and a node name (for the node running 
 your layout interfacing application) of "box2", trigger events for gpio sensor "3" would be
@@ -69,7 +69,7 @@ published to the following topic:
 
 To encode a GPIO sensor event you just need to include the item-identifier in a json message and
 'publish' this to the MQTT broker on the appropriate topic. Note that as these messages relate to 
-transitory events, they should be published to the broker as 'non-retained' messages.
+transitory events, they should be published to the broker as 'non-retained' messages:
 <pre>
 def publish_gpio_sensor_event(network_identifier:str, node_identifier:str, sensor_id:int):
     item_identifier = node_identifier+"-"+str(sensor_id)
@@ -80,4 +80,5 @@ def publish_gpio_sensor_event(network_identifier:str, node_identifier:str, senso
 
 Note that it will be the responsibility of your application to implement any 'debounce' or 'timeouts' that
 may be required for whatever mechanisms you choose to use for train detection. Your application should
-only ever publish a single GPIO sensor event to the main Model Railway Signalling application when triggered.
+only ever publish a single GPIO sensor event to the main Model Railway Signalling application when triggered
+by a passing train.
