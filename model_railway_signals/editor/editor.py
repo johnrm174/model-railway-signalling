@@ -20,8 +20,8 @@
 #    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
 #    schematic.enable_editing() - On mode toggle or load (if loaded file is in edit mode and not already in edit mode)
 #    schematic.disable_editing() - On mode toggle or load (if loaded file is in run mode and not already in run mode)
-#    run_layout.enable_automation() - On automation toggle or load
-#    run_layout.disable_automation() - On automation toggle or load
+#    run_layout.configure_automation() - On automation toggle or load
+#    run_layout.configure_spad_popups() - On settings update or load
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
@@ -152,14 +152,16 @@ class main_menubar:
         self.settings_menu = Tk.Menu(self.mainmenubar,tearoff=False)
         self.settings_menu.add_command(label =" Canvas...",
                 command=lambda:menubar_windows.edit_canvas_settings(self.root, self.canvas_update))
+        self.settings_menu.add_command(label =" General...",
+                command=lambda:menubar_windows.edit_general_settings(self.root, self.general_settings_update))
+        self.settings_menu.add_command(label =" GPIO...",
+                command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
+        self.settings_menu.add_command(label =" Logging...",
+                command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
         self.settings_menu.add_command(label =" MQTT...",
                 command=lambda:menubar_windows.edit_mqtt_settings(self.root, self.mqtt_connect, self.mqtt_update))
         self.settings_menu.add_command(label =" SPROG...",
                 command=lambda:menubar_windows.edit_sprog_settings(self.root, self.sprog_connect, self.sprog_update))
-        self.settings_menu.add_command(label =" Logging...",
-                command=lambda:menubar_windows.edit_logging_settings(self.root, self.logging_update))
-        self.settings_menu.add_command(label =" Sensors...",
-                command=lambda:menubar_windows.edit_gpio_settings(self.root, self.gpio_update))
         self.mainmenubar.add_cascade(label = "Settings", menu=self.settings_menu)
         # Create the various menubar items for the Help Dropdown
         self.help_menu = Tk.Menu(self.mainmenubar,tearoff=False)
@@ -283,6 +285,8 @@ class main_menubar:
         else: self.run_mode()
         # Create all the track sensor objects that have been defined
         self.gpio_update()
+        # Apply any other general settings
+        self.general_settings_update()
         
     # --------------------------------------------------------------------------------------
     # Callback function to handle the Toggle Mode Event ('m' key) from schematic.py
@@ -314,14 +318,14 @@ class main_menubar:
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
         settings.set_general(automation=True)
-        run_layout.enable_automation()
+        run_layout.configure_automation(True)
 
     def automation_disable(self):
         new_label = "Automation:Off"
         self.mainmenubar.entryconfigure(self.auto_label, label=new_label)
         self.auto_label = new_label
         settings.set_general(automation=False)
-        run_layout.disable_automation()
+        run_layout.configure_automation(False)
 
     def edit_mode(self):
         if self.mode_label != "Mode:Edit":
@@ -510,6 +514,10 @@ class main_menubar:
         # Delete all track sensor objects and then re-create from the updated settings - we do this
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
         objects.update_local_gpio_sensors(trigger, timeout, mappings)
+
+    def general_settings_update(self):
+        # The spad popups enabled flag is the 6th parameter returned
+        run_layout.configure_spad_popups(settings.get_general()[5])
 
     #------------------------------------------------------------------------------------------
     # FILE menubar functions

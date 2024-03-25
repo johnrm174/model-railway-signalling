@@ -1129,4 +1129,54 @@ class edit_gpio_settings():
         edit_gpio_settings_window = None
         self.window.destroy()
 
+#------------------------------------------------------------------------------------
+# Class for the General Settings toolbar window. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+edit_general_settings_window = None
+
+class edit_general_settings():
+    def __init__(self, root_window, update_function):
+        global edit_general_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_general_settings_window is not None:
+            edit_general_settings_window.lift()
+            edit_general_settings_window.state('normal')
+            edit_general_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the (non resizable) top level window for the General Settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("General")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_general_settings_window = self.window
+            # Create the "SPAD Popups" selection element
+            self.spad = common.check_box(self.window, label="Enable Signal Passed at Danger popup warnings",
+                    tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
+            self.spad.pack(padx=2, pady=2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
+
+    def load_state(self):
+        # Spad Popups flag is the 6th parameter returned from get_general
+        self.spad.set_value(settings.get_general()[5])
+
+    def save_state(self, close_window:bool):
+        settings.set_general(spad=self.spad.get_value())
+        # Make the callback to apply the updated settings
+        self.update_function()
+        # close the window (on OK )
+        if close_window: self.close_window()
+
+    def close_window(self):
+        global edit_general_settings_window
+        edit_general_settings_window = None
+        self.window.destroy()
+
 #############################################################################################

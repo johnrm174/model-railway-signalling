@@ -302,25 +302,18 @@ class general_settings_frame():
                     tool_tip="Select to override distant signal to CAUTION if "+
                     "any home signals on the route ahead are at DANGER")
         self.override_ahead.pack()
-        self.spad_warnings = common.check_box(self.frame, width=39,
-                    label="Popup warnings when Signal is Passed At Danger",
-                    tool_tip="Select to enable Pop-up warnings if the system "+
-                    "detects that the signal has been passed at danger (SPAD)")
-        self.spad_warnings.pack()
                         
-    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool, spad_warnings:bool):
+    def set_values(self, override:bool, main_auto:bool, override_ahead:bool, dist_auto:bool):
         self.override.set_value(override)
         self.automatic.set_value(main_auto)
         self.override_ahead.set_value(override_ahead)
         self.distant_automatic.set_value(dist_auto)
-        self.spad_warnings.set_value(spad_warnings)
 
     def get_values(self):
         return ( self.override.get_value(),
                  self.automatic.get_value(),
                  self.override_ahead.get_value(),
-                 self.distant_automatic.get_value(),
-                 self.spad_warnings.get_value() )
+                 self.distant_automatic.get_value() )
 
 #------------------------------------------------------------------------------------
 # Class for a Timed signal route element comprising a route selection checkbox, a

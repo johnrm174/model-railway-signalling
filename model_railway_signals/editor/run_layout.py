@@ -7,8 +7,8 @@
 #    schematic_callback(item_id,callback_type) - the callback for all library objects
 #    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
 #    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
-#    enable_automation() - Call when Automation is enabled (from Editor Module)
-#    disable_automation() - Call when Automation is disabled (from Editor Module)
+#    configure_automation(auto_enabled) - Call to set automation mode (from Editor Module)
+#    configure_spad_popups(spad_enabled) - Call to set SPAD popup warnings (from Editor Module)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.signal(signal_id) - To get the object_id for a given signal_id
@@ -86,6 +86,7 @@ from . import objects
 canvas = None
 run_mode = None
 automation_enabled = None
+spad_popups = False
 enhanced_debugging = False  # Switch this on to enable 'info'
 
 #------------------------------------------------------------------------------------
@@ -113,16 +114,15 @@ def disable_editing():
     initialise_layout()
     return()
 
-def enable_automation():
+def configure_automation(automation:bool):
     global automation_enabled
-    automation_enabled = True
+    automation_enabled = automation
     initialise_layout()
     return()
 
-def disable_automation():
-    global automation_enabled
-    automation_enabled = False
-    initialise_layout()
+def configure_spad_popups(popups:bool):
+    global spad_popups
+    spad_popups = popups
     return()
 
 #------------------------------------------------------------------------------------
@@ -524,8 +524,9 @@ def update_track_occupancy_for_signal(object_id):
             logging.debug("RUN LAYOUT: "+item_text+" 'passed' - no valid route ahead of the Signal "+
                         "but ignoring as this is a possible secondary event")
         else:
-            logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
-                        "movement as there is no valid route ahead of the Signal")
+            log_text = item_text+" has been 'passed' but unable to determine train movement as there is no valid route ahead of the Signal"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     # Establish if this is a primary event or a secondary event (to a previous train movement). This is the
     # case of a train passing a signal and then immediately passing an opposing signal on the route ahead
     # The second event should be ignored as we don't want to pass the train back to the previous section.
@@ -545,8 +546,7 @@ def update_track_occupancy_for_signal(object_id):
     else:
         signal_clear = False
     if route is not None and not is_secondary_event:
-        spad_popups = schematic_object["spadwarnings"]
-        process_track_occupancy(section_ahead, section_behind, item_text, signal_clear, spad_popups)
+        process_track_occupancy(section_ahead, section_behind, item_text, signal_clear)
     return()
 
 #------------------------------------------------------------------------------------
@@ -561,14 +561,16 @@ def update_track_occupancy_for_track_sensor(object_id):
     # the returned routes are None we can't really assume anything so don't process any changes.
     route_ahead = find_valid_route(object_id, "routeahead")
     if route_ahead is None:
-        logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
-                        "movement as there is no valid route ahead of the Track Sensor")
+        log_text = item_text+"has been 'passed' but unable to determine train movement as there is no valid route ahead of the Track Sensor"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:
         section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
     route_behind = find_valid_route(object_id, "routebehind")
     if route_behind is  None:
-        logging.warning("RUN LAYOUT: "+item_text+" 'passed' but unable to determine train "+
-                        "movement as there is no valid route behind of the Track Sensor")
+        log_text=item_text+"has been 'passed' but unable to determine train movement as there is no valid route behind of the Track Sensor"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:
         section_behind = schematic_object["routebehind"][route_behind.value-1][1]
     if route_ahead is not None and route_behind is not None:
@@ -580,8 +582,7 @@ def update_track_occupancy_for_track_sensor(object_id):
 # called for a track sensor then the sig_clear will default to None
 #------------------------------------------------------------------------------------
 
-def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str,
-                             sig_clear:bool=None, spad_popups:bool=False):
+def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str, sig_clear:bool=None):
     if ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
          section_behind > 0 and not track_sections.section_occupied(section_behind) ):
         # Section AHEAD = OCCUPIED and section BEHIND = CLEAR - Pass train from AHEAD to BEHIND
@@ -593,16 +594,16 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
         train_descriptor = track_sections.clear_section_occupied(section_behind)
         track_sections.set_section_occupied (section_ahead, train_descriptor)
         if sig_clear == False:
-            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
-            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
-                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
+            log_text = item_text+" has been Passed at Danger by '"+train_descriptor+"'"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning", message=log_text)
     elif section_ahead > 0 and section_behind == 0 and not track_sections.section_occupied(section_ahead):
         # Section AHEAD = CLEAR - section BEHIND doesn't exist - set section ahead to OCCUPIED
         track_sections.set_section_occupied(section_ahead)
         if sig_clear == False:
-            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
-            if spad_popups:  Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
-                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
+            log_text = item_text+" has been Passed at Danger by an unidentified train"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups:  Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning", message=log_text)
     elif section_behind > 0 and section_ahead == 0 and not track_sections.section_occupied(section_behind):
         # Section BEHIND = CLEAR - section AHEAD doesn't exist - set section behind to OCCUPIED
        track_sections.set_section_occupied(section_behind)
@@ -611,16 +612,18 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
         track_sections.clear_section_occupied(section_ahead)
     elif section_behind > 0 and section_ahead == 0 and track_sections.section_occupied(section_behind):
         # Section BEHIND = OCCUPIED - section AHEAD doesn't exist -set section behind to CLEAR
-        track_sections.clear_section_occupied(section_behind)
+        train_descriptor = track_sections.clear_section_occupied(section_behind)
         if sig_clear == False:
-            logging.warning("RUN LAYOUT: "+item_text+" 'passed' at DANGER ")
-            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning",
-                    message=item_text+" has been Passed at Danger by '"+train_descriptor+"'")
+            log_text = item_text+" has been Passed at Danger by '"+train_descriptor+"'"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="SPAD Warning", message=log_text)
     elif ( section_ahead > 0 and not track_sections.section_occupied(section_ahead) and
            section_behind > 0 and not track_sections.section_occupied(section_behind) ):
         # Section BEHIND = CLEAR and section AHEAD = CLEAR - No idea
-        log_text = " 'passed' but unable to determine train movement as Track Sections ahead and behind are both CLEAR"
-        logging.warning("RUN LAYOUT: "+item_text+log_text)
+        log_text = item_text+" has been 'passed' but unable to determine train movement as Track Sections ahead and behind are both CLEAR"
+        logging.warning("RUN LAYOUT: "+log_text)
+        if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
+
     elif ( section_ahead > 0 and track_sections.section_occupied(section_ahead) and
            section_behind > 0 and track_sections.section_occupied(section_behind) ):
         # Section BEHIND = OCCUPIED and section AHEAD = OCCUPIED
@@ -629,15 +632,15 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
             train_descriptor = track_sections.clear_section_occupied(section_behind)
             train_ahead_descriptor = track_sections.section_label(section_ahead)
             track_sections.set_section_occupied (section_ahead, train_descriptor)
-            log_text = " 'passed' at CLEAR - Assume Trains coupling - Check and update Train Descriptor"
-            if spad_popups: Tk.messagebox.showinfo(parent=canvas, title="Train entering occupied section",
-                           message=item_text+" has been Passed at Clear by '"+train_descriptor+
-                                   "' and is entering Section occupied by '"+train_ahead_descriptor+
-                                   "'. Check and update train descriptor as required" )
+            log_text = (item_text+" has been Passed at Clear by '"+train_descriptor+"' and has entered Section occupied by '"
+                                   +train_ahead_descriptor+ "'. Check and update train descriptor as required")
+            logging.info("RUN LAYOUT: "+log_text)
+            if spad_popups: Tk.messagebox.showinfo(parent=canvas, title="Occupancy Update", message=log_text)
         else:
             # We have no idea what train has passed the Signal / Track Section
-            log_text = " 'passed' but unable to determine train movement as Track Sections ahead and behind are both OCCUPIED"
-        logging.warning("RUN LAYOUT: "+item_text+log_text)
+            log_text = item_text+" has been 'passed' but unable to determine train movement as Track Sections ahead and behind are both OCCUPIED"
+            logging.warning("RUN LAYOUT: "+log_text)
+            if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     ############################################################################################
     # Propagate changes to any mirrored track sections - To move into Library eventually #######
     ############################################################################################
