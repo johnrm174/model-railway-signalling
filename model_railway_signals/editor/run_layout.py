@@ -561,14 +561,14 @@ def update_track_occupancy_for_track_sensor(object_id):
     # the returned routes are None we can't really assume anything so don't process any changes.
     route_ahead = find_valid_route(object_id, "routeahead")
     if route_ahead is None:
-        log_text = item_text+"has been 'passed' but unable to determine train movement as there is no valid route ahead of the Track Sensor"
+        log_text = item_text+" has been 'passed' but unable to determine train movement as there is no valid route ahead of the Track Sensor"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:
         section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
     route_behind = find_valid_route(object_id, "routebehind")
     if route_behind is  None:
-        log_text=item_text+"has been 'passed' but unable to determine train movement as there is no valid route behind of the Track Sensor"
+        log_text=item_text+" has been 'passed' but unable to determine train movement as there is no valid route behind of the Track Sensor"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:
