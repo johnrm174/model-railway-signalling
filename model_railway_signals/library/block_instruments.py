@@ -731,7 +731,7 @@ def validate_linked_instrument(inst_id:int, linked_to:str):
             # We've found an instrument already 'linked back to' the instrument we have just created
             # but 'our instrument' points to a completely different instrument - Raise a warning
             logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
-                " - but instrument "+other_instrument+" is linked from instrument "+linked_to)
+                " - but instrument "+link_from_other_instrument+" is linked from instrument "+other_instrument)
         elif other_instrument != str(inst_id) and link_from_other_instrument != "" and link_from_other_instrument == linked_to:
             # We've found another instrument linked to the instrument we are trying to link to
             logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
