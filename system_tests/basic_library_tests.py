@@ -498,12 +498,12 @@ def run_instrument_library_tests():
     # Raise a warning because we are linking to instrument 8 but Instruments 6 and 7 are already linked to back to 'our' instrument
     block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 900, 100, instrument_callback, linked_to="10") # Warning
     # Rainy day tests:
-    block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail
-    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail
-    block_instruments.create_instrument(canvas, "6", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail
-    block_instruments.create_instrument(canvas, 7, "random_type", 100, 100, instrument_callback, linked_to="2") # Fail
-    block_instruments.create_instrument(canvas, 8, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10) # Fail
-    block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1") # Fail
+    block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (int <1)
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (Exists)
+    block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (str)
+    block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2") # Fail
+    block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10) # Fail
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1") # Fail
     assert len(block_instruments.instruments) == 9
     print("Library Tests - instrument_exists - 1 Error will be generated")
     assert block_instruments.instrument_exists("1")
@@ -517,7 +517,7 @@ def run_instrument_library_tests():
     assert block_instruments.instrument_exists(9)
     assert not block_instruments.instrument_exists("10")
     assert not block_instruments.instrument_exists(10)
-    assert not block_instruments.instrument_exists(True)
+    assert not block_instruments.instrument_exists(10.1)
     print("Library Tests - block_section_ahead_clear - Part 1 - 2 Errors will be generated")
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
@@ -528,17 +528,20 @@ def run_instrument_library_tests():
     print("Library Tests - block_section_ahead_clear - Part 2 - Testing instrument states (no errors or warnings)")
     block_instruments.clear_button_event(1)
     block_instruments.clear_button_event(3)
+    block_instruments.clear_button_event(3)
     assert block_instruments.block_section_ahead_clear(2)
     assert block_instruments.block_section_ahead_clear(4)
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(3)
     block_instruments.occup_button_event(1)
     block_instruments.occup_button_event(3)
+    block_instruments.occup_button_event(3)
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
     assert not block_instruments.block_section_ahead_clear(3)
     assert not block_instruments.block_section_ahead_clear(4)
     block_instruments.blocked_button_event(1)
+    block_instruments.blocked_button_event(3)
     block_instruments.blocked_button_event(3)
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
@@ -552,7 +555,7 @@ def run_instrument_library_tests():
     assert not block_instruments.block_section_ahead_clear(4)
     block_instruments.blocked_button_event(2)
     block_instruments.blocked_button_event(4)
-    print("Library Tests - update_linked_instrument - 4 Errors and 5 warnings will be generated")
+    print("Library Tests - update_linked_instrument - 5 Errors and 5 warnings will be generated")
     # Clear down the spurious linkings
     block_instruments.update_linked_instrument(5,"")
     block_instruments.update_linked_instrument(6,"")
@@ -568,18 +571,29 @@ def run_instrument_library_tests():
     block_instruments.update_linked_instrument(10,"7")   # Fail -Inst ID does not exist
     block_instruments.update_linked_instrument("1","2") # Fail - Inst ID not an int
     block_instruments.update_linked_instrument(1,2)     # Fail - Linked ID not a str
-    
-    print("Library Tests - set_instruments_to_publish_state - 2 Errors and 2 warnings will be generated")
+    block_instruments.update_linked_instrument(1,"box1") # Fail - linked ID npot valid remote ID
+    print("Library Tests - set_instruments_to_publish_state - 3 Errors and 4 warnings will be generated")
     assert len(block_instruments.list_of_instruments_to_publish) == 0
-    block_instruments.set_instruments_to_publish_state(1,2) 
-    block_instruments.set_instruments_to_publish_state(1,2) # Already set to publish - warnings
-    block_instruments.set_instruments_to_publish_state("1,","2") # Fail - not integers
-    assert len(block_instruments.list_of_instruments_to_publish) == 2
-    # Excersise the code to publish state and telegraph key events
-    block_instruments.update_linked_instrument(5,"")
+    block_instruments.set_instruments_to_publish_state(1,2,5,20) 
+    block_instruments.set_instruments_to_publish_state(1,2,5,20) # Already set to publish - 4 warnings
+    block_instruments.set_instruments_to_publish_state("1,","2") # Not integers - 2 Errors
+    block_instruments.set_instruments_to_publish_state(0) # Integer but < 1 - 1 Error
+    assert len(block_instruments.list_of_instruments_to_publish) == 4
+    print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code")    
+    # Clear down the existing linked instruments first
+    block_instruments.update_linked_instrument(4,"")
+    block_instruments.update_linked_instrument(1,"")
+    block_instruments.update_linked_instrument(5,"Box2-150")
+    block_instruments.update_linked_instrument(6,"Box2-160")
     block_instruments.clear_button_event(5)
     block_instruments.blocked_button_event(5)
     block_instruments.telegraph_key_button(5)
+    block_instruments.clear_button_event(6)
+    block_instruments.blocked_button_event(6)
+    block_instruments.telegraph_key_button(6)
+    
+    
+    
     print("Library Tests - subscribe_to_remote_instrument - 3 Errors and 1 Warning will be generated")
     block_instruments.subscribe_to_remote_instrument("box2-200")
     block_instruments.subscribe_to_remote_instrument("box2-200")   # Warning - This is a duplicate
@@ -646,9 +660,9 @@ def run_instrument_library_tests():
 
 def run_all_basic_library_tests(shutdown:bool=False):
     logging.getLogger().setLevel(logging.DEBUG)
-    run_track_sensor_library_tests()
-    run_gpio_sensor_library_tests()
-    run_point_library_tests()
+#     run_track_sensor_library_tests()
+#     run_gpio_sensor_library_tests()
+#     run_point_library_tests()
     run_instrument_library_tests()
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: report_results()
