@@ -230,7 +230,7 @@ def gpio_sensor_triggered(gpio_port:int, testing:bool=False):
 def send_mqtt_gpio_sensor_triggered_event(sensor_id:int):
     if sensor_id in list_of_track_sensors_to_publish:
         log_message = "GPIO Sensor "+str(sensor_id)+": Publishing 'sensor triggered' event to MQTT Broker"
-        # Publish as "retained" messages so remote items that subscribe later will always pick up the latest state
+        # Publish as non "retained" messages as these events are transitory
         mqtt_interface.send_mqtt_message("gpio_sensor_event",sensor_id,data={},log_message=log_message,retain=False)
     return()
 
