@@ -882,7 +882,7 @@ def run_signal_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:b
     sleep(delay)
     
     if not edit_mode: print("Signal Track occupancy changes - Edge case tests - 3 warnings should be generated:")
-    # Test Both sections occupied - and signal is CLEAR - Train should be passed (with warning)
+    # Test Both sections occupied - and signal is CLEAR - Valid Move - Train should be passed (without warnings)
     set_subsidaries_off(1)
     sleep(delay)
     gpio_trigger_delay = 0.2
@@ -899,7 +899,7 @@ def run_signal_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:b
     if not edit_mode:
         assert_sections_occupied(2)
         assert_sections_clear(1)
-    # Test Both sections occupied - and signal is at DANGER - Negative Test
+    # Test Both sections occupied - and signal is at DANGER - Warning will be generated
     set_subsidaries_on(1)
     sleep(delay)
     if not edit_mode:
@@ -914,7 +914,7 @@ def run_signal_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:b
         sleep(delay)
     if not edit_mode:
         assert_sections_occupied(1,2)
-    # Test Both sections clear - and signal is at DANGER - Negative Test
+    # Test Both sections clear - and signal is at DANGER - Warning will be generated
     sleep(delay)
     if not edit_mode:
         set_sections_clear(1,2)
@@ -927,6 +927,19 @@ def run_signal_track_occupancy_tests(delay:float, edit_mode:bool, test_sensors:b
         sleep(delay)
     if not edit_mode:
         assert_sections_clear(1,2)
+    # Test Both sections clear - and signal is Clear - Warning will be generated
+    set_subsidaries_off(1)
+    sleep(delay)
+    if test_sensors:
+        simulate_gpio_triggered(4)
+        sleep(delay+gpio_trigger_delay)
+    else:
+        trigger_signals_passed(1)
+        sleep(delay)
+    if not edit_mode:
+        assert_sections_clear(1,2)
+    set_subsidaries_on(1)
+    sleep(delay)
     return()
 
 #-----------------------------------------------------------------------------------
