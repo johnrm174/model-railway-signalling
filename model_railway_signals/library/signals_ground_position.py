@@ -156,7 +156,7 @@ def update_ground_position_signal (sig_id:int):
             
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
-        dcc_control.update_dcc_signal_aspects(sig_id)
+        dcc_control.update_dcc_signal_aspects(sig_id, aspect_to_set)
         
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal

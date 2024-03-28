@@ -97,14 +97,14 @@
 #
 #   update_dcc_point(point_id:int,state:bool) - Called on state change of a point
 #
-#   update_dcc_signal_aspects(sig_id: int) - called on state change of a Colour Light Signal
+#   update_dcc_signal_aspects(sig_id:int, sig_state:signals_common.signal_state_type) - called on change of a Colour Light Signal
 #
-#   update_dcc_signal_element(sig_id:int,state:bool,element:str)- called on update of a Semaphore Signal
+#   update_dcc_signal_element(sig_id:int, state:bool, element:str)- called on update of a Semaphore Signal
 #       (also called for Colour Light signals to change the 'main_subsidary' element when this changes)
 #
-#   update_dcc_signal_route(sig_id:int,route:signals_common.route_type,signal_change:bool=False,sig_at_danger:bool=False)
+#   update_dcc_signal_route(sig_id:int, route:signals_common.route_type, signal_change:bool=False ,sig_at_danger:bool=False)
 #
-#   update_dcc_signal_theatre(sig_id:int,character_to_display:str,signal_change:bool=False,sig_at_danger:bool=False):
+#   update_dcc_signal_theatre(sig_id:int, character_to_display:str, signal_change:bool=False, sig_at_danger:bool=False):
 #
 #   handle_mqtt_dcc_accessory_short_event(message) - Called on reciept of a 'dcc_accessory_short_events' message
 #
@@ -260,7 +260,7 @@ def map_dcc_signal(sig_id:int,
     # Do some basic validation on the parameters we have been given
     if not isinstance(sig_id,int) or sig_id < 1:
         logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Signal ID must be a positive integer")
-    if sig_mapped(sig_id):
+    elif sig_mapped(sig_id):
         logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - already has a DCC mapping")
     else:
         # Create a list of DCC addresses [address,state] to validate
@@ -279,7 +279,7 @@ def map_dcc_signal(sig_id:int,
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC command")
                 addresses_valid = False
             elif not isinstance(entry[1],bool):
-                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state")
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state " +str(entry[1]))
                 addresses_valid = False
             elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
@@ -452,7 +452,7 @@ def update_dcc_point(point_id:int, state:bool):
 # Signal. The commands to be sent will depend on the displayed aspect of the signal.
 #----------------------------------------------------------------------------------------------------
 
-def update_dcc_signal_aspects(sig_id: int):
+def update_dcc_signal_aspects(sig_id:int, sig_state:signals_common.signal_state_type):
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for Colour Light Signal Types
@@ -461,7 +461,7 @@ def update_dcc_signal_aspects(sig_id: int):
             logging.error ("Signal "+str(sig_id)+": Incorrect DCC Mapping Type for signal - Expecting a Colour Light signal")
         else:
             logging.debug ("Signal "+str(sig_id)+": Looking up DCC commands to change main signal aspect")
-            for entry in dcc_mapping[str(signals_common.signals[str(sig_id)]["sigstate"])]:
+            for entry in dcc_mapping[str(sig_state)]:
                 if entry[0] > 0:
                     # Send the DCC commands to change the state via the serial port to the Pi-Sprog.
                     # Note that the commands will only be sent if the pi-sprog interface is configured
