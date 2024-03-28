@@ -212,7 +212,7 @@ def get_dcc_address_mappings():
 #----------------------------------------------------------------------------------------------------
 
 def dcc_address_mapping(dcc_address:int):
-    if not isinstance(dcc_address, int) or dcc_address < 0 or dcc_address > 2047:
+    if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 2047:
         logging.error("DCC Control: dcc_address_mapping - Invalid DCC Address "+str(dcc_address))
         dcc_address_mapping = None
     elif dcc_address not in dcc_address_mappings.keys():
@@ -281,7 +281,7 @@ def map_dcc_signal(sig_id:int,
             elif not isinstance(entry[1],bool):
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state " +str(entry[1]))
                 addresses_valid = False
-            elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
+            elif not isinstance(entry[0],int) or entry[0] < 1 or entry[0] > 2047:
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
                 addresses_valid = False
             elif dcc_address_mapping(entry[0]) is not None:
@@ -350,7 +350,7 @@ def map_semaphore_signal(sig_id:int,
         # within the valid DCC accessory address range of 1 and 2047.
         addresses_valid = True
         for entry in addresses:
-            if not isinstance(entry,int) or entry < 0 or entry > 2047:
+            if not isinstance(entry,int) or entry < 1 or entry > 2047:
                 logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
                 addresses_valid = False
             elif dcc_address_mapping(entry) is not None:
@@ -366,7 +366,7 @@ def map_semaphore_signal(sig_id:int,
                 elif not isinstance(entry[1],bool):
                     logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC state")
                     addresses_valid = False
-                elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
+                elif not isinstance(entry[0],int) or entry[0] < 1 or entry[0] > 2047:
                     logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
                     addresses_valid = False
                 elif dcc_address_mapping(entry[0]) is not None:
@@ -412,7 +412,7 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Point ID must be a positive integer")
     elif point_mapped(point_id):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - already has a DCC Address mapping")
-    elif not isinstance(address,int) or address < 0 or address > 2047:
+    elif not isinstance(address,int) or address < 1 or address > 2047:
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid DCC address "+str(address))
     elif not isinstance(state_reversed,bool):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid state_reversed flag")
