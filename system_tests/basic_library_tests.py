@@ -10,6 +10,9 @@ from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import points
 from model_railway_signals.library import block_instruments
+from model_railway_signals.library import dcc_control
+from model_railway_signals.library import pi_sprog_interface
+
 from model_railway_signals.editor import schematic
 
 #---------------------------------------------------------------------------------------------------------
@@ -467,7 +470,6 @@ def run_point_library_tests():
     logging.getLogger().setLevel(logging.WARNING)
     return()
 
-
 #---------------------------------------------------------------------------------------------------------
 # Test Block Instrument Library objects
 #---------------------------------------------------------------------------------------------------------
@@ -591,9 +593,6 @@ def run_instrument_library_tests():
     block_instruments.clear_button_event(6)
     block_instruments.blocked_button_event(6)
     block_instruments.telegraph_key_button(6)
-    
-    
-    
     print("Library Tests - subscribe_to_remote_instrument - 3 Errors and 1 Warning will be generated")
     block_instruments.subscribe_to_remote_instrument("box2-200")
     block_instruments.subscribe_to_remote_instrument("box2-200")   # Warning - This is a duplicate
@@ -655,15 +654,241 @@ def run_instrument_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test Pi-Sprog interface - Requires Harman SC1 to be connected for CV read/write tests (set to address 1)
+#---------------------------------------------------------------------------------------------------------
+
+def run_pi_sprog_interface_tests(baud_rate):
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Pi Sprog Interface Tests")
+    print("Library Tests - sprog_connect - 3 Errors will be generated")
+    assert not pi_sprog_interface.sprog_connect (0, 115200)                         # Fail - Port name not a str
+    assert not pi_sprog_interface.sprog_connect ("/dev/serial0", "115200")          # Fail - Baud Rate not an int
+    assert not pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, "True") # Fail - Debug mode not a bool
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, False)      # Success
+    print("Library Tests - sprog_disconnect and reconnect (no errors or warnings)")
+    assert pi_sprog_interface.sprog_disconnect()
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate, True)
+    print("Library Tests - dcc_power_on and dcc_power_off (no errors or warnings)")
+    assert pi_sprog_interface.request_dcc_power_on()
+    assert pi_sprog_interface.request_dcc_power_off()
+    print("Library Tests - service_mode_read_cv - 2 Errors should be generated")
+    assert pi_sprog_interface.request_dcc_power_on()
+    assert pi_sprog_interface.service_mode_read_cv("1") is None   # Fail
+    assert pi_sprog_interface.service_mode_read_cv(1024) is None  # Fail
+    cv1_value = pi_sprog_interface.service_mode_read_cv(1)        # Success
+    cv9_value = pi_sprog_interface.service_mode_read_cv(9)        # Success
+    assert cv1_value is not None
+    assert cv9_value is not None
+    print("Library Tests - service_mode_write_cv - 4 Errors should be generated")
+    assert not pi_sprog_interface.service_mode_write_cv("1", 123)      # Fail - CV not an int
+    assert not pi_sprog_interface.service_mode_write_cv(1024, 123)     # Fail - CV out of range
+    assert not pi_sprog_interface.service_mode_write_cv(1, "123")      # Fail - Value not an int
+    assert not pi_sprog_interface.service_mode_write_cv(1, 256)        # Fail - Value out of range
+    print("Library Tests - service_mode_write_cv - Set new values for CV1 and CV9 (no errors or warnings)")
+    assert pi_sprog_interface.service_mode_write_cv(1, 123)            # Success
+    assert pi_sprog_interface.service_mode_write_cv(9, 255)            # Success
+    print("Library Tests - service_mode_write_cv - Read back the values to confirm (no errors or warnings)")
+    assert pi_sprog_interface.service_mode_read_cv(1) == 123            # Success
+    assert pi_sprog_interface.service_mode_read_cv(9) == 255            # Success
+    print("Library Tests - service_mode_write_cv - Set the values back to what they were (no errors or warnings)")
+    assert pi_sprog_interface.service_mode_write_cv(1, cv1_value)       # Success
+    assert pi_sprog_interface.service_mode_write_cv(9, cv9_value)       # Success
+    print("Library Tests - service_mode_write_cv - Confirm the values have been set back (no errors or warnings)")
+    assert pi_sprog_interface.service_mode_read_cv(1) == cv1_value      # Success
+    assert pi_sprog_interface.service_mode_read_cv(9) == cv9_value      # Success
+    assert pi_sprog_interface.request_dcc_power_off()
+    print("Library Tests - send_accessory_short_event - 3 Errors should be generated")
+    assert pi_sprog_interface.request_dcc_power_on()
+    pi_sprog_interface.send_accessory_short_event("1", True)    # Fail - address not int
+    pi_sprog_interface.send_accessory_short_event(2048, True)   # Fail - address invalid
+    pi_sprog_interface.send_accessory_short_event(1, "True")    # Fail - state invalid
+    pi_sprog_interface.send_accessory_short_event(1, True)
+    pi_sprog_interface.send_accessory_short_event(2, True)
+    pi_sprog_interface.send_accessory_short_event(3, True)
+    pi_sprog_interface.send_accessory_short_event(4, True)
+    pi_sprog_interface.send_accessory_short_event(5, True)
+    pi_sprog_interface.send_accessory_short_event(6, True)
+    pi_sprog_interface.send_accessory_short_event(7, True)
+    pi_sprog_interface.send_accessory_short_event(8, True)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(1, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(2, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(3, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(4, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(5, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(6, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(7, False)
+    sleep(0.5)
+    pi_sprog_interface.send_accessory_short_event(8, False)
+    sleep(1.0)
+    print("Library Tests - negative tests - sending commands when DCC power is OFF - 2 Warnings will be generated")
+    assert pi_sprog_interface.request_dcc_power_off()
+    pi_sprog_interface.send_accessory_short_event(8, True)
+    pi_sprog_interface.send_accessory_short_event(8, False)
+    assert pi_sprog_interface.service_mode_read_cv(1) is None
+    assert not pi_sprog_interface.service_mode_write_cv(1,255)
+    print("Library Tests - negative tests - sending commands when port is closed - 4 Warnings will be generated")
+    assert pi_sprog_interface.sprog_disconnect()
+    assert not pi_sprog_interface.request_dcc_power_on()
+    pi_sprog_interface.send_accessory_short_event(8, True)
+    pi_sprog_interface.send_accessory_short_event(8, False)
+    assert pi_sprog_interface.service_mode_read_cv(1) is None
+    assert not pi_sprog_interface.service_mode_write_cv(1,255)
+    assert not pi_sprog_interface.request_dcc_power_off()
+    print("Library Tests - Sprog Shutdown (no errors or warnings)")
+    pi_sprog_interface.sprog_shutdown()
+    pi_sprog_interface.sprog_shutdown()
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test DCC Control interface
+#---------------------------------------------------------------------------------------------------------
+
+def run_dcc_control_tests(baud_rate):
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - DCC control Tests")
+    print("Library Tests - map_dcc_signal - one Debug message - rest are Errors")
+    assert len(dcc_control.dcc_signal_mappings) == 0
+    assert len(dcc_control.dcc_address_mappings) == 0
+    dcc_control.map_dcc_signal(1, auto_route_inhibit=False,
+                               danger = [[1,True], [2,True], [3,False]],
+                               proceed = [[1,True], [2,False], [3,False] ],
+                               caution = [[1,True], [2,False], [3,False] ],
+                               prelim_caution = [[1,False], [2,True], [3,True] ],
+                               flash_caution = [[1,False], [2,True], [3,False] ],
+                               flash_prelim_caution = [[1,False], [2,False], [3,True] ],
+                               MAIN = [[4,True], [5,True], [6,False]],
+                               LH1 = [[4,True], [5,False], [6,False] ],
+                               LH2 = [[4,True], [5,False], [6,False] ],
+                               RH1 = [[4,False], [5,True], [6,True] ],
+                               RH2 = [[4,False], [5,True], [6,False] ],
+                               NONE = [[4,False], [5,False], [6,True] ],
+                               THEATRE = [ ['#', [[4,True], [5,True], [6,False]]],
+                                           ['1', [[4,True], [5,False], [6,False]] ],
+                                           ['2', [[4,True], [5,False], [6,False]] ],
+                                           ['3', [[4,False], [5,True], [6,True]] ],
+                                           ['4', [[4,False], [5,True], [6,False]] ],
+                                           ['5', [[4,False], [5,False], [6,True]] ] ],
+                               subsidary = 7 )
+    # Negative tests - all will fail with errors
+    dcc_control.map_dcc_signal(0)       # Fail - out of range
+    dcc_control.map_dcc_signal(1)       # Fail - already exists
+    dcc_control.map_dcc_signal("2")     # Fail - not an int 
+    dcc_control.map_dcc_signal(3, danger = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(4, proceed = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(5, caution = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(6, prelim_caution = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(7, flash_prelim_caution = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(8, MAIN = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(9, LH1 = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(10, RH1 = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(11, RH2 = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(12, NONE = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(13, MAIN = [[1,True], ["abc",True], [11,"random"], [2048, True]] )
+    dcc_control.map_dcc_signal(14, subsidary = 1)
+    dcc_control.map_dcc_signal(15, subsidary = "abc")
+    dcc_control.map_dcc_signal(16, subsidary = 2048)
+    dcc_control.map_dcc_signal(13, THEATRE = [ ['#', [[1,True], ["abc",True], [11,"random"], [2048, True]]],
+                                               ['2', [[1,True], ["abc",True], [11,"random"], [2048, True]]] ] )
+    assert len(dcc_control.dcc_signal_mappings) == 1
+    assert len(dcc_control.dcc_address_mappings) == 7
+    print("Library Tests - map_semaphore_signal - one Debug message - rest are Errors")
+    dcc_control.map_semaphore_signal(2, main_signal=10, lh1_signal=11, lh2_signal=12, rh1_signal=13, rh2_signal=14,
+                        main_subsidary=15, lh1_subsidary=16, lh2_subsidary=17, rh1_subsidary=18, rh2_subsidary=19,
+                               THEATRE = [ ['#', [[20,True], [21,True], [22,False]]],
+                                           ['1', [[20,True], [21,False], [22,False]] ],
+                                           ['2', [[20,True], [21,False], [22,False]] ],
+                                           ['3', [[20,False], [21,True], [22,True]] ],
+                                           ['4', [[20,False], [21,True], [22,False]] ],
+                                           ['5', [[20,False], [21,False], [22,True]] ] ])
+    # Negative tests - all will fail with errors
+    dcc_control.map_semaphore_signal(0)       # Fail - out of range
+    dcc_control.map_semaphore_signal(2)       # Fail - already exists
+    dcc_control.map_semaphore_signal("3")     # Fail - not an int 
+    dcc_control.map_semaphore_signal(4, main_signal=1, lh1_signal=2, lh2_signal=3, rh1_signal=4, rh2_signal=5)
+    dcc_control.map_semaphore_signal(5, main_signal="ab", lh1_signal="cd", lh2_signal="ef", rh1_signal="gh", rh2_signal="jk")
+    dcc_control.map_semaphore_signal(6, main_signal=2048, lh1_signal=2049, lh2_signal=2050, rh1_signal=2051, rh2_signal=2052)
+    dcc_control.map_semaphore_signal(7, main_subsidary=2048, lh1_subsidary=2049, lh2_subsidary=2050, rh1_subsidary=2051, rh2_subsidary=2052)
+    dcc_control.map_semaphore_signal(8, main_subsidary="ab", lh1_subsidary="cd", lh2_subsidary="ef", rh1_subsidary="gh", rh2_subsidary="jk")
+    dcc_control.map_semaphore_signal(9, main_subsidary=10, lh1_subsidary=11, lh2_subsidary=12, rh1_subsidary=13, rh2_subsidary=14)
+    assert len(dcc_control.dcc_signal_mappings) == 2
+    assert len(dcc_control.dcc_address_mappings) == 20
+    print("Library Tests - map_dcc_point - Two Debug messages - rest are Errors")
+    assert len(dcc_control.dcc_point_mappings) == 0
+    dcc_control.map_dcc_point(1, 30, False)
+    dcc_control.map_dcc_point(2, 31, True)
+    dcc_control.map_dcc_point(0, 32, False)     # Fail - Invalid ID
+    dcc_control.map_dcc_point(1, 32, False)     # Fail - Duplicate ID
+    dcc_control.map_dcc_point("3", 32, False)   # Fail - ID not an int 
+    dcc_control.map_dcc_point(4, 30, False)     # Fail - address already in use 
+    dcc_control.map_dcc_point(5, 10, False)     # Fail - address already in use 
+    dcc_control.map_dcc_point(6, "abc", False)  # Fail - address not a str 
+    dcc_control.map_dcc_point(6, 2048, False)   # Fail - Invalid address 
+    dcc_control.map_dcc_point(7, 33, "True")    # Fail - Invalid reversed flag 
+    assert len(dcc_control.dcc_point_mappings) == 2
+    assert len(dcc_control.dcc_address_mappings) == 22
+    print("Library Tests - get_dcc_address_mappings (no errors or warnings should be generated)")
+    mappings = dcc_control.get_dcc_address_mappings()
+    assert mappings == {1: ['Signal', 1], 2: ['Signal', 1], 3: ['Signal', 1], 4: ['Signal', 1],
+                        5: ['Signal', 1], 6: ['Signal', 1], 7: ['Signal', 1], 10: ['Signal', 2],
+                        15: ['Signal', 2], 11: ['Signal', 2], 16: ['Signal', 2], 13: ['Signal', 2],
+                        18: ['Signal', 2], 12: ['Signal', 2], 17: ['Signal', 2], 14: ['Signal', 2],
+                        19: ['Signal', 2], 20: ['Signal', 2], 21: ['Signal', 2], 22: ['Signal', 2],
+                        30: ['Point', 1], 31: ['Point', 2]}
+    print("Library Tests - dcc_address_mapping - 2 Errors should be generated)")
+    assert dcc_control.dcc_address_mapping(1) == ['Signal', 1]
+    assert dcc_control.dcc_address_mapping(10) == ['Signal', 2]
+    assert dcc_control.dcc_address_mapping(30) == ['Point', 1]
+    assert dcc_control.dcc_address_mapping(31) == ['Point', 2]
+    assert dcc_control.dcc_address_mapping(40) is None
+    assert dcc_control.dcc_address_mapping("40") is None  # Error - not an int
+    assert dcc_control.dcc_address_mapping(2048) is None  # Error - out of range
+    
+#     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate)
+#     assert pi_sprog_interface.request_dcc_power_on()
+#
+#     print("Library Tests - update_dcc_point - ")
+#     print("Library Tests - update_dcc_signal_aspects - ")
+#     print("Library Tests - update_dcc_signal_element - ")
+#     print("Library Tests - update_dcc_signal_route - ")
+#     print("Library Tests - update_dcc_signal_theatre - ")
+#     
+#     print("Library Tests - reset_mqtt_configuration - ")
+#     print("Library Tests - set_node_to_publish_dcc_commands - ")
+#     print("Library Tests - subscribe_to_dcc_command_feed - ")
+#     print("Library Tests - handle_mqtt_dcc_accessory_short_event - ")
+# 
+#     print("Library Tests - delete_point_mapping - ")
+#     print("Library Tests - delete_signal_mapping - ")
+#     
+#     pi_sprog_interface.sprog_shutdown()
+
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+    
+    
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests(shutdown:bool=False):
+    baud_rate = 115200    # change to 460800 for Pi Sprog V2
     logging.getLogger().setLevel(logging.DEBUG)
-#     run_track_sensor_library_tests()
-#     run_gpio_sensor_library_tests()
-#     run_point_library_tests()
+    run_track_sensor_library_tests()
+    run_gpio_sensor_library_tests()
+    run_point_library_tests()
     run_instrument_library_tests()
+    run_pi_sprog_interface_tests(baud_rate)
+    run_dcc_control_tests(baud_rate)
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: report_results()
 
