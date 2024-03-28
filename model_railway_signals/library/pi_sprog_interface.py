@@ -102,6 +102,7 @@ service_mode_response = None        # The response code from the sstat response 
 service_mode_cv_value = None        # The returned value from the pcvs response (query a CV)
 service_mode_cv_address = None      # The reported CV address from the pcvs response
 service_mode_session_id = None      # The reported session ID from the sstat/pcvs responses
+dcc_power_on = None                 # What we think the status of the DCC Track power is (None=Unknown)
 
 # Global 'one up' session ID (to match up the CV programming responses with the requests)
 session_id = 1
@@ -263,16 +264,20 @@ def process_stat_message(byte_string):
 
 def process_tof_message(byte_string):
     global tof_response
+    global dcc_power_on
     if debug: logging.debug ("Pi-SPROG: Rx thread - Received TOF (Track OFF) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     tof_response = True
+    dcc_power_on = False
     return()
                         
 def process_ton_message(byte_string):
     global ton_response
+    global dcc_power_on
     if debug: logging.debug ("Pi-SPROG: Rx thread - Received TON (Track ON) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     ton_response = True
+    dcc_power_on = True
     return()
 
 #------------------------------------------------------------------------------
@@ -493,7 +498,7 @@ def query_command_station_status():
         if rstat_response: logging.debug ("Pi-SPROG: Received STAT (Command Station Status Report)")
         else: logging.error("Pi-SPROG: Request Command Station Status failed")
     else:
-        logging.warning("Pi-SPROG: Cannot Request Command Station Status - port is closed")
+        logging.warning("Pi-SPROG: Cannot Request Command Station Status - SPROG is disconnected")
     return(rstat_response)
 
 #------------------------------------------------------------------------------
@@ -523,7 +528,7 @@ def request_dcc_power_on():
         # Give things time to get established before sending out any commands
         time.sleep (0.1)
     else:
-        logging.warning("Pi-SPROG: Cannot Request Track Power On - port is closed")
+        logging.warning("Pi-SPROG: Cannot Request Track Power On - SPROG is disconnected")
     return(ton_response)
 
 #------------------------------------------------------------------------------
@@ -551,7 +556,7 @@ def request_dcc_power_off():
             logging.info("Pi-SPROG: Track power has been turned OFF")
         else: logging.error("Pi-SPROG: Request to turn off Track Power failed")
     else:
-        logging.warning("Pi-SPROG: Cannot Request Track Power Off - port is closed")
+        logging.warning("Pi-SPROG: Cannot Request Track Power Off - SPROG is disconnected")
     return(tof_response)
 
 #------------------------------------------------------------------------------
@@ -566,7 +571,7 @@ def send_accessory_short_event(address:int, active:bool):
     elif (address < 1 or address > 2047):
         logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address))
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
-    elif serial_port.is_open:
+    elif serial_port.is_open and dcc_power_on:
         # Encode the message into the required number of bytes
         byte1 = (pi_cbus_node & 0xff00) >> 8
         byte2 = (pi_cbus_node & 0x00ff)
@@ -581,8 +586,9 @@ def send_accessory_short_event(address:int, active:bool):
             send_cbus_command(2, 3, 153, byte1, byte2, byte3, byte4)
     elif debug:
         # Note we only log the discard messages in enhanced debugging mode (to reduce the spam in the logs)
-        if active: logging.debug("Pi-SPROG: Discarding ASON command to DCC address: "+ str(address)+" - port is closed")
-        else: logging.debug("Pi-SPROG: Discarding ASOF command to DCC address: "+ str(address)+" - port is closed")
+        if active: log_string ="Discarding ASON command to DCC address: "+ str(address)
+        else: log_string = "Discarding ASOF command to DCC address: "+ str(address)
+        logging.debug("Pi-SPROG: "+log_string+" - SPROG is disconnected or DCC power is OFF")
     return ()
 
 #------------------------------------------------------------------------------
@@ -603,7 +609,7 @@ def service_mode_read_cv(cv:int):
     elif (cv < 0 or cv > 1023):
         logging.error("Pi-SPROG: service_mode_read_cv - Invalid CV specified: "+str(cv))
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
-    elif serial_port.is_open:
+    elif serial_port.is_open and dcc_power_on:
         # Encode the message into the required number of bytes
         byte1 = session_id             # Session ID
         byte2 = (cv & 0xff00) >> 8     # High CV
@@ -632,7 +638,7 @@ def service_mode_read_cv(cv:int):
         session_id = session_id + 1
         if session_id > 255: session_id = 1
     else:
-        logging.warning("Pi-SPROG: Failed to read CV "+str(cv)+" - Port is closed")
+        logging.warning("Pi-SPROG: Failed to read CV "+str(cv)+" - SPROG is disconnected or DCC power is off")
     return (service_mode_cv_value)
 
 #------------------------------------------------------------------------------
@@ -649,14 +655,14 @@ def service_mode_write_cv(cv:int, value:int):
     service_mode_session_id = None
     if not isinstance(cv, int):
         logging.error("Pi-SPROG: service_mode_write_cv - CV to write must be specified as an integer")
-    elif not isinstance(cv, int):
+    elif not isinstance(value, int):
         logging.error("Pi-SPROG: service_mode_write_cv - Value to write must be specified as an integer")
     elif (cv < 0 or cv > 1023):
         logging.error("Pi-SPROG: service_mode_write_cv - Invalid CV specified: "+str(cv))
     elif (value < 0 or value > 255):
         logging.error("Pi-SPROG: service_mode_write_cv - CV "+str(cv)+" - Invalid value specified: "+str(value))
     # Only try to send the command if the PI-SPROG-3 has initialised correctly
-    elif serial_port.is_open:
+    elif serial_port.is_open and dcc_power_on:
         # Encode the message into the required number of bytes
         byte1 = session_id             # Session ID
         byte2 = (cv & 0xff00) >> 8     # High CV
@@ -686,7 +692,7 @@ def service_mode_write_cv(cv:int, value:int):
         session_id = session_id + 1
         if session_id > 255: session_id = 1
     else:
-        logging.warning("Pi-SPROG: Failed to write CV "+str(cv)+" - Port is closed")
+        logging.warning("Pi-SPROG: Failed to write CV "+str(cv)+" - SPROG is disconnected or DCC power is off")
     return(service_mode_response == 3)
 
 #------------------------------------------------------------------------------
