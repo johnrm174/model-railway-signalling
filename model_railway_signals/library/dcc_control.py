@@ -212,7 +212,7 @@ def get_dcc_address_mappings():
 #----------------------------------------------------------------------------------------------------
 
 def dcc_address_mapping(dcc_address:int):
-    if not isinstance(dcc_address, int) or dcc_address < 1 or dcc_address > 2047:
+    if not isinstance(dcc_address, int) or dcc_address < 0 or dcc_address > 2047:
         logging.error("DCC Control: dcc_address_mapping - Invalid DCC Address "+str(dcc_address))
         dcc_address_mapping = None
     elif dcc_address not in dcc_address_mappings.keys():
@@ -237,6 +237,7 @@ def point_mapped(point_id:int):
 
 #----------------------------------------------------------------------------------------------------
 # Function to "map" a Colour Light signal object to a series of DCC addresses/command sequences
+# Note we allow DCC addresses of zero to be specified (i.e. no mapping for that element)
 #----------------------------------------------------------------------------------------------------
 
 def map_dcc_signal(sig_id:int,
@@ -281,7 +282,7 @@ def map_dcc_signal(sig_id:int,
             elif not isinstance(entry[1],bool):
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state " +str(entry[1]))
                 addresses_valid = False
-            elif not isinstance(entry[0],int) or entry[0] < 1 or entry[0] > 2047:
+            elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
                 addresses_valid = False
             elif dcc_address_mapping(entry[0]) is not None:
@@ -321,6 +322,7 @@ def map_dcc_signal(sig_id:int,
 # Function to "map" a semaphore signal to the appropriate DCC addresses/commands using
 # a simple one-to-one mapping of each signal arm to a single DCC accessory address (apart
 # from the theatre route display where we send a sequence of DCC commands)
+# Note we allow DCC addresses of zero to be specified (i.e. no mapping for that element)
 #----------------------------------------------------------------------------------------------------
 
 def map_semaphore_signal(sig_id:int,
@@ -350,7 +352,7 @@ def map_semaphore_signal(sig_id:int,
         # within the valid DCC accessory address range of 1 and 2047.
         addresses_valid = True
         for entry in addresses:
-            if not isinstance(entry,int) or entry < 1 or entry > 2047:
+            if not isinstance(entry,int) or entry < 0 or entry > 2047:
                 logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
                 addresses_valid = False
             elif dcc_address_mapping(entry) is not None:
@@ -366,7 +368,7 @@ def map_semaphore_signal(sig_id:int,
                 elif not isinstance(entry[1],bool):
                     logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC state")
                     addresses_valid = False
-                elif not isinstance(entry[0],int) or entry[0] < 1 or entry[0] > 2047:
+                elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
                     logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
                     addresses_valid = False
                 elif dcc_address_mapping(entry[0]) is not None:
@@ -404,6 +406,7 @@ def map_semaphore_signal(sig_id:int,
 # Externally called unction to "map" a particular point object to a DCC address/command
 # This is much simpler than the signals as we only need to map a signle DCC address for
 # each point to be controlled - with an appropriate state (either switched or not_switched)
+# Note we allow DCC addresses of zero to be specified (i.e. no mapping for that element)
 #----------------------------------------------------------------------------------------------------
 
 def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
@@ -412,7 +415,7 @@ def map_dcc_point(point_id:int, address:int, state_reversed:bool=False):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Point ID must be a positive integer")
     elif point_mapped(point_id):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - already has a DCC Address mapping")
-    elif not isinstance(address,int) or address < 1 or address > 2047:
+    elif not isinstance(address,int) or address < 0 or address > 2047:
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid DCC address "+str(address))
     elif not isinstance(state_reversed,bool):
         logging.error ("DCC Control: map_dcc_point - Point "+str(point_id)+" - Invalid state_reversed flag")
@@ -623,6 +626,7 @@ def delete_point_mapping(point_id:int):
     elif not point_mapped(point_id):
         logging.error("DCC Control: delete_point_mapping - Point "+str(point_id)+" - DCC Mapping does not exist")
     else:
+        logging.debug("Point "+str(point_id)+": Deleting DCC Address mapping for Point")
         # Retrieve the DCC mapping address for the Point
         dcc_address = dcc_point_mappings[str(point_id)]["address"]
         # Remove the DCC address from the dcc_address_mappings dictionary (note the key is an INTEGER)
@@ -646,6 +650,7 @@ def delete_signal_mapping(sig_id:int):
     elif not sig_mapped(sig_id):
         logging.error("DCC Control: delete_signal_mapping - Signal "+str(sig_id)+" - DCC Mapping does not exist")
     else:
+        logging.debug("Signal "+str(sig_id)+": Deleting DCC Address mapping for signal")
         # Retrieve the DCC mappings for the signal and determine the mapping type
         dcc_signal_mapping = dcc_signal_mappings[str(sig_id)]
         # Colour Light Signal mappings
@@ -723,7 +728,7 @@ def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
         logging.error("DCC Control: set_node_to_publish_dcc_commands - invalid publish_dcc_commands flag")
     else:
         if publish_dcc_commands: logging.debug("DCC Control: Configuring Application to publish DCC Commands to MQTT broker")
-        else: logging.info("DCC Control: Configuring Application NOT to publish DCC Commands to MQTT broker")
+        else: logging.debug("DCC Control: Configuring Application NOT to publish DCC Commands to MQTT broker")
         publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
 
