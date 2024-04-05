@@ -14,7 +14,6 @@ from model_railway_signals.library import dcc_control
 from model_railway_signals.library import pi_sprog_interface
 from model_railway_signals.library import signals_common
 from model_railway_signals.library import mqtt_interface
-from model_railway_signals.library import file_interface
 
 from model_railway_signals.editor import schematic
 
@@ -1005,21 +1004,6 @@ def run_mqtt_interface_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
-# Test File interface
-#---------------------------------------------------------------------------------------------------------
-
-def run_file_interface_tests():
-    # Test all functions - including negative tests for parameter validation
-    print("Library Tests - File Interface Tests")
-    print("Library Tests - load_schematic")
-    filename, loaded_data = file_interface.load_schematic("basic_library_tests.sig")
-    print("Library Tests - save_schematic")
-    file_interface.save_schematic(loaded_data["settings"], loaded_data["objects"], filename)
-    print("----------------------------------------------------------------------------------------")
-    print("")
-    return()
-
-#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
@@ -1033,7 +1017,6 @@ def run_all_basic_library_tests(shutdown:bool=False):
     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
     run_mqtt_interface_tests()
-    run_file_interface_tests()
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: report_results()
 
