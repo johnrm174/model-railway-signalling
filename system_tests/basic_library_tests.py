@@ -12,6 +12,9 @@ from model_railway_signals.library import points
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import dcc_control
 from model_railway_signals.library import pi_sprog_interface
+from model_railway_signals.library import signals_common
+from model_railway_signals.library import mqtt_interface
+from model_railway_signals.library import file_interface
 
 from model_railway_signals.editor import schematic
 
@@ -307,7 +310,6 @@ def run_point_library_tests():
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Point Objects")
     canvas = schematic.canvas
-    logging.getLogger().setLevel(logging.DEBUG)
     # create_point
     assert len(points.points) == 0
     # Point ID and point_type combinations
@@ -467,7 +469,6 @@ def run_point_library_tests():
     assert len(points.points) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
-    logging.getLogger().setLevel(logging.WARNING)
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -482,7 +483,6 @@ def run_instrument_library_tests():
     # Test all functions - including negative tests for parameter validation
     print("Library Tests - Instrument Objects")
     canvas = schematic.canvas
-    logging.getLogger().setLevel(logging.DEBUG)
     # create_instrument
     print("Library Tests - create_instrument - 6 Errors and 4 warnings will be generated")
     assert len(block_instruments.instruments) == 0
@@ -754,7 +754,9 @@ def run_pi_sprog_interface_tests(baud_rate):
 
 def run_dcc_control_tests(baud_rate):
     # Test all functions - including negative tests for parameter validation
-    print("Library Tests - DCC control Tests")
+    print("Library Tests - DCC control Tests - connecting to SPROG first")
+    assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate)
+    assert pi_sprog_interface.request_dcc_power_on()
     print("Library Tests - map_dcc_signal - one Debug message - rest are Errors")
     assert len(dcc_control.dcc_signal_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 0
@@ -851,31 +853,172 @@ def run_dcc_control_tests(baud_rate):
     assert dcc_control.dcc_address_mapping(40) is None
     assert dcc_control.dcc_address_mapping("40") is None  # Error - not an int
     assert dcc_control.dcc_address_mapping(2048) is None  # Error - out of range
-    
-#     assert pi_sprog_interface.sprog_connect ("/dev/serial0", baud_rate)
-#     assert pi_sprog_interface.request_dcc_power_on()
-#
-#     print("Library Tests - update_dcc_point - ")
-#     print("Library Tests - update_dcc_signal_aspects - ")
-#     print("Library Tests - update_dcc_signal_element - ")
-#     print("Library Tests - update_dcc_signal_route - ")
-#     print("Library Tests - update_dcc_signal_theatre - ")
-#     
-#     print("Library Tests - reset_mqtt_configuration - ")
-#     print("Library Tests - set_node_to_publish_dcc_commands - ")
-#     print("Library Tests - subscribe_to_dcc_command_feed - ")
-#     print("Library Tests - handle_mqtt_dcc_accessory_short_event - ")
-# 
-#     print("Library Tests - delete_point_mapping - ")
-#     print("Library Tests - delete_signal_mapping - ")
-#     
-#     pi_sprog_interface.sprog_shutdown()
-
+    print("Library Tests - update_dcc_point (no errors or warnings - but DCC commands should be sent)")
+    dcc_control.update_dcc_point(1, True)
+    dcc_control.update_dcc_point(1, False)
+    dcc_control.update_dcc_point(2, True)
+    dcc_control.update_dcc_point(2, False)
+    print("Library Tests - update_dcc_signal_aspects - 1 Error - DCC commands should be sent")
+    dcc_control.update_dcc_signal_aspects(2, signals_common.signal_state_type.DANGER) # Error - wrong type
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.DANGER)
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.PROCEED)
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.CAUTION)
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.PRELIM_CAUTION)
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.FLASH_CAUTION)
+    dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.FLASH_PRELIM_CAUTION)
+    dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
+    dcc_control.update_dcc_signal_aspects(3, signals_common.signal_state_type.DANGER)
+    print("Library Tests - update_dcc_signal_element - 1 Error - DCC commands should be sent")
+    dcc_control.update_dcc_signal_element(1, True, element="main_signal")
+    dcc_control.update_dcc_signal_element(1, True, element="main_subsidary")
+    dcc_control.update_dcc_signal_element(2, True, element="main_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="main_subsidary")
+    dcc_control.update_dcc_signal_element(2, True, element="lh1_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="lh1_subsidary")
+    dcc_control.update_dcc_signal_element(2, True, element="lh2_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="lh2_subsidary")
+    dcc_control.update_dcc_signal_element(2, True, element="rh1_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="rh1_subsidary")
+    dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")
+    dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")
+    print("Library Tests - update_dcc_signal_route (no errors or warnings - DCC commands should be sent)")
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, True, False)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.LH1, True, False)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.LH2, True, False)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.RH1, True, False)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.RH2, True, False)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, True, True)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, False, True)
+    dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, False, False)
+    print("Library Tests - update_dcc_signal_theatre (no errors or warnings - DCC commands should be sent)")
+    dcc_control.update_dcc_signal_theatre(1,"#", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"1", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"2", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"3", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"4", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"5", True, False)
+    dcc_control.update_dcc_signal_theatre(1,"1", True, True)
+    dcc_control.update_dcc_signal_theatre(1,"1", False, True)
+    dcc_control.update_dcc_signal_theatre(1,"1", False, False)
+    print("Library Tests - set_node_to_publish_dcc_commands - 1 Error will be generated ")
+    dcc_control.set_node_to_publish_dcc_commands("True") # Error
+    dcc_control.set_node_to_publish_dcc_commands(True) 
+    print("Library Tests - subscribe_to_dcc_command_feed - 1 Error will be generated")
+    dcc_control.subscribe_to_dcc_command_feed(100) # Error
+    dcc_control.subscribe_to_dcc_command_feed("Box1")
+    print("Library Tests - reset_mqtt_configuration - No warnings or errors")
+    dcc_control.reset_mqtt_configuration()
+    print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors - DCC Commands should be sent out")
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000}) # Error
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccstate": True}) # Error
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"dccaddress": 1000, "dccstate": True}) # Error
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": True}) # Valid
+    dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000, "dccstate": False}) # Valid
+    print("Library Tests - delete_point_mapping - 2 Errors shoould be generated")
+    assert len(dcc_control.dcc_point_mappings) == 2
+    assert len(dcc_control.dcc_address_mappings) == 22
+    dcc_control.delete_point_mapping("100") # Error
+    dcc_control.delete_point_mapping(5) # Error (does not exist)
+    dcc_control.delete_point_mapping(1) 
+    assert len(dcc_control.dcc_point_mappings) == 1
+    assert len(dcc_control.dcc_address_mappings) == 21
+    dcc_control.delete_point_mapping(2) 
+    assert len(dcc_control.dcc_point_mappings) == 0
+    assert len(dcc_control.dcc_address_mappings) == 20
+    print("Library Tests - delete_signal_mapping - 2 Errors shoould be generated")
+    assert len(dcc_control.dcc_signal_mappings) == 2
+    dcc_control.delete_signal_mapping("100") # Error
+    dcc_control.delete_signal_mapping(5) # Error (does not exist)
+    dcc_control.delete_signal_mapping(2) 
+    assert len(dcc_control.dcc_signal_mappings) == 1
+    assert len(dcc_control.dcc_address_mappings) == 7
+    dcc_control.delete_signal_mapping(1) 
+    assert len(dcc_control.dcc_signal_mappings) == 0
+    assert len(dcc_control.dcc_address_mappings) == 0
+    print("Library Tests - DCC control Tests - disconnecting from SPROG")
+    sleep(1.0) # Give the SPROG a chance to send all DCC commands
+    assert pi_sprog_interface.request_dcc_power_off()
+    assert pi_sprog_interface.sprog_disconnect()
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
-    
-    
+
+#---------------------------------------------------------------------------------------------------------
+# Test MQTT interface
+#---------------------------------------------------------------------------------------------------------
+
+
+def shutdown_callback():
+    print("Library Tests - MQTT shutdown callback received")
+
+def message_callback(message):
+    print("Library Tests - MQTT message received: "+str(message))
+
+def run_mqtt_interface_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - MQTT Interface Tests")
+    print("Library Tests - split_remote_item_identifier")
+    assert mqtt_interface.split_remote_item_identifier(123) is None
+    assert mqtt_interface.split_remote_item_identifier("box111") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-abc") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-0") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-999") is None
+    assert mqtt_interface.split_remote_item_identifier("box1-99") == ["box1", 99]
+    print("Library Tests - configure_mqtt_client - 5 Errors should be generated")
+    mqtt_interface.configure_mqtt_client(100,"node1", False, False, False, shutdown_callback) # error
+    mqtt_interface.configure_mqtt_client("network1",100, False, False, False, shutdown_callback) # error
+    mqtt_interface.configure_mqtt_client("network1","node1", "False", False, False, shutdown_callback) # error
+    mqtt_interface.configure_mqtt_client("network1","node1", False, "False", False, shutdown_callback) # error
+    mqtt_interface.configure_mqtt_client("network1","node1", False, False, "False", shutdown_callback) # error
+    mqtt_interface.configure_mqtt_client("network1","node1", True, True, True, shutdown_callback) # Success
+    print("Library Tests - mqtt_broker_connect - 4 Errors should be generated")
+    assert not mqtt_interface.mqtt_broker_connect(127,1883) # Fail
+    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1","1883") # Fail
+    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, 100, "password1") # Fail
+    assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", 100) # Fail
+    assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
+    sleep(0.2)
+    print("Library Tests - mqtt_broker_disconnect (and then re-connect")
+    assert mqtt_interface.mqtt_broker_disconnect()
+    assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
+    sleep(0.2)
+    print("Library Tests - subscribe_to_mqtt_messages")
+    mqtt_interface.subscribe_to_mqtt_messages("test_messages_1", "node1", 1, message_callback)
+    mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
+    sleep(0.2)
+    print("Library Tests - send_mqtt_message")
+    mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
+    mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
+    mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 3", subtopic="sub1")
+    mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 4", subtopic="sub2")
+    sleep(0.2)
+    print("Library Tests - unsubscribe_from_message_type")
+    mqtt_interface.unsubscribe_from_message_type("test_messages_1")
+    sleep(0.2)
+    mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
+    mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
+    print("Library Tests - mqtt_shutdown")
+    mqtt_interface.mqtt_shutdown()
+    sleep(0.2)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test File interface
+#---------------------------------------------------------------------------------------------------------
+
+def run_file_interface_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - File Interface Tests")
+    print("Library Tests - load_schematic")
+    filename, loaded_data = file_interface.load_schematic("basic_library_tests.sig")
+    print("Library Tests - save_schematic")
+    file_interface.save_schematic(loaded_data["settings"], loaded_data["objects"], filename)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
@@ -889,6 +1032,8 @@ def run_all_basic_library_tests(shutdown:bool=False):
     run_instrument_library_tests()
     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
+    run_mqtt_interface_tests()
+    run_file_interface_tests()
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: report_results()
 
