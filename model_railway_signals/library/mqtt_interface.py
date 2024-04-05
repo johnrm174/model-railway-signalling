@@ -204,9 +204,9 @@ def create_remote_item_identifier(item_id:int,node:str = None):
     return (node+"-"+str(item_id))
 
 # ---------------------------------------------------------------------------------------------
-# Common Function to extract the the item-ID (int) and Node-ID (str) from a compound identifier
-# and return them to the calling programme - Will return None if the conversion fails - hence
-# this function can also be used for validating remote item identifiers
+# API and Common Function to extract the the item-ID (int) and Node-ID (str) from a compound
+# identifierand return them to the calling programme - Will return None if the conversion
+# fails - hence this function can also be used for validating remote item identifiers
 # ---------------------------------------------------------------------------------------------
 
 def split_remote_item_identifier(item_identifier:str):
@@ -296,10 +296,7 @@ def process_message(msg):
             logging.debug("MQTT-Client: Received: "+str(msg.topic)+str(unpacked_json))
         # If it is a heartbeat message then we just update the list of connected nodes
         if msg.topic.startswith("heartbeat"):
-            time_stamp = int(time.time())
-            if node_config["enhanced_debugging"]:
-                logging.debug("MQTT-Client: Received Heartbeat message at time: "+str(time_stamp))
-            heartbeats[unpacked_json["node"]] = [unpacked_json["ip"],time_stamp]
+            heartbeats[unpacked_json["node"]] = [unpacked_json["ip"], int(time.time())]
         # If it is a shutdown message we only act on it if configured to do so
         elif msg.topic.startswith("shutdown"):
             if node_config["act_on_shutdown"] and node_config["shutdown_callback"] is not None:
@@ -559,7 +556,7 @@ def send_mqtt_message (message_type:str,item_id:int,data:dict,log_message:str=No
     return()
 
 #-----------------------------------------------------------------------------------------------
-# Non public  Function to unsubscribe to a particular message type from the broker. Called by
+# Externally called Function to unsubscribe to a particular message type from the broker. Called by
 # the higher-level 'reset_mqtt_configuration' functions for instruments, signals and sections to
 # clear out the relevant subscrptions in support of the editor - where a configuration change
 # to MQTT networking will trigger a reset of all subscriptions followed by a re-configuration
