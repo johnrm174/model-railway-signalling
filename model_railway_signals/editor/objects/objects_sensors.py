@@ -94,7 +94,7 @@ def remove_points_from_route_table(point_id:int, dict_key:str):
             list_of_points = route[0]
             # Create a new 'blank' list for copying the points (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by the point removal)
-            new_list_of_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
+            new_list_of_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
             index2 = 0
             # Iterate through each point in the route to build up the new list of (retained) points
             for point_entry in list_of_points:
