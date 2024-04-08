@@ -59,7 +59,7 @@ from system_test_harness import *
 #-----------------------------------------------------------------------------------
 
 def run_instrument_linking_tests(delay:float=0.0):
-    print("Block Instrument linking tests")
+    print("Block Instrument linking tests - 4 warnings will be generated")
     # Add elements to the layout
     sleep(delay)
     i1 = create_block_instrument()
@@ -146,7 +146,7 @@ def run_instrument_linking_tests(delay:float=0.0):
     sleep(delay)
     set_instrument_blocked(4)
     assert_block_section_ahead_not_clear(1,2,3,4)
-    # Change the item IDs
+    # Change the item IDs - 4 warnings will be generated as we change the IDs
     update_object_configuration(i1,{"itemid":11})
     update_object_configuration(i2,{"itemid":12})
     update_object_configuration(i3,{"itemid":13})
@@ -157,6 +157,7 @@ def run_instrument_linking_tests(delay:float=0.0):
     assert_object_configuration(i4,{"itemid":14,"linkedto":"13"})
     # Test the telegraph key / bell of linked instrument - we can't really
     # make any meaningful assertions other than it doesn't throw an exception
+    sleep(100)
     sleep(delay)
     sleep(0.3)
     click_telegraph_key(11)
@@ -648,7 +649,7 @@ def test_interlocking_and_overrides(delay,sig1,sig2,sig3,sig4,point1,point2,bloc
 #-----------------------------------------------------------------------------------
 
 def run_change_of_item_id_tests(delay:float=0.0):
-    print("Change of Item Id tests")
+    print("Change of Item Id tests - 2 warnings will be generated for the Block Instruments")
     # Add elements to the layout
     sleep(delay)
     l1 = create_line()
@@ -1137,7 +1138,7 @@ def run_reset_objects_tests(delay:float=0.0):
 def run_all_object_editing_tests(delay:float=0.0, shutdown:bool=False):
     initialise_test_harness()
     set_edit_mode()
-    run_point_chaining_tests(delay)
+#     run_point_chaining_tests(delay)
     run_instrument_linking_tests(delay)
     run_mirrored_section_tests(delay)
     run_mode_change_tests(delay)

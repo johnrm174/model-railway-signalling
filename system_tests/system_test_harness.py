@@ -70,42 +70,50 @@
 #    assert_block_section_ahead_clear(instids*)
 #    assert_block_section_ahead_not_clear(instids*)
 #
-# Supported Menubar/Schematic control invocations:
+# Supported Menubar control invocations:
 #    set_edit_mode()
 #    set_run_mode()
-#    toggle_mode()
 #    set_automation_on()
 #    set_automation_off()
-#    toggle_automation()
-#    toggle_snap_to_grid()
 #    reset_layout()
-#    reset_window_size()
-# Supported Schematic test invocations:
+#
+# Supported Schematic create object invocations:
 #    create_line()
 #    create_colour_light_signal()
 #    create_semaphore_signal()
 #    create_ground_position_signal()
 #    create_ground_disc_signal()
 #    create_track_section()
+#    create_track_sensor()
 #    create_block_instrument()
 #    create_left_hand_point()
 #    create_right_hand_point()
 #    create_textbox()
+#
+# Supported Schematic keypress / right click menu invocations:
+#    toggle_mode()                    - 'Cntl-m'
+#    toggle_automation()              - 'Cntl-a'
+#    toggle_snap_to_grid()            - 'Cntl-s'
+#    reset_window_size()              - 'Cntl-r'
+#    snap_selected_objects_to_grid()  - 's' key - also right-click-menu function
+#    rotate_selected_objects()        - 'r' key - also right-click-menu function
+#    delete_selected_objects()        - 'del' key - also right-click-menu function
+#    nudge_selected_objects()         - 'arrow' keys
+#    copy_selected_objects()          - 'Cntl-c' - also right-click-menu function
+#    paste_clipboard_objects()        - 'Cntl-v' - also right-click-menu function
+#    undo() / redo()                  - 'Cntl-x' / 'Cntl-y'
+#    select_all_objects()             - Right-click-menu function
+#    deselect_all_objects()           - 'esc' key
+#
+# Supported Schematic mouse event invocations:
+#    test_all_edit_object_windows(test_all_controls:bool=False - Opens & exercises all edit windows for all schematic objects
 #    update_object_configuration(object_id, new_values:dict)
 #    select_or_deselect_objects(*object_ids)
 #    select_single_object(object_id)
 #    select_and_edit_single_object (object_id)
-#    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:int=1, test_cancel:bool=True)
-#    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:int=1, test_cancel:bool=True)
-#    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=1, test_cancel:bool=True):
-#    select_all_objects()
-#    deselect_all_objects()
-#    rotate_selected_objects()
-#    delete_selected_objects()
-#    copy_selected_objects()
-#    paste_clipboard_objects()
-#    snap_selected_objects_to_grid()
-#    undo() and redo()
+#    select_and_move_objects(object_id, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True)
+#    select_and_move_line_end(object_id, line_end:int, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True)
+#    select_area(xstart:int, ystart:int, xfinish:int, yfinish:int, steps:int=50, delay:float=0.0, test_cancel:bool=True):
 #    get_item_id(object_id) - This is a helper function
 #    get_object_id(item_type, item_id) - This is a helper function
 #
@@ -116,6 +124,8 @@
 #    assert_objects_deselected(*object_ids)
 #    assert_objects_exist(*object_ids)
 #    assert_objects_do_not_exist(*object_ids)
+#
+# Supported configuration
 # ------------------------------------------------------------------------------
 
 from inspect import getframeinfo
@@ -206,7 +216,6 @@ def start_application(callback_function):
 def run_function(test_function, delay:float=thread_delay_time):
     common.execute_function_in_tkinter_thread (test_function)
     sleep(delay)
-    return()
 
 # ------------------------------------------------------------------------------
 # Functions to log out test error/warning messages with the filename and line number 
@@ -1103,14 +1112,41 @@ def paste_clipboard_objects():
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def undo():
     run_function(lambda:schematic.schematic_undo(),delay=0.5)
-    return()
 
 # Simulates the <cntl-v> keypress event on the canvas
 # This event is normally only enabled in EDIT Mode (disabled when move in progress)
 def redo():
     run_function(lambda:schematic.schematic_redo(),delay=0.5)
-    return()
 
+def test_all_edit_object_windows(test_all_controls:bool=False):
+    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
+                              objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor)
+    for object_type in object_types:
+        for object_id in objects.schematic_objects.keys():
+            if objects.schematic_objects[object_id]["item"] == object_type:
+                configuration = copy.deepcopy(objects.schematic_objects[object_id])
+                print("Testing object edit window for:",configuration["item"],configuration["itemid"])
+                # Get rid of the bits we dont need
+                if configuration["item"] == objects.object_type.line:
+                    del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
+                    del configuration["end1"]   ## Tkinter drawing object - re-created on re-draw
+                    del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
+                    del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
+                    del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
+                elif configuration["item"] == objects.object_type.section:
+                    del configuration["label"]  ## Always reset to default after editing
+                    del configuration["state"]  ## Always reset to default after editing
+                run_function(lambda:schematic.deselect_all_objects())
+                run_function(lambda:schematic.select_object(object_id))
+                run_function(lambda:schematic.edit_selected_object(), delay=1.0)
+                if test_all_controls:
+                    run_function(lambda:schematic.close_edit_window(reset=True), delay=0.2)
+                    run_function(lambda:schematic.close_edit_window(apply=True), delay=0.2)
+                    run_function(lambda:schematic.close_edit_window(cancel=True), delay=0.2)
+                    run_function(lambda:schematic.edit_selected_object(), delay=1.0)
+                run_function(lambda:schematic.close_edit_window(ok=True), delay=0.5)
+                assert_object_configuration(object_id, configuration)
+    
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior
 # ------------------------------------------------------------------------------

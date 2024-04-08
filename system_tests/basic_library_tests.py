@@ -1,11 +1,12 @@
 #-----------------------------------------------------------------------------------
 # Library tests to check the basic function of all library object object functions
+# Calls the library functions directly rather than using the sysytem_test_harness
 #-----------------------------------------------------------------------------------
 
 import time
 import logging
 
-from system_test_harness import *
+import system_test_harness
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import points
@@ -49,7 +50,7 @@ def run_track_sensor_library_tests():
     track_sensors.track_sensor_triggered(101)
     print("Library Tests - track_sensor_triggered - Triggering 2 track sensor passed events:")
     track_sensors.track_sensor_triggered(100)
-    sleep(1.5)
+    system_test_harness.sleep(1.5)
     # track_sensor_triggered (pulse the button and generate callback)
     track_sensors.track_sensor_triggered(100)
     # delete_track_sensor - reset_sensor_button function should not generate any exceptions
@@ -200,19 +201,19 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 105 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 106 (timeout=3.0)
     gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 107 (timeout=2.0)
-    sleep(1.0)
+    system_test_harness.sleep(1.0)
     print ("GPIO Sensors - Re-triggering Sensor 105 (which will have time out) - Sensors 106 and 107 will be extended")
     print ("GPIO Sensors - Will generate 1 Error (signal 1 not existing)")
     gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 105 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 106 (timeout=3.0)
     gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 107 (timeout=2.0)
-    sleep(2.5)
+    system_test_harness.sleep(2.5)
     print ("GPIO Sensors - Re-triggering Sensors 105, 107 (which will have time out) - Sensors 106 will be extended")
     print ("GPIO Sensors - Will generate 2 Errors (signal 1 / Track Sensor 3 not existing)")
     gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 105 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 106 (timeout=3.0)
     gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 107 (timeout=2.0)
-    sleep(3.5)
+    system_test_harness.sleep(3.5)
     print ("GPIO Sensors - End of sensor triggering tests -  all sensors should have timed out")
     # subscribe_to_remote_gpio_sensor
     print ("GPIO Sensors - subscribe_to_remote_gpio_sensor - Will generate 1 warning and 10 Errors")
@@ -250,7 +251,7 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-203"})
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"wrongkey": "box1-200"})          # Fail - spurious message
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-150"})  # Fail - not subscribed
-    sleep (1.0)
+    system_test_harness.sleep (1.0)
     # reset_mqtt_configuration (all remote sensors will be deleted)
     print ("GPIO Sensors - reset_mqtt_configuration")
     gpio_sensors.reset_mqtt_configuration()
@@ -709,23 +710,23 @@ def run_pi_sprog_interface_tests(baud_rate):
     pi_sprog_interface.send_accessory_short_event(6, True)
     pi_sprog_interface.send_accessory_short_event(7, True)
     pi_sprog_interface.send_accessory_short_event(8, True)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(1, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(2, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(3, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(4, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(5, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(6, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(7, False)
-    sleep(0.5)
+    system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(8, False)
-    sleep(1.0)
+    system_test_harness.sleep(1.0)
     print("Library Tests - negative tests - sending commands when DCC power is OFF - 2 Warnings will be generated")
     assert pi_sprog_interface.request_dcc_power_off()
     pi_sprog_interface.send_accessory_short_event(8, True)
@@ -935,7 +936,7 @@ def run_dcc_control_tests(baud_rate):
     assert len(dcc_control.dcc_signal_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 0
     print("Library Tests - DCC control Tests - disconnecting from SPROG")
-    sleep(1.0) # Give the SPROG a chance to send all DCC commands
+    system_test_harness.sleep(1.0) # Give the SPROG a chance to send all DCC commands
     assert pi_sprog_interface.request_dcc_power_off()
     assert pi_sprog_interface.sprog_disconnect()
     print("----------------------------------------------------------------------------------------")
@@ -976,29 +977,29 @@ def run_mqtt_interface_tests():
     assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, 100, "password1") # Fail
     assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", 100) # Fail
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     print("Library Tests - mqtt_broker_disconnect (and then re-connect")
     assert mqtt_interface.mqtt_broker_disconnect()
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     print("Library Tests - subscribe_to_mqtt_messages")
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_1", "node1", 1, message_callback)
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     print("Library Tests - send_mqtt_message")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 3", subtopic="sub1")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 4", subtopic="sub2")
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     print("Library Tests - unsubscribe_from_message_type")
     mqtt_interface.unsubscribe_from_message_type("test_messages_1")
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
     print("Library Tests - mqtt_shutdown")
     mqtt_interface.mqtt_shutdown()
-    sleep(0.2)
+    system_test_harness.sleep(0.2)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1018,9 +1019,9 @@ def run_all_basic_library_tests(shutdown:bool=False):
     run_dcc_control_tests(baud_rate)
     run_mqtt_interface_tests()
     logging.getLogger().setLevel(logging.WARNING)
-    if shutdown: report_results()
+    if shutdown: system_test_harness.report_results()
 
 if __name__ == "__main__":
-    start_application(lambda:run_all_basic_library_tests(shutdown=True))
+    system_test_harness.start_application(lambda:run_all_basic_library_tests(shutdown=True))
 
 ###############################################################################################################################
