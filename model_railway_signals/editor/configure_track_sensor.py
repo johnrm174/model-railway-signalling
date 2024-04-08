@@ -66,6 +66,10 @@ open_windows={}
 
 class gpio_sensor_selection(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame):
+        # We need to hold the current track_sensor_id for validation purposes but we don't pass this 
+        # into the parent class as the entered ID for the gpio sensor can be the same as the current
+        # item_id (for the track sensor object) - so we don't want the parent class to validate this.
+        self.track_sensor_id = 0
         # Create a labelframe to hold the various UI elements
         self.frame = Tk.LabelFrame(parent_frame, text="GPIO sensor events")
         # Create a subframe to centre the UI elements
@@ -95,11 +99,18 @@ class gpio_sensor_selection(common.str_int_item_id_entry_box):
             elif event_mappings[1] > 0:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
-            elif event_mappings[2] > 0 and event_mappings[2] != self.current_item_id:
+            elif event_mappings[2] > 0 and event_mappings[2] != self.track_sensor_id:
                 self.TT.text = ("GPIO Sensor "+gpio_sensor_id+" is already mapped to Track Sensor "+str(event_mappings[2]))
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
+    
+    # We need to hold the current track_sensor_id for validation purposes but we don't pass this 
+    # into the parent class as the entered ID for the gpio sensor can be the same as the current
+    # item_id (for the track sensor object) - so we don't want the parent class to validate this.
+    def set_value(self, value:str, track_sensor_id:int):
+        self.track_sensor_id = track_sensor_id
+        super().set_value(value)
     
 #------------------------------------------------------------------------------------
 # Class for a track_sensor_route_group (comprising 6 points, and a track section)
@@ -277,7 +288,7 @@ class edit_track_sensor():
             item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Item ID
             self.window.title("Track Sensor "+str(item_id))
-            # Set the Initial UI state (note the 'gpiosensor' element also needs the current item id)
+            # Set the Initial UI state (note the gpiosensor element needs the track sensor id for validation)
             self.sensorid.set_value(item_id)
             self.gpiosensor.set_value(objects.schematic_objects[self.object_id]["passedsensor"], item_id)
             self.ahead.set_routes(objects.schematic_objects[self.object_id]["routeahead"])

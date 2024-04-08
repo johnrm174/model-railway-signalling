@@ -46,6 +46,10 @@ from ..library import track_sections
 
 class signal_sensor(common.str_int_item_id_entry_box):
     def __init__(self, parent_frame, callback, label:str, tool_tip:str):
+        # We need to hold the current signal_id for validation purposes but we don't pass this 
+        # into the parent class as the entered ID for the gpio sensor can be the same as the current
+        # item_id (for the signal object) - so we don't want the parent class to validate this.
+        self.signal_id = 0
         # The this function will return true if the GPIO sensor exists
         exists_function = gpio_sensors.gpio_sensor_exists
         # Create the label and entry box UI elements
@@ -61,10 +65,10 @@ class signal_sensor(common.str_int_item_id_entry_box):
         if valid and self.entry.get() != "":
             sensor_id = self.entry.get()
             event_mappings = gpio_sensors.get_gpio_sensor_callback(sensor_id)
-            if event_mappings[0] > 0 and event_mappings[0] != self.current_item_id:
+            if event_mappings[0] > 0 and event_mappings[0] != self.signal_id:
                 self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[0]))
                 valid = False
-            elif event_mappings[1] > 0 and event_mappings[1] != self.current_item_id:
+            elif event_mappings[1] > 0 and event_mappings[1] != self.signal_id:
                 self.TT.text = ("GPIO Sensor "+sensor_id+" is already mapped to Signal "+str(event_mappings[1]))
                 valid = False
             elif event_mappings[2] > 0:
@@ -72,6 +76,13 @@ class signal_sensor(common.str_int_item_id_entry_box):
                 valid = False
         if update_validation_status: self.set_validation_status(valid)
         return(valid)
+    
+    # We need to hold the current signal_id for validation purposes but we don't pass this 
+    # into the parent class as the entered ID for the gpio sensor can be the same as the current
+    # item_id (for the signal object) - so we don't want the parent class to validate this.
+    def set_value(self, value:str, signal_id:int):
+        self.signal_id = signal_id
+        super().set_value(value)
         
 #------------------------------------------------------------------------------------
 # Class for the Signal Passed Sensor Frame - uses the Signal Sensor Entry Box class
