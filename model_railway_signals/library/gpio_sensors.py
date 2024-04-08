@@ -172,18 +172,23 @@ def gpio_sensor_exists(sensor_id:Union[int,str]):
 
 def thread_to_timeout_sensor(gpio_port:int, testing:bool):
     global gpio_port_mappings
-    # Wait for the timeout period to expire (if the sensor is released and triggered again within the
-    # timeout period then the timeout will just be extended). Note that the loop will immediately exit
-    # if the shutdown has been initiated (which will delete the gpio zero button objects)
-    while (time.time() <  (gpio_port_mappings[str(gpio_port)]["timeout_start"]
-            + gpio_port_mappings[str(gpio_port)]["timeout_value"]) and not common.shutdown_initiated):
-        # We also wait for the button to be released before trporting the Event release.
-        while not testing and not common.shutdown_initiated and gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed:
-            time.sleep(0.0001)
-    # Reset the sensor at the end of the timeout period
-    sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
-    logging.debug("GPIO Sensor "+str(sensor_id)+": Event Reset **********************************************")
-    gpio_port_mappings[str(gpio_port)]["timeout_active"] = False
+    # We put exception handling round the entirethread to handle the case of a gpio sensor mapping
+    # being deleted whilst the timeout period is still active - in this case we just exit gracefully
+    try:
+        # Wait for the timeout period to expire (if the sensor is released and triggered again within the
+        # timeout period then the timeout will just be extended). Note that the loop will immediately exit
+        # if the shutdown has been initiated (which will delete the gpio zero button objects)
+        while (time.time() <  (gpio_port_mappings[str(gpio_port)]["timeout_start"]
+                + gpio_port_mappings[str(gpio_port)]["timeout_value"]) and not common.shutdown_initiated):
+            # We also wait for the button to be released before trporting the Event release.
+            while not testing and not common.shutdown_initiated and gpio_port_mappings[str(gpio_port)]["sensor_device"].is_pressed:
+                time.sleep(0.0001)
+        # Reset the sensor at the end of the timeout period
+        sensor_id = gpio_port_mappings[str(gpio_port)]["sensor_id"]
+        logging.debug("GPIO Sensor "+str(sensor_id)+": Event Reset **********************************************")
+        gpio_port_mappings[str(gpio_port)]["timeout_active"] = False
+    except:
+        pass
     return()
 
 #---------------------------------------------------------------------------------------------------
