@@ -11,7 +11,7 @@
 #    objects.track_sensor(sensor_id) - To get the object_id for a given sensor ID
 #########################################################################################################
 # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-# function will not work in edit mode as the Track Section library objects don't exist in edit mode
+# function will not work in edit mode as local Track Section library objects don't exist in edit mode
 # To be addressed in a future software update when the Track Sections functionality is re-factored
 #########################################################################################################
 #    objects.section_exists(id) - To see if the Track Section exists  ###################################
@@ -22,7 +22,7 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
-#    track_sections.section_exists(id) - To see if the track section exists       ####################
+#    track_sections.section_exists(id) - To see if the track section exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -191,15 +191,20 @@ class mirrored_section(common.str_int_item_id_entry_box):
         self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
         #########################################################################################################
-        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
+        # Note that we need to use the a custom 'section_exists' function as the the library 'section_exists'
+        # function will not work for local track sections in edit mode as the local Track Section library objects
+        # don't exist in edit mode (although any subscribed remote track sections will exist). We therefore have
+        # to use a combination of the 'objects.section_exists' and ' track_sections.section_exists' functions
         # To be addressed in a future software update when the Track Sections functionality is re-factored
         #########################################################################################################
         super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
                          "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
                          "which has been subscribed to via MQTT networking",
-                          exists_function = objects.section_exists)
+                          exists_function = self.section_exists)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def section_exists(self,entered_value:str):
+        return (objects.section_exists(entered_value) or track_sections.section_exists(entered_value))
 
 #------------------------------------------------------------------------------------
 # Class for the Default lable entry box - builds on the common entry_box class
