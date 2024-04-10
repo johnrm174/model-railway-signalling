@@ -277,13 +277,13 @@ def map_dcc_signal(sig_id:int,
         addresses_valid = True
         for entry in addresses:
             if not isinstance(entry,list) or not len(entry) == 2:
-                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC command")
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC command: "+str(entry))
                 addresses_valid = False
             elif not isinstance(entry[1],bool):
-                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state " +str(entry[1]))
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC state: " +str(entry[1]))
                 addresses_valid = False
             elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
-                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
+                logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - Invalid DCC address: "+str(entry[0]))
                 addresses_valid = False
             elif dcc_address_mapping(entry[0]) is not None:
                 logging.error ("DCC Control: map_dcc_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry[0])+
@@ -353,7 +353,7 @@ def map_semaphore_signal(sig_id:int,
         addresses_valid = True
         for entry in addresses:
             if not isinstance(entry,int) or entry < 0 or entry > 2047:
-                logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
+                logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address: "+str(entry))
                 addresses_valid = False
             elif dcc_address_mapping(entry) is not None:
                 logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry)+
@@ -363,20 +363,21 @@ def map_semaphore_signal(sig_id:int,
         for theatre_state in THEATRE:
             for entry in theatre_state[1]:
                 if not isinstance(entry,list) or not len(entry) == 2:
-                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC command")
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC command: "+str(entry))
                     addresses_valid = False
                 elif not isinstance(entry[1],bool):
-                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC state")
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC state: "+str(entry[1]))
                     addresses_valid = False
                 elif not isinstance(entry[0],int) or entry[0] < 0 or entry[0] > 2047:
-                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry))
+                    logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - Invalid DCC address "+str(entry[0]))
                     addresses_valid = False
                 elif dcc_address_mapping(entry[0]) is not None:
                     logging.error ("DCC Control: map_semaphore_signal - Signal "+str(sig_id)+" - DCC Address "+str(entry[0])+
                         " is already assigned to "+dcc_address_mapping(entry[0])[0]+" "+str(dcc_address_mapping(entry[0])[1]))
                     addresses_valid = False
-                # Add to the list of addresses (so we can add to the mappings later on)
-                addresses.append(entry[0])
+                else:
+                    # Add to the list of addresses (so we can add to the mappings later on)
+                    addresses.append(entry[0])
         # We now know if all the DCC addresses we have been given are valid
         if addresses_valid:
             logging.debug("Signal "+str(sig_id)+": Creating DCC Address mapping for a Semaphore Signal")
