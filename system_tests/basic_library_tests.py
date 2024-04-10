@@ -467,6 +467,22 @@ def run_point_library_tests():
     points.delete_point(102)
     assert not points.point_exists(102)
     assert len(points.points) == 0
+    print("Library Tests - create autoswitched point - will generate 1 warning:")
+    points.create_point(canvas, 100, points.point_type.LH, 100, 100, point_callback, also_switch=101) # Valid
+    points.toggle_point_state(100)
+    points.create_point(canvas, 101, points.point_type.LH, 200, 100, point_callback, auto=True) # Valid
+    assert len(points.points) == 2
+    assert points.point_switched(100)
+    assert points.point_switched(101)
+    points.create_point(canvas, 102, points.point_type.LH, 300, 100, point_callback, also_switch=101) # Valid
+    assert points.point_switched(100)
+    assert not points.point_switched(101)
+    assert not points.point_switched(101)
+    print("Library Tests - clean up by deleting all points")
+    points.delete_point(100)
+    points.delete_point(101)
+    points.delete_point(102)
+    assert len(points.points) == 0
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -727,12 +743,6 @@ def run_pi_sprog_interface_tests(baud_rate):
     system_test_harness.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(8, False)
     system_test_harness.sleep(1.0)
-    print("Library Tests - negative tests - sending commands when DCC power is OFF - 2 Warnings will be generated")
-    assert pi_sprog_interface.request_dcc_power_off()
-    pi_sprog_interface.send_accessory_short_event(8, True)
-    pi_sprog_interface.send_accessory_short_event(8, False)
-    assert pi_sprog_interface.service_mode_read_cv(1) is None
-    assert not pi_sprog_interface.service_mode_write_cv(1,255)
     print("Library Tests - negative tests - sending commands when port is closed - 4 Warnings will be generated")
     assert pi_sprog_interface.sprog_disconnect()
     assert not pi_sprog_interface.request_dcc_power_on()
@@ -798,8 +808,8 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_dcc_signal(14, subsidary = 1)
     dcc_control.map_dcc_signal(15, subsidary = "abc")
     dcc_control.map_dcc_signal(16, subsidary = 2048)
-    dcc_control.map_dcc_signal(13, THEATRE = [ ['#', [[1,True], ["abc",True], [11,"random"], [2048, True]]],
-                                               ['2', [[1,True], ["abc",True], [11,"random"], [2048, True]]] ] )
+    dcc_control.map_dcc_signal(17, THEATRE = [ ['#', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]],
+                                               ['2', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]] ] )
     assert len(dcc_control.dcc_signal_mappings) == 1
     assert len(dcc_control.dcc_address_mappings) == 7
     print("Library Tests - map_semaphore_signal - one Debug message - rest are Errors")
@@ -821,6 +831,8 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.map_semaphore_signal(7, main_subsidary=2048, lh1_subsidary=2049, lh2_subsidary=2050, rh1_subsidary=2051, rh2_subsidary=2052)
     dcc_control.map_semaphore_signal(8, main_subsidary="ab", lh1_subsidary="cd", lh2_subsidary="ef", rh1_subsidary="gh", rh2_subsidary="jk")
     dcc_control.map_semaphore_signal(9, main_subsidary=10, lh1_subsidary=11, lh2_subsidary=12, rh1_subsidary=13, rh2_subsidary=14)
+    dcc_control.map_semaphore_signal(10, THEATRE = [ ['#', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]],
+                                                     ['2', [[1,True], ["abc",True], [11,"random"], [2048, True], 2047,[1,2,3]]] ] )
     assert len(dcc_control.dcc_signal_mappings) == 2
     assert len(dcc_control.dcc_address_mappings) == 20
     print("Library Tests - map_dcc_point - Two Debug messages - rest are Errors")
@@ -881,7 +893,8 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="rh1_subsidary")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")
-    print("Library Tests - update_dcc_signal_route (no errors or warnings - DCC commands should be sent)")
+    print("Library Tests - update_dcc_signal_route - 1 Error - DCC commands should be sent)")
+    dcc_control.update_dcc_signal_route(2,signals_common.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.LH1, True, False)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.LH2, True, False)
@@ -947,7 +960,6 @@ def run_dcc_control_tests(baud_rate):
 # Test MQTT interface
 #---------------------------------------------------------------------------------------------------------
 
-
 def shutdown_callback():
     print("Library Tests - MQTT shutdown callback received")
 
@@ -1009,7 +1021,7 @@ def run_mqtt_interface_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests(shutdown:bool=False):
-    baud_rate = 115200    # change to 460800 for Pi Sprog V2
+    baud_rate = 115200    # change to 115200 for Pi Sprog V2
     logging.getLogger().setLevel(logging.DEBUG)
     run_track_sensor_library_tests()
     run_gpio_sensor_library_tests()

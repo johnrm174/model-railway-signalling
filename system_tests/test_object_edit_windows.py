@@ -5,7 +5,8 @@
 from system_test_harness import *
 
 #-----------------------------------------------------------------------------------
-# Create and then edit/save all object types - to test default configuration is unchanged 
+# Create and then edit/save all object types - to test default configuration is unchanged
+# Note that this test exercises all of the windows controls (CANCEL, RESET, APPLY, OK)
 #-----------------------------------------------------------------------------------
 
 def test_edit_object_windows(delay:float=0.0):
@@ -30,6 +31,7 @@ def test_edit_object_windows(delay:float=0.0):
 #-----------------------------------------------------------------------------------
 # System test to edit/save all schematic objects - to test configuration is unchanged
 # This does partially duplicate the above but we run it for all layout examples as well
+# IFor these tests we only exercise the OK Control
 #-----------------------------------------------------------------------------------
 
 def really_do_test_all_object_edit_windows(delay:float=0.0):
@@ -39,7 +41,7 @@ def really_do_test_all_object_edit_windows(delay:float=0.0):
 
 # This is the easy way to shorten the tests - miss out the object window tests
 def test_all_object_edit_windows(delay:float=0.0):
-#    really_do_test_all_object_edit_windows(delay)
+    really_do_test_all_object_edit_windows(delay)
     pass
                 
 ######################################################################################################

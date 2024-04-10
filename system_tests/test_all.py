@@ -18,7 +18,7 @@ import test_automation_examples
 import test_single_line_examples
 import test_mqtt_networking_example
 
-#import test_library_objects
+import test_library_objects
 
 import test_load_layout_failures
 
@@ -48,8 +48,8 @@ def run_all_tests():
     print("*** Running tests from 'test_mqtt_networking_example.py' ***")
     test_mqtt_networking_example.run_all_mqtt_networking_example_tests()
     
-#     print("*** Running tests from 'test_library_objects.py' ***")
-#     test_library_objects.run_all_basic_library_tests()
+    print("*** Running tests from 'test_library_objects.py' ***")
+    test_library_objects.run_all_basic_library_tests()
 
     print("*** Running tests from 'test_load_layout_failures.py' ***")
     test_load_layout_failures.run_all_load_layout_negative_tests()

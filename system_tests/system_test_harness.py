@@ -211,7 +211,8 @@ def start_application(callback_function):
     try: root.mainloop()
     except KeyboardInterrupt:
         logging.info("Keyboard Interrupt - Shutting down")
-        library_common.on_closing(ask_to_save_state=False)
+        schematic.shutdown()
+        common.shutdown()
         
 def run_function(test_function, delay:float=thread_delay_time):
     common.execute_function_in_tkinter_thread (test_function)
@@ -1118,14 +1119,15 @@ def undo():
 def redo():
     run_function(lambda:schematic.schematic_redo(),delay=0.5)
 
-def test_all_edit_object_windows(test_all_controls:bool=False):
+def test_all_edit_object_windows(test_all_controls:bool=False, report_object_tested:bool=False):
     object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
                               objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor)
     for object_type in object_types:
         for object_id in objects.schematic_objects.keys():
             if objects.schematic_objects[object_id]["item"] == object_type:
                 configuration = copy.deepcopy(objects.schematic_objects[object_id])
-                print("Testing object edit window for:",configuration["item"],configuration["itemid"])
+                if report_object_tested:
+                    print("Testing object edit window for:",configuration["item"],configuration["itemid"])
                 # Get rid of the bits we dont need
                 if configuration["item"] == objects.object_type.line:
                     del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
