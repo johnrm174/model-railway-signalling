@@ -320,7 +320,7 @@ def remove_references_to_point(point_id:int):
             list_of_interlocked_points = interlocked_route[0]
             # Create a new 'blank' list for copying the points (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by the point removal)
-            new_list_of_interlocked_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
+            new_list_of_interlocked_points = [[0,False],[0,False],[0,False],[0,False],[0,False],[0,False]]
             index2 = 0
             # Iterate through each point on the route in the interlocking table
             # to build up the new list of points (that are to be retained)

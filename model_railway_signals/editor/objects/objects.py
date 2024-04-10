@@ -582,6 +582,18 @@ def set_all(new_objects):
                 #############################################################################################
                 ## End of Handle breaking change for track sections and sensor IDs ##########################
                 #############################################################################################
+                ########################################################################################################
+                ## Handle bugfix for Signal point interlocking tables (i.e. length point list was wrongly getting 7 ####
+                ## points assigned on point deletion whereas the list should only ever include 6 points ################ 
+                ########################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
+                    for index, route in enumerate (new_objects[object_id][element]):
+                        objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
+                        objects_common.schematic_objects[object_id][element][index][1] = route[1]
+                        objects_common.schematic_objects[object_id][element][index][2] = route[2]
+                ########################################################################################################
+                ## End of Handle bugfix for Signal point interlocking tables ###########################################
+                ########################################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             ##################################################################################
