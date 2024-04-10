@@ -549,7 +549,7 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID is the same as the Instrument ID")
     elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
-    elif inst_type not in instrument_type:
+    elif inst_type != instrument_type.single_line and inst_type != instrument_type.double_line:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Invalid Instrument Type specified")
     else:
         logging.debug("Instrument "+str(inst_id)+": Creating library object on the schematic")

@@ -229,7 +229,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an integer")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
-    elif pointtype not in point_type:
+    elif pointtype != point_type.LH and pointtype != point_type.RH:
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Type specified")
     elif fpl and auto:
         logging.error("Point "+str(point_id)+": create_point - Automatic point should be created without a FPL")
