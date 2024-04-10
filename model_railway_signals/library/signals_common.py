@@ -390,7 +390,7 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0,
+                                   associated_home:int=0,
                                    tag:str=""):
     global signals
     # If no callback has been specified, use the null callback to do nothing
@@ -399,7 +399,7 @@ def create_common_signal_elements (canvas,
     # special case of a semaphore distant signal being created on the same "post" as a semaphore
     # home signal. On this case we label the button as "D" to differentiate it from the main
     # home signal button and then apply the offset to deconflict with the home signal buttons
-    if distant_button_offset !=0 : main_button_text = "D"
+    if associated_home > 0: main_button_text = "D"
     elif sig_id < 10: main_button_text = "0" + str(sig_id)
     else: main_button_text = str(sig_id)
     # Create the Signal and Subsidary Button objects and their callbacks
@@ -418,25 +418,22 @@ def create_common_signal_elements (canvas,
     # Note that we have to cater for the special case of a semaphore distant signal being
     # created on the same post as a semaphore home signal. In this case (signified by a
     # distant_button_offset), we apply the offset to deconflict with the home signal buttons.
-    if distant_button_offset != 0:
-        button_position = common.rotate_point (x,y,distant_button_offset,-14,orientation)
+    if associated_home > 0:
+        if signals[str(associated_home)]["hassubsidary"] and orientation == 0: button_offset = -52
+        elif signals[str(associated_home)]["hassubsidary"] and orientation != 0: button_offset = -54
+        else: button_offset = -36
+        button_position = common.rotate_point(x,y,button_offset,-14,orientation)
         if not automatic: canvas.create_window(button_position,window=sig_button,tags=tag)
-        else: canvas.create_window(button_position,window=sig_button,state='hidden',tags=tag)
-        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     elif subsidary:
         if orientation == 0: button_position = common.rotate_point (x,y,-22,-14,orientation) 
-        else: button_position = common.rotate_point (x,y,-35,-20,orientation) 
+        else: button_position = common.rotate_point (x,y,-30,-14,orientation) 
         canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=tag)
         canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=tag)          
     else:
         button_position = common.rotate_point (x,y,-17,-14,orientation) 
         canvas.create_window(button_position,window=sig_button,tags=tag)
-        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     # Signal passed button is created on the track at the base of the signal
-    if sig_passed_button:
-        canvas.create_window(x,y,window=passed_button,tags=tag)
-    else:
-        canvas.create_window(x,y,window=passed_button,state='hidden',tags=tag)
+    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=tag)
     # Disable the main signal button if the signal is fully automatic
     if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
@@ -475,10 +472,7 @@ def create_approach_control_elements (canvas,sig_id:int,
     approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                                         command=lambda:approach_release_button_event (sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
-    if approach_button:
-        canvas.create_window(button_position,window=approach_release_button,tags=tag)
-    else:
-        canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
+    if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
