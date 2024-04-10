@@ -102,7 +102,6 @@ service_mode_response = None        # The response code from the sstat response 
 service_mode_cv_value = None        # The returned value from the pcvs response (query a CV)
 service_mode_cv_address = None      # The reported CV address from the pcvs response
 service_mode_session_id = None      # The reported session ID from the sstat/pcvs responses
-dcc_power_on = None                 # What we think the status of the DCC Track power is (None=Unknown)
 
 # Global 'one up' session ID (to match up the CV programming responses with the requests)
 session_id = 1
@@ -264,20 +263,16 @@ def process_stat_message(byte_string):
 
 def process_tof_message(byte_string):
     global tof_response
-    global dcc_power_on
     if debug: logging.debug ("Pi-SPROG: Rx thread - Received TOF (Track OFF) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     tof_response = True
-    dcc_power_on = False
     return()
                         
 def process_ton_message(byte_string):
     global ton_response
-    global dcc_power_on
     if debug: logging.debug ("Pi-SPROG: Rx thread - Received TON (Track ON) acknowledgement")
     # Respond to the trigger function (waiting in the main thread for a response)
     ton_response = True
-    dcc_power_on = True
     return()
 
 #------------------------------------------------------------------------------
@@ -571,7 +566,7 @@ def send_accessory_short_event(address:int, active:bool):
     elif (address < 1 or address > 2047):
         logging.error("Pi-SPROG: send_accessory_short_event - Invalid address specified: "+ str(address))
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
-    elif serial_port.is_open and dcc_power_on:
+    elif serial_port.is_open:
         # Encode the message into the required number of bytes
         byte1 = (pi_cbus_node & 0xff00) >> 8
         byte2 = (pi_cbus_node & 0x00ff)
@@ -609,7 +604,7 @@ def service_mode_read_cv(cv:int):
     elif (cv < 0 or cv > 1023):
         logging.error("Pi-SPROG: service_mode_read_cv - Invalid CV specified: "+str(cv))
     # Only bother sending commands to the Pi Sprog if the serial port has been opened
-    elif serial_port.is_open and dcc_power_on:
+    elif serial_port.is_open:
         # Encode the message into the required number of bytes
         byte1 = session_id             # Session ID
         byte2 = (cv & 0xff00) >> 8     # High CV
@@ -662,7 +657,7 @@ def service_mode_write_cv(cv:int, value:int):
     elif (value < 0 or value > 255):
         logging.error("Pi-SPROG: service_mode_write_cv - CV "+str(cv)+" - Invalid value specified: "+str(value))
     # Only try to send the command if the PI-SPROG-3 has initialised correctly
-    elif serial_port.is_open and dcc_power_on:
+    elif serial_port.is_open:
         # Encode the message into the required number of bytes
         byte1 = session_id             # Session ID
         byte2 = (cv & 0xff00) >> 8     # High CV
