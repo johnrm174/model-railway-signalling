@@ -315,12 +315,13 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         # see if any existing points have already been configured to "autoswitch' the newly
         # created point and, if so, toggle the newly created point to the same state
         for other_point_id in points:
-            if (points[other_point_id]["alsoswitch"] == str(point_id) and
-                   point_switched(int(other_point_id)) != point_switched(point_id)):
-                toggle_point_state(point_id,True)
+            if points[other_point_id]["alsoswitch"] == point_id:
+                update_downstream_points(int(other_point_id))
         # Update any downstream points (configured to be 'autoswitched' by this point
         # but only if they have been created (allows them to be created after this point)
-        if point_exists(points[str(point_id)]["alsoswitch"]): update_downstream_points(point_id)
+        if point_exists(points[str(point_id)]["alsoswitch"]):
+            validate_alsoswitch_point(point_id, also_switch)
+            update_downstream_points(point_id)
         # Return the canvas_tag for the tkinter drawing objects        
     return(canvas_tag)
 
@@ -444,7 +445,21 @@ def update_autoswitch(point_id:int, autoswitch_id:int):
     else:
         logging.debug("Point "+str(point_id)+": Updating Autoswitch point to "+str(autoswitch_id))
         points[str(point_id)]["alsoswitch"] = autoswitch_id
-        update_downstream_points(point_id)
+        if point_exists(points[str(point_id)]["alsoswitch"]):
+            validate_alsoswitch_point(point_id, autoswitch_id)
+            update_downstream_points(point_id)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Internal common function to validate point linking (raising a warning as required)
+# ------------------------------------------------------------------------------------------
+
+def validate_alsoswitch_point(point_id:int, autoswitch_id:int):
+    for other_point in points:
+        if points[other_point]['alsoswitch'] == autoswitch_id and other_point != str(point_id):
+            # We've found another point 'also switching' the point we are trying to link to
+            logging.warning("Point "+str(point_id)+": configuring to 'autoswitch' "+str(autoswitch_id)+
+                  " - but point "+ other_point+" is also configured to 'autoswitch' "+str(autoswitch_id))
     return()
 
 ###############################################################################
