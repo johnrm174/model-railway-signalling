@@ -117,7 +117,7 @@ def run_all_configuration_update_tests(shutdown:bool=False, delay:float=0):
     if shutdown: report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_configuration_update_tests(shutdown=True, delay=1.0))
+    start_application(lambda:run_all_configuration_update_tests(shutdown=True, delay=0.0))
 
 ###############################################################################################################################
     

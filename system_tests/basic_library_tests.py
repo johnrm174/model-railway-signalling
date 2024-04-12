@@ -1021,7 +1021,7 @@ def run_mqtt_interface_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests(shutdown:bool=False):
-    baud_rate = 115200    # change to 115200 for Pi Sprog V2
+    baud_rate = 115200    # change to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
     logging.getLogger().setLevel(logging.DEBUG)
     run_track_sensor_library_tests()
     run_gpio_sensor_library_tests()
