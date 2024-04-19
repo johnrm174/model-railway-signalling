@@ -21,6 +21,7 @@
 #    configure_signal_tab2 - Point and signal interlocking
 #    configure_signal_tab3 - signal automation
 #    common.window_controls - the common load/save/cancel/OK controls
+#
 #------------------------------------------------------------------------------------
 
 import copy
@@ -721,7 +722,7 @@ def update_tab3_approach_control_selections(signal):
         if sig_routes[4] and approach_control: signal.automation.approach_control.rh2.enable_route()
         else: signal.automation.approach_control.rh2.disable_route()
         # Enable the Approach sensor entry box
-        signal.automation.track_sensors.approach.enable()
+        signal.automation.gpio_sensors.approach.enable()
     else:
         signal.automation.approach_control.main.disable_route()
         signal.automation.approach_control.lh1.disable_route()
@@ -732,11 +733,11 @@ def update_tab3_approach_control_selections(signal):
         signal.automation.approach_control.disable_release_on_red()
         signal.automation.approach_control.disable_release_on_red_sig_ahead()
         # Disable the Approach sensor entry box
-        signal.automation.track_sensors.approach.disable()
+        signal.automation.gpio_sensors.approach.disable()
     return() 
 
 #------------------------------------------------------------------------------------
-# Top level Edit signal class (has 2 sybtabs for configuration and Interlocking 
+# Top level Edit signal class (Has 3 tabs - Configuration, Interlocking and Automation 
 #------------------------------------------------------------------------------------
 
 class edit_signal:
@@ -764,7 +765,7 @@ class edit_signal:
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
             self.tab1 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab1, text="Configration")
+            self.tabs.add(self.tab1, text="Configuration")
             self.tab2 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab2, text="Interlocking")
             self.tabs.pack()
@@ -866,41 +867,44 @@ class edit_signal:
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Signal ID
-            self.window.title("Signal "+str(objects.schematic_objects[self.object_id]["itemid"]))
-            # Set the Initial UI state from the current object settings
-            self.config.sigid.set_value(str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.window.title("Signal "+str(item_id))
+            # Set the Initial UI state from the current object settings. Note that several
+            # of the elements need the current signal ID to validate the DCC addresses
+            self.config.sigid.set_value(item_id)
             self.config.sigtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
             self.config.subtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
-            self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"])
+            self.config.aspects.set_subsidary(objects.schematic_objects[self.object_id]["subsidary"], item_id)
+            self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"], item_id)
             self.config.feathers.set_feathers(objects.schematic_objects[self.object_id]["feathers"])
-            self.config.aspects.set_addresses(objects.schematic_objects[self.object_id]["dccaspects"])
-            self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"])
-            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"])
+            self.config.feathers.set_addresses(objects.schematic_objects[self.object_id]["dccfeathers"], item_id)
             self.config.feathers.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
-            self.config.theatre.set_auto_inhibit(objects.schematic_objects[self.object_id]["dccautoinhibit"])
-            self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"])
+            self.config.theatre.set_theatre(objects.schematic_objects[self.object_id]["dcctheatre"], item_id)
+            self.config.semaphores.set_arms(objects.schematic_objects[self.object_id]["sigarms"], item_id)
             self.config.sig_routes.set_values(objects.schematic_objects[self.object_id]["sigroutes"])
             self.config.sub_routes.set_values(objects.schematic_objects[self.object_id]["subroutes"])
             # These are the general settings for the signal
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
             self.config.settings.set_value(rot)
-            # These elements are for the signal intelocking tab
-            self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"])
+            # These elements are for the signal intelocking tab. Note that several of 
+            # the elements need the current signal ID to validate the signal entries
+            self.locking.interlocking.set_routes(objects.schematic_objects[self.object_id]["pointinterlock"], item_id)
             self.locking.interlocked_sections.set_routes(objects.schematic_objects[self.object_id]["trackinterlock"])
-            self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
+            self.locking.conflicting_sigs.set_values(objects.schematic_objects[self.object_id]["siginterlock"], item_id)
             self.locking.interlock_ahead.set_value(objects.schematic_objects[self.object_id]["interlockahead"])
-            # These elements are for the Automation tab
-            self.automation.track_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1])
-            self.automation.track_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1])
+            # These elements are for the Automation tab. Note that several elements 
+            # need the current signal IDfor validation purposes
+            self.automation.gpio_sensors.approach.set_value(objects.schematic_objects[self.object_id]["approachsensor"][1], item_id)
+            self.automation.gpio_sensors.passed.set_value(objects.schematic_objects[self.object_id]["passedsensor"][1], item_id)
             self.automation.track_occupancy.set_values(objects.schematic_objects[self.object_id]["tracksections"])
             override = objects.schematic_objects[self.object_id]["overridesignal"]
             main_auto = objects.schematic_objects[self.object_id]["fullyautomatic"]
             dist_auto = objects.schematic_objects[self.object_id]["distautomatic"]
             override_ahead = objects.schematic_objects[self.object_id]["overrideahead"]
             self.automation.general_settings.set_values(override, main_auto, override_ahead, dist_auto)
-            self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"])
+            self.automation.timed_signal.set_values(objects.schematic_objects[self.object_id]["timedsequences"], item_id)
             self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
             # Configure the initial Route indication selection
             feathers = objects.schematic_objects[self.object_id]["feathers"]
@@ -954,7 +958,7 @@ class edit_signal:
             if not self.locking.interlocking.validate(): valid = False
             if not self.locking.interlocked_sections.validate(): valid = False
             if not self.locking.conflicting_sigs.validate(): valid = False
-            if not self.automation.track_sensors.validate(): valid = False
+            if not self.automation.gpio_sensors.validate(): valid = False
             if not self.automation.track_occupancy.validate(): valid = False
             if not self.automation.timed_signal.validate(): valid = False
             if valid:
@@ -990,9 +994,9 @@ class edit_signal:
                 new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
                 # These elements are for the Automation tab
                 new_object_configuration["passedsensor"][0] = True
-                new_object_configuration["passedsensor"][1] = self.automation.track_sensors.passed.get_value()
+                new_object_configuration["passedsensor"][1] = self.automation.gpio_sensors.passed.get_value()
                 new_object_configuration["approachsensor"][0] = self.automation.approach_control.is_selected()
-                new_object_configuration["approachsensor"][1] = self.automation.track_sensors.approach.get_value()
+                new_object_configuration["approachsensor"][1] = self.automation.gpio_sensors.approach.get_value()
                 new_object_configuration["tracksections"] = self.automation.track_occupancy.get_values()
                 override, main_auto, override_ahead, dist_auto = self.automation.general_settings.get_values()
                 new_object_configuration["fullyautomatic"] = main_auto

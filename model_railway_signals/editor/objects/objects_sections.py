@@ -22,6 +22,8 @@
 #    objects_common.section_exists - Common function to see if a given item exists
 #    objects_signals.update_references_to_instrument - when the instrument ID is changed
 #    objects_signals.remove_references_to_instrument - when the instrument is deleted
+#    objects_sensors.update_references_to_point - called when the point ID is changed
+#    objects_sensors.remove_references_to_point - called when the point is deleted
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
@@ -48,6 +50,7 @@ from ...library import track_sections
 
 from . import objects_common
 from . import objects_signals
+from . import objects_sensors
 from .. import run_layout 
 
 #------------------------------------------------------------------------------------
@@ -167,8 +170,9 @@ def update_section(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.section_index[str(old_item_id)]
         objects_common.section_index[str(new_item_id)] = object_id
-        # Update any references to the section from the Signal automation tables
+        # Update any references to the section from the Signal / track sensor tables
         objects_signals.update_references_to_section(old_item_id, new_item_id)
+        objects_sensors.update_references_to_section(old_item_id, new_item_id)
         # Update any references from other Track Sections (mirrored sections)
         update_references_to_section(old_item_id, new_item_id)
     return()
@@ -296,8 +300,9 @@ def delete_section_object(object_id):
 def delete_section(object_id):
     # Soft delete the associated library objects from the canvas
     delete_section_object(object_id)
-    # Remove any references to the section from the signal track occupancy tables
+    # Remove any references to the section from the signal / track sensor tables
     objects_signals.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
+    objects_sensors.remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # Remove any references from other Track Sections (mirrored sections)
     remove_references_to_section(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting

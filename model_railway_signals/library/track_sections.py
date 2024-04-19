@@ -228,8 +228,6 @@ def create_section (canvas, section_id:int, x:int, y:int,
                     editable:bool = True):
     global sections
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
-    # Find and store the root window (when the first signal is created)
-    if common.root_window is None: common.find_root_window(canvas)
     # Verify that a section with the same ID does not already exist
     if section_exists(section_id):
         logging.error ("Section "+str(section_id)+": Section already exists")

@@ -55,7 +55,7 @@
 #    common.scrollable_text_box
 #
 # Uses the following library functions:
-#    track_sensors.get_list_of_available_ports() - to get a list of supported ports
+#    gpio_sensors.get_list_of_available_ports() - to get a list of supported ports
 #    mqtt_interface.get_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ import datetime
 
 from . import common
 from . import settings
-from ..library import track_sensors
+from ..library import gpio_sensors
 from ..library import mqtt_interface
 
 #------------------------------------------------------------------------------------
@@ -982,24 +982,27 @@ class gpio_port_entry_box(common.int_item_id_entry_box):
         self.label.pack(side=Tk.LEFT)
         super().__init__(self.frame, tool_tip=tool_tip, callback=callback)
         super().pack(side=Tk.LEFT)
+        # Create the Signal/Track sensor 'mapping' label
+        self.mapping = Tk.Label(self.frame, width=16, anchor='w')
+        self.mapping.pack(side=Tk.LEFT,padx=5)
     
 class gpio_port_entry_frame():
     def __init__(self, parent_frame):
         # Create the Label frame for the GPIO port assignments 
-        self.frame = Tk.LabelFrame(parent_frame, text="Track Sensors")
+        self.frame = Tk.LabelFrame(parent_frame, text="GPIO port to GPIO Sensor mappings")
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                
-        self.list_of_available_gpio_ports = track_sensors.get_list_of_available_ports()
+        self.list_of_available_gpio_ports = gpio_sensors.get_list_of_available_ports()
         while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
             # Create the Frame for the row
             self.list_of_subframes.append(Tk.Frame(self.frame))
             self.list_of_subframes[-1].pack(side=Tk.LEFT, padx=2, fill='x')
             # Create the entry_boxes for the row
-            for value in range (5):
+            for value in range (10):
                 if len(self.list_of_entry_boxes) == len(self.list_of_available_gpio_ports): break
                 label = "GPIO-"+str(self.list_of_available_gpio_ports[len(self.list_of_entry_boxes)])
-                tool_tip = "Enter a Sensor ID to be associated with this GPIO port (or leave blank)"
+                tool_tip = "Enter a GPIO Sensor ID to be associated with this GPIO port (or leave blank)"
                 self.list_of_entry_boxes.append(gpio_port_entry_box(self.list_of_subframes[-1],
                                             label=label, tool_tip=tool_tip, callback=self.validate))
                 
@@ -1032,11 +1035,17 @@ class gpio_port_entry_frame():
         for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
             self.list_of_entry_boxes[index].set_value(None)
         # Mappings is a variable length list of sensor to gpio mappings [sensor,gpio]
-        for mapping in list_of_mappings:
-            for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
-                if gpio_port == mapping[1]:
-                    self.list_of_entry_boxes[index].set_value(mapping[0])
-                    break        
+        for index, gpio_port in enumerate(self.list_of_available_gpio_ports):
+            self.list_of_entry_boxes[index].mapping.config(text="-------------------------")
+            for gpio_mapping in list_of_mappings:
+                if gpio_port == gpio_mapping[1]:
+                    event_mappings = gpio_sensors.get_gpio_sensor_callback(gpio_mapping[0])
+                    if event_mappings[0] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[0])
+                    elif event_mappings[1] > 0: mapping_text = u"\u2192"+" Signal "+str(event_mappings[1])
+                    elif event_mappings[2] > 0: mapping_text = u"\u2192"+" Track Sensor "+str(event_mappings[2])
+                    else: mapping_text="-------------------------"
+                    self.list_of_entry_boxes[index].set_value(gpio_mapping[0])
+                    self.list_of_entry_boxes[index].mapping.config(text=mapping_text)
 
 #------------------------------------------------------------------------------------
 # Class for the "Sensors" window - Uses the classes above. Note the init function takes
@@ -1074,7 +1083,7 @@ class edit_gpio_settings():
             self.label1 = Tk.Label(self.subframe2, text="Delay (ms):")
             self.label1.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.trigger = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value=1000, allow_empty=False,
-                tool_tip="Enter the delay period (before track sensor events will be triggered) in milliseconds (0-1000)")
+                tool_tip="Enter the delay period (before GPIO sensor events will be triggered) in milliseconds (0-1000)")
             self.trigger.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
             self.label2 = Tk.Label(self.subframe2, text="Timeout (ms):")
             self.label2.pack(side=Tk.LEFT, padx=2, pady=2, fill='x')
@@ -1108,8 +1117,9 @@ class edit_gpio_settings():
             settings.set_gpio(trigger, timeout, mappings)
             # Make the callback to apply the updated settings
             self.update_function()
-            # close the window (on OK)
-            if close_window: self.close_window() 
+            # Close the window (on OK) or refresh the display (on APPLY)
+            if close_window: self.close_window()
+            else: self.load_state()
         else:
             # Display the validation error message
             self.validation_error.pack(side=Tk.BOTTOM, before=self.controls.frame)
@@ -1117,6 +1127,56 @@ class edit_gpio_settings():
     def close_window(self):
         global edit_gpio_settings_window
         edit_gpio_settings_window = None
+        self.window.destroy()
+
+#------------------------------------------------------------------------------------
+# Class for the General Settings toolbar window. Note the init function takes
+# in a callback so it can apply the updated settings in the main editor application.
+# Note also that if a window is already open then we just raise it and exit.
+#------------------------------------------------------------------------------------
+
+edit_general_settings_window = None
+
+class edit_general_settings():
+    def __init__(self, root_window, update_function):
+        global edit_general_settings_window
+        # If there is already a  window open then we just make it jump to the top and exit
+        if edit_general_settings_window is not None:
+            edit_general_settings_window.lift()
+            edit_general_settings_window.state('normal')
+            edit_general_settings_window.focus_force()
+        else:
+            self.update_function = update_function
+            # Create the (non resizable) top level window for the General Settings
+            self.window = Tk.Toplevel(root_window)
+            self.window.title("General")
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
+            self.window.resizable(False, False)
+            edit_general_settings_window = self.window
+            # Create the "SPAD Popups" selection element
+            self.spad = common.check_box(self.window, label="Enable Signal Passed at Danger popup warnings",
+                    tool_tip="Select to Enable popup Signal Passed at Danger (SPAD) and other track occupancy warnings")
+            self.spad.pack(padx=2, pady=2)
+            # Create the common Apply/OK/Reset/Cancel buttons for the window
+            self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
+            self.controls.frame.pack(padx=2, pady=2)
+            # Load the initial UI state
+            self.load_state()
+
+    def load_state(self):
+        # Spad Popups flag is the 6th parameter returned from get_general
+        self.spad.set_value(settings.get_general()[5])
+
+    def save_state(self, close_window:bool):
+        settings.set_general(spad=self.spad.get_value())
+        # Make the callback to apply the updated settings
+        self.update_function()
+        # close the window (on OK )
+        if close_window: self.close_window()
+
+    def close_window(self):
+        global edit_general_settings_window
+        edit_general_settings_window = None
         self.window.destroy()
 
 #############################################################################################

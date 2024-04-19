@@ -5,10 +5,9 @@
 #
 # External API functions intended for use by other editor modules:
 #    initialise(root, callback, width, height, grid, snap) - Call once on startup
+#    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #    update_canvas(width,height,grid,snap) - Call following a size update (or layout load/canvas resize)
 #    delete_all_objects() - To delete all objects for layout 'new' and layout 'load'
-#    enable_editing() - Call when 'Edit' Mode is selected (via toolbar or on load)
-#    disable_editing() - Call when 'Run' Mode is selected (via toolbar or on load)
 #
 # Makes the following external API calls to other editor modules:
 #    objects.initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
@@ -19,14 +18,15 @@
 #    objects.copy_objects(list of obj IDs) - Copy the selected objects to the clipboard
 #    objects.paste_objects() - Paste the selected objects (returns a list of new IDs)
 #    objects.undo() / objects.redo() - Undo and re-do functions as you would expect
-#    objects.enable_editing() - Call when 'Edit' Mode is selected 
-#    objects.disable_editing() - Call when 'Run' Mode is selected
 #    configure_signal.edit_signal(root,object_id) - Open signal edit window (on double click)
 #    configure_point.edit_point(root,object_id) - Open point edit window (on double click)
 #    configure_section.edit_section(root,object_id) - Open section edit window (on double click)
 #    configure_instrument.edit_instrument(root,object_id) - Open inst edit window (on double click)
 #    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
 #    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
+#    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
+#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
+#
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -54,12 +54,14 @@ from ..library import block_instruments
 from ..library import points
 
 from . import objects
+from . import run_layout
 from . import configure_signal
 from . import configure_point
 from . import configure_section
 from . import configure_instrument
 from . import configure_line
 from . import configure_textbox
+from . import configure_track_sensor
 
 import importlib.resources
 import math
@@ -238,6 +240,8 @@ def edit_selected_object():
         edit_popup = configure_section.edit_section(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.instrument:
         edit_popup = configure_instrument.edit_instrument(root,object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.track_sensor:
+        edit_popup = configure_track_sensor.edit_track_sensor(root,object_id)
     return()
 
 # The following function is for test purposes only - to close the windows opened above by the system tests
@@ -818,63 +822,60 @@ def disable_edit_keypress_events():
 # Either from the Menubar Mode selection or the 'm' key
 #------------------------------------------------------------------------------------
 
-def enable_editing():
+def configure_edit_mode(edit_mode:bool):
     global canvas_grid_state
-    canvas_grid_state = "normal"
-    canvas.itemconfig("grid",state=canvas_grid_state)
-    # Enable editing of the schematic objects
-    objects.enable_editing()
-    # Re-pack the subframe containing the "add object" buttons to display it. Note that we
-    # first 'forget' the canvas_frame and then re-pack the button_frame first, followed by
-    # the canvas_frame - this ensures that the buttons don't dissapear on window re-size
-    canvas_frame.forget()
-    button_frame.pack(side=Tk.LEFT, expand=False, fill=Tk.BOTH)
-    canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
-    # Bind the Canvas mouse and button events to the various callback functions
-    canvas.bind("<Motion>", track_cursor)
-    canvas.bind('<Button-1>', left_button_click)
-    canvas.bind('<Button-2>', right_button_click)
-    canvas.bind('<Button-3>', right_button_click)
-    canvas.bind('<Shift-Button-1>', left_shift_click)
-    canvas.bind('<ButtonRelease-1>', left_button_release)
-    canvas.bind('<Double-Button-1>', left_double_click)
-    # Bind the canvas keypresses to the associated functions
-    enable_edit_keypress_events()
-    # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
-    # and Run Modes - only disabled during Edit Mode object moves and area selections)
-    canvas.bind('<Control-Key-r>', reset_window_size)
-    canvas.bind('<Control-Key-m>', canvas_event_callback)
-    enable_arrow_keypress_events()
-    # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
-    canvas.unbind('<Control-Key-a>')
-    return()
-
-def disable_editing():
-    global canvas_grid_state
-    canvas_grid_state = "hidden"
-    canvas.itemconfig("grid",state=canvas_grid_state)
-    deselect_all_objects()
-    # Disable editing of the schematic objects
-    objects.disable_editing()
-    # Forget the subframe containing the "add object" buttons to hide it
-    button_frame.forget()
-    # Unbind the Canvas mouse and button events in Run Mode
-    canvas.unbind("<Motion>")
-    canvas.unbind('<Button-1>')
-    canvas.unbind('<Button-2>')
-    canvas.unbind('<Button-3>')
-    canvas.unbind('<Shift-Button-1>')
-    canvas.unbind('<ButtonRelease-1>')
-    canvas.unbind('<Double-Button-1>')
-    # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
-    disable_edit_keypress_events()
-    # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
-    # and Run Modes - only disabled during Edit Mode object moves and area selections)
-    canvas.bind('<Control-Key-r>', reset_window_size)
-    canvas.bind('<Control-Key-m>', canvas_event_callback)
-    enable_arrow_keypress_events()
-    # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
-    canvas.bind('<Control-Key-a>', canvas_event_callback)
+    if edit_mode:
+        # Display the Edit Mode Grid
+        canvas_grid_state = "normal"
+        canvas.itemconfig("grid",state=canvas_grid_state)
+        # Re-pack the subframe containing the "add object" buttons to display it. Note that we
+        # first 'forget' the canvas_frame and then re-pack the button_frame first, followed by
+        # the canvas_frame - this ensures that the buttons don't dissapear on window re-size
+        canvas_frame.forget()
+        button_frame.pack(side=Tk.LEFT, expand=False, fill=Tk.BOTH)
+        canvas_frame.pack(side=Tk.LEFT, expand=True, fill=Tk.BOTH)
+        # Bind the Canvas mouse and button events to the various callback functions
+        canvas.bind("<Motion>", track_cursor)
+        canvas.bind('<Button-1>', left_button_click)
+        canvas.bind('<Button-2>', right_button_click)
+        canvas.bind('<Button-3>', right_button_click)
+        canvas.bind('<Shift-Button-1>', left_shift_click)
+        canvas.bind('<ButtonRelease-1>', left_button_release)
+        canvas.bind('<Double-Button-1>', left_double_click)
+        # Bind the canvas keypresses to the associated functions
+        enable_edit_keypress_events()
+        # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
+        # and Run Modes - only disabled during Edit Mode object moves and area selections)
+        canvas.bind('<Control-Key-r>', reset_window_size)
+        canvas.bind('<Control-Key-m>', canvas_event_callback)
+        enable_arrow_keypress_events()
+        # Layout Automation toggle is disabled in Edit Mode (only enabled in Run Mode)
+        canvas.unbind('<Control-Key-a>')
+    else:
+        # Hide the Edit Mode Grid
+        canvas_grid_state = "hidden"
+        canvas.itemconfig("grid",state=canvas_grid_state)
+        # Deselect any currently selected objects
+        deselect_all_objects()
+        # Forget the subframe containing the "add object" buttons to hide it
+        button_frame.forget()
+        # Unbind the Canvas mouse and button events in Run Mode
+        canvas.unbind("<Motion>")
+        canvas.unbind('<Button-1>')
+        canvas.unbind('<Button-2>')
+        canvas.unbind('<Button-3>')
+        canvas.unbind('<Shift-Button-1>')
+        canvas.unbind('<ButtonRelease-1>')
+        canvas.unbind('<Double-Button-1>')
+        # Unbind the canvas keypresses in Run Mode (apart from 'm' to toggle modes)
+        disable_edit_keypress_events()
+        # Bind the Toggle Mode, arrow key and window re-size keypress events (active in Edit
+        # and Run Modes - only disabled during Edit Mode object moves and area selections)
+        canvas.bind('<Control-Key-r>', reset_window_size)
+        canvas.bind('<Control-Key-m>', canvas_event_callback)
+        enable_arrow_keypress_events()
+        # Layout Automation toggle is only enabled in Run Mode (disabled in Edit Mode)
+        canvas.bind('<Control-Key-a>', canvas_event_callback)        
     return()
 
 #------------------------------------------------------------------------------------
@@ -947,6 +948,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                    ["rhpoint", lambda:create_object(objects.object_type.point,
                                         points.point_type.RH.value) ],
                    ["section", lambda:create_object(objects.object_type.section) ],
+                   ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
                                         block_instruments.instrument_type.single_line.value) ] ]
     # Create the buttons we need (Note that the button images are added to a global
@@ -965,8 +967,9 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
             # Else fall back to using a text label (filename) for the button
             button = Tk.Button (button_frame, text=selections[index][0],command=selections[index][1], bg="grey85")
             button.pack(padx=2, pady=2, fill='x')
-    # Initialise the Objects package with the required parameters
-    objects.initialise(root, canvas, canvas_width, canvas_height, canvas_grid)
+    # Initialise the Objects and run_layout modules with the canvas details
+    objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
+    run_layout.initialise(canvas)
     return()
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where

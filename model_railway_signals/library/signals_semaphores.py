@@ -237,16 +237,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if not rh1_signal: rh1_signal = None
         if not lh2_signal: lh2_signal = None
         if not rh2_signal: rh2_signal = None
-
-        # If this is a distant signal associated with another home signal then we need to adjust the
-        # position of the signal button to "deconflict" with the buttons of the home signal
-        if associated_home > 0:
-            if signals_common.signals[str(associated_home)]["hassubsidary"]:
-                button_offset = -65
-            else:
-                button_offset = -45
-        else:
-            button_offset = 0
             
         # Create all of the signal elements common to all signal types
         signals_common.create_common_signal_elements (canvas, sig_id, x, y,
@@ -256,7 +246,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
                                        subsidary = has_subsidary,
                                        sig_passed_button = sig_passed_button,
                                        automatic = fully_automatic,
-                                       distant_button_offset = button_offset,
+                                       associated_home = associated_home,
                                        tag = sig_id_tag)
         
         # Create the signal elements for a Theatre Route indicator

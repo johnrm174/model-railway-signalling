@@ -472,6 +472,8 @@ def run_loop_line_tests(delay=0):
     assert_sections_occupied(1)
     assert_sections_clear(5)
     sleep(delay)
+    trigger_signals_released(8)
+    sleep(delay)
     trigger_signals_passed(8)
     assert_sections_occupied(2)
     assert_sections_clear(1)

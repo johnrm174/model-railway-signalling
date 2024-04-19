@@ -7,15 +7,22 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.section_exists(section_id) - To see if a specified section ID exists (local)
-#    objects.section(section_id) - To get the object_id for a given section ID
+#    objects.signal(signal_id) - To get the object_id for a given signal ID
+#    objects.track_sensor(sensor_id) - To get the object_id for a given sensor ID
+#########################################################################################################
+# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+# function will not work in edit mode as local Track Section library objects don't exist in edit mode
+# To be addressed in a future software update when the Track Sections functionality is re-factored
+#########################################################################################################
+#    objects.section_exists(id) - To see if the Track Section exists  ###################################
 #
 # Accesses the following external editor objects directly:
-#    objects.section_index - To iterate through all the section objects
+#    objects.track_sensor_index - To iterate through all the track sensor objects
+#    objects.signal_index - To iterate through all the signal objects
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
-#    track_sections.section_exists(id) - To see if the section exists (remote)
+#    track_sections.section_exists(id) - To see if the track section exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -81,6 +88,38 @@ def get_signal_routes(object_id):
                sig_routes[4] or sub_routes[4] ] )
 
 #------------------------------------------------------------------------------------
+# Function to return the read-only "sensors ahead" and "sensors_behind" elements.
+# These are the back-references to the track sensors that are configured to either
+# set or clear the track section when the track sensor is 'passed'
+#------------------------------------------------------------------------------------
+
+def find_sensor_routes(track_section_id:int, sensor_routes:list):
+    matched_routes = [False, False, False, False, False]
+    one_or_more_routes_matched = False
+    # "sensor_routes" comprises a list of routes: [main, lh1, lh2, rh1, rh2]
+    # Each route element comprises: [[p1, p2, p3, p4, p5, p6, p7], section_id]
+    # We need to iterate through the routes to find all matches on the section_id
+    for index1, sensor_route in enumerate(sensor_routes):
+        if sensor_route[1] == track_section_id:
+            matched_routes[index1] = True
+            one_or_more_routes_matched = True
+    return( [one_or_more_routes_matched, matched_routes] )
+
+def track_sensors_behind_and_ahead(object_id):
+    track_section_id = int(objects.schematic_objects[object_id]["itemid"])
+    list_of_track_sensors_ahead = []
+    list_of_track_sensors_behind = []
+    # Iterate through all track sensor objects to see if the track section appears in the configuration
+    for track_sensor_id in objects.track_sensor_index:
+        routes_ahead = objects.schematic_objects[objects.track_sensor(track_sensor_id)]["routeahead"]
+        route_matches = find_sensor_routes(track_section_id, routes_ahead)
+        if route_matches[0]: list_of_track_sensors_ahead.append([track_sensor_id, route_matches[1]])
+        routes_behind = objects.schematic_objects[objects.track_sensor(track_sensor_id)]["routebehind"]
+        route_matches = find_sensor_routes(track_section_id, routes_behind)
+        if route_matches[0]: list_of_track_sensors_behind.append([track_sensor_id, route_matches[1]])
+    return(list_of_track_sensors_behind, list_of_track_sensors_ahead)
+
+#------------------------------------------------------------------------------------
 # Function to return the read-only "signals ahead" element. This is the back-reference
 # to the signals that are configured to clear the track section when passed
 #------------------------------------------------------------------------------------
@@ -135,17 +174,14 @@ def signals_behind_and_overridden(object_id):
 #------------------------------------------------------------------------------------
 # Class for the Mirror Section Entry Box - builds on the common str_int_item_id_entry_box. 
 # Class instance methods inherited/used from the parent classes are:
-#    "set_value" - will set the current value of the entry box (str)
+#    "set_value" - set the initial value of the entry_box (str) - Also sets the
+#                  current track sensor item ID (int) for validation purposes
 #    "get_value" - will return the last "valid" value of the entry box (str)
 #    "validate" - validate the section exists and not the same as the current item ID
 #------------------------------------------------------------------------------------
 
 class mirrored_section(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame, parent_object):
-        # These are the functions used to validate that the entered section ID
-        # exists on the schematic and is different to the current section ID
-        exists_function = self.section_exists
-        current_id_function = parent_object.sectionid.get_value
+    def __init__(self, parent_frame):
         # Create the Label Frame for the "mirrored section" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Link to other track section")
         # Create a frame for the "Section to mirror" elements
@@ -154,20 +190,21 @@ class mirrored_section(common.str_int_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
+        #########################################################################################################
+        # Note that we need to use the a custom 'section_exists' function as the the library 'section_exists'
+        # function will not work for local track sections in edit mode as the local Track Section library objects
+        # don't exist in edit mode (although any subscribed remote track sections will exist). We therefore have
+        # to use a combination of the 'objects.section_exists' and ' track_sections.section_exists' functions
+        # To be addressed in a future software update when the Track Sections functionality is re-factored
+        #########################################################################################################
         super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
                          "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
                          "which has been subscribed to via MQTT networking",
-                    exists_function=exists_function, current_id_function=current_id_function)
+                          exists_function = self.section_exists)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
-    
-    # We would normally use the library 'section_exists' function to determine if a track section
-    # either exists on the local schematic OR has been subscribed to via MQTT networking, but the
-    # local track section library objects don't exist when in edit mode (although the function
-    # will report that any remote sections subscribed to via MQTT networking do exist). We
-    # therefore need to create a hybrid 'exists' function using a combination of the exists
-    # functions from the objects module and the library modules
-    def section_exists(self, sec_id):
-        return (objects.section_exists(sec_id) or track_sections.section_exists(sec_id))
+
+    def section_exists(self,entered_value:str):
+        return (objects.section_exists(entered_value) or track_sections.section_exists(entered_value))
 
 #------------------------------------------------------------------------------------
 # Class for the Default lable entry box - builds on the common entry_box class
@@ -214,6 +251,11 @@ class section_configuration_tab():
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Section ID selection
+        #########################################################################################################
+        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
+        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
+        # To be addressed in a future software update when the Track Sections functionality is re-factored
+        #########################################################################################################
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
                                 exists_function = objects.section_exists) 
         self.sectionid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
@@ -225,7 +267,7 @@ class section_configuration_tab():
         self.readonly.pack(padx=2, pady=2)
         # Create a Label Frame to hold the "Mirror" section. Note that this needs a
         # reference to the parent object to access the current value of Section ID
-        self.mirror = mirrored_section(parent_tab, self)
+        self.mirror = mirrored_section(parent_tab)
         self.mirror.frame.pack(padx=2, pady=2, fill='x')
         self.label = default_label_entry(parent_tab)
         self.label.frame.pack(padx=2, pady=2, fill='x')
@@ -252,7 +294,13 @@ class section_automation_tab():
         self.ahead = common.signal_route_frame (parent_tab, label="Signals controlling access out of section",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.ahead.frame.pack(padx=2, pady=2, fill='x')
-        self.override = common.signal_route_frame (parent_tab, label="Signals overridden when section occupied",
+        self.sensors1 = common.signal_route_frame (parent_tab, label="Sensors controlling access into section",
+                                tool_tip="Edit the appropriate track sensors to configure automation")
+        self.sensors1.frame.pack(padx=2, pady=2, fill='x')
+        self.sensors2 = common.signal_route_frame (parent_tab, label="Sensors controlling access out of section",
+                                tool_tip="Edit the appropriate track sensors to configure automation")
+        self.sensors2.frame.pack(padx=2, pady=2, fill='x')
+        self.override = common.signal_route_frame (parent_tab, label="Sigs overridden when section occupied",
                                 tool_tip="Edit the appropriate signals to configure automation")
         self.override.frame.pack(padx=2, pady=2, fill='x')
         
@@ -289,7 +337,7 @@ class edit_section():
             self.tabs = ttk.Notebook(self.main_frame)
             # Create the Window tabs
             self.tab1 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab1, text="Configration")
+            self.tabs.add(self.tab1, text="Configuration")
             self.tab2 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab2, text="Interlocking")
             self.tab3 = Tk.Frame(self.tabs)
@@ -311,18 +359,22 @@ class edit_section():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Section ID
-            self.window.title("Track Section "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.window.title("Track Section "+str(item_id))
             # Set the Initial UI state from the current object settings
-            self.config.sectionid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.sectionid.set_value(item_id)
             self.config.readonly.set_value(not objects.schematic_objects[self.object_id]["editable"])
-            self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"])
+            self.config.mirror.set_value(objects.schematic_objects[self.object_id]["mirror"], item_id)
             self.config.label.set_value(objects.schematic_objects[self.object_id]["defaultlabel"])
             self.interlocking.signals.set_values(interlocked_signals(self.object_id))
             self.automation.ahead.set_values(signals_ahead(self.object_id))
             signals_behind, signals_overridden = signals_behind_and_overridden(self.object_id)
             self.automation.behind.set_values(signals_behind)
             self.automation.override.set_values(signals_overridden)
+            sensors_behind, sensors_ahead = track_sensors_behind_and_ahead(self.object_id)
+            self.automation.sensors1.set_values(sensors_behind)
+            self.automation.sensors2.set_values(sensors_ahead)
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()

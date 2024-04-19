@@ -16,6 +16,7 @@
 #    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    reset_objects() - resets all points, signals, instruments and sections to default state
+#    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -79,6 +80,7 @@ from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
 from . import objects_textboxes
+from . import objects_sensors
 
 from .. import run_layout
 
@@ -123,6 +125,8 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
             objects_sections.redraw_section_object(object_id, reset_state=reset_state)
         elif this_object_type == objects_common.object_type.instrument:
             objects_instruments.redraw_instrument_object(object_id)
+        elif this_object_type == objects_common.object_type.track_sensor:
+            objects_sensors.redraw_track_sensor_object(object_id)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     return()
@@ -148,6 +152,8 @@ def reset_all_schematic_indexes():
             objects_common.section_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.instrument:
             objects_common.instrument_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.track_sensor:
+            objects_common.track_sensor_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -220,15 +226,12 @@ def restore_schematic_state():
 # Functions to Enable and disable editing 
 #------------------------------------------------------------------------------------
 
-def enable_editing():
-    objects_sections.enable_editing()
-    run_layout.enable_editing()
+############################################################################
+def configure_edit_mode(edit_mode:bool):
+    if edit_mode: objects_sections.enable_editing()
+    else: objects_sections.disable_editing()
     return()
-
-def disable_editing():
-    objects_sections.disable_editing()
-    run_layout.disable_editing()
-    return()
+###########################################################################
 
 #------------------------------------------------------------------------------------
 # Function to reset the schematic back to its default state with all signals 'on',
@@ -252,6 +255,8 @@ def reset_objects():
             objects_sections.delete_section_object(object_id)
         elif type_of_object == objects_common.object_type.instrument:
             objects_instruments.delete_instrument_object(object_id)
+        elif type_of_object == objects_common.object_type.track_sensor:
+            objects_sensors.delete_track_sensor_object(object_id)
     # Redraw all point, section, instrument and signal objects in their default state
     # We don't need to create a new bbox as soft_delete keeps the tkinter object
     redraw_all_objects(create_new_bbox=False, reset_state=True)
@@ -280,6 +285,8 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
         object_id = objects_sections.create_section()
     elif new_object_type == objects_common.object_type.instrument:
         object_id = objects_instruments.create_instrument(item_type)
+    elif new_object_type == objects_common.object_type.track_sensor:
+        object_id = objects_sensors.create_track_sensor()
     else:
         object_id = None
     # save the current state (for undo/redo)
@@ -306,6 +313,8 @@ def update_object(object_id, new_object):
         objects_sections.update_section(object_id, new_object)
     elif type_of_object == objects_common.object_type.instrument:
         objects_instruments.update_instrument(object_id, new_object)
+    elif type_of_object == objects_common.object_type.track_sensor:
+        objects_sensors.update_track_sensor(object_id, new_object)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # save the current state (for undo/redo)
@@ -334,6 +343,8 @@ def delete_object(object_id):
         objects_sections.delete_section(object_id)
     elif type_of_object == objects_common.object_type.instrument:
         objects_instruments.delete_instrument(object_id)
+    elif type_of_object == objects_common.object_type.track_sensor:
+        objects_sensors.delete_track_sensor(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -456,6 +467,8 @@ def paste_objects():
             new_object_id = objects_sections.paste_section(object_to_paste, deltax, deltay)
         elif type_of_object == objects_common.object_type.instrument:
             new_object_id = objects_instruments.paste_instrument(object_to_paste, deltax, deltay)
+        elif type_of_object == objects_common.object_type.track_sensor:
+            new_object_id = objects_sensors.paste_track_sensor(object_to_paste, deltax, deltay)
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
@@ -502,6 +515,8 @@ def set_all(new_objects):
             default_object = objects_sections.default_section_object
         elif new_object_type == objects_common.object_type.instrument:
             default_object = objects_instruments.default_instrument_object
+        elif new_object_type == objects_common.object_type.track_sensor:
+            default_object = objects_sensors.default_track_sensor_object
         else:
             default_object = {}
             logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
@@ -565,6 +580,18 @@ def set_all(new_objects):
                 #############################################################################################
                 ## End of Handle breaking change for track sections and sensor IDs ##########################
                 #############################################################################################
+                ########################################################################################################
+                ## Handle bugfix for Signal point interlocking tables (i.e. length point list was wrongly getting 7 ####
+                ## points assigned on point deletion whereas the list should only ever include 6 points ################ 
+                ########################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
+                    for index, route in enumerate (new_objects[object_id][element]):
+                        objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
+                        objects_common.schematic_objects[object_id][element][index][1] = route[1]
+                        objects_common.schematic_objects[object_id][element][index][2] = route[2]
+                ########################################################################################################
+                ## End of Handle bugfix for Signal point interlocking tables ###########################################
+                ########################################################################################################
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
             ##################################################################################

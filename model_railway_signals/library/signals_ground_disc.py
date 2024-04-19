@@ -65,8 +65,9 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
                                        tag = sig_id_tag)
 
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals_common.signals[str(sig_id)]["sigon"] = sigon           # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigoff"] = sigoff         # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sig_subtype"] = signal_subtype  # Type-specific - signal subtype
+        signals_common.signals[str(sig_id)]["sigon"] = sigon                 # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigoff"] = sigoff               # Type-specific - drawing object
 
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
@@ -94,11 +95,17 @@ def create_ground_disc_signal (canvas, sig_id:int, x:int, y:int,
 def update_ground_disc_signal (sig_id:int):
     
     # Establish what the signal should be displaying based on the state
-    if not signals_common.signals[str(sig_id)]["sigclear"]:   
-        aspect_to_set = signals_common.signal_state_type.DANGER
+    if not signals_common.signals[str(sig_id)]["sigclear"]:
+        if signals_common.signals[str(sig_id)]["sig_subtype"] == ground_disc_sub_type.shunt_ahead:
+            aspect_to_set = signals_common.signal_state_type.CAUTION
+        else:
+            aspect_to_set = signals_common.signal_state_type.DANGER
         log_message = " (signal is ON)"
     elif signals_common.signals[str(sig_id)]["override"]:
-        aspect_to_set = signals_common.signal_state_type.DANGER
+        if signals_common.signals[str(sig_id)]["sig_subtype"] == ground_disc_sub_type.shunt_ahead:
+            aspect_to_set = signals_common.signal_state_type.CAUTION
+        else:
+            aspect_to_set = signals_common.signal_state_type.DANGER
         log_message = " (signal is OVERRIDDEN)"
     else:
         aspect_to_set = signals_common.signal_state_type.PROCEED
@@ -114,7 +121,8 @@ def update_ground_disc_signal (sig_id:int):
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='hidden')    
             dcc_control.update_dcc_signal_element(sig_id,True,element="main_signal")
             
-        elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
+        elif ( signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER or
+               signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION ):
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigoff"],state='hidden')
             signals_common.signals[str(sig_id)]["canvas"].itemconfigure(signals_common.signals[str(sig_id)]["sigon"],state='normal')    
             dcc_control.update_dcc_signal_element(sig_id,False,element="main_signal")

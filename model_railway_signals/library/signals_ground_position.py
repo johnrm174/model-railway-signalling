@@ -86,10 +86,11 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
                                        tag = sig_id_tag)
         
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals_common.signals[str(sig_id)]["sigoff1"]  = sigoff1         # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigoff2"]  = sigoff2         # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigon1"]   = sigon1          # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigon2"]   = sigon2          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sig_subtype"]  = signal_subtype  # Type-specific - Signal Subtype
+        signals_common.signals[str(sig_id)]["sigoff1"]      = sigoff1         # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigoff2"]      = sigoff2         # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigon1"]       = sigon1          # Type-specific - drawing object
+        signals_common.signals[str(sig_id)]["sigon2"]       = sigon2          # Type-specific - drawing object
         
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
@@ -117,11 +118,19 @@ def create_ground_position_signal (canvas, sig_id:int, x:int, y:int,
 def update_ground_position_signal (sig_id:int):
 
     # Establish what the signal should be displaying based on the state
-    if not signals_common.signals[str(sig_id)]["sigclear"]:   
-        aspect_to_set = signals_common.signal_state_type.DANGER
+    if not signals_common.signals[str(sig_id)]["sigclear"]:
+        if ( signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.shunt_ahead or
+             signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.early_shunt_ahead ):
+            aspect_to_set = signals_common.signal_state_type.CAUTION
+        else:
+            aspect_to_set = signals_common.signal_state_type.DANGER
         log_message = " (signal is ON)"
     elif signals_common.signals[str(sig_id)]["override"]:
-        aspect_to_set = signals_common.signal_state_type.DANGER
+        if ( signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.shunt_ahead or
+             signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.early_shunt_ahead ):
+            aspect_to_set = signals_common.signal_state_type.CAUTION
+        else:
+            aspect_to_set = signals_common.signal_state_type.DANGER
         log_message = " (signal is OVERRIDDEN)"
     else:
         aspect_to_set = signals_common.signal_state_type.PROCEED
@@ -138,7 +147,8 @@ def update_ground_position_signal (sig_id:int):
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="hidden")
 
-        elif signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER:
+        elif ( signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER or
+               signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION):
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="hidden")
             signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="normal")
@@ -146,7 +156,7 @@ def update_ground_position_signal (sig_id:int):
             
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
-        dcc_control.update_dcc_signal_aspects(sig_id)
+        dcc_control.update_dcc_signal_aspects(sig_id, aspect_to_set)
         
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal

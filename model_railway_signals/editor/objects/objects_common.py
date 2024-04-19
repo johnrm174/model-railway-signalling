@@ -3,39 +3,39 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
+#
 #    initialise (canvas,width,height,grid) - Initialise the objects package and set defaults
 #    update_canvas(width,height,grid) - update the attributes (on layout load or canvas re-size)
 #    set_bbox - Common function to create/update the boundary box for a schematic object
 #    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
-#    signal_exists (item_id:int) - Common function to see if a given item exists
-#    point_exists (item_id:int) - Common function to see if a given item exists
-#    section_exists (item_id:int) - Common function to see if a given item exists
-#    instrument_exists (item_id:int) - Common function to see if a given item exists
-#    line_exists (item_id:int) - Common function to see if a given item exists
+#
+#    section_exists (item_id:int) - Common function to see if a given item exists  #####################
+#    line_exists (item_id:int) - Common function to see if a given item exists  ########################
+#
 #    signal(item_id:int) - helper function to find the object Id by Item ID
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
+#    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #
 # Objects intended to be accessed directly by other editor modules:
+#
+#    canvas - global reference to the Tkinter drawing object
 #    object_type - Enumeration type for the supported objects
 #    schematic_objects - for accessing/editing the configuration of an object
+#    canvas_width, canvas_height, canvas_grid - for creating/pasting objects
+#    canvas - global reference to the Tkinter drawing object
+#
 #    signal_index - for iterating through all the signal objects
 #    point_index - for iterating through all the point objects
 #    instrument_index - for iterating through all the instrument objects
 #    section_index - for iterating through all the section objects
 #    line_index - for iterating through all the line objects
-#    canvas_width, canvas_height, canvas_grid - for creating/pasting objects
-#    canvas - global reference to the Tkinter drawing object
-#
-# Makes the following external API calls to other editor modules:
-#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
+#    track_sensor_index - for iterating through all the sensor objects
 #
 #------------------------------------------------------------------------------------
-
-from .. import run_layout
 
 #------------------------------------------------------------------------------------
 # Global class used for the object_type - we use normal strings rather than enumeration
@@ -50,6 +50,7 @@ class object_type():
     signal:str = "signal"
     section:str = "section"
     instrument:str = "instrument"
+    track_sensor:str = "tracksensor"
 
 #------------------------------------------------------------------------------------
 # All Objects we create (and their configuration) are stored in a global dictionary
@@ -68,6 +69,7 @@ point_index:dict={}
 instrument_index:dict={}
 section_index:dict={}
 line_index:dict={}
+track_sensor_index:dict={}
 
 #------------------------------------------------------------------------------------
 # Helper functions to get the main dictionary index (the object_id) from the item_id
@@ -78,16 +80,14 @@ def point(ID:int): return (point_index[str(ID)])
 def instrument(ID:int): return (instrument_index[str(ID)])
 def section(ID:int): return (section_index[str(ID)])
 def line(ID:int): return (line_index[str(ID)])
+def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 
 #------------------------------------------------------------------------------------
 # Simple functions to test if a particular item_id already exists (for an item_type)
 #------------------------------------------------------------------------------------
 
-def signal_exists(ID:int): return (str(ID) in signal_index.keys())
-def point_exists(ID:int): return (str(ID) in point_index.keys())
-def instrument_exists(ID:int): return (str(ID) in instrument_index.keys())
-def section_exists(ID:int): return (str(ID) in section_index.keys())
-def line_exists(ID:int): return (str(ID) in line_index.keys())
+def section_exists(ID:int): return (str(ID) in section_index.keys())  ####################
+def line_exists(ID:int): return (str(ID) in line_index.keys())  ##########################
 
 #------------------------------------------------------------------------------------
 # Common parameters for a Default Layout Object (i.e. state at creation)
@@ -111,18 +111,15 @@ default_object["tags"] = ""     # Canvas Tags (for moving/deleting objects)
 # Also calls the run_layout.initialise function to set the tkinter canvas object
 #------------------------------------------------------------------------------------
 
-root = None
 canvas = None
 canvas_width = 0
 canvas_height = 0
 canvas_grid = 0
 
-def initialise (root_object,canvas_object, width:int, height:int, grid:int):
-    global canvas, root
-    root = root_object
+def initialise (canvas_object, width:int, height:int, grid:int):
+    global canvas
     canvas = canvas_object
     update_canvas(canvas_width, canvas_height, grid)
-    run_layout.initialise(canvas)
     return()
 
 #------------------------------------------------------------------------------------
@@ -146,7 +143,7 @@ def set_bbox(object_id:str,bbox:[int,int,int,int]):
     x1, y1 = bbox[0] - 2, bbox[1] - 2
     x2, y2 = bbox[2] + 2, bbox[3] + 2
     # If the tkinter object exists we leave it in its current selected/unselected state
-    # If it doesn't exist then we create it (in the default object unselected state)
+    # If it doesn't exist then we create it (in the default unselected state)
     if schematic_objects[object_id]["bbox"]:
         canvas.coords(schematic_objects[object_id]["bbox"],x1,y1,x2,y2)
     else:

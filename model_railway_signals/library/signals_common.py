@@ -62,8 +62,8 @@ class sig_type(enum.Enum):
     remote_signal = 0
     colour_light = 1
     ground_position = 2
-    semaphore = 3                 
-    ground_disc = 4          
+    semaphore = 3
+    ground_disc = 4
 
 # -------------------------------------------------------------------------
 # Signals are to be added to a global dictionary when created
@@ -126,34 +126,40 @@ def reset_sig_released_button (sig_id:int):
     if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
 
 def sig_passed_button_event (sig_id:int):
-    logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
-    # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
-    if not common.shutdown_initiated:
-        signals[str(sig_id)]["passedbutton"].config(bg="red")
-        common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
-    # Reset the approach control 'released' state (if the signal supports approach control)
-    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
-        signals[str(sig_id)]["released"] = False
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
+    if not sig_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
+    else:
+        logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
+        # Pulse the signal passed button to provide a visual indication (but not if a shutdown has been initiated)
+        if not common.shutdown_initiated:
+            signals[str(sig_id)]["passedbutton"].config(bg="red")
+            common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
+        # Reset the approach control 'released' state (if the signal supports approach control)
+        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+            signals[str(sig_id)]["released"] = False
+        # Make the external callback (if one was specified at signal creation time)
+        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
     return ()
 
 def approach_release_button_event (sig_id:int):
-    logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
-    # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
-    if not common.shutdown_initiated:
-        signals[str(sig_id)]["releasebutton"].config(bg="red")
-        common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
-    # Set the approach control 'released' state (if the signal supports approach control)
-    if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-         signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
-        signals[str(sig_id)]["released"] = True
-    # Clear the approach control and refresh the signal
-    clear_approach_control(sig_id)
-    auto_refresh_signal(sig_id)
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
+    if not sig_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not exist")
+    else:
+        logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
+        # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
+        if not common.shutdown_initiated:
+            signals[str(sig_id)]["releasebutton"].config(bg="red")
+            common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
+        # Set the approach control 'released' state (if the signal supports approach control)
+        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+            signals[str(sig_id)]["released"] = True
+        # Clear the approach control and refresh the signal
+        clear_approach_control(sig_id)
+        auto_refresh_signal(sig_id)
+        # Make the external callback (if one was specified at signal creation time)
+        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
@@ -384,18 +390,16 @@ def create_common_signal_elements (canvas,
                                    subsidary:bool=False,
                                    sig_passed_button:bool=False,
                                    automatic:bool=False,
-                                   distant_button_offset:int=0,
+                                   associated_home:int=0,
                                    tag:str=""):
     global signals
-    # Find and store the root window (when the first signal is created)
-    if common.root_window is None: common.find_root_window(canvas)
     # If no callback has been specified, use the null callback to do nothing
     if ext_callback is None: ext_callback = null_callback
     # Assign the button labels. if a distant_button_offset has been defined then this represents the 
     # special case of a semaphore distant signal being created on the same "post" as a semaphore
     # home signal. On this case we label the button as "D" to differentiate it from the main
     # home signal button and then apply the offset to deconflict with the home signal buttons
-    if distant_button_offset !=0 : main_button_text = "D"
+    if associated_home > 0: main_button_text = "D"
     elif sig_id < 10: main_button_text = "0" + str(sig_id)
     else: main_button_text = str(sig_id)
     # Create the Signal and Subsidary Button objects and their callbacks
@@ -414,25 +418,22 @@ def create_common_signal_elements (canvas,
     # Note that we have to cater for the special case of a semaphore distant signal being
     # created on the same post as a semaphore home signal. In this case (signified by a
     # distant_button_offset), we apply the offset to deconflict with the home signal buttons.
-    if distant_button_offset != 0:
-        button_position = common.rotate_point (x,y,distant_button_offset,-25,orientation)
+    if associated_home > 0:
+        if signals[str(associated_home)]["hassubsidary"] and orientation == 0: button_offset = -52
+        elif signals[str(associated_home)]["hassubsidary"] and orientation != 0: button_offset = -54
+        else: button_offset = -36
+        button_position = common.rotate_point(x,y,button_offset,-14,orientation)
         if not automatic: canvas.create_window(button_position,window=sig_button,tags=tag)
-        else: canvas.create_window(button_position,window=sig_button,state='hidden',tags=tag)
-        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     elif subsidary:
-        if orientation == 0: button_position = common.rotate_point (x,y,-25,-25,orientation) 
-        else: button_position = common.rotate_point (x,y,-35,-25,orientation) 
+        if orientation == 0: button_position = common.rotate_point (x,y,-22,-14,orientation) 
+        else: button_position = common.rotate_point (x,y,-30,-14,orientation) 
         canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=tag)
         canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=tag)          
     else:
-        button_position = common.rotate_point (x,y,-20,-25,orientation) 
+        button_position = common.rotate_point (x,y,-17,-14,orientation) 
         canvas.create_window(button_position,window=sig_button,tags=tag)
-        canvas.create_window(button_position,window=sub_button,state='hidden',tags=tag)
     # Signal passed button is created on the track at the base of the signal
-    if sig_passed_button:
-        canvas.create_window(x,y,window=passed_button,tags=tag)
-    else:
-        canvas.create_window(x,y,window=passed_button,state='hidden',tags=tag)
+    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=tag)
     # Disable the main signal button if the signal is fully automatic
     if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
@@ -471,10 +472,7 @@ def create_approach_control_elements (canvas,sig_id:int,
     approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
                                         command=lambda:approach_release_button_event (sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
-    if approach_button:
-        canvas.create_window(button_position,window=approach_release_button,tags=tag)
-    else:
-        canvas.create_window(button_position,window=approach_release_button,state="hidden",tags=tag)
+    if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
@@ -606,8 +604,6 @@ def publish_signal_state(sig_id:int):
 
 def delete_signal(sig_id:int):
     global signals
-    global list_of_signals_to_publish_state_changes
-    global list_of_signals_to_publish_passed_events
     if sig_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
         signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))

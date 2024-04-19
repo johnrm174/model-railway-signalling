@@ -12,9 +12,13 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Inherits the following common editor base classes (from common):
+#    common.integer_entry_box
+#    common.scrollable_text_frame
 #    common.window_controls
 #    common.colour_selection
+#    common.selection_buttons
 #    common.check_box
+#
 #------------------------------------------------------------------------------------
 
 import copy

@@ -5,26 +5,27 @@ signalling schemes to be designed and configured via the UI without the need to 
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
 without some of the Raspberry-Pi specific interfacing functions).
 
-* Enables layout schematics to be created with signals, points, track sections and block instruments
+* Enables layout schematics to be created with signals, points, track sections and block instruments.
 * Supports most types of UK colour light signals, semaphore signals, and ground signals.
-* Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout
-* Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation
-* Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts
+* Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout.
+* Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation.
+* Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts.
+* Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) to support custom layout control interfaces.
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
 Configured / pre-installed systems are now available to purchase from:
 [https://www.model-railway-signalling.co.uk/](https://www.model-railway-signalling.co.uk/)
 
-## What's new for Release 4.1.0:
+## What's new for Release 4.2.0:
 
-* Hidden files and folders now supressed in file load and save dialogs
-* Network heartbeats and monitering to check the status of other network nodes
-* Ability to trigger application shutdown of connected network nodes on application exit
-* Support for the Pi-SPROG3 V2 DCC Programmer / Controller (higher baud rate)
-* Quickstart guide updated to reflect settings changes for the Pi-SPROG3 V2
-* BREAKING CHANGE - GPIO Ports 16 and 17 no longer selectable for track sensors
-* Minor bugfixes and application enhancements to improve the overall user experience
+* New 'Track Sensors' feature - extends track occupancy into non-signalled areas such as goods yards and MPDs.
+* Improved 'signal passed' logic - will now detect (and warn the user about) Signal Passed at Danger events.
+* New DCC Mappings utility - to display all mapped DCC addresses and the signals/points they are assigned to.
+* Improved DCC validation - Prevents DCC addresses being mapped if already assigned to another signal or point.
+* Improved GPIO Sensor Settings window -  now includes a back reference to the mapped Signals / 'Track sensors'.
+* GPIO library updated - GPIO inputs are now fully functional on the most recent versions of RPi-OS/Python.
+* A new Public API - to enable integration of your own custom layout interfaces via the MQTT network.
 
 Bug reports and feedback are welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
@@ -49,6 +50,10 @@ If 'simpleaudio' is not installed then the software will still function correctl
 <pre>
 $ python3 -m pip install simpleaudio
 </pre>
+Note that if you are running on a later version of Python you may need to install libasound2 before the simpleaudio pip install will work.
+<pre>
+$ sudo apt-get install libasound2-dev
+</pre>
 
 ## Running the application
 
@@ -71,3 +76,13 @@ Documentation, in the form of a Quick-Start guide can be found in the 'user_guid
 Some example layout configuration files can be found in the 'configuration_examples' folder:
 [https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
 
+And finally, a top tip for running the application on the latest Debian Bookworm release which uses Wayland as the GUI backend
+rather than X11 (which was the backend for previous Debian releases). I found that with Wayland, the Tkinter GUI performance
+was terrible for some reason (not just my application - python/Tkinter performance in general) - and that was running on a
+Raspberry Pi 5 which I would have expected to improve overall performance. Anyway, I found that the fix is to switch the GUI
+backend of the Raspberry Pi back to X11 - performance of the user interface is now lightning quick!
+
+To change the backend - Run "sudo raspi-config", select 'Advanced Options' then 'Wayland' and select X11.
+
+An additional benifit was that some of the other applications I use (such as the kazam video capture software)
+will now work as normal on the Raspberry Pi 5.

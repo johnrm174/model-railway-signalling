@@ -7,7 +7,7 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.instrument_exists(id) - To see if the instrument exists (local or remote)
+#    objects.signal(sig_id) - to get the object ID for a given item ID
 #
 # Accesses the following external editor objects directly:
 #    objects.signal_index - To iterate through all the signal objects
@@ -22,8 +22,7 @@
 #    common.create_tool_tip
 #    common.object_id_selection
 #    common.selection_buttons
-#    common.signal_route_interlocking_frame
-#    common.signal_route_selections
+#    common.signal_route_frame
 #    common.window_controls
 #
 #------------------------------------------------------------------------------------
@@ -101,17 +100,17 @@ def interlocked_signals(instrument_id:int):
 # Class for the "Linked To" Entry Box - builds on the common str_int_item_id_entry_box.
 # Note that linked instrument can either be a local (int) or remote (str) instrument ID
 # Class instance methods inherited/used from the parent classes are:
-#    "set_value" - will set the current value of the entry box (str)
+#    "set_value" - will set the current value of the entry box (str) - Also sets
+#             the current block Instrument item ID (int) for validation purposes
 #    "get_value" - will return the last "valid" value of the entry box (str)
 #    "validate" - Validates the instrument exists and not the current inst_id
 #------------------------------------------------------------------------------------
 
 class linked_to_selection(common.str_int_item_id_entry_box):
-    def __init__(self, parent_frame, parent_object):
+    def __init__(self, parent_frame):
         # The exists_function from the block_instruments module is used to validate that the
         # entered ID  exists on the schematic or has been subscribed to via mqtt networking
         exists_function = block_instruments.instrument_exists
-        current_id_function = parent_object.instid.get_value
         # Create the Label Frame for the "also switch" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Block section")
         # Call the common base class init function to create the EB
@@ -120,7 +119,7 @@ class linked_to_selection(common.str_int_item_id_entry_box):
         super().__init__(self.frame, tool_tip = "Enter the ID of the linked block instrument - "+
                 "This can be a local instrument ID or a remote instrument ID (in the form 'Node-ID') "+
                 "which has been subscribed to via MQTT networking",
-                exists_function=exists_function, current_id_function=current_id_function)
+                exists_function=exists_function)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
     
 #------------------------------------------------------------------------------------
@@ -224,16 +223,17 @@ class instrument_configuration_tab():
         # Create a Frame to hold the Inst ID and Inst Type Selections
         self.frame = Tk.Frame(parent_tab)
         self.frame.pack(padx=2, pady=2, fill='x')
-        # Create the UI Element for Inst ID selection - Note that we use the instrument_exists
-        # function from the objects module - as we are only interested in local instruments
+        # Create the UI Element for Item ID selection. Note that although the block_instruments.instrument_exists
+        # function will match both local and remote Instrument IDs, the object_id_selection only allows integers to
+        # be selected - so we can safely use this function here for consistency.
         self.instid = common.object_id_selection(self.frame, "Inst ID",
-                        exists_function = objects.instrument_exists) 
+                        exists_function = block_instruments.instrument_exists) 
         self.instid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Inst Type selection
         self.insttype = common.selection_buttons(self.frame, "Point type",
                     "Select block Instrument Type", None, "Single line", "Double Line")
         self.insttype.frame.pack(padx=2, pady=2, fill='x')
-        self.linkedto = linked_to_selection(parent_tab, self)
+        self.linkedto = linked_to_selection(parent_tab)
         self.linkedto.frame.pack(padx=2, pady=2, fill='x')
         self.sounds = sound_file_selections(parent_tab)
         self.sounds.frame.pack(padx=2, pady=2, fill='x')
@@ -277,7 +277,7 @@ class edit_instrument():
             self.tabs = ttk.Notebook(self.window)
             # Create the Window tabs
             self.tab1 = Tk.Frame(self.tabs)
-            self.tabs.add(self.tab1, text="Configration")
+            self.tabs.add(self.tab1, text="Configuration")
             self.tab2 = Tk.Frame(self.tabs)
             self.tabs.add(self.tab2, text="Interlocking")
             self.tabs.pack()
@@ -296,17 +296,18 @@ class edit_instrument():
         if self.object_id not in objects.schematic_objects.keys():
             self.close_window()
         else:
+            item_id = objects.schematic_objects[self.object_id]["itemid"]
             # Label the edit window with the Instrument ID
-            self.window.title("Instrument "+str(objects.schematic_objects[self.object_id]["itemid"]))
+            self.window.title("Instrument "+str(item_id))
             # Set the Initial UI state from the current object settings
-            self.config.instid.set_value(objects.schematic_objects[self.object_id]["itemid"])
+            self.config.instid.set_value(item_id)
             self.config.insttype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
-            self.config.linkedto.set_value(objects.schematic_objects[self.object_id]["linkedto"])
+            self.config.linkedto.set_value(objects.schematic_objects[self.object_id]["linkedto"], item_id)
             bell_sound = objects.schematic_objects[self.object_id]["bellsound"]
             key_sound = objects.schematic_objects[self.object_id]["keysound"]
             self.config.sounds.set_values(bell_sound, key_sound)
             # Set the read only list of Interlocked signals
-            self.locking.signals.set_values(interlocked_signals(objects.schematic_objects[self.object_id]["itemid"]))
+            self.locking.signals.set_values(interlocked_signals(item_id))
             # Hide the validation error message
             self.validation_error.pack_forget()
         return()

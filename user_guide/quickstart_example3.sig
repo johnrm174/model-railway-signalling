@@ -2,6 +2,22 @@
     "information": "Model Railway Signalling Configuration File",
     "instruments": {},
     "objects": {
+        "027167c4-575e-4384-9e79-d97b56ae3e01": {
+            "background": "grey85",
+            "bbox": 1051,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 1146.0,
+            "posy": 62.0,
+            "tags": "027167c4-575e-4384-9e79-d97b56ae3e01",
+            "text": "TT-DS10"
+        },
         "07cd6ea1-f297-4487-867f-b3d735e1fc41": {
             "arrowends": 2,
             "arrowtype": [
@@ -9,25 +25,25 @@
                 20,
                 5
             ],
-            "bbox": 3857,
+            "bbox": 1057,
             "colour": "black",
-            "end1": 3853,
-            "end2": 3854,
+            "end1": 1053,
+            "end2": 1054,
             "endx": 1275.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 5,
-            "line": 3852,
+            "line": 1052,
             "posx": 825.0,
             "posy": 225.0,
-            "stop1": 3855,
-            "stop2": 3856,
+            "stop1": 1055,
+            "stop2": 1056,
             "tags": "line5"
         },
         "07d52e15-c961-4ee9-8227-5c7e7ade9d7c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 3864,
+            "bbox": 1064,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -65,11 +81,37 @@
                 false,
                 ""
             ],
-            "bbox": 3883,
+            "bbox": 1083,
             "dccaspects": [
                 [
                     [
+                        120,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        120,
                         false
                     ],
                     [
@@ -95,7 +137,7 @@
                 ],
                 [
                     [
-                        0,
+                        121,
                         false
                     ],
                     [
@@ -121,34 +163,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        122,
+                        true
                     ],
                     [
                         0,
@@ -733,7 +749,7 @@
                 ]
             ],
             "posx": 375.0,
-            "posy": 275.0,
+            "posy": 274.0,
             "sigarms": [
                 [
                     [
@@ -1128,8 +1144,24 @@
                 ]
             ]
         },
+        "1cd0d6ee-bf33-4e85-ad10-162a5114e499": {
+            "background": "grey85",
+            "bbox": 1086,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 1170.0,
+            "posy": 239.0,
+            "tags": "1cd0d6ee-bf33-4e85-ad10-162a5114e499",
+            "text": "TT-DS10"
+        },
         "1d324970-3029-401b-8c66-8425a680ff42": {
-            "bbox": 3885,
+            "bbox": 1088,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1153,11 +1185,11 @@
                 false,
                 ""
             ],
-            "bbox": 3904,
+            "bbox": 1107,
             "dccaspects": [
                 [
                     [
-                        0,
+                        30,
                         false
                     ],
                     [
@@ -1183,7 +1215,59 @@
                 ],
                 [
                     [
+                        30,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        31,
+                        true
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        31,
                         false
                     ],
                     [
@@ -1209,8 +1293,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
+                        32,
+                        true
                     ],
                     [
                         0,
@@ -1235,59 +1319,7 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
+                        32,
                         false
                     ],
                     [
@@ -2223,19 +2255,19 @@
                 0,
                 0
             ],
-            "bbox": 3910,
+            "bbox": 1113,
             "colour": "black",
-            "end1": 3906,
-            "end2": 3907,
+            "end1": 1109,
+            "end2": 1110,
             "endx": 900.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 2,
-            "line": 3905,
+            "line": 1108,
             "posx": 800.0,
             "posy": 200.0,
-            "stop1": 3908,
-            "stop2": 3909,
+            "stop1": 1111,
+            "stop2": 1112,
             "tags": "line2"
         },
         "242be6a5-b50d-4967-b1b3-e0d99ae4039f": {
@@ -2250,11 +2282,37 @@
                 false,
                 ""
             ],
-            "bbox": 3929,
+            "bbox": 1132,
             "dccaspects": [
                 [
                     [
+                        100,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        100,
                         false
                     ],
                     [
@@ -2280,7 +2338,7 @@
                 ],
                 [
                     [
-                        0,
+                        101,
                         false
                     ],
                     [
@@ -2306,34 +2364,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        101,
+                        true
                     ],
                     [
                         0,
@@ -3325,11 +3357,37 @@
                 false,
                 ""
             ],
-            "bbox": 3948,
+            "bbox": 1151,
             "dccaspects": [
                 [
                     [
+                        80,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        80,
                         false
                     ],
                     [
@@ -3355,7 +3413,7 @@
                 ],
                 [
                     [
-                        0,
+                        81,
                         false
                     ],
                     [
@@ -3381,34 +3439,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        81,
+                        true
                     ],
                     [
                         0,
@@ -4388,6 +4420,22 @@
                 ]
             ]
         },
+        "33bf5593-6030-4282-a957-c96d2a12548f": {
+            "background": "grey85",
+            "bbox": 1154,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 1126.0,
+            "posy": 314.0,
+            "tags": "33bf5593-6030-4282-a957-c96d2a12548f",
+            "text": "TT-DS10"
+        },
         "3861465f-82fc-4911-853a-558f4bf91a71": {
             "arrowends": 1,
             "arrowtype": [
@@ -4395,19 +4443,19 @@
                 20,
                 5
             ],
-            "bbox": 3954,
+            "bbox": 1160,
             "colour": "black",
-            "end1": 3950,
-            "end2": 3951,
+            "end1": 1156,
+            "end2": 1157,
             "endx": 800.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 3,
-            "line": 3949,
+            "line": 1155,
             "posx": 25.0,
             "posy": 275.0,
-            "stop1": 3952,
-            "stop2": 3953,
+            "stop1": 1158,
+            "stop2": 1159,
             "tags": "line3"
         },
         "42dceb78-03de-49ac-898a-6ca5aea4b6db": {
@@ -4422,11 +4470,37 @@
                 false,
                 ""
             ],
-            "bbox": 3973,
+            "bbox": 1179,
             "dccaspects": [
                 [
                     [
+                        61,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        60,
                         false
                     ],
                     [
@@ -4452,7 +4526,7 @@
                 ],
                 [
                     [
-                        0,
+                        62,
                         false
                     ],
                     [
@@ -4478,34 +4552,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        63,
+                        true
                     ],
                     [
                         0,
@@ -5497,11 +5545,37 @@
                 false,
                 ""
             ],
-            "bbox": 3992,
+            "bbox": 1198,
             "dccaspects": [
                 [
                     [
+                        130,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        130,
                         false
                     ],
                     [
@@ -5527,7 +5601,7 @@
                 ],
                 [
                     [
-                        0,
+                        131,
                         false
                     ],
                     [
@@ -5553,34 +5627,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        131,
+                        true
                     ],
                     [
                         0,
@@ -6561,7 +6609,7 @@
             ]
         },
         "55eab425-03d7-40a2-8b77-2c7d23b8e933": {
-            "bbox": 3994,
+            "bbox": 1200,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -6585,11 +6633,37 @@
                 false,
                 ""
             ],
-            "bbox": 4013,
+            "bbox": 1219,
             "dccaspects": [
                 [
                     [
+                        110,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        110,
                         false
                     ],
                     [
@@ -6615,7 +6689,7 @@
                 ],
                 [
                     [
-                        0,
+                        111,
                         false
                     ],
                     [
@@ -6641,34 +6715,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        112,
+                        true
                     ],
                     [
                         0,
@@ -7660,11 +7708,37 @@
                 false,
                 ""
             ],
-            "bbox": 4032,
+            "bbox": 1238,
             "dccaspects": [
                 [
                     [
+                        50,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        50,
                         false
                     ],
                     [
@@ -7690,7 +7764,7 @@
                 ],
                 [
                     [
-                        0,
+                        51,
                         false
                     ],
                     [
@@ -7716,34 +7790,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        51,
+                        true
                     ],
                     [
                         0,
@@ -8327,8 +8375,8 @@
                     0
                 ]
             ],
-            "posx": 1100.0,
-            "posy": 225.0,
+            "posx": 1126.0,
+            "posy": 223.0,
             "sigarms": [
                 [
                     [
@@ -8735,11 +8783,37 @@
                 false,
                 ""
             ],
-            "bbox": 4051,
+            "bbox": 1257,
             "dccaspects": [
                 [
                     [
+                        90,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        90,
                         false
                     ],
                     [
@@ -8765,7 +8839,7 @@
                 ],
                 [
                     [
-                        0,
+                        91,
                         false
                     ],
                     [
@@ -8791,34 +8865,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        91,
+                        true
                     ],
                     [
                         0,
@@ -9799,7 +9847,7 @@
             ]
         },
         "628c161f-b9f5-46fd-837c-4f36eecd60ab": {
-            "bbox": 4053,
+            "bbox": 1259,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9812,7 +9860,7 @@
             "tags": "section11"
         },
         "65c6b251-6622-4fd2-958f-b28a6778dc76": {
-            "bbox": 4055,
+            "bbox": 1261,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9824,10 +9872,42 @@
             "state": false,
             "tags": "section5"
         },
+        "6966a516-b636-4321-ae7b-3a733356e215": {
+            "background": "grey85",
+            "bbox": 1264,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 14,
+            "fontstyle": "bold ",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 444.0,
+            "posy": 115.0,
+            "tags": "6966a516-b636-4321-ae7b-3a733356e215",
+            "text": "Approach Control Example (Signals 4, 3 and 2)"
+        },
+        "6b03065c-be75-450c-8af5-af5dc644b14f": {
+            "background": "grey85",
+            "bbox": 1267,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 951.0,
+            "posy": 313.0,
+            "tags": "6b03065c-be75-450c-8af5-af5dc644b14f",
+            "text": "TT-DS10"
+        },
         "719f6d7b-e39c-4d3a-8b22-f232dff5443e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 4062,
+            "bbox": 1273,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -9863,8 +9943,24 @@
             ],
             "tags": "point2"
         },
+        "7c1562c4-2d75-46cf-b559-bef25efa2c9e": {
+            "background": "grey85",
+            "bbox": 1276,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 325.0,
+            "posy": 314.0,
+            "tags": "7c1562c4-2d75-46cf-b559-bef25efa2c9e",
+            "text": "TT-DS10"
+        },
         "7d95452f-2bb7-48b8-8418-6d83598356d4": {
-            "bbox": 4064,
+            "bbox": 1278,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9883,23 +9979,23 @@
                 20,
                 5
             ],
-            "bbox": 4070,
+            "bbox": 1284,
             "colour": "black",
-            "end1": 4066,
-            "end2": 4067,
+            "end1": 1280,
+            "end2": 1281,
             "endx": 1275.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 8,
-            "line": 4065,
+            "line": 1279,
             "posx": 900.0,
             "posy": 100.0,
-            "stop1": 4068,
-            "stop2": 4069,
+            "stop1": 1282,
+            "stop2": 1283,
             "tags": "line8"
         },
         "a6541a21-387c-4ebc-93dd-3b86a950f45d": {
-            "bbox": 4072,
+            "bbox": 1286,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9911,8 +10007,24 @@
             "state": false,
             "tags": "section1"
         },
+        "a6d29d1d-43c7-4b82-bca6-0fd6d90d6c89": {
+            "background": "grey85",
+            "bbox": 1289,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 175.0,
+            "posy": 187.0,
+            "tags": "a6d29d1d-43c7-4b82-bca6-0fd6d90d6c89",
+            "text": "TT-DS10"
+        },
         "a6e61479-8736-4f06-b351-c8e99ff870f5": {
-            "bbox": 4074,
+            "bbox": 1291,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -9924,6 +10036,22 @@
             "state": false,
             "tags": "section6"
         },
+        "a96bd506-67b8-4312-a415-169eae42e657": {
+            "background": "grey85",
+            "bbox": 1294,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 1130.0,
+            "posy": 136.0,
+            "tags": "a96bd506-67b8-4312-a415-169eae42e657",
+            "text": "TT-DS10"
+        },
         "aa736f3d-7877-4615-b1e7-bc50b39db7f0": {
             "arrowends": 0,
             "arrowtype": [
@@ -9931,19 +10059,19 @@
                 0,
                 0
             ],
-            "bbox": 4080,
+            "bbox": 1300,
             "colour": "black",
-            "end1": 4076,
-            "end2": 4077,
+            "end1": 1296,
+            "end2": 1297,
             "endx": 1275.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 4,
-            "line": 4075,
+            "line": 1295,
             "posx": 850.0,
             "posy": 275.0,
-            "stop1": 4078,
-            "stop2": 4079,
+            "stop1": 1298,
+            "stop2": 1299,
             "tags": "line4"
         },
         "b0d82676-b068-4cb5-b1c9-d5ae0ee55b46": {
@@ -9958,11 +10086,37 @@
                 false,
                 ""
             ],
-            "bbox": 4099,
+            "bbox": 1319,
             "dccaspects": [
                 [
                     [
+                        70,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        70,
                         false
                     ],
                     [
@@ -9988,7 +10142,7 @@
                 ],
                 [
                     [
-                        0,
+                        71,
                         false
                     ],
                     [
@@ -10014,34 +10168,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        71,
+                        true
                     ],
                     [
                         0,
@@ -11022,7 +11150,7 @@
             ]
         },
         "b1288a67-ed1d-427f-98d5-f7963edaf7f4": {
-            "bbox": 4101,
+            "bbox": 1321,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11041,23 +11169,23 @@
                 0,
                 0
             ],
-            "bbox": 4107,
+            "bbox": 1327,
             "colour": "black",
-            "end1": 4103,
-            "end2": 4104,
+            "end1": 1323,
+            "end2": 1324,
             "endx": 925.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 6,
-            "line": 4102,
+            "line": 1322,
             "posx": 825.0,
             "posy": 250.0,
-            "stop1": 4105,
-            "stop2": 4106,
+            "stop1": 1325,
+            "stop2": 1326,
             "tags": "line6"
         },
         "b62548e4-2291-454e-9f01-4c3163fb178a": {
-            "bbox": 4109,
+            "bbox": 1329,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11070,7 +11198,7 @@
             "tags": "section3"
         },
         "bc423a55-8a1d-42b1-82ee-24b38662af63": {
-            "bbox": 4111,
+            "bbox": 1331,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -11089,20 +11217,68 @@
                 0,
                 0
             ],
-            "bbox": 4117,
+            "bbox": 1337,
             "colour": "black",
-            "end1": 4113,
-            "end2": 4114,
+            "end1": 1333,
+            "end2": 1334,
             "endx": 1275.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 7,
-            "line": 4112,
+            "line": 1332,
             "posx": 925.0,
             "posy": 150.0,
-            "stop1": 4115,
-            "stop2": 4116,
+            "stop1": 1335,
+            "stop2": 1336,
             "tags": "line7"
+        },
+        "d6a52ed1-1079-413c-ba46-7d8bb9b44dfd": {
+            "background": "grey85",
+            "bbox": 1340,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 525.0,
+            "posy": 187.0,
+            "tags": "d6a52ed1-1079-413c-ba46-7d8bb9b44dfd",
+            "text": "TT-DS5HS"
+        },
+        "db5992bd-ce35-492b-9453-b8a860f4a69b": {
+            "background": "grey85",
+            "bbox": 1343,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 149.0,
+            "posy": 313.0,
+            "tags": "db5992bd-ce35-492b-9453-b8a860f4a69b",
+            "text": "TT-DS10"
+        },
+        "e5810a77-a225-4247-acd8-0df551fe4184": {
+            "background": "grey85",
+            "bbox": 1346,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 351.0,
+            "posy": 187.0,
+            "tags": "e5810a77-a225-4247-acd8-0df551fe4184",
+            "text": "TT-DS5HS"
         },
         "e9341909-f8c6-4799-9f1f-c68dfa243425": {
             "approachcontrol": [
@@ -11116,11 +11292,37 @@
                 false,
                 ""
             ],
-            "bbox": 4136,
+            "bbox": 1365,
             "dccaspects": [
                 [
                     [
+                        20,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        20,
                         false
                     ],
                     [
@@ -11146,7 +11348,7 @@
                 ],
                 [
                     [
-                        0,
+                        21,
                         false
                     ],
                     [
@@ -11172,7 +11374,33 @@
                 ],
                 [
                     [
+                        21,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        22,
                         false
                     ],
                     [
@@ -11198,60 +11426,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        22,
+                        true
                     ],
                     [
                         0,
@@ -12191,11 +12367,37 @@
                 true,
                 "14"
             ],
-            "bbox": 4155,
+            "bbox": 1384,
             "dccaspects": [
                 [
                     [
+                        40,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        40,
                         false
                     ],
                     [
@@ -12221,7 +12423,7 @@
                 ],
                 [
                     [
-                        0,
+                        41,
                         false
                     ],
                     [
@@ -12247,34 +12449,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        41,
+                        true
                     ],
                     [
                         0,
@@ -12354,7 +12530,7 @@
             "dccfeathers": [
                 [
                     [
-                        0,
+                        45,
                         false
                     ],
                     [
@@ -12380,7 +12556,7 @@
                 ],
                 [
                     [
-                        0,
+                        45,
                         false
                     ],
                     [
@@ -12406,8 +12582,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
+                        45,
+                        true
                     ],
                     [
                         0,
@@ -13255,7 +13431,7 @@
             ]
         },
         "eca7185e-bfed-4cfb-8430-a3153bc29573": {
-            "bbox": 4157,
+            "bbox": 1386,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -13266,6 +13442,22 @@
             "posy": 275.0,
             "state": false,
             "tags": "section10"
+        },
+        "edf730b4-253d-4ac9-a473-0a3ba0e72183": {
+            "background": "grey85",
+            "bbox": 1389,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 748.0,
+            "posy": 185.0,
+            "tags": "edf730b4-253d-4ac9-a473-0a3ba0e72183",
+            "text": "TT-DS10L"
         },
         "f49fbf77-4587-42fb-b0a8-45d646a96a95": {
             "approachcontrol": [
@@ -13279,11 +13471,11 @@
                 false,
                 ""
             ],
-            "bbox": 4176,
+            "bbox": 1408,
             "dccaspects": [
                 [
                     [
-                        0,
+                        10,
                         false
                     ],
                     [
@@ -13309,8 +13501,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
+                        10,
+                        true
                     ],
                     [
                         0,
@@ -13335,8 +13527,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
+                        11,
+                        true
                     ],
                     [
                         0,
@@ -13361,7 +13553,7 @@
                 ],
                 [
                     [
-                        0,
+                        11,
                         false
                     ],
                     [
@@ -14343,7 +14535,7 @@
             ]
         },
         "f85047ff-ffac-4342-835a-98803dee39b6": {
-            "bbox": 4178,
+            "bbox": 1410,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14362,23 +14554,23 @@
                 0,
                 0
             ],
-            "bbox": 4184,
+            "bbox": 1416,
             "colour": "black",
-            "end1": 4180,
-            "end2": 4181,
+            "end1": 1412,
+            "end2": 1413,
             "endx": 775.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 1,
-            "line": 4179,
+            "line": 1411,
             "posx": 25.0,
             "posy": 225.0,
-            "stop1": 4182,
-            "stop2": 4183,
+            "stop1": 1414,
+            "stop2": 1415,
             "tags": "line1"
         },
         "fdcafbec-2869-438c-ba72-2a8d5d849f58": {
-            "bbox": 4186,
+            "bbox": 1418,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14389,6 +14581,22 @@
             "posy": 275.0,
             "state": false,
             "tags": "section9"
+        },
+        "ff002fef-4577-4b37-8b4c-c09a758ae29f": {
+            "background": "grey85",
+            "bbox": 1421,
+            "border": 0,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 8,
+            "fontstyle": "",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 501.0,
+            "posy": 313.0,
+            "tags": "ff002fef-4577-4b37-8b4c-c09a758ae29f",
+            "text": "TT-DS10"
         }
     },
     "points": {
@@ -14461,15 +14669,16 @@
         "canvas": {
             "grid": 25,
             "height": 500,
-            "snaptogrid": true,
+            "snaptogrid": false,
             "width": 1300
         },
         "general": {
             "automation": true,
             "editmode": false,
-            "filename": "/home/pi/model-railway-signalling/user_guide/quickstart_example3.sig",
+            "filename": "/home/pi/Software/model-railway-signalling/user_guide/quickstart_example3.sig",
             "info": "Document your layout here",
-            "version": "Version 4.1.0"
+            "spadpopups": false,
+            "version": "Version 4.2.0"
         },
         "gpio": {
             "portmappings": [
@@ -14486,6 +14695,26 @@
                     6
                 ],
                 [
+                    4,
+                    7
+                ],
+                [
+                    5,
+                    8
+                ],
+                [
+                    6,
+                    9
+                ],
+                [
+                    7,
+                    10
+                ],
+                [
+                    8,
+                    11
+                ],
+                [
                     9,
                     12
                 ],
@@ -14494,43 +14723,43 @@
                     13
                 ],
                 [
-                    13,
+                    11,
                     18
                 ],
                 [
-                    14,
+                    12,
                     19
                 ],
                 [
-                    15,
+                    13,
                     20
                 ],
                 [
-                    16,
+                    14,
                     21
                 ],
                 [
-                    17,
+                    15,
                     22
                 ],
                 [
-                    18,
+                    16,
                     23
                 ],
                 [
-                    19,
+                    17,
                     24
                 ],
                 [
-                    20,
+                    18,
                     25
                 ],
                 [
-                    21,
+                    19,
                     26
                 ],
                 [
-                    22,
+                    20,
                     27
                 ]
             ],

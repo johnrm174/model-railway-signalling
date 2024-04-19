@@ -16,7 +16,6 @@
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
-#    objects_common.instrument_exists - Common function to see if a given item exists
 #    objects_signals.update_references_to_instrument - when the instrument ID is changed
 #    objects_signals.remove_references_to_instrument - when the instrument is deleted
 #
@@ -29,9 +28,10 @@
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
 # Makes the following external API calls to library modules:
+#    block_instruments.instrument_exists - Common function to see if a given item exists
 #    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
-#    block_instruments.update_linked_to(old_id, new_id) - update the linked instrument reference
+#    block_instruments.update_linked_instrument(old_id, new_id) - update the linked instrument reference
 #    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
 #    block_instruments.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
 #    block_instruments.set_instruments_to_publish_state(IDs) - configure MQTT networking
@@ -69,7 +69,7 @@ def update_references_to_instrument(old_inst_id:int, new_inst_id:int):
         instrument_object = objects_common.instrument(instrument_id)
         if objects_common.schematic_objects[instrument_object]["linkedto"] == str(old_inst_id):
             objects_common.schematic_objects[instrument_object]["linkedto"] = str(new_inst_id)
-            block_instruments.update_linked_to(int(instrument_id), str(new_inst_id))
+            block_instruments.update_linked_instrument(int(instrument_id), str(new_inst_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ def remove_references_to_instrument(deleted_inst_id:int):
         instrument_object = objects_common.instrument(instrument_id)
         if objects_common.schematic_objects[instrument_object]["linkedto"] == str(deleted_inst_id):
             objects_common.schematic_objects[instrument_object]["linkedto"] = ""
-            block_instruments.update_linked_to(int(instrument_id), None)
+            block_instruments.update_linked_instrument(int(instrument_id), "")
     return()
     
 #------------------------------------------------------------------------------------
@@ -118,19 +118,19 @@ def redraw_instrument_object(object_id):
     # Turn the instrument type value back into the required enumeration type
     instrument_type = block_instruments.instrument_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Create the new Block Instrument object
-    block_instruments.create_block_instrument (
-                canvas = objects_common.canvas,
-                block_id = objects_common.schematic_objects[object_id]["itemid"],
-                x = objects_common.schematic_objects[object_id]["posx"],
-                y = objects_common.schematic_objects[object_id]["posy"],
-                block_callback = run_layout.schematic_callback,
-                inst_type = instrument_type,
-                bell_sound_file = objects_common.schematic_objects[object_id]["bellsound"],
-                telegraph_sound_file = objects_common.schematic_objects[object_id]["keysound"],
-                linked_to = objects_common.schematic_objects[object_id]["linkedto"])
+    canvas_tags = block_instruments.create_instrument (
+                        canvas = objects_common.canvas,
+                        inst_id = objects_common.schematic_objects[object_id]["itemid"],
+                        inst_type = instrument_type,
+                        x = objects_common.schematic_objects[object_id]["posx"],
+                        y = objects_common.schematic_objects[object_id]["posy"],
+                        callback = run_layout.schematic_callback,
+                        bell_sound_file = objects_common.schematic_objects[object_id]["bellsound"],
+                        telegraph_sound_file = objects_common.schematic_objects[object_id]["keysound"],
+                        linked_to = objects_common.schematic_objects[object_id]["linkedto"])
     # Create/update the canvas "tags" and selection rectangle for the instrument
-    objects_common.schematic_objects[object_id]["tags"] = block_instruments.get_tags(objects_common.schematic_objects[object_id]["itemid"])
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
+    objects_common.schematic_objects[object_id]["tags"] = canvas_tags
+    objects_common.set_bbox (object_id, objects_common.canvas.bbox(canvas_tags))         
     return()
 
 #------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ def create_instrument(item_type):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_instrument_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
+    item_id = objects_common.new_item_id(exists_function=block_instruments.instrument_exists)
     # Add the specific elements for this particular instance of the instrument
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -167,7 +167,7 @@ def paste_instrument(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=objects_common.instrument_exists)
+    new_id = objects_common.new_item_id(exists_function=block_instruments.instrument_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.instrument_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
