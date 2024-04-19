@@ -358,7 +358,8 @@ def delete_all_local_gpio_sensors():
     new_gpio_port_mappings = {}
     for gpio_port in gpio_port_mappings:
         if not gpio_port.isdigit(): new_gpio_port_mappings[gpio_port] = gpio_port_mappings[gpio_port]
-        elif running_on_raspberry_pi: gpio_port_mappings[gpio_port]["sensor_device"].close()
+        elif gpio_port_mappings[gpio_port]["sensor_device"] is not None:
+            gpio_port_mappings[gpio_port]["sensor_device"].close()
     gpio_port_mappings = new_gpio_port_mappings
     return()
 
@@ -451,7 +452,8 @@ def gpio_shutdown():
         logging.debug("GPIO Interface: Restoring default settings")
         # Close all the gpiozero Button objects to reset the GPIO interface
         for gpio_port in gpio_port_mappings:
-            if gpio_port.isdigit(): gpio_port_mappings[gpio_port]["sensor_device"].close()
+            if gpio_port.isdigit() and gpio_port_mappings[gpio_port]["sensor_device"] is not None:
+                gpio_port_mappings[gpio_port]["sensor_device"].close()
     return()
 
 #---------------------------------------------------------------------------------------------------
