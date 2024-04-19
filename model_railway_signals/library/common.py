@@ -9,6 +9,8 @@
 #
 #   shutdown() - perform an orderly shutdown of the library functions (clean up)
 #
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
 # External API - classes and functions (used by the other library modules):
 #
 #   execute_function_in_tkinter_thread(callback_function) - Will 'pass' the function
@@ -24,6 +26,7 @@ import time
 from . import mqtt_interface
 from . import pi_sprog_interface
 from . import gpio_sensors
+from . import track_sensors
 
 # -------------------------------------------------------------------------
 # Global variables used within the Library Modules
@@ -44,6 +47,14 @@ root_window = None
 event_queue = queue.Queue()
 # Global variable to signal (to other modules) that application is closing
 shutdown_initiated = False
+
+#------------------------------------------------------------------------------------
+# The behavior/appearance of the some library objects may change in Edit Mode
+#------------------------------------------------------------------------------------
+
+def configure_edit_mode(edit_mode:bool):
+    track_sensors.configure_edit_mode(edit_mode)
+    return()
 
 #-------------------------------------------------------------------------
 # Function to perfor an orderly shutdown of the library modules:

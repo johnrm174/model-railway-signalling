@@ -8,19 +8,20 @@
 #    run_editor() - Start the application
 #
 # Makes the following external API calls to other editor modules:
-#    objects.save_schematic_state() - Save the state following save or load
+#    objects.configure_edit_mode(edit_mode) - Configure the objects module for Edit or Run Mode ######################
+#    objects.reset_objects() - Reset the schematic back to its default state
+#    objects.save_schematic_state(reset_pointer) - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
-#    objects.reset_objects() - Reset the schematic back to its default state
 #    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking
 #    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking
 #    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking
 #    schematic.initialise(root, callback, width, height, grid, snap) - Create the canvas
-#    schematic.delete_all_objects() - For deleting all objects (on new/load)
+#    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
-#    schematic.enable_editing() - On mode toggle or load (if loaded file is in edit mode and not already in edit mode)
-#    schematic.disable_editing() - On mode toggle or load (if loaded file is in run mode and not already in run mode)
-#    run_layout.configure_automation() - On automation toggle or load
+#    schematic.delete_all_objects() - For deleting all objects (on new/load)
+#    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
+#    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
@@ -32,7 +33,6 @@
 #    settings.get_sprog() - to get the current SPROG settings
 #    settings.get_gpio() - to get the current track sensor GPIO mappings
 #    settings.restore_defaults() - Following user selection of "new"
-#    common.scrollable_text_box - to display a list of warnings on file load
 #    menubar_windows.edit_mqtt_settings(root, mqtt_connect_callback, mqtt_update_callback)
 #    menubar_windows.edit_sprog_settings(root, sprog_connect_callback, sprog_update_callback)
 #    menubar_windows.edit_logging_settings(root, logging_update_callback)
@@ -45,22 +45,23 @@
 #    utilities.dcc_mappings(root)
 #
 # Makes the following external API calls to library modules:
-#    library_common.find_root_window (widget) - To set the root window
-#    library_common.on_closing (ask_to_save_state) - To shutdown gracefully
-#    file_interface.load_schematic - To load all settings and objects
-#    file_interface.save_schematic - To save all settings and objects
-#    file_interface.purge_loaded_state_information - Called following a re-load
-#    pi_sprog_interface.initialise_pi_sprog - After update of Pi Sprog Settings
-#    pi_sprog_interface.sprog_shutdown - Disconnect from the Pi-SPROG
-#    pi_sprog_interface.request_dcc_power_off - To turn off the track power
-#    pi_sprog_interface.request_dcc_power_on - To turn on the track power
-#    mqtt_interface.mqtt_broker_connect - MQTT Broker connection configuration
-#    mqtt_interface.mqtt_broker_disconnect - disconnect prior to reconfiguration
-#    mqtt_interface.configure_mqtt_client - configure client network details
-#    dcc_control.reset_mqtt_configuration - reset all publish/subscribe
-#    dcc_control.set_node_to_publish_dcc_commands - set note to publish DCC
-#    dcc_control.subscribe_to_dcc_command_feed - subscribe to DCC from other nodes
-#    gpio_sensors.running_on_raspberry_pi - is the app running on a Raspberry Pi
+#    library_common.set_root_window(widget) - To set the root window
+#    library_common.shutdown() - To shutdown the library module gracefully
+#    library_common.configure_edit_mode(edit_mode) - Configure the library for Edit or Run Mode
+#    file_interface.load_schematic(filename) - To load all settings and objects
+#    file_interface.save_schematic(settings,objects,filename,save_as) - Save the layout
+#    file_interface.purge_loaded_state_information() - Called following a re-load
+#    pi_sprog_interface.sprog_connect(port,baud,debug) - Connect to the Pi-sprog
+#    pi_sprog_interface.sprog_disconnect() - Disconnect from the Pi-SPROG
+#    pi_sprog_interface.request_dcc_power_off() - To turn off the track power
+#    pi_sprog_interface.request_dcc_power_on() - To turn on the track power
+#    mqtt_interface.mqtt_broker_connect(url,port,user,pssword) - Connect to the broker
+#    mqtt_interface.mqtt_broker_disconnect() - Disconnect (prior to reconfiguration)
+#    mqtt_interface.configure_mqtt_client(settings) - configure client network details
+#    dcc_control.reset_mqtt_configuration() - reset all publish/subscribe
+#    dcc_control.set_node_to_publish_dcc_commands(publish) - set note to publish DCC
+#    dcc_control.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC from other nodes
+#    gpio_sensors.gpio_interface_enabled() - is the app running on a Raspberry Pi
 #
 #------------------------------------------------------------------------------------
 
@@ -173,6 +174,7 @@ class main_menubar:
         # Used to enforce a "save as" dialog on the initial save of a new layout
         self.file_has_been_saved = False
         # Initialise the schematic - the Edit Mode flag is the 2nd param in the returned tuple from get_general
+        # Note the schematic module will then initialise the objects and run_layout modules with the canvas
         width, height, grid, snap_to_grid = settings.get_canvas()
         edit_mode = settings.get_general()[1]
         schematic.initialise(self.root, self.handle_canvas_event, width, height, grid, snap_to_grid, edit_mode)
@@ -333,7 +335,10 @@ class main_menubar:
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
             settings.set_general(editmode=True)
-            schematic.enable_editing()
+            schematic.configure_edit_mode(True)
+            library_common.configure_edit_mode(True)
+            objects.configure_edit_mode(True)
+            run_layout.configure_edit_mode(True)
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
         new_label1 = "Automation:N/A"
@@ -347,7 +352,10 @@ class main_menubar:
             self.mainmenubar.entryconfigure(self.mode_label, label=new_label)
             self.mode_label = new_label
             settings.set_general(editmode=False)
-            schematic.disable_editing()
+            schematic.configure_edit_mode(False)
+            objects.configure_edit_mode(False)
+            library_common.configure_edit_mode(False)
+            run_layout.configure_edit_mode(False)
         # Enable the the automation menubar selection and update to reflect the current setting
         # Note that automation is only enbled in Run mode so we just need to update the indication
         # no need to update 'run_layout'. Note the Automation flag is the fifth parameter returned
@@ -508,7 +516,7 @@ class main_menubar:
     def gpio_update(self):
         trigger, timeout, mappings = settings.get_gpio()
         # Generate a pop-up warning if mappings have been defined but we are not running on a Pi
-        if len(mappings)>0 and not gpio_sensors.running_on_raspberry_pi:
+        if len(mappings)>0 and not gpio_sensors.gpio_interface_enabled():
             Tk.messagebox.showwarning(parent=self.root, title="GPIO Warning",
                     message="Not running on Raspberry Pi - no track sensors will be active")
         # Delete all track sensor objects and then re-create from the updated settings - we do this

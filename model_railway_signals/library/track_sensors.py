@@ -24,6 +24,8 @@
 #   track_sensor_triggered (sensor_id:int, callback_type=None) - Called on gpio_sensor trigger
 #         events if the gpio_sensor has been configured to generate a "track sensor passed" event
 #
+#   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
+#
 #---------------------------------------------------------------------------------------------------
 
 import enum
@@ -45,9 +47,28 @@ class track_sensor_callback_type(enum.Enum):
 #   'callback' - The callback function to make on track sensor triggered events
 #   'button' - A reference to the Tkinter Button object (to simulate 'sensor triggered' events)
 #   'tags' - The tags applied to all canvas drawing objects for the Track Sensor instance
+#   'circle' - The treference to the Tkinter circle used for "selection" in edit mode
 #---------------------------------------------------------------------------------------------------
 
 track_sensors = {}
+
+#------------------------------------------------------------------------------------
+# API function to set/clear Edit Mode (called by the editor on mode change)
+# The appearance of Track Sensor library objects will change in Edit Mode
+#------------------------------------------------------------------------------------
+
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing library objects (according to the current mode)
+    for track_sensor_id in track_sensors:
+        track_sensor = track_sensors[track_sensor_id]
+        if editing_enabled: track_sensor["canvas"].itemconfig(track_sensor["circle"], state="normal")
+        else: track_sensor["canvas"].itemconfig(track_sensor["circle"], state="hidden")
+    return()
 
 #---------------------------------------------------------------------------------------------------
 # API Function to check if a Track Sensor library object exists (in the dictionary of Track Sensors)
@@ -105,13 +126,16 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
         sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"))
         sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
         canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
-        canvas.create_oval(x-15, y-15, x+15, y+15, outline="grey60", tags=canvas_tag)
+        selection_circle = canvas.create_oval(x-15, y-15, x+15, y+15, outline="grey60", tags=canvas_tag, state="hidden")
+        # If we are in edit mode then the selection circle is visible
+        if editing_enabled: canvas.itemconfig(selection_circle, state="normal")
         # Store the details of the Track Sensor Object in the dictionary of Track Sensors
         track_sensors[str(sensor_id)] = {}
         track_sensors[str(sensor_id)]['canvas'] = canvas
         track_sensors[str(sensor_id)]['button'] = sensor_button
         track_sensors[str(sensor_id)]['callback'] = callback
         track_sensors[str(sensor_id)]['tags'] = canvas_tag
+        track_sensors[str(sensor_id)]['circle'] = selection_circle
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
