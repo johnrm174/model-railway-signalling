@@ -5,8 +5,7 @@
 #    initialise(canvas) - sets a global reference to the tkinter canvas object
 #    initialise_layout() - call after object changes/deletions or load of a new schematic
 #    schematic_callback(item_id,callback_type) - the callback for all library objects
-#    enable_editing() - Call when 'Edit' Mode is selected (from Schematic Module)
-#    disable_editing() - Call when 'Run' Mode is selected (from Schematic Module)
+#    configure_edit_mode(edit_mode) - Set the mode - True for Edit Mode, False for Run Mode
 #    configure_automation(auto_enabled) - Call to set automation mode (from Editor Module)
 #    configure_spad_popups(spad_enabled) - Call to set SPAD popup warnings (from Editor Module)
 #
@@ -102,15 +101,9 @@ def initialise(canvas_object):
 # The behavior of the layout processing will change depending on what mode we are in
 #------------------------------------------------------------------------------------
 
-def enable_editing():
+def configure_edit_mode(edit_mode:bool):
     global run_mode
-    run_mode = False
-    initialise_layout()
-    return()
-
-def disable_editing():
-    global run_mode
-    run_mode = True
+    run_mode = not edit_mode
     initialise_layout()
     return()
 
@@ -561,14 +554,14 @@ def update_track_occupancy_for_track_sensor(object_id):
     # the returned routes are None we can't really assume anything so don't process any changes.
     route_ahead = find_valid_route(object_id, "routeahead")
     if route_ahead is None:
-        log_text = item_text+" has been 'passed' but unable to determine train movement as there is no valid route ahead of the Track Sensor"
+        log_text = item_text+" has been 'passed' but unable to determine train movement as there is no valid route 'ahead of' the Track Sensor"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:
         section_ahead = schematic_object["routeahead"][route_ahead.value-1][1]
     route_behind = find_valid_route(object_id, "routebehind")
-    if route_behind is  None:
-        log_text=item_text+" has been 'passed' but unable to determine train movement as there is no valid route behind of the Track Sensor"
+    if route_behind is None:
+        log_text=item_text+" has been 'passed' but unable to determine train movement as there is no valid route 'behind' the Track Sensor"
         logging.warning("RUN LAYOUT: "+log_text)
         if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
     else:

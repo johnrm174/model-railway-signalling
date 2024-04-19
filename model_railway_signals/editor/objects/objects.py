@@ -16,6 +16,7 @@
 #    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    reset_objects() - resets all points, signals, instruments and sections to default state
+#    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -225,15 +226,12 @@ def restore_schematic_state():
 # Functions to Enable and disable editing 
 #------------------------------------------------------------------------------------
 
-def enable_editing():
-    objects_sections.enable_editing()
-    run_layout.enable_editing()
+############################################################################
+def configure_edit_mode(edit_mode:bool):
+    if edit_mode: objects_sections.enable_editing()
+    else: objects_sections.disable_editing()
     return()
-
-def disable_editing():
-    objects_sections.disable_editing()
-    run_layout.disable_editing()
-    return()
+###########################################################################
 
 #------------------------------------------------------------------------------------
 # Function to reset the schematic back to its default state with all signals 'on',

@@ -35,13 +35,7 @@
 #    line_index - for iterating through all the line objects
 #    track_sensor_index - for iterating through all the sensor objects
 #
-# Makes the following external API calls to other editor modules:
-#
-#    run_layout.initialise(canvas) - Initialise the run_layout module with the canvas reference
-#
 #------------------------------------------------------------------------------------
-
-from .. import run_layout
 
 #------------------------------------------------------------------------------------
 # Global class used for the object_type - we use normal strings rather than enumeration
@@ -126,7 +120,6 @@ def initialise (canvas_object, width:int, height:int, grid:int):
     global canvas
     canvas = canvas_object
     update_canvas(canvas_width, canvas_height, grid)
-    run_layout.initialise(canvas)
     return()
 
 #------------------------------------------------------------------------------------
