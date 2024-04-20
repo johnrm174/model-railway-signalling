@@ -77,7 +77,7 @@ class section_callback_type(enum.Enum):
     section_updated = 21   # The section has been updated by the user
     
 # -------------------------------------------------------------------------
-# sections are to be added to a global dictionary when created
+# Track sections are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
 
 sections: dict = {}
@@ -92,13 +92,31 @@ entry_box_window = None
 # Global list of track sections to publish to the MQTT Broker
 list_of_sections_to_publish=[]
 
-# -------------------------------------------------------------------------
-# The default "External" callback for the section buttons
-# Used if this is not specified when the section is created
-# -------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
+# API function to set/clear Edit Mode (called by the editor on mode change)
+# The appearance of Track Sensor library objects will change in Edit Mode
+#------------------------------------------------------------------------------------
 
-def null_callback(section_id:int, callback_type):
-    return(section_id, callback_type)
+editing_enabled = False
+
+def configure_edit_mode(edit_mode:bool):
+    global editing_enabled
+    # Maintain a global flag (for creating new library objects)
+    editing_enabled = edit_mode
+    # Update all existing library objects (according to the current mode)
+    # Note that only local objects (ID is an integer) are updated
+    for section_id in sections:
+        if section_id.isdigit():
+            track_section = sections[section_id]
+            if editing_enabled:
+                track_section["canvas"].itemconfig(track_section["buttonwindow"], state='hidden')
+                track_section["canvas"].itemconfig(track_section["placeholder1"], state='normal')
+                track_section["canvas"].itemconfig(track_section["placeholder2"], state='normal')
+            else:
+                track_section["canvas"].itemconfig(track_section["buttonwindow"], state='normal')
+                track_section["canvas"].itemconfig(track_section["placeholder1"], state='hidden')
+                track_section["canvas"].itemconfig(track_section["placeholder2"], state='hidden')
+    return()
 
 # -------------------------------------------------------------------------
 # Internal Function to check if a section exists in the list of section
@@ -133,14 +151,14 @@ def toggle_section (section_id:int):
         logging.info ("Section "+str(section_id)+": Changing to CLEAR - Label \'"
                                          +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = False
-        sections[str(section_id)]["button1"].config(relief="raised", bg="grey", fg="grey40",
+        sections[str(section_id)]["button"].config(relief="raised", bg="grey", fg="grey40",
                                             activebackground="grey", activeforeground="grey40")
     else:
         # section is off
         logging.info ("Section "+str(section_id)+": Changing to OCCUPIED - Label \'"
                                          +sections[str(section_id)]["labeltext"]+"\'")
         sections[str(section_id)]["occupied"] = True
-        sections[str(section_id)]["button1"].config(relief="sunken", bg="black",fg="white",
+        sections[str(section_id)]["button"].config(relief="sunken", bg="black",fg="white",
                                             activebackground="black", activeforeground="white")
     return()
 
@@ -155,15 +173,13 @@ def update_identifier(section_id):
     logging.info ("Section "+str(section_id)+": Track Section Label Updated **************************************")
     # Set the new label for the section button and set the width to the width it was created with
     # If we get back an empty string then set the label back to the default (OCCUPIED)
-    new_section_label =text_entry_box.get()
-    if new_section_label=="": new_section_label="XXXX"
+    new_section_label = text_entry_box.get()
     sections[str(section_id)]["labeltext"] = new_section_label
-    sections[str(section_id)]["button1"]["text"] = new_section_label
-    sections[str(section_id)]["button1"].config(width=sections[str(section_id)]["labellength"])
+    sections[str(section_id)]["button"]["text"] = new_section_label
+    sections[str(section_id)]["button"].config(width=sections[str(section_id)]["labellength"])
     # Assume that by entering a value the user wants to set the section to OCCUPIED. Note that the
     # toggle_section function will also publish the section state & label changes to the MQTT Broker
-    if not sections[str(section_id)]["occupied"]:
-        toggle_section(section_id)
+    if not sections[str(section_id)]["occupied"]: toggle_section(section_id)
     # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
     send_mqtt_section_updated_event(section_id)
@@ -207,8 +223,7 @@ def open_entry_box(section_id):
     text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
     text_entry_box.bind('<FocusOut>', lambda event:update_identifier(section_id))
     # if the section button is already showing occupied then we EDIT the value
-    if sections[str(section_id)]["occupied"]:
-        text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
+    if sections[str(section_id)]["occupied"]: text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
     # Create a window on the canvas for the Entry box (overlaying the section button)
     bbox = sections[str(section_id)]["canvas"].bbox("section"+str(section_id))
     x = bbox[0] + (bbox[2]-bbox[0]) / 2
@@ -219,59 +234,76 @@ def open_entry_box(section_id):
     return()
 
 # -------------------------------------------------------------------------
-# Public API function to create a section (drawing objects + state)
+# Public API function to create a Track section object (drawing objects + state)
 # -------------------------------------------------------------------------
 
-def create_section (canvas, section_id:int, x:int, y:int,
-                    section_callback = null_callback,
-                    label:str = "OCCUPIED",
-                    editable:bool = True):
+def create_section (canvas, section_id:int, x:int, y:int, section_callback,
+                    default_label:str, editable:bool=True):
     global sections
+    # Set a unique 'tag' to reference the tkinter drawing objects
+    canvas_tag = "section"+str(section_id)
     logging.info ("Section "+str(section_id)+": Creating Track Occupancy Section")
-    # Verify that a section with the same ID does not already exist
-    if section_exists(section_id):
-        logging.error ("Section "+str(section_id)+": Section already exists")
-    elif section_id < 1:
-        logging.error ("Section "+str(section_id)+": Section ID must be greater than zero")
+    # Verify the section ID is validd and a section with the same ID does not already exist
+    if not isinstance(section_id, int) or section_id < 1:
+        logging.error ("Section "+str(section_id)+": Section ID must be a positive integer")
+    elif section_exists(section_id):
+        logging.error ("Section "+str(section_id)+": Section ID already exists")
     else:
-        # Create the button objects and their callbacks
-        font_size = common.fontsize
-        section_button = Tk.Button (canvas, text=label, state="normal", relief="raised",
-                    padx=common.xpadding, pady=common.ypadding, font=('Ariel',font_size,"normal"),
-                    bg="grey", fg="grey40", activebackground="grey", activeforeground="grey40",
-                    command = lambda:section_button_event(section_id), width = len(label))
-        # Note the "Tag" for the drawing objects for this track section (i.e. this window)
-        canvas.create_window (x,y,window=section_button,tags="section"+str(section_id))
-        # Compile a dictionary of everything we need to track
-        sections[str(section_id)] = {"canvas" : canvas,                   # canvas object
-                                     "button1" : section_button,          # drawing object
-                                     "extcallback" : section_callback,    # External callback to make
-                                     "labeltext" : label,                 # The Text to display (when OCCUPIED)
-                                     "labellength" : len(label),          # The fixed length for the button
-                                     "positionx" : x,                     # Position of the button on the canvas
-                                     "positiony" : y,                     # Position of the button on the canvas
-                                     "occupied" : False }                 # Current state
-        # Bind the Middle and Right Mouse buttons to the section_button if the
-        # Section is editable so that a "right click" will open the entry box 
-        # Disable the button(so the section cannot be toggled) if not editable
+        # We need the default label width to set the width of the Track section
+        label_width = len(default_label)
+        # Create the button object, callbacks and window to hold it. Note the Mouse button events are
+        # only bound to the button if the Section is editable - otherwise the button will be disabled
+        section_button = Tk.Button(canvas, text=default_label, state="normal", relief="raised",
+                                   width=label_width, font=('Courier',common.fontsize,"normal"),
+                                   bg="grey", fg="grey40", padx=common.xpadding, pady=common.ypadding,
+                                   activebackground="grey", activeforeground="grey40")
         if editable:
-            section_button.bind('<Button-2>', lambda event:open_entry_box(section_id))
+            section_button.bind('<Button-1>', lambda event:section_button_event(section_id))
             section_button.bind('<Button-3>', lambda event:open_entry_box(section_id))
         else:
             section_button.config(state="disabled")
+        button_window = canvas.create_window(x, y, window=section_button, tags=canvas_tag)
+        # Create the 'placeholder' for the button to display in Edit Mode (so it an be selected/moved)
+        # Note that the canvas Text object width is defined in pixels so we have to use the fointsize
+        # The Placeholder label is always the Track Section ID so it can be identified on the edit canvas
+        placeholder1 = canvas.create_text(x, y, text=default_label, width=label_width*common.fontsize,                  
+                                    font=('Courier',common.fontsize,"normal"), fill="white", tags=canvas_tag)
+        bbox = canvas.bbox(placeholder1)
+        placeholder2 = canvas.create_rectangle(bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+1,
+                    tags=canvas_tag, fill="black")
+        canvas.tag_raise(placeholder1,placeholder2)
+        canvas.itemconfigure(placeholder1, text=format(section_id,'02d'))
+        # Display either the button or button 'placeholder' depending on the mode
+        if editing_enabled:
+            canvas.itemconfig(button_window, state='hidden')
+        else:
+            canvas.itemconfig(placeholder1, state='hidden')
+            canvas.itemconfig(placeholder2, state='hidden')
+        # Compile a dictionary of everything we need to track
+        sections[str(section_id)] = {"canvas" : canvas,                   # Tkinter canvas object
+                                     "button" : section_button,           # Tkinter button object
+                                     "buttonwindow" : button_window,      # Tkinter drawing object
+                                     "placeholder1" : placeholder1,       # Tkinter drawing object
+                                     "placeholder2" : placeholder2,       # Tkinter drawing object
+                                     "extcallback" : section_callback,    # External callback to make
+                                     "labeltext" : default_label,         # The Text to display (when OCCUPIED)
+                                     "labellength": label_width,          # The fixed length for the designator
+                                     "positionx" : x,                     # Position of the button on the canvas
+                                     "positiony" : y,                     # Position of the button on the canvas
+                                     "occupied" : False }                 # Current state
         # Get the initial state for the section (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("sections",section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
         if loaded_state["labeltext"]:
             sections[str(section_id)]["labeltext"] = loaded_state["labeltext"]
-            sections[str(section_id)]["button1"]["text"] = loaded_state["labeltext"]
+            sections[str(section_id)]["button"]["text"] = loaded_state["labeltext"]
         # Toggle the section if OCCUPIED (loaded_state_occupied will be 'None' if no data was loaded)
         if loaded_state["occupied"]: toggle_section(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
         # only be published if the MQTT interface has been configured for publishing updates for this track
         # section. This allows publish/subscribe to be configured prior to track section creation
         send_mqtt_section_updated_event(section_id) 
-    return()
+    return(canvas_tag)
 
 # -------------------------------------------------------------------------
 # Public API function to Return the current state of the section
@@ -313,7 +345,7 @@ def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
         if not section_occupied(section_id):
             # Need to toggle the section - ALSO update the label if that has been changed
             if label is not None and sections[str(section_id)]["labeltext"] != label:
-                sections[str(section_id)]["button1"]["text"] = label
+                sections[str(section_id)]["button"]["text"] = label
                 sections[str(section_id)]["labeltext"]= label
             toggle_section(section_id)
             # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
@@ -321,7 +353,7 @@ def set_section_occupied (section_id:int,label:str=None, publish:bool=True):
             if publish: send_mqtt_section_updated_event(section_id)
         elif label is not None and sections[str(section_id)]["labeltext"] != label:
             # Section state remains unchanged but we need to update the Label
-            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["button"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
             # Publish the label changes to the broker (for other nodes to consume). Note that changes will only
             # be published if the MQTT interface has been configured for publishing updates for this track section
@@ -340,7 +372,7 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
     elif section_occupied(section_id):
         # Need to toggle the section - ALSO update the label if that has been changed
         if label is not None and sections[str(section_id)]["labeltext"] != label:
-            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["button"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
         toggle_section(section_id)
         # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
@@ -350,7 +382,7 @@ def clear_section_occupied (section_id:int, label:str=None, publish:bool=True):
     else:
         # Section state remains unchanged but we need to update the Label
         if label is not None and sections[str(section_id)]["labeltext"] != label:
-            sections[str(section_id)]["button1"]["text"] = label
+            sections[str(section_id)]["button"]["text"] = label
             sections[str(section_id)]["labeltext"]= label
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
@@ -445,7 +477,7 @@ def delete_section(section_id:int):
         # Delete all the tkinter canvas drawing objects associated with the section
         sections[str(section_id)]["canvas"].delete("section"+str(section_id))
         # Delete all the tkinter button objects created for the section
-        sections[str(section_id)]["button1"].destroy()
+        sections[str(section_id)]["button"].destroy()
         # Finally, delete the entry from the dictionary of sections
         del sections[str(section_id)]
     return()
