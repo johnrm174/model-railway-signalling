@@ -174,10 +174,11 @@ def load_schematic(requested_filename:str=None):
             if layout_state["sections"] == {}:
                 for object_id in layout_state["objects"]:
                     if layout_state["objects"][object_id]["item"] == "section":
-                        print ("updating section", layout_state["objects"][object_id]["itemid"])
                         section_id = layout_state["objects"][object_id]["itemid"]
                         section_state = layout_state["objects"][object_id]["state"]
                         section_text = layout_state["objects"][object_id]["label"]
+                        logging.debug("LOAD LAYOUT - Section "+str(section_id)+" - Assigning state from "
+                                      + "object onfiguration (handle breaking change for Release 4.3.0)")
                         layout_state["sections"][str(section_id)] = {}
                         layout_state["sections"][str(section_id)]["occupied"] = section_state
                         layout_state["sections"][str(section_id)]["labeltext"] = section_text
