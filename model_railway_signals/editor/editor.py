@@ -8,7 +8,6 @@
 #    run_editor() - Start the application
 #
 # Makes the following external API calls to other editor modules:
-#    objects.configure_edit_mode(edit_mode) - Configure the objects module for Edit or Run Mode ######################
 #    objects.reset_objects() - Reset the schematic back to its default state
 #    objects.save_schematic_state(reset_pointer) - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
