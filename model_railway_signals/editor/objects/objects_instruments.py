@@ -32,7 +32,6 @@
 #    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
 #    block_instruments.update_linked_instrument(old_id, new_id) - update the linked instrument reference
-#    block_instruments.get_tags(id) - get the canvas 'tags' for the instrument drawing objects
 #    block_instruments.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
 #    block_instruments.set_instruments_to_publish_state(IDs) - configure MQTT networking
 #    block_instruments.subscribe_to_remote_instrument(ID) - configure MQTT networking

@@ -40,9 +40,6 @@
 #    points.delete_point(id) - delete library drawing object (part of soft delete)
 #    points.create_point(id) -  To create the library object (create or redraw)
 #    points.update_autoswitch(id,autoswitch_id) - to change the config of an existing point
-#    points.get_tags(id) - get the canvas 'tags' for the point drawing objects
-#    points.point_switched(id) - test if a point is switched (when updating dependent objects)
-#    points.toggle_point_state(id) - to toggle point (when updating dependent objects)
 #    dcc_control.delete_point_mapping - delete mappings when deleting point / prior to recreating
 #    dcc_control.map_dcc_point - to create the new DCC mapping (creation or updating)
 #
