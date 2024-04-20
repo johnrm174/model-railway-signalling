@@ -337,7 +337,6 @@ class main_menubar:
             settings.set_general(editmode=True)
             schematic.configure_edit_mode(True)
             library_common.configure_edit_mode(True)
-            objects.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
@@ -353,7 +352,6 @@ class main_menubar:
             self.mode_label = new_label
             settings.set_general(editmode=False)
             schematic.configure_edit_mode(False)
-            objects.configure_edit_mode(False)
             library_common.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
         # Enable the the automation menubar selection and update to reflect the current setting

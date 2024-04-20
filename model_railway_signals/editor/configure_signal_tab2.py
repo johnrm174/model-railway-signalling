@@ -2,18 +2,12 @@
 # Functions and sub Classes for the Edit Signal "Interlocking" Tab
 #
 # Makes the following external API calls to other editor modules:
-#########################################################################################################
-# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-# function will not work in edit mode as the Track Section library objects don't exist in edit mode
-# To be addressed in a future software update when the Track Sections functionality is re-factored
-#########################################################################################################
-#    objects.section_exists(id) - To see if the track section exists (local)   ##########################
 #
 # Makes the following external API calls to library modules:
 #    signals_common.sig_exists(id) - To see if the instrument exists (local or remote)
 #    points.point_exists(id) - To see if the point exists (local)
 #    block_instruments.instrument_exists(id) - To see if the instrument exists (local or remote)
-#    track_sections.section_exists(id) - To see if the track section exists       ####################
+#    track_sections.section_exists(id) - To see if the track section exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.check_box
@@ -27,7 +21,6 @@
 import tkinter as Tk
 
 from . import common
-from . import objects ##################################################################################
 
 from ..library import points
 from ..library import signals_common
@@ -388,16 +381,11 @@ class interlocked_sections_group:
         self.frame = Tk.LabelFrame(parent_frame, text=label)
         self.frame.pack(side=Tk.LEFT, padx=8, pady=2)
         tool_tip = "Specify any track sections along the route that will lock this signal when occupied by another train"
-        #########################################################################################################
-        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
-        # To be addressed in a future software update when the Track Sections functionality is re-factored
-        #########################################################################################################
-        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip)
         self.t1.pack(side = Tk.LEFT)
-        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip)
         self.t2.pack(side = Tk.LEFT)
-        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip)
+        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip)
         self.t3.pack(side = Tk.LEFT)
 
     def validate(self):

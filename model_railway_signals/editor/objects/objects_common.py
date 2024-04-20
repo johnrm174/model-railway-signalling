@@ -10,7 +10,6 @@
 #    find_initial_canvas_position - common function to return the next 'free' position (x,y)
 #    new_item_id - Common function - common function to return the next 'free' item ID
 #
-#    section_exists (item_id:int) - Common function to see if a given item exists  #####################
 #    line_exists (item_id:int) - Common function to see if a given item exists  ########################
 #
 #    signal(item_id:int) - helper function to find the object Id by Item ID
@@ -86,7 +85,6 @@ def track_sensor(ID:int): return (track_sensor_index[str(ID)])
 # Simple functions to test if a particular item_id already exists (for an item_type)
 #------------------------------------------------------------------------------------
 
-def section_exists(ID:int): return (str(ID) in section_index.keys())  ####################
 def line_exists(ID:int): return (str(ID) in line_index.keys())  ##########################
 
 #------------------------------------------------------------------------------------

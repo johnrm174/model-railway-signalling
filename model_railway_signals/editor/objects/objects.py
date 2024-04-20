@@ -20,8 +20,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
-#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
-#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
 #    objects_instruments.create_instrument(type) - Create a default object on the schematic
 #    objects_instruments.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_instruments.update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
@@ -58,8 +56,6 @@
 #    objects_sections.delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_sections.redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    objects_sections.default_section_object - The dictionary of default values for the object
-#    objects_sections.enable_editing() - Called when 'Edit' Mode is selected (from Schematic Module)
-#    objects_sections.disable_editing() - Called when 'Run' Mode is selected (from Schematic Module)
 #    objects_signals.create_signal(type,subtype) - Create a default object on the schematic
 #    objects_signals.delete_signal(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_signals.update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
@@ -122,7 +118,7 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
         elif this_object_type == objects_common.object_type.point:
             objects_points.redraw_point_object(object_id)
         elif this_object_type == objects_common.object_type.section:
-            objects_sections.redraw_section_object(object_id, reset_state=reset_state)
+            objects_sections.redraw_section_object(object_id)
         elif this_object_type == objects_common.object_type.instrument:
             objects_instruments.redraw_instrument_object(object_id)
         elif this_object_type == objects_common.object_type.track_sensor:
@@ -221,17 +217,6 @@ def restore_schematic_state():
     # basis they would have successfully been restored with the rest of the snapshot)
     objects_points.reset_point_interlocking_tables()
     return()
-
-#------------------------------------------------------------------------------------
-# Functions to Enable and disable editing 
-#------------------------------------------------------------------------------------
-
-############################################################################
-def configure_edit_mode(edit_mode:bool):
-    if edit_mode: objects_sections.enable_editing()
-    else: objects_sections.disable_editing()
-    return()
-###########################################################################
 
 #------------------------------------------------------------------------------------
 # Function to reset the schematic back to its default state with all signals 'on',

@@ -11,7 +11,7 @@
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
-#    section_exists(item_id:int) - Common function to see if a given item exists ###############
+#
 #    line_exists (item_id:int) - Common function to see if a given item exists #################
 #
 #    update_local_gpio_sensors(trigger,timeout,mappings) - configure local track sections
@@ -64,7 +64,6 @@ from .objects import copy_objects
 from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
-from .objects import configure_edit_mode
 from .objects import reset_objects
 from .objects_common import initialise
 from .objects_common import update_canvas
@@ -75,7 +74,6 @@ from .objects_common import instrument
 from .objects_common import line
 from .objects_common import track_sensor
 
-from .objects_common import section_exists  ####################
 from .objects_common import line_exists  #######################
 
 from .objects_common import object_type
@@ -109,7 +107,6 @@ assert copy_objects
 assert paste_objects
 assert update_object
 assert save_schematic_state
-assert configure_edit_mode
 assert reset_objects
 assert initialise
 assert update_canvas
@@ -119,7 +116,6 @@ assert section
 assert instrument
 assert line
 assert track_sensor
-assert section_exists  #######################
 assert line_exists  ##########################
 assert object_type
 assert get_endstop_offsets

@@ -7,12 +7,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#########################################################################################################
-# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-# function will not work in edit mode as the Track Section library objects don't exist in edit mode
-# To be addressed in a future software update when the Track Sections functionality is re-factored
-#########################################################################################################
-#    objects.section_exists(id) - To see if the Track Section exists  ###################################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
@@ -21,7 +15,7 @@
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
 #    track_sensors.track_sensor_exists(id) - To see if the track sensor exists
-#    track_sections.section_exists(id) - To see if the track section exists       ####################
+#    track_sections.section_exists(id) - To see if the track section exists (local or remote)
 #    points.point_exists(id) - To see if the point exists
 #
 # Inherits the following common editor base classes (from common):
@@ -139,12 +133,7 @@ class track_sensor_route_group():
         # Create the Track Section element (always packed)
         self.label = Tk.Label(self.frame, text="  Section:")
         self.label.pack(side=Tk.LEFT)
-        #########################################################################################################
-        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
-        # To be addressed in a future software update when the Track Sections functionality is re-factored
-        #########################################################################################################
-        self.section = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists,
+        self.section = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists,
                         tool_tip = "Specify the next track section on the specified route (or leave blank)")
         self.section.pack(side=Tk.LEFT)
     
