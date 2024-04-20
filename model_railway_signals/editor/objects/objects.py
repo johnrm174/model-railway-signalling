@@ -1,3 +1,9 @@
+#################################################################################################
+#################################################################################################
+### Includes Code to handle breaking changes for previous releases in the set_all function ######
+#################################################################################################
+#################################################################################################
+
 #------------------------------------------------------------------------------------
 # This module contains all the functions for managing layout objects. This is
 # effectively the "top-level" objects module (with all public API functions)
@@ -514,7 +520,7 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 #################################################################################################
-                ## Handle breaking change of tracksections now a list of 3 sections from release 4.0.0 ##########
+                ## Handle breaking change of tracks ections now a list of 3 sections from release 4.0.0 #########
                 ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
                 ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
                 ## Before release 4.0.0, each route element was a single track section (integer value) ##########
@@ -530,12 +536,15 @@ def set_all(new_objects):
                                 " - Handling version 4.0.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
-                ##################################################################################
-                ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-                ### This is something we can resolve without affecting the user so we resolve ####
-                ### it silently without an Log message or load warning message - unless the ######
-                ### track sensors - in which case we need to list them for the user to resolve ###
-                ##################################################################################
+                #################################################################################################
+                ## End of Handle breaking change for Track sections #############################################
+                #################################################################################################
+
+                #################################################################################################
+                ### Handle change of GPIO sensor IDs being strings from Release 3.6.0 onwards ###################
+                ### This is something we can resolve without affecting the user so we resolve ###################
+                ### it silently without an Log message or load warning message ##################################
+                #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if new_objects[object_id][element][1] == 0:
@@ -562,32 +571,36 @@ def set_all(new_objects):
                                 " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                #############################################################################################
-                ## End of Handle breaking change for track sections and sensor IDs ##########################
-                #############################################################################################
-                ########################################################################################################
-                ## Handle bugfix for Signal point interlocking tables (i.e. length point list was wrongly getting 7 ####
-                ## points assigned on point deletion whereas the list should only ever include 6 points ################ 
-                ########################################################################################################
+                #################################################################################################
+                ## End of Handle breaking change for GPIO sensor IDs ############################################
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle bugfix for Signal point interlocking tables (i.e. list wrongly included 7 points ######
+                ## on point deletion whereas the list should only ever include 6 points #########################
+                #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
                     for index, route in enumerate (new_objects[object_id][element]):
                         objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
                         objects_common.schematic_objects[object_id][element][index][1] = route[1]
                         objects_common.schematic_objects[object_id][element][index][2] = route[2]
-                ########################################################################################################
-                ## End of Handle bugfix for Signal point interlocking tables ###########################################
-                ########################################################################################################
+                #################################################################################################
+                ## End of Handle bugfix for Signal point interlocking tables ####################################
+                #################################################################################################
+
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-            ##################################################################################
-            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-            ##################################################################################
+
+            #################################################################################################
+            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards ########################
+            #################################################################################################
             if len(list_of_track_sensors_to_create) > 0:
                 logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
                 settings.set_gpio(mappings = list_of_track_sensors_to_create)       
-            ##################################################################################
-            ## End of Handle breaking change for sensor IDs ##################################
-            ##################################################################################
+            #################################################################################################
+            ## End of Handle breaking change for sensor IDs #################################################
+            #################################################################################################
+
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:
