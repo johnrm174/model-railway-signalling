@@ -539,8 +539,8 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "instrument"+str(inst_id)
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(inst_id, int) or inst_id < 1:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be a positive integer")
+    if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 99:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be an integer between 1 and 99")
     elif instrument_exists(inst_id):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID already exists")
     elif not isinstance(linked_to, str):
@@ -561,18 +561,19 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
             canvas.create_rectangle (x-48, y-18, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
         else:
             canvas.create_rectangle (x-48, y-73, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
-        # Create the button objects and their callbacks
+        # Create the button objects and their callbacks. Note that for block instruments we don't use
+        # The default font size defined in 'common' as the buttons are (hopefully) big enough
         occup_button = Tk.Button (canvas, text="OCCUP", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                    state="normal", relief="raised", font=('Courier',8,"normal"),
                     bg=common.bgraised, command = lambda:occup_button_event(inst_id))
         clear_button = Tk.Button (canvas, text="CLEAR", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                    state="normal", relief="raised", font=('Courier',8,"normal"),
                     bg=common.bgraised, command = lambda:clear_button_event(inst_id))
         block_button = Tk.Button (canvas, text="LINE BLOCKED", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="sunken", font=('Courier',common.fontsize,"normal"),
+                    state="normal", relief="sunken", font=('Courier',8,"normal"),
                     bg=common.bgsunken, command = lambda:blocked_button_event(inst_id))
         bell_button = Tk.Button (canvas, text="TELEGRAPH", padx=common.xpadding, pady=common.ypadding,
-                    state="normal", relief="raised", font=('Courier',common.fontsize,"normal"),
+                    state="normal", relief="raised", font=('Courier',8,"normal"),
                     bg="black", fg="white", activebackground="black", activeforeground="white",
                     command = lambda:telegraph_key_button(inst_id))
         # Bind a right click on the Telegraph button to open the bell code hints
@@ -776,8 +777,8 @@ def set_instruments_to_publish_state(*inst_ids:int):
     global list_of_instruments_to_publish
     for inst_id in inst_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(inst_id, int) or inst_id < 1:
-            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be a positive integer")
+        if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 99:
+            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be an integer between 1 and 99")
         elif inst_id in list_of_instruments_to_publish:
             logging.warning("Instrument "+str(inst_id)+": set_instruments_to_publish_state -"
                                 +" Instrument is already configured to publish state to MQTT broker")
