@@ -80,10 +80,9 @@ def redraw_textbox_object(object_id):
                              width=width, tags=str(object_id), fill=background, outline=colour)
     # Raise the text item to be in front of the rectangle item
     objects_common.canvas.tag_raise(text_box, rectangle)
-    # Store the reference for the the Tkinter drawing objects
+    # Create/update the canvas "tags" and selection rectangle for the textbox
     objects_common.schematic_objects[object_id]["tags"] = str(object_id)
-    # Create/update the selection rectangle for the Text box
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(str(object_id)))         
+    objects_common.set_bbox(object_id, str(object_id))
     return()
 
 #------------------------------------------------------------------------------------

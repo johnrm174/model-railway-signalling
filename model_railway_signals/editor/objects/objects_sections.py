@@ -106,8 +106,8 @@ def update_section(object_id, new_object_configuration):
         # Update any references to the section from the Signal / track sensor tables
         objects_signals.update_references_to_section(old_item_id, new_item_id)
         objects_sensors.update_references_to_section(old_item_id, new_item_id)
-        # Update any references from other Track Sections (mirrored sections)     ###########################
-        update_references_to_section(old_item_id, new_item_id) ##################################################
+        # Update any references from other Track Sections (mirrored sections)
+        update_references_to_section(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -128,10 +128,11 @@ def redraw_section_object(object_id):
                 y = objects_common.schematic_objects[object_id]["posy"],
                 section_callback = run_layout.schematic_callback,
                 default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
-                editable = objects_common.schematic_objects[object_id]["editable"])
+                editable = objects_common.schematic_objects[object_id]["editable"],
+                mirror_id = objects_common.schematic_objects[object_id]["mirror"])
     # Create/update the canvas "tags" and selection rectangle for the Track Section
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
-    objects_common.set_bbox(object_id, objects_common.canvas.bbox(canvas_tags))         
+    objects_common.set_bbox(object_id, canvas_tags)
     return()
  
 #------------------------------------------------------------------------------------

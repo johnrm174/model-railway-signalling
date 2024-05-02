@@ -405,10 +405,12 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                 if xdiff2 is not None and ydiff2 is not None:
                     objects_common.schematic_objects[object_id]["endx"] += xdiff2 
                     objects_common.schematic_objects[object_id]["endy"] += ydiff2 
-                # Update the boundary box to reflect the new line position
-                objects_common.set_bbox(object_id,objects_common.canvas.bbox
-                                (objects_common.schematic_objects[object_id]["line"]))
+                # Update the boundary box to reflect the new line geometry - to cover the case
+                # of one of the line ends being moved independently to the other line end
+                objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
             else:
+                # Note that we don't need to update the boundary box for objects other than lines as
+                # this will have been moved with the object but the geometry will not have changed
                 objects_common.schematic_objects[object_id]["posx"] += xdiff1 
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines

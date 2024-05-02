@@ -217,7 +217,7 @@ def redraw_track_sensor_object(object_id):
     canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
-    objects_common.set_bbox(object_id, objects_common.canvas.bbox(canvas_tags))
+    objects_common.set_bbox(object_id, canvas_tags)
     # If an external GPIO sensor is specified then map this to the Track Sensor
     gpio_sensor = objects_common.schematic_objects[object_id]["passedsensor"] 
     if gpio_sensor != "": gpio_sensors.add_gpio_sensor_callback(gpio_sensor, sensor_passed=item_id)

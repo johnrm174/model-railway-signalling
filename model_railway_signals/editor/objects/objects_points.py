@@ -201,7 +201,7 @@ def redraw_point_object(object_id):
                 fpl = objects_common.schematic_objects[object_id]["hasfpl"])
     # Create/update the canvas "tags" and selection rectangle for the point
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(canvas_tags))         
+    objects_common.set_bbox(object_id, canvas_tags)        
     return()
 
 #------------------------------------------------------------------------------------

@@ -129,7 +129,7 @@ def redraw_instrument_object(object_id):
                         linked_to = objects_common.schematic_objects[object_id]["linkedto"])
     # Create/update the canvas "tags" and selection rectangle for the instrument
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(canvas_tags))         
+    objects_common.set_bbox(object_id, canvas_tags)
     return()
 
 #------------------------------------------------------------------------------------

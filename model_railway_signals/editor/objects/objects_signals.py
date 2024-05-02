@@ -625,7 +625,7 @@ def redraw_signal_object(object_id):
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the canvas "tags" and selection rectangle for the signal
     objects_common.schematic_objects[object_id]["tags"] = signals_common.get_tags(objects_common.schematic_objects[object_id]["itemid"])
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
+    objects_common.set_bbox (object_id, objects_common.schematic_objects[object_id]["tags"])
     return()
 
 #------------------------------------------------------------------------------------

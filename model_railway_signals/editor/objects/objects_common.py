@@ -136,8 +136,13 @@ def update_canvas(width:int, height:int, grid:int):
 # Note that we create the boundary box slightly bigger than the object itself
 #------------------------------------------------------------------------------------
 
-def set_bbox(object_id:str,bbox:[int,int,int,int]):
+def set_bbox(object_id:str, canvas_tags:str):
     global schematic_objects
+    # Get the boundary box coords for the tagged canvas items
+    bbox = canvas.bbox(canvas_tags)
+    # Handle the case of the boundary box being 'None' - no tagged items exist
+    if bbox is None: bbox = [0, 0, 0, 0]
+    # Set the coordinates for the selection rectangle for the object
     x1, y1 = bbox[0] - 2, bbox[1] - 2
     x2, y2 = bbox[2] + 2, bbox[3] + 2
     # If the tkinter object exists we leave it in its current selected/unselected state
@@ -147,6 +152,7 @@ def set_bbox(object_id:str,bbox:[int,int,int,int]):
     else:
         schematic_objects[object_id]["bbox"] = canvas.create_rectangle(x1,y1,x2,y2,state='hidden')
     return()
+
 
 #------------------------------------------------------------------------------------
 # Internal function to find an initial canvas position for the created object.

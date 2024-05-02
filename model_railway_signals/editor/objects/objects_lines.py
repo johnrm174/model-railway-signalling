@@ -141,7 +141,7 @@ def redraw_line_object(object_id,state:str="hidden"):
     objects_common.schematic_objects[object_id]["stop2"] = stop2_object
     # Create/update the canvas "tags" and selection rectangle for the line
     objects_common.schematic_objects[object_id]["tags"] = tags
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(tags))         
+    objects_common.set_bbox(object_id, tags)
     return()
 
 #------------------------------------------------------------------------------------
