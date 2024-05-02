@@ -529,7 +529,7 @@ def subscribe_to_remote_gpio_sensor(remote_id:str, signal_passed:int=0,
         elif signal_approach > 0: event = " - will trigger Signal "+str(signal_approach)+ " 'approach' event"
         elif sensor_passed > 0: event = " - will trigger Track Section "+str(sensor_passed)+ " 'passed' event"
         else: event = ""
-        logging.debug("GPIO Sensor "+str(remote_id)+": Subscribing to remote GPIO sensor"+event)
+        logging.debug("GPIO Sensor "+remote_id+": Subscribing to remote GPIO sensor"+event)
         sensor_already_subscribed = gpio_sensor_exists(remote_id)
         # Create (or update) the dummy GPIO port mapping to hold the callback information for the remote sensor
         # Rather than use the mapped GPIO port number as the dictionary key we will use the remote Sensor ID
