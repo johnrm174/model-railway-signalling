@@ -634,49 +634,7 @@ def process_track_occupancy(section_ahead:int, section_behind:int, item_text:str
             log_text = item_text+" has been 'passed' but unable to determine train movement as Track Sections ahead and behind are both OCCUPIED"
             logging.warning("RUN LAYOUT: "+log_text)
             if spad_popups: Tk.messagebox.showwarning(parent=canvas, title="Occupancy Error", message=log_text)
-    ############################################################################################
-    # Propagate changes to any mirrored track sections - To move into Library eventually #######
-    ############################################################################################
-    if section_ahead > 0: update_mirrored_section(section_ahead)
-    if section_behind > 0: update_mirrored_section(section_behind)
-    ############################################################################################
     return()
-
-################################################################################################
-# Function to Update a mirrored track sections on a change to one track section. Note ##########
-# the Track Section ID is a string (local or remote) - To move into Library eventually #########
-################################################################################################
-
-def update_mirrored_section(int_or_str_section_id:Union[int,str], str_section_id_just_set:str="0", recursion_level:int=0):
-    if recursion_level < 20:
-       # Iterate through the other sections to see if any are set to mirror this section
-        for str_section_id_to_test in objects.section_index:
-            section_object_to_test = objects.schematic_objects[objects.section(str_section_id_to_test)]
-            str_mirrored_section_id_of_object_to_test = section_object_to_test["mirror"]
-            # Note that the use case of trwo sections set to mirror each other is valid
-            # For this, we just update the first mirrored section and then exit
-            if str(int_or_str_section_id) == str_mirrored_section_id_of_object_to_test:
-                current_label = track_sections.section_label(str_section_id_to_test)
-                current_state = track_sections.section_occupied(str_section_id_to_test)
-                label_to_set = track_sections.section_label(int_or_str_section_id)
-                state_to_set = track_sections.section_occupied(int_or_str_section_id)
-                if state_to_set:
-                    track_sections.set_section_occupied(str_section_id_to_test,label_to_set,publish=False)
-                else:
-                    track_sections.clear_section_occupied(str_section_id_to_test,label_to_set,publish=False)
-                # See if there are any other sections set to mirror this section - but only bother if the
-                # state or label of this section have actually changed (otherwise there is no point). We
-                # also don't bother looping back on ourselves (if 2 sections are set to mirror each other)
-                if ((current_label != label_to_set or current_state != state_to_set) and
-                           str_section_id_to_test != str_section_id_just_set ):
-                    update_mirrored_section(str_section_id_to_test,
-                                str_mirrored_section_id_of_object_to_test,
-                                recursion_level= recursion_level+1)
-    else:
-        logging.error("RUN LAYOUT - Update Mirrored Section - Maximum recursion level reached")
-    return()
-
-################################################################################################
 
 #-------------------------------------------------------------------------------------
 # Function to update the Signal interlocking (against points & instruments). Called on
@@ -926,16 +884,6 @@ def set_all_signal_routes():
         set_signal_route(int(str_signal_id))
     return()
 
-################################################################################################
-# Function to Update all LOCAL mirrored track sections - To move into Library eventually #######
-################################################################################################
-
-def update_all_mirrored_sections():
-    for str_section_id in objects.section_index:
-        update_mirrored_section(int(str_section_id))
-
-################################################################################################
-
 #------------------------------------------------------------------------------------
 # Function to Update all signal aspects (based on signals ahead)
 #------------------------------------------------------------------------------------
@@ -977,15 +925,6 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == points.point_callback_type.fpl_switched ):
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
-    # Any 'Mirrored' track sections are updated following changes to track occupancy as part of the
-    # 'update_track_occupancy' function call above. The 'section_updated' callback is generated when a
-    # track section is manually changed (only possible in RUN Mode) or if an update is received from
-    # a remote track section (which could happen in either Run and Edit Mode). As Track sections (the
-    # library objects) only "exist" in run mode this event is only processed in RUN mode, whether
-    # automation is Enabled or Disabled. Note that the Item ID could local (int) or remote (str).
-    if callback_type == track_sections.section_callback_type.section_updated and run_mode:
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating any Mirrored Track Sections:")
-        update_mirrored_section(item_id)   # Could be an int (local) or str (remote) ####################################################
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
     # changes to signal overides (see above for events) or changes to the approach control state
@@ -1069,8 +1008,6 @@ def initialise_layout():
     if run_mode and not automation_enabled:
         # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
         # the process_all_aspect_updates function (as we are not making the other update calls)
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:") ####################################
-        update_all_mirrored_sections() ###############################################################################################
         if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
         clear_all_signal_overrides()
         clear_all_distant_overrides()
@@ -1081,8 +1018,6 @@ def initialise_layout():
     elif run_mode and automation_enabled:
         # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
         # updated by update_all_signal_approach_control and update_all_distant_overrides
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating all Mirrored Track Sections:") ####################################
-        update_all_mirrored_sections() ###############################################################################################
         if enhanced_debugging: logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
         update_all_signal_overrides()
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
