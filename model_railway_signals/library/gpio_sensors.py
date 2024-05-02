@@ -290,8 +290,8 @@ def create_gpio_sensor (sensor_id:int, gpio_channel:int,
                         trigger_period:float = 0.001):
     global gpio_port_mappings
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(sensor_id,int) or sensor_id < 1:
-        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be a positive integer")
+    if not isinstance(sensor_id,int) or sensor_id < 1 or sensor_id > 99:
+        logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an integer between 1 and 99")
     elif gpio_sensor_exists(sensor_id):
         logging.error("GPIO Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     elif not isinstance(signal_passed,int):
@@ -489,8 +489,8 @@ def set_gpio_sensors_to_publish_state(*sensor_ids:int):
     global list_of_track_sensors_to_publish
     for sensor_id in sensor_ids:
         # Validate the parameters we have been given as this is a library API function
-        if not isinstance(sensor_id,int) or sensor_id < 1:
-            logging.error("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state - ID must be a positive integer")
+        if not isinstance(sensor_id,int) or sensor_id < 1 or sensor_id > 99:
+            logging.error("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state - ID must be an integer between 1 and 99")
         elif sensor_id in list_of_track_sensors_to_publish:
             logging.warning("GPIO Sensor "+str(sensor_id)+": set_gpio_sensors_to_publish_state -"
                                         +" Sensor is already configured to publish state to MQTT broker")
