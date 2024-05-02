@@ -66,8 +66,12 @@ def configure_edit_mode(edit_mode:bool):
     # Update all existing library objects (according to the current mode)
     for track_sensor_id in track_sensors:
         track_sensor = track_sensors[track_sensor_id]
-        if editing_enabled: track_sensor["canvas"].itemconfig(track_sensor["circle"], state="normal")
-        else: track_sensor["canvas"].itemconfig(track_sensor["circle"], state="hidden")
+        if editing_enabled:
+            track_sensor["canvas"].itemconfig(track_sensor["circle"], state="normal")
+            track_sensor["canvas"].itemconfig(track_sensor["label"], state="normal")
+        else:
+            track_sensor["canvas"].itemconfig(track_sensor["circle"], state="hidden")
+            track_sensor["canvas"].itemconfig(track_sensor["label"], state="hidden")
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -115,20 +119,26 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
     global track_sensors
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "sensor"+str(sensor_id)
-    if not isinstance(sensor_id, int) or sensor_id < 1:
-        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be a positive integer")
+    if not isinstance(sensor_id, int) or sensor_id < 1 or sensor_id > 99:
+        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an integer between 1 and 99")
     elif track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     else:
         logging.debug("Track Sensor "+str(sensor_id)+": Creating library object on the schematic")
         # Create the new drawing objects (tagged with the canvas_tag) - the oval is to give us
-        # a reasonable selection area when we subsequently get the bbox of the tagged objects
+        # a reasonable selection area when we subsequently get the bbox of the tagged objects.
+        # The Sensor identifier is only displayed in Edit mode (to aid configuration) - Note
+        # that the label is offset to take into account the default font size in 'common'
         sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"))
         sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
         canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
-        selection_circle = canvas.create_oval(x-15, y-15, x+15, y+15, outline="grey60", tags=canvas_tag, state="hidden")
+        selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, state="hidden")
+        sensor_label = canvas.create_text(x, y+9+(common.fontsize/2), text=format(sensor_id,'02d'), tags=canvas_tag,
+                                          state="hidden", font=('Courier',common.fontsize,"normal"))
         # If we are in edit mode then the selection circle is visible
-        if editing_enabled: canvas.itemconfig(selection_circle, state="normal")
+        if editing_enabled:
+            canvas.itemconfig(selection_circle, state="normal")
+            canvas.itemconfig(sensor_label, state="normal")
         # Store the details of the Track Sensor Object in the dictionary of Track Sensors
         track_sensors[str(sensor_id)] = {}
         track_sensors[str(sensor_id)]['canvas'] = canvas
@@ -136,6 +146,7 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
         track_sensors[str(sensor_id)]['callback'] = callback
         track_sensors[str(sensor_id)]['tags'] = canvas_tag
         track_sensors[str(sensor_id)]['circle'] = selection_circle
+        track_sensors[str(sensor_id)]['label'] = sensor_label
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
