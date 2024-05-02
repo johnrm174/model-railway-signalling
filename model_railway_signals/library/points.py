@@ -221,8 +221,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     global points
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
-    if not isinstance(point_id, int) or point_id < 1:
-        logging.error("Point "+str(point_id)+": create_point - Point ID must be a positive integer")
+    if not isinstance(point_id, int) or point_id < 1 or point_id > 99:
+        logging.error("Point "+str(point_id)+": create_point - Point ID must be an integer between 1 and 99")
     elif point_exists(point_id):
         logging.error("Point "+str(point_id)+": create_point - Point ID already exists")
     elif not isinstance(also_switch, int):
@@ -236,9 +236,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     else:
         logging.debug("Point "+str(point_id)+": Creating library object on the schematic")
         # Create the button objects and their callbacks
-        if point_id < 10: main_button_text = "0" + str(point_id)
-        else: main_button_text = str(point_id)
-        point_button = Tk.Button (canvas, text=main_button_text, state="normal", relief="raised",
+        point_button = Tk.Button (canvas, text=format(point_id,'02d'), state="normal", relief="raised",
                                   font=('Courier',common.fontsize,"normal"),bg= "grey85",
                                   padx=common.xpadding, pady=common.ypadding,
                                   command = lambda:change_button_event(point_id))
@@ -260,7 +258,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
             # Create the button windows in the correct relative positions for a Right Hand Point
-            point_coords = common.rotate_point (x,y,-3,-13,orientation)
+            # Note that the button is offset to take into account the default font size in 'common'
+            point_coords = common.rotate_point (x,y,-3,-9-(common.fontsize/2),orientation)
             if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
             if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
         else: 
@@ -274,7 +273,8 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
             # Create the button windows in the correct relative positions for a Left Hand Point
-            point_coords = common.rotate_point (x,y,-3,+13,orientation)
+            # Note that the button is offset to take into account the default font size in 'common'
+            point_coords = common.rotate_point (x,y,-3,+9+(common.fontsize/2),orientation)
             if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
             if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
         # The "normal" state of the point is the straight through route by default
