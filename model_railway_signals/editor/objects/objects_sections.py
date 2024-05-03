@@ -71,9 +71,8 @@ def update_references_to_section(old_section_id:int, new_section_id:int):
         # We use strings as the IDs support local or remote sections
         if objects_common.schematic_objects[object_id]["mirror"] == str(old_section_id):
             objects_common.schematic_objects[object_id]["mirror"] = str(new_section_id)
-            #####################################################################################################
-            ### TODO - Will also need to call the new 'update_mirrored_id' library function 
-            #####################################################################################################
+            # Update the mirrored section reference for the library object
+            track_sections.update_mirrored(int(section_id), str(new_section_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -87,9 +86,8 @@ def remove_references_to_section(deleted_sec_id:int):
         # We use string comparison as the IDs support local or remote sections
         if objects_common.schematic_objects[section_object]["mirror"] == str(deleted_sec_id):
             objects_common.schematic_objects[section_object]["mirror"] = ""
-            #####################################################################################################
-            ### TODO - Will also need to call the new 'update_mirrored_id' library function 
-            #####################################################################################################
+            # Update the mirrored section reference for the library object
+            track_sections.update_mirrored(int(section_id), "")
     return()
 
 #------------------------------------------------------------------------------------
