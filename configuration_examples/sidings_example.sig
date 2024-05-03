@@ -9,25 +9,25 @@
                 0,
                 0
             ],
-            "bbox": 221,
+            "bbox": 632,
             "colour": "black",
-            "end1": 217,
-            "end2": 218,
+            "end1": 628,
+            "end2": 629,
             "endx": 300.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 8,
-            "line": 216,
+            "line": 627,
             "posx": 350.0,
             "posy": 275.0,
-            "stop1": 219,
-            "stop2": 220,
+            "stop1": 630,
+            "stop2": 631,
             "tags": "line8"
         },
         "05083e4d-786d-421e-af32-90cf02b69524": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 227,
+            "bbox": 638,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -49,25 +49,25 @@
                 0,
                 0
             ],
-            "bbox": 233,
+            "bbox": 644,
             "colour": "black",
-            "end1": 229,
-            "end2": 230,
+            "end1": 640,
+            "end2": 641,
             "endx": 575.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 13,
-            "line": 228,
+            "line": 639,
             "posx": 25.0,
             "posy": 325.0,
-            "stop1": 231,
-            "stop2": 232,
+            "stop1": 642,
+            "stop2": 643,
             "tags": "line13"
         },
         "096de21f-50bd-4997-b78c-259af84a518a": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 239,
+            "bbox": 650,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -94,12 +94,12 @@
                 false,
                 ""
             ],
-            "bbox": 250,
+            "bbox": 661,
             "dccaspects": [
                 [
                     [
-                        0,
-                        false
+                        201,
+                        true
                     ],
                     [
                         0,
@@ -124,7 +124,7 @@
                 ],
                 [
                     [
-                        0,
+                        201,
                         false
                     ],
                     [
@@ -607,7 +607,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                ""
+                "2"
             ],
             "pointinterlock": [
                 [
@@ -1158,7 +1158,7 @@
             ]
         },
         "0fe13115-2591-4c50-b1e8-944937058e27": {
-            "bbox": 253,
+            "bbox": 664,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1173,7 +1173,7 @@
         "164f0397-7c2a-428c-baaa-beaa2fa30004": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 259,
+            "bbox": 670,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1195,23 +1195,23 @@
                 0,
                 0
             ],
-            "bbox": 265,
+            "bbox": 676,
             "colour": "black",
-            "end1": 261,
-            "end2": 262,
+            "end1": 672,
+            "end2": 673,
             "endx": 975.0,
             "endy": 375.0,
             "item": "line",
             "itemid": 15,
-            "line": 260,
+            "line": 671,
             "posx": 675.0,
             "posy": 375.0,
-            "stop1": 263,
-            "stop2": 264,
+            "stop1": 674,
+            "stop2": 675,
             "tags": "line15"
         },
         "1f224d72-58aa-4d11-bc79-8fc6bb41d91b": {
-            "bbox": 268,
+            "bbox": 679,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1226,7 +1226,7 @@
         "25438172-e456-40c5-b75e-1a1ba9ebddd0": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 274,
+            "bbox": 685,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1275,9 +1275,9 @@
         "272f2895-1e55-4a45-adf5-19c1fa1a5a85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 280,
+            "bbox": 691,
             "colour": "black",
-            "dccaddress": 0,
+            "dccaddress": 1000,
             "dccreversed": false,
             "hasfpl": false,
             "item": "point",
@@ -1287,7 +1287,18 @@
             "posx": 675.0,
             "posy": 275.0,
             "reverse": false,
-            "siginterlock": [],
+            "siginterlock": [
+                [
+                    1,
+                    [
+                        false,
+                        true,
+                        false,
+                        false,
+                        false
+                    ]
+                ]
+            ],
             "tags": "point10"
         },
         "29b8841b-848c-41b0-81a4-58a329f83215": {
@@ -1297,23 +1308,23 @@
                 0,
                 0
             ],
-            "bbox": 286,
+            "bbox": 697,
             "colour": "black",
-            "end1": 282,
-            "end2": 283,
+            "end1": 693,
+            "end2": 694,
             "endx": 650.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 19,
-            "line": 281,
+            "line": 692,
             "posx": 625.0,
             "posy": 275.0,
-            "stop1": 284,
-            "stop2": 285,
+            "stop1": 695,
+            "stop2": 696,
             "tags": "line19"
         },
         "2ae22ec0-ab06-4a07-941d-9ebd0b62920e": {
-            "bbox": 289,
+            "bbox": 700,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -1328,7 +1339,7 @@
         "2da9f2b6-37f4-45bd-ac05-bd099c5415dc": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 294,
+            "bbox": 705,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1350,19 +1361,19 @@
                 0,
                 0
             ],
-            "bbox": 300,
+            "bbox": 711,
             "colour": "black",
-            "end1": 296,
-            "end2": 297,
+            "end1": 707,
+            "end2": 708,
             "endx": 275.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 3,
-            "line": 295,
+            "line": 706,
             "posx": 250.0,
             "posy": 225.0,
-            "stop1": 298,
-            "stop2": 299,
+            "stop1": 709,
+            "stop2": 710,
             "tags": "line3"
         },
         "2eaee2d3-d077-42ac-aa42-1d8f8ec44f1e": {
@@ -1377,11 +1388,37 @@
                 false,
                 ""
             ],
-            "bbox": 317,
+            "bbox": 728,
             "dccaspects": [
                 [
                     [
+                        401,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        401,
                         false
                     ],
                     [
@@ -1407,7 +1444,7 @@
                 ],
                 [
                     [
-                        0,
+                        402,
                         false
                     ],
                     [
@@ -1433,34 +1470,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        403,
+                        true
                     ],
                     [
                         0,
@@ -1890,7 +1901,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                ""
+                "4"
             ],
             "pointinterlock": [
                 [
@@ -2441,10 +2452,10 @@
             ]
         },
         "3488e32c-5c4e-4d54-bf0f-798f2e4319a6": {
-            "bbox": 320,
+            "bbox": 731,
             "item": "tracksensor",
             "itemid": 2,
-            "passedsensor": "",
+            "passedsensor": "12",
             "posx": 425.0,
             "posy": 225.0,
             "routeahead": [
@@ -2547,7 +2558,7 @@
                         ],
                         [
                             0,
-                            true
+                            false
                         ],
                         [
                             0,
@@ -2744,10 +2755,10 @@
             "tags": "sensor2"
         },
         "3d5a6124-111a-4765-b09e-84236b082aeb": {
-            "bbox": 323,
+            "bbox": 734,
             "item": "tracksensor",
             "itemid": 1,
-            "passedsensor": "",
+            "passedsensor": "11",
             "posx": 425.0,
             "posy": 275.0,
             "routeahead": [
@@ -2989,7 +3000,7 @@
                     [
                         [
                             2,
-                            false
+                            true
                         ],
                         [
                             9,
@@ -3018,7 +3029,7 @@
                     [
                         [
                             2,
-                            false
+                            true
                         ],
                         [
                             9,
@@ -3047,10 +3058,10 @@
             "tags": "sensor1"
         },
         "42f78e7b-e26c-4c11-9be5-4e86210ff479": {
-            "bbox": 326,
+            "bbox": 737,
             "item": "tracksensor",
             "itemid": 4,
-            "passedsensor": "",
+            "passedsensor": "14",
             "posx": 625.0,
             "posy": 225.0,
             "routeahead": [
@@ -3058,7 +3069,7 @@
                     [
                         [
                             10,
-                            false
+                            true
                         ],
                         [
                             0,
@@ -3361,11 +3372,37 @@
                 false,
                 ""
             ],
-            "bbox": 343,
+            "bbox": 754,
             "dccaspects": [
                 [
                     [
+                        801,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        801,
                         false
                     ],
                     [
@@ -3391,7 +3428,7 @@
                 ],
                 [
                     [
-                        0,
+                        802,
                         false
                     ],
                     [
@@ -3417,34 +3454,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        802,
+                        true
                     ],
                     [
                         0,
@@ -3874,7 +3885,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                ""
+                "8"
             ],
             "pointinterlock": [
                 [
@@ -4427,7 +4438,7 @@
         "4677ea0e-2946-4798-8d9f-5a71fa913c84": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 349,
+            "bbox": 760,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -4500,23 +4511,23 @@
                 0,
                 0
             ],
-            "bbox": 355,
+            "bbox": 766,
             "colour": "black",
-            "end1": 351,
-            "end2": 352,
+            "end1": 762,
+            "end2": 763,
             "endx": 350.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 7,
-            "line": 350,
+            "line": 761,
             "posx": 300.0,
             "posy": 175.0,
-            "stop1": 353,
-            "stop2": 354,
+            "stop1": 764,
+            "stop2": 765,
             "tags": "line7"
         },
         "4a657a16-f262-4413-a41b-08b1e5bb9448": {
-            "bbox": 358,
+            "bbox": 769,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -4540,11 +4551,11 @@
                 false,
                 ""
             ],
-            "bbox": 369,
+            "bbox": 780,
             "dccaspects": [
                 [
                     [
-                        0,
+                        101,
                         false
                     ],
                     [
@@ -4570,8 +4581,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
+                        101,
+                        true
                     ],
                     [
                         0,
@@ -5053,7 +5064,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                ""
+                "1"
             ],
             "pointinterlock": [
                 [
@@ -5093,7 +5104,7 @@
                             false
                         ],
                         [
-                            0,
+                            10,
                             false
                         ],
                         [
@@ -5610,28 +5621,28 @@
                 0,
                 0
             ],
-            "bbox": 375,
+            "bbox": 786,
             "colour": "black",
-            "end1": 371,
-            "end2": 372,
+            "end1": 782,
+            "end2": 783,
             "endx": 275.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 10,
-            "line": 370,
+            "line": 781,
             "posx": 200.0,
             "posy": 75.0,
-            "stop1": 373,
-            "stop2": 374,
+            "stop1": 784,
+            "stop2": 785,
             "tags": "line10"
         },
         "4ee8acda-44a1-45dd-8572-3ce33d9b6f8e": {
-            "bbox": 378,
+            "bbox": 789,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
             "itemid": 9,
-            "label": "XXXXXXX",
+            "label": "HST",
             "mirror": "",
             "posx": 800.0,
             "posy": 325.0,
@@ -5645,19 +5656,19 @@
                 1,
                 1
             ],
-            "bbox": 384,
+            "bbox": 795,
             "colour": "black",
-            "end1": 380,
-            "end2": 381,
+            "end1": 791,
+            "end2": 792,
             "endx": 825.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 11,
-            "line": 379,
+            "line": 790,
             "posx": 700.0,
             "posy": 275.0,
-            "stop1": 382,
-            "stop2": 383,
+            "stop1": 793,
+            "stop2": 794,
             "tags": "line11"
         },
         "52d18274-eb4a-45e7-adfa-89bfbd3bf383": {
@@ -5672,11 +5683,37 @@
                 false,
                 ""
             ],
-            "bbox": 401,
+            "bbox": 812,
             "dccaspects": [
                 [
                     [
+                        701,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        701,
                         false
                     ],
                     [
@@ -5702,7 +5739,7 @@
                 ],
                 [
                     [
-                        0,
+                        702,
                         false
                     ],
                     [
@@ -5728,34 +5765,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        702,
+                        true
                     ],
                     [
                         0,
@@ -6185,7 +6196,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                ""
+                "7"
             ],
             "pointinterlock": [
                 [
@@ -6736,7 +6747,7 @@
             ]
         },
         "5c0bd890-f69f-4f6b-b604-2dee9c53ee9f": {
-            "bbox": 404,
+            "bbox": 815,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6749,7 +6760,7 @@
             "tags": "section11"
         },
         "5c437fb2-93a1-47a7-8558-9d5ab4f79ca5": {
-            "bbox": 407,
+            "bbox": 818,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6768,19 +6779,19 @@
                 1,
                 1
             ],
-            "bbox": 413,
+            "bbox": 824,
             "colour": "black",
-            "end1": 409,
-            "end2": 410,
+            "end1": 820,
+            "end2": 821,
             "endx": 200.0,
             "endy": 75.0,
             "item": "line",
             "itemid": 9,
-            "line": 408,
+            "line": 819,
             "posx": 100.0,
             "posy": 75.0,
-            "stop1": 411,
-            "stop2": 412,
+            "stop1": 822,
+            "stop2": 823,
             "tags": "line9"
         },
         "6a484560-236e-42d4-96ca-49fe1a74876d": {
@@ -6790,19 +6801,19 @@
                 0,
                 0
             ],
-            "bbox": 419,
+            "bbox": 830,
             "colour": "black",
-            "end1": 415,
-            "end2": 416,
+            "end1": 826,
+            "end2": 827,
             "endx": 575.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 12,
-            "line": 414,
+            "line": 825,
             "posx": 400.0,
             "posy": 275.0,
-            "stop1": 417,
-            "stop2": 418,
+            "stop1": 828,
+            "stop2": 829,
             "tags": "line12"
         },
         "73c8d359-fadd-416c-a9d0-468c8f478c58": {
@@ -6812,19 +6823,19 @@
                 1,
                 1
             ],
-            "bbox": 425,
+            "bbox": 836,
             "colour": "black",
-            "end1": 421,
-            "end2": 422,
+            "end1": 832,
+            "end2": 833,
             "endx": 200.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 4,
-            "line": 420,
+            "line": 831,
             "posx": 100.0,
             "posy": 175.0,
-            "stop1": 423,
-            "stop2": 424,
+            "stop1": 834,
+            "stop2": 835,
             "tags": "line4"
         },
         "79a7624e-caec-41d8-bef8-3ab48131c182": {
@@ -6834,23 +6845,23 @@
                 0,
                 0
             ],
-            "bbox": 431,
+            "bbox": 842,
             "colour": "black",
-            "end1": 427,
-            "end2": 428,
+            "end1": 838,
+            "end2": 839,
             "endx": 675.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 18,
-            "line": 426,
+            "line": 837,
             "posx": 650.0,
             "posy": 225.0,
-            "stop1": 429,
-            "stop2": 430,
+            "stop1": 840,
+            "stop2": 841,
             "tags": "line18"
         },
         "81104548-f84d-4544-8225-dd143a85086b": {
-            "bbox": 434,
+            "bbox": 845,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -6863,10 +6874,10 @@
             "tags": "section13"
         },
         "8fb91b2a-f5db-46d8-be1e-6159187f8919": {
-            "bbox": 437,
+            "bbox": 848,
             "item": "tracksensor",
             "itemid": 3,
-            "passedsensor": "",
+            "passedsensor": "13",
             "posx": 525.0,
             "posy": 225.0,
             "routeahead": [
@@ -7166,7 +7177,7 @@
             "tags": "sensor3"
         },
         "9540b948-4815-4767-a6cb-dfe3388301ef": {
-            "bbox": 440,
+            "bbox": 851,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -7175,20 +7186,20 @@
             "mirror": "",
             "posx": 475.0,
             "posy": 275.0,
-            "state": true,
+            "state": false,
             "tags": "section6"
         },
         "99d9b4ef-9e56-4fb4-8539-066142c94e2f": {
-            "bbox": 443,
+            "bbox": 854,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
             "itemid": 8,
-            "label": "XXXXXXX",
+            "label": "HST",
             "mirror": "",
             "posx": 425.0,
             "posy": 325.0,
-            "state": false,
+            "state": true,
             "tags": "section8"
         },
         "9a938bb7-f581-4536-9e40-622ee3499629": {
@@ -7198,19 +7209,19 @@
                 0,
                 0
             ],
-            "bbox": 449,
+            "bbox": 860,
             "colour": "black",
-            "end1": 445,
-            "end2": 446,
+            "end1": 856,
+            "end2": 857,
             "endx": 650.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 17,
-            "line": 444,
+            "line": 855,
             "posx": 400.0,
             "posy": 225.0,
-            "stop1": 447,
-            "stop2": 448,
+            "stop1": 858,
+            "stop2": 859,
             "tags": "line17"
         },
         "9b20c5b7-a05c-4d20-96c2-45d8880b05e5": {
@@ -7220,19 +7231,19 @@
                 0,
                 0
             ],
-            "bbox": 455,
+            "bbox": 866,
             "colour": "black",
-            "end1": 451,
-            "end2": 452,
+            "end1": 862,
+            "end2": 863,
             "endx": 225.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 6,
-            "line": 450,
+            "line": 861,
             "posx": 200.0,
             "posy": 125.0,
-            "stop1": 453,
-            "stop2": 454,
+            "stop1": 864,
+            "stop2": 865,
             "tags": "line6"
         },
         "9b4c4410-1382-4213-af69-722398bc5bd4": {
@@ -7247,12 +7258,12 @@
                 false,
                 ""
             ],
-            "bbox": 466,
+            "bbox": 877,
             "dccaspects": [
                 [
                     [
-                        0,
-                        false
+                        301,
+                        true
                     ],
                     [
                         0,
@@ -7277,7 +7288,7 @@
                 ],
                 [
                     [
-                        0,
+                        301,
                         false
                     ],
                     [
@@ -7760,7 +7771,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                ""
+                "3"
             ],
             "pointinterlock": [
                 [
@@ -8317,19 +8328,19 @@
                 20,
                 5
             ],
-            "bbox": 472,
+            "bbox": 883,
             "colour": "black",
-            "end1": 468,
-            "end2": 469,
+            "end1": 879,
+            "end2": 880,
             "endx": 625.0,
             "endy": 375.0,
             "item": "line",
             "itemid": 14,
-            "line": 467,
+            "line": 878,
             "posx": 25.0,
             "posy": 375.0,
-            "stop1": 470,
-            "stop2": 471,
+            "stop1": 881,
+            "stop2": 882,
             "tags": "line14"
         },
         "a41c0abe-6a8f-4b99-a677-437ffd109f7b": {
@@ -8339,28 +8350,28 @@
                 1,
                 1
             ],
-            "bbox": 478,
+            "bbox": 889,
             "colour": "black",
-            "end1": 474,
-            "end2": 475,
+            "end1": 885,
+            "end2": 886,
             "endx": 250.0,
             "endy": 275.0,
             "item": "line",
             "itemid": 1,
-            "line": 473,
+            "line": 884,
             "posx": 100.0,
             "posy": 275.0,
-            "stop1": 476,
-            "stop2": 477,
+            "stop1": 887,
+            "stop2": 888,
             "tags": "line1"
         },
         "b0391ce1-ec72-4971-9b9b-6f629d6b7ef0": {
-            "bbox": 481,
+            "bbox": 892,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
             "itemid": 1,
-            "label": "XXXXXXX",
+            "label": "50035",
             "mirror": "",
             "posx": 150.0,
             "posy": 275.0,
@@ -8374,23 +8385,23 @@
                 1,
                 1
             ],
-            "bbox": 487,
+            "bbox": 898,
             "colour": "black",
-            "end1": 483,
-            "end2": 484,
+            "end1": 894,
+            "end2": 895,
             "endx": 250.0,
             "endy": 225.0,
             "item": "line",
             "itemid": 2,
-            "line": 482,
+            "line": 893,
             "posx": 100.0,
             "posy": 225.0,
-            "stop1": 485,
-            "stop2": 486,
+            "stop1": 896,
+            "stop2": 897,
             "tags": "line2"
         },
         "b6dcf075-cc98-4a5e-ae70-e19b4e18ed54": {
-            "bbox": 490,
+            "bbox": 901,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8399,7 +8410,7 @@
             "mirror": "",
             "posx": 750.0,
             "posy": 275.0,
-            "state": false,
+            "state": true,
             "tags": "section7"
         },
         "c303fbe5-e682-4043-a123-e1699df0a627": {
@@ -8409,25 +8420,25 @@
                 1,
                 1
             ],
-            "bbox": 496,
+            "bbox": 907,
             "colour": "black",
-            "end1": 492,
-            "end2": 493,
+            "end1": 903,
+            "end2": 904,
             "endx": 200.0,
             "endy": 125.0,
             "item": "line",
             "itemid": 5,
-            "line": 491,
+            "line": 902,
             "posx": 100.0,
             "posy": 125.0,
-            "stop1": 494,
-            "stop2": 495,
+            "stop1": 905,
+            "stop2": 906,
             "tags": "line5"
         },
         "c34d8895-30b6-4d70-8cb7-bd06fb39ae82": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 502,
+            "bbox": 913,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8443,7 +8454,7 @@
             "tags": "point9"
         },
         "c89b6e58-0a68-41f7-bfbb-666119b0f0ea": {
-            "bbox": 505,
+            "bbox": 916,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
@@ -8462,28 +8473,28 @@
                 20,
                 5
             ],
-            "bbox": 511,
+            "bbox": 922,
             "colour": "black",
-            "end1": 507,
-            "end2": 508,
+            "end1": 918,
+            "end2": 919,
             "endx": 975.0,
             "endy": 325.0,
             "item": "line",
             "itemid": 16,
-            "line": 506,
+            "line": 917,
             "posx": 675.0,
             "posy": 325.0,
-            "stop1": 509,
-            "stop2": 510,
+            "stop1": 920,
+            "stop2": 921,
             "tags": "line16"
         },
         "d795ff87-0401-4125-8978-5e03ff90bae0": {
-            "bbox": 514,
+            "bbox": 925,
             "defaultlabel": "XXXXXXX",
             "editable": true,
             "item": "section",
             "itemid": 2,
-            "label": "XXXXXXX",
+            "label": "50035",
             "mirror": "",
             "posx": 150.0,
             "posy": 225.0,
@@ -8493,7 +8504,7 @@
         "e374c174-df8c-4cbf-b2ef-8ee59101f1a0": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 520,
+            "bbox": 931,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8511,7 +8522,7 @@
         "e709491b-e065-46cf-a3ce-d893cab6cb8d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 525,
+            "bbox": 936,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8538,11 +8549,37 @@
                 false,
                 ""
             ],
-            "bbox": 542,
+            "bbox": 953,
             "dccaspects": [
                 [
                     [
+                        501,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        501,
                         false
                     ],
                     [
@@ -8568,7 +8605,7 @@
                 ],
                 [
                     [
-                        0,
+                        502,
                         false
                     ],
                     [
@@ -8594,34 +8631,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        502,
+                        true
                     ],
                     [
                         0,
@@ -9051,7 +9062,7 @@
             "overridesignal": false,
             "passedsensor": [
                 true,
-                ""
+                "5"
             ],
             "pointinterlock": [
                 [
@@ -9613,11 +9624,37 @@
                 false,
                 ""
             ],
-            "bbox": 559,
+            "bbox": 970,
             "dccaspects": [
                 [
                     [
+                        601,
+                        true
+                    ],
+                    [
                         0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        601,
                         false
                     ],
                     [
@@ -9643,7 +9680,7 @@
                 ],
                 [
                     [
-                        0,
+                        602,
                         false
                     ],
                     [
@@ -9669,34 +9706,8 @@
                 ],
                 [
                     [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
+                        602,
+                        true
                     ],
                     [
                         0,
@@ -10126,7 +10137,7 @@
             "overridesignal": true,
             "passedsensor": [
                 true,
-                ""
+                "6"
             ],
             "pointinterlock": [
                 [
@@ -10686,7 +10697,7 @@
         "10": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "2": {
             "fpllock": false,
@@ -10696,17 +10707,17 @@
         "3": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "4": {
             "fpllock": false,
             "locked": false,
-            "switched": false
+            "switched": true
         },
         "5": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "6": {
             "fpllock": false,
@@ -10726,7 +10737,7 @@
         "9": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         }
     },
     "sections": {},
@@ -10740,13 +10751,94 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/sidings_example.sig",
+            "filename": "/home/john/Software/model-railway-signalling/configuration_examples/sidings_example (2).sig",
             "info": "Document your layout here",
-            "spadpopups": true,
+            "spadpopups": false,
             "version": "Version 4.2.0"
         },
         "gpio": {
-            "portmappings": [],
+            "portmappings": [
+                [
+                    1,
+                    4
+                ],
+                [
+                    2,
+                    5
+                ],
+                [
+                    3,
+                    6
+                ],
+                [
+                    4,
+                    7
+                ],
+                [
+                    5,
+                    8
+                ],
+                [
+                    6,
+                    9
+                ],
+                [
+                    7,
+                    10
+                ],
+                [
+                    8,
+                    11
+                ],
+                [
+                    9,
+                    12
+                ],
+                [
+                    10,
+                    13
+                ],
+                [
+                    11,
+                    18
+                ],
+                [
+                    12,
+                    19
+                ],
+                [
+                    13,
+                    20
+                ],
+                [
+                    14,
+                    21
+                ],
+                [
+                    15,
+                    22
+                ],
+                [
+                    16,
+                    23
+                ],
+                [
+                    17,
+                    24
+                ],
+                [
+                    18,
+                    25
+                ],
+                [
+                    19,
+                    26
+                ],
+                [
+                    20,
+                    27
+                ]
+            ],
             "timeoutperiod": 1.0,
             "triggerdelay": 0.001
         },
@@ -10788,9 +10880,9 @@
             "override": false,
             "releaseonred": null,
             "releaseonyel": null,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
-            "siglocked": false,
+            "siglocked": true,
             "subclear": false,
             "sublocked": false,
             "theatretext": null
@@ -10833,7 +10925,7 @@
             "releaseonred": false,
             "releaseonyel": false,
             "routeset": 1,
-            "sigclear": true,
+            "sigclear": false,
             "siglocked": false,
             "subclear": false,
             "sublocked": false,
