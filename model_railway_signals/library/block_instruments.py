@@ -112,12 +112,6 @@ class block_callback_type(enum.Enum):
 instruments = {}
 
 # --------------------------------------------------------------------------------
-# Global variable to indicate whether a Bell Code window is already open or not
-# --------------------------------------------------------------------------------
-
-bell_code_hints_open = False
-
-# --------------------------------------------------------------------------------
 # Global list of block instruments to publish to the MQTT Broker
 # --------------------------------------------------------------------------------
 
@@ -130,17 +124,25 @@ list_of_instruments_to_publish = []
 # Only one Telegraph Bell Codes window can be open at a time
 # --------------------------------------------------------------------------------
 
+# Global variable to hold the handle to the Bell Code hints window
+bell_code_hints_window = None
+
 # Function to close the Telegraph Bell Codes window (when "X" is clicked)
-def close_bell_code_hints(hints_window):
-    global bell_code_hints_open
-    bell_code_hints_open = False
-    hints_window.destroy()
+def close_bell_code_hints():
+    global bell_code_hints_window
+    bell_code_hints_window.destroy()
+    bell_code_hints_window = None
     return()
 
 # Function to Open the Telegraph Bell Codes window (right click of TELEGRAPH button)
 def open_bell_code_hints():
-    global bell_code_hints_open
-    if not bell_code_hints_open:
+    global bell_code_hints_window
+        # If there is already a  window open then we just make it jump to the top and exit
+    if bell_code_hints_window is not None:
+        bell_code_hints_window.lift()
+        bell_code_hints_window.state('normal')
+        bell_code_hints_window.focus_force()
+    else:
         # List of common bell codes (additional codes can be added to the list as required)
         bell_codes = []
         bell_codes.append ([" 1"," Call attention"])
@@ -155,19 +157,18 @@ def open_bell_code_hints():
         bell_codes.append ([" 4 - 1"," Is line clear for mineral or empty waggon train"])
         bell_codes.append ([" 2 - 1"," Train arrived"])
         bell_codes.append ([" 6"," Obstruction danger"])
-        hints_window = Tk.Toplevel(common.root_window)
-        hints_window.attributes('-topmost',True)
-        hints_window.title("Common signal box bell codes")
-        hints_window.protocol("WM_DELETE_WINDOW", lambda:close_bell_code_hints(hints_window))
-        bell_code_hints_open = True
+        bell_code_hints_window = Tk.Toplevel(common.root_window)
+        bell_code_hints_window.attributes('-topmost',True)
+        bell_code_hints_window.title("Common signal box bell codes")
+        bell_code_hints_window.protocol("WM_DELETE_WINDOW", close_bell_code_hints)
         for row, item1 in enumerate (bell_codes, start=1):
-            text_entry_box1 = Tk.Entry(hints_window,width=8)
+            text_entry_box1 = Tk.Entry(bell_code_hints_window,width=8)
             text_entry_box1.insert(0,item1[0])
             text_entry_box1.grid(row=row,column=1)
             text_entry_box1.config(state='disabled')
             text_entry_box1.config({'disabledbackground':'white'}) 
             text_entry_box1.config({'disabledforeground':'black'}) 
-            text_entry_box2 = Tk.Entry(hints_window,width=40)
+            text_entry_box2 = Tk.Entry(bell_code_hints_window,width=40)
             text_entry_box2.insert(0,item1[1])
             text_entry_box2.grid(row=row,column=2)
             text_entry_box2.config(state='disabled')
