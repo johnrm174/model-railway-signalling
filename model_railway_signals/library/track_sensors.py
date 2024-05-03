@@ -67,10 +67,10 @@ def configure_edit_mode(edit_mode:bool):
     for track_sensor_id in track_sensors:
         track_sensor = track_sensors[track_sensor_id]
         if editing_enabled:
-            track_sensor["canvas"].itemconfig(track_sensor["circle"], state="normal")
+            track_sensor["canvas"].itemconfig(track_sensor["circle"], width=1)
             track_sensor["canvas"].itemconfig(track_sensor["label"], state="normal")
         else:
-            track_sensor["canvas"].itemconfig(track_sensor["circle"], state="hidden")
+            track_sensor["canvas"].itemconfig(track_sensor["circle"], width=0)
             track_sensor["canvas"].itemconfig(track_sensor["label"], state="hidden")
     return()
 
@@ -132,12 +132,12 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
         sensor_button = Tk.Button(canvas, text="O", padx=1, pady=1, font=('Courier',2,"normal"))
         sensor_button.config(command=lambda:track_sensor_triggered(sensor_id))
         canvas.create_window(x, y, window=sensor_button, tags=canvas_tag)
-        selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, state="hidden")
+        selection_circle = canvas.create_oval(x-20, y-20, x+20, y+20, outline="grey60", tags=canvas_tag, width=0)
         sensor_label = canvas.create_text(x, y+9+(common.fontsize/2), text=format(sensor_id,'02d'), tags=canvas_tag,
                                           state="hidden", font=('Courier',common.fontsize,"normal"))
         # If we are in edit mode then the selection circle is visible
         if editing_enabled:
-            canvas.itemconfig(selection_circle, state="normal")
+            canvas.itemconfig(selection_circle, width=1)
             canvas.itemconfig(sensor_label, state="normal")
         # Store the details of the Track Sensor Object in the dictionary of Track Sensors
         track_sensors[str(sensor_id)] = {}
