@@ -505,7 +505,7 @@ def run_instrument_library_tests():
     print("Library Tests - Instrument Objects")
     canvas = schematic.canvas
     # create_instrument
-    print("Library Tests - create_instrument - 6 Errors and 4 warnings will be generated")
+    print("Library Tests - create_instrument - 10 Errors and 4 warnings will be generated")
     assert len(block_instruments.instruments) == 0
     # Sunny day tests
     block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")
@@ -522,11 +522,15 @@ def run_instrument_library_tests():
     block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 900, 100, instrument_callback, linked_to="10") # Warning
     # Rainy day tests:
     block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (int <1)
+    block_instruments.create_instrument(canvas, 100, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (int >100)
     block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (Exists)
     block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (str)
     block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2") # Fail
     block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10) # Fail
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1") # Fail
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-0") # Fail
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-100") # Fail
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="12") # Fail
     assert len(block_instruments.instruments) == 9
     print("Library Tests - instrument_exists - 1 Error will be generated")
     assert block_instruments.instrument_exists("1")
@@ -609,9 +613,17 @@ def run_instrument_library_tests():
     block_instruments.update_linked_instrument(5,"Box2-50")
     block_instruments.update_linked_instrument(6,"Box2-60")
     block_instruments.clear_button_event(5)
+    block_instruments.clear_button_event(5)
+    block_instruments.occup_button_event(5)
+    block_instruments.occup_button_event(5)
+    block_instruments.blocked_button_event(5)
     block_instruments.blocked_button_event(5)
     block_instruments.telegraph_key_button(5)
     block_instruments.clear_button_event(6)
+    block_instruments.clear_button_event(6)
+    block_instruments.occup_button_event(6)
+    block_instruments.occup_button_event(6)
+    block_instruments.blocked_button_event(6)
     block_instruments.blocked_button_event(6)
     block_instruments.telegraph_key_button(6)
     print("Library Tests - subscribe_to_remote_instrument - 5 Errors and 1 Warning will be generated")
@@ -650,6 +662,13 @@ def run_instrument_library_tests():
     assert len(block_instruments.list_of_instruments_to_publish) == 0
     assert len(block_instruments.instruments) == 9
     assert not block_instruments.instrument_exists("box1-20")
+    print("Library Tests - Test Bell code window (no errors or warnings)")
+    block_instruments.open_bell_code_hints()
+    time.sleep(0.5)
+    block_instruments.open_bell_code_hints()
+    time.sleep(0.1)
+    block_instruments.close_bell_code_hints()
+    time.sleep(0.1)
     print("Library Tests - delete_instrument - 2 Errors will be generated")
     block_instruments.delete_instrument(1)
     block_instruments.delete_instrument(2)
@@ -878,6 +897,8 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_point(1, False)
     dcc_control.update_dcc_point(2, True)
     dcc_control.update_dcc_point(2, False)
+    dcc_control.update_dcc_point(3, True)
+    dcc_control.update_dcc_point(3, False)
     print("Library Tests - update_dcc_signal_aspects - 1 Error - DCC commands should be sent")
     dcc_control.update_dcc_signal_aspects(2, signals_common.signal_state_type.DANGER) # Error - wrong type
     dcc_control.update_dcc_signal_aspects(1, signals_common.signal_state_type.DANGER)
@@ -901,6 +922,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_element(2, True, element="rh1_subsidary")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_signal")
     dcc_control.update_dcc_signal_element(2, True, element="rh2_subsidary")
+    dcc_control.update_dcc_signal_element(3, True, element="main_subsidary")
     print("Library Tests - update_dcc_signal_route - 1 Error - DCC commands should be sent)")
     dcc_control.update_dcc_signal_route(2,signals_common.route_type.MAIN, True, False)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, True, False)
@@ -911,6 +933,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, True, True)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, False, True)
     dcc_control.update_dcc_signal_route(1,signals_common.route_type.MAIN, False, False)
+    dcc_control.update_dcc_signal_route(3,signals_common.route_type.MAIN, False, False)
     print("Library Tests - update_dcc_signal_theatre (no errors or warnings - DCC commands should be sent)")
     dcc_control.update_dcc_signal_theatre(1,"#", True, False)
     dcc_control.update_dcc_signal_theatre(1,"1", True, False)
@@ -921,6 +944,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.update_dcc_signal_theatre(1,"1", True, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, True)
     dcc_control.update_dcc_signal_theatre(1,"1", False, False)
+    dcc_control.update_dcc_signal_theatre(3,"1", False, False)
     print("Library Tests - set_node_to_publish_dcc_commands - 1 Error will be generated ")
     dcc_control.set_node_to_publish_dcc_commands("True") # Error
     dcc_control.set_node_to_publish_dcc_commands(True) 
