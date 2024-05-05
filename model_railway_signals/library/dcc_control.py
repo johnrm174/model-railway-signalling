@@ -729,7 +729,6 @@ def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
         logging.error("DCC Control: set_node_to_publish_dcc_commands - invalid publish_dcc_commands flag")
     else:
         if publish_dcc_commands: logging.debug("DCC Control: Configuring Application to publish DCC Commands to MQTT broker")
-        else: logging.debug("DCC Control: Configuring Application NOT to publish DCC Commands to MQTT broker")
         publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
 
