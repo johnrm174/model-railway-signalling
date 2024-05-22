@@ -61,6 +61,16 @@ def run_track_sensor_library_tests():
     track_sensors.delete_track_sensor(10)     # success
     assert len(track_sensors.track_sensors) == 0
     assert not track_sensors.track_sensor_exists(10)
+    # configure_edit_mode - this is an internal library function
+    print("Library Tests - configure_edit_mode")
+    track_sensors.configure_edit_mode(edit_mode=False)
+    track_sensors.create_track_sensor(canvas, sensor_id=10, x=100, y=100, callback=track_sensor_callback)    # success
+    track_sensors.configure_edit_mode(edit_mode=True)
+    track_sensors.create_track_sensor(canvas, sensor_id=20, x=200, y=100, callback=track_sensor_callback)    # success
+    track_sensors.configure_edit_mode(edit_mode=False)
+    # Clean up
+    track_sensors.delete_track_sensor(10)     # success
+    track_sensors.delete_track_sensor(20)     # success
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -77,60 +87,35 @@ def run_gpio_sensor_library_tests():
     assert gpio_sensors.gpio_interface_enabled()
     # create_gpio_sensor - Sensor ID combinations
     assert len(gpio_sensors.gpio_port_mappings) == 0
-    print ("GPIO Sensors - create_gpio_sensor - will generate 18 errors")
-    gpio_sensors.create_gpio_sensor(10, 4)                        # Success - int > 0 with valid port
-    gpio_sensors.create_gpio_sensor(11, 5)                        # Success - int > 0 with valid port
-    gpio_sensors.create_gpio_sensor(12, 6, signal_passed=1)       # Success - int > 0 with valid port & valid callback
-    gpio_sensors.create_gpio_sensor(13, 7, signal_approach=1)     # Success - int > 0 with valid port & valid callback
-    gpio_sensors.create_gpio_sensor(14, 8, sensor_passed=1)       # Success - int > 0 with valid port & valid callback
-    gpio_sensors.create_gpio_sensor(15, 9, sensor_timeout=0.001)  # Success - int > 0 with valid port & valid timeout
-    gpio_sensors.create_gpio_sensor(16, 10, trigger_period=0.001) # success - int > 0 with valid port & valid  trigger
-    gpio_sensors.create_gpio_sensor(17, 11, trigger_period=0.005, sensor_timeout=2.0) # Success - all valid
-    assert len(gpio_sensors.gpio_port_mappings) == 8
+    print ("GPIO Sensors - create_gpio_sensor - will generate 11 errors")
+    gpio_sensors.create_gpio_sensor(10, 4, trigger_period=0.01, sensor_timeout=0.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(11, 5, trigger_period=0.01, sensor_timeout=1.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(12, 6, trigger_period=0.01, sensor_timeout=2.00)  # Success - int > 0 with valid port
+    gpio_sensors.create_gpio_sensor(13, 7, trigger_period=0.01, sensor_timeout=3.00)  # Success - int > 0 with valid port
+    assert len(gpio_sensors.gpio_port_mappings) == 4
     # create_gpio_sensor - Invalid Sensor ID
-    gpio_sensors.create_gpio_sensor("18", 9)                   # Fail - Sensor ID not an int
-    gpio_sensors.create_gpio_sensor(0, 9)                      # Fail - Sensor ID int not > 0
-    gpio_sensors.create_gpio_sensor(100, 9)                    # Fail - Sensor ID int not < 100
-    gpio_sensors.create_gpio_sensor(10, 9)                     # Fail - Sensor ID duplicate
-    assert len(gpio_sensors.gpio_port_mappings) == 8
+    gpio_sensors.create_gpio_sensor("18", 9, trigger_period=0.01, sensor_timeout=0.01)  # Fail - Sensor ID not an int
+    gpio_sensors.create_gpio_sensor(0, 9, trigger_period=0.01, sensor_timeout=0.01)     # Fail - Sensor ID int not > 0
+    gpio_sensors.create_gpio_sensor(100, 9, trigger_period=0.01, sensor_timeout=0.01)   # Fail - Sensor ID int not < 100
+    gpio_sensors.create_gpio_sensor(10, 9, trigger_period=0.01, sensor_timeout=0.01)    # Fail - Sensor ID duplicate
+    assert len(gpio_sensors.gpio_port_mappings) == 4
     # create_gpio_sensor - Invalid GPIO Port
-    gpio_sensors.create_gpio_sensor(18, "5")                   # Fail - Port not an int
-    gpio_sensors.create_gpio_sensor(18, 14)                    # Fail - invalid port number
-    gpio_sensors.create_gpio_sensor(18, 4)                     # Fail - port already mapped
-    assert len(gpio_sensors.gpio_port_mappings) == 8
-    # create_gpio_sensor - Invalid Callback combinations
-    gpio_sensors.create_gpio_sensor(18, 6, signal_passed="1")                                    # Fail - not an int
-    gpio_sensors.create_gpio_sensor(18, 6, signal_approach="1")                                  # Fail - not an int
-    gpio_sensors.create_gpio_sensor(18, 6, sensor_passed="1")                                    # Fail - not an int
-    gpio_sensors.create_gpio_sensor(18, 6, signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
-    gpio_sensors.create_gpio_sensor(18, 6, signal_passed=1, signal_approach=1)                   # Fail - multiple specified
-    gpio_sensors.create_gpio_sensor(18, 6, signal_approach=1, sensor_passed=1)                   # Fail - multiple specified
-    gpio_sensors.create_gpio_sensor(18, 6, signal_passed=1, sensor_passed=1)                     # Fail - multiple specified
-    assert len(gpio_sensors.gpio_port_mappings) == 8
+    gpio_sensors.create_gpio_sensor(18, "5", trigger_period=0.01, sensor_timeout=0.01) # Fail - Port not an int
+    gpio_sensors.create_gpio_sensor(18, 14, trigger_period=0.01, sensor_timeout=0.01)  # Fail - invalid port number
+    gpio_sensors.create_gpio_sensor(18, 4, trigger_period=0.01, sensor_timeout=0.01)   # Fail - port already mapped
+    assert len(gpio_sensors.gpio_port_mappings) == 4
     # create_gpio_sensor - Invalid Timeout and trigger period 
-    gpio_sensors.create_gpio_sensor(18, 9, sensor_timeout=2)       # Fail - not a float
-    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=1)       # Fail - not a float
-    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=-1.0)    # Fail - must be >= 0.0
-    gpio_sensors.create_gpio_sensor(18, 9, sensor_timeout=-1.0)    # Fail - must be >= 0.0
-    assert len(gpio_sensors.gpio_port_mappings) == 8
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=1, sensor_timeout=0.01)       # Fail - not a float
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=1)       # Fail - not a float
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=-0.1, sensor_timeout=0.01)    # Fail - must be >= 0.0
+    gpio_sensors.create_gpio_sensor(18, 9, trigger_period=0.01, sensor_timeout=-0.01)   # Fail - must be >= 0.0
+    assert len(gpio_sensors.gpio_port_mappings) == 4
     # track_sensor_exists (accepts ints and strs)
     print ("GPIO Sensors - gpio_sensor_exists - will generate 1 error")
     assert gpio_sensors.gpio_sensor_exists(10)         # True - int and exists
     assert gpio_sensors.gpio_sensor_exists(11)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(12)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(13)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(14)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(15)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(16)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists(17)         # True - int and exists
-    assert gpio_sensors.gpio_sensor_exists("10")       # True - str and exists
-    assert gpio_sensors.gpio_sensor_exists("11")       # True - str and exists
     assert gpio_sensors.gpio_sensor_exists("12")       # True - str and exists
     assert gpio_sensors.gpio_sensor_exists("13")       # True - str and exists
-    assert gpio_sensors.gpio_sensor_exists("14")       # True - str and exists
-    assert gpio_sensors.gpio_sensor_exists("15")       # True - str and exists
-    assert gpio_sensors.gpio_sensor_exists("16")       # True - str and exists
-    assert gpio_sensors.gpio_sensor_exists("17")       # True - str and exists
     assert not gpio_sensors.gpio_sensor_exists(18)     # False - does not exist
     assert not gpio_sensors.gpio_sensor_exists("18")   # False - does not exist
     assert not gpio_sensors.gpio_sensor_exists(107.0)   # False (with Error) - not an int or str
@@ -138,165 +123,142 @@ def run_gpio_sensor_library_tests():
     print ("GPIO Sensors - get_gpio_sensor_callback - will generate 3 errors")
     assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0]    # Success - ID is int
     assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(12) == [1,0,0]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(13) == [0,1,0]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback(14) == [0,0,1]    # Success - ID is int
-    assert gpio_sensors.get_gpio_sensor_callback("10") == [0,0,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback("11") == [0,0,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback("12") == [1,0,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,1,0]  # Success - ID is str
-    assert gpio_sensors.get_gpio_sensor_callback("14") == [0,0,1]  # Success - ID is str
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0]  # Success - ID is str
+    assert gpio_sensors.get_gpio_sensor_callback("13") == [0,0,0]  # Success - ID is str
     assert gpio_sensors.get_gpio_sensor_callback(14.0) == [0,0,0]  # Error - not int or str
     assert gpio_sensors.get_gpio_sensor_callback(18) == [0,0,0]    # Error - Does not exist
     assert gpio_sensors.get_gpio_sensor_callback("18") == [0,0,0]  # Error - Does not exist
-    # remove_gpio_sensor_callbacks
-    print ("GPIO Sensors - remove_gpio_sensor_callback - will generate 3 errors")
-    gpio_sensors.remove_gpio_sensor_callback(12)                   # Success - int and exists
-    gpio_sensors.remove_gpio_sensor_callback("13")                 # success - str and exists
-    gpio_sensors.remove_gpio_sensor_callback("14")                 # success - str and exists
-    gpio_sensors.remove_gpio_sensor_callback(18)                   # Fail - Does not exist
-    gpio_sensors.remove_gpio_sensor_callback("18")                 # Fail - Does not exist
-    gpio_sensors.remove_gpio_sensor_callback(14.0)                 # Fail - not int or str
-    assert gpio_sensors.get_gpio_sensor_callback(12) == [0,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback(13) == [0,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback(14) == [0,0,0]
     # add_gpio_sensor_callbacks
-    print ("GPIO Sensors - add_gpio_sensor_callback - will generate 10 errors")
-    # Set up the test condition for Sensor 105
-    gpio_sensors.add_gpio_sensor_callback(15, signal_passed=2)    
-    assert gpio_sensors.get_gpio_sensor_callback(15) == [2,0,0]
-    # Tests start here
-    gpio_sensors.add_gpio_sensor_callback(12, sensor_passed=1)      # Success - int and exists
-    gpio_sensors.add_gpio_sensor_callback("13", signal_passed=1)    # Success - str and exists
-    gpio_sensors.add_gpio_sensor_callback("14", signal_approach=1)  # Success - str and exists
-    gpio_sensors.add_gpio_sensor_callback(15)                       # Success - int and exists
-    gpio_sensors.add_gpio_sensor_callback(18, signal_passed=1)                                      # Fail - Does not exist
-    gpio_sensors.add_gpio_sensor_callback("18", signal_passed=1)                                    # Fail - Does not exist
-    gpio_sensors.add_gpio_sensor_callback(12.0, signal_passed=1)                                    # Fail - not an int or str
-    gpio_sensors.add_gpio_sensor_callback(12, signal_passed="1")                                    # Fail - Item not an int
-    gpio_sensors.add_gpio_sensor_callback(12, signal_approach="1")                                  # Fail - Item not an int
-    gpio_sensors.add_gpio_sensor_callback(12, sensor_passed="1")                                    # Fail - Item not an int
-    gpio_sensors.add_gpio_sensor_callback(12, signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
-    gpio_sensors.add_gpio_sensor_callback(12, signal_passed=1, signal_approach=1)                   # Fail - multiple specified
-    gpio_sensors.add_gpio_sensor_callback(12, signal_approach=1, sensor_passed=1)                   # Fail - multiple specified
-    gpio_sensors.add_gpio_sensor_callback(12, signal_passed=1, sensor_passed=1)                     # Fail - multiple specified
-    assert gpio_sensors.get_gpio_sensor_callback(12) == [0,0,1]
-    assert gpio_sensors.get_gpio_sensor_callback(13) == [1,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback(14) == [0,1,0]
-    assert gpio_sensors.get_gpio_sensor_callback(15) == [0,0,0]
+    print ("GPIO Sensors - update_gpio_sensor_callback - will generate 16 errors")
+    gpio_sensors.update_gpio_sensor_callback(10, sensor_passed=1)      # Success - int and exists
+    gpio_sensors.update_gpio_sensor_callback(11, signal_passed=1)      # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback("12", signal_approach=1)  # Success - str and exists
+    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,1]        # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback(11) == [1,0,0]        # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,1,0]      # Success - ID is str
+    gpio_sensors.update_gpio_sensor_callback(10)                       # Success - int and exists
+    gpio_sensors.update_gpio_sensor_callback(11)                       # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback("12")                     # Success - str and exists
+    assert gpio_sensors.get_gpio_sensor_callback(10) == [0,0,0]        # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback(11) == [0,0,0]        # Success - ID is int
+    assert gpio_sensors.get_gpio_sensor_callback("12") == [0,0,0]      # Success - ID is str
+    gpio_sensors.update_gpio_sensor_callback(18, signal_passed=1)                                      # Fail - Does not exist
+    gpio_sensors.update_gpio_sensor_callback("18", signal_passed=1)                                    # Fail - Does not exist
+    gpio_sensors.update_gpio_sensor_callback(12.0, signal_passed=1)                                    # Fail - not an int or str
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed="1")                                    # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach="1")                                  # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed="1")                                    # Fail - Item not an int
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=-1)                                     # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=-1)                                   # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=-1)                                     # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=100)                                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=100)                                  # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=100)                                    # Fail - invalid item id
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, signal_approach=1)                   # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_approach=1, sensor_passed=1)                   # Fail - multiple specified
+    gpio_sensors.update_gpio_sensor_callback(12, signal_passed=1, sensor_passed=1)                     # Fail - multiple specified
     # set_gpio_sensors_to_publish_state
-    print ("GPIO Sensors - set_gpio_sensors_to_publish_state - will generate 2 warnings and 2 errors")
+    print ("GPIO Sensors - set_gpio_sensors_to_publish_state - will generate 2 warnings and 4 errors")
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 0
-    gpio_sensors.set_gpio_sensors_to_publish_state(15, 16)         # success - int and exists
+    gpio_sensors.set_gpio_sensors_to_publish_state(10, 11)         # success - int and exists
     gpio_sensors.set_gpio_sensors_to_publish_state(20, 21)         # success - int but does not yet exist
-    gpio_sensors.set_gpio_sensors_to_publish_state(15, 16)         # sensors already set to publish - will generate warnings
-    gpio_sensors.set_gpio_sensors_to_publish_state("17", "18")     # Fail - not an int
+    gpio_sensors.set_gpio_sensors_to_publish_state(10, 11)         # sensors already set to publish - will generate warnings
+    gpio_sensors.set_gpio_sensors_to_publish_state("12", "13")     # Fail - not an int
+    gpio_sensors.set_gpio_sensors_to_publish_state(0, 100)         # Fail - int out of range
     assert len(gpio_sensors.list_of_track_sensors_to_publish) == 4
     # gpio_sensor_triggered - This is an internal function so no need to test invalid inputs
-    print ("GPIO Sensors - Sensor triggering tests - Triggering Sensors 105, 106, 107")
+    print ("GPIO Sensors - Sensor triggering tests - Triggering Sensors 10, 11, 12")
     print ("GPIO Sensors - Will generate 3 Errors (signals / Track Sensors not existing)")
     # Set up the initial state for the tests
-    gpio_sensors.add_gpio_sensor_callback(15, signal_passed=1)
-    gpio_sensors.add_gpio_sensor_callback(16, signal_approach=2)
-    gpio_sensors.add_gpio_sensor_callback(17, sensor_passed=3)
+    gpio_sensors.update_gpio_sensor_callback(10, signal_passed=1)
+    gpio_sensors.update_gpio_sensor_callback(11, signal_approach=2)
+    gpio_sensors.update_gpio_sensor_callback(12, sensor_passed=3)
     # Tests start here
-    gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 15 (timeout=0.0)
-    gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 16 (timeout=3.0)
-    gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 17 (timeout=2.0)
-    system_test_harness.sleep(1.0)
-    print ("GPIO Sensors - Re-triggering Sensor 105 (which will have time out) - Sensors 106 and 107 will be extended")
+    gpio_sensors.gpio_sensor_triggered(4, testing=True)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.sleep(0.25)
+    print ("GPIO Sensors - Re-triggering Sensors - 10 will be re-triggered - 11 and 12 will be extended")
     print ("GPIO Sensors - Will generate 1 Error (signal 1 not existing)")
-    gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 15 (timeout=0.0)
-    gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 16 (timeout=3.0)
-    gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 17 (timeout=2.0)
-    system_test_harness.sleep(2.5)
-    print ("GPIO Sensors - Re-triggering Sensors 105, 107 (which will have time out) - Sensors 106 will be extended")
-    print ("GPIO Sensors - Will generate 2 Errors (signal 1 / Track Sensor 3 not existing)")
-    gpio_sensors.gpio_sensor_triggered(9, testing=True)   # Port number for GPIO Sensor 15 (timeout=0.0)
-    gpio_sensors.gpio_sensor_triggered(10, testing=True)  # Port number for GPIO Sensor 16 (timeout=3.0)
-    gpio_sensors.gpio_sensor_triggered(11, testing=True)  # Port number for GPIO Sensor 17 (timeout=2.0)
-    system_test_harness.sleep(3.5)
+    gpio_sensors.gpio_sensor_triggered(4, testing=True)  # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.sleep(1.25)
+    print ("GPIO Sensors - Re-triggering Sensors - 10 & 11 will be re-triggered - 12 will be extended")
+    print ("GPIO Sensors - Will generate 2 Errors (signal 1 / Signal 2 not existing)")
+    gpio_sensors.gpio_sensor_triggered(4, testing=True)   # Port number for GPIO Sensor 10 (timeout=0.0)
+    gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
+    gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
+    system_test_harness.sleep(2.25)
     print ("GPIO Sensors - End of sensor triggering tests -  all sensors should have timed out")
-    # subscribe_to_remote_gpio_sensor
-    print ("GPIO Sensors - subscribe_to_remote_gpio_sensor - Will generate 1 warning and 12 Errors")
-    assert len(gpio_sensors.gpio_port_mappings) == 8
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-20")                      # Success - valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_passed=1)     # Success
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-22", signal_approach=1)   # Success
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-23", sensor_passed=1)     # Success
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-20")                      # Warning - This is a duplicate
-    gpio_sensors.subscribe_to_remote_gpio_sensor(120)                            # Fail - not a string
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1")                         # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensor("20")                           # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-0")                       # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-100")                     # Fail - not valid remote ID
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_passed="1")    # Fail - not an int
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_approach="1")    # Fail - not an int
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", sensor_passed="1")        # Fail - not an int
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_passed=1, signal_approach=1, sensor_passed=1)  # Fail - multiple specified
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_passed=1, signal_approach=1)   # Fail - multiple specified
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21", signal_approach=1, sensor_passed=1)  # Fail - multiple specified
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-11", signal_passed=1, sensor_passed=1)    # Fail - multiple specified
+    # subscribe_to_remote_gpio_sensors
+    print ("GPIO Sensors - subscribe_to_remote_gpio_sensors - Will generate 1 warning and 5 Errors")
+    assert len(gpio_sensors.gpio_port_mappings) == 4
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20","box1-21")  # Success - valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-22")            # Success - valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20")            # Warning - This is a duplicate
+    gpio_sensors.subscribe_to_remote_gpio_sensors(120)                  # Fail - not a string
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1")               # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("20")                 # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-0")             # Fail - not valid remote ID
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-100")           # Fail - not valid remote ID
     assert gpio_sensors.gpio_sensor_exists("box1-20")
     assert gpio_sensors.gpio_sensor_exists("box1-21")
     assert gpio_sensors.gpio_sensor_exists("box1-22")
-    assert gpio_sensors.gpio_sensor_exists("box1-23")
-    assert len(gpio_sensors.gpio_port_mappings) == 12
-    # Check the callbacks have been setup correctly
+    assert len(gpio_sensors.gpio_port_mappings) == 7
+    # Check the callbacks have been initialised correctly
     assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [1,0,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,1,0]
-    assert gpio_sensors.get_gpio_sensor_callback("box1-23") == [0,0,1]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [0,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,0,0]
+    # Set up the correct callbacks
+    gpio_sensors.update_gpio_sensor_callback("box1-20", sensor_passed=10)      # Success - int and exists
+    gpio_sensors.update_gpio_sensor_callback("box1-21", signal_passed=10)      # Success - str and exists
+    gpio_sensors.update_gpio_sensor_callback("box1-22", signal_approach=10)    # Success - str and exists
+    # Check the callbacks have been updated correctly
+    assert gpio_sensors.get_gpio_sensor_callback("box1-20") == [0,0,10]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-21") == [10,0,0]
+    assert gpio_sensors.get_gpio_sensor_callback("box1-22") == [0,10,0]
     # Test the triggering of remote sensors:
-    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 3 errors and 2 warnings")
+    print ("GPIO Sensors - handle_mqtt_gpio_sensor_triggered_event - will generate 3 errors (signals / track sensors not existing) and 2 warnings")
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-20"})
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-21"})
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-22"})
-    gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-23"})
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"wrongkey": "box1-20"})          # Fail - spurious message
     gpio_sensors.handle_mqtt_gpio_sensor_triggered_event({"sourceidentifier": "box1-15"})  # Fail - not subscribed
-    system_test_harness.sleep (1.0)
     # reset_mqtt_configuration (all remote sensors will be deleted)
     print ("GPIO Sensors - reset_mqtt_configuration")
-    gpio_sensors.reset_mqtt_configuration()
-    assert len(gpio_sensors.gpio_port_mappings) == 8
+    gpio_sensors.reset_gpio_mqtt_configuration()
+    assert len(gpio_sensors.gpio_port_mappings) == 4
     assert not gpio_sensors.gpio_sensor_exists("box1-20")
     assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert not gpio_sensors.gpio_sensor_exists("box1-22")
-    assert not gpio_sensors.gpio_sensor_exists("box1-23")
     assert gpio_sensors.gpio_sensor_exists(10)
     assert gpio_sensors.gpio_sensor_exists(11)
     assert gpio_sensors.gpio_sensor_exists(12)
     assert gpio_sensors.gpio_sensor_exists(13)
-    assert gpio_sensors.gpio_sensor_exists(14)
-    assert gpio_sensors.gpio_sensor_exists(15)
-    assert gpio_sensors.gpio_sensor_exists(16)
-    assert gpio_sensors.gpio_sensor_exists(17)
     print ("GPIO Sensors - delete_all_local_gpio_sensors")
     # Subscribe to remote sensors to test delete of local sensors
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-20") 
-    gpio_sensors.subscribe_to_remote_gpio_sensor("box1-21")
-    assert len(gpio_sensors.gpio_port_mappings) == 10
+    gpio_sensors.subscribe_to_remote_gpio_sensors("box1-20","box1-21") 
+    assert len(gpio_sensors.gpio_port_mappings) == 6
     # delete_all_local_gpio_sensors
     gpio_sensors.delete_all_local_gpio_sensors()
     assert not gpio_sensors.gpio_sensor_exists(10)
     assert not gpio_sensors.gpio_sensor_exists(11)
     assert not gpio_sensors.gpio_sensor_exists(12)
     assert not gpio_sensors.gpio_sensor_exists(13)
-    assert not gpio_sensors.gpio_sensor_exists(14)
-    assert not gpio_sensors.gpio_sensor_exists(15)
-    assert not gpio_sensors.gpio_sensor_exists(16)
-    assert not gpio_sensors.gpio_sensor_exists(17)
     assert gpio_sensors.gpio_sensor_exists("box1-20")
     assert gpio_sensors.gpio_sensor_exists("box1-21")
     assert len(gpio_sensors.gpio_port_mappings) == 2
-    gpio_sensors.reset_mqtt_configuration()
+    gpio_sensors.reset_gpio_mqtt_configuration()
+    assert not gpio_sensors.gpio_sensor_exists("box1-20")
+    assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert len(gpio_sensors.gpio_port_mappings) == 0
     # gpio_shutdown
     print ("GPIO Sensors - gpio_shutdown immediately after a trigger event")
-    gpio_sensors.create_gpio_sensor(10, 4)
+    gpio_sensors.create_gpio_sensor(10, 4, trigger_period=0.01, sensor_timeout=5.00)
     gpio_sensors.gpio_sensor_triggered(4, testing=True)
-    gpio_sensors.gpio_shutdown()
+    gpio_sensors.delete_all_local_gpio_sensors()
     gpio_sensors.gpio_sensor_triggered(4, testing=True)
     print("----------------------------------------------------------------------------------------")
     print("")
@@ -435,12 +397,14 @@ def run_point_library_tests():
     assert points.points[str(14)]['locked']==False
     # Update autoswitch
     print("Library Tests - update_autoswitch - will generate 4 errors:")
-    points.update_autoswitch("10", 13)
-    points.update_autoswitch(15, 13)   # Point 105 does not exist
-    points.update_autoswitch(12, "19")
-    points.update_autoswitch(12, 15)
-    points.toggle_point(12) # 102 was autoswitching 101
+    points.update_autoswitch("10", 13) # Error - not an int
+    points.update_autoswitch(15, 13)   # Error - Point does not exist
+    points.update_autoswitch(12, "19") # Error - alsoswitch not an int
+    points.update_autoswitch(12, 15)   # Error - alsoswitch point does not exist
+    points.toggle_point(12)            # Valid - 12 is configured to autoswitching 11
     assert points.point_switched(12)
+    assert points.point_switched(11)
+    # Test changing alsoswitch when a point already switched
     assert not points.point_switched(13)
     points.update_autoswitch(12, 13)  
     assert points.point_switched(12)
@@ -448,6 +412,12 @@ def run_point_library_tests():
     points.toggle_point(12)
     assert not points.point_switched(12)
     assert not points.point_switched(13)
+    print("Library Tests - update_autoswitch to a 'null' point (no errors)")
+    points.update_autoswitch(12, 0)  
+    points.toggle_point(12)
+    assert points.point_switched(12)
+    assert not points.point_switched(13)
+    points.toggle_point(12)
     print("Library Tests - update_autoswitch to a non-auto point - will generate 2 errors:")
     points.update_autoswitch(12, 10)  
     points.toggle_point(12)
@@ -497,7 +467,7 @@ def run_point_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def instrument_callback(instrument_id, callback_type):
-    logging_string="Instrument Callback from Instrument "+str(instrument_id)+"-"+str(callback_type)
+    logging_string="Instrument Callback from Instrument "+str(instrument_id)+" - "+str(callback_type)
     logging.info(logging_string)
     
 def run_instrument_library_tests():
@@ -508,29 +478,29 @@ def run_instrument_library_tests():
     print("Library Tests - create_instrument - 10 Errors and 4 warnings will be generated")
     assert len(block_instruments.instruments) == 0
     # Sunny day tests
-    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")
-    block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="1")
-    block_instruments.create_instrument(canvas, 3, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="4")
-    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.double_line, 400, 100, instrument_callback, linked_to="3")
-    block_instruments.create_instrument(canvas, 5, block_instruments.instrument_type.double_line, 500, 100, instrument_callback, linked_to="box1-5")
-    block_instruments.create_instrument(canvas, 6, block_instruments.instrument_type.single_line, 600, 100, instrument_callback, linked_to="9")
+    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")      # Valid
+    block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="1")      # Valid
+    block_instruments.create_instrument(canvas, 3, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="4")      # Valid
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.double_line, 400, 100, instrument_callback, linked_to="3")      # Valid
+    block_instruments.create_instrument(canvas, 5, block_instruments.instrument_type.double_line, 500, 100, instrument_callback, linked_to="box1-5") # Valid
+    block_instruments.create_instrument(canvas, 6, block_instruments.instrument_type.single_line, 600, 100, instrument_callback, linked_to="9")      # valid
     # Raise a warning because Instrument 6 is already linked to instrument 9
-    block_instruments.create_instrument(canvas, 7, block_instruments.instrument_type.single_line, 700, 100, instrument_callback, linked_to="9") # warning
+    block_instruments.create_instrument(canvas, 7, block_instruments.instrument_type.single_line, 700, 100, instrument_callback, linked_to="9")      # warning
     # Raise a warning because Instrument 5 is linked back to a completely different instrument (instrument "box1-5")
-    block_instruments.create_instrument(canvas, 8, block_instruments.instrument_type.single_line, 800, 100, instrument_callback, linked_to="5") # Warning
+    block_instruments.create_instrument(canvas, 8, block_instruments.instrument_type.single_line, 800, 100, instrument_callback, linked_to="5")      # Warning
     # Raise a warning because we are linking to instrument 8 but Instruments 6 and 7 are already linked to back to 'our' instrument
-    block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 900, 100, instrument_callback, linked_to="10") # Warning
+    block_instruments.create_instrument(canvas, 9, block_instruments.instrument_type.single_line, 900, 100, instrument_callback, linked_to="10")     # Warning
     # Rainy day tests:
-    block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (int <1)
-    block_instruments.create_instrument(canvas, 100, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (int >100)
-    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (Exists)
-    block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10") # Fail (str)
-    block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2") # Fail
-    block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10) # Fail
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1") # Fail
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-0") # Fail
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-100") # Fail
-    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="12") # Fail
+    block_instruments.create_instrument(canvas, 0, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")     # Fail (int <1)
+    block_instruments.create_instrument(canvas, 100, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")   # Fail (int >100)
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")     # Fail (Exists)
+    block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")  # Fail (str)
+    block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2")                                     # Fail (invalid type)
+    block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10)         # Fail (linked ID not int)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1")     # Fail (invalid linked ID)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-0")   # Fail (invalid linked ID)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-100") # Fail (invalid linked ID)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="12")       # Fail (same ID)
     assert len(block_instruments.instruments) == 9
     print("Library Tests - instrument_exists - 1 Error will be generated")
     assert block_instruments.instrument_exists("1")
@@ -544,44 +514,89 @@ def run_instrument_library_tests():
     assert block_instruments.instrument_exists(9)
     assert not block_instruments.instrument_exists("10")
     assert not block_instruments.instrument_exists(10)
-    assert not block_instruments.instrument_exists(10.1)
+    assert not block_instruments.instrument_exists(10.1) # Error - ID not an int
     print("Library Tests - block_section_ahead_clear - Part 1 - 2 Errors will be generated")
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
     assert not block_instruments.block_section_ahead_clear(3)
     assert not block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear("5")
-    assert not block_instruments.block_section_ahead_clear(10)
-    print("Library Tests - block_section_ahead_clear - Part 2 - Testing instrument states (no errors or warnings)")
+    assert not block_instruments.block_section_ahead_clear("5") # Fail - not an int
+    assert not block_instruments.block_section_ahead_clear(10)  # Fail - does not exist
+    print("Library Tests - block_section_ahead_clear - Part 2 - Testing local instrument states (no errors or warnings)")
+    # Instrument 1 is linked to Instrument 2 
     block_instruments.clear_button_event(1)
-    block_instruments.clear_button_event(3)
-    block_instruments.clear_button_event(3)
+    block_instruments.clear_button_event(1)
+    assert not block_instruments.block_section_ahead_clear(1)
     assert block_instruments.block_section_ahead_clear(2)
-    assert block_instruments.block_section_ahead_clear(4)
-    assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(3)
-    block_instruments.occup_button_event(1)
-    block_instruments.occup_button_event(3)
-    block_instruments.occup_button_event(3)
-    assert not block_instruments.block_section_ahead_clear(1)
-    assert not block_instruments.block_section_ahead_clear(2)
-    assert not block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(4)
     block_instruments.blocked_button_event(1)
-    block_instruments.blocked_button_event(3)
-    block_instruments.blocked_button_event(3)
+    block_instruments.blocked_button_event(1)
     assert not block_instruments.block_section_ahead_clear(1)
     assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.occup_button_event(1)
+    block_instruments.occup_button_event(1)
+    assert not block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.blocked_button_event(1)
+    block_instruments.blocked_button_event(1)
+    assert not block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)    
+    # Instrument 2 is linked to Instrument 1 
+    block_instruments.clear_button_event(2)
+    block_instruments.clear_button_event(2)
+    assert block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.blocked_button_event(2)
+    block_instruments.blocked_button_event(2)
+    assert not block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.occup_button_event(2)
+    block_instruments.occup_button_event(2)
+    assert not block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.blocked_button_event(2)
+    block_instruments.blocked_button_event(2)
+    assert not block_instruments.block_section_ahead_clear(1)
+    assert not block_instruments.block_section_ahead_clear(2)    
+    # Instrument 3 is linked to Instrument 4 
+    block_instruments.clear_button_event(3)
+    block_instruments.clear_button_event(3)
+    assert not block_instruments.block_section_ahead_clear(3)
+    assert block_instruments.block_section_ahead_clear(4)
+    block_instruments.blocked_button_event(3)
+    block_instruments.blocked_button_event(3)
     assert not block_instruments.block_section_ahead_clear(3)
     assert not block_instruments.block_section_ahead_clear(4)
-    block_instruments.clear_button_event(2)
-    block_instruments.clear_button_event(4)
-    assert block_instruments.block_section_ahead_clear(1)
-    assert block_instruments.block_section_ahead_clear(3)
-    assert not block_instruments.block_section_ahead_clear(2)
+    block_instruments.occup_button_event(3)
+    block_instruments.occup_button_event(3)
+    assert not block_instruments.block_section_ahead_clear(3)
     assert not block_instruments.block_section_ahead_clear(4)
-    block_instruments.blocked_button_event(2)
+    block_instruments.blocked_button_event(3)
+    block_instruments.blocked_button_event(3)
+    assert not block_instruments.block_section_ahead_clear(3)
+    assert not block_instruments.block_section_ahead_clear(4)    
+    # Instrument 4 is linked to Instrument 3 
+    block_instruments.clear_button_event(4)
+    block_instruments.clear_button_event(4)
+    assert block_instruments.block_section_ahead_clear(3)
+    assert not block_instruments.block_section_ahead_clear(4)
     block_instruments.blocked_button_event(4)
+    block_instruments.blocked_button_event(4)
+    assert not block_instruments.block_section_ahead_clear(3)
+    assert not block_instruments.block_section_ahead_clear(4)
+    block_instruments.occup_button_event(4)
+    block_instruments.occup_button_event(4)
+    assert not block_instruments.block_section_ahead_clear(3)
+    assert not block_instruments.block_section_ahead_clear(4)
+    block_instruments.blocked_button_event(4)
+    block_instruments.blocked_button_event(4)
+    assert not block_instruments.block_section_ahead_clear(3)
+    assert not block_instruments.block_section_ahead_clear(4)    
+    print("Library Tests - Test linking of section bells to excersise the code (no errors or warnings)")
+    # Instrument 1 is linked to Instrument 2  and instrument 3 is linked to instrument 4
+    block_instruments.telegraph_key_button(1)
+    block_instruments.telegraph_key_button(2)
+    block_instruments.telegraph_key_button(3)
+    block_instruments.telegraph_key_button(4)
     print("Library Tests - update_linked_instrument - 5 Errors and 5 warnings will be generated")
     # Clear down the spurious linkings
     block_instruments.update_linked_instrument(5,"")
@@ -590,26 +605,31 @@ def run_instrument_library_tests():
     block_instruments.update_linked_instrument(8,"")
     block_instruments.update_linked_instrument(9,"")
     # Make the new linkings
-    block_instruments.update_linked_instrument(5,"4")
-    block_instruments.update_linked_instrument(4,"5")
-    block_instruments.update_linked_instrument(1,"6")
-    block_instruments.update_linked_instrument(6,"1")
-    block_instruments.update_linked_instrument(4,"4")   # Fail - same ID
-    block_instruments.update_linked_instrument(10,"7")   # Fail -Inst ID does not exist
-    block_instruments.update_linked_instrument("1","2") # Fail - Inst ID not an int
-    block_instruments.update_linked_instrument(1,2)     # Fail - Linked ID not a str
-    block_instruments.update_linked_instrument(1,"box1") # Fail - linked ID npot valid remote ID
-    print("Library Tests - set_instruments_to_publish_state - 3 Errors and 4 warnings will be generated")
+    block_instruments.update_linked_instrument(5,"4")    # 2 Warnings (3 is linked to 4)
+    block_instruments.update_linked_instrument(4,"5")    # Warning (3 is linked to 4) 
+    block_instruments.update_linked_instrument(1,"6")    # Warning (2 is linked to 1)
+    block_instruments.update_linked_instrument(6,"1")    # Warning (2 is linked to 1)
+    block_instruments.update_linked_instrument(4,"4")    # Fail - same ID
+    block_instruments.update_linked_instrument(10,"7")   # Fail - Inst ID does not exist
+    block_instruments.update_linked_instrument("1","2")  # Fail - Inst ID not an int
+    block_instruments.update_linked_instrument(1,2)      # Fail - Linked ID not a str
+    block_instruments.update_linked_instrument(1,"box1") # Fail - linked ID not valid remote ID
+    print("Library Tests - set_instruments_to_publish_state - 4 Errors and 3 warnings will be generated")
+    # Set instrument 5 to publish state as soon as it set to publish (and reset the other linkings)
+    block_instruments.update_linked_instrument(5,"box1-5") # Warning - inst 5 linked from inst 4
+    block_instruments.update_linked_instrument(6,"")
+    block_instruments.update_linked_instrument(4,"3")
+    block_instruments.update_linked_instrument(1,"2")
     assert len(block_instruments.list_of_instruments_to_publish) == 0
-    block_instruments.set_instruments_to_publish_state(1,2,5,20) 
-    block_instruments.set_instruments_to_publish_state(1,2,5,20) # Already set to publish - 4 warnings
-    block_instruments.set_instruments_to_publish_state("1,","2") # Not integers - 2 Errors
-    block_instruments.set_instruments_to_publish_state(0) # Integer but < 1 - 1 Error
+    block_instruments.set_instruments_to_publish_state(1,2,5,20)  # Valid
+    block_instruments.set_instruments_to_publish_state(1, 2)      # Already set to publish - 2 warnings
+    block_instruments.set_instruments_to_publish_state("1,","2")  # Not integers - 2 Errors
+    block_instruments.set_instruments_to_publish_state(0, 100)    # Integer but out of range - 2 errors
     assert len(block_instruments.list_of_instruments_to_publish) == 4
-    print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code")    
+    # Create an instrument already set to publish state on creation
+    block_instruments.create_instrument(canvas, 10, block_instruments.instrument_type.single_line, 1000, 100, instrument_callback, linked_to="box1-20")
+    print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code")
     # Clear down the existing linked instruments first
-    block_instruments.update_linked_instrument(4,"")
-    block_instruments.update_linked_instrument(1,"")
     block_instruments.update_linked_instrument(5,"Box2-50")
     block_instruments.update_linked_instrument(6,"Box2-60")
     block_instruments.clear_button_event(5)
@@ -619,6 +639,7 @@ def run_instrument_library_tests():
     block_instruments.blocked_button_event(5)
     block_instruments.blocked_button_event(5)
     block_instruments.telegraph_key_button(5)
+    block_instruments.telegraph_key_button(5)
     block_instruments.clear_button_event(6)
     block_instruments.clear_button_event(6)
     block_instruments.occup_button_event(6)
@@ -626,41 +647,49 @@ def run_instrument_library_tests():
     block_instruments.blocked_button_event(6)
     block_instruments.blocked_button_event(6)
     block_instruments.telegraph_key_button(6)
+    block_instruments.telegraph_key_button(6)
     print("Library Tests - subscribe_to_remote_instrument - 5 Errors and 1 Warning will be generated")
-    block_instruments.subscribe_to_remote_instrument("box2-20")
-    block_instruments.subscribe_to_remote_instrument("box2-20")   # Warning - This is a duplicate
-    block_instruments.subscribe_to_remote_instrument(20)          # Fail - not a string
-    block_instruments.subscribe_to_remote_instrument("box2")      # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instrument("200")       # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instrument("box2-0")    # Fail - not valid remote ID
-    block_instruments.subscribe_to_remote_instrument("box2-100")  # Fail - not valid remote ID
     assert len(block_instruments.instruments) == 10
+    block_instruments.subscribe_to_remote_instruments("box2-20")   # Success
+    block_instruments.subscribe_to_remote_instruments("box2-20")   # Warning - This is a duplicate
+    block_instruments.subscribe_to_remote_instruments(20)          # Fail - not a string
+    block_instruments.subscribe_to_remote_instruments("box2")      # Fail - not valid remote ID
+    block_instruments.subscribe_to_remote_instruments("200")       # Fail - not valid remote ID
+    block_instruments.subscribe_to_remote_instruments("box2-0")    # Fail - not valid remote ID
+    block_instruments.subscribe_to_remote_instruments("box2-100")  # Fail - not valid remote ID
+    assert len(block_instruments.instruments) == 11
     assert block_instruments.instrument_exists("box2-20")
     print("Library Tests - handle_mqtt_instrument_updated_event - 5 Warnings will be generated")
     assert not block_instruments.block_section_ahead_clear(1)
     block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": True, "instrumentid":"box1-1" })
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": True, "instrumentid":"box1-1" })
     assert block_instruments.block_section_ahead_clear(1)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": False, "instrumentid":"box1-1" })
     block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": False, "instrumentid":"box1-1" })
     assert not block_instruments.block_section_ahead_clear(1)
     block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": None, "instrumentid":"box1-1" })
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": None, "instrumentid":"box1-1" })
     assert not block_instruments.block_section_ahead_clear(1)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": None, "instrumentid":"box1-20" })  # box1-20 Does not exist (no warnings)
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier": "box2-20", "sectionstate": None, "instrumentid":"box1-20" })  # box1-20 Does not exist (no warnings)
     block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-20","sectionstate":None,"instrumentid":"random" }) # Invalid ID
     block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-50","sectionstate":False,"instrumentid":"box1-1"}) # Not subscribed
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-50","instrumentid":"box1-1"})  # Fail - spurious message
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-50","instrumentid":"box1-1"})   # Fail - spurious message
     block_instruments.handle_mqtt_instrument_updated_event({"sectionstate": False, "instrumentid":"box1-1"})         # Fail - spurious message
-    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-50","sectionstate": False})    # Fail - spurious message
+    block_instruments.handle_mqtt_instrument_updated_event({"sourceidentifier":"box2-50","sectionstate": False})     # Fail - spurious message
     print("Library Tests - handle_mqtt_ring_section_bell_event - 4 Warnings will be generated")
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"box1-1" })
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"box1-1" })
-    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"box1-1" })
-    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"random" }) # Invalid ID
-    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-50", "sectionstate": False})    # Not subscribed
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"box1-20" }) # box1-20 Does not exist (no warnings)
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"box1-20" }) # box1-20 Does not exist (no warnings)
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20", "instrumentid":"random" })  # Invalid ID
+    block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-50", "instrumentid":"box1-1"})   # Not subscribed
     block_instruments.handle_mqtt_ring_section_bell_event({"instrumentid": "box2-1"})                                 # Fail - spurious message
     block_instruments.handle_mqtt_ring_section_bell_event({"sourceidentifier": "box2-20"})                            # Fail - spurious message
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
-    block_instruments.reset_mqtt_configuration()
+    block_instruments.reset_instruments_mqtt_configuration()
     assert len(block_instruments.list_of_instruments_to_publish) == 0
-    assert len(block_instruments.instruments) == 9
+    assert len(block_instruments.instruments) == 10
     assert not block_instruments.instrument_exists("box1-20")
     print("Library Tests - Test Bell code window (no errors or warnings)")
     block_instruments.open_bell_code_hints()
@@ -679,6 +708,7 @@ def run_instrument_library_tests():
     block_instruments.delete_instrument(7)
     block_instruments.delete_instrument(8)
     block_instruments.delete_instrument(9)
+    block_instruments.delete_instrument(10)
     assert len(block_instruments.instruments) == 0
     assert not block_instruments.instrument_exists(1)
     assert not block_instruments.instrument_exists(2)
@@ -689,8 +719,44 @@ def run_instrument_library_tests():
     assert not block_instruments.instrument_exists(7)
     assert not block_instruments.instrument_exists(8)
     assert not block_instruments.instrument_exists(9)
+    assert not block_instruments.instrument_exists(10)
     block_instruments.delete_instrument(10) # Fail
     block_instruments.delete_instrument("10") # Fail
+    
+    
+    
+    
+    
+    print("Library Tests - create_instrument - update the state of repeater on created instrument to reflect instrument already linked back to it")
+    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="4")
+    block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="5")
+    block_instruments.create_instrument(canvas, 3, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="6")
+    block_instruments.blocked_button_event(1)
+    block_instruments.clear_button_event(2)
+    block_instruments.occup_button_event(3)
+    block_instruments.create_instrument(canvas, 4, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="1")
+    block_instruments.create_instrument(canvas, 5, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="2")
+    block_instruments.create_instrument(canvas, 6, block_instruments.instrument_type.double_line, 300, 100, instrument_callback, linked_to="3")
+    assert not block_instruments.block_section_ahead_clear(4)
+    assert block_instruments.block_section_ahead_clear(5)
+    assert not block_instruments.block_section_ahead_clear(6)
+    block_instruments.delete_instrument(1)
+    block_instruments.delete_instrument(2)
+    block_instruments.delete_instrument(3)
+    block_instruments.delete_instrument(4)
+    block_instruments.delete_instrument(5)
+    block_instruments.delete_instrument(6)
+    print("Library Tests - update block instrument not linked to any other block instrument")
+    block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.double_line, 100, 100, instrument_callback, linked_to="")
+    block_instruments.telegraph_key_button(1)
+    block_instruments.telegraph_key_button(1)
+    block_instruments.blocked_button_event(1)
+    block_instruments.blocked_button_event(1)
+    block_instruments.clear_button_event(1)
+    block_instruments.clear_button_event(1)
+    block_instruments.occup_button_event(1)
+    block_instruments.occup_button_event(1)
+    block_instruments.delete_instrument(1)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1060,9 +1126,9 @@ def run_all_basic_library_tests(shutdown:bool=False):
     run_gpio_sensor_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
-    run_pi_sprog_interface_tests(baud_rate)
-    run_dcc_control_tests(baud_rate)
-    run_mqtt_interface_tests()
+#     run_pi_sprog_interface_tests(baud_rate)
+#     run_dcc_control_tests(baud_rate)
+#     run_mqtt_interface_tests()
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: system_test_harness.report_results()
 

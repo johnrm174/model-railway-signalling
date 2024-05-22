@@ -44,15 +44,15 @@
 #                       (i.e. the linked instrument controlling the state of the block section ahead)
 #
 # The following API functions are for configuring the pub/sub of Block Instrument events. The functions are
-# called by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# called by the editor on 'Apply' of the MQTT settings. First, 'reset_instruments_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_instruments_to_publish_state' (with the list of LOCAL Block
 # Instruments to publish) and 'subscribe_to_remote_instrument' for each REMOTE Block Instrument that has been subscribed.
 #
-#   reset_mqtt_configuration() - Clears down the current Block Instrument pub/sub configuration
+#   reset_instruments_mqtt_configuration() - Clears down the current Block Instrument pub/sub configuration
 # 
 #   set_instruments_to_publish_state(*sensor_ids:int) - Enable the publication of Block Instrument events.
 #
-#   subscribe_to_remote_instrument(remote_id:str) - Subscribes to a remote Block Instrument
+#   subscribe_to_remote_instruments(*remote_id:str) - Subscribes to one or more remote Block Instrument
 #
 # Classes and functions used by the other library modules:
 #
@@ -211,9 +211,9 @@ def blocked_button_event(inst_id:int):
 
 def telegraph_key_button(inst_id:int):
     logging.debug ("Instrument "+str(inst_id)+": Telegraph key operated ************************************")
-    # Provide a visual indication of the key being pressed
+    # Provide a visual indication of the key being pressed (and schedule the button reset)
     instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
-    common.root_window.after(10,lambda:instruments[str(inst_id)]["bellbutton"].config(relief="raised"))
+    common.root_window.after(10,lambda:reset_telegraph_button(inst_id))
     # Sound the "clack" of the telegraph key - We put exception handling around this as the function can raise
     # exceptions if you try to play too many sounds simultaneously (if the button is clicked too quickly/frequently)
     if instruments[str(inst_id)]["telegraphsound"] is not None:
@@ -222,18 +222,27 @@ def telegraph_key_button(inst_id:int):
     # If linked to another instrument then call the function to ring the bell on the other instrument or
     # Publish the "bell ring event" to the broker (for other nodes to consume). Note that events will only
     # be published if the MQTT interface has been configured and we are connected to the broker
-    if instruments[str(inst_id)]["linkedto"].isdigit(): ring_section_bell(instruments[str(inst_id)]["linkedto"])
-    elif instruments[str(inst_id)]["linkedto"] != "": send_mqtt_ring_section_bell_event(inst_id)
+    linked_instrument = instruments[str(inst_id)]["linkedto"]
+    if linked_instrument.isdigit() and instrument_exists(linked_instrument):
+        ring_section_bell(linked_instrument)
+    elif linked_instrument != "":
+        send_mqtt_ring_section_bell_event(inst_id)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal Function to reset the state of the telegraph button. Scheduled from 
+# the telegraph_key_button function and ring_section_bell function
+# --------------------------------------------------------------------------------
+
+def reset_telegraph_button(inst_id:int):
+    if instrument_exists(inst_id): instruments[str(inst_id)]["bellbutton"].config(bg="black", relief="raised")
     return()
 
 # --------------------------------------------------------------------------------
 # Internal Function to receive bell rings from another instrument and
 # sound a bell "ting" on the local instrument (with a visual indication)
 # --------------------------------------------------------------------------------
-
-def reset_telegraph_button (inst_id:int):
-    if instrument_exists(inst_id): instruments[str(inst_id)]["bellbutton"].config(bg="black")
-
+        
 def ring_section_bell(inst_id:int):
     logging.debug ("Instrument "+str(inst_id)+": Ringing Bell")
     # Provide a visual indication and sound the bell (not if shutdown has been initiated)
@@ -253,40 +262,57 @@ def ring_section_bell(inst_id:int):
 # --------------------------------------------------------------------------------
 
 def handle_mqtt_instrument_updated_event(message):
-    if ("sourceidentifier" not in message.keys() or "sectionstate" not in message.keys() or
-          "instrumentid" not in message.keys() or not instrument_exists(message["sourceidentifier"]) or
-              mqtt_interface.split_remote_item_identifier(message["instrumentid"]) is None):
+    if ("sourceidentifier" not in message.keys() or "sectionstate" not in message.keys() or "instrumentid" not in message.keys()
+              or mqtt_interface.split_remote_item_identifier(message["instrumentid"]) is None):
         logging.warning("Instruments: handle_mqtt_instrument_updated_event - Unhandled MQTT message - "+str(message))
+    elif not instrument_exists(message["sourceidentifier"]):
+        logging.warning("Instruments: handle_mqtt_instrument_updated_event - Message received from Remote Instrument "+
+                        message["sourceidentifier"]+" but this instrument has not been subscribed to")
     else:
-        node_id, inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
-        if instrument_exists(inst_id):
-            logging.info("Instrument "+str(inst_id)+": State update from linked instrument "+
-                                        message["sourceidentifier"]+" ********************")
-            if message["sectionstate"] == True: set_repeater_clear(inst_id)
-            elif message["sectionstate"] == False: set_repeater_occupied(inst_id)
-            elif message["sectionstate"] == None: set_repeater_blocked(inst_id)
-        # Note that if the specified block instrument does not exist then we fail silently for the instrument updated event.
-        # This could arise from either layout misconfiguration (a non existant 'linked instrument' specified for the Block
-        # instrument on the oither network node), or the race condition that will arise when loading the layouts (one of the
-        # layouts will always be created first and will therefore end up sending the initial block instrument state message
-        # before the linked instrument (on the other layout) has been created. We therefore accept this as a limitation.
+        # Get the 'target' for the state update (i.e. the LOCAL instrument the REMOTE instrument is linked to)
+        # We don't validate on the 'node_id' as this will always be the network node for this application instance
+        local_node_id, local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        remote_inst_id = message["sourceidentifier"]
+        remote_inst_state = message["sectionstate"]
+        # Remote Instrument state is True for CLEAR, False for OCCUPIED or None for BLOCKED
+        if message["sectionstate"] == True: remote_state = "LINE CLEAR"
+        elif message["sectionstate"] == False: remote_state = "TRAIN ON LINE"
+        else: remote_state = "LINE BLOCKED "
+        logging.info("Instrument "+str(remote_inst_id)+": State update from Remote instrument - "+remote_state+" **********")
+        # Store the state of the REMOTE instrument in the dummy instrument object created at subscription time. We need this
+        # when creating or updating the configuration of LOCAL instruments so the Repeater display can be correctly set to
+        # reflect the state of the REMOTE instrument. The state of the remote instrument is now known so it is VALID 
+        instruments[remote_inst_id]["statevalid"] = True
+        instruments[remote_inst_id]["sectionstate"] = remote_inst_state
+        instruments[remote_inst_id]["linkedto"] = str(local_inst_id)
+        # Only update the LOCAL block instrument if it exists on the schematic (we might have subscribed to the
+        # REMOTE instrument and the REMOTE instrument may be linked to an LOCAL instrument on our schematic (which
+        # will mean we get an initial state update from the REMOTE instrument to update the LOCAL instrument repeater
+        # display) - but there are edge cases where the LOCAL instrument might not have been created (e.g. file load)
+        if instrument_exists(local_inst_id):
+            if remote_inst_state == True: set_repeater_clear(local_inst_id)
+            elif remote_inst_state == False: set_repeater_occupied(local_inst_id)
+            elif remote_inst_state == None: set_repeater_blocked(local_inst_id)
     return()
 
 def handle_mqtt_ring_section_bell_event(message):
-    if ("sourceidentifier" not in message.keys() or "instrumentid" not in message.keys() or not instrument_exists(message["sourceidentifier"])
-            or mqtt_interface.split_remote_item_identifier(message["instrumentid"])  is None):
+    if ("sourceidentifier" not in message.keys() or "instrumentid" not in message.keys()
+            or mqtt_interface.split_remote_item_identifier(message["instrumentid"]) is None):
         logging.warning("Instruments: handle_mqtt_ring_section_bell_event - Unhandled MQTT message - "+str(message))
+    elif not instrument_exists(message["sourceidentifier"]):
+        logging.warning("Instruments: handle_mqtt_ring_section_bell_event - Message received from Remote Instrument "+
+                        message["sourceidentifier"]+" but this instrument has not been subscribed to")
     else:
-        node_id, inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
-        if instrument_exists(inst_id):
-            logging.debug("Instrument "+str(inst_id)+": Telegraph key event from linked instrument"+
-                                        message["sourceidentifier"]+" ********************")
-            ring_section_bell(inst_id)
-        # Note that if the specified block instrument does not exist then we fail silently for the ring section bell event.
-        # This could arise from either layout misconfiguration (a non existant 'linked instrument' specified for the Block
-        # instrument on the oither network node), or the race condition that will arise when loading the layouts (one of the
-        # layouts will always be created first and will therefore end up sending the initial block instrument state message
-        # before the linked instrument (on the other layout) has been created. We therefore accept this as a limitation.
+        logging.info("Instrument "+message["sourceidentifier"]+": Telegraph key Event from Remote instrument "+
+                                                     " *****************************************")
+        # Get the 'target' for the bell event (i.e. the LOCAL instrument the REMOTE instrument is linked to)
+        # We don't validate on the 'node_id' as this will always be the network node for this application instance
+        local_node_id, local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        # Only ring the bell on the the LOCAL instrument if it exists on the schematic (we might have subscribed to
+        # the REMOTE instrument and the REMOTE instrument may be linked to an LOCAL instrument on our schematic (which
+        # will mean we get an initial state update from the REMOTE instrument to update the LOCAL instrument repeater
+        # display) - but there are edge cases where the LOCAL instrument might not have been created (e.g. file load)
+        if instrument_exists(local_inst_id): ring_section_bell(local_inst_id)
     return()
 
 # --------------------------------------------------------------------------------
@@ -413,7 +439,7 @@ def set_section_blocked(inst_id:int,update_remote_instrument:bool=True):
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
+        if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -439,7 +465,7 @@ def set_section_clear(inst_id:int,update_remote_instrument:bool=True):
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
+        if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -465,25 +491,8 @@ def set_section_occupied(inst_id:int,update_remote_instrument:bool=True):
         # If linked to another instrument then update the repeater indicator on the other instrument or
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
-        if update_remote_instrument: refresh_linked_instrument(inst_id, instruments[str(inst_id)]["linkedto"])
+        if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
     return ()
-
-# --------------------------------------------------------------------------------
-# Internal function to update the REPEATER display on a linked block instrument
-# --------------------------------------------------------------------------------
-
-def refresh_linked_instrument(inst_id:int, linked_to:str):
-    # Block State is as follows: True = Line Clear, False = Train On Line, None = Line Blocked
-    if instruments[str(inst_id)]["sectionstate"] == True:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_clear(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
-    elif instruments[str(inst_id)]["sectionstate"] == False:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_occupied(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
-    else:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_blocked(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
-    return()
 
 # --------------------------------------------------------------------------------
 # Internal function to create the Indicator component of a Block Instrument
@@ -554,9 +563,6 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Invalid Instrument Type specified")
     else:
         logging.debug("Instrument "+str(inst_id)+": Creating library object on the schematic")
-        # Validate the linked instrument config - this won't prevent the instrument being created
-        # but does raise warnings for potential misconfigurations (that won't break the system)
-        validate_linked_instrument(inst_id, linked_to)
         # Create the Instrument background - this will vary in size depending on single or double line
         if inst_type == instrument_type.single_line:
             canvas.create_rectangle (x-48, y-18, x+48, y+120, fill = "saddle brown",tags=canvas_tag)
@@ -610,6 +616,7 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         instruments[str(inst_id)]["insttype"] = inst_type                    # Block Instrument Type
         instruments[str(inst_id)]["sectionstate"] = None                     # State of this instrument (None = "BLOCKED")
         instruments[str(inst_id)]["repeaterstate"] = None                    # State of repeater display (None = "BLOCKED")
+        instruments[str(inst_id)]["statevalid"] = True                       # State is always valid for LOCAL instruments
         instruments[str(inst_id)]["blockbutton"] = block_button              # Tkinter Button object
         instruments[str(inst_id)]["clearbutton"] = clear_button              # Tkinter Button object
         instruments[str(inst_id)]["occupbutton"] = occup_button              # Tkinter Button object
@@ -638,13 +645,118 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         # local instruments (inst_id is an int) if they have already been created on the schematic or
         # send an MQTT event to update remote instruments (inst_id is a str) if the current instrument
         # has already been configured to publish state to the MQTT broker.
-        refresh_linked_instrument(inst_id, linked_to)
+        refresh_repeater_of_linked_instrument(inst_id)
         # If an instrument already exists that is already linked to this instrument then we need
         # to set the repeater display of 'our' instrument to reflect the state of that instrument.
-        for other_instrument in instruments:
-            if instruments[other_instrument]['linkedto'] == str(inst_id):
-                refresh_linked_instrument(int(other_instrument), str(inst_id))
+        refresh_repeater_of_our_instrument(inst_id)
+        # Validate the linked instrument config - this won't prevent the linking being created
+        # but will raise warnings for potential misconfigurations (that won't break the system)
+        validate_linked_instrument(inst_id)
     return(canvas_tag)
+
+# ------------------------------------------------------------------------------------------
+# API function for updating the ID of the linked block instrument without
+# needing to delete the block instrument and then create it in its new state. The main
+# use case is when bulk deleting objects via the schematic editor, where we want to avoid
+# interleaving tkinter 'create' commands in amongst the 'delete' commands outside of the
+# main tkinter loop as this can lead to problems with artefacts persisting on the canvas
+# ------------------------------------------------------------------------------------------
+
+def update_linked_instrument(inst_id:int, linked_to:str):
+    global instruments
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(inst_id, int):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID must be an integer")
+    elif not instrument_exists(inst_id):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID does not exist")
+    elif not isinstance(linked_to, str):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked ID must be a string")
+    elif linked_to == str(inst_id):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked Instrument ID is the same as the Instrument ID")
+    elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
+    else:
+        if linked_to == "":
+            logging.debug("Instrument "+str(inst_id)+": Un-linking Block Instrument "+instruments[str(inst_id)]["linkedto"])
+        else:
+            logging.debug("Instrument "+str(inst_id)+": Updating linked Block Instrument to "+linked_to)
+        # Update the "linkedto" element of the Instrument configuration
+        instruments[str(inst_id)]["linkedto"] = linked_to
+        # Update the repeater display of the linked instrument (if one is specified). This will update
+        # local instruments (inst_id is an int) if they have already been created on the schematic or
+        # send an MQTT event to update remote instruments (inst_id is a str) if the current instrument
+        # has already been configured to publish state to the MQTT broker.
+        refresh_repeater_of_linked_instrument(inst_id)
+        # If an instrument already exists that is already linked to this instrument then we need
+        # to set the repeater display of 'our' instrument to reflect the state of that instrument.
+        refresh_repeater_of_our_instrument(inst_id)
+        # Validate the linked instrument config - this won't prevent the linking being updated
+        # but will raise warnings for potential misconfigurations (that won't break the system)
+        validate_linked_instrument(inst_id)
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Internal common function to validate instrument linking (raising warnings as required)
+# ------------------------------------------------------------------------------------------
+
+def validate_linked_instrument(inst_id:int):
+    linked_to = instruments[str(inst_id)]['linkedto']
+    # Raise a warning if the instrument weare linking to is already linked to a different instrument
+    if instrument_exists(linked_to) and instruments[linked_to]['linkedto'] not in ("",str(inst_id)):
+        logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+" - but instrument "
+                +linked_to+" is already linked to instrument "+instruments[linked_to]['linkedto'])
+    # Raise a warning if a different instrument is already linked to the instrument we have created/updated
+    for other_instrument in instruments:
+        linked_from = instruments[other_instrument]['linkedto']
+        if linked_from == str(inst_id) and linked_to != "" and linked_to != other_instrument:
+            # We've found an instrument already 'linked back to' the instrument we have just created
+            # but 'our instrument' points to a completely different instrument - Raise a warning
+            logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
+                " - but instrument "+linked_from+" is linked from instrument "+other_instrument)
+        elif other_instrument != str(inst_id) and linked_from != "" and linked_from == linked_to:
+            # We've found another instrument linked to the instrument we are trying to link to
+            logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
+                  " - but instrument "+ other_instrument+" is also linked to instrument "+linked_to)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal function to Update the repeater display of a linked LOCAL instrument or
+# send a MQTT message to update the repeater display of a linked REMOTE instrument.
+# Note that the Repeater display of LOCAL instruments will only be updated if they
+# already exist on the schematic (there are cases when they may not yet exist (for
+# example on File load where we can't determine the order of creation). Similarly
+# MQTT messages will only be sent if the LOCAL instrument is configured to publish
+# --------------------------------------------------------------------------------
+
+def refresh_repeater_of_linked_instrument(inst_id:int):
+    linked_to = instruments[str(inst_id)]["linkedto"]
+    # Block State is as follows: True = Line Clear, False = Train On Line, None = Line Blocked
+    if instruments[str(inst_id)]["sectionstate"] == True:
+        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_clear(linked_to)
+        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
+    elif instruments[str(inst_id)]["sectionstate"] == False:
+        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_occupied(linked_to)
+        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
+    else:
+        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_blocked(linked_to)
+        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
+    return()
+
+# --------------------------------------------------------------------------------
+# Internal function to find the first LOCAL or REMOTE block instrument linked to this
+# instrument and if the state is considered valid, then use that state to update
+# the repeater display of the block instrument
+# --------------------------------------------------------------------------------
+
+def refresh_repeater_of_our_instrument(inst_id:int):
+    # Block State is as follows: True = Line Clear, False = Train On Line, None = Line Blocked
+    for other_instrument in instruments:
+        if instruments[other_instrument]['linkedto'] == str(inst_id) and instruments[other_instrument]['statevalid']:
+            if instruments[other_instrument]["sectionstate"] == True: set_repeater_clear(inst_id)
+            elif instruments[other_instrument]["sectionstate"] == False: set_repeater_occupied(inst_id)
+            else: set_repeater_blocked(inst_id)
+            break
+    return()
 
 # --------------------------------------------------------------------------------
 # Public API function to find out if the block section ahead is clear.
@@ -689,68 +801,12 @@ def delete_instrument(inst_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function for updating the ID of the linked block instrument without
-# needing to delete the block instrument and then create it in its new state. The main
-# use case is when bulk deleting objects via the schematic editor, where we want to avoid
-# interleaving tkinter 'create' commands in amongst the 'delete' commands outside of the
-# main tkinter loop as this can lead to problems with artefacts persisting on the canvas
-# ------------------------------------------------------------------------------------------
-
-def update_linked_instrument(inst_id:int, linked_to:str):
-    global instruments
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(inst_id, int):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID must be an integer")
-    elif not instrument_exists(inst_id):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID does not exist")
-    elif not isinstance(linked_to, str):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked ID must be a string")
-    elif linked_to == str(inst_id):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked Instrument ID is the same as the Instrument ID")
-    elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
-    else:
-        if linked_to == "":
-            logging.debug("Instrument "+str(inst_id)+": Un-linking Block Instrument "+instruments[str(inst_id)]["linkedto"])
-        else:
-            logging.debug("Instrument "+str(inst_id)+": Updating linked Block Instrument to "+linked_to)
-        # Validate the config to generate any warnings as required:
-        validate_linked_instrument(inst_id, linked_to)
-        # Update the "linkedto" element of the Instrument configuration
-        instruments[str(inst_id)]["linkedto"] = linked_to
-        # Ensure the repeater on the new linked instrument reflects the state of our instrument
-        refresh_linked_instrument(inst_id, linked_to)
-    return()
-
-# ------------------------------------------------------------------------------------------
-# Internal common function to validate instrument linking (raising warnings as required)
-# ------------------------------------------------------------------------------------------
-
-def validate_linked_instrument(inst_id:int, linked_to:str):
-    for other_instrument in instruments:
-        link_from_other_instrument = instruments[other_instrument]['linkedto']
-        if link_from_other_instrument == str(inst_id) and linked_to != "" and linked_to != other_instrument:
-            # We've found an instrument already 'linked back to' the instrument we have just created
-            # but 'our instrument' points to a completely different instrument - Raise a warning
-            logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
-                " - but instrument "+link_from_other_instrument+" is linked from instrument "+other_instrument)
-        elif other_instrument != str(inst_id) and link_from_other_instrument != "" and link_from_other_instrument == linked_to:
-            # We've found another instrument linked to the instrument we are trying to link to
-            logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+
-                  " - but instrument "+ other_instrument+" is also linked to instrument "+linked_to)
-    # Raise a warning if the instrument we are linked to is already linked to another instrument
-    if instrument_exists(linked_to) and instruments[linked_to]['linkedto'] not in ("",str(inst_id)):
-        logging.warning("Instrument "+str(inst_id)+": linking to instrument "+linked_to+" - but instrument "
-                +linked_to+" is already linked to instrument "+instruments[linked_to]['linkedto'])
-    return()
-
-# ------------------------------------------------------------------------------------------
 # API function to reset the list of published/subscribed Instruments. This function is called by
 # the editor on 'Apply' of the MQTT pub/sub configuration prior to applying the new configuration
 # via the 'set_instruments_to_publish_state' & 'subscribe_to_remote_instrument' functions.
 # ------------------------------------------------------------------------------------------
 
-def reset_mqtt_configuration():
+def reset_instruments_mqtt_configuration():
     global instruments
     global list_of_instruments_to_publish
     logging.debug("Block Instruments: Resetting MQTT publish and subscribe configuration")
@@ -786,9 +842,11 @@ def set_instruments_to_publish_state(*inst_ids:int):
         else:
             logging.debug("Instrument "+str(inst_id)+": Configuring to publish state changes and telegraph events to MQTT broker")
             list_of_instruments_to_publish.append(inst_id)
-            # Publish the initial state now this has been added to the list of instruments to publish
-            # This allows the pub/sub config to be configured independently to instrument creation
-            if instrument_exists(inst_id): send_mqtt_instrument_updated_event(inst_id)
+            # If the instrument exists and a valid remote identifier has been specified for the linked instrument
+            # Then we publish the current state to the network (The instrument may not yet exist as the instrument
+            # pub/sub configuration can be configured independently to block instrument creation)
+            if instrument_exists(inst_id) and mqtt_interface.split_remote_item_identifier(instruments[str(inst_id)]["linkedto"]) is not None:
+                send_mqtt_instrument_updated_event(inst_id)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -798,27 +856,33 @@ def set_instruments_to_publish_state(*inst_ids:int):
 # for all subscribed Block Instruments.
 #---------------------------------------------------------------------------------------------------
 
-def subscribe_to_remote_instrument(remote_id:str):   
+def subscribe_to_remote_instruments(*remote_identifiers:str):   
     global instruments
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(remote_id,str):
-        logging.error("Instrument "+str(remote_id)+": subscribe_to_remote_instrument - Remote ID must be a string")
-    elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
-        logging.error("Instrument "+remote_id+": subscribe_to_remote_instrument - Remote ID is an invalid format")
-    elif instrument_exists(remote_id):
-        logging.warning("Instrument "+remote_id+": subscribe_to_remote_instrument - Already subscribed")
-    else:
-        logging.debug("Instrument "+remote_id+": Subscribing to remote Block Instrument")
-        # Create a dummy instrument object to enable 'instrument_exists' validation checks
-        # Note that this does not hold state - as state is reflected on the local repeater indicator
-        instruments[remote_id] = {}
-        instruments[remote_id]["linkedto"] = ""
-        # Subscribe to updates from the remote block instrument
-        [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
-        mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event", node_id,
-                                    item_id, handle_mqtt_instrument_updated_event)
-        mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event", node_id,
-                                    item_id, handle_mqtt_ring_section_bell_event)
+    for remote_id in remote_identifiers:
+        # Validate the parameters we have been given as this is a library API function
+        if not isinstance(remote_id,str):
+            logging.error("Instrument "+str(remote_id)+": subscribe_to_remote_instrument - Remote ID must be a string")
+        elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
+            logging.error("Instrument "+remote_id+": subscribe_to_remote_instrument - Remote ID is an invalid format")
+        elif instrument_exists(remote_id):
+            logging.warning("Instrument "+remote_id+": subscribe_to_remote_instrument - Already subscribed")
+        else:
+            logging.debug("Instrument "+remote_id+": Subscribing to remote Block Instrument")
+            # Create a dummy instrument object to enable 'instrument_exists' validation checks and hold the state
+            # for the REMOTE instrument. At subscription time the state of the REMOTE instrument will be unknown so
+            # the 'statevalid' flag is initially FALSE (this will be set to TRUE as soon as we receive the first state
+            # update from the remote instrument). This prevents the Repeater display of LOCAL block instruments being
+            # erroneously set to the default (as subscribed) state on creation or update of the linked instrument ID
+            instruments[remote_id] = {}
+            instruments[remote_id]["statevalid"] = False          # Data will be invalid until we receive the first update
+            instruments[remote_id]["sectionstate"] = None         # Initial (invalid) State of the instrument ("BLOCKED")
+            instruments[remote_id]["linkedto"] = ""               # The LOCAL instrument the REMOTE one is linked to (unknown)
+            # Subscribe to state updates and bell ring events from the remote block instrument
+            [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_updated_event", node_id,
+                                        item_id, handle_mqtt_instrument_updated_event)
+            mqtt_interface.subscribe_to_mqtt_messages("instrument_telegraph_event", node_id,
+                                        item_id, handle_mqtt_ring_section_bell_event)
     return()
 
 ###############################################################################

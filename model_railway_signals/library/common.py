@@ -76,7 +76,7 @@ def shutdown():
         # Turn off the DCC bus power and close the comms port
         pi_sprog_interface.sprog_shutdown()
         # Return the GPIO ports to their original configuration
-        gpio_sensors.gpio_shutdown()
+        gpio_sensors.delete_all_local_gpio_sensors()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
         # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
         # (although its unlikely the user would initiate a shut down until these have finished)

@@ -21,7 +21,7 @@
 #
 # Classes and functions used by the other library modules:
 #
-#   track_sensor_triggered (sensor_id:int, callback_type=None) - Called on gpio_sensor trigger
+#   track_sensor_triggered(sensor_id:int, callback_type=None) - Called on gpio_sensor trigger
 #         events if the gpio_sensor has been configured to generate a "track sensor passed" event
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
@@ -47,7 +47,8 @@ class track_sensor_callback_type(enum.Enum):
 #   'callback' - The callback function to make on track sensor triggered events
 #   'button' - A reference to the Tkinter Button object (to simulate 'sensor triggered' events)
 #   'tags' - The tags applied to all canvas drawing objects for the Track Sensor instance
-#   'circle' - The treference to the Tkinter circle used for "selection" in edit mode
+#   'circle' - The reference to the Tkinter circle used for "selection" in edit mode
+#   'label' - The reference to the Tkinter label which is only displayed in edit mode
 #---------------------------------------------------------------------------------------------------
 
 track_sensors = {}
@@ -80,7 +81,7 @@ def configure_edit_mode(edit_mode:bool):
 
 def track_sensor_exists(sensor_id:int):
     if not isinstance(sensor_id, int):
-        logging.error("Track Sensor "+str(sensor_id)+": track_sensor_exists - Sensor ID must be an integer")
+        logging.error("Track Sensor "+str(sensor_id)+": track_sensor_exists - Sensor ID must be an int")
         sensor_exists = False
     else:
         sensor_exists = str(sensor_id) in track_sensors.keys() 
@@ -94,7 +95,7 @@ def track_sensor_exists(sensor_id:int):
 
 def track_sensor_triggered (sensor_id:int, callback_type=None):
     if not isinstance(sensor_id, int):
-        logging.error("Track Sensor "+str(sensor_id)+": track_sensor_triggered - Sensor ID must be an integer")
+        logging.error("Track Sensor "+str(sensor_id)+": track_sensor_triggered - Sensor ID must be an int")
     elif not track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": track_sensor_triggered - Sensor ID does not exist")
     else:
@@ -120,7 +121,7 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "sensor"+str(sensor_id)
     if not isinstance(sensor_id, int) or sensor_id < 1 or sensor_id > 99:
-        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an integer between 1 and 99")
+        logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID must be an int (1-99)")
     elif track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": create_track_sensor - Sensor ID already exists")
     else:
@@ -157,7 +158,7 @@ def create_track_sensor(canvas, sensor_id:int, x:int, y:int, callback):
 def delete_track_sensor(sensor_id:int):
     global track_sensors
     if not isinstance(sensor_id, int):
-        logging.error("Track Sensor "+str(sensor_id)+": delete_track_sensor - Sensor ID must be an integer")
+        logging.error("Track Sensor "+str(sensor_id)+": delete_track_sensor - Sensor ID must be an int")
     elif not track_sensor_exists(sensor_id):
         logging.error("Track Sensor "+str(sensor_id)+": delete_track_sensor - Sensor ID does not exist")
     else:

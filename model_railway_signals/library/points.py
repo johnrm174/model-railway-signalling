@@ -11,6 +11,8 @@
 #   point_callback_type (tells the calling program what has triggered the callback):
 #      point_callback_type.point_switched (point has been switched)
 #      point_callback_type.fpl_switched (facing point lock has been switched)
+#
+#   point_exists(point_id:int) - returns true if the point object 'exists' 
 # 
 #   create_point - Creates a point object and returns the "tag" for all tkinter canvas drawing objects 
 #                  This allows the editor to move the point object on the schematic as required 
@@ -81,7 +83,7 @@ points: dict = {}
 
 def point_exists(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": point_exists - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": point_exists - Point ID must be an int")
         point_exists = False
     else:
         point_exists = str(point_id) in points.keys()
@@ -111,7 +113,7 @@ def change_button_event(point_id:int):
 def toggle_fpl(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": toggle_fpl - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": toggle_fpl - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": toggle_fpl - Point ID does not exist")
     elif not points[str(point_id)]["hasfpl"]:
@@ -190,7 +192,7 @@ def update_downstream_points(point_id:int):
 def toggle_point(point_id:int, switched_by_another_point:bool=False):
     global points
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": toggle_point - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": toggle_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": toggle_point - Point ID does not exist")
     elif points[str(point_id)]["automatic"] and not switched_by_another_point:
@@ -222,11 +224,11 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
     if not isinstance(point_id, int) or point_id < 1 or point_id > 99:
-        logging.error("Point "+str(point_id)+": create_point - Point ID must be an integer between 1 and 99")
+        logging.error("Point "+str(point_id)+": create_point - Point ID must be an int(1-99)")
     elif point_exists(point_id):
         logging.error("Point "+str(point_id)+": create_point - Point ID already exists")
     elif not isinstance(also_switch, int):
-        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an integer")
+        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
     elif pointtype != point_type.LH and pointtype != point_type.RH:
@@ -332,7 +334,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 def lock_point(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": lock_point - Point ID does not exist")
     elif not points[str(point_id)]["locked"]:
@@ -356,7 +358,7 @@ def lock_point(point_id:int):
 def unlock_point(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": unlock_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": unlock_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": unlock_point - Point ID does not exist")
     elif points[str(point_id)]["locked"]:
@@ -376,7 +378,7 @@ def unlock_point(point_id:int):
 
 def point_switched(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": point_switched - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": point_switched - Point ID must be an int")    
         switched = False
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": point_switched - Point ID does not exist")
@@ -391,7 +393,7 @@ def point_switched(point_id:int):
 
 def fpl_active(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": fpl_active - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": fpl_active - Point ID must be an int")    
         locked = False
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": fpl_active - Point ID does not exist")
@@ -412,7 +414,7 @@ def fpl_active(point_id:int):
 def delete_point(point_id:int):
     global points
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": delete_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": delete_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": delete_point - Point ID does not exist")
     else:
@@ -435,11 +437,11 @@ def delete_point(point_id:int):
 
 def update_autoswitch(point_id:int, autoswitch_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": update_autoswitch - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": update_autoswitch - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": update_autoswitch - Point ID does not exist")
     elif not isinstance(autoswitch_id, int):
-        logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID must be an integer")    
+        logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID must be an int")    
     elif autoswitch_id > 0 and not point_exists(autoswitch_id):
         logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID does not exist")
     else:

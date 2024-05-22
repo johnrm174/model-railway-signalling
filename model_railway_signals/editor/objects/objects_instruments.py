@@ -10,7 +10,6 @@
 #    delete_instrument_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_instrument_object(object_id) - Redraw the object on the canvas following an update
 #    default_instrument_object - The dictionary of default values for the object
-#    mqtt_update_instruments(pub_list, sub_list) - Configure MQTT publish/subscribe
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
@@ -32,9 +31,6 @@
 #    block_instruments.delete_instrument(id) - delete library drawing object (part of soft delete)
 #    block_instruments.create_block_instrument(id) -  To create the library object (create or redraw)
 #    block_instruments.update_linked_instrument(old_id, new_id) - update the linked instrument reference
-#    block_instruments.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
-#    block_instruments.set_instruments_to_publish_state(IDs) - configure MQTT networking
-#    block_instruments.subscribe_to_remote_instrument(ID) - configure MQTT networking
 #------------------------------------------------------------------------------------
 
 import uuid
@@ -207,18 +203,6 @@ def delete_instrument(object_id):
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
     del objects_common.instrument_index[str(objects_common.schematic_objects[object_id]["itemid"])]
     del objects_common.schematic_objects[object_id]
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update the MQTT networking configuration for instruments, namely
-# subscribing to remote instruments and setting local instruments to publish state
-#------------------------------------------------------------------------------------
-
-def mqtt_update_instruments(instruments_to_publish:list, instruments_to_subscribe_to:list):
-    block_instruments.reset_mqtt_configuration()
-    block_instruments.set_instruments_to_publish_state(*instruments_to_publish)
-    for instrument_identifier in instruments_to_subscribe_to:
-        block_instruments.subscribe_to_remote_instrument(instrument_identifier)
     return()
     
 ####################################################################################
