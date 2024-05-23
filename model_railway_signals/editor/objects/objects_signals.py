@@ -11,9 +11,6 @@
 #    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    default_signal_object - The dictionary of default values for the object
-#    mqtt_update_signals(pub_list, sub_list) - Configure MQTT publish/subscribe
-#    mqtt_update_sensors(pub_list, sub_list) - Configure MQTT publish/subscribe
-#    update_local_sensors(trigger,timeout,mappings) - Configure local track sensors
 #    remove_references_to_point (point_id) - remove point references from the interlocking tables
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
@@ -53,14 +50,10 @@
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
 #    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
 #    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
-#    signals.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
-#    signals.set_signals_to_publish_state(IDs) - configure MQTT networking
-#    signals.subscribe_to_remote_signal(ID,callback) - configure MQTT networking
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
-#    gpio_sensors.add_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
-#    gpio_sensors.remove_gpio_sensor_callback - To remove any GPIO Sensor triggered callbacks
+#    gpio_sensors.update_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
 #
 #------------------------------------------------------------------------------------
 
@@ -474,10 +467,10 @@ def redraw_signal_object(object_id):
     sig_type = signals_common.sig_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Update the sensor mapping callbacks for the signal (if any have been specified)
     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
-        gpio_sensors.add_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
                                     signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
     if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
-        gpio_sensors.add_gpio_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
                                     signal_approach = objects_common.schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
     if (sig_type == signals_common.sig_type.colour_light or
@@ -720,8 +713,8 @@ def delete_signal_object(object_id):
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    if passed_sensor != "": gpio_sensors.remove_gpio_sensor_callback(passed_sensor)
-    if approach_sensor != "": gpio_sensors.remove_gpio_sensor_callback(approach_sensor)
+    if passed_sensor != "": gpio_sensors.update_gpio_sensor_callback(passed_sensor)
+    if approach_sensor != "": gpio_sensors.update_gpio_sensor_callback(approach_sensor)
     # Delete the associated distant signal (if there is one)
     if has_associated_distant(object_id):
         signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
@@ -745,19 +738,6 @@ def delete_signal(object_id):
     del objects_common.schematic_objects[object_id]
     # Recalculate point interlocking tables to remove references to the signal
     objects_points.reset_point_interlocking_tables()
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update the MQTT networking configuration for signals, namely
-# subscribing to remote signals and setting local signals to publish state
-# Note that the editor doesn't use signal passed events
-#------------------------------------------------------------------------------------
-
-def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
-    signals_common.reset_mqtt_configuration()
-    signals.set_signals_to_publish_state(*signals_to_publish)
-    for signal_identifier in signals_to_subscribe_to:
-        signals.subscribe_to_remote_signal(signal_identifier, run_layout.schematic_callback)
     return()
 
 ####################################################################################

@@ -56,9 +56,14 @@
 #
 # Classes and functions used by the other library modules:
 #
-#   handle_mqtt_instrument_updated_event(message) - called on receipt of a remote 'instrument_updated' event
+#   handle_mqtt_instrument_updated_event(message:dict) - called on receipt of a remote 'instrument_updated' event
+#        Dict comprises ["sourceidentifier"] - the identifier for the remote block instrument
+#                       ["instrumentid"] - the identifier of the 'target' instrument on the local schematic
+#                       ["sectionstate"] - the state of the remote section (True=CLEAR, False=OCCUPIED, None=BLOCKED)
 #
-#   handle_mqtt_ring_section_bell_event(message) - called on receipt of a remote 'telegraph key' event
+#   handle_mqtt_ring_section_bell_event(message:dict) - called on receipt of a remote 'telegraph key' event
+#        Dict comprises ["sourceidentifier"] - the identifier for the remote block instrument sensor
+#                       ["instrumentid"] - the identifier of the 'target' instrument on the local schematic
 #
 # ------------------------------------------------------------------------------------------
 # To use Block Instruments with full sound enabled (bell rings and telegraph key sounds) then
@@ -191,26 +196,26 @@ def instrument_exists(inst_id:Union[int,str]):
     return(instrument_exists)
 
 # --------------------------------------------------------------------------------
-# Internal Callbacks for handling button push events
+# Internal Callback functions for handling button push events
 # --------------------------------------------------------------------------------
 
 def occup_button_event(inst_id:int):
-    logging.info ("Instrument "+str(inst_id)+": Occup button event ***********************************************")
+    logging.info("Instrument "+str(inst_id)+": Occup button event ***********************************************")
     set_section_occupied(inst_id)
     return()
 
 def clear_button_event(inst_id:int):
-    logging.info ("Instrument "+str(inst_id)+": Clear button event ***********************************************")
+    logging.info("Instrument "+str(inst_id)+": Clear button event ***********************************************")
     set_section_clear(inst_id)
     return()
 
 def blocked_button_event(inst_id:int):
-    logging.info ("Instrument "+str(inst_id)+": Blocked button event *********************************************")
+    logging.info("Instrument "+str(inst_id)+": Blocked button event *********************************************")
     set_section_blocked(inst_id)
     return()
 
 def telegraph_key_button(inst_id:int):
-    logging.debug ("Instrument "+str(inst_id)+": Telegraph key operated ************************************")
+    logging.debug("Instrument "+str(inst_id)+": Telegraph key operated *******************************************")
     # Provide a visual indication of the key being pressed (and schedule the button reset)
     instruments[str(inst_id)]["bellbutton"].config(relief="sunken")
     common.root_window.after(10,lambda:reset_telegraph_button(inst_id))
@@ -230,16 +235,7 @@ def telegraph_key_button(inst_id:int):
     return()
 
 # --------------------------------------------------------------------------------
-# Internal Function to reset the state of the telegraph button. Scheduled from 
-# the telegraph_key_button function and ring_section_bell function
-# --------------------------------------------------------------------------------
-
-def reset_telegraph_button(inst_id:int):
-    if instrument_exists(inst_id): instruments[str(inst_id)]["bellbutton"].config(bg="black", relief="raised")
-    return()
-
-# --------------------------------------------------------------------------------
-# Internal Function to receive bell rings from another instrument and
+# Internal Function to receive telegraph key events from another instrument and
 # sound a bell "ting" on the local instrument (with a visual indication)
 # --------------------------------------------------------------------------------
         
@@ -256,8 +252,12 @@ def ring_section_bell(inst_id:int):
             except: pass
     return()
 
+def reset_telegraph_button(inst_id:int):
+    if instrument_exists(inst_id): instruments[str(inst_id)]["bellbutton"].config(bg="black", relief="raised")
+    return()
+
 # --------------------------------------------------------------------------------
-# API callback function for handling received MQTT messages from a remote instrument
+# Callback function for handling received MQTT state updates from a remote instrument
 # Note that this function will already be running in the main Tkinter thread
 # --------------------------------------------------------------------------------
 
@@ -269,31 +269,33 @@ def handle_mqtt_instrument_updated_event(message):
         logging.warning("Instruments: handle_mqtt_instrument_updated_event - Message received from Remote Instrument "+
                         message["sourceidentifier"]+" but this instrument has not been subscribed to")
     else:
-        # Get the 'target' for the state update (i.e. the LOCAL instrument the REMOTE instrument is linked to)
-        # We don't validate on the 'node_id' as this will always be the network node for this application instance
-        local_node_id, local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        # Extract the Data we need from the message. The local_inst_id is the 'target' for the state update (i.e. the
+        # LOCAL instrument the REMOTE instrument is linked to), which is the second parameter of the Tuple returned from
+        # the 'split_remote_item_identifier' function (we don't need on the 'node_id' as this will always be our node)
         remote_inst_id = message["sourceidentifier"]
         remote_inst_state = message["sectionstate"]
+        local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])[1]
         # Remote Instrument state is True for CLEAR, False for OCCUPIED or None for BLOCKED
-        if message["sectionstate"] == True: remote_state = "LINE CLEAR"
-        elif message["sectionstate"] == False: remote_state = "TRAIN ON LINE"
-        else: remote_state = "LINE BLOCKED "
-        logging.info("Instrument "+str(remote_inst_id)+": State update from Remote instrument - "+remote_state+" **********")
+        if remote_inst_state == True:
+            logging.info("Instrument "+remote_inst_id+": State update from Remote instrument - CLEAR ****************")
+        elif remote_inst_state == False:
+            logging.info("Instrument "+remote_inst_id+": State update from Remote instrument - OCCUPIED *************")
+        else:
+            logging.info("Instrument "+remote_inst_id+": State update from Remote instrument - BLOCKED **************")
         # Store the state of the REMOTE instrument in the dummy instrument object created at subscription time. We need this
         # when creating or updating the configuration of LOCAL instruments so the Repeater display can be correctly set to
         # reflect the state of the REMOTE instrument. The state of the remote instrument is now known so it is VALID 
         instruments[remote_inst_id]["statevalid"] = True
         instruments[remote_inst_id]["sectionstate"] = remote_inst_state
         instruments[remote_inst_id]["linkedto"] = str(local_inst_id)
-        # Only update the LOCAL block instrument if it exists on the schematic (we might have subscribed to the
-        # REMOTE instrument and the REMOTE instrument may be linked to an LOCAL instrument on our schematic (which
-        # will mean we get an initial state update from the REMOTE instrument to update the LOCAL instrument repeater
-        # display) - but there are edge cases where the LOCAL instrument might not have been created (e.g. file load)
-        if instrument_exists(local_inst_id):
-            if remote_inst_state == True: set_repeater_clear(local_inst_id)
-            elif remote_inst_state == False: set_repeater_occupied(local_inst_id)
-            elif remote_inst_state == None: set_repeater_blocked(local_inst_id)
+        # Update the repeater of the (local) linked instrument (if it exists)
+        refresh_repeater_of_linked_instrument(remote_inst_id)
     return()
+
+# --------------------------------------------------------------------------------
+# API callback function for handling received MQTT messages from a remote instrument
+# Note that this function will already be running in the main Tkinter thread
+# --------------------------------------------------------------------------------
 
 def handle_mqtt_ring_section_bell_event(message):
     if ("sourceidentifier" not in message.keys() or "instrumentid" not in message.keys()
@@ -305,9 +307,10 @@ def handle_mqtt_ring_section_bell_event(message):
     else:
         logging.info("Instrument "+message["sourceidentifier"]+": Telegraph key Event from Remote instrument "+
                                                      " *****************************************")
-        # Get the 'target' for the bell event (i.e. the LOCAL instrument the REMOTE instrument is linked to)
-        # We don't validate on the 'node_id' as this will always be the network node for this application instance
-        local_node_id, local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])
+        # Extract the Data we need from the message. The local_inst_id is the 'target' for the bell event (i.e. the
+        # LOCAL instrument the REMOTE instrument is linked to), which is the second parameter of the Tuple returned from
+        # the 'split_remote_item_identifier' function (we don't need on the 'node_id' as this will always be our node)
+        local_inst_id = mqtt_interface.split_remote_item_identifier(message["instrumentid"])[1]
         # Only ring the bell on the the LOCAL instrument if it exists on the schematic (we might have subscribed to
         # the REMOTE instrument and the REMOTE instrument may be linked to an LOCAL instrument on our schematic (which
         # will mean we get an initial state update from the REMOTE instrument to update the LOCAL instrument repeater
@@ -440,6 +443,7 @@ def set_section_blocked(inst_id:int,update_remote_instrument:bool=True):
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
         if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
+        send_mqtt_instrument_updated_event(inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -466,6 +470,7 @@ def set_section_clear(inst_id:int,update_remote_instrument:bool=True):
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
         if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
+        send_mqtt_instrument_updated_event(inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -492,6 +497,7 @@ def set_section_occupied(inst_id:int,update_remote_instrument:bool=True):
         # Publish the initial state to the broker (for other nodes to consume). Note that state will only
         # be published if the MQTT interface has been configured and we are connected to the broker
         if update_remote_instrument: refresh_repeater_of_linked_instrument(inst_id)
+        send_mqtt_instrument_updated_event(inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -542,23 +548,24 @@ def load_audio_file(audio_filename):
 # --------------------------------------------------------------------------------
 
 def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:int, callback,
-                       bell_sound_file:str = "bell-ring-01.wav",
-                       telegraph_sound_file:str = "telegraph-key-01.wav",
-                       linked_to:str = ""):
+                       linked_to:str = "", bell_sound_file:str = "bell-ring-01.wav",
+                       telegraph_sound_file:str = "telegraph-key-01.wav"):
     global instruments
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "instrument"+str(inst_id)
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 99:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be an integer between 1 and 99")
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID must be an int (1-99)")
     elif instrument_exists(inst_id):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Instrument ID already exists")
     elif not isinstance(linked_to, str):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID must be a str")
     elif linked_to == str(inst_id):
         logging.error("Instrument "+str(inst_id)+": create_instrument - Linked Instrument ID is the same as the Instrument ID")
-    elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
+    elif linked_to != "" and linked_to.isdigit() and (int(linked_to) < 1 or int(linked_to) > 99):
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked (local) Instrument ID is out of range (1-99)")
+    elif linked_to != "" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+        logging.error("Instrument "+str(inst_id)+": create_instrument - Linked (Remote) Instrument ID is invalid format")
     elif inst_type != instrument_type.single_line and inst_type != instrument_type.double_line:
         logging.error("Instrument "+str(inst_id)+": create_instrument - Invalid Instrument Type specified")
     else:
@@ -646,6 +653,7 @@ def create_instrument (canvas, inst_id:int, inst_type:instrument_type, x:int, y:
         # send an MQTT event to update remote instruments (inst_id is a str) if the current instrument
         # has already been configured to publish state to the MQTT broker.
         refresh_repeater_of_linked_instrument(inst_id)
+        send_mqtt_instrument_updated_event(inst_id)
         # If an instrument already exists that is already linked to this instrument then we need
         # to set the repeater display of 'our' instrument to reflect the state of that instrument.
         refresh_repeater_of_our_instrument(inst_id)
@@ -666,15 +674,17 @@ def update_linked_instrument(inst_id:int, linked_to:str):
     global instruments
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(inst_id, int):
-        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID must be an integer")
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID must be an int")
     elif not instrument_exists(inst_id):
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Instrument ID does not exist")
     elif not isinstance(linked_to, str):
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked ID must be a string")
     elif linked_to == str(inst_id):
         logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked Instrument ID is the same as the Instrument ID")
-    elif linked_to !="" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
-        logging.error("Instrument "+str(inst_id)+": create_instrument - Remote identifier for linked instrument is invalid format")
+    elif linked_to != "" and linked_to.isdigit() and (int(linked_to) < 1 or int(linked_to) > 99):
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked (local) Instrument ID is out of range (1-99)")
+    elif linked_to != "" and not linked_to.isdigit() and mqtt_interface.split_remote_item_identifier(linked_to) is None:
+        logging.error("Instrument "+str(inst_id)+": update_linked_instrument - Linked (Remote) Instrument ID is invalid format")
     else:
         if linked_to == "":
             logging.debug("Instrument "+str(inst_id)+": Un-linking Block Instrument "+instruments[str(inst_id)]["linkedto"])
@@ -687,6 +697,7 @@ def update_linked_instrument(inst_id:int, linked_to:str):
         # send an MQTT event to update remote instruments (inst_id is a str) if the current instrument
         # has already been configured to publish state to the MQTT broker.
         refresh_repeater_of_linked_instrument(inst_id)
+        send_mqtt_instrument_updated_event(inst_id)
         # If an instrument already exists that is already linked to this instrument then we need
         # to set the repeater display of 'our' instrument to reflect the state of that instrument.
         refresh_repeater_of_our_instrument(inst_id)
@@ -724,22 +735,17 @@ def validate_linked_instrument(inst_id:int):
 # send a MQTT message to update the repeater display of a linked REMOTE instrument.
 # Note that the Repeater display of LOCAL instruments will only be updated if they
 # already exist on the schematic (there are cases when they may not yet exist (for
-# example on File load where we can't determine the order of creation). Similarly
-# MQTT messages will only be sent if the LOCAL instrument is configured to publish
+# example on File load where we can't determine the order of creation).
 # --------------------------------------------------------------------------------
 
 def refresh_repeater_of_linked_instrument(inst_id:int):
     linked_to = instruments[str(inst_id)]["linkedto"]
+    section_state = instruments[str(inst_id)]["sectionstate"]
     # Block State is as follows: True = Line Clear, False = Train On Line, None = Line Blocked
-    if instruments[str(inst_id)]["sectionstate"] == True:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_clear(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
-    elif instruments[str(inst_id)]["sectionstate"] == False:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_occupied(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
-    else:
-        if linked_to.isdigit() and instrument_exists(linked_to): set_repeater_blocked(linked_to)
-        elif linked_to != "": send_mqtt_instrument_updated_event(inst_id)
+    if linked_to.isdigit() and instrument_exists(linked_to):
+        if section_state == True: set_repeater_clear(linked_to)
+        elif section_state == False: set_repeater_occupied(linked_to)
+        else: set_repeater_blocked(linked_to)
     return()
 
 # --------------------------------------------------------------------------------
@@ -766,7 +772,7 @@ def refresh_repeater_of_our_instrument(inst_id:int):
 def block_section_ahead_clear(inst_id:int):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(inst_id, int) :
-        logging.error("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID must be an integer")
+        logging.error("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID must be an int")
         section_ahead_clear = False
     if not instrument_exists(inst_id):
         logging.error ("Instrument "+str(inst_id)+": block_section_ahead_clear - Instrument ID does not exist")
@@ -785,7 +791,7 @@ def delete_instrument(inst_id:int):
     global instruments
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(inst_id, int):
-        logging.error("Instrument "+str(inst_id)+": delete_instrument - Instrument ID must be an integer")    
+        logging.error("Instrument "+str(inst_id)+": delete_instrument - Instrument ID must be an int")    
     elif not instrument_exists(inst_id):
         logging.error("Instrument "+str(inst_id)+": delete_instrument - Instrument ID does not exist")
     else:
@@ -835,18 +841,16 @@ def set_instruments_to_publish_state(*inst_ids:int):
     for inst_id in inst_ids:
         # Validate the parameters we have been given as this is a library API function
         if not isinstance(inst_id, int) or inst_id < 1 or inst_id > 99:
-            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be an integer between 1 and 99")
+            logging.error("Instrument "+str(inst_id)+": set_instruments_to_publish_state - ID must be an int (1-99)")
         elif inst_id in list_of_instruments_to_publish:
             logging.warning("Instrument "+str(inst_id)+": set_instruments_to_publish_state -"
                                 +" Instrument is already configured to publish state to MQTT broker")
         else:
             logging.debug("Instrument "+str(inst_id)+": Configuring to publish state changes and telegraph events to MQTT broker")
             list_of_instruments_to_publish.append(inst_id)
-            # If the instrument exists and a valid remote identifier has been specified for the linked instrument
-            # Then we publish the current state to the network (The instrument may not yet exist as the instrument
-            # pub/sub configuration can be configured independently to block instrument creation)
-            if instrument_exists(inst_id) and mqtt_interface.split_remote_item_identifier(instruments[str(inst_id)]["linkedto"]) is not None:
-                send_mqtt_instrument_updated_event(inst_id)
+            # If the instrument exists Then we publish the current state to the network (it may not yet exist as
+            # the instrument pub/sub configuration can be configured independently to block instrument creation)
+            if instrument_exists(inst_id): send_mqtt_instrument_updated_event(inst_id)
     return()
 
 #---------------------------------------------------------------------------------------------------
@@ -861,7 +865,7 @@ def subscribe_to_remote_instruments(*remote_identifiers:str):
     for remote_id in remote_identifiers:
         # Validate the parameters we have been given as this is a library API function
         if not isinstance(remote_id,str):
-            logging.error("Instrument "+str(remote_id)+": subscribe_to_remote_instrument - Remote ID must be a string")
+            logging.error("Instrument "+str(remote_id)+": subscribe_to_remote_instrument - Remote ID must be a str")
         elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
             logging.error("Instrument "+remote_id+": subscribe_to_remote_instrument - Remote ID is an invalid format")
         elif instrument_exists(remote_id):
@@ -885,4 +889,4 @@ def subscribe_to_remote_instruments(*remote_identifiers:str):
                                         item_id, handle_mqtt_ring_section_bell_event)
     return()
 
-###############################################################################
+############################################################################################################

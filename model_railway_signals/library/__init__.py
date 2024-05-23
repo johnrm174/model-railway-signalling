@@ -15,12 +15,80 @@ from .points import toggle_fpl
 from .points import point_switched
 from .points import fpl_active
 
-################################################
+from .track_sections import section_callback_type
+from .track_sections import create_section
+from .track_sections import section_exists
+from .track_sections import delete_section
+from .track_sections import section_occupied
+from .track_sections import section_label
+from .track_sections import set_section_occupied
+from .track_sections import clear_section_occupied
+from .track_sections import reset_sections_mqtt_configuration
+from .track_sections import set_sections_to_publish_state
+from .track_sections import subscribe_to_remote_sections
+
+from .gpio_sensors import gpio_interface_enabled
+from .gpio_sensors import get_list_of_available_gpio_ports
+from .gpio_sensors import gpio_sensor_exists
+from .gpio_sensors import delete_all_local_gpio_sensors
+from .gpio_sensors import create_gpio_sensor
+from .gpio_sensors import get_gpio_sensor_callback
+from .gpio_sensors import update_gpio_sensor_callback
+from .gpio_sensors import reset_gpio_mqtt_configuration
+from .gpio_sensors import set_gpio_sensors_to_publish_state
+from .gpio_sensors import subscribe_to_remote_gpio_sensors
+
+from .track_sensors import track_sensor_callback_type
+from .track_sensors import create_track_sensor
+from .track_sensors import track_sensor_exists
+from .track_sensors import delete_track_sensor
+
+from .pi_sprog_interface import sprog_connect
+from .pi_sprog_interface import sprog_disconnect
+from .pi_sprog_interface import service_mode_read_cv
+from .pi_sprog_interface import service_mode_write_cv
+from .pi_sprog_interface import request_dcc_power_on
+from .pi_sprog_interface import request_dcc_power_off
+
+from .dcc_control import get_dcc_address_mappings
+from .dcc_control import dcc_address_mapping
+from .dcc_control import map_dcc_signal
+from .dcc_control import map_semaphore_signal
+from .dcc_control import map_dcc_point
+from .dcc_control import delete_point_mapping
+from .dcc_control import delete_signal_mapping
+from .dcc_control import reset_dcc_mqtt_configuration
+from .dcc_control import set_node_to_publish_dcc_commands
+from .dcc_control import subscribe_to_dcc_command_feed
+
+from .mqtt_interface import configure_mqtt_client
+from .mqtt_interface import mqtt_broker_connect
+from .mqtt_interface import mqtt_broker_disconnect
+
+from .block_instruments import instrument_type
+from .block_instruments import block_callback_type
+from .block_instruments import create_instrument
+from .block_instruments import instrument_exists
+from .block_instruments import update_linked_instrument
+from .block_instruments import delete_instrument
+from .block_instruments import block_section_ahead_clear
+from .block_instruments import reset_instruments_mqtt_configuration
+from .block_instruments import set_instruments_to_publish_state
+from .block_instruments import subscribe_to_remote_instruments
+
+from .file_interface import load_schematic
+from .file_interface import purge_loaded_state_information
+from .file_interface import save_schematic
+
+from .common import set_root_window
+from .common import shutdown
+from .common import configure_edit_mode
+
+##########################TO UPDATE####################################
 from .signals_common import route_type
 from .signals_common import sig_callback_type
 from .signals_common import signal_state_type
 
-################################################
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
 from .signals_semaphores import semaphore_sub_type
@@ -30,7 +98,6 @@ from .signals_ground_position import create_ground_position_signal
 from .signals_ground_disc import ground_disc_sub_type
 from .signals_ground_disc import create_ground_disc_signal
 
-################################################
 from .signals import set_route
 from .signals import update_signal
 from .signals import lock_signal
@@ -51,68 +118,7 @@ from .signals import clear_approach_control
 from .signals import trigger_timed_signal
 from .signals import subscribe_to_remote_signals
 from .signals import set_signals_to_publish_state
-
-################################################
-from .track_sections import section_callback_type
-from .track_sections import create_section
-from .track_sections import section_occupied
-from .track_sections import section_label
-from .track_sections import set_section_occupied
-from .track_sections import clear_section_occupied
-from .track_sections import subscribe_to_remote_sections
-from .track_sections import set_sections_to_publish_state
-
-from .gpio_sensors import gpio_interface_enabled
-from .gpio_sensors import get_list_of_available_gpio_ports
-from .gpio_sensors import gpio_sensor_exists
-from .gpio_sensors import delete_all_local_gpio_sensors
-from .gpio_sensors import create_gpio_sensor
-from .gpio_sensors import get_gpio_sensor_callback
-from .gpio_sensors import update_gpio_sensor_callback
-from .gpio_sensors import reset_gpio_mqtt_configuration
-from .gpio_sensors import set_gpio_sensors_to_publish_state
-from .gpio_sensors import subscribe_to_remote_gpio_sensors
-
-from .track_sensors import track_sensor_callback_type
-from .track_sensors import create_track_sensor
-from .track_sensors import track_sensor_exists
-from .track_sensors import delete_track_sensor
-
-################################################
-from .pi_sprog_interface import sprog_connect
-from .pi_sprog_interface import service_mode_write_cv
-from .pi_sprog_interface import request_dcc_power_on
-from .pi_sprog_interface import request_dcc_power_off
-
-################################################
-from .dcc_control import map_dcc_signal
-from .dcc_control import map_semaphore_signal
-from .dcc_control import map_dcc_point
-from .dcc_control import subscribe_to_dcc_command_feed
-from .dcc_control import set_node_to_publish_dcc_commands
-
-################################################
-from .mqtt_interface import configure_mqtt_client
-from .mqtt_interface import mqtt_broker_connect
-
-from .block_instruments import instrument_type
-from .block_instruments import block_callback_type
-from .block_instruments import create_instrument
-from .block_instruments import instrument_exists
-from .block_instruments import update_linked_instrument
-from .block_instruments import delete_instrument
-from .block_instruments import block_section_ahead_clear
-from .block_instruments import reset_instruments_mqtt_configuration
-from .block_instruments import set_instruments_to_publish_state
-from .block_instruments import subscribe_to_remote_instruments
-
-############################################
-from .file_interface import load_schematic
-from .file_interface import save_schematic
-
-from .common import set_root_window
-from .common import shutdown
-from .common import configure_edit_mode
+######################END OF TO UPDATE########################################
 
 __all__ = [
       # Public common functions
@@ -169,13 +175,16 @@ __all__ = [
         'trigger_timed_signal',
         'subscribe_to_remote_signals',
         'set_signals_to_publish_state',
-      # Public track_section types/functions
+      # Public track section types/functions
         'section_callback_type',
         'create_section',
+        'section_exists',
+        'delete_section',
         'section_occupied',
         'section_label',
         'set_section_occupied',
         'clear_section_occupied',
+        'reset_sections_mqtt_configuration',
         'subscribe_to_remote_sections',
         'set_sections_to_publish_state', 
       # public gpio sensor functions
@@ -189,19 +198,28 @@ __all__ = [
         'reset_gpio_mqtt_configuration',
         'subscribe_to_remote_gpio_sensors',
         'set_gpio_sensors_to_publish_state',
-      # Public DCC control functions
+      # Public SPROG control functions
         'sprog_connect',
+        'sprog_disconnect',
+        'service_mode_read_cv',
         'service_mode_write_cv',
         'request_dcc_power_on',
         'request_dcc_power_off',
+      # Public DCC control functions
+        'get_dcc_address_mappings',
+        'dcc_address_mapping',
         'map_dcc_signal',
         'map_semaphore_signal',
         'map_dcc_point',
+        'delete_point_mapping',
+        'delete_signal_mapping',
+        'reset_dcc_mqtt_configuration',
         'subscribe_to_dcc_command_feed',
         'set_node_to_publish_dcc_commands',
-      # Public networking functions
+      # Public MQTTnetworking functions
         'configure_mqtt_client',
         'mqtt_broker_connect',
+        'mqtt_broker_disconnect',
       # public block instrument types/functions
         'block_callback_type',
         'instrument_type',
@@ -215,6 +233,7 @@ __all__ = [
         'set_instruments_to_publish_state',
       # Public file interface functions
         'save_schematic',
-        'load_schematic'
+        'load_schematic',
+        'purge_loaded_state_information'
            ]
 

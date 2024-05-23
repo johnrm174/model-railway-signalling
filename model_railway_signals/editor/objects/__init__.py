@@ -64,6 +64,7 @@ from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
 from .objects import reset_objects
+
 from .objects_common import initialise
 from .objects_common import update_canvas
 from .objects_common import signal 
@@ -91,8 +92,16 @@ from .objects_gpio import configure_remote_gpio_sensor_event_mappings
 from .objects_gpio import configure_local_gpio_sensor_event_mappings
 
 __all__ = [
+    # Initialisation and update functions
+    'initialise',
+    'update_canvas',
+    'save_schematic_state',
+    # Enumeration of the object type
+    'object_type',
+    # Save and load functions
     'set_all',
     'get_all',
+    # Schematic editor functions
     'undo',
     'redo',
     'create_object',
@@ -102,10 +111,8 @@ __all__ = [
     'copy_objects',
     'paste_objects',
     'update_object',
-    'save_schematic_state',
     'reset_objects',
-    'initialise',
-    'update_canvas',
+    # Helper functions to get the obj ID of an item ID
     'signal',
     'point',
     'section',
@@ -113,8 +120,9 @@ __all__ = [
     'line',
     'track_sensor',
     'line_exists',  ##########################
-    'object_type',
+    # Function to get the x and y deltas for a line 'end stop' 
     'get_endstop_offsets',
+    # Main schematic object dict and the type-specific indexes
     'schematic_objects',
     'signal_index',
     'point_index',
@@ -122,7 +130,7 @@ __all__ = [
     'instrument_index',
     'line_index',
     'track_sensor_index',
-
+    # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',
     'configure_local_gpio_sensor_event_mappings'

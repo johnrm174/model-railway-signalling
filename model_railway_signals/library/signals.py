@@ -292,11 +292,10 @@
 #
 # The following functions are associated with the MQTT networking Feature:
 # 
-# subscribe_to_remote_signal - Subscribes to a remote signal object
+# subscribe_to_remote_signals - Subscribes to a remote signal object
 #   Mandatory Parameters:
-#       remote_identifier:str - the remote identifier for the signal in the form 'node-id'
-#   Optional Parameters:
 #       signal_callback - Function to call when a signal update is received - default = None
+#       *remote_identifier:str - the remote identifiers for the signal in the form 'node-id'
 #       
 # set_signals_to_publish_state - Enable the publication of state updates for signals.
 #                All subsequent changes will be automatically published to remote subscribers
@@ -743,23 +742,24 @@ def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
 # Public API Function to "subscribe" to signal updates published by another MQTT"Node"
 #-----------------------------------------------------------------------------------------------
 
-def subscribe_to_remote_signal (remote_identifier:str,signal_callback):   
-    # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
-    if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
-        logging.error ("MQTT-Client: Signal "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
-        logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
-    else:
-        if signals_common.sig_exists(remote_identifier):
-            logging.warning("MQTT-Client: Signal "+remote_identifier+" - has already been subscribed to via MQTT networking")
-        signals_common.signals[remote_identifier] = {}
-        signals_common.signals[remote_identifier]["sigtype"] = signals_common.sig_type.remote_signal
-        signals_common.signals[remote_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
-        signals_common.signals[remote_identifier]["routeset"] = signals_common.route_type.NONE
-        signals_common.signals[remote_identifier]["extcallback"] = signal_callback
-        # Subscribe to updates from the remote signal (even if we have already subscribed)
-        [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
-        mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node_id,item_id,
-                                    signals_common.handle_mqtt_signal_updated_event)
+def subscribe_to_remote_signals (signal_callback, *remote_identifiers:str):
+    for remote_identifier in remote_identifiers:
+        # Validate the remote identifier (must be 'node-id' where id is an int between 1 and 99)
+        if mqtt_interface.split_remote_item_identifier(remote_identifier) is None:
+            logging.error ("MQTT-Client: Signal "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
+            logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
+        else:
+            if signals_common.sig_exists(remote_identifier):
+                logging.warning("MQTT-Client: Signal "+remote_identifier+" - has already been subscribed to via MQTT networking")
+            signals_common.signals[remote_identifier] = {}
+            signals_common.signals[remote_identifier]["sigtype"] = signals_common.sig_type.remote_signal
+            signals_common.signals[remote_identifier]["sigstate"] = signals_common.signal_state_type.DANGER
+            signals_common.signals[remote_identifier]["routeset"] = signals_common.route_type.NONE
+            signals_common.signals[remote_identifier]["extcallback"] = signal_callback
+            # Subscribe to updates from the remote signal (even if we have already subscribed)
+            [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_identifier)
+            mqtt_interface.subscribe_to_mqtt_messages("signal_updated_event",node_id,item_id,
+                                        signals_common.handle_mqtt_signal_updated_event)
     return()
 
 #-----------------------------------------------------------------------------------------------
@@ -777,6 +777,26 @@ def set_signals_to_publish_state(*sig_ids:int):
             # Publish the initial state now this has been added to the list of signals to publish
             # This allows the publish/subscribe functions to be configured after signal creation
             if str(sig_id) in signals_common.signals.keys(): signals_common.publish_signal_state(sig_id) 
+    return()
+
+# ------------------------------------------------------------------------------------------
+# Non public API function to reset the list of published/subscribed signals. Used
+# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
+# via the signal-specific publish and subscribe configuration functions
+# ------------------------------------------------------------------------------------------
+
+def reset_mqtt_configuration():
+    # We only need to clear the list to stop any further signal events being published
+    signals_common.list_of_signals_to_publish_state_changes.clear()
+    # For subscriptions we unsubscribe from all topics associated with the message_type
+    mqtt_interface.unsubscribe_from_message_type("signal_updated_event")
+    # Finally remove all "remote" signals from the dictionary of signals - these will
+    # be re-created if they are subsequently re-subscribed to. Note we don't iterate 
+    # through the dictionary of signals to remove items as it will change under us
+    new_signals = {}
+    for key in signals_common.signals:
+        if key.isdigit(): new_signals[key] = signals_common.signals[key]
+    signals_common.signals = new_signals
     return()
 
 ##########################################################################################

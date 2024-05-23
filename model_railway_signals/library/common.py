@@ -74,7 +74,8 @@ def shutdown():
         # Clear out any retained messages and disconnect from broker
         mqtt_interface.mqtt_shutdown()
         # Turn off the DCC bus power and close the comms port
-        pi_sprog_interface.sprog_shutdown()
+        pi_sprog_interface.request_dcc_power_off()
+        pi_sprog_interface.sprog_disconnect()
         # Return the GPIO ports to their original configuration
         gpio_sensors.delete_all_local_gpio_sensors()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
@@ -90,7 +91,6 @@ def shutdown():
                 break
         if time.time() >= timeout_start + 30:
             logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
-        root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------

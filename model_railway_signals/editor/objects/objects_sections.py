@@ -10,7 +10,6 @@
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
-#    mqtt_update_sections(pub_list, sub_list) - Configure MQTT publish/subscribe
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
@@ -34,9 +33,7 @@
 #    track_sections.section_exists - Common function to see if a given item exists
 #    track_sections.delete_section(id) - delete library drawing object (part of soft delete)
 #    track_sections.create_section(id) -  To create the library object (create or redraw)
-#    track_sections.reset_mqtt_configuration() - reset MQTT networking prior to reconfiguration
-#    track_sections.set_sections_to_publish_state(IDs) - configure MQTT networking
-#    track_sections.subscribe_to_section_updates(node,IDs) - configure MQTT networking
+#    track_sections.update_mirrored(id, mirrored_id) - To update the mirrored section reference
 #
 #------------------------------------------------------------------------------------
 
@@ -217,16 +214,4 @@ def delete_section(object_id):
     del objects_common.schematic_objects[object_id]
     return()
 
-#------------------------------------------------------------------------------------
-# Function to update the MQTT networking configuration for sections, namely
-# subscribing to remote sections and setting local sections to publish state
-#------------------------------------------------------------------------------------
-
-def mqtt_update_sections(sections_to_publish:list, sections_to_subscribe_to:list):
-    track_sections.reset_mqtt_configuration()
-    track_sections.set_sections_to_publish_state(*sections_to_publish)
-    for section_identifier in sections_to_subscribe_to:
-        track_sections.subscribe_to_remote_section(section_identifier, run_layout.schematic_callback)
-    return()
-    
 ####################################################################################

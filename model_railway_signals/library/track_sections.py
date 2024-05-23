@@ -4,54 +4,56 @@
 #
 # Public types and functions:
 # 
-# section_callback_type (tells the calling program what has triggered the callback):
+#   section_callback_type (tells the calling program what has triggered the callback):
 #      section_callback_type.section_updated - The section has been updated by the user
 # 
-# create_section - Creates a Track Occupancy section object
-#   Mandatory Parameters:
+#   create_section - Creates a Track Occupancy section object
+#     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the section is to be displayed
 #       section_id:int - The ID to be used for the section 
 #       x:int, y:int - Position of the section on the canvas (in pixels)
 #       callback - The function to call when the track section is updated
 #                Note that the callback function returns (item_id, callback type)
 #       default_label:str - The default label to display when occupied
-#   Optional parameters:
+#     Optional parameters:
 #       editable:bool - If the section can be manually toggled and/or edited - default = True
 #       mirror_id:str - The ID of another local/remote Section to mirror - default = None
+#
+#   section_exists(section_id:int/str) - returns true if the Track Section object 'exists' (either the
+#             Track Section exists on the local schematic or has been subscribed to via MQTT networking)
+#
+#   delete_section(section_id:int) - Delete the library object from the schematic
+#
+#   section_occupied(section_id:int)- Returns the section state (True=Occupied, False=Clear)
 # 
-# section_occupied(section_id:int/str)- Returns the section state (True=Occupied, False=Clear)
-#                The Section ID can either be specified as an integer representing the ID of a 
-#                section created on the local schematic, or a string representing the remote 
-#                identifier of a track section on another MQTT network node.
+#   section_label(section_id:int)- Returns the 'label' of the section (as a string)
 # 
-# section_label(section_id:int/str)- Returns the 'label' of the section (as a string)
-#                The Section ID can either be specified as an integer representing the ID of a 
-#                section created on the local schematic, or a string representing the remote 
-#                identifier of a track section on another MQTT network node.
-# 
-# set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
-#   Mandatory Parameters:
+#   set_section_occupied - Sets the section to "OCCUPIED" (and updates the 'label' if required)
+#     Mandatory Parameters:
 #       section_id:int - The ID to be used for the section 
-#   Optional Parameters:
+#     Optional Parameters:
 #       new_label:str - An updated label to display when occupied - Default = No Change
 # 
-# clear_section_occupied (section_id:int) - Sets the section to "CLEAR" and returns the current 'label' (as a string)
+#   clear_section_occupied (section_id:int) - Sets the section to "CLEAR" and returns the current 'label' (as a string)
 #                 to allow this to be 'passed' to the next section (via the set_section_occupied function)  
 # 
 # The following API functions are for configuring the pub/sub of Track Section events. The functions are
-# called by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# called by the editor on 'Apply' of the MQTT settings. First, 'reset_sections_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_sections_to_publish_state' (with the list of LOCAL Track
 # Sections to publish) and 'subscribe_to_remote_section' for each REMOTE Track Section that has been subscribed.
 #
-#   reset_mqtt_configuration() - Clears down the current Track Section pub/sub configuration
+#   reset_sections_mqtt_configuration() - Clears down the current Track Section pub/sub configuration
 # 
 #   set_sections_to_publish_state(*sec_ids:int) - Enable the publication of Track Section events.
 #
-#   subscribe_to_remote_section(remote_id:str, callback:func) - Subscribes to a remote Track Section
+#   subscribe_to_remote_section(remote_id:str) - Subscribes to a remote Track Section
 #
 # External API - classes and functions (used by the other library modules):
 #
-#   handle_mqtt_section_updated_event(message) - called on receipt of a remote 'section_updated_event'
+#   handle_mqtt_section_updated_event(message:dict) - called on receipt of a remote 'section_updated_event'
+#        Dict comprises ["sourceidentifier"] - the identifier for the remote track section
+#                       ["occupied"] - the state of the remote section (True=OCCUPIED, False=CLEAR)
+#                       ["labeltext"] - the current label (train designator) for the remote section
 #
 #   configure_edit_mode(edit_mode:bool) - True for Edit Mode, False for Run Mode
 # 
@@ -79,17 +81,75 @@ class section_callback_type(enum.Enum):
 sections: dict = {}
 
 #---------------------------------------------------------------------------------------------
-# Global references to the Tkinter Entry box and the associated window (for editing)
+# Global list of track sections to publish to the MQTT Broker
+#---------------------------------------------------------------------------------------------
+
+list_of_sections_to_publish=[]
+
+#---------------------------------------------------------------------------------------------
+# Internal functions to create an entry widget for the Track Section (on right mouse button click).
+# Also functions to deal with cancelling out of the edit and confirming the edit.
+# TODO - TECH DEBT - Change this into a class at some time perhaps
 #---------------------------------------------------------------------------------------------
 
 text_entry_box = None
 entry_box_window = None
 
-#---------------------------------------------------------------------------------------------
-# Global list of track sections to publish to the MQTT Broker
-#---------------------------------------------------------------------------------------------
+def open_entry_box(section_id):
+    global text_entry_box
+    global entry_box_window
+    canvas = sections[str(section_id)]["canvas"]
+    # If another text entry box is already open then close that first
+    if entry_box_window is not None:
+        text_entry_box.destroy()
+        canvas.delete(entry_box_window)
+    # Set the font size and length for the text entry box
+    font_size = common.fontsize
+    label_length = sections[str(section_id)]["labellength"]
+    # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
+    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Courier',font_size,"normal"))
+    text_entry_box.bind('<Return>', lambda event:accept_entered_value(section_id))
+    text_entry_box.bind('<Escape>', lambda event:close_entry_box(section_id))
+    text_entry_box.bind('<FocusOut>', lambda event:accept_entered_value(section_id))
+    # if the section button is already showing occupied then we EDIT the value
+    if sections[str(section_id)]["occupied"]: text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
+    # Create a window on the canvas for the Entry box (overlaying the section button)
+    bbox = sections[str(section_id)]["canvas"].bbox(sections[str(section_id)]["tags"])
+    x = bbox[0] + (bbox[2]-bbox[0]) / 2
+    y = bbox[1] + (bbox[3]-bbox[1]) / 2
+    entry_box_window = canvas.create_window(x,y,window=text_entry_box)
+    # Force focus on the entry box so it will accept the keyboard entry immediately
+    text_entry_box.focus()
+    return()
 
-list_of_sections_to_publish=[]
+# Internal function to accept the new label text from the entry widget (on RETURN)
+def accept_entered_value(section_id:int):
+    update_identifier(section_id, text_entry_box.get())
+    close_entry_box(section_id)
+    return()
+
+# Internal function to close (and delete) the entry widget and associated window
+def close_entry_box(section_id:int):
+    global text_entry_box
+    global entry_box_window
+    text_entry_box.destroy()
+    sections[str(section_id)]["canvas"].delete(entry_box_window)
+    return()
+
+# Internal function to process the manual update of the Section label
+def update_identifier(section_id:int, new_label:str):
+    global sections
+    logging.info ("Section "+str(section_id)+": Label Updated to '"+new_label+"' ****************************")
+    update_label(section_id, new_label)
+    # Assume that by entering a value the user wants to set the section to OCCUPIED.
+    if not sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
+    # Publish the label change to the MQTT broker (if the section has been configured to publish updates)
+    send_mqtt_section_updated_event(section_id)
+    # Update any Local mirrored sections (no callbacks will be raised for updating these)
+    update_mirrored_sections(section_id)
+    # Make an external callback to indicate the section has been updated
+    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
+    return()
 
 #---------------------------------------------------------------------------------------------
 # API function to set/clear Edit Mode (called by the editor on mode change)
@@ -142,8 +202,8 @@ def section_button_event (section_id:int):
     # Publish the state changes to the broker (for other nodes to consume). Note that changes will only
     # be published if the MQTT interface has been configured for publishing updates for this track section
     send_mqtt_section_updated_event(section_id)
-    # Update any local mirrored sections (no callbacks will be generated for these updates)
-    update_sections_set_to_mirror_this_section(section_id)
+    # Update any LOCAL mirrored sections (no callbacks or MQTT Messages will be generated for these updates)
+    update_mirrored_sections(section_id)
     # Make the external callback (if one has been defined)
     sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
     return ()
@@ -155,25 +215,29 @@ def section_button_event (section_id:int):
 
 def handle_mqtt_section_updated_event(message):
     global sections
-    if ( "sourceidentifier" not in message.keys() or not "occupied" in message.keys()
-          or not "labeltext" in message.keys() or not section_exists(message["sourceidentifier"]) ):
+    if "sourceidentifier" not in message.keys() or "occupied" not in message.keys() or "labeltext" not in message.keys():
         logging.warning("Sections: handle_mqtt_section_updated_event - Unhandled MQTT message - "+str(message))
+    elif not section_exists(message["sourceidentifier"]):
+        logging.warning("Sections: handle_mqtt_section_updated_event - Message received from Remote Section "+
+                        message["sourceidentifier"]+" but this Section has not been subscribed to")
     else:
-        # Update the dummy section dict entry to hold the state of the remote track section
-        # Now we have received a message the state data can now be considered VALID
-        section_identifier = message["sourceidentifier"]
-        sections[section_identifier]["occupied"] = message["occupied"]
-        sections[section_identifier]["labeltext"] = message["labeltext"]
-        sections[section_identifier]["datavalid"] = True
-        if sections[section_identifier]["occupied"] == True: state = " OCCUPIED "
-        else: state = " CLEAR "
-        logging.info("Section "+section_identifier+": Remote section updated to"+state+"- Label '"+message["labeltext"]+"' ***********************")
-        # Update any local mirrored sections (no callbacks will be generated for these updates)
-        # Make sure we don't publish any updates back to the broker for the mirrored section or we
-        # could end up in a race condition between mirrored sections on different networked nodes
-        update_sections_set_to_mirror_this_section(section_identifier, publish_to_broker=False)
-        # Make the external callback (if one has been defined)
-        sections[section_identifier]["extcallback"] (section_identifier,section_callback_type.section_updated)
+        # Extract the Data we need from the message.
+        remote_sec_id = message["sourceidentifier"]
+        remote_sec_state = message["occupied"]
+        remote_sec_label = message["labeltext"]
+        # Log out the state update
+        if remote_sec_state:
+            logging.info("Section "+remote_sec_id+": State update from Remote Section - OCCUPIED (Label="+remote_sec_label+") *************")        
+        else:
+            logging.info("Section "+remote_sec_id+": State update from Remote Section - CLEAR (Label="+remote_sec_label+") ****************")
+        # Store the state of the REMOTE Section in the dummy Section object created at subscription time. We need this
+        # when creating or updating the configuration of LOCAL Mirrored sections. We know the state is now valid.         
+        sections[remote_sec_id]["statevalid"] = True
+        sections[remote_sec_id]["occupied"] = remote_sec_state
+        sections[remote_sec_id]["labeltext"] = remote_sec_label
+        # Update any LOCAL sections set to mirror this section, making sure we don't publish any updates back to
+        # the broker for the LOCAL section changes which may produce a race condition between network nodes
+        update_mirrored_sections(remote_sec_id, publish_to_broker=False)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -221,7 +285,7 @@ def update_label(section_id:int, new_label:str):
     global sections
     logging.info ("Section "+str(section_id)+": Updating Label to '"+new_label+"'")
     sections[str(section_id)]["labeltext"] = new_label
-    sections[str(section_id)]["button"]["text"] = new_label
+    sections[str(section_id)]["button"].config(text=new_label)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -230,7 +294,7 @@ def update_label(section_id:int, new_label:str):
 # the broker and set up a race condition between the mirrored sections on two networked nodes
 #---------------------------------------------------------------------------------------------
 
-def update_sections_set_to_mirror_this_section(section_id:int, publish_to_broker:bool=True):
+def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
     # Iterate through all other local track sections (where the section ID will be a digit rather than a remote
     # identifier) to see if any of them are configured to mirror this track section. If so then we need to update
     # the label and/or state of the other track section to match the label/state of the current track section
@@ -248,72 +312,7 @@ def update_sections_set_to_mirror_this_section(section_id:int, publish_to_broker
             # if any other track sections are mirroring the section we have just updated
             if other_section_updated:
                 if publish_to_broker: send_mqtt_section_updated_event(int(other_section))
-                update_sections_set_to_mirror_this_section(int(other_section), publish_to_broker)
-    return()
-
-#---------------------------------------------------------------------------------------------
-# Internal function to create an entry widget (on right mouse button click).
-# Also functions to deal with cancelling out of the edit and confirming the edit.
-# TODO - TECH DEBT - Change this into a class at some time perhaps
-#---------------------------------------------------------------------------------------------
-
-def open_entry_box(section_id):
-    global text_entry_box
-    global entry_box_window
-    canvas = sections[str(section_id)]["canvas"]
-    # If another text entry box is already open then close that first
-    if entry_box_window is not None:
-        text_entry_box.destroy()
-        canvas.delete(entry_box_window)
-    # Set the font size and length for the text entry box
-    font_size = common.fontsize
-    label_length = sections[str(section_id)]["labellength"]
-    # Create the entry box and bind the RETURN, ESCAPE and FOCUSOUT events to it
-    text_entry_box = Tk.Entry(canvas,width=label_length,font=('Courier',font_size,"normal"))
-    text_entry_box.bind('<Return>', lambda event:update_identifier(section_id))
-    text_entry_box.bind('<Escape>', lambda event:cancel_update(section_id))
-    text_entry_box.bind('<FocusOut>', lambda event:update_identifier(section_id))
-    # if the section button is already showing occupied then we EDIT the value
-    if sections[str(section_id)]["occupied"]: text_entry_box.insert(0,sections[str(section_id)]["labeltext"])
-    # Create a window on the canvas for the Entry box (overlaying the section button)
-    bbox = sections[str(section_id)]["canvas"].bbox(sections[str(section_id)]["tags"])
-    x = bbox[0] + (bbox[2]-bbox[0]) / 2
-    y = bbox[1] + (bbox[3]-bbox[1]) / 2
-    entry_box_window = canvas.create_window(x,y,window=text_entry_box)
-    # Force focus on the entry box so it will accept the keyboard entry immediately
-    text_entry_box.focus()
-    return()
-
-# Internal function to set the new label text from the entry widget (on RETURN)
-
-def update_identifier(section_id):
-    global sections 
-    global text_entry_box
-    global entry_box_window
-    logging.info ("Section "+str(section_id)+": Track Section Label Updated **************************************")
-    # Set the new label for the section button
-    update_label(section_id, text_entry_box.get())
-    # Assume that by entering a value the user wants to set the section to OCCUPIED.
-    if not sections[str(section_id)]["occupied"]: toggle_section_button(section_id)
-    # Publish the label change to the MQTT broker (if the section has been configured to publish updates)
-    send_mqtt_section_updated_event(section_id)
-    # Update any Local mirrored sections (no callbacks will be raised for updating these)
-    update_sections_set_to_mirror_this_section(section_id)
-    # Make an external callback to indicate the section has been switched
-    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
-    # Clean up by destroying the entry box and the window we created it in
-    text_entry_box.destroy()
-    sections[str(section_id)]["canvas"].delete(entry_box_window)
-    return()
-
-# Internal function to close the entry widget (on ESCAPE)
-
-def cancel_update(section_id):
-    global text_entry_box
-    global entry_box_window
-    # Clean up by destroying the entry box and the window we created it in
-    text_entry_box.destroy()
-    sections[str(section_id)]["canvas"].delete(entry_box_window)
+                update_mirrored_sections(int(other_section), publish_to_broker)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -327,15 +326,17 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
     canvas_tag = "section"+str(section_id)
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int) or section_id < 1 or section_id > 99:
-        logging.error("Section "+str(section_id)+": create_section - Section ID must be an integer between 1 and 99")
+        logging.error("Section "+str(section_id)+": create_section - Section ID must be an int (1-99)")
     elif section_exists(section_id):
         logging.error("Section "+str(section_id)+": create_section - Section ID already exists")
     elif not isinstance(mirror_id, str):
-        logging.error("Section "+str(section_id)+": create_section - Mirrored Section ID must be a str")
+        logging.error("Section "+str(section_id)+": create_section - Mirror Section ID must be a str")
     elif mirror_id == str(section_id):
-        logging.error("Section "+str(section_id)+": create_section - Mirrored Section ID is the same as the Section ID")
+        logging.error("Section "+str(section_id)+": create_section - Mirror Section ID is the same as the Section ID")
+    elif mirror_id != "" and mirror_id.isdigit() and (int(mirror_id) < 1 or int(mirror_id) > 99):
+        logging.error("Section "+str(section_id)+": create_section - (Local) Mirrored Section ID is out of range (1-99)")        
     elif mirror_id != "" and not mirror_id.isdigit() and mqtt_interface.split_remote_item_identifier(mirror_id) is None:
-        logging.error("Section "+str(section_id)+": create_section - Remote identifier for Mirrored Section is invalid format")        
+        logging.error("Section "+str(section_id)+": create_section - (Remote) Mirrored Section ID is invalid format")        
     else:
         logging.debug("Section "+str(section_id)+": Creating Track Occupancy Section")
         # We need the default label width to set the width of the Track section button
@@ -369,20 +370,19 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
             canvas.itemconfig(placeholder1, state='hidden')
             canvas.itemconfig(placeholder2, state='hidden')
         # Compile a dictionary of everything we need to track
-        sections[str(section_id)] = {"canvas"       : canvas,             # Tkinter canvas object
-                                     "button"       : section_button,     # Tkinter button object
-                                     "buttonwindow" : button_window,      # Tkinter drawing object
-                                     "placeholder1" : placeholder1,       # Tkinter drawing object
-                                     "placeholder2" : placeholder2,       # Tkinter drawing object
-                                     "tags"         : canvas_tag,         # Tag for ALL drawing objects
-                                     "extcallback"  : section_callback,   # External callback to make
-                                     "mirror"       : mirror_id,          # Other Local section to mirror  
-                                     "labeltext"    : default_label,      # The Text to display (when OCCUPIED)
-                                     "labellength"  : label_width,        # The fixed length for the designator
-                                     "positionx"    : x,                  # Position of the button on the canvas
-                                     "positiony"    : y,                  # Position of the button on the canvas
-                                     "datavalid"    : True,               # State data is always valid for local sections
-                                     "occupied"     : False }             # Current state
+        sections[str(section_id)] = {}
+        sections[str(section_id)]["canvas"] = canvas                  # Tkinter canvas object
+        sections[str(section_id)]["extcallback"] = section_callback   # External callback to make
+        sections[str(section_id)]["mirror"] = mirror_id               # Other Local or Remote section to mirror
+        sections[str(section_id)]["labellength"] = label_width        # The fixed width for the train designator
+        sections[str(section_id)]["occupied"] = False                 # Current state (occupied/clear)
+        sections[str(section_id)]["labeltext"] = default_label        # Current state (train designator)
+        sections[str(section_id)]["statevalid"] = True                # State always valid for Local sections
+        sections[str(section_id)]["button"] = section_button          # Tkinter button object (for run mode)
+        sections[str(section_id)]["buttonwindow"] = button_window     # Tkinter drawing object (for run mode)
+        sections[str(section_id)]["placeholder1"] = placeholder1      # Tkinter drawing object (for edit mode)
+        sections[str(section_id)]["placeholder2"] = placeholder2      # Tkinter drawing object (for edit mode)
+        sections[str(section_id)]["tags"] = canvas_tag                # Canvas Tag for ALL drawing objects
         # Get the initial state for the section (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("sections",section_id)
         # Set the label to the loaded_label (loaded_label will be 'None' if no data was loaded)
@@ -393,13 +393,13 @@ def create_section (canvas, section_id:int, x:int, y:int, section_callback,
         if loaded_state["occupied"]: toggle_section_button(section_id)
         # Update the state of the newly created section to reflect the mirrored section - Note that we need
         # to handle the case where it has yet to be created (file load case) or none specified (empty string)
-        if section_exists(mirror_id) and sections[mirror_id]["datavalid"]: 
+        if section_exists(mirror_id) and sections[mirror_id]["statevalid"]: 
             if sections[str(section_id)]["labeltext"] != sections[mirror_id]["labeltext"]:
                 update_label(section_id, sections[mirror_id]["labeltext"])
             if sections[str(section_id)]["occupied"] != sections[mirror_id]["occupied"]:
                 toggle_section_button(section_id)
         # Now update any other track sections configured to mirror this section
-        update_sections_set_to_mirror_this_section(section_id)
+        update_mirrored_sections(section_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will only
         # only be published if the MQTT interface has been configured for publishing updates for this track
         # section. This allows publish/subscribe to be configured prior to track section creation
@@ -420,31 +420,33 @@ def update_mirrored(section_id:int, mirror_id:str):
         logging.error("Section "+str(section_id)+": update_mirrored - Mirrored Section ID must be a str")
     elif mirror_id == str(section_id):
         logging.error("Section "+str(section_id)+": update_mirrored - Mirrored Section ID is the same as the Section ID")
+    elif mirror_id != "" and mirror_id.isdigit() and (int(mirror_id) < 1 or int(mirror_id) > 99):
+        logging.error("Section "+str(section_id)+": update_mirrored - (Local) Mirrored Section ID is out of range (1-99)")        
     elif mirror_id != "" and not mirror_id.isdigit() and mqtt_interface.split_remote_item_identifier(mirror_id) is None:
-        logging.error("Section "+str(section_id)+": create_section - Remote identifier for Mirrored Section is invalid format")        
+        logging.error("Section "+str(section_id)+": update_mirrored - (Remote) Mirrored Section ID is invalid format")        
     else:
-        logging.debug("Section "+str(section_id)+": Updating mirrored section to "+mirror_id)
+        logging.debug("Section "+str(section_id)+": Updating Mirrored Section ID to "+mirror_id)
         sections[str(section_id)]["mirror"] = mirror_id
         # Update the state of the section to reflect the state of the newly specified mirrored section
         # Note that we need to handle the case where it none has been specified (empty string) or if the
         # mirrored section data is invalid (remote section state is only valid on receipt of first message)
-        if section_exists(mirror_id) and sections[mirror_id]["datavalid"]: 
+        if section_exists(mirror_id) and sections[mirror_id]["statevalid"]: 
             if sections[str(section_id)]["labeltext"] != sections[mirror_id]["labeltext"]:
                 update_label(section_id, sections[mirror_id]["labeltext"])
             if sections[str(section_id)]["occupied"] != sections[mirror_id]["occupied"]:
                 toggle_section_button(section_id)
         # Now update any other track sections configured to mirror this section
-        update_sections_set_to_mirror_this_section(section_id)
+        update_mirrored_sections(section_id)
     return()
 
 #---------------------------------------------------------------------------------------------
 # Public API function to Return the current state of the section
 #---------------------------------------------------------------------------------------------
 
-def section_occupied(section_id:Union[int,str]):
+def section_occupied(section_id:int):
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(section_id, int) and not isinstance(section_id, str):
-        logging.error("Section "+str(section_id)+": section_occupied - Section ID must be an integer or string")
+    if not isinstance(section_id, int):
+        logging.error("Section "+str(section_id)+": section_occupied - Section ID must be an int")
         occupied = False
     elif not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_occupied - Section ID does not exist")
@@ -457,10 +459,10 @@ def section_occupied(section_id:Union[int,str]):
 # Public API function to Return the current label of the section (train identifier)
 #---------------------------------------------------------------------------------------------
 
-def section_label(section_id:Union[int,str]):
+def section_label(section_id:int):
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(section_id, int) and not isinstance(section_id, str):
-        logging.error("Section "+str(section_id)+": section_label - Section ID must be an integer or string")
+    if not isinstance(section_id, int):
+        logging.error("Section "+str(section_id)+": section_label - Section ID must be an int")
         section_label = ""
     elif not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": section_label - Section ID does not exist")
@@ -475,10 +477,12 @@ def section_label(section_id:Union[int,str]):
 
 def set_section_occupied(section_id:int, new_label:str=None):
     # Validate the parameters we have been given as this is a library API function
-    if not isinstance(section_id, int) :
-        logging.error("Section "+str(section_id)+": set_section_occupied - Section ID must be an integer")
+    if not isinstance(section_id, int):
+        logging.error("Section "+str(section_id)+": set_section_occupied - Section ID must be an int")
     elif not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": set_section_occupied - Section ID does not exist")
+    elif new_label is not None and not isinstance(new_label, str): 
+        logging.error ("Section "+str(section_id)+": set_section_occupied - New Label must be a str")
     else:
         section_updated = False
         # Update the Label if we have been given a different one in the function call
@@ -493,7 +497,7 @@ def set_section_occupied(section_id:int, new_label:str=None):
         # (only sent if the section is configured to publish changes) and update any mirrored sections
         if section_updated:
             send_mqtt_section_updated_event(section_id)
-            update_sections_set_to_mirror_this_section(section_id)
+            update_mirrored_sections(section_id)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -503,7 +507,7 @@ def set_section_occupied(section_id:int, new_label:str=None):
 def clear_section_occupied(section_id:int):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int) :
-        logging.error("Section "+str(section_id)+": clear_section_occupied - Section ID must be an integer")
+        logging.error("Section "+str(section_id)+": clear_section_occupied - Section ID must be an int")
         section_label = ""
     elif not section_exists(section_id):
         logging.error ("Section "+str(section_id)+": clear_section_occupied - Section ID does not exist")
@@ -515,7 +519,7 @@ def clear_section_occupied(section_id:int):
         if section_occupied(section_id):
             toggle_section_button(section_id)
             send_mqtt_section_updated_event(section_id)
-            update_sections_set_to_mirror_this_section(section_id)
+            update_mirrored_sections(section_id)
         # Return the current Section Label to the calling function
         section_label = sections[str(section_id)]["labeltext"]
     return(section_label)
@@ -531,13 +535,16 @@ def delete_section(section_id:int):
     global entry_box_window
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(section_id, int):
-        logging.error("Section "+str(section_id)+": delete_section - Section ID must be an integer")    
+        logging.error("Section "+str(section_id)+": delete_section - Section ID must be an int")    
     elif not section_exists(section_id):
         logging.error("Section "+str(section_id)+": delete_section - Section ID does not exist")
     else:
         logging.debug("Section "+str(section_id)+": Deleting library object from the schematic")    
         # If a text entry box is open then we need to destroy it (to be on the safe side)
-        if entry_box_window is not None: cancel_update (section_id)
+        # Note that the open entry box may be associated with a completely different Section ID
+        # But the 'close_entry_box' function only uses that to get the canvas reference
+        # To be addressed as TECH DEBT when the entry box stuff gets re-factored
+        if entry_box_window is not None: close_entry_box(section_id)
         # Delete all the tkinter drawing objects associated with the track section
         sections[str(section_id)]["canvas"].delete(sections[str(section_id)]["tags"])
         sections[str(section_id)]["button"].destroy()
@@ -551,7 +558,7 @@ def delete_section(section_id:int):
 # via the 'subscribe_to_remote_section' & 'set_sections_to_publish_state' functions.
 #---------------------------------------------------------------------------------------------
 
-def reset_mqtt_configuration():
+def reset_sections_mqtt_configuration():
     global sections
     global list_of_sections_to_publish
     logging.debug("Track Sections: Resetting MQTT publish and subscribe configuration")
@@ -579,7 +586,7 @@ def set_sections_to_publish_state(*sec_ids:int):
     for sec_id in sec_ids:
         # Validate the parameters we have been given as this is a library API function
         if not isinstance(sec_id,int) or sec_id < 1 or sec_id > 99:
-            logging.error("Section "+str(sec_id)+": set_sections_to_publish_state - ID must be an integer between 1 and 99")
+            logging.error("Section "+str(sec_id)+": set_sections_to_publish_state - ID must be an int (1-99)")
         elif sec_id in list_of_sections_to_publish:
             logging.warning("Section "+str(sec_id)+": set_sections_to_publish_state -"
                                 +" Section is already configured to publish state to MQTT broker")
@@ -594,33 +601,36 @@ def set_sections_to_publish_state(*sec_ids:int):
 
 #---------------------------------------------------------------------------------------------
 # API Function to "subscribe" to remote Track Section updates (published by other MQTT Nodes)
-# and map a function to call when updates are received . This function is called by the editor
-# on "Apply' of the MQTT pub/sub configuration or all subscribed Track Sections.
+# This function is called by the editor on "Apply' of the MQTT pub/sub configuration or all
+# subscribed Track Sections. Note that we don't need any callback information as REMOTE
+# track sections are only used to update LOCAL track sections configured to 'Mirror' them.
 #---------------------------------------------------------------------------------------------
 
-def subscribe_to_remote_section(remote_id:str, section_callback):   
+def subscribe_to_remote_sections(*remote_identifiers:str):   
     global sections
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(remote_id,str):
-        logging.error("Section "+str(remote_id)+": subscribe_to_remote_section - Remote ID must be a string")
-    elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
-        logging.error("Section "+remote_id+": subscribe_to_remote_section - Remote ID is an invalid format")
-    else:
-        logging.debug("Section "+remote_id+": Subscribing to remote Track Section")
-        # Only subscribe to events from the remote track section if we are not already subscribed        
-        if section_exists(remote_id):
+    for remote_id in remote_identifiers:
+        # Validate the parameters we have been given as this is a library API function
+        if not isinstance(remote_id,str):
+            logging.error("Section "+str(remote_id)+": subscribe_to_remote_section - Remote ID must be a string")
+        elif mqtt_interface.split_remote_item_identifier(remote_id) is None:
+            logging.error("Section "+remote_id+": subscribe_to_remote_section - Remote ID is an invalid format")
+        elif section_exists(remote_id):
             logging.warning("Section "+remote_id+" - subscribe_to_remote_section - Already subscribed")
         else:
-            # Create (or update) the dummy section entry to hold the state for the remote section and the callback
-            # Note that the data will only be valid when we have received the first update from the remote section
+            logging.debug("Section "+remote_id+": Subscribing to remote Track Section")
+            # Create a dummy Section object to enable 'section_exists' validation checks and hold the state for
+            # the REMOTE Section. At subscription time the state of the REMOTE Section will be unknown so the
+            # 'statevalid' flag is initially FALSE (this will be set to TRUE as soon as we receive the first state
+            # update from the REMOTE Section). This is to prevent any LOCAL Track Sections configured to 'mirror' the
+            # REMOTE section erroneously inheriting the default state of the dummy Section object at creation time.
             sections[remote_id] = {}
-            sections[remote_id]["datavalid"] = False
+            sections[remote_id]["statevalid"] = False
             sections[remote_id]["occupied"] = False
             sections[remote_id]["labeltext"] = ""
-            sections[remote_id]["extcallback"] = section_callback
-            [node_id,item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
-            mqtt_interface.subscribe_to_mqtt_messages("section_updated_event", node_id, item_id,
-                                                  handle_mqtt_section_updated_event)
+            # Subscribe to state updates from the remote Track Section
+            [node_id, item_id] = mqtt_interface.split_remote_item_identifier(remote_id)
+            mqtt_interface.subscribe_to_mqtt_messages("section_updated_event", node_id,
+                                        item_id, handle_mqtt_section_updated_event)
     return()
 
 ###############################################################################################

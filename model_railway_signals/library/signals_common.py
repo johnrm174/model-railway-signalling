@@ -624,28 +624,6 @@ def delete_signal(sig_id:int):
     return()
 
 # ------------------------------------------------------------------------------------------
-# Non public API function to reset the list of published/subscribed signals. Used
-# by the schematic editor for re-setting the MQTT configuration prior to re-configuring
-# via the signal-specific publish and subscribe configuration functions
-# ------------------------------------------------------------------------------------------
-
-def reset_mqtt_configuration():
-    global signals
-    global list_of_signals_to_publish_state_changes
-    # We only need to clear the list to stop any further signal events being published
-    list_of_signals_to_publish_state_changes.clear()
-    # For subscriptions we unsubscribe from all topics associated with the message_type
-    mqtt_interface.unsubscribe_from_message_type("signal_updated_event")
-    # Finally remove all "remote" signals from the dictionary of signals - these will
-    # be re-created if they are subsequently re-subscribed to. Note we don't iterate 
-    # through the dictionary of signals to remove items as it will change under us
-    new_signals = {}
-    for key in signals:
-        if key.isdigit(): new_signals[key] = signals[key]
-    signals = new_signals
-    return()
-
-# ------------------------------------------------------------------------------------------
 # Non public API function to return the tkinter canvas 'tags' for the signal
 # ------------------------------------------------------------------------------------------
 
