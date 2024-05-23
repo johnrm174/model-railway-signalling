@@ -104,6 +104,7 @@ def run_basic_networking_tests(delay:float=0.0):
 
 def run_specific_signal_ahead_tests(delay:float=0.0):
     print("MQTT interlocking and override on signals ahead tests")
+    print("Expected ERROR - assert_signals_PROCEED - Signal: 1 - Test Fail - Signal state: signal_state_type.CAUTION")
     # As we are using networking, we need to introduce an additional delay for messages
     # to be sent to and received from the MQTT message broker - as we are using a
     # local broker, a short delay of 100ms should suffice
