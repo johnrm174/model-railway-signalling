@@ -15,6 +15,7 @@ from model_railway_signals.library import dcc_control
 from model_railway_signals.library import pi_sprog_interface
 from model_railway_signals.library import signals_common
 from model_railway_signals.library import mqtt_interface
+from model_railway_signals.library import track_sections
 
 from model_railway_signals.editor import schematic
 
@@ -51,7 +52,7 @@ def run_track_sensor_library_tests():
     track_sensors.track_sensor_triggered(100)  # Fail - does not exist
     print("Library Tests - track_sensor_triggered - Triggering 2 track sensor passed events:")
     track_sensors.track_sensor_triggered(10)   # success
-    system_test_harness.sleep(1.5)
+    time.sleep(1.5)
     # track_sensor_triggered (pulse the button and generate callback)
     track_sensors.track_sensor_triggered(10)   # Success
     # delete_track_sensor - reset_sensor_button function should not generate any exceptions
@@ -75,6 +76,235 @@ def run_track_sensor_library_tests():
     print("")
     return()
 
+#---------------------------------------------------------------------------------------------------------
+# Test Track Section Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def track_section_callback(section_id, callback_type):
+    logging_string="Track Section Callback from Section "+str(section_id)+"-"+str(callback_type)
+    logging.info(logging_string)
+    
+def run_track_section_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Track Section Objects")
+    canvas = schematic.canvas
+    # create_track_section
+    print("Library Tests - create_section - will generate 11 errors:")
+    assert len(track_sections.sections) == 0
+    track_sections.configure_edit_mode(False)
+    track_sections.create_section(canvas,1,100,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-50")    # Success
+    track_sections.create_section(canvas,2,200,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="box1-51")    # Success
+    track_sections.create_section(canvas,3,300,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="4")          # Success
+    track_sections.configure_edit_mode(True)
+    track_sections.create_section(canvas,4,400,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="3")          # Success
+    track_sections.create_section(canvas,5,500,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
+    track_sections.create_section(canvas,6,600,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="")          # Success
+    track_sections.create_section(canvas,0,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID out of range
+    track_sections.create_section(canvas,100,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")       # Fail - ID out of range
+    track_sections.create_section(canvas,6,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")         # Fail - ID already exists
+    track_sections.create_section(canvas,"7",100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="4")       # Fail - ID not an int
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id=4)           # Fail - Mirror ID not a str
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="7")         # Fail - Mirror ID same as ID
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="0")         # Fail - Mirror ID invalid
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="100")       # Fail - Mirror ID invalid
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1")      # Fail - Mirror ID invalid
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1-0")    # Fail - Mirror ID invalid
+    track_sections.create_section(canvas,7,100,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="box1-100")  # Fail - Mirror ID invalid
+    assert len(track_sections.sections) == 6
+    print("Library Tests - section_exists - will generate 1 error:")
+    assert track_sections.section_exists(1)
+    assert track_sections.section_exists(2)
+    assert track_sections.section_exists("3")
+    assert track_sections.section_exists("4")
+    assert not track_sections.section_exists(7)
+    assert not track_sections.section_exists("8")
+    assert not track_sections.section_exists(10.1) # Error (not int or str
+    print("Library Tests - section_occupied - will generate 2 errors:")
+    assert not track_sections.section_occupied(1)
+    assert not track_sections.section_occupied(2)
+    assert not track_sections.section_occupied(3)
+    assert not track_sections.section_occupied(4)
+    assert not track_sections.section_occupied(5)
+    assert not track_sections.section_occupied(6)
+    assert not track_sections.section_occupied(7)   # Error - does not exist
+    assert not track_sections.section_occupied("6") # Error - not an int
+    print("Library Tests - section_label - will generate 2 errors:")
+    assert track_sections.section_label(1) == "OCCUPIED"
+    assert track_sections.section_label(2) == "OCCUPIED"
+    assert track_sections.section_label(3) == "OCCUPIED"
+    assert track_sections.section_label(4) == "OCCUPIED"
+    assert track_sections.section_label(5) == "OCCUPIED"
+    assert track_sections.section_label(6) == "OCCUPIED"
+    assert track_sections.section_label(7) != "OCCUPIED"   # Error - does not exist
+    assert track_sections.section_label("6") != "OCCUPIED"  # Error - not an int
+    print("Library Tests - Test manual update of section state and label - edit mode")
+    track_sections.configure_edit_mode(True)
+    # Track sections 3 and 4 are set to mirror each other
+    track_sections.update_identifier(3,"Train1")
+    assert track_sections.section_occupied(3)
+    assert track_sections.section_occupied(4)
+    assert track_sections.section_label(3) == "Train1"
+    assert track_sections.section_label(4) == "Train1"
+    track_sections.section_button_event(3)
+    assert not track_sections.section_occupied(3)
+    assert not track_sections.section_occupied(4)
+    track_sections.section_button_event(4)
+    assert track_sections.section_occupied(3)
+    assert track_sections.section_occupied(4)
+    track_sections.update_identifier(4,"Train2")
+    assert track_sections.section_label(3) == "Train2"
+    assert track_sections.section_label(4) == "Train2"
+    print("Library Tests - Test manual update of section state and label - run mode")
+    track_sections.configure_edit_mode(False)
+    # Track sections 3 and 4 are set to mirror each other
+    track_sections.update_identifier(3,"Train1")
+    assert track_sections.section_occupied(3)
+    assert track_sections.section_occupied(4)
+    assert track_sections.section_label(3) == "Train1"
+    assert track_sections.section_label(4) == "Train1"
+    track_sections.section_button_event(3)
+    assert not track_sections.section_occupied(3)
+    assert not track_sections.section_occupied(4)
+    track_sections.section_button_event(4)
+    assert track_sections.section_occupied(3)
+    assert track_sections.section_occupied(4)
+    track_sections.update_identifier(4,"Train2")
+    assert track_sections.section_label(3) == "Train2"
+    assert track_sections.section_label(4) == "Train2"
+    print("Library Tests - Test API update of section state and label - edit mode")
+    track_sections.configure_edit_mode(True)
+    track_sections.set_section_occupied(1,"Train3")
+    track_sections.set_section_occupied(1,"Train3")
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "Train3"
+    track_sections.set_section_occupied(2,track_sections.clear_section_occupied(1))
+    assert not track_sections.section_occupied(1)
+    assert track_sections.section_occupied(2)
+    assert track_sections.section_label(2) == "Train3"
+    track_sections.clear_section_occupied(2)
+    track_sections.clear_section_occupied(2)
+    print("Library Tests - Test API update of section state and label - run mode")
+    track_sections.configure_edit_mode(False)
+    track_sections.set_section_occupied(1,"Train4")
+    track_sections.set_section_occupied(1,"Train4")
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(1) == "Train4"
+    track_sections.set_section_occupied(2,track_sections.clear_section_occupied(1))
+    assert not track_sections.section_occupied(1)
+    assert track_sections.section_occupied(2)
+    assert track_sections.section_label(2) == "Train4"
+    print("Library Tests - set/clear_section_occupied - negative tests - will generate 5 errors")
+    track_sections.set_section_occupied("1")                    # Fail - not int
+    track_sections.set_section_occupied(7)                      # Fail - does not exist
+    track_sections.set_section_occupied(1,20)                   # Fail - new label not a str
+    assert track_sections.clear_section_occupied("1") == ""     # Fail - not int
+    assert track_sections.clear_section_occupied(7) == ""       # Fail - does not exist
+    print("Library Tests - create a new Sectiion set to mirror an existing section")
+    # Track Section 2 Should already be OCCUPIED by "Train4" from the previous tests
+    track_sections.create_section(canvas,7,700,100, track_section_callback, "OCCUPIED", editable=False, mirror_id="2")
+    assert len(track_sections.sections) == 7
+    assert track_sections.section_occupied(2)
+    assert track_sections.section_occupied(7)
+    assert track_sections.section_label(7) == "Train4"
+    track_sections.section_button_event(2)
+    assert not track_sections.section_occupied(2)
+    assert not track_sections.section_occupied(7)
+    print("Library Tests - update_mirrored - 9 errors will be generated")
+    # Set up the sections to be mirrored with a known state
+    track_sections.update_identifier(3,"Train60")
+    track_sections.clear_section_occupied(3)
+    track_sections.update_identifier(4,"Train61")
+    track_sections.set_section_occupied (3)
+    # update the mirrored id references (note we do 5 and 6 twice to exersise the "do we update or not" code)
+    track_sections.update_mirrored(5,"3")           # success
+    track_sections.update_mirrored(6,"4")           # success
+    track_sections.update_mirrored(5,"3")           # success
+    track_sections.update_mirrored(6,"4")           # success
+    track_sections.update_mirrored(6,"box1-1")      # success
+    track_sections.update_mirrored("1","5")         # Fail - Section ID not an int
+    track_sections.update_mirrored(8,"5")           # Fail - Section ID does not exist
+    track_sections.update_mirrored(1,8)             # Fail - Mirrored ID not a str
+    track_sections.update_mirrored(1,"1")           # Fail - Mirrored ID Same as Section ID
+    track_sections.update_mirrored(1,"0")           # Fail - Local Mirrored ID out of range
+    track_sections.update_mirrored(1,"100")         # Fail - Local Mirrored ID out of range
+    track_sections.update_mirrored(1,"box1")        # Fail - Remote Mirrored ID invalid
+    track_sections.update_mirrored(1,"box1-0")      # Fail - Remote Mirrored ID invalid
+    track_sections.update_mirrored(1,"box1-100")    # Fail - Remote Mirrored ID invalid
+    print("Library Tests - set_sections_to_publish_state - 4 Errors and 2 warnings will be generated")    
+    track_sections.set_sections_to_publish_state(1,2,20)    # Valid
+    track_sections.set_sections_to_publish_state(1,2)       # Already set to publish - 2 warnings
+    track_sections.set_sections_to_publish_state("1,","2")  # Not integers - 2 Errors
+    track_sections.set_sections_to_publish_state(0, 100)    # Integer but out of range - 2 errors
+    # Create a Section already set to publish state on creation
+    print("Library Tests - set_sections_to_publish_state - Exercise Publishing of Events code")
+    track_sections.create_section(canvas,8,800,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="")
+    assert len(track_sections.sections) == 8
+    # Excersise the publishing of the other sections
+    track_sections.set_section_occupied(1,"Train10")
+    track_sections.clear_section_occupied(1)
+    track_sections.update_identifier(2,"Train11")
+    track_sections.section_button_event(2)
+    track_sections.section_button_event(3)
+    print("Library Tests - subscribe_to_remote_instruments - 5 Errors and 2 warnings will be generated")
+    track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
+    track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
+    track_sections.subscribe_to_remote_sections("box1","51", 3)        # Fail - 3 errors
+    track_sections.subscribe_to_remote_sections("box1-0","box1-100")   # Fail - 2 errors
+    assert len(track_sections.sections) == 10
+    assert track_sections.section_exists("box1-50")
+    assert track_sections.section_exists("box1-51")
+    print("Library Tests - Toggle Edit mode with remote sensors to excersise code - no errors or warnings")
+    track_sections.configure_edit_mode(False)
+    track_sections.configure_edit_mode(True)
+    print("Library Tests - handle_mqtt_section_updated_event - 4 warnings will be generated")
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50", "occupied":True, "labeltext":"Train20"})
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-51", "occupied":True, "labeltext":"Train21"})
+    # Test the mirrored sections have been updated correctly
+    assert track_sections.section_label(1) == "Train20"
+    assert track_sections.section_occupied(1)
+    assert track_sections.section_label(2) == "Train21"
+    assert track_sections.section_occupied(2)
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50", "occupied":False, "labeltext":"Train22"})
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-51", "occupied":False, "labeltext":"Train23"})
+    assert track_sections.section_label(1) == "Train22"
+    assert not track_sections.section_occupied(1)
+    assert track_sections.section_label(2) == "Train23"
+    assert not track_sections.section_occupied(2)
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-70","occupied": False, "labeltext":"Train20"}) # Warning - Not subscribed
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","occupied":False})          # Warning - spurious message
+    track_sections.handle_mqtt_section_updated_event({"occupied": False, "labeltext":"Train20"})               # Warning - spurious message
+    track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","labeltext":"Train20"})     # Warning - spurious message    
+    print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
+    track_sections.reset_sections_mqtt_configuration()
+    assert len(track_sections.sections) == 8
+    assert not track_sections.section_exists("box1-50")
+    assert not track_sections.section_exists("box1-51")
+    print("Library Tests - Excersise Edit window code (no errors or warnings)")
+    assert track_sections.section_label(1) == "Train22"
+    assert track_sections.section_label(2) == "Train23"
+    track_sections.open_entry_box(1)
+    time.sleep(0.1)
+    track_sections.open_entry_box(2)
+    time.sleep(0.1)
+    track_sections.accept_entered_value(2)
+    time.sleep(0.1)
+    assert track_sections.section_label(1) == "Train22"
+    assert track_sections.section_label(2) == ""
+    print("Library Tests - delete_section - 2 errors will be generated")
+    track_sections.delete_section(1)
+    track_sections.delete_section(2)
+    track_sections.delete_section(3)
+    track_sections.delete_section(4)
+    track_sections.delete_section(5)
+    track_sections.delete_section(6)
+    track_sections.delete_section(7)
+    track_sections.delete_section(8)
+    track_sections.delete_section("9")   # Fail - not an int
+    track_sections.delete_section(9)     # Fail - does not exist
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+    
 #---------------------------------------------------------------------------------------------------------
 # Test GPIO Sensor Library objects
 #---------------------------------------------------------------------------------------------------------
@@ -178,19 +408,19 @@ def run_gpio_sensor_library_tests():
     gpio_sensors.gpio_sensor_triggered(4, testing=True)  # Port number for GPIO Sensor 10 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
     gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.sleep(0.25)
+    time.sleep(0.25)
     print ("GPIO Sensors - Re-triggering Sensors - 10 will be re-triggered - 11 and 12 will be extended")
     print ("GPIO Sensors - Will generate 1 Error (signal 1 not existing)")
     gpio_sensors.gpio_sensor_triggered(4, testing=True)  # Port number for GPIO Sensor 10 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
     gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.sleep(1.25)
+    time.sleep(1.25)
     print ("GPIO Sensors - Re-triggering Sensors - 10 & 11 will be re-triggered - 12 will be extended")
     print ("GPIO Sensors - Will generate 2 Errors (signal 1 / Signal 2 not existing)")
     gpio_sensors.gpio_sensor_triggered(4, testing=True)   # Port number for GPIO Sensor 10 (timeout=0.0)
     gpio_sensors.gpio_sensor_triggered(5, testing=True)  # Port number for GPIO Sensor 11 (timeout=1.0)
     gpio_sensors.gpio_sensor_triggered(6, testing=True)  # Port number for GPIO Sensor 12 (timeout=2.0)
-    system_test_harness.sleep(2.25)
+    time.sleep(2.25)
     print ("GPIO Sensors - End of sensor triggering tests -  all sensors should have timed out")
     # subscribe_to_remote_gpio_sensors
     print ("GPIO Sensors - subscribe_to_remote_gpio_sensors - Will generate 1 warning and 5 Errors")
@@ -475,7 +705,7 @@ def run_instrument_library_tests():
     print("Library Tests - Instrument Objects")
     canvas = schematic.canvas
     # create_instrument
-    print("Library Tests - create_instrument - 10 Errors and 4 warnings will be generated")
+    print("Library Tests - create_instrument - 12 Errors and 4 warnings will be generated")
     assert len(block_instruments.instruments) == 0
     # Sunny day tests
     block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="2")      # Valid
@@ -497,6 +727,8 @@ def run_instrument_library_tests():
     block_instruments.create_instrument(canvas, "10", block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="10")  # Fail (str)
     block_instruments.create_instrument(canvas, 10, "random_type", 100, 100, instrument_callback, linked_to="2")                                     # Fail (invalid type)
     block_instruments.create_instrument(canvas, 11, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to=10)         # Fail (linked ID not int)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="0")        # Fail (invalid linked ID)
+    block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="100")      # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1")     # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-0")   # Fail (invalid linked ID)
     block_instruments.create_instrument(canvas, 12, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="box1-100") # Fail (invalid linked ID)
@@ -597,7 +829,7 @@ def run_instrument_library_tests():
     block_instruments.telegraph_key_button(2)
     block_instruments.telegraph_key_button(3)
     block_instruments.telegraph_key_button(4)
-    print("Library Tests - update_linked_instrument - 5 Errors and 5 warnings will be generated")
+    print("Library Tests - update_linked_instrument - 10 Errors and 5 warnings will be generated")
     # Clear down the spurious linkings
     block_instruments.update_linked_instrument(5,"")
     block_instruments.update_linked_instrument(6,"")
@@ -605,15 +837,20 @@ def run_instrument_library_tests():
     block_instruments.update_linked_instrument(8,"")
     block_instruments.update_linked_instrument(9,"")
     # Make the new linkings
-    block_instruments.update_linked_instrument(5,"4")    # 2 Warnings (3 is linked to 4)
-    block_instruments.update_linked_instrument(4,"5")    # Warning (3 is linked to 4) 
-    block_instruments.update_linked_instrument(1,"6")    # Warning (2 is linked to 1)
-    block_instruments.update_linked_instrument(6,"1")    # Warning (2 is linked to 1)
-    block_instruments.update_linked_instrument(4,"4")    # Fail - same ID
-    block_instruments.update_linked_instrument(10,"7")   # Fail - Inst ID does not exist
-    block_instruments.update_linked_instrument("1","2")  # Fail - Inst ID not an int
-    block_instruments.update_linked_instrument(1,2)      # Fail - Linked ID not a str
-    block_instruments.update_linked_instrument(1,"box1") # Fail - linked ID not valid remote ID
+    block_instruments.update_linked_instrument(5,"4")           # 2 Warnings (3 is linked to 4)
+    block_instruments.update_linked_instrument(4,"5")           # Warning (3 is linked to 4) 
+    block_instruments.update_linked_instrument(1,"6")           # Warning (2 is linked to 1)
+    block_instruments.update_linked_instrument(6,"1")           # Warning (2 is linked to 1)
+    block_instruments.update_linked_instrument(4,"4")           # Fail - same ID
+    block_instruments.update_linked_instrument(10,"7")          # Fail - Inst ID does not exist
+    block_instruments.update_linked_instrument("1","2")         # Fail - Inst ID not an int
+    block_instruments.update_linked_instrument(1,2)             # Fail - Linked ID not a str
+    block_instruments.update_linked_instrument(1,"box1")        # Fail - linked ID not valid remote ID
+    block_instruments.update_linked_instrument(1,"0")           # Fail (invalid linked ID)
+    block_instruments.update_linked_instrument(1,"100")         # Fail (invalid linked ID)
+    block_instruments.update_linked_instrument(1,"box1")        # Fail (invalid linked ID)
+    block_instruments.update_linked_instrument(1,"box1-0")      # Fail (invalid linked ID)
+    block_instruments.update_linked_instrument(1,"box1-100")    # Fail (invalid linked ID)
     print("Library Tests - set_instruments_to_publish_state - 4 Errors and 3 warnings will be generated")
     # Set instrument 5 to publish state as soon as it set to publish (and reset the other linkings)
     block_instruments.update_linked_instrument(5,"box1-5") # Warning - inst 5 linked from inst 4
@@ -626,12 +863,13 @@ def run_instrument_library_tests():
     block_instruments.set_instruments_to_publish_state("1,","2")  # Not integers - 2 Errors
     block_instruments.set_instruments_to_publish_state(0, 100)    # Integer but out of range - 2 errors
     assert len(block_instruments.list_of_instruments_to_publish) == 4
-    # Create an instrument already set to publish state on creation
-    block_instruments.create_instrument(canvas, 10, block_instruments.instrument_type.single_line, 1000, 100, instrument_callback, linked_to="box1-20")
     print("Library Tests - set_instruments_to_publish_state - Exercise  Publishing of Events code")
     # Clear down the existing linked instruments first
     block_instruments.update_linked_instrument(5,"Box2-50")
     block_instruments.update_linked_instrument(6,"Box2-60")
+    # Create an instrument already set to publish state on creation
+    block_instruments.create_instrument(canvas, 10, block_instruments.instrument_type.single_line, 1000, 100, instrument_callback, linked_to="box1-20")
+    # Excersise the other instruments
     block_instruments.clear_button_event(5)
     block_instruments.clear_button_event(5)
     block_instruments.occup_button_event(5)
@@ -722,11 +960,6 @@ def run_instrument_library_tests():
     assert not block_instruments.instrument_exists(10)
     block_instruments.delete_instrument(10) # Fail
     block_instruments.delete_instrument("10") # Fail
-    
-    
-    
-    
-    
     print("Library Tests - create_instrument - update the state of repeater on created instrument to reflect instrument already linked back to it")
     block_instruments.create_instrument(canvas, 1, block_instruments.instrument_type.single_line, 100, 100, instrument_callback, linked_to="4")
     block_instruments.create_instrument(canvas, 2, block_instruments.instrument_type.single_line, 200, 100, instrument_callback, linked_to="5")
@@ -818,24 +1051,24 @@ def run_pi_sprog_interface_tests(baud_rate):
     pi_sprog_interface.send_accessory_short_event(6, True)
     pi_sprog_interface.send_accessory_short_event(7, True)
     pi_sprog_interface.send_accessory_short_event(8, True)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(1, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(2, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(3, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(4, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(5, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(6, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(7, False)
-    system_test_harness.sleep(0.5)
+    time.sleep(0.5)
     pi_sprog_interface.send_accessory_short_event(8, False)
-    system_test_harness.sleep(1.0)
-    print("Library Tests - negative tests - sending commands when port is closed - 4 Warnings will be generated")
+    time.sleep(1.0)
+    print("Library Tests - negative tests - sending commands when port is closed - 2 Warnings will be generated")
     assert pi_sprog_interface.sprog_disconnect()
     assert not pi_sprog_interface.request_dcc_power_on()
     pi_sprog_interface.send_accessory_short_event(8, True)
@@ -843,9 +1076,6 @@ def run_pi_sprog_interface_tests(baud_rate):
     assert pi_sprog_interface.service_mode_read_cv(1) is None
     assert not pi_sprog_interface.service_mode_write_cv(1,255)
     assert not pi_sprog_interface.request_dcc_power_off()
-    print("Library Tests - Sprog Shutdown (no errors or warnings)")
-    pi_sprog_interface.sprog_shutdown()
-    pi_sprog_interface.sprog_shutdown()
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1018,7 +1248,7 @@ def run_dcc_control_tests(baud_rate):
     dcc_control.subscribe_to_dcc_command_feed(100) # Error
     dcc_control.subscribe_to_dcc_command_feed("Box1")
     print("Library Tests - reset_mqtt_configuration - No warnings or errors")
-    dcc_control.reset_mqtt_configuration()
+    dcc_control.reset_dcc_mqtt_configuration()
     print("Library Tests - handle_mqtt_dcc_accessory_short_event - 3 Errors - DCC Commands should be sent out")
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccaddress": 1000}) # Error
     dcc_control.handle_mqtt_dcc_accessory_short_event({"sourceidentifier": "box1-200", "dccstate": True}) # Error
@@ -1048,7 +1278,7 @@ def run_dcc_control_tests(baud_rate):
     assert len(dcc_control.dcc_signal_mappings) == 0
     assert len(dcc_control.dcc_address_mappings) == 0
     print("Library Tests - DCC control Tests - disconnecting from SPROG")
-    system_test_harness.sleep(1.0) # Give the SPROG a chance to send all DCC commands
+    time.sleep(1.0) # Give the SPROG a chance to send all DCC commands
     assert pi_sprog_interface.request_dcc_power_off()
     assert pi_sprog_interface.sprog_disconnect()
     print("----------------------------------------------------------------------------------------")
@@ -1088,29 +1318,29 @@ def run_mqtt_interface_tests():
     assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, 100, "password1") # Fail
     assert not mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", 100) # Fail
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     print("Library Tests - mqtt_broker_disconnect (and then re-connect")
     assert mqtt_interface.mqtt_broker_disconnect()
     assert mqtt_interface.mqtt_broker_connect("127.0.0.1",1883, "user1", "password1") # success
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     print("Library Tests - subscribe_to_mqtt_messages")
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_1", "node1", 1, message_callback)
     mqtt_interface.subscribe_to_mqtt_messages("test_messages_2", "node1", 1, message_callback, subtopics=True)
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     print("Library Tests - send_mqtt_message")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 3", subtopic="sub1")
     mqtt_interface.send_mqtt_message("test_messages_2", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 4", subtopic="sub2")
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     print("Library Tests - unsubscribe_from_message_type")
     mqtt_interface.unsubscribe_from_message_type("test_messages_1")
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":123, "data2":"abc"}, log_message="LOG MESSAGE 1")
     mqtt_interface.send_mqtt_message("test_messages_1", 1, {"data1":456, "data2":"def"}, log_message="LOG MESSAGE 2")
     print("Library Tests - mqtt_shutdown")
     mqtt_interface.mqtt_shutdown()
-    system_test_harness.sleep(0.2)
+    time.sleep(0.2)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -1122,13 +1352,14 @@ def run_mqtt_interface_tests():
 def run_all_basic_library_tests(shutdown:bool=False):
     baud_rate = 115200    # change to 115200 for Pi-Sprog-3 V2 or 460800 for Pi-SPROG-3 V1
     logging.getLogger().setLevel(logging.WARNING)
+    run_track_section_library_tests()
     run_track_sensor_library_tests()
     run_gpio_sensor_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
-#     run_pi_sprog_interface_tests(baud_rate)
-#     run_dcc_control_tests(baud_rate)
-#     run_mqtt_interface_tests()
+    run_pi_sprog_interface_tests(baud_rate)
+    run_dcc_control_tests(baud_rate)
+    run_mqtt_interface_tests()
     logging.getLogger().setLevel(logging.WARNING)
     if shutdown: system_test_harness.report_results()
 

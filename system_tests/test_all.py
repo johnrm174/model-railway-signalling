@@ -25,6 +25,7 @@ import test_load_layout_failures
 def run_all_tests():
     print("*** Running tests from 'basic_library_tests.py' ***")
     basic_library_tests.run_all_basic_library_tests()
+    
     print("*** Running tests from 'test_schematic_editor.py' ***")
     test_schematic_editor.run_all_schematic_editor_tests()
     print("*** Running tests from 'test_object_editing.py' ***")
@@ -47,12 +48,13 @@ def run_all_tests():
     test_single_line_examples.run_all_single_line_example_tests()
     print("*** Running tests from 'test_mqtt_networking_example.py' ***")
     test_mqtt_networking_example.run_all_mqtt_networking_example_tests()
-    
+
     print("*** Running tests from 'test_library_objects.py' ***")
     test_library_objects.run_all_basic_library_tests()
 
     print("*** Running tests from 'test_load_layout_failures.py' ***")
     test_load_layout_failures.run_all_load_layout_negative_tests()
+
     system_test_harness.report_results()
 
 # The main code starts here
