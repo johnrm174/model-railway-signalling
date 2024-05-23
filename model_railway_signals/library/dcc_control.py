@@ -81,11 +81,11 @@
 #   delete_signal_mapping(sig_id:int) - Delete a DCC mapping (called when the Signal is deleted)
 #
 # The following API functions are for configuring the pub/sub of DCC command feeds. The functions are called
-# by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# by the editor on 'Apply' of the MQTT settings. First, 'reset_dcc_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_node_to_publish_dcc_commands' (either True or False)
 # and 'subscribe_to_dcc_command_feed' for each REMOTE DCC Node (DCC Command feed subscribed).
 #
-#   reset_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
+#   reset_dcc_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
 #
 #   set_node_to_publish_dcc_commands(publish_dcc_commands:bool) - Enable publishing of DCC command feed
 #           All DCC commands wil lthen be published to the MQTT broker for consumption by other nodes
@@ -711,7 +711,7 @@ def delete_signal_mapping(sig_id:int):
 # via the 'subscribe_to_dcc_command_feed' & 'set_node_to_publish_dcc_commands' functions.
 #----------------------------------------------------------------------------------------------------
 
-def reset_mqtt_configuration():
+def reset_dcc_mqtt_configuration():
     global publish_dcc_commands_to_mqtt_broker
     logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_commands_to_mqtt_broker = False
