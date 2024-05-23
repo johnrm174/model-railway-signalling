@@ -409,9 +409,9 @@ def set_sections_occupied(*sectionids):
             if track_sections.section_occupied(secid):
                 raise_test_warning ("set_sections_occupied - Section: "+str(secid)+" is already OCCUPIED")
             else:
-                # Two calls are needed - we first clear the section to set the section label
+                # Two calls are needed - we first set the label using the 'update_label' function
                 # then we call the section callback library function to simulate the 'click'
-                run_function(lambda:track_sections.clear_section_occupied(secid,str(train_identifier)))
+                run_function(lambda:track_sections.update_label(secid,str(train_identifier)))
                 run_function(lambda:track_sections.section_button_event(secid))
             train_identifier=train_identifier+1
 
@@ -1135,9 +1135,6 @@ def test_all_edit_object_windows(test_all_controls:bool=False, report_object_tes
                     del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
                     del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
                     del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
-                elif configuration["item"] == objects.object_type.section:
-                    del configuration["label"]  ## Always reset to default after editing
-                    del configuration["state"]  ## Always reset to default after editing
                 run_function(lambda:schematic.deselect_all_objects())
                 run_function(lambda:schematic.select_object(object_id))
                 run_function(lambda:schematic.edit_selected_object(), delay=1.0)
