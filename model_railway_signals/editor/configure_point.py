@@ -72,18 +72,21 @@ class also_switch_selection(common.int_item_id_entry_box):
         self.point_id = 0
         # Create the Label Frame for the "also switch" entry box
         self.frame = Tk.LabelFrame(parent_frame, text="Automatic switching")
+        # Create a subframe to centre all other UI elements
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
         # Call the common base class init function to create the EB
-        self.label1 = Tk.Label(self.frame,text="Switch point:")
+        self.label1 = Tk.Label(self.subframe,text="Switch point:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        super().__init__(self.frame, tool_tip = "Enter the ID of another (fully "+
+        super().__init__(self.subframe, tool_tip = "Enter the ID of another (fully "+
                 "automatic) point to be switched with this point (or leave blank)",
                  exists_function=points.point_exists)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
         # This is the read-only element for the point this point is switched with
         self.switched_with = Tk.StringVar(parent_frame, "")
-        self.label2 = Tk.Label(self.frame,text="Switched with:")
+        self.label2 = Tk.Label(self.subframe,text="Switched with:")
         self.label2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.switched_eb = Tk.Entry(self.frame, width=3, textvariable=self.switched_with,
+        self.switched_eb = Tk.Entry(self.subframe, width=3, textvariable=self.switched_with,
                                             justify='center',state="disabled")
         self.switched_eb.pack(side=Tk.LEFT, padx=2, pady=2)
         self.TT1 = common.CreateToolTip(self.switched_eb, "ID of the point that "+
@@ -275,7 +278,7 @@ class point_configuration_tab():
         self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
         self.pointtype = common.selection_buttons(self.frame, "Point type",
-                                      "Select Point Type", None, "RH", "LH")
+                                      "Select Point Type", None, "RH", "LH", "Y")
         self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the Point colour selection element
         self.colour = common.colour_selection(self.frame, label="Colour")

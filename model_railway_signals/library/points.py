@@ -7,6 +7,7 @@
 #   point_type (use when creating points)
 #      point_type.RH
 #      point_type.LH
+#      point_type.Y
 # 
 #   point_callback_type (tells the calling program what has triggered the callback):
 #      point_callback_type.point_switched (point has been switched)
@@ -65,6 +66,7 @@ import logging
 class point_type(enum.Enum):
     RH = 1   # Right Hand point
     LH = 2   # Left Hand point
+    Y = 3    # Y point
     
 # Define the different callbacks types for the point
 class point_callback_type(enum.Enum):
@@ -231,7 +233,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
-    elif pointtype != point_type.LH and pointtype != point_type.RH:
+    elif pointtype != point_type.LH and pointtype != point_type.RH and pointtype != point_type.Y:
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Type specified")
     elif fpl and auto:
         logging.error("Point "+str(point_id)+": create_point - Automatic point should be created without a FPL")
@@ -248,23 +250,30 @@ def create_point (canvas, point_id:int, pointtype:point_type,
                                 command = lambda:fpl_button_event(point_id))
         # Disable the change button if the point has FPL (default state = FPL active)
         if fpl: point_button.config(state="disabled")
-        # Create the Tkinter drawing objects for the point
+        # Create the Tkinter drawing objects
         if pointtype==point_type.RH:
             # Draw the lines representing a Right Hand point
-            line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
-            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
-            line_coords = common.rotate_line (x,y,-25,0,-15,+10,orientation)
-            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
-            line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
-            canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
-            line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
+            line_coords = common.rotate_line(x,y,-25,0,-10,0,orientation) 
+            blade1 = canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
+            line_coords = common.rotate_line(x,y,-25,0,-15,+10,orientation)
+            blade2 = canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
+            line_coords = common.rotate_line(x,y,-10,0,+25,0,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
+            line_coords = common.rotate_line(x,y,-15,+10,0,+25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button_y_offset = -9-(common.fontsize/2)
+            if fpl and orientation == 0: button_x_offset = 2-common.fontsize
+            elif fpl: button_x_offset = 8-common.fontsize
+            else: button_x_offset = -6-(common.fontsize/2)
             # Create the button windows in the correct relative positions for a Right Hand Point
             # Note that the button is offset to take into account the default font size in 'common'
-            point_coords = common.rotate_point (x,y,-3,-9-(common.fontsize/2),orientation)
-            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
-            if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
-        else: 
+            point_coords = common.rotate_point (x,y,button_x_offset,button_y_offset,orientation)
+            if fpl: 
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                canvas.create_window (point_coords,window=point_button,tags=canvas_tag) 
+        elif pointtype==point_type.LH: 
             # Draw the lines representing a Left Hand point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
@@ -274,11 +283,43 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
             line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button_y_offset = +9+(common.fontsize/2)
+            if fpl and orientation == 0: button_x_offset = -common.fontsize
+            elif fpl: button_x_offset = 8-common.fontsize
+            else: button_x_offset = -6-(common.fontsize/2)
             # Create the button windows in the correct relative positions for a Left Hand Point
             # Note that the button is offset to take into account the default font size in 'common'
-            point_coords = common.rotate_point (x,y,-3,+9+(common.fontsize/2),orientation)
-            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
-            if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            point_coords = common.rotate_point (x,y,button_x_offset,button_y_offset,orientation)
+            if fpl: 
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                canvas.create_window (point_coords,window=point_button,tags=canvas_tag) 
+        elif pointtype==point_type.Y:
+            # Draw the lines representing a Y point
+            line_coords = common.rotate_line(x,y,-25,0,0,0,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) # Root route
+            line_coords = common.rotate_line(x,y,0,0,+10,-10,orientation) 
+            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
+            line_coords = common.rotate_line(x,y,0,0,+10,+10,orientation)
+            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
+            line_coords = common.rotate_line(x,y,+10,-10,+25,-25,orientation)
+            canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
+            line_coords = common.rotate_line(x,y,+10,+10,+25,+25,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button1_y_offset = +9+(common.fontsize/2)
+            button2_y_offset = -9-(common.fontsize/2)
+            button_x_offset = -10-(common.fontsize/2)
+            # Create the button windows in the correct relative positions for a Y Point
+            # Note that the button is offset to take into account the default font size in 'common'
+            if fpl: 
+                point_coords = common.rotate_point(x,y,button_x_offset,button1_y_offset,orientation)
+                canvas.create_window(point_coords,window=point_button,tags=canvas_tag) 
+                point_coords = common.rotate_point(x,y,button_x_offset,button2_y_offset,orientation)
+                canvas.create_window(point_coords,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                point_coords = common.rotate_point(x,y,button_x_offset,button1_y_offset,orientation)
+                canvas.create_window(point_coords,window=point_button,tags=canvas_tag) 
         # The "normal" state of the point is the straight through route by default
         # With reverse set to True, the divergent route becomes the "normal" state
         if reverse is True: blade1, blade2 = blade2, blade1
