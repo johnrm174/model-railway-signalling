@@ -23,7 +23,8 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.3.0:
 
-* TO DO.
+* 'Y' points can now be created on the schematic
+* Bugfix to 'Track Sensor' selection when toggling modes
 
 Bug reports and feedback are welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?

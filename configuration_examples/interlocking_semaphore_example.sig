@@ -14,7 +14,7 @@
                 false,
                 ""
             ],
-            "bbox": 3339,
+            "bbox": 1913,
             "dccaspects": [
                 [
                     [
@@ -1089,7 +1089,7 @@
                 false,
                 ""
             ],
-            "bbox": 3369,
+            "bbox": 1942,
             "dccaspects": [
                 [
                     [
@@ -2159,19 +2159,19 @@
                 0,
                 0
             ],
-            "bbox": 3375,
+            "bbox": 1948,
             "colour": "black",
-            "end1": 3900,
-            "end2": 3901,
+            "end1": 1944,
+            "end2": 1945,
             "endx": 1275,
             "endy": 225,
             "item": "line",
             "itemid": 1,
-            "line": 3899,
+            "line": 1943,
             "posx": 975,
             "posy": 225,
-            "stop1": 3902,
-            "stop2": 3903,
+            "stop1": 1946,
+            "stop2": 1947,
             "tags": "line1"
         },
         "19df44d6-4976-4925-a159-ad9e515da21c": {
@@ -2186,7 +2186,7 @@
                 false,
                 ""
             ],
-            "bbox": 3403,
+            "bbox": 1974,
             "dccaspects": [
                 [
                     [
@@ -3261,7 +3261,7 @@
                 false,
                 ""
             ],
-            "bbox": 3431,
+            "bbox": 2000,
             "dccaspects": [
                 [
                     [
@@ -4336,7 +4336,7 @@
                 false,
                 ""
             ],
-            "bbox": 3459,
+            "bbox": 2026,
             "dccaspects": [
                 [
                     [
@@ -5411,7 +5411,7 @@
                 false,
                 ""
             ],
-            "bbox": 3487,
+            "bbox": 2052,
             "dccaspects": [
                 [
                     [
@@ -6481,19 +6481,19 @@
                 0,
                 0
             ],
-            "bbox": 3493,
+            "bbox": 2058,
             "colour": "black",
-            "end1": 4013,
-            "end2": 4014,
+            "end1": 2054,
+            "end2": 2055,
             "endx": 1375,
             "endy": 225,
             "item": "line",
             "itemid": 2,
-            "line": 4012,
+            "line": 2053,
             "posx": 1800,
             "posy": 225,
-            "stop1": 4015,
-            "stop2": 4016,
+            "stop1": 2056,
+            "stop2": 2057,
             "tags": "line2"
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
@@ -6508,7 +6508,7 @@
                 false,
                 ""
             ],
-            "bbox": 3502,
+            "bbox": 2066,
             "dccaspects": [
                 [
                     [
@@ -7583,7 +7583,7 @@
                 false,
                 ""
             ],
-            "bbox": 3530,
+            "bbox": 2092,
             "dccaspects": [
                 [
                     [
@@ -8658,7 +8658,7 @@
                 false,
                 ""
             ],
-            "bbox": 3558,
+            "bbox": 2119,
             "dccaspects": [
                 [
                     [
@@ -9728,19 +9728,19 @@
                 0,
                 0
             ],
-            "bbox": 3564,
+            "bbox": 2125,
             "colour": "black",
-            "end1": 4080,
-            "end2": 4081,
+            "end1": 2121,
+            "end2": 2122,
             "endx": 1375,
             "endy": 275,
             "item": "line",
             "itemid": 3,
-            "line": 4079,
+            "line": 2120,
             "posx": 1800,
             "posy": 275,
-            "stop1": 4082,
-            "stop2": 4083,
+            "stop1": 2123,
+            "stop2": 2124,
             "tags": "line3"
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
@@ -9755,7 +9755,7 @@
                 false,
                 ""
             ],
-            "bbox": 3617,
+            "bbox": 2173,
             "dccaspects": [
                 [
                     [
@@ -10830,7 +10830,7 @@
                 false,
                 ""
             ],
-            "bbox": 3645,
+            "bbox": 2199,
             "dccaspects": [
                 [
                     [
@@ -11905,7 +11905,7 @@
                 false,
                 ""
             ],
-            "bbox": 3654,
+            "bbox": 2207,
             "dccaspects": [
                 [
                     [
@@ -12971,7 +12971,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 3661,
+            "bbox": 2214,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -13039,7 +13039,7 @@
                 false,
                 ""
             ],
-            "bbox": 3689,
+            "bbox": 2240,
             "dccaspects": [
                 [
                     [
@@ -14109,19 +14109,19 @@
                 0,
                 0
             ],
-            "bbox": 3695,
+            "bbox": 2246,
             "colour": "black",
-            "end1": 4205,
-            "end2": 4206,
+            "end1": 2242,
+            "end2": 2243,
             "endx": 1275,
             "endy": 175,
             "item": "line",
             "itemid": 4,
-            "line": 4204,
+            "line": 2241,
             "posx": 975,
             "posy": 175,
-            "stop1": 4207,
-            "stop2": 4208,
+            "stop1": 2244,
+            "stop2": 2245,
             "tags": "line4"
         },
         "902284fd-0dc0-4ded-96b6-e94ba78a1cf4": {
@@ -14136,7 +14136,7 @@
                 false,
                 ""
             ],
-            "bbox": 3704,
+            "bbox": 2254,
             "dccaspects": [
                 [
                     [
@@ -15206,19 +15206,19 @@
                 0,
                 0
             ],
-            "bbox": 3710,
+            "bbox": 2260,
             "colour": "black",
-            "end1": 4218,
-            "end2": 4219,
+            "end1": 2256,
+            "end2": 2257,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 5,
-            "line": 4217,
+            "line": 2255,
             "posx": 1325,
             "posy": 275,
-            "stop1": 4220,
-            "stop2": 4221,
+            "stop1": 2258,
+            "stop2": 2259,
             "tags": "line5"
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
@@ -15228,25 +15228,25 @@
                 1,
                 1
             ],
-            "bbox": 3716,
+            "bbox": 2266,
             "colour": "black",
-            "end1": 4223,
-            "end2": 4224,
+            "end1": 2262,
+            "end2": 2263,
             "endx": 1325,
             "endy": 175,
             "item": "line",
             "itemid": 6,
-            "line": 4222,
+            "line": 2261,
             "posx": 1575,
             "posy": 175,
-            "stop1": 4225,
-            "stop2": 4226,
+            "stop1": 2264,
+            "stop2": 2265,
             "tags": "line6"
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3721,
+            "bbox": 2271,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15273,7 +15273,7 @@
                 false,
                 ""
             ],
-            "bbox": 3749,
+            "bbox": 2297,
             "dccaspects": [
                 [
                     [
@@ -16343,25 +16343,25 @@
                 0,
                 0
             ],
-            "bbox": 3755,
+            "bbox": 2303,
             "colour": "black",
-            "end1": 4259,
-            "end2": 4260,
+            "end1": 2299,
+            "end2": 2300,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": 7,
-            "line": 4258,
+            "line": 2298,
             "posx": 925,
             "posy": 225,
-            "stop1": 4261,
-            "stop2": 4262,
+            "stop1": 2301,
+            "stop2": 2302,
             "tags": "line7"
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 3762,
+            "bbox": 2310,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -16424,19 +16424,19 @@
                 1,
                 1
             ],
-            "bbox": 3768,
+            "bbox": 2316,
             "colour": "black",
-            "end1": 4270,
-            "end2": 4271,
+            "end1": 2312,
+            "end2": 2313,
             "endx": 725,
             "endy": 175,
             "item": "line",
             "itemid": 8,
-            "line": 4269,
+            "line": 2311,
             "posx": 925,
             "posy": 175,
-            "stop1": 4272,
-            "stop2": 4273,
+            "stop1": 2314,
+            "stop2": 2315,
             "tags": "line8"
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
@@ -16451,7 +16451,7 @@
                 false,
                 ""
             ],
-            "bbox": 3777,
+            "bbox": 2324,
             "dccaspects": [
                 [
                     [
@@ -17517,7 +17517,7 @@
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 3783,
+            "bbox": 2330,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17586,7 +17586,7 @@
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3788,
+            "bbox": 2335,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17613,7 +17613,7 @@
                 false,
                 ""
             ],
-            "bbox": 3797,
+            "bbox": 2343,
             "dccaspects": [
                 [
                     [
@@ -18679,7 +18679,7 @@
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 3802,
+            "bbox": 2348,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -18706,7 +18706,7 @@
                 false,
                 ""
             ],
-            "bbox": 3811,
+            "bbox": 2356,
             "dccaspects": [
                 [
                     [
@@ -19781,7 +19781,7 @@
                 false,
                 ""
             ],
-            "bbox": 3842,
+            "bbox": 2386,
             "dccaspects": [
                 [
                     [
@@ -20891,7 +20891,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/interlocking_semaphore_example.sig",
             "info": "This is a basic example of a layout without track sensors (and the associated signal automation).\n\nThe layout is signalled with a combination of semaphore home and distant signals. Note that\nSignal 16 is a home signal with a secondary distant arm (controled by the 'D' button). \n\nThe signals and points are interlocked together - and the signals interlocked with opposing signals\n(in 'edit' mode, double click on a signal or point and select the 'interlocking' tab to edit/view).\n\nIn this example, signal 1 is interlocked with point 2 so can only be cleared if the facing point \nlock (the 'L' button) is active. When the main signal is cleared, the appropriate route arm will \nbe cleared. Note that the associated subsidary signal (controlled by the 'S' button) is similarly\ninterlocked with point 2. When cleared, the appropriate subsidary arm will be cleared.\n\nSignal 1 is also interlocked with any opposing signals that could allow a train onto the same\nsection of track - in this example, the signal is interlocked with ground signals 15, 13, 7 and 6\n(dependant on whether the route 'cleared' by these signals conflicts with the route for Signal 1).\n\nNote that the distant signals are also configured to be interlocked with all home signals ahead. \nThis means that the signal cannot be cleared unless all home signals (up to the next distant signal)\nhave also been cleared (note that they can be returned to Caution at any time).\n\nAll point interlocking is automatically configured via the signal interlocking so, for example\npoint 2 is locked if signal 1 (main or subsidary) is cleared for a train movement.\n\nNote that not all signals are configured for all possible routes - the only 'valid' shunting\nmovement allowed from signal 14 is via the crossover back onto the other main line. \n\nSome of the signals and points are configured with DCC Addresses, with a single DCC address used\nfor each main or subsidary route arm. \n\nThis level of configuration is ideal if you want to be the signal man/woman for your layout. Other\nexamples add track sensors to allow semi-automation of the signalling scheme so the signals will \nchange automatically as you watch the trains go round.\n",
             "spadpopups": false,
-            "version": "Version 4.2.0"
+            "version": "Version 4.3.0"
         },
         "gpio": {
             "portmappings": [],

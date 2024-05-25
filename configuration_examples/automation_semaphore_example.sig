@@ -14,7 +14,7 @@
                 true,
                 ""
             ],
-            "bbox": 1304,
+            "bbox": 790,
             "dccaspects": [
                 [
                     [
@@ -1089,7 +1089,7 @@
                 true,
                 ""
             ],
-            "bbox": 1332,
+            "bbox": 817,
             "dccaspects": [
                 [
                     [
@@ -2159,19 +2159,19 @@
                 0,
                 0
             ],
-            "bbox": 1338,
+            "bbox": 823,
             "colour": "black",
-            "end1": 1893,
-            "end2": 1894,
+            "end1": 819,
+            "end2": 820,
             "endx": 1275,
             "endy": 225,
             "item": "line",
             "itemid": 1,
-            "line": 1892,
+            "line": 818,
             "posx": 975,
             "posy": 225,
-            "stop1": 1895,
-            "stop2": 1896,
+            "stop1": 821,
+            "stop2": 822,
             "tags": "line1"
         },
         "16c59187-f382-4e52-9d40-41856f8c57e9": {
@@ -2186,7 +2186,7 @@
                 true,
                 ""
             ],
-            "bbox": 1366,
+            "bbox": 850,
             "dccaspects": [
                 [
                     [
@@ -3250,29 +3250,25 @@
             ]
         },
         "1b3f1dca-d687-4ec6-98e3-cc017d9f844a": {
-            "bbox": 1368,
+            "bbox": 854,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 11,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 750,
             "posy": 175,
-            "state": false,
             "tags": "section11"
         },
         "23ef06a2-5597-4aba-920c-ca15828a7733": {
-            "bbox": 1370,
+            "bbox": 858,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 9,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 750,
             "posy": 275,
-            "state": false,
             "tags": "section9"
         },
         "2af3fecc-b104-4832-bc02-aadedb0177e9": {
@@ -3287,7 +3283,7 @@
                 true,
                 ""
             ],
-            "bbox": 1398,
+            "bbox": 885,
             "dccaspects": [
                 [
                     [
@@ -4362,7 +4358,7 @@
                 true,
                 ""
             ],
-            "bbox": 1426,
+            "bbox": 912,
             "dccaspects": [
                 [
                     [
@@ -5437,7 +5433,7 @@
                 false,
                 ""
             ],
-            "bbox": 1454,
+            "bbox": 938,
             "dccaspects": [
                 [
                     [
@@ -6501,16 +6497,14 @@
             ]
         },
         "3c5565ee-45f3-4298-a7da-5c1c52ebf2d2": {
-            "bbox": 1456,
+            "bbox": 942,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 13,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1550,
             "posy": 175,
-            "state": false,
             "tags": "section13"
         },
         "3f11b41e-b356-402c-b59e-b314963b3723": {
@@ -6520,32 +6514,30 @@
                 0,
                 0
             ],
-            "bbox": 1462,
+            "bbox": 948,
             "colour": "black",
-            "end1": 2009,
-            "end2": 2010,
+            "end1": 944,
+            "end2": 945,
             "endx": 1375,
             "endy": 225,
             "item": "line",
             "itemid": 2,
-            "line": 2008,
+            "line": 943,
             "posx": 1800,
             "posy": 225,
-            "stop1": 2011,
-            "stop2": 2012,
+            "stop1": 946,
+            "stop2": 947,
             "tags": "line2"
         },
         "40da50ad-40cf-4f2f-a86f-eef794d41ace": {
-            "bbox": 1464,
+            "bbox": 952,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 2,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 750,
             "posy": 225,
-            "state": false,
             "tags": "section2"
         },
         "48fb7f13-0c14-4920-b2d3-a1013c4b5a1f": {
@@ -6560,7 +6552,7 @@
                 false,
                 ""
             ],
-            "bbox": 1473,
+            "bbox": 960,
             "dccaspects": [
                 [
                     [
@@ -7624,16 +7616,14 @@
             ]
         },
         "49436626-93f4-4b47-b9ae-5221c9d27577": {
-            "bbox": 1475,
+            "bbox": 964,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 7,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1550,
             "posy": 275,
-            "state": false,
             "tags": "section7"
         },
         "547bd259-550f-4e84-b100-fb0dd86ba88d": {
@@ -7648,7 +7638,7 @@
                 true,
                 ""
             ],
-            "bbox": 1503,
+            "bbox": 992,
             "dccaspects": [
                 [
                     [
@@ -8718,19 +8708,19 @@
                 0,
                 0
             ],
-            "bbox": 1509,
+            "bbox": 998,
             "colour": "black",
-            "end1": 2051,
-            "end2": 2052,
+            "end1": 994,
+            "end2": 995,
             "endx": 1375,
             "endy": 275,
             "item": "line",
             "itemid": 3,
-            "line": 2050,
+            "line": 993,
             "posx": 1800,
             "posy": 275,
-            "stop1": 2053,
-            "stop2": 2054,
+            "stop1": 996,
+            "stop2": 997,
             "tags": "line3"
         },
         "59c4ede5-e1ca-42cb-bcd9-fd630fb9c383": {
@@ -8745,7 +8735,7 @@
                 false,
                 ""
             ],
-            "bbox": 1562,
+            "bbox": 1045,
             "dccaspects": [
                 [
                     [
@@ -9820,7 +9810,7 @@
                 false,
                 ""
             ],
-            "bbox": 1571,
+            "bbox": 1053,
             "dccaspects": [
                 [
                     [
@@ -10886,7 +10876,7 @@
         "6c28ce24-e08c-4845-8e06-b21f418911eb": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 1578,
+            "bbox": 1060,
             "colour": "black",
             "dccaddress": 101,
             "dccreversed": false,
@@ -10954,7 +10944,7 @@
                 false,
                 ""
             ],
-            "bbox": 1606,
+            "bbox": 1086,
             "dccaspects": [
                 [
                     [
@@ -12018,16 +12008,14 @@
             ]
         },
         "85d79875-69a8-4f48-b990-56add64e268d": {
-            "bbox": 1608,
+            "bbox": 1090,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 1,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 525,
             "posy": 225,
-            "state": false,
             "tags": "section1"
         },
         "8efa0c5d-19c3-4826-a797-34453446bb67": {
@@ -12037,19 +12025,19 @@
                 0,
                 0
             ],
-            "bbox": 1614,
+            "bbox": 1096,
             "colour": "black",
-            "end1": 2150,
-            "end2": 2151,
+            "end1": 1092,
+            "end2": 1093,
             "endx": 1275,
             "endy": 175,
             "item": "line",
             "itemid": 4,
-            "line": 2149,
+            "line": 1091,
             "posx": 975,
             "posy": 175,
-            "stop1": 2152,
-            "stop2": 2153,
+            "stop1": 1094,
+            "stop2": 1095,
             "tags": "line4"
         },
         "902284fd-0dc0-4ded-96b6-e94ba78a1cf4": {
@@ -12064,7 +12052,7 @@
                 false,
                 ""
             ],
-            "bbox": 1623,
+            "bbox": 1104,
             "dccaspects": [
                 [
                     [
@@ -13128,16 +13116,14 @@
             ]
         },
         "94fd8cf6-a410-4f67-9da5-c985edcbf688": {
-            "bbox": 1625,
+            "bbox": 1108,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 3,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1075,
             "posy": 225,
-            "state": false,
             "tags": "section3"
         },
         "98387fe9-9a77-4b97-92e3-0df8c2a21c2f": {
@@ -13152,7 +13138,7 @@
                 false,
                 ""
             ],
-            "bbox": 1653,
+            "bbox": 1134,
             "dccaspects": [
                 [
                     [
@@ -14222,32 +14208,30 @@
                 0,
                 0
             ],
-            "bbox": 1659,
+            "bbox": 1140,
             "colour": "black",
-            "end1": 2191,
-            "end2": 2192,
+            "end1": 1136,
+            "end2": 1137,
             "endx": 0,
             "endy": 275,
             "item": "line",
             "itemid": 5,
-            "line": 2190,
+            "line": 1135,
             "posx": 1325,
             "posy": 275,
-            "stop1": 2193,
-            "stop2": 2194,
+            "stop1": 1138,
+            "stop2": 1139,
             "tags": "line5"
         },
         "a6e56e82-869d-4a63-b9fe-649476f59a62": {
-            "bbox": 1661,
+            "bbox": 1144,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 12,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1075,
             "posy": 175,
-            "state": false,
             "tags": "section12"
         },
         "a9fca83a-6c10-454f-a141-e4931d7c06d7": {
@@ -14257,19 +14241,19 @@
                 1,
                 1
             ],
-            "bbox": 1667,
+            "bbox": 1150,
             "colour": "black",
-            "end1": 2197,
-            "end2": 2198,
+            "end1": 1146,
+            "end2": 1147,
             "endx": 1325,
             "endy": 175,
             "item": "line",
             "itemid": 6,
-            "line": 2196,
+            "line": 1145,
             "posx": 1600,
             "posy": 175,
-            "stop1": 2199,
-            "stop2": 2200,
+            "stop1": 1148,
+            "stop2": 1149,
             "tags": "line6"
         },
         "aa07d0f4-841d-40c9-87ef-cf9ec08a9239": {
@@ -14284,7 +14268,7 @@
                 false,
                 ""
             ],
-            "bbox": 1695,
+            "bbox": 1176,
             "dccaspects": [
                 [
                     [
@@ -15348,22 +15332,20 @@
             ]
         },
         "af408a69-7a43-4f8e-9453-728ec2747514": {
-            "bbox": 1697,
+            "bbox": 1180,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 6,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1750,
             "posy": 275,
-            "state": false,
             "tags": "section6"
         },
         "b8c1ca15-569a-42d8-9692-c4634b06e70b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1702,
+            "bbox": 1185,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15379,16 +15361,14 @@
             "tags": "point4"
         },
         "bd8c0b62-add0-4714-b49a-7bbae0da4124": {
-            "bbox": 1704,
+            "bbox": 1189,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 8,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1075,
             "posy": 275,
-            "state": false,
             "tags": "section8"
         },
         "bef3b222-f3c5-427d-b34c-cd5d283a00fa": {
@@ -15403,7 +15383,7 @@
                 false,
                 ""
             ],
-            "bbox": 1732,
+            "bbox": 1215,
             "dccaspects": [
                 [
                     [
@@ -16473,25 +16453,25 @@
                 0,
                 0
             ],
-            "bbox": 1738,
+            "bbox": 1221,
             "colour": "black",
-            "end1": 2262,
-            "end2": 2263,
+            "end1": 1217,
+            "end2": 1218,
             "endx": 0,
             "endy": 225,
             "item": "line",
             "itemid": 7,
-            "line": 2261,
+            "line": 1216,
             "posx": 925,
             "posy": 225,
-            "stop1": 2264,
-            "stop2": 2265,
+            "stop1": 1219,
+            "stop2": 1220,
             "tags": "line7"
         },
         "c52e3e22-22c7-4623-bd67-8cacac93ba06": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 1745,
+            "bbox": 1228,
             "colour": "black",
             "dccaddress": 100,
             "dccreversed": false,
@@ -16554,32 +16534,30 @@
                 1,
                 1
             ],
-            "bbox": 1751,
+            "bbox": 1234,
             "colour": "black",
-            "end1": 2273,
-            "end2": 2274,
+            "end1": 1230,
+            "end2": 1231,
             "endx": 675,
             "endy": 175,
             "item": "line",
             "itemid": 8,
-            "line": 2272,
+            "line": 1229,
             "posx": 925,
             "posy": 175,
-            "stop1": 2275,
-            "stop2": 2276,
+            "stop1": 1232,
+            "stop2": 1233,
             "tags": "line8"
         },
         "c88a11f5-d1b0-4a02-869e-f53d2c930635": {
-            "bbox": 1753,
+            "bbox": 1238,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 5,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 275,
             "posy": 225,
-            "state": false,
             "tags": "section5"
         },
         "ce134677-c6b8-43f6-8d96-4da4fc745df1": {
@@ -16594,7 +16572,7 @@
                 false,
                 ""
             ],
-            "bbox": 1762,
+            "bbox": 1246,
             "dccaspects": [
                 [
                     [
@@ -17658,22 +17636,20 @@
             ]
         },
         "d5bac97c-de07-407d-966d-83ea0ae26a83": {
-            "bbox": 1764,
+            "bbox": 1250,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 10,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 50,
             "posy": 225,
-            "state": false,
             "tags": "section10"
         },
         "d9840a46-28fd-40dd-a059-df46b9a762e2": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 1770,
+            "bbox": 1256,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17740,22 +17716,20 @@
             "tags": "point5"
         },
         "dcf7ea0d-cd58-45bf-842e-d4e6e87c9a2a": {
-            "bbox": 1772,
+            "bbox": 1260,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 15,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 275,
             "posy": 275,
-            "state": false,
             "tags": "section15"
         },
         "df337c59-d6c8-420a-9165-628b58e8be08": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1777,
+            "bbox": 1265,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17771,16 +17745,14 @@
             "tags": "point1"
         },
         "e0705584-fbf0-47f0-a695-810489e4d5d4": {
-            "bbox": 1779,
+            "bbox": 1269,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 4,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 1550,
             "posy": 225,
-            "state": false,
             "tags": "section4"
         },
         "ed8d646c-60cc-4a5a-b8f0-cbd337263db8": {
@@ -17795,7 +17767,7 @@
                 false,
                 ""
             ],
-            "bbox": 1788,
+            "bbox": 1277,
             "dccaspects": [
                 [
                     [
@@ -18861,7 +18833,7 @@
         "f14ef6e8-7b7b-4568-b0e6-c105889caf10": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 1793,
+            "bbox": 1282,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -18888,7 +18860,7 @@
                 false,
                 ""
             ],
-            "bbox": 1802,
+            "bbox": 1290,
             "dccaspects": [
                 [
                     [
@@ -19963,7 +19935,7 @@
                 true,
                 ""
             ],
-            "bbox": 1833,
+            "bbox": 1321,
             "dccaspects": [
                 [
                     [
@@ -21027,16 +20999,14 @@
             ]
         },
         "fc4b8a11-3862-417f-ba09-493456b59064": {
-            "bbox": 1835,
+            "bbox": 1325,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 14,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 525,
             "posy": 275,
-            "state": false,
             "tags": "section14"
         }
     },
@@ -21147,7 +21117,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/automation_semaphore_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto-isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration (note that external\nGPIO sensors haven't been configured for this particular example layout). 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to 'off' as soon as the section ahead is cleared. Note that some of the signals in this example \nhave been configured as 'fully automatic' (without a control button). This means that they will be 'off'\nby default and controlled entirely by whether the track section ahead is occupied or not.\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed (when 'off') they are overriden \nto 'on' (as per the other signals on the layout) but then revert to 'off' after the specified delay.\n\nTrack sensors can also be positioned slightly before the signal and mapped to generate 'signal \napproached' events to simulate 'approach control'. In this example, all non-fully-automatic home signals \nare configured for 'release on red based on the signals ahead'. This means that if any home signals ahead\nare showing danger then the home signal will also be overridden to 'on' by default.As the train approaches\nthe signal (at a slow speed as the signal is against it) then the signal will be released to 'off' to\nallow the train to pass and then revert back to the overidden 'on' state when the signal is passed.\nSignal 1 is also configured for 'release on red' for the diverging (low-speed) route. In this case it\nwill be overridden to 'on' even if all home signals ahead are 'off', only released as the train approaches.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. Right click the far left track section and enter a train\ndesignation code of your choice (this sets the section to 'occupied'). Set signals 8, 1 and 3 to 'off' (note\nthat they will remail overridden to 'on' as home signal ahead 4 is still showing 'on'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of each signal if you want to see\napproach control working). When the train reaches signal 4, set the signal to 'off' and trigger the signal\npassed event. The track section before the signal will be cleared and the signal overridden to 'on' as part\nof the timed sequence. After a short delay it will revert to 'off' and when it does, all home signals behind\nwill also revert to 'off' (as they will no longer be overridden on a home signal ahead).\n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n",
             "spadpopups": false,
-            "version": "Version 4.2.0"
+            "version": "Version 4.3.0"
         },
         "gpio": {
             "portmappings": [],
