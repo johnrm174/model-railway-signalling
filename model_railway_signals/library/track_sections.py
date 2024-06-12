@@ -14,8 +14,8 @@
 #       x:int, y:int - Position of the section on the canvas (in pixels)
 #       callback - The function to call when the track section is updated
 #                Note that the callback function returns (item_id, callback type)
-#       default_label:str - The default label to display when occupied
 #     Optional parameters:
+#       default_label:str - The default label to display when occupied - default = 'OCCUPIED'
 #       editable:bool - If the section can be manually toggled and/or edited - default = True
 #       mirror_id:str - The ID of another local/remote Section to mirror - default = None
 #
@@ -320,7 +320,7 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
 #---------------------------------------------------------------------------------------------
 
 def create_section (canvas, section_id:int, x:int, y:int, section_callback,
-                    default_label:str, editable:bool=True, mirror_id:str=""):
+                    default_label:str="OCCUPIED", editable:bool=True, mirror_id:str=""):
     global sections
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "section"+str(section_id)
