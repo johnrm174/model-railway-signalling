@@ -126,12 +126,12 @@ def toggle_fpl(point_id:int):
         if not points[str(point_id)]["fpllock"]:
             logging.info("Point "+str(point_id)+": Activating FPL")
             points[str(point_id)]["changebutton"].config(state="disabled") 
-            points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
+            points[str(point_id)]["lockbutton"].config(relief="sunken",bg=common.bgsunken) 
             points[str(point_id)]["fpllock"] = True 
         else:
             logging.info("Point "+str(point_id)+": Clearing FPL")
             points[str(point_id)]["changebutton"].config(state="normal")  
-            points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
+            points[str(point_id)]["lockbutton"].config(relief="raised",bg=common.bgraised)
             points[str(point_id)]["fpllock"] = False
     return()
 
@@ -148,7 +148,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED")
-        points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
+        points[str(point_id)]["changebutton"].config(relief="sunken",bg=common.bgsunken)
         points[str(point_id)]["switched"] = True
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
@@ -158,7 +158,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to NORMAL")
-        points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
+        points[str(point_id)]["changebutton"].config(relief="raised",bg=common.bgraised) 
         points[str(point_id)]["switched"] = False
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
@@ -241,11 +241,11 @@ def create_point (canvas, point_id:int, pointtype:point_type,
         logging.debug("Point "+str(point_id)+": Creating library object on the schematic")
         # Create the button objects and their callbacks
         point_button = Tk.Button (canvas, text=format(point_id,'02d'), state="normal", relief="raised",
-                                  font=('Courier',common.fontsize,"normal"),bg= "grey85",
+                                  font=('Courier',common.fontsize,"normal"),bg=common.bgraised,
                                   padx=common.xpadding, pady=common.ypadding,
                                   command = lambda:change_button_event(point_id))
         fpl_button = Tk.Button (canvas,text="L",state="normal", relief="sunken",
-                                font=('Courier',common.fontsize,"normal"), bg = "white",
+                                font=('Courier',common.fontsize,"normal"), bg=common.bgsunken,
                                 padx=common.xpadding, pady=common.ypadding, 
                                 command = lambda:fpl_button_event(point_id))
         # Disable the change button if the point has FPL (default state = FPL active)
