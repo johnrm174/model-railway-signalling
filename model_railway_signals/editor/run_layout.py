@@ -24,9 +24,9 @@
 #
 # Accesses the following external library objects directly:
 #    signals_common.route_type - for accessing the enum value
-#    signals_common.sig_type - for accessing the enum value
+#    signals_common.signal_type - for accessing the enum value
 #    signals_common.signal_state_type - for accessing the enum value
-#    signals_common.sig_callback_type - for accessing the enum value
+#    signals_common.signal_callback_type - for accessing the enum value
 #    points.point_callback_type - for accessing the enum value
 #    track_sections.section_callback_type - for accessing the enum value
 #    block_instruments.block_callback_type - for accessing the enum value
@@ -159,9 +159,9 @@ def has_distant_arms(int_signal_id:int):
 
 def is_home_signal(int_signal_id:int):
     signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return ( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
+    return ( ( signal_object["itemtype"] == signals_common.signal_type.colour_light.value and
                signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.home.value ) or
-             ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
+             ( signal_object["itemtype"] == signals_common.signal_type.semaphore.value and
                signal_object["itemsubtype"] == signals_semaphores.semaphore_sub_type.home.value) )
 
 #------------------------------------------------------------------------------------
@@ -171,9 +171,9 @@ def is_home_signal(int_signal_id:int):
 
 def is_distant_signal(int_signal_id:int):
     signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    return( ( signal_object["itemtype"] == signals_common.sig_type.colour_light.value and
+    return( ( signal_object["itemtype"] == signals_common.signal_type.colour_light.value and
               signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) or
-            ( signal_object["itemtype"] == signals_common.sig_type.semaphore.value and
+            ( signal_object["itemtype"] == signals_common.signal_type.semaphore.value and
               signal_object["itemsubtype"] == signals_colour_lights.signal_sub_type.distant.value ) )
 
 #------------------------------------------------------------------------------------
@@ -319,7 +319,7 @@ def update_signal_behind(int_signal_id:int, recursion_level:int=0):
         int_signal_behind_id = find_signal_behind(int_signal_id)
         if int_signal_behind_id is not None:
             signal_behind_object = objects.schematic_objects[objects.signal(int_signal_behind_id)]
-            if signal_behind_object["itemtype"] == signals_common.sig_type.colour_light.value:
+            if signal_behind_object["itemtype"] == signals_common.signal_type.colour_light.value:
                 # Fnd the displayed aspect of the signal (before any changes)
                 initial_signal_aspect = signals.signal_state(int_signal_behind_id)
                 # Update the signal behind based on the signal we called into the function with
@@ -343,7 +343,7 @@ def process_aspect_updates(int_signal_id:int):
     # First update on the signal ahead (only if its a colour light signal)
     # Other signal types are updated automatically when switched
     signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-    if signal_object["itemtype"] == signals_common.sig_type.colour_light.value:
+    if signal_object["itemtype"] == signals_common.signal_type.colour_light.value:
         str_signal_ahead_id = find_signal_ahead(int_signal_id)
         if str_signal_ahead_id is not None:
             # The update signal function works with local and remote signal IDs
@@ -413,8 +413,8 @@ def trigger_timed_sequence(int_signal_id:int):
 def update_signal_approach_control(int_signal_id:int, force_set:bool, recursion_level:int=0):
     if recursion_level < 20:
         signal_object = objects.schematic_objects[objects.signal(int_signal_id)]
-        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
-                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+        if (signal_object["itemtype"] == signals_common.signal_type.colour_light.value or
+                 signal_object["itemtype"] == signals_common.signal_type.semaphore.value):
             signal_route = find_valid_route(objects.signal(int_signal_id),"pointinterlock")
             if signal_route is not None:
                 # The "approachcontrol" element is a list of routes [Main, Lh1, Lh2, Rh1, Rh2]
@@ -842,7 +842,7 @@ def update_all_distant_overrides():
 
 def update_all_signal_approach_control(int_or_str_item_id:Union[int,str]=None, callback_type=None):
     for str_signal_id in objects.signal_index:
-        if (callback_type == signals_common.sig_callback_type.sig_switched and
+        if (callback_type == signals_common.signal_callback_type.sig_switched and
             str_signal_id == str(int_or_str_item_id) ): force_set = True
         else: force_set = False
         update_signal_approach_control(int(str_signal_id), force_set)
@@ -870,8 +870,8 @@ def clear_all_distant_overrides():
 def clear_all_approach_control():
     for str_signal_id in objects.signal_index:
         signal_object = objects.schematic_objects[objects.signal(int(str_signal_id))]
-        if (signal_object["itemtype"] == signals_common.sig_type.colour_light.value or
-                 signal_object["itemtype"] == signals_common.sig_type.semaphore.value):
+        if (signal_object["itemtype"] == signals_common.signal_type.colour_light.value or
+                 signal_object["itemtype"] == signals_common.signal_type.semaphore.value):
             signals.clear_approach_control(int(str_signal_id))
     return()
 
@@ -897,7 +897,7 @@ def process_all_aspect_updates():
 # Main callback function for when anything on the layout changes
 # Note that the returned item_id could be a remote ID (str) for the following events:
 #    track_sections.section_callback_type.section_updated
-#    signals_common.sig_callback_type.sig_updated
+#    signals_common.signal_callback_type.sig_updated
 #------------------------------------------------------------------------------------
 
 def schematic_callback(item_id:Union[int,str], callback_type):
@@ -905,12 +905,12 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # 'signal_passed' events (from LOCAL SIGNALS) can trigger changes in track occupancy 
     # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
     # in Run mode) - and are enabled in RUN MODE whether automation is ENABLED or DISABLED
-    if callback_type == signals_common.sig_callback_type.sig_passed and run_mode:
+    if callback_type == signals_common.signal_callback_type.sig_passed and run_mode:
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
         update_track_occupancy(objects.signal(item_id))
     # Timed signal sequences can be triggered by 'signal_passed' events (from LOCAL SIGNALS) 
     # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
-    if (callback_type == signals_common.sig_callback_type.sig_passed and run_mode and automation_enabled):
+    if (callback_type == signals_common.signal_callback_type.sig_passed and run_mode and automation_enabled):
         if enhanced_debugging: logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(item_id) 
     # 'sensor_passed' events can trigger changes in track occupancy - LOCAL TRACK SENSORS ONLY
@@ -934,10 +934,10 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # approach control states have been SET or CLEARED - including the case of the signal
     # being RELEASED (as signified by the 'sig_released' event) or the approach control
     # being RESET (following a 'sig_passed' event)
-    if ( callback_type == signals_common.sig_callback_type.sig_updated or
-         callback_type == signals_common.sig_callback_type.sig_released or
-         callback_type == signals_common.sig_callback_type.sig_passed or
-         callback_type == signals_common.sig_callback_type.sig_switched or
+    if ( callback_type == signals_common.signal_callback_type.sig_updated or
+         callback_type == signals_common.signal_callback_type.sig_released or
+         callback_type == signals_common.signal_callback_type.sig_passed or
+         callback_type == signals_common.signal_callback_type.sig_switched or
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated ):
@@ -970,11 +970,11 @@ def schematic_callback(item_id:Union[int,str], callback_type):
     # displayed aspect of a signal (when interlocking signals against home signals ahead)
     # Interlocking is ENABLED in Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == block_instruments.block_callback_type.block_section_ahead_updated or
-         callback_type == signals_common.sig_callback_type.sub_switched or
-         callback_type == signals_common.sig_callback_type.sig_updated or
-         callback_type == signals_common.sig_callback_type.sig_released or
-         callback_type == signals_common.sig_callback_type.sig_passed or
-         callback_type == signals_common.sig_callback_type.sig_switched or
+         callback_type == signals_common.signal_callback_type.sub_switched or
+         callback_type == signals_common.signal_callback_type.sig_updated or
+         callback_type == signals_common.signal_callback_type.sig_released or
+         callback_type == signals_common.signal_callback_type.sig_passed or
+         callback_type == signals_common.signal_callback_type.sig_switched or
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated  ):
@@ -982,8 +982,8 @@ def schematic_callback(item_id:Union[int,str], callback_type):
         process_all_signal_interlocking()
     # Point interlocking is updated on signal (or subsidary signal) switched events
     # Interlocking is ENABLED in  Run and Edit Modes, whether automation is Enabled or Disabled
-    if ( callback_type == signals_common.sig_callback_type.sig_switched or
-         callback_type == signals_common.sig_callback_type.sub_switched):
+    if ( callback_type == signals_common.signal_callback_type.sig_switched or
+         callback_type == signals_common.signal_callback_type.sub_switched):
         if enhanced_debugging: logging.info("RUN LAYOUT - Updating Point Interlocking:")
         process_all_point_interlocking()
     if enhanced_debugging: logging.info("**************************************************************************************")

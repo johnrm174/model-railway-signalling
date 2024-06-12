@@ -1,5 +1,51 @@
 # --------------------------------------------------------------------------------
-# This module is used for creating and managing semaphore signal types
+# This module is used for creating and managing semaphore signal library objects
+# --------------------------------------------------------------------------------
+#
+# External API - classes and functions (used by the Schematic Editor):
+#
+#   signal_subtype (use when creating signals)
+#      signal_subtype.home
+#      signal_subtype.distant
+#
+#   create_semaphore_signal - Creates a Semaphore signal
+#     Mandatory Parameters:
+#       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
+#       sig_id:int - The ID for the signal - also displayed on the signal button
+#       signal_subtype - subtype of the semaphore signal
+#       x:int, y:int - Position of the signal on the canvas (in pixels) 
+#       callback - the function to call on signal switched, approached or passed events
+#               Note that the callback function returns (item_id, callback type)
+#     Optional Parameters:
+#       orientation:int - Orientation in degrees (0 or 180) - Default = zero
+#       sig_passed_button:bool - Creates a "signal Passed" button - Default = False
+#       sig_release_button:bool - Creates an "Approach Release" button - Default = False
+#       main_signal:bool - To create a signal arm for the main route - default = True
+#                        (Only set this to False when creating an "associated" distant signal
+#                        for a situation where a distant arm for the main route is not required)
+#       lh1_signal:bool - create a LH1 post with a main (junction) arm - default = False
+#       lh2_signal:bool - create a LH2 post with a main (junction) arm - default = False
+#       rh1_signal:bool - create a RH1 post with a main (junction) arm - default = False
+#       rh2_signal:bool - create a RH2 post with a main (junction) arm - default = False
+#       main_subsidary:bool - create a subsidary signal under the "main" signal - default = False
+#       lh1_subsidary:bool - create a LH1 post with a subsidary arm - default = False
+#       lh2_subsidary:bool - create a LH2 post with a subsidary arm - default = False
+#       rh1_subsidary:bool - create a RH1 post with a subsidary arm - default = False
+#       rh2_subsidary:bool - create a RH2 post with a subsidary arm - default = False
+#       theatre_route_indicator:bool -  Creates a Theatre route indicator - Default = False
+#       fully_automatic:bool - Creates a signal without a manual control button - Default = False
+#       associated_home:int - Option only valid when creating distant signals
+#                        Provide the ID of a previously created home signal (and use the same
+#                        x and y coords to create the distant signal on the same post as the home
+#                        signal with appropriate "slotting" between the signal arms - Default = False  
+#
+# Classes and functions used by the other library modules:
+#
+#   update_semaphore_signal(sig_id:int) - called to update the displayed aspect after a change in state
+#   update_semaphore_subsidary_arms
+#   update_semaphore_route_indication
+#   trigger_timed_semaphore_signal
+#
 # --------------------------------------------------------------------------------
 
 from . import common
@@ -11,82 +57,87 @@ from typing import Union
 import logging
 import enum
 
-# -------------------------------------------------------------------------
-# Classes used externally when creating/updating semaphore signals 
-# -------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# Public API classes (to be used by external functions)
+# --------------------------------------------------------------------------------
 
-# Define the superset of signal sub types that can be created
 class semaphore_sub_type(enum.Enum):
     home = 1
     distant = 2
     
 # ---------------------------------------------------------------------------------
-# Externally called Function to create a Semaphore Signal 'object'. The Signal is
-# normally set to "NOT CLEAR" = RED unless its fully automatic - when its set to "CLEAR"
+# Public API Function to create a Semaphore Signal 'object'. The Signal is normally
+# set to "NOT CLEAR" = RED unless its fully automatic - when its set to "CLEAR".
 # All attributes (that need to be tracked) are stored as a dictionary which is then
 # stored in the common dictionary of signals. Note that some elements in the dictionary
 # are MANDATORY across all signal types (to allow mixing and matching of signal types)
 # ---------------------------------------------------------------------------------
     
-def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
-                                signal_subtype=semaphore_sub_type.home,
-                                associated_home:int = 0,
-                                sig_callback = None,
-                                orientation:int = 0,
-                                sig_passed_button:bool=False,
-                                approach_release_button:bool=False,
-                                main_signal:bool=True,
-                                lh1_signal:bool=False,
-                                lh2_signal:bool=False,
-                                rh1_signal:bool=False,
-                                rh2_signal:bool=False,
-                                main_subsidary:bool=False,
-                                lh1_subsidary:bool=False,
-                                lh2_subsidary:bool=False,
-                                rh1_subsidary:bool=False,
-                                rh2_subsidary:bool=False,
-                                theatre_route_indicator:bool=False,
-                                refresh_immediately:bool = True,
-                                fully_automatic:bool=False):
-    
-    # Do some basic validation on the parameters we have been given
-    logging.info ("Signal "+str(sig_id)+": Creating Semaphore Signal")
-
+def create_semaphore_signal (canvas, sig_id:int,
+                             signal_subtype:semaphore_sub_type,
+                             x:int, y:int, callback,
+                             orientation:int=0,
+                             sig_passed_button:bool=False,
+                             sig_release_button:bool=False,
+                             main_signal:bool=True,
+                             lh1_signal:bool=False,
+                             lh2_signal:bool=False,
+                             rh1_signal:bool=False,
+                             rh2_signal:bool=False,
+                             main_subsidary:bool=False,
+                             lh1_subsidary:bool=False,
+                             lh2_subsidary:bool=False,
+                             rh1_subsidary:bool=False,
+                             rh2_subsidary:bool=False,
+                             theatre_route_indicator:bool=False,
+                             fully_automatic:bool=False,
+                             associated_home:int=0):
+    # Set a default 'tag' to reference the tkinter drawing objects (if creation fails)
+    canvas_tag = "signal"+str(sig_id)
+    # Get some info about the signal to help validation of the parameters we have been given
     has_subsidary = main_subsidary or lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary
-    has_junction_arms = (lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary or
+    has_route_arms = (lh1_subsidary or lh2_subsidary or rh1_subsidary or rh2_subsidary or
                          lh1_signal or lh2_signal or rh1_signal or rh2_signal )
-
-    if signals_common.sig_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": Signal already exists")
-    elif sig_id < 1:
-        logging.error ("Signal "+str(sig_id)+": Signal ID must be greater than zero")
-    elif orientation != 0 and orientation != 180:
-        logging.error ("Signal "+str(sig_id)+": Invalid orientation angle - only 0 and 180 currently supported")          
-    elif has_junction_arms and theatre_route_indicator:
-        logging.error ("Signal "+str(sig_id)+": Signal can only have junction arms OR a Theatre Route Indicator")
+    # Common validation (common to all signal types) 
+    if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 199:
+        logging.error ("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-199)")
+    elif signals_common.sig_exists(sig_id):
+        logging.error ("Signal "+str(sig_id)+": create_signal - Signal already exists")
+    # Type specific validation
+    elif signal_subtype != semaphore_sub_type.home and signal_subtype != semaphore_sub_type.distant:
+        logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
+    elif has_route_arms and theatre_route_indicator:
+        logging.error ("Signal "+str(sig_id)+": create_signal - Route Arms AND Theatre Route Indicator specified")
     elif signal_subtype == semaphore_sub_type.distant and theatre_route_indicator:
-        logging.error ("Signal "+str(sig_id)+": Distant signals should not have a Theatre Route Indicator")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Distant signals should not have a Theatre Route Indicator")
     elif signal_subtype == semaphore_sub_type.distant and has_subsidary:
-        logging.error ("Signal "+str(sig_id)+": Distant signals should not have subsidary signals")
-    elif signal_subtype == semaphore_sub_type.distant and approach_release_button:
-        logging.error ("Signal "+str(sig_id)+": Distant signals should not have Approach Release Control")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Distant signals should not have subsidary signals")
+    elif signal_subtype == semaphore_sub_type.distant and sig_release_button:
+        logging.error ("Signal "+str(sig_id)+": create_signal - Distant signals do not support Approach Control")
+    elif not isinstance(associated_home, int):
+        logging.error ("Signal "+str(sig_id)+": create_signal - Associated Home ID must be an int")
     elif associated_home > 0 and signal_subtype == semaphore_sub_type.home:
-        logging.error ("Signal "+str(sig_id)+": Can only specify an associated signal for a distant signal")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Cannot specify an associated home for a home signal")
     elif associated_home > 0 and not signals_common.sig_exists(associated_home):
-        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" does not exist")
-    elif associated_home > 0 and signals_common.signals[str(associated_home)]["sigtype"] != signals_common.sig_type.semaphore:
-        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a semaphore type")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" does not exist")
+    elif associated_home > 0 and signals_common.signals[str(associated_home)]["sigtype"] != signals_common.signal_type.semaphore:
+        logging.error ("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" is not a semaphore")
     elif associated_home > 0 and signals_common.signals[str(associated_home)]["subtype"] == semaphore_sub_type.distant:
-        logging.error ("Signal "+str(sig_id)+": Associated signal "+str(associated_home)+" is not a home signal")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" is not a home signal")
     elif associated_home > 0 and sig_passed_button:
-        logging.error ("Signal "+str(sig_id)+": Cannot create a signal passed button if associated with another signal")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Cannot create a 'passed' button if associated with another signal")
     elif associated_home == 0 and not main_signal:
-        logging.error ("Signal "+str(sig_id)+": Normal home and distant signals must have a signal arm for the main route")
+        logging.error ("Signal "+str(sig_id)+": create_signal - Signal must have a signal arm for the main route")
     else:
-        # Define the "Tag" for all drawing objects for this signal instance
-        # If it is an associated distant then set the tag the same as the home signal
-        if associated_home > 0: sig_id_tag = "signal"+str(associated_home)
-        else: sig_id_tag = "signal"+str(sig_id)
+        logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
+        # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
+        canvas_tag = signals_common.create_common_signal_elements (canvas, sig_id,
+                                                signals_common.signal_type.semaphore,
+                                                x, y, orientation, callback,
+                                                has_subsidary = has_subsidary,
+                                                sig_passed_button = sig_passed_button,
+                                                sig_automatic = fully_automatic,
+                                                associated_home = associated_home)
         # Work out the offset for the post depending on the combination of signal arms. Note that if
         # this is a distant signal associated with another home signal then we'll use the post offset
         # for the existing signal (as there may be a different combination of home arms specified)
@@ -94,119 +145,118 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if associated_home > 0:
             postoffset = signals_common.signals[str(associated_home)]["postoffset"]
         elif (not rh2_signal and not rh2_subsidary and not rh1_signal and not rh1_subsidary ):
-            if lh2_signal or lh2_subsidary:
+            if lh2_signal or lh2_subsidary or lh1_signal or lh1_subsidary:
                 postoffset = -8
-            elif lh1_signal or lh1_subsidary:
-                postoffset = -15
             else:
-                postoffset = -20
+                postoffset = -15
         elif rh2_signal or rh2_subsidary:
-            postoffset = -37
-        elif (not rh2_signal and not rh2_subsidary) and (not lh2_signal and not lh2_subsidary):
-            postoffset = -22
+            postoffset = -34
+        elif rh1_signal or rh1_subsidary:
+            postoffset = -20
         else:
-            postoffset = -22
-        lh2offset = postoffset-28 
-        lh1offset = postoffset-14
-        rh1offset = postoffset+14
-        rh2offset = postoffset+28 
-
+            postoffset = -20
+        lh2offset = postoffset-26 
+        lh1offset = postoffset-13
+        rh1offset = postoffset+13
+        rh2offset = postoffset+26 
         # Draw the signal base & signal post (unless this is a distant associated with an existing home signal
         # in which case the signal base & post will already have been drawn when the home signal was created
         # and we therefore only need to add the additional distant arms to the existing posts
         if associated_home == 0:
             line_coords = common.rotate_line(x,y,0,0,0,postoffset,orientation)
-            canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-            line_coords = common.rotate_line(x,y,0,postoffset,+70,postoffset,orientation)
-            canvas.create_line(line_coords,width=3,fill="white",tags=sig_id_tag)
+            canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+            line_coords = common.rotate_line(x,y,0,postoffset,+60,postoffset,orientation)
+            canvas.create_line(line_coords,width=3,fill="snow",tags=canvas_tag)
             # Draw the rest of the gantry to support other arms as required
             if lh2_signal or lh2_subsidary:
-                line_coords = common.rotate_line(x,y,30,postoffset,30,lh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-                line_coords = common.rotate_line(x,y,30,lh2offset,40,lh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                line_coords = common.rotate_line(x,y,25,postoffset,25,lh2offset,orientation)
+                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
                 if lh2_signal:
-                    line_coords = common.rotate_line(x,y,40,lh2offset,65,lh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                    line_coords = common.rotate_line(x,y,25,lh2offset,55,lh2offset,orientation)
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                else:
+                    line_coords = common.rotate_line(x,y,25,lh2offset,38,lh2offset,orientation) ##
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
             if lh1_signal or lh1_subsidary:
-                line_coords = common.rotate_line(x,y,30,postoffset,30,lh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-                line_coords = common.rotate_line(x,y,30,lh1offset,40,lh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                line_coords = common.rotate_line(x,y,25,postoffset,25,lh1offset,orientation)
+                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
                 if lh1_signal:
-                    line_coords = common.rotate_line(x,y,40,lh1offset,65,lh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                    line_coords = common.rotate_line(x,y,25,lh1offset,55,lh1offset,orientation)
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                else:
+                    line_coords = common.rotate_line(x,y,25,lh1offset,38,lh1offset,orientation) ###
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
             if rh2_signal or rh2_subsidary:
-                line_coords = common.rotate_line(x,y,30,postoffset,30,rh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-                line_coords = common.rotate_line(x,y,30,rh2offset,40,rh2offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                line_coords = common.rotate_line(x,y,25,postoffset,25,rh2offset,orientation)
+                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
                 if rh2_signal:
-                    line_coords = common.rotate_line(x,y,40,rh2offset,65,rh2offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                    line_coords = common.rotate_line(x,y,25,rh2offset,55,rh2offset,orientation)
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                else:
+                    line_coords = common.rotate_line(x,y,25,rh2offset,38,rh2offset,orientation) ##
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
             if rh1_signal or rh1_subsidary:
-                line_coords = common.rotate_line(x,y,30,postoffset,30,rh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-                line_coords = common.rotate_line(x,y,30,rh1offset,40,rh1offset,orientation)
-                canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
+                line_coords = common.rotate_line(x,y,25,postoffset,25,rh1offset,orientation)
+                canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
                 if rh1_signal:
-                    line_coords = common.rotate_line(x,y,40,rh1offset,65,rh1offset,orientation)
-                    canvas.create_line(line_coords,width=2,fill="white",tags=sig_id_tag)
-
+                    line_coords = common.rotate_line(x,y,25,rh1offset,55,rh1offset,orientation)
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
+                else:
+                    line_coords = common.rotate_line(x,y,25,rh1offset,38,rh1offset,orientation) ##
+                    canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
         # set the colour of the signal arm according to the signal type
         if signal_subtype == semaphore_sub_type.distant: arm_colour="yellow"
         else: arm_colour = "red"
-        
         # If this is a distant signal associated with an existing home signal then the distant arms need
         # to be created underneath the main home signal arms - we therefore need to apply a vertical offset
-        if associated_home > 0: armoffset = -10
+        if associated_home > 0: armoffset = -8
         else: armoffset = 0
         # Draw the signal arm for the main route
-        line_coords = common.rotate_line(x,y,65+armoffset,postoffset+3,65+armoffset,postoffset-8,orientation)
-        mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,65+armoffset,postoffset+3,72+armoffset,postoffset-8,orientation)
-        mainsigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,55+armoffset,postoffset+3,55+armoffset,postoffset-8,orientation)
+        mainsigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,55+armoffset,postoffset+3,62+armoffset,postoffset-8,orientation)
+        mainsigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arm for the main route
-        line_coords = common.rotate_line(x,y,+43,postoffset+3,+43,postoffset-6,orientation)
-        mainsubon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+43,postoffset+3,+48,postoffset-6,orientation)
-        mainsuboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,+37,postoffset+3,+37,postoffset-6,orientation)
+        mainsubon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+37,postoffset+3,+42,postoffset-6,orientation)
+        mainsuboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Draw the signal arms for the RH routes
-        line_coords = common.rotate_line(x,y,60+armoffset,rh1offset+2,60+armoffset,rh1offset-8,orientation)
-        rh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,rh1offset+2,67+armoffset,rh1offset-8,orientation)
-        rh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,rh2offset+2,60+armoffset,rh2offset-8,orientation)
-        rh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,rh2offset+2,67+armoffset,rh2offset-8,orientation)
-        rh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,50+armoffset,rh1offset-8,orientation)
+        rh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh1offset+2,57+armoffset,rh1offset-8,orientation)
+        rh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh2offset+2,50+armoffset,rh2offset-8,orientation)
+        rh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,rh2offset+2,57+armoffset,rh2offset-8,orientation)
+        rh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arms for the RH routes
-        line_coords = common.rotate_line(x,y,+38,rh1offset+2,+38,rh1offset-6,orientation)
-        rh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,rh1offset+2,+43,rh1offset-6,orientation)
-        rh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,rh2offset+2,+38,rh2offset-6,orientation)
-        rh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,rh2offset+2,+43,rh2offset-6,orientation)
-        rh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,+33,rh1offset+2,+33,rh1offset-6,orientation)
+        rh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,rh1offset+2,+38,rh1offset-6,orientation)
+        rh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,rh2offset+2,+33,rh2offset-6,orientation)
+        rh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,rh2offset+2,+38,rh2offset-6,orientation)
+        rh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Draw the signal arms for the LH routes
-        line_coords = common.rotate_line(x,y,60+armoffset,lh1offset+2,60+armoffset,lh1offset-8,orientation)
-        lh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,lh1offset+2,67+armoffset,lh1offset-8,orientation)
-        lh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,lh2offset+2,60+armoffset,lh2offset-8,orientation)
-        lh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,60+armoffset,lh2offset+2,67+armoffset,lh2offset-8,orientation)
-        lh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh1offset+2,50+armoffset,lh1offset-8,orientation)
+        lh1sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh1offset+2,57+armoffset,lh1offset-8,orientation)
+        lh1sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh2offset+2,50+armoffset,lh2offset-8,orientation)
+        lh2sigon = canvas.create_line(line_coords,fill=arm_colour,width=4,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,50+armoffset,lh2offset+2,57+armoffset,lh2offset-8,orientation)
+        lh2sigoff = canvas.create_line(line_coords,fill=arm_colour,width=4,state='hidden',tags=canvas_tag)
         # Draw the subsidary arms for the LH routes
-        line_coords = common.rotate_line(x,y,+38,lh1offset+2,+38,lh1offset-6,orientation)
-        lh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,lh1offset+2,+43,lh1offset-6,orientation)
-        lh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,lh2offset+2,+38,lh2offset-6,orientation)
-        lh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=sig_id_tag)
-        line_coords = common.rotate_line(x,y,+38,lh2offset+2,+43,lh2offset-6,orientation)
-        lh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=sig_id_tag)
+        line_coords = common.rotate_line(x,y,+33,lh1offset+2,+33,lh1offset-6,orientation)
+        lh1subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,lh1offset+2,+38,lh1offset-6,orientation)
+        lh1suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,lh2offset+2,+33,lh2offset-6,orientation)
+        lh2subon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
+        line_coords = common.rotate_line(x,y,+33,lh2offset+2,+38,lh2offset-6,orientation)
+        lh2suboff = canvas.create_line(line_coords,fill=arm_colour,width=3,state='hidden',tags=canvas_tag)
         # Hide any otherdrawing objects we don't need for this particular signal
         if not main_signal: canvas.itemconfigure(mainsigon,state='hidden')
         if not main_subsidary: canvas.itemconfigure(mainsubon,state='hidden')
@@ -218,7 +268,6 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if not rh1_signal: canvas.itemconfigure(rh1sigon,state='hidden')
         if not lh2_signal: canvas.itemconfigure(lh2sigon,state='hidden')
         if not rh2_signal: canvas.itemconfigure(rh2sigon,state='hidden')
-                             
         # Set the initial state of the signal Arms. We use True/False to represent the current
         # state of the signal arm, or a value of 'None' if the arm doesn't exist. We set the
         # arms that do exist in the "wrong" state initially, so that when they are first updated
@@ -237,30 +286,15 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         if not rh1_signal: rh1_signal = None
         if not lh2_signal: lh2_signal = None
         if not rh2_signal: rh2_signal = None
-            
-        # Create all of the signal elements common to all signal types
-        signals_common.create_common_signal_elements (canvas, sig_id, x, y,
-                                       ext_callback = sig_callback,
-                                       signal_type = signals_common.sig_type.semaphore,
-                                       orientation = orientation,
-                                       subsidary = has_subsidary,
-                                       sig_passed_button = sig_passed_button,
-                                       automatic = fully_automatic,
-                                       associated_home = associated_home,
-                                       tag = sig_id_tag)
-        
         # Create the signal elements for a Theatre Route indicator
-        signals_common.create_theatre_route_elements (canvas, sig_id, x, y, xoff=25, yoff = postoffset,
-                                        orientation = orientation,has_theatre = theatre_route_indicator)
-
+        signals_common.create_theatre_route_elements(canvas, sig_id, x, y, xoff=24, yoff=postoffset,
+                        orientation=orientation, canvas_tag=canvas_tag, has_theatre=theatre_route_indicator)
         # Create the signal elements to support Approach Control
-        signals_common.create_approach_control_elements (canvas, sig_id, x, y, orientation = orientation,
-                                                        approach_button = approach_release_button)
-
+        signals_common.create_approach_control_elements(canvas, sig_id, x, y, orientation=orientation,
+                                            canvas_tag=canvas_tag, approach_button=sig_release_button)
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
-        signals_common.signals[str(sig_id)]["refresh"]          = refresh_immediately    # Type-specific - if signal should be refreshed on a change
         signals_common.signals[str(sig_id)]["subtype"]          = signal_subtype         # Type-specific - subtype of the signal (home/distant)
         signals_common.signals[str(sig_id)]["associatedsignal"] = associated_home        # Type-specific - subtype of the signal (home/distant)
         signals_common.signals[str(sig_id)]["main_subsidary"]   = main_subsidary         # Type-specific - details of the signal configuration
@@ -294,15 +328,12 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
         signals_common.signals[str(sig_id)]["rh1suboff"]        = rh1suboff              # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rh2subon"]         = rh2subon               # Type-specific - drawing object
         signals_common.signals[str(sig_id)]["rh2suboff"]        = rh2suboff              # Type-specific - drawing object
-
         # Create the timed sequence class instances for the signal (one per route)
         signals_common.signals[str(sig_id)]["timedsequence"] = []
         for route in signals_common.route_type:
             signals_common.signals[str(sig_id)]["timedsequence"].append(timed_sequence(sig_id,route))
-                    
         # if there is an associated signal then we also need to update that signal to refer back to this one
         if associated_home > 0: signals_common.signals[str(associated_home)]["associatedsignal"] = sig_id
-
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
@@ -335,13 +366,11 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             elif (signals_common.signals[str(sig_id)]["routeset"]==signals_common.route_type.RH2
                    and signals_common.signals[str(sig_id)]["rh2_signal"]==True ):
                 signals_common.signals[str(sig_id)]["rh2_signal"] = False
-            signals_common.toggle_signal(sig_id)
+            signals_common.toggle_signal_state(sig_id)
         # Update the signal to show the initial aspect (and send out DCC commands)
-        # We only refresh the signal if it is set to refresh immediately
-        if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)
+        update_semaphore_signal(sig_id)
         # finally Lock the signal if required
         if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
-
         # Set the initial state of the subsidary from the "loaded" state
         # Note that we also need to Set the signal Arms to the "wrong" initial state so that when they
         # are first updated they get "changed" to the correct aspects and the correct DCC commands sent out
@@ -368,13 +397,12 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
             update_semaphore_subsidary_arms(sig_id)
             # finally Lock the subsidary if required 
             if loaded_state["sublocked"]: signals_common.lock_subsidary(sig_id)
-            
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will
         # only be published if the MQTT interface has been configured for publishing updates for this 
         # signal. This allows publish/subscribe to be configured prior to signal creation
         signals_common.publish_signal_state(sig_id)
-
-    return ()
+        # Return the canvas_tag for the tkinter drawing objects
+    return(canvas_tag)
 
 #-------------------------------------------------------------------
 # Internal Function to update the drawing objects for a specified signal Arm
@@ -385,7 +413,7 @@ def create_semaphore_signal (canvas, sig_id: int, x:int, y:int,
 # into the function as to WHY the signal Arm is being changed to its new state
 #------------------------------------------------------------------
 
-def update_signal_arm (sig_id, signal_arm, off_element, on_element, set_to_clear, log_message = ""):
+def update_signal_arm(sig_id, signal_arm, off_element, on_element, set_to_clear, log_message=""):
     # We explicitly test for True or False as "None" signifies the signal arm does not exist
     if set_to_clear and signals_common.signals[str(sig_id)][signal_arm]==False:
         logging.info ("Signal "+str(sig_id)+": Changing \'"+signal_arm+"\' arm to OFF"+log_message)
@@ -414,7 +442,7 @@ def has_diverging_route_arms(sig_id:int):
                       signals_common.signals[str(sig_id)]["lh2_signal"] is not None or
                       signals_common.signals[str(sig_id)]["rh1_signal"] is not None or
                       signals_common.signals[str(sig_id)]["rh2_signal"] is not None )
-    return (has_route_arms)
+    return(has_route_arms)
 
 #-------------------------------------------------------------------
 # Internal Function to update each of the subsidary signal arms supported by
@@ -424,7 +452,7 @@ def has_diverging_route_arms(sig_id:int):
 # Calls the Update_Signal_Arm function to update the state of each arm
 #------------------------------------------------------------------
 
-def update_semaphore_subsidary_arms (sig_id:int, log_message:str=""):
+def update_semaphore_subsidary_arms(sig_id:int, log_message:str=""):
     # We explicitly test for True and False as a state of 'None' signifies the signal was created without a subsidary
     if signals_common.signals[str(sig_id)]["subclear"] == True:
         # If the route has been set to signals_common.route_type.NONE then we assume MAIN and change the MAIN arm
@@ -559,10 +587,8 @@ def update_main_signal_arms(sig_id:int, log_message:str=""):
 # This function assumes the Sig_ID has been validated by the calling programme
 # -------------------------------------------------------------------------
 
-def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updating_associated_signal:bool=False):
-    
+def update_semaphore_signal(sig_id:int, sig_ahead_id:Union[int,str]=None, updating_associated_signal:bool=False):
     route = signals_common.signals[str(sig_id)]["routeset"]
-    
     # Get the ID of the associated signal (to make the following code more readable)
     associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
     # Establish what the signal should be displaying based on the state
@@ -609,13 +635,11 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
             new_aspect = signals_common.signal_state_type.PROCEED
             log_message = (" (PROCEED) - signal is OFF - route is set to " +
                  str(signals_common.signals[str(sig_id)]["routeset"]).rpartition('.')[-1] +")")
-
     current_aspect = signals_common.signals[str(sig_id)]["sigstate"]
-
     # Now refresh the displayed aspect (passing in the log message to be displayed) if the aspect has changed
     if new_aspect != current_aspect:
         signals_common.signals[str(sig_id)]["sigstate"] = new_aspect
-        update_main_signal_arms (sig_id,log_message)
+        update_main_signal_arms(sig_id, log_message)
         # If this signal is an associated with another signal then we also need to refresh the other signal
         # Associated distant signals need to be updated as they are "slotted" with the home signal - i.e. if the
         # home signal is set to DANGER then the distant signal (on the same arm) should show CAUTION
@@ -623,8 +647,7 @@ def update_semaphore_signal (sig_id:int, sig_ahead_id:Union[int,str]=None, updat
         # the distant signal and the home signal (i.e. Home is OFF but distant is ON - State is therefore CAUTION
         # We set a flag for the recursive call so we don't end up in a circular recursion
         if associated_signal > 0 and not updating_associated_signal:
-            if signals_common.signals[str(associated_signal)]["refresh"]:
-                update_semaphore_signal(associated_signal,updating_associated_signal=True)
+            update_semaphore_signal(associated_signal,updating_associated_signal=True)
         # Call the common function to update the theatre route indicator elements
         # (if the signal has a theatre route indicator - otherwise no effect)
         signals_common.enable_disable_theatre_route_indication(sig_id)
@@ -665,11 +688,10 @@ def update_semaphore_route_indication (sig_id,route_to_set = None):
         associated_signal = signals_common.signals[str(sig_id)]["associatedsignal"]
         if signals_common.signals[str(sig_id)]["subtype"] == semaphore_sub_type.home and associated_signal > 0:
             update_semaphore_route_indication (associated_signal,route_to_set)
-        # Refresh the signal aspect (a catch-all to ensure the signal displays the correct aspect
+        # Refresh the signal aspect (a catch-all to ensure the signal displays the correct aspect)
         # in case the signal is in the middle of a timed sequence for the old route or the new route
-        if signals_common.signals[str(sig_id)]["refresh"]: update_semaphore_signal(sig_id)
+        update_semaphore_signal(sig_id)
     return()
-
 
 # -------------------------------------------------------------------------
 # Class for a timed signal sequence. A class instance is created for each
@@ -705,7 +727,7 @@ class timed_sequence():
                     # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
                     # mqtt interface has been successfully configured and the signal has been set to publish passed events
                     signals_common.publish_signal_passed_event(self.sig_id)
-                    signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id,signals_common.sig_callback_type.sig_passed)
+                    signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id,signals_common.signal_callback_type.sig_passed)
                 else:
                     update_semaphore_signal(self.sig_id)
             # We need to schedule the sequence completion (i.e. back to clear
@@ -717,7 +739,7 @@ class timed_sequence():
         if signals_common.sig_exists(self.sig_id):
             logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_semaphore_signal(self.sig_id)
-            signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.sig_callback_type.sig_updated)
+            signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.signal_callback_type.sig_updated)
 
 # -------------------------------------------------------------------------
 # Function to initiate a timed signal sequence - setting the signal initially to ON
@@ -732,7 +754,7 @@ class timed_sequence():
 def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     
     def delayed_sequence_start(sig_id:int, sig_route):
-        if signals_common.sig_exists(sig_id):
+        if signals_common.sig_exists(sig_id) and not common.shutdown_initiated:
             signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
             
     # Don't initiate a timed signal sequence if a shutdown has already been initiated
@@ -742,7 +764,7 @@ def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=
         # Abort any timed signal sequences already in progess
         route = signals_common.signals[str(sig_id)]["routeset"]
         signals_common.signals[str(sig_id)]["timedsequence"][route.value].abort()
-        # Create a new instnce of the time signal class - this should have the effect of "destroying"
+        # Create a new instance of the time signal class - this should have the effect of "destroying"
         # the old instance when it goes out of scope, leaving us with the newly created instance
         signals_common.signals[str(sig_id)]["timedsequence"][route.value] = timed_sequence(sig_id, route, start_delay, time_delay)
         # Schedule the start of the sequence (i.e. signal to danger) if the start delay is greater than zero

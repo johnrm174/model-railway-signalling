@@ -34,7 +34,7 @@ class route_type(enum.Enum):
 
 # Define the different callbacks types for the signal
 # Used for identifying the event that has triggered the callback
-class sig_callback_type(enum.Enum):
+class signal_callback_type(enum.Enum):
     sig_switched = 1   # The signal has been switched by the user
     sub_switched = 2   # The subsidary signal has been switched by the user
     sig_passed = 3     # The "signal passed" has been activated by the user
@@ -58,7 +58,7 @@ class signal_state_type(enum.Enum):
     FLASH_PRELIM_CAUTION = 7
 
 # Define the main signal types that can be created
-class sig_type(enum.Enum):
+class signal_type(enum.Enum):
     remote_signal = 0
     colour_light = 1
     ground_position = 2
@@ -88,44 +88,39 @@ def sig_exists(sig_id:Union[int,str]):
     return (str(sig_id) in signals.keys() )
 
 # -------------------------------------------------------------------------
-# Define a null callback function for internal use
-# -------------------------------------------------------------------------
-
-def null_callback (sig_id:int,callback_type):
-    return (sig_id,callback_type)
-
-# -------------------------------------------------------------------------
-# Callbacks for processing button pushes
+# Callbacks for processing signal/subsudary button events
 # -------------------------------------------------------------------------
 
 def signal_button_event (sig_id:int):
     logging.info("Signal "+str(sig_id)+": Signal Change Button Event *************************************************")
-    # toggle the signal state and refresh the signal
-    toggle_signal(sig_id)
-    auto_refresh_signal(sig_id)
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_switched)
+    # Toggle the signal state (and the tkinter button object)
+    toggle_signal_state(sig_id)
+    # Update the displayed aspect of the signal
+    update_displayed_aspect(sig_id)
+    # Make the external callback
+    signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_switched)
     return ()
 
 def subsidary_button_event (sig_id:int):
     logging.info("Signal "+str(sig_id)+": Subsidary Change Button Event **********************************************")
-    toggle_subsidary(sig_id)
-    #  call the signal type-specific functions to update the signal
-    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
+    # Toggle the subsidary state (and the tkinter button object)
+    toggle_subsidary_state(sig_id)
+    # Call the signal type-specific functions to update the signal
+    if signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
         signals_colour_lights.update_colour_light_subsidary(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
+    elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
         signals_semaphores.update_semaphore_subsidary_arms(sig_id)
-    # Make the external callback (if one was specified at signal creation time)
-    signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sub_switched)
+    # Make the external callback
+    signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sub_switched)
     return ()
 
-def reset_sig_passed_button (sig_id:int):
-    if sig_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
-
-def reset_sig_released_button (sig_id:int):
-    if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
+# -------------------------------------------------------------------------
+# Callbacks for processing signal 'approached' and 'passed' events
+# These can either be from tkinter button events or GPIO sensor events
+# -------------------------------------------------------------------------
 
 def sig_passed_button_event (sig_id:int):
+    # We validate the Sig_Id as function can be called from GPIO sensor events
     if not sig_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
     else:
@@ -134,15 +129,17 @@ def sig_passed_button_event (sig_id:int):
         if not common.shutdown_initiated:
             signals[str(sig_id)]["passedbutton"].config(bg="red")
             common.root_window.after(1000,lambda:reset_sig_passed_button(sig_id))
-        # Reset the approach control 'released' state (if the signal supports approach control)
-        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+        # Reset the approach control 'released' state (if the signal supports approach control).
+        # We don't reset the approach control mode  - this needs to be reset from the calling application.
+        if ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
             signals[str(sig_id)]["released"] = False
-        # Make the external callback (if one was specified at signal creation time)
-        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_passed)
+        # Make the external callback
+        signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_passed)
     return ()
 
-def approach_release_button_event (sig_id:int):
+def approach_release_button_event(sig_id:int):
+    # We validate the Sig_Id as function can be called from GPIO sensor events
     if not sig_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not exist")
     else:
@@ -151,39 +148,32 @@ def approach_release_button_event (sig_id:int):
         if not common.shutdown_initiated:
             signals[str(sig_id)]["releasebutton"].config(bg="red")
             common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
-        # Set the approach control 'released' state (if the signal supports approach control)
-        if ( signals[str(sig_id)]["sigtype"] == sig_type.colour_light or
-             signals[str(sig_id)]["sigtype"] == sig_type.semaphore ):
+        # Set the approach control 'released' state (if the signal supports approach control).
+        # We also clear down the approach control mode and update the displayed signal aspects.
+        if ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light or
+             signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
             signals[str(sig_id)]["released"] = True
-        # Clear the approach control and refresh the signal
-        clear_approach_control(sig_id)
-        auto_refresh_signal(sig_id)
-        # Make the external callback (if one was specified at signal creation time)
-        signals[str(sig_id)]['extcallback'] (sig_id,sig_callback_type.sig_released)
+            clear_approach_control(sig_id)
+            update_displayed_aspect(sig_id)
+        # Make the external callback
+        signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_released)
     return ()
 
 # -------------------------------------------------------------------------
-# Common function to refreh a signal following a change in state
+# Functions for "resetting" the approached / passed buttons after the timeout 
 # -------------------------------------------------------------------------
 
-def auto_refresh_signal(sig_id:int):
-    # call the signal type-specific functions to update the signal (note that we only update
-    # Semaphore and colour light signals if they are configured to update immediately)
-    if signals[str(sig_id)]["sigtype"] == sig_type.colour_light:
-        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_position:
-        signals_ground_position.update_ground_position_signal (sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.semaphore:
-        if signals[str(sig_id)]["refresh"]: signals_semaphores.update_semaphore_signal(sig_id)
-    elif signals[str(sig_id)]["sigtype"] == sig_type.ground_disc:
-        signals_ground_disc.update_ground_disc_signal(sig_id)
-    return()
+def reset_sig_passed_button (sig_id:int):
+    if sig_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
+
+def reset_sig_released_button (sig_id:int):
+    if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
 
 # -------------------------------------------------------------------------
 # Common function to flip the internal state of a signal
 # -------------------------------------------------------------------------
 
-def toggle_signal (sig_id:int):
+def toggle_signal_state (sig_id:int):
     global signals
     # Update the state of the signal button - Common to ALL signal types
     # The Signal Clear boolean value will always be either True or False
@@ -205,7 +195,7 @@ def toggle_signal (sig_id:int):
 # Common function to flip the internal state of a subsidary signal
 # -------------------------------------------------------------------------
 
-def toggle_subsidary (sig_id:int):
+def toggle_subsidary_state (sig_id:int):
     global signals
     # Update the state of the subsidary button - Common to ALL signal types.
     # The subsidary clear boolean value will always be either True or False
@@ -218,6 +208,23 @@ def toggle_subsidary (sig_id:int):
         signals[str(sig_id)]["subclear"] = True
         signals[str(sig_id)]["subbutton"].config(relief="sunken",bg=common.bgsunken)
     return ()
+
+# -------------------------------------------------------------------------
+# Common function to update the displayed aspect of a signal
+# -------------------------------------------------------------------------
+
+def update_displayed_aspect(sig_id:int):
+    # Call the signal type-specific functions to update the signal (note that we only update
+    # Colour light signals if they are configured to update immediately after a state change)
+    if signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
+        if signals[str(sig_id)]["refresh"]: signals_colour_lights.update_colour_light_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == signal_type.ground_position:
+        signals_ground_position.update_ground_position_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == signal_type.semaphore:
+        signals_semaphores.update_semaphore_signal(sig_id)
+    elif signals[str(sig_id)]["sigtype"] == signal_type.ground_disc:
+        signals_ground_disc.update_ground_disc_signal(sig_id)
+    return()
 
 # -------------------------------------------------------------------------
 # Common function to Set the approach control mode for a signal
@@ -382,19 +389,20 @@ def unlock_subsidary (sig_id:int):
 # -------------------------------------------------------------------------
 
 def create_common_signal_elements (canvas,
-                                   sig_id: int,
+                                   sig_id:int,
+                                   signal_type:signal_type,
                                    x:int, y:int,
-                                   signal_type:sig_type,
-                                   ext_callback,
                                    orientation:int,
-                                   subsidary:bool=False,
+                                   ext_callback,
+                                   has_subsidary:bool=False,
                                    sig_passed_button:bool=False,
-                                   automatic:bool=False,
-                                   associated_home:int=0,
-                                   tag:str=""):
+                                   sig_automatic:bool=False,
+                                   associated_home:int=0):
     global signals
-    # If no callback has been specified, use the null callback to do nothing
-    if ext_callback is None: ext_callback = null_callback
+    # Define the "Tag" for all drawing objects for this signal instance
+    # If it is an associated distant then set the tag the same as the home signal
+    if associated_home > 0: canvas_tag = "signal"+str(associated_home)
+    else: canvas_tag = "signal"+str(sig_id)
     # Create the Signal Buttons. If an 'associated_home' has been specified then this represents the
     # special case of a semaphore distant signal being created on the same "post" as a home signal, where
     # we label the button as "D" to differentiate it from the main signal button and apply a position offset
@@ -426,63 +434,60 @@ def create_common_signal_elements (canvas,
             if orientation == 0: xoffset = -common.fontsize/2*5-18
             else: xoffset = -common.fontsize*3-14
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation)
-        if not automatic: canvas.create_window(button_position, window=sig_button, tags=tag)
-    elif subsidary:
+        if not sig_automatic: canvas.create_window(button_position, window=sig_button, tags=canvas_tag)
+    elif has_subsidary:
         if orientation == 0: xoffset = -common.fontsize-14
         else: xoffset = -common.fontsize*2-12
         button_position = common.rotate_point(x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=tag)
-        canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=tag)          
+        canvas.create_window(button_position,anchor=Tk.E,window=sig_button,tags=canvas_tag)
+        canvas.create_window(button_position,anchor=Tk.W,window=sub_button,tags=canvas_tag)          
     else:
         xoffset = -14-common.fontsize/2
         button_position = common.rotate_point (x, y, xoffset, yoffset, orientation) 
-        canvas.create_window(button_position,window=sig_button,tags=tag)
+        canvas.create_window(button_position,window=sig_button,tags=canvas_tag)
     # Signal passed button is created on the track at the base of the signal
-    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=tag)
+    if sig_passed_button: canvas.create_window(x,y,window=passed_button,tags=canvas_tag)
     # Disable the main signal button if the signal is fully automatic
-    if automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
+    if sig_automatic: sig_button.config(state="disabled",relief="sunken",bg=common.bgraised,bd=0)
     # Create an initial dictionary entry for the signal and add all the mandatory signal elements
     signals[str(sig_id)] = {}
     signals[str(sig_id)]["canvas"]       = canvas               # MANDATORY - canvas object
     signals[str(sig_id)]["sigtype"]      = signal_type          # MANDATORY - Type of the signal
-    signals[str(sig_id)]["automatic"]    = automatic            # MANDATORY - True = signal is fully automatic 
+    signals[str(sig_id)]["automatic"]    = sig_automatic        # MANDATORY - True = signal is fully automatic
     signals[str(sig_id)]["extcallback"]  = ext_callback         # MANDATORY - The External Callback to use for the signal
     signals[str(sig_id)]["routeset"]     = route_type.MAIN      # MANDATORY - Route setting for signal (MAIN at creation)
     signals[str(sig_id)]["sigclear"]     = False                # MANDATORY - State of the main signal control (ON/OFF)
     signals[str(sig_id)]["override"]     = False                # MANDATORY - Signal is "Overridden" to most restrictive aspect
     signals[str(sig_id)]["overcaution"]  = False                # MANDATORY - Signal is "Overridden" to CAUTION
     signals[str(sig_id)]["sigstate"]     = None                 # MANDATORY - Displayed 'aspect' of the signal (None on creation)
-    signals[str(sig_id)]["hassubsidary"] = subsidary            # MANDATORY - Whether the signal has a subsidary aspect or arms
+    signals[str(sig_id)]["hassubsidary"] = has_subsidary        # MANDATORY - Whether the signal has a subsidary aspect or arms
     signals[str(sig_id)]["subclear"]     = False                # MANDATORY - State of the subsidary sgnal control (ON/OFF - or None)
     signals[str(sig_id)]["siglocked"]    = False                # MANDATORY - State of signal interlocking 
     signals[str(sig_id)]["sublocked"]    = False                # MANDATORY - State of subsidary interlocking
     signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
-    return()
+    signals[str(sig_id)]["tags"]         = canvas_tag           # MANDATORY - Canvas Tags for all drawing objects
+    return(canvas_tag)
 
 # -------------------------------------------------------------------------
 # Common Function to generate all the signal elements for Approach Control
 # (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
-def create_approach_control_elements (canvas,sig_id:int,
-                                      x:int,y:int,
-                                      orientation:int,
-                                      approach_button:bool):
+def create_approach_control_elements (canvas, sig_id:int, x:int,y:int, canvas_tag:str,
+                                      orientation:int, approach_button:bool):
     global signals
-    # Define the "Tag" for all drawing objects for this signal instance
-    tag = "signal"+str(sig_id)
     # Create the approach release button - We only want a small button - hence a small font size
     approach_release_button = Tk.Button(canvas,text="O",padx=1,pady=1,font=('Courier',2,"normal"),
-                                        command=lambda:approach_release_button_event (sig_id))
+                                        command=lambda:approach_release_button_event(sig_id))
     button_position = common.rotate_point(x,y,-50,0,orientation)
-    if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=tag)
+    if approach_button: canvas.create_window(button_position,window=approach_release_button,tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["released"] = False                          # SHARED - State between 'released' and 'passed' events
     signals[str(sig_id)]["releaseonred"] = False                      # SHARED - State of the "Approach Release for the signal
     signals[str(sig_id)]["releaseonyel"] = False                      # SHARED - State of the "Approach Release for the signal
-    signals[str(sig_id)]["releasebutton"] = approach_release_button   # SHARED - Button drawing object
+    signals[str(sig_id)]["releasebutton"] = approach_release_button   # SHARED - Tkinter Button object
     return()
 
 # -------------------------------------------------------------------------
@@ -490,24 +495,20 @@ def create_approach_control_elements (canvas,sig_id:int,
 # display (shared by Colour Light and semaphore signal types)
 # -------------------------------------------------------------------------
 
-def create_theatre_route_elements (canvas,sig_id:int,
-                                   x:int,y:int,
-                                   xoff:int,yoff:int,
-                                   orientation:int,
-                                   has_theatre:bool):
+def create_theatre_route_elements (canvas,sig_id:int, x:int, y:int,
+                                   xoff:int, yoff:int, canvas_tag:str,
+                                   orientation:int, has_theatre:bool):
     global signals
-    # Define the "Tag" for all drawing objects for this signal instance
-    tag = "signal"+str(sig_id)
     # Draw the theatre route indicator box only if one is specified for this particular signal
     # The text object is created anyway - but 'hidden' if not required for this particular signal
     text_coordinates = common.rotate_point(x,y,xoff,yoff,orientation)
-    tag = "signal"+str(sig_id)
     if has_theatre:
-        rectangle_coords = common.rotate_line(x,y,xoff-10,yoff+8,xoff+10,yoff-8,orientation)
-        canvas.create_rectangle(rectangle_coords,fill="black",tags=tag)
-        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='normal',tags=tag)
+        rectangle_coords = common.rotate_line(x,y,xoff-6,yoff+6,xoff+6,yoff-6,orientation)
+        canvas.create_rectangle(rectangle_coords,fill="black",tags=canvas_tag)
+        theatre_text = canvas.create_text(text_coordinates,fill="white",font=('Courier',common.fontsize,"normal"),
+                                          angle=orientation-90,state='normal',tags=canvas_tag)
     else:
-        theatre_text = canvas.create_text(text_coordinates,fill="white",text="",angle=orientation-90,state='hidden',tags=tag)
+        theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
     signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
     signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
@@ -578,7 +579,7 @@ def handle_mqtt_signal_updated_event(message):
         logging.info ("Signal "+signal_identifier+": Aspect has changed to : "+
                             str(signals[signal_identifier]["sigstate"]).rpartition('.')[-1])
         # Make the external callback (if one has been defined)
-        signals[signal_identifier]["extcallback"] (signal_identifier,sig_callback_type.sig_updated)
+        signals[signal_identifier]["extcallback"] (signal_identifier,signal_callback_type.sig_updated)
     return()
 
 # --------------------------------------------------------------------------------
@@ -617,17 +618,10 @@ def delete_signal(sig_id:int):
         signals[str(sig_id)]["subbutton"].destroy()
         signals[str(sig_id)]["passedbutton"].destroy()
         # This buttons is only common to colour light and semaphore types
-        if signals[str(sig_id)]["sigtype"] in (sig_type.colour_light,sig_type.semaphore):
+        if signals[str(sig_id)]["sigtype"] in (signal_type.colour_light,signal_type.semaphore):
             signals[str(sig_id)]["releasebutton"].destroy()
         # Finally, delete the signal entry from the dictionary of signals
         del signals[str(sig_id)]
     return()
-
-# ------------------------------------------------------------------------------------------
-# Non public API function to return the tkinter canvas 'tags' for the signal
-# ------------------------------------------------------------------------------------------
-
-def get_tags(sig_id:int):
-    return("signal"+str(sig_id))
 
 #################################################################################################

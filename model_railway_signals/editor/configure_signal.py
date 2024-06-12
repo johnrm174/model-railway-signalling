@@ -12,7 +12,7 @@
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Accesses the following types directly from the library modules:
-#    signals_common.sig_type - The sygnal type
+#    signals_common.signal_type - The sygnal type
 #    signals_colour_lights.signal_sub_type - colour light signal sub-type
 #    signals_semaphores.semaphore_sub_type - semaphore signal sub-type
 #
@@ -53,13 +53,13 @@ open_windows={}
 #------------------------------------------------------------------------------------
 
 def has_subsidary(signal):
-    return ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+    return ( ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
                ( signal.config.semaphores.main.sub.get_element()[0] or
                  signal.config.semaphores.lh1.sub.get_element()[0] or
                  signal.config.semaphores.lh2.sub.get_element()[0] or
                  signal.config.semaphores.rh1.sub.get_element()[0] or
                  signal.config.semaphores.rh2.sub.get_element()[0] ) ) or
-             (signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+             (signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                 signal.config.aspects.get_subsidary()[0] ) )
 
 #------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ def has_subsidary(signal):
 #------------------------------------------------------------------------------------
 
 def has_secondary_distant(signal):
-    return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+    return ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
              ( signal.config.semaphores.main.dist.get_element()[0] or
                signal.config.semaphores.lh1.dist.get_element()[0] or
                signal.config.semaphores.lh2.dist.get_element()[0] or
@@ -79,7 +79,7 @@ def has_secondary_distant(signal):
 #------------------------------------------------------------------------------------
 
 def has_route_arms(signal):
-    return ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+    return ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
              (signal.config.semaphores.lh1.sig.get_element()[0] or
                signal.config.semaphores.lh2.sig.get_element()[0] or
                signal.config.semaphores.rh1.sig.get_element()[0] or
@@ -135,12 +135,12 @@ def get_sig_routes(signal):
 
 def get_sub_routes(signal):
     # Get the route selections from the appropriate UI element
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value or
-          signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value):
+    if ( signal.config.sigtype.get_value() == signals_common.signal_type.ground_position.value or
+          signal.config.sigtype.get_value() == signals_common.signal_type.ground_disc.value):
         routes = [False, False, False, False, False]
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         routes = signal.config.sub_routes.get_values()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value:
         if signal.config.routetype.get_value() == 4:
             # Signal arm list comprises:[main, LH1, LH2, RH1, RH2]
             # Each Route element comprises: [signal, subsidary, distant]
@@ -206,13 +206,13 @@ def update_tab1_signal_ui_elements(signal):
     signal.config.sig_routes.frame.pack_forget()
     signal.config.sub_routes.frame.pack_forget()
     # Only pack those elements relevant to the signal type and route type
-    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    if signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_position.value:
         signal.config.aspects.frame.pack(padx=2, pady=2, fill='x')
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value:
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_disc.value:
         signal.config.semaphores.frame.pack(padx=2, pady=2, fill='x')
     # Pack the Route selections according to type
     if signal.config.routetype.get_value() == 1:
@@ -234,7 +234,7 @@ def update_tab1_signal_ui_elements(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab1_signal_subtype_selections(signal):
-    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    if signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         signal.config.subtype.B1.configure(text="2 Asp G/R")
         signal.config.subtype.B2.configure(text="2 Asp G/Y")
         signal.config.subtype.B3.configure(text="2 Asp Y/R")
@@ -243,13 +243,13 @@ def update_tab1_signal_subtype_selections(signal):
         signal.config.subtype.B3.pack(side=Tk.LEFT)
         signal.config.subtype.B4.pack(side=Tk.LEFT)
         signal.config.subtype.B5.pack(side=Tk.LEFT)
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value:
         signal.config.subtype.B1.configure(text="Home")
         signal.config.subtype.B2.configure(text="Distant")
         signal.config.subtype.B3.pack_forget()
         signal.config.subtype.B4.pack_forget()
         signal.config.subtype.B5.pack_forget()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_position.value:
         signal.config.subtype.B1.configure(text="Norm (post'96)")
         signal.config.subtype.B2.configure(text="Shunt (post'96)")
         signal.config.subtype.B3.configure(text="Norm (early)")
@@ -257,7 +257,7 @@ def update_tab1_signal_subtype_selections(signal):
         signal.config.subtype.B3.pack(side=Tk.LEFT)
         signal.config.subtype.B4.pack(side=Tk.LEFT)
         signal.config.subtype.B5.pack_forget()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_disc.value:
         signal.config.subtype.B1.configure(text="Normal")
         signal.config.subtype.B2.configure(text="Shunt Ahead")
         signal.config.subtype.B3.pack_forget()
@@ -270,7 +270,7 @@ def update_tab1_signal_subtype_selections(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab1_signal_aspect_selections(signal):
-    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    if signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         if signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value:
             signal.config.aspects.red.enable_addresses()
             signal.config.aspects.grn.enable_addresses()
@@ -306,7 +306,7 @@ def update_tab1_signal_aspect_selections(signal):
             signal.config.aspects.dylw.enable_addresses()
             signal.config.aspects.fylw.enable_addresses()
             signal.config.aspects.fdylw.enable_addresses()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_position.value:
         signal.config.aspects.red.enable_addresses()
         signal.config.aspects.grn.enable_addresses()
         signal.config.aspects.ylw.disable_addresses()
@@ -318,7 +318,7 @@ def update_tab1_signal_aspect_selections(signal):
         # will be hidden and the semaphore signals arm UI element will be displayed
         signal.config.aspects.disable_aspects()
     # Enable/Disable the Colour Light subsidary selection (disabled for 2 aspect GRN/YLW)
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    if ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
          signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value ):
         signal.config.aspects.enable_subsidary()
     else:
@@ -330,7 +330,7 @@ def update_tab1_signal_aspect_selections(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab1_route_selection_elements(signal):
-    if signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    if signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         # Disable the Semaphore-specific route selections (this UI element will be hidden)
         signal.config.semaphores.disable_main_route()
         signal.config.semaphores.disable_diverging_routes()
@@ -371,7 +371,7 @@ def update_tab1_route_selection_elements(signal):
             if has_subsidary(signal): signal.config.sub_routes.enable_selection()
             else: signal.config.sub_routes.disable_selection()
         
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value:
         # If Feathers are selected (Colour light signals only) then change to Route Arms 
         if signal.config.routetype.get_value() == 2: signal.config.routetype.set_value(4)
         # Disable the Colour-light-specific 'feathers' selection (this UI element will be hidden)
@@ -430,7 +430,7 @@ def update_tab1_route_selection_elements(signal):
                 signal.config.sig_routes.disable_selection()
                 signal.config.sub_routes.disable_selection()
 
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_disc.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_disc.value:
         # No route indications supported for ground signals
         signal.config.routetype.set_value(1)
         signal.config.routetype.B2.configure(state="disabled")
@@ -447,7 +447,7 @@ def update_tab1_route_selection_elements(signal):
         signal.config.theatre.disable_selection()
         signal.config.sub_routes.disable_selection()
 
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.ground_position.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.ground_position.value:
         # No route indications supported for ground signals
         signal.config.routetype.set_value(1)
         signal.config.routetype.B2.configure(state="disabled")
@@ -526,13 +526,13 @@ def update_tab2_available_signal_routes(signal):
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
     # Block Ahead selection is only enabled for Semaphore or Colour Light Home signals
     # both are disabled for Ground Position and Ground disc signal types
-    if signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value:
+    if signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value:
         signal.locking.interlocking.enable_sig_ahead()
         if signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value:
             signal.locking.interlocking.disable_block_ahead()
         else:
             signal.locking.interlocking.enable_block_ahead()
-    elif signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value:
+    elif signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value:
         if signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value:
             signal.locking.interlocking.enable_block_ahead()
             signal.locking.interlocking.enable_sig_ahead()
@@ -550,11 +550,11 @@ def update_tab2_available_signal_routes(signal):
 #------------------------------------------------------------------------------------
 
 def update_tab2_interlock_ahead_selection(signal):
-    if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+    if ( ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.distant.value) or
-         ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+         ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
            signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.distant.value) or
-         ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+         ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
            signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value and
            has_secondary_distant(signal) ) ):
         signal.locking.interlock_ahead.frame.pack(padx=2, pady=2, fill='x')
@@ -573,14 +573,14 @@ def update_tab3_signal_ui_elements(signal):
     signal.automation.timed_signal.frame.pack_forget()
     signal.automation.approach_control.frame.pack_forget()
     # Only pack those elements relevant to the signal type and route type
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value or
-         signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value ):
+    if ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value or
+         signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value ):
         signal.automation.timed_signal.frame.pack(padx=2, pady=2, fill='x')
-    rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                      signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value) or
-                   ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+                   ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
                      signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.distant.value ) )
-    rel_on_yel = ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    rel_on_yel = ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.home.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.red_ylw.value )
@@ -594,26 +594,26 @@ def update_tab3_signal_ui_elements(signal):
 
 def update_tab3_general_settings_selections(signal):
     # Enable/disable the "Fully Automatic"(no signal button) and "Override" selections
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value  or
-         signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value):
+    if ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value  or
+         signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value):
         signal.automation.general_settings.automatic.enable()
         signal.automation.general_settings.override.enable()
     else:
         signal.automation.general_settings.automatic.disable()
         signal.automation.general_settings.override.disable()
     # Enable/disable the "Dustant Automatic"(no distant button) selection
-    if ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+    if ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
          has_secondary_distant(signal) ):
         signal.automation.general_settings.distant_automatic.enable()
     else:
         signal.automation.general_settings.distant_automatic.disable()
     # Enable/disable the "Override Ahead" selection (can be selected for all main signal types
     # apart from colour light Home signals and Semnaphore Home signals without secondary distant arms
-    if ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    if ( ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
            signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.home.value) or
-         ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+         ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
            signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.home.value ) or
-         ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+         ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
            has_secondary_distant(signal) ) ):
         signal.automation.general_settings.override_ahead.enable()
     else:
@@ -660,8 +660,8 @@ def update_tab3_timed_signal_selections(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     # Enable/disable the UI element depending on whether the signal supports timed signal sequences
-    timed_signal = (signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value or
-                    signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value )
+    timed_signal = (signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value or
+                    signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value )
     if timed_signal: signal.automation.timed_signal.main.enable()
     else: signal.automation.timed_signal.main.disable()
     # LH1 Route (sig or sub)
@@ -686,17 +686,17 @@ def update_tab3_approach_control_selections(signal):
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     # Work out if the signal type supports approach control:
-    rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    rel_on_red = ( ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                      signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value ) or
-                   ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+                   ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
                      signal.config.subtype.get_value() != signals_semaphores.semaphore_sub_type.distant.value ) )
-    rel_on_yel = ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    rel_on_yel = ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.home.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.distant.value and
                    signal.config.subtype.get_value() != signals_colour_lights.signal_sub_type.red_ylw.value )
-    rel_on_sig = ( ( signal.config.sigtype.get_value() == signals_common.sig_type.colour_light.value and
+    rel_on_sig = ( ( signal.config.sigtype.get_value() == signals_common.signal_type.colour_light.value and
                      signal.config.subtype.get_value() == signals_colour_lights.signal_sub_type.home.value )or
-                   ( signal.config.sigtype.get_value() == signals_common.sig_type.semaphore.value and
+                   ( signal.config.sigtype.get_value() == signals_common.signal_type.semaphore.value and
                      signal.config.subtype.get_value() == signals_semaphores.semaphore_sub_type.home.value ) )
     approach_control = rel_on_red or rel_on_yel or rel_on_sig
     if approach_control:
@@ -774,7 +774,7 @@ class edit_signal:
             self.tabs.pack()
             # The config tab needs references to all the 'config changed' callback functions
             self.config = configure_signal_tab1.signal_configuration_tab(self.tab1,
-                    self.sig_type_updated, self.sub_type_updated, self.route_type_updated,
+                    self.signal_type_updated, self.sub_type_updated, self.route_type_updated,
                     self.route_selections_updated, self.sig_routes_updated,
                     self.sub_routes_updated, self.dist_routes_updated)
             # The interlocking tab needs the parent object so the sig_id can be accessed for validation
@@ -784,7 +784,7 @@ class edit_signal:
             # load the initial UI state
             self.load_state()
                 
-    def sig_type_updated(self):
+    def signal_type_updated(self):
         # The signal type has been changed (colour-light/semaphore/ground-pos-ground-disc)
         self.config.subtype.set_value(1)
         update_tab1_signal_subtype_selections(self)
@@ -908,14 +908,14 @@ class edit_signal:
             self.automation.approach_control.set_values(objects.schematic_objects[self.object_id]["approachcontrol"])
             # Configure the initial Route indication selection
             feathers = objects.schematic_objects[self.object_id]["feathers"]
-            if objects.schematic_objects[self.object_id]["itemtype"] == signals_common.sig_type.colour_light.value:
+            if objects.schematic_objects[self.object_id]["itemtype"] == signals_common.signal_type.colour_light.value:
                 if objects.schematic_objects[self.object_id]["theatreroute"]:
                     self.config.routetype.set_value(3)
                 elif feathers[0] or feathers[1] or feathers[2] or feathers[3] or feathers[4]:
                     self.config.routetype.set_value(2)
                 else:
                     self.config.routetype.set_value(1)      
-            elif objects.schematic_objects[self.object_id]["itemtype"] == signals_common.sig_type.semaphore.value:
+            elif objects.schematic_objects[self.object_id]["itemtype"] == signals_common.signal_type.semaphore.value:
                 if objects.schematic_objects[self.object_id]["theatreroute"]:
                     self.config.routetype.set_value(3)
                 elif has_route_arms(self):

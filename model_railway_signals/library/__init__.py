@@ -85,16 +85,22 @@ from .common import shutdown
 from .common import configure_edit_mode
 
 ##########################TO UPDATE####################################
+from .signals_common import signal_type
 from .signals_common import route_type
-from .signals_common import sig_callback_type
+from .signals_common import signal_callback_type
 from .signals_common import signal_state_type
+from .signals_common import sig_exists
+from .signals_common import delete_signal
 
 from .signals_colour_lights import signal_sub_type
 from .signals_colour_lights import create_colour_light_signal
+
 from .signals_semaphores import semaphore_sub_type
 from .signals_semaphores import create_semaphore_signal
+
 from .signals_ground_position import ground_pos_sub_type
 from .signals_ground_position import create_ground_position_signal
+
 from .signals_ground_disc import ground_disc_sub_type
 from .signals_ground_disc import create_ground_disc_signal
 
@@ -145,16 +151,19 @@ __all__ = [
         'track_sensor_exists',
       # Public signal types/functions
         'route_type',
+        'sig_exists',
+        'signal_type',
         'signal_sub_type',
         'semaphore_sub_type',
         'ground_pos_sub_type',
         'ground_disc_sub_type',
-        'sig_callback_type',
+        'signal_callback_type',
         'signal_state_type',
         'create_colour_light_signal',
         'create_semaphore_signal',
         'create_ground_position_signal',
         'create_ground_disc_signal',
+        'delete_signal',
         'set_route',
         'update_signal',
         'lock_signal',

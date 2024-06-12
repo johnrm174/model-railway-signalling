@@ -33,7 +33,7 @@
 #    objects.object_type - used to establish the type of the schematic objects
 #
 # Accesses the following external library objects directly:
-#    signals_common.sig_type - Used to access the signal type
+#    signals_common.signal_type - Used to access the signal type
 #    signals_colour_lights.signal_sub_type - Used to access the signal subtype
 #    signals_semaphores.semaphore_sub_type - Used to access the signal subtype
 #    signals_ground_position.ground_pos_sub_type - Used to access the signal subtype
@@ -932,16 +932,16 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     selections = [ ["textbox", lambda:create_object(objects.object_type.textbox) ],
                    ["line", lambda:create_object(objects.object_type.line) ],
                    ["colourlight", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.colour_light.value,
+                                        signals_common.signal_type.colour_light.value,
                                         signals_colour_lights.signal_sub_type.four_aspect.value) ],
                    ["semaphore", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.semaphore.value,
+                                        signals_common.signal_type.semaphore.value,
                                         signals_semaphores.semaphore_sub_type.home.value) ],
                    ["groundpos", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.ground_position.value,
+                                        signals_common.signal_type.ground_position.value,
                                         signals_ground_position.ground_pos_sub_type.standard.value) ],
                    ["grounddisc", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.ground_disc.value,
+                                        signals_common.signal_type.ground_disc.value,
                                         signals_ground_disc.ground_disc_sub_type.standard.value) ],
                    ["lhpoint", lambda:create_object(objects.object_type.point,
                                         points.point_type.LH.value) ],
