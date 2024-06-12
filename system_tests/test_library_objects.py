@@ -337,7 +337,7 @@ def test_basic_semaphore_operation(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_basic_library_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_library_objects1.sig")
     # basic_library_tests1.sig was saved in edit mode
     set_run_mode()
@@ -368,10 +368,10 @@ def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
     ### TO DO - semaphore release on red
     set_edit_mode()
     test_object_edit_windows.test_all_object_edit_windows(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_basic_library_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_basic_library_tests(delay=0.0))
 
 ###############################################################################################################################
     

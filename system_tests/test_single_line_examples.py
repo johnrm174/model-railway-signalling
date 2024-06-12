@@ -313,7 +313,7 @@ def run_shunting_tests(delay:float=0.0):
 
 #-----------------------------------------------------------------------------------
 
-def run_all_single_line_example_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_single_line_example_tests(delay:float=0.0):
     initialise_test_harness(filename="../configuration_examples/single_line_semaphore_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -325,9 +325,9 @@ def run_all_single_line_example_tests(delay:float=0.0, shutdown:bool=False):
     run_signal_route_tests()
     run_signal_override_tests()
     run_shunting_tests(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_single_line_example_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_single_line_example_tests(delay=0.0))
 
 ######################################################################################################

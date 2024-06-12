@@ -58,4 +58,4 @@ def run_all_tests():
     system_test_harness.report_results()
 
 # The main code starts here
-system_test_harness.start_application(lambda:run_all_tests())
+system_test_harness.start_application(run_all_tests)

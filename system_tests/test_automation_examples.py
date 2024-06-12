@@ -791,7 +791,7 @@ def run_shunting_tests(delay=0):
 
 #-----------------------------------------------------------------------------------
 
-def run_all_automation_example_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_automation_example_tests(delay:float=0.0):
     initialise_test_harness(filename="../configuration_examples/automation_colour_light_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -827,10 +827,10 @@ def run_all_automation_example_tests(delay:float=0.0, shutdown:bool=False):
     run_shunting_tests(delay)
     run_main_line_approach_control_tests(delay)
     run_loop_line_approach_control_tests(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_automation_example_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_automation_example_tests(delay=0.0))
 
 ######################################################################################################
 

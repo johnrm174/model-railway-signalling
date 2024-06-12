@@ -263,8 +263,12 @@ def initialise_test_harness(filename=None):
 # ------------------------------------------------------------------------------
 
 def report_results():
-    print ("Tests Run:",tests_executed,"  Tests Passed:",
-              tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
+    print ("")
+    print ("##################################################################################################################")
+    print ("Tests Run:", tests_executed, "  Tests Passed:",
+              tests_executed-test_failures, "  Test failures" ,test_failures ,"  Test Warnings",test_warnings)
+    print ("##################################################################################################################")
+    print ("")
     
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
@@ -796,28 +800,28 @@ def create_track_sensor():
 
 def create_colour_light_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                        signals_common.sig_type.colour_light.value,
+                        signals_common.signal_type.colour_light.value,
                         signals_colour_lights.signal_sub_type.four_aspect.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_semaphore_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.semaphore.value,
+                           signals_common.signal_type.semaphore.value,
                            signals_semaphores.semaphore_sub_type.home.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_position_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_position.value,
+                           signals_common.signal_type.ground_position.value,
                            signals_ground_position.ground_pos_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_disc_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_disc.value,
+                           signals_common.signal_type.ground_disc.value,
                            signals_ground_disc.ground_disc_sub_type.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)

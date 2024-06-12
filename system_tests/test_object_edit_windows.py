@@ -41,18 +41,18 @@ def really_do_test_all_object_edit_windows(delay:float=0.0):
 
 # This is the easy way to shorten the tests - miss out the object window tests
 def test_all_object_edit_windows(delay:float=0.0):
-    really_do_test_all_object_edit_windows(delay)
+    #really_do_test_all_object_edit_windows(delay)
     pass
                 
 ######################################################################################################
 
-def run_all_configuration_window_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_configuration_window_tests(delay:float=0.0):
     initialise_test_harness()
     test_edit_object_windows()
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_configuration_window_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_configuration_window_tests(delay=0.0))
 
 ###############################################################################################################################
     

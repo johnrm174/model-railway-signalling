@@ -110,14 +110,14 @@ def test_gpio_configuration_update_functions(delay:float=0.0):
     
 ######################################################################################################
 
-def run_all_configuration_update_tests(shutdown:bool=False, delay:float=0):
+def run_all_configuration_update_tests(delay:float=0):
     initialise_test_harness()
     set_edit_mode()
     test_gpio_configuration_update_functions(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_configuration_update_tests(shutdown=True, delay=0.0))
+    start_application(lambda:run_all_configuration_update_tests(delay=0.0))
 
 ###############################################################################################################################
     

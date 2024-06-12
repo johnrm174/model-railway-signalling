@@ -361,7 +361,7 @@ def run_object_deletion_tests(delay:float=0.0):
      
 ######################################################################################################
 
-def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_mqtt_networking_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -371,10 +371,10 @@ def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
     run_remote_track_sensor_tests(delay)
     run_specific_signal_ahead_tests(delay)
     run_object_deletion_tests(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_mqtt_networking_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_mqtt_networking_tests(delay=0.0))
 
 ###############################################################################################################################
     

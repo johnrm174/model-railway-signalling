@@ -1671,7 +1671,7 @@ def run_layout_tests(delay:float, edit_mode:bool, automation_enabled:bool):
     
 ######################################################################################################
 
-def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_run_layout_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_run_layout.sig")
     # IMPORTANT - Sig file must be saved in EDIT mode with Automation ON **************
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
@@ -1681,19 +1681,22 @@ def run_all_run_layout_tests(delay:float=0.0, shutdown:bool=False):
     # The 'A' keypress event is disabled and the menubar 'Automation Enable/Disable' selection is inhibited
     print("Run Layout Tests - EDIT Mode / Automation ON **************************************************")    
     run_layout_tests(delay, edit_mode=True, automation_enabled=True)
+    report_results()
     set_run_mode() 
     print("Run Layout Tests - RUN Mode / Automation ON ***************************************************")    
     run_layout_tests(delay, edit_mode=False, automation_enabled=True)
+    report_results()
     toggle_automation()
     print("Run Layout Tests - RUN Mode / Automation OFF **************************************************")    
     run_layout_tests(delay, edit_mode=False, automation_enabled=False)
+    report_results()
     toggle_mode()
     print("Run Layout Tests - EDIT Mode / Automation OFF *************************************************")    
     run_layout_tests(delay, edit_mode=True, automation_enabled=False)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_run_layout_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_run_layout_tests(delay=0.0))
 
 ###############################################################################################################################
     
