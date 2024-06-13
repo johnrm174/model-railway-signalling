@@ -44,7 +44,8 @@ import json
 import logging
 import tkinter.messagebox
 import tkinter.filedialog
-from . import signals_common
+
+from . import signals
 from . import track_sections
 from . import block_instruments
 from . import points

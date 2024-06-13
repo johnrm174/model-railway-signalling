@@ -51,13 +51,13 @@
 #
 #---------------------------------------------------------------------------------------------------
 
+import enum
+import logging
+import tkinter as Tk
+
 from . import dcc_control
 from . import common
 from . import file_interface
-
-import tkinter as Tk
-import enum
-import logging
 
 # -------------------------------------------------------------------------
 # Public API classes (to be used by external functions)

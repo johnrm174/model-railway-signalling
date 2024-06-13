@@ -80,13 +80,14 @@
 #
 #-----------------------------------------------------------------------------------------------
 
-from . import common
 import json
 import logging
 import time
 import paho.mqtt.client
 import threading
 import socket
+
+from . import common
 
 #-----------------------------------------------------------------------------------------------
 # Define an empty dictionary for holding the basic configuration information we need to track

@@ -75,14 +75,14 @@
 import copy 
 import logging
 
-from . import objects_common
 from . import objects_signals
-from . import objects_points
+from . import objects_common
 from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
 from . import objects_textboxes
 from . import objects_sensors
+from . import objects_points
 
 from .. import run_layout
 

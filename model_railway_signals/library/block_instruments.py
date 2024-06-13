@@ -43,10 +43,10 @@
 #   block_section_ahead_clear(inst_id:int) - Returns the state of the ASSOCIATED block instrument
 #                       (i.e. the linked instrument controlling the state of the block section ahead)
 #
-# The following API functions are for configuring the pub/sub of Block Instrument events. The functions are
-# called by the editor on 'Apply' of the MQTT settings. First, 'reset_instruments_mqtt_configuration' is called to clear down
+# The following API functions are for configuring the pub/sub of Block Instrument events. The functions are called by
+# the editor on 'Apply' of the MQTT settings. First, 'reset_instruments_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_instruments_to_publish_state' (with the list of LOCAL Block
-# Instruments to publish) and 'subscribe_to_remote_instrument' for each REMOTE Block Instrument that has been subscribed.
+# Instruments to publish) and 'subscribe_to_remote_instruments' (with the list of REMOTE instruments to subscribe to).
 #
 #   reset_instruments_mqtt_configuration() - Clears down the current Block Instrument pub/sub configuration
 # 
@@ -72,15 +72,16 @@
 # If 'simpleaudio' is not installed then the software will function without sound.
 # ------------------------------------------------------------------------------------------
 
-from . import common
-from . import mqtt_interface
-from . import file_interface
-from typing import Union
-import tkinter as Tk
 import enum
 import os
 import logging
 import importlib.resources
+import tkinter as Tk
+from typing import Union
+
+from . import common
+from . import mqtt_interface
+from . import file_interface
 
 # -------------------------------------------------------------------------
 # We can only use audio for the block instruments if 'simpleaudio' is installed

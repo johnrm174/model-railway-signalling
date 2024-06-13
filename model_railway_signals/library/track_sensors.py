@@ -31,6 +31,7 @@
 import enum
 import logging
 import tkinter as Tk
+
 from . import common
 
 #---------------------------------------------------------------------------------------------------

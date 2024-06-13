@@ -37,16 +37,16 @@
 #   clear_section_occupied (section_id:int) - Sets the section to "CLEAR" and returns the current 'label' (as a string)
 #                 to allow this to be 'passed' to the next section (via the set_section_occupied function)  
 # 
-# The following API functions are for configuring the pub/sub of Track Section events. The functions are
-# called by the editor on 'Apply' of the MQTT settings. First, 'reset_sections_mqtt_configuration' is called to clear down
+# The following API functions are for configuring the pub/sub of Track Section events. The functions are called by
+# the editor on 'Apply' of the MQTT settings. First, 'reset_sections_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_sections_to_publish_state' (with the list of LOCAL Track
-# Sections to publish) and 'subscribe_to_remote_section' for each REMOTE Track Section that has been subscribed.
+# Sections to publish) and 'subscribe_to_remote_section' (with the list of REMOTE sections to subscribe to).
 #
 #   reset_sections_mqtt_configuration() - Clears down the current Track Section pub/sub configuration
 # 
 #   set_sections_to_publish_state(*sec_ids:int) - Enable the publication of Track Section events.
 #
-#   subscribe_to_remote_section(remote_id:str) - Subscribes to a remote Track Section
+#   subscribe_to_remote_sections(*remote_ids:str) - Subscribes to remote Track Sections
 #
 # External API - classes and functions (used by the other library modules):
 #
@@ -59,13 +59,14 @@
 # 
 #---------------------------------------------------------------------------------------------
 
+import enum
+import logging
+import tkinter as Tk
+from typing import Union
+
 from . import common
 from . import mqtt_interface
 from . import file_interface
-from typing import Union
-import tkinter as Tk
-import enum
-import logging
 
 #---------------------------------------------------------------------------------------------
 # Public API Classes (to be used by external functions)
