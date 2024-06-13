@@ -101,7 +101,7 @@ def create_semaphore_signal (canvas, sig_id:int,
     # Common validation (common to all signal types) 
     if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 199:
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-199)")
-    elif signals_common.sig_exists(sig_id):
+    elif signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
     elif signal_subtype != semaphore_sub_type.home and signal_subtype != semaphore_sub_type.distant:
@@ -118,7 +118,7 @@ def create_semaphore_signal (canvas, sig_id:int,
         logging.error ("Signal "+str(sig_id)+": create_signal - Associated Home ID must be an int")
     elif associated_home > 0 and signal_subtype == semaphore_sub_type.home:
         logging.error ("Signal "+str(sig_id)+": create_signal - Cannot specify an associated home for a home signal")
-    elif associated_home > 0 and not signals_common.sig_exists(associated_home):
+    elif associated_home > 0 and not signals_common.signal_exists(associated_home):
         logging.error ("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" does not exist")
     elif associated_home > 0 and signals_common.signals[str(associated_home)]["sigtype"] != signals_common.signal_type.semaphore:
         logging.error ("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" is not a semaphore")
@@ -712,7 +712,7 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag or not signals_common.sig_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals_common.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
@@ -736,7 +736,7 @@ class timed_sequence():
     def timed_signal_sequence_end(self):
         # We've finished - Set the signal back to its "normal" condition
         self.sequence_in_progress = False
-        if signals_common.sig_exists(self.sig_id):
+        if signals_common.signal_exists(self.sig_id):
             logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
             update_semaphore_signal(self.sig_id)
             signals_common.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals_common.signal_callback_type.sig_updated)
@@ -754,7 +754,7 @@ class timed_sequence():
 def trigger_timed_semaphore_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     
     def delayed_sequence_start(sig_id:int, sig_route):
-        if signals_common.sig_exists(sig_id) and not common.shutdown_initiated:
+        if signals_common.signal_exists(sig_id) and not common.shutdown_initiated:
             signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
             
     # Don't initiate a timed signal sequence if a shutdown has already been initiated

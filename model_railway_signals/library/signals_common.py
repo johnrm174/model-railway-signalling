@@ -84,7 +84,7 @@ list_of_signals_to_publish_state_changes=[]
 # This to support identifiers containing the node and ID of a remote signal
 # -------------------------------------------------------------------------
 
-def sig_exists(sig_id:Union[int,str]):
+def signal_exists(sig_id:Union[int,str]):
     return (str(sig_id) in signals.keys() )
 
 # -------------------------------------------------------------------------
@@ -121,7 +121,7 @@ def subsidary_button_event (sig_id:int):
 
 def sig_passed_button_event (sig_id:int):
     # We validate the Sig_Id as function can be called from GPIO sensor events
-    if not sig_exists(sig_id):
+    if not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": sig_passed_button_event - signal does not exist")
     else:
         logging.info("Signal "+str(sig_id)+": Signal Passed Event **********************************************")
@@ -140,7 +140,7 @@ def sig_passed_button_event (sig_id:int):
 
 def approach_release_button_event(sig_id:int):
     # We validate the Sig_Id as function can be called from GPIO sensor events
-    if not sig_exists(sig_id):
+    if not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not exist")
     else:
         logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
@@ -164,10 +164,10 @@ def approach_release_button_event(sig_id:int):
 # -------------------------------------------------------------------------
 
 def reset_sig_passed_button (sig_id:int):
-    if sig_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
+    if signal_exists(sig_id): signals[str(sig_id)]["passedbutton"].config(bg=common.bgraised)
 
 def reset_sig_released_button (sig_id:int):
-    if sig_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
+    if signal_exists(sig_id): signals[str(sig_id)]["releasebutton"].config(bg=common.bgraised)
 
 # -------------------------------------------------------------------------
 # Common function to flip the internal state of a signal
@@ -610,7 +610,7 @@ def publish_signal_state(sig_id:int):
 
 def delete_signal(sig_id:int):
     global signals
-    if sig_exists(sig_id):
+    if signal_exists(sig_id):
         # Delete all the tkinter canvas drawing objects created for the signal
         signals[str(sig_id)]["canvas"].delete("signal"+str(sig_id))
         # Delete all the tkinter button objects created for the signal

@@ -51,7 +51,7 @@ def create_colour_light_signal (canvas, sig_id:int,
     # Common validation (common to all signal types)
     if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 99:
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-99)")
-    elif signals_common.sig_exists(sig_id):
+    elif signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
     elif signal_has_feathers and theatre_route_indicator:
@@ -550,7 +550,7 @@ class timed_sequence():
         self.sequence_abort_flag = True
             
     def start(self):
-        if self.sequence_abort_flag or not signals_common.sig_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals_common.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             self.sequence_in_progress = True
@@ -576,7 +576,7 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
 
     def timed_signal_sequence_yellow(self):
-        if self.sequence_abort_flag or not signals_common.sig_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals_common.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             # This sequence step only applicable to 3 and 4 aspect signals
@@ -593,7 +593,7 @@ class timed_sequence():
                 common.root_window.after(self.time_delay*1000,lambda:self.timed_signal_sequence_end())
     
     def timed_signal_sequence_double_yellow(self):
-        if self.sequence_abort_flag or not signals_common.sig_exists(self.sig_id):
+        if self.sequence_abort_flag or not signals_common.signal_exists(self.sig_id):
             self.sequence_in_progress = False
         else:
             # This sequence step only applicable to 4 aspect signals
@@ -609,7 +609,7 @@ class timed_sequence():
     def timed_signal_sequence_end(self): 
         # We've finished - Set the signal back to its "normal" condition
         self.sequence_in_progress = False
-        if signals_common.sig_exists(self.sig_id):
+        if signals_common.signal_exists(self.sig_id):
             # Only change the aspect and generate the callback if the same route is set
             if signals_common.signals[str(self.sig_id)]["routeset"] == self.sig_route:
                 logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Updated Event *************************")
@@ -630,7 +630,7 @@ class timed_sequence():
 def trigger_timed_colour_light_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     
     def delayed_sequence_start(sig_id:int, sig_route):
-        if signals_common.sig_exists(sig_id):
+        if signals_common.signal_exists(sig_id):
             signals_common.signals[str(sig_id)]["timedsequence"][route.value].start()
             
     # Don't initiate a timed signal sequence if a shutdown has already been initiated

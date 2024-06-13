@@ -101,12 +101,12 @@
 #     FLASH_CAUTION        (colour light signals only- when the signal ahead is CAUTION_APP_CNTL)
 #     FLASH_PRELIM_CAUTION (colour light signals only- when the signal ahead is FLASH_CAUTION)
 # 
-# sig_callback_type (tells the calling program what has triggered the callback):
-#     sig_callback_type.sig_switched (signal has been switched)
-#     sig_callback_type.sub_switched (subsidary signal has been switched)
-#     sig_callback_type.sig_passed ("signal passed" event - or triggered by a Timed signal)
-#     sig_callback_type.sig_updated (signal aspect updated as part of a timed sequence)
-#     sig_callback_type.sig_released (signal "approach release" event)
+# signal_callback_type (tells the calling program what has triggered the callback):
+#     signal_callback_type.sig_switched (signal has been switched)
+#     signal_callback_type.sub_switched (subsidary signal has been switched)
+#     signal_callback_type.sig_passed ("signal passed" event - or triggered by a Timed signal)
+#     signal_callback_type.sig_updated (signal aspect updated as part of a timed sequence)
+#     signal_callback_type.sig_released (signal "approach release" event)
 # 
 # create_colour_light_signal - Creates a colour light signal
 #   Mandatory Parameters:
@@ -323,7 +323,7 @@ import logging
 
 def signal_clear (sig_id:int,route:signals_common.route_type = None):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_clear - Signal does not exist")
         sig_clear = False
     else:
@@ -344,7 +344,7 @@ def signal_clear (sig_id:int,route:signals_common.route_type = None):
 
 def signal_state (sig_id:Union[int,str]):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": signal_state - Signal does not exist")
         sig_state = signals_common.signal_state_type.DANGER
     else:
@@ -360,7 +360,7 @@ def signal_state (sig_id:Union[int,str]):
 
 def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": subsidary_clear - Signal does not exist")
         sig_clear = False
     elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
@@ -384,7 +384,7 @@ def subsidary_clear (sig_id:int,route:signals_common.route_type = None):
 def lock_signal (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": lock_signal - Signal does not exist")
         else:
             signals_common.lock_signal(sig_id)
@@ -400,7 +400,7 @@ def lock_signal (*sig_ids:int):
 def unlock_signal (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": unlock_signal - Signal does not exist")
         else:
             signals_common.unlock_signal(sig_id)
@@ -418,7 +418,7 @@ def unlock_signal (*sig_ids:int):
 def lock_subsidary (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": lock_subsidary - Signal does not exist")
         elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
             logging.error ("Signal "+str(sig_id)+": lock_subsidary - Signal does not have a subsidary")
@@ -438,7 +438,7 @@ def lock_subsidary (*sig_ids:int):
 def unlock_subsidary (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": unlock_subsidary - Signal does not exist")
         elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
             logging.error ("Signal "+str(sig_id)+": unlock_subsidary - Signal does not have a subsidary")
@@ -459,7 +459,7 @@ def unlock_subsidary (*sig_ids:int):
 def set_signal_override (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": set_signal_override - Signal does not exist")
         else:
             # Set the override and refresh the signal following the change in state
@@ -478,7 +478,7 @@ def set_signal_override (*sig_ids:int):
 def clear_signal_override (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": clear_signal_override - Signal does not exist")
         else:
             # Clear the override and refresh the signal following the change in state
@@ -498,7 +498,7 @@ def clear_signal_override (*sig_ids:int):
 def set_signal_override_caution (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": set_signal_override_caution - Signal does not exist")
         elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.signal_type.colour_light and
                  signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
@@ -522,7 +522,7 @@ def set_signal_override_caution (*sig_ids:int):
 def clear_signal_override_caution (*sig_ids:int):
     for sig_id in sig_ids:
         # Validate the signal exists
-        if not signals_common.sig_exists(sig_id):
+        if not signals_common.signal_exists(sig_id):
             logging.error ("Signal "+str(sig_id)+": clear_signal_override_caution - Signal does not exist")
         elif ( ( signals_common.signals[str(sig_id)]["sigtype"] == signals_common.signal_type.colour_light and
                  signals_common.signals[str(sig_id)]["subtype"] != signals_colour_lights.signal_sub_type.home ) or
@@ -545,7 +545,7 @@ def clear_signal_override_caution (*sig_ids:int):
 
 def toggle_signal (sig_id:int):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_signal - Signal does not exist")
     else:
         if signals_common.signals[str(sig_id)]["siglocked"]:
@@ -566,7 +566,7 @@ def toggle_signal (sig_id:int):
 
 def toggle_subsidary (sig_id:int):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": toggle_subsidary - Signal does not exist")
     elif not signals_common.signals[str(sig_id)]["hassubsidary"]:
         logging.error ("Signal "+str(sig_id)+": toggle_subsidary - Signal does not have a subsidary")
@@ -593,7 +593,7 @@ def toggle_subsidary (sig_id:int):
 
 def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:bool = True):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_approach_control - Signal does not exist")
     else:
         # call the signal type-specific functions to update the signal (note that we only update
@@ -633,7 +633,7 @@ def set_approach_control (sig_id:int, release_on_yellow:bool = False, force_set:
 
 def clear_approach_control (sig_id:int):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": clear_approach_control - Signal does not exist")  
     else:
         # call the signal type-specific functions to update the signal (note that we only update
@@ -659,9 +659,9 @@ def clear_approach_control (sig_id:int):
 
 def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
     # Validate the signal exists (and the one ahead if specified)
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal does not exist")
-    elif sig_ahead_id != None and not signals_common.sig_exists(sig_ahead_id): 
+    elif sig_ahead_id != None and not signals_common.signal_exists(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
     elif sig_id == sig_ahead_id: 
         logging.error ("Signal "+str(sig_id)+": update_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
@@ -683,7 +683,7 @@ def update_signal (sig_id:int, sig_ahead_id:Union[int,str]=None):
 
 def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:str = None):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": set_route - Signal does not exist")
     else:
         if route is not None:
@@ -721,7 +721,7 @@ def set_route (sig_id:int, route:signals_common.route_type = None, theatre_text:
 
 def trigger_timed_signal (sig_id:int,start_delay:int=0,time_delay:int=5):
     # Validate the signal exists
-    if not signals_common.sig_exists(sig_id):
+    if not signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": trigger_timed_signal - Signal does not exist")
     else:
         # call the signal type-specific functions to update the signal
@@ -746,7 +746,7 @@ def subscribe_to_remote_signals (signal_callback, *remote_identifiers:str):
             logging.error ("MQTT-Client: Signal "+remote_identifier+": The remote identifier must be in the form of 'Node-ID'")
             logging.error ("with the 'Node' element a non-zero length string and the 'ID' element an integer between 1 and 99")
         else:
-            if signals_common.sig_exists(remote_identifier):
+            if signals_common.signal_exists(remote_identifier):
                 logging.warning("MQTT-Client: Signal "+remote_identifier+" - has already been subscribed to via MQTT networking")
             signals_common.signals[remote_identifier] = {}
             signals_common.signals[remote_identifier]["sigtype"] = signals_common.signal_type.remote_signal

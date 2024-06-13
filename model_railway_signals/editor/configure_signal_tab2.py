@@ -4,7 +4,7 @@
 # Makes the following external API calls to other editor modules:
 #
 # Makes the following external API calls to library modules:
-#    signals_common.sig_exists(id) - To see if the instrument exists (local or remote)
+#    signals_common.signal_exists(id) - To see if the instrument exists (local or remote)
 #    points.point_exists(id) - To see if the point exists (local)
 #    block_instruments.instrument_exists(id) - To see if the instrument exists (local or remote)
 #    track_sections.section_exists(id) - To see if the track section exists
@@ -46,7 +46,7 @@ from ..library import track_sections
 class interlocking_route_group: 
     def __init__(self, parent_frame, label:str):
         # These are the 'item exists' functions for validation
-        signal_exists_function = signals_common.sig_exists
+        signal_exists_function = signals_common.signal_exists
         instrument_exists_function = block_instruments.instrument_exists
         point_exists_function = points.point_exists
         # Create a frame for this UI element (always packed into the parent frame)
@@ -251,7 +251,7 @@ class interlocking_route_frame:
 class conflicting_signals_element():
     def __init__(self, parent_frame, parent_object, label:str):
         # Theis is the functions used to validate that the entered signal ID exists
-        exists_function = signals_common.sig_exists
+        exists_function = signals_common.signal_exists
         # Create the Label Frame for the UI element (packed/unpacked on enable/disable) 
         self.frame = Tk.LabelFrame(parent_frame, text=label+" - interlocking with conflicting signals")
         self.frame.pack(padx=2, pady=2, fill='x')

@@ -89,7 +89,7 @@ from .signals_common import signal_type
 from .signals_common import route_type
 from .signals_common import signal_callback_type
 from .signals_common import signal_state_type
-from .signals_common import sig_exists
+from .signals_common import signal_exists
 from .signals_common import delete_signal
 
 from .signals_colour_lights import signal_sub_type
@@ -151,7 +151,7 @@ __all__ = [
         'track_sensor_exists',
       # Public signal types/functions
         'route_type',
-        'sig_exists',
+        'signal_exists',
         'signal_type',
         'signal_sub_type',
         'semaphore_sub_type',

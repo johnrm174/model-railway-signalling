@@ -34,7 +34,7 @@
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
 # Accesses the following external library objects directly:
-#    signals_common.sig_exists - Common function to see if a given item exists
+#    signals_common.signal_exists - Common function to see if a given item exists
 #    signals_common.signal_type - for setting the enum value when creating the object
 #    signals_colour_lights.signal_sub_type - for setting the enum value when creating the object
 #    signals_semaphores.semaphore_sub_type - for setting the enum value when creating the object
@@ -631,7 +631,7 @@ def create_signal(item_type, item_subtype):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_signal_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=signals_common.sig_exists)
+    item_id = objects_common.new_item_id(exists_function=signals_common.signal_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -656,7 +656,7 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=signals_common.sig_exists)
+    new_id = objects_common.new_item_id(exists_function=signals_common.signal_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.signal_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)

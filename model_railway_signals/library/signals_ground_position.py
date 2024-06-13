@@ -63,7 +63,7 @@ def create_ground_position_signal(canvas, sig_id:int,
     # Common validation (common to all signal types) 
     if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 99:
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-99)")
-    elif signals_common.sig_exists(sig_id):
+    elif signals_common.signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
     elif (signal_subtype != ground_pos_sub_type.standard and signal_subtype != ground_pos_sub_type.shunt_ahead and
