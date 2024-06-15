@@ -60,24 +60,24 @@
 #    mqtt_interface.mqtt_broker_connect(url, port, user, password) - Connect to MQTT broker
 #    mqtt_interface.mqtt_broker_disconnect() - Disconnect from MQTT broker
 #
-#    dcc_control.reset_mqtt_configuration() - Resets the publish/subscribe configuration
+#    dcc_control.reset_dcc_mqtt_configuration() - Resets the publish/subscribe configuration
 #    dcc_control.set_node_to_publish_dcc_commands(publish) - set note to publish DCC command feed
 #    dcc_control.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC command feeds from other nodes
 #
 #    gpio_sensors.gpio_interface_enabled() - is the app running on a Raspberry Pi
-#    gpio_sensors.reset_mqtt_configuration() - Resets the publish/subscribe configuration
+#    gpio_sensors.reset_gpio_mqtt_configuration() - Resets the publish/subscribe configuration
 #    gpio_sensors.set_gpio_sensors_to_publish_state(*ids) - Configure objects to publish state changes
 #    objects.subscribe_to_remote_gpio_sensors(*ids) #########################################
 #
-#    signals.reset_mqtt_configuration() - Resets the publish/subscribe configuration
+#    signals.reset_signals_mqtt_configuration() - Resets the publish/subscribe configuration
 #    signals.set_signals_to_publish_state(*ids) - Configure objects to publish state changes
 #    signals.subscribe_to_remote_signals(*ids) - subscribe to state updates from other nodes
 #
-#    track_sections.reset_mqtt_configuration() - Resets the publish/subscribe configuration
+#    track_sections.reset_mqtt_setions_configuration() - Resets the publish/subscribe configuration
 #    track_sections.set_sections_to_publish_state(*ids) - Configure objects to publish state changes
 #    track_sections.subscribe_to_remote_sections(*ids) - subscribe to state updates from other nodes
 #
-#    block_instruments.reset_mqtt_configuration() - Resets the publish/subscribe configuration
+#    block_instruments.reset_instruments_mqtt_configuration() - Resets the publish/subscribe configuration
 #    block_instruments.set_instruments_to_publish_state(*ids) - Configure objects to publish state changes
 #    block_instruments.subscribe_to_remote_instruments(*ids) - subscribe to state updates from other nodes
 #
@@ -87,6 +87,7 @@ import os
 import tkinter as Tk
 import logging
 import argparse
+import importlib.resources ######
 
 from . import objects
 from . import settings
@@ -114,12 +115,23 @@ import tracemalloc
 
 class main_menubar:
     def __init__(self, root):
-        self.root = root
         # Configure the logger (log level gets set later)
         logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
+        self.root = root
         self.mainmenubar = Tk.Menu(self.root)
-        self.root.configure(menu=self.mainmenubar)    
+        self.root.configure(menu=self.mainmenubar)
+        # Create a dummy menubar item for the application Logo
+        resource_folder = 'model_railway_signals.editor.resources'
+        logo_filename = 'dcc_signalling_logo.png'
+        try:
+            with importlib.resources.path(resource_folder, logo_filename) as fully_qualified_filename:
+                self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
+                self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
+                self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
+                                             background="white",activebackground="white")
+        except:
+            pass
         # Create the various menubar items for the File Dropdown
         self.file_menu = Tk.Menu(self.mainmenubar, tearoff=False)
         self.file_menu.add_command(label=" New", command=self.new_schematic)
@@ -514,7 +526,7 @@ class main_menubar:
     def reset_mqtt_pub_sub_configuration(self):
         dcc_control.reset_dcc_mqtt_configuration()
         gpio_sensors.reset_gpio_mqtt_configuration()
-        signals.reset_mqtt_configuration()
+        signals.reset_signals_mqtt_configuration()
         track_sections.reset_sections_mqtt_configuration()
         block_instruments.reset_instruments_mqtt_configuration()
         
