@@ -55,7 +55,7 @@
 #    common.scrollable_text_box
 #
 # Uses the following library functions:
-#    gpio_sensors.get_list_of_available_ports() - to get a list of supported ports
+#    gpio_sensors.get_list_of_available_gpio_ports() - to get a list of supported ports
 #    mqtt_interface.get_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
@@ -993,7 +993,7 @@ class gpio_port_entry_frame():
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                
-        self.list_of_available_gpio_ports = gpio_sensors.get_list_of_available_ports()
+        self.list_of_available_gpio_ports = gpio_sensors.get_list_of_available_gpio_ports()
         while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
             # Create the Frame for the row
             self.list_of_subframes.append(Tk.Frame(self.frame))
