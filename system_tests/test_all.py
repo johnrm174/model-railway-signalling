@@ -4,7 +4,8 @@
 
 import system_test_harness
 
-import basic_library_tests
+import basic_library_tests1
+import basic_library_tests2
 
 import test_schematic_editor
 import test_object_editing
@@ -23,8 +24,10 @@ import test_library_objects
 import test_load_layout_failures
 
 def run_all_tests():
-    print("*** Running tests from 'basic_library_tests.py' ***")
-    basic_library_tests.run_all_basic_library_tests()
+    print("*** Running tests from 'basic_library_tests1.py' ***")
+    basic_library_tests1.run_all_basic_library_tests()
+    print("*** Running tests from 'basic_library_tests2.py' ***")
+    basic_library_tests2.run_all_basic_library_tests()
     
     print("*** Running tests from 'test_schematic_editor.py' ***")
     test_schematic_editor.run_all_schematic_editor_tests()

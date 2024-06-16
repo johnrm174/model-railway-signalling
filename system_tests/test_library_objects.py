@@ -115,9 +115,9 @@ def test_basic_semaphore_operation(delay:float=0.0):
     shunt_ahead_signals = (41,33)
     MAIN_dist_arms_only = (36,71,72,73,74,75,76,4,24,3,67,69,16,6)
     MAIN_home_arms_only = (35,45,65,52,64,60,66,70,10,68,18,9,11,21,42,17)
-    MAIN_home_and_sub_arms = (37,50,51,53,54,55,56,20,15,29,13,31,5,8,77,78)
+    MAIN_home_and_sub_arms = (31,37,50,51,53,54,55,56,20,15,29,13,5,8,77,78)
     MAIN_home_and_dist_arms = (39,59,61,58,62,57,63,1,2,32,7,25,12,19,79,80)
-    MAIN_home_dist_and_sub_arms = (38,43,44,46,47,48,49,34,30,22,14,26,23,28,81,82)
+    MAIN_home_dist_and_sub_arms = (26,47,38,43,44,46,48,49,34,30,22,14,23,28,81,82)
     MAIN_all_signals = (MAIN_dist_arms_only + MAIN_home_arms_only + MAIN_home_and_sub_arms +
                    MAIN_home_and_dist_arms + MAIN_home_dist_and_sub_arms + shunt_signals+shunt_ahead_signals)
     route = list(signals.route_type)[1]
