@@ -41,7 +41,7 @@ def really_do_test_all_object_edit_windows(delay:float=0.0):
 
 # This is the easy way to shorten the tests - miss out the object window tests
 def test_all_object_edit_windows(delay:float=0.0):
-    #really_do_test_all_object_edit_windows(delay)
+    really_do_test_all_object_edit_windows(delay)
     pass
                 
 ######################################################################################################

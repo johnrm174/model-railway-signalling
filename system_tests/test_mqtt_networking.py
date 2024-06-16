@@ -209,7 +209,7 @@ def run_specific_signal_ahead_tests(delay:float=0.0):
     set_signals_off(1)
     sleep(delay)
     sleep(network_delay)
-    assert_signals_PROCEED(1) ##################################################################################
+    assert_signals_PROCEED(1) ################# This fails - returns CAUTION ##############################
     set_signals_on(1)
     sleep(delay)
     sleep(network_delay)

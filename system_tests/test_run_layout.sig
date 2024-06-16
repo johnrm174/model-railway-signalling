@@ -14,7 +14,7 @@
         "00df7795-1ac5-4b0a-8400-0ae0f64e3cf7": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8668,
+            "bbox": 155,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -61,7 +61,7 @@
             "tags": "point4"
         },
         "014637ab-1cc0-47e4-8e2e-d6799882d586": {
-            "bbox": 8672,
+            "bbox": 159,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -72,7 +72,7 @@
             "tags": "section33"
         },
         "059e8b30-21fe-4a68-8fde-644d31f5963f": {
-            "bbox": 8676,
+            "bbox": 163,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -89,1095 +89,20 @@
                 0,
                 0
             ],
-            "bbox": 8682,
+            "bbox": 169,
             "colour": "black",
-            "end1": 8678,
-            "end2": 8679,
+            "end1": 165,
+            "end2": 166,
             "endx": 175.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 44,
-            "line": 8677,
+            "line": 164,
             "posx": 25.0,
             "posy": 800.0,
-            "stop1": 8680,
-            "stop2": 8681,
+            "stop1": 167,
+            "stop2": 168,
             "tags": "line44"
-        },
-        "06384292-95e6-4a34-b6cc-dacf1e08f90c": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 8708,
-            "dccaspects": [
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ]
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ]
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 8,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                "11"
-            ],
-            "pointinterlock": [
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 925.0,
-            "posy": 425.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal8",
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                8,
-                [
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ]
         },
         "070fb3ca-5984-440b-8f99-46f2683874ac": {
             "arrowends": 0,
@@ -1186,34 +111,34 @@
                 0,
                 0
             ],
-            "bbox": 8714,
+            "bbox": 175,
             "colour": "black",
-            "end1": 8710,
-            "end2": 8711,
+            "end1": 171,
+            "end2": 172,
             "endx": 750.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 20,
-            "line": 8709,
+            "line": 170,
             "posx": 650.0,
             "posy": 600.0,
-            "stop1": 8712,
-            "stop2": 8713,
+            "stop1": 173,
+            "stop2": 174,
             "tags": "line20"
         },
         "07bad1d2-4308-4c99-b240-dc819e80a7de": {
-            "bbox": 8718,
+            "bbox": 179,
             "item": "tracksensor",
             "itemid": 3,
             "passedsensor": "24",
             "posx": 1000.0,
-            "posy": 850.0,
+            "posy": 775.0,
             "routeahead": [
                 [
                     [
                         [
-                            0,
-                            false
+                            19,
+                            true
                         ],
                         [
                             0,
@@ -1505,7 +430,7 @@
             "tags": "sensor3"
         },
         "0d5da466-b04e-402a-aa88-1afa3c1a0ed1": {
-            "bbox": 8722,
+            "bbox": 183,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1517,7 +442,7 @@
         },
         "12add760-8012-462a-b09f-07b831af55b5": {
             "background": "grey85",
-            "bbox": 8725,
+            "bbox": 186,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1538,19 +463,19 @@
                 0,
                 0
             ],
-            "bbox": 8731,
+            "bbox": 192,
             "colour": "black",
-            "end1": 8727,
-            "end2": 8728,
+            "end1": 188,
+            "end2": 189,
             "endx": 400.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 25,
-            "line": 8726,
+            "line": 187,
             "posx": 250.0,
             "posy": 600.0,
-            "stop1": 8729,
-            "stop2": 8730,
+            "stop1": 190,
+            "stop2": 191,
             "tags": "line25"
         },
         "14f60c65-dcd5-456d-82eb-3537015cbc0c": {
@@ -1560,19 +485,19 @@
                 0,
                 0
             ],
-            "bbox": 8737,
+            "bbox": 198,
             "colour": "black",
-            "end1": 8733,
-            "end2": 8734,
+            "end1": 194,
+            "end2": 195,
             "endx": 225.0,
             "endy": 750.0,
             "item": "line",
             "itemid": 43,
-            "line": 8732,
+            "line": 193,
             "posx": 25.0,
             "posy": 750.0,
-            "stop1": 8735,
-            "stop2": 8736,
+            "stop1": 196,
+            "stop2": 197,
             "tags": "line43"
         },
         "1519e546-0c5f-42ef-88e3-b4c90a6205b1": {
@@ -1582,23 +507,23 @@
                 0,
                 0
             ],
-            "bbox": 8743,
+            "bbox": 204,
             "colour": "black",
-            "end1": 8739,
-            "end2": 8740,
+            "end1": 200,
+            "end2": 201,
             "endx": 650.0,
             "endy": 825.0,
             "item": "line",
             "itemid": 34,
-            "line": 8738,
+            "line": 199,
             "posx": 675.0,
             "posy": 850.0,
-            "stop1": 8741,
-            "stop2": 8742,
+            "stop1": 202,
+            "stop2": 203,
             "tags": "line34"
         },
         "15e208d0-1738-407c-adac-0119c52527d6": {
-            "bbox": 8758,
+            "bbox": 219,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -1611,7 +536,7 @@
         },
         "1691d3ee-af50-44d0-af70-e400407393aa": {
             "background": "grey85",
-            "bbox": 8761,
+            "bbox": 222,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -1620,15 +545,15 @@
             "item": "textbox",
             "itemid": 0,
             "justify": 2,
-            "posx": 957.0,
-            "posy": 486.0,
+            "posx": 982.0,
+            "posy": 361.0,
             "tags": "1691d3ee-af50-44d0-af70-e400407393aa",
             "text": "Section ahead or section behind tests\n Distant and shunt-ahead signal types"
         },
         "1752a0a1-b276-4db6-9f2f-12b15748c742": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8767,
+            "bbox": 228,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1644,7 +569,7 @@
             "tags": "point14"
         },
         "1ccdf967-6bae-4665-a682-489a7b7542ee": {
-            "bbox": 8771,
+            "bbox": 232,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -1655,14 +580,14 @@
             "tags": "section4"
         },
         "1cfdad25-a454-44a3-b440-988209da6738": {
-            "bbox": 8775,
+            "bbox": 236,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 12,
             "mirror": "",
-            "posx": 1050.0,
-            "posy": 650.0,
+            "posx": 1075.0,
+            "posy": 525.0,
             "tags": "section12"
         },
         "1e6b30b4-df92-4c43-9435-e8bf2b4f4f6b": {
@@ -1672,19 +597,19 @@
                 0,
                 0
             ],
-            "bbox": 8781,
+            "bbox": 242,
             "colour": "black",
-            "end1": 8777,
-            "end2": 8778,
+            "end1": 238,
+            "end2": 239,
             "endx": 900.0,
             "endy": 200.0,
             "item": "line",
             "itemid": 9,
-            "line": 8776,
+            "line": 237,
             "posx": 575.0,
             "posy": 200.0,
-            "stop1": 8779,
-            "stop2": 8780,
+            "stop1": 240,
+            "stop2": 241,
             "tags": "line9"
         },
         "1f15aa6e-49df-4080-a0b6-0fa47ff46fc8": {
@@ -1694,19 +619,19 @@
                 0,
                 0
             ],
-            "bbox": 8787,
+            "bbox": 248,
             "colour": "black",
-            "end1": 8783,
-            "end2": 8784,
+            "end1": 244,
+            "end2": 245,
             "endx": 425.0,
             "endy": 725.0,
             "item": "line",
             "itemid": 54,
-            "line": 8782,
+            "line": 243,
             "posx": 475.0,
             "posy": 775.0,
-            "stop1": 8785,
-            "stop2": 8786,
+            "stop1": 246,
+            "stop2": 247,
             "tags": "line54"
         },
         "20f2e28c-a01b-475e-8cf4-15a251fd5fe3": {
@@ -1721,7 +646,7 @@
                 false,
                 ""
             ],
-            "bbox": 8804,
+            "bbox": 265,
             "dccaspects": [
                 [
                     [
@@ -2785,7 +1710,7 @@
             ]
         },
         "263cd888-5471-4263-91a7-f957c7ba98fa": {
-            "bbox": 8808,
+            "bbox": 269,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2802,23 +1727,23 @@
                 0,
                 0
             ],
-            "bbox": 8814,
+            "bbox": 275,
             "colour": "black",
-            "end1": 8810,
-            "end2": 8811,
+            "end1": 271,
+            "end2": 272,
             "endx": 400.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 28,
-            "line": 8809,
+            "line": 270,
             "posx": 325.0,
             "posy": 550.0,
-            "stop1": 8812,
-            "stop2": 8813,
+            "stop1": 273,
+            "stop2": 274,
             "tags": "line28"
         },
         "27215a1d-9b38-4e57-80af-f67a4ee7448e": {
-            "bbox": 8818,
+            "bbox": 279,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -2840,7 +1765,7 @@
                 false,
                 ""
             ],
-            "bbox": 8829,
+            "bbox": 290,
             "dccaspects": [
                 [
                     [
@@ -3507,8 +2432,8 @@
                     0
                 ]
             ],
-            "posx": 925.0,
-            "posy": 600.0,
+            "posx": 950.0,
+            "posy": 475.0,
             "sigarms": [
                 [
                     [
@@ -3910,25 +2835,25 @@
                 0,
                 0
             ],
-            "bbox": 8835,
+            "bbox": 296,
             "colour": "black",
-            "end1": 8831,
-            "end2": 8832,
+            "end1": 292,
+            "end2": 293,
             "endx": 425.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 2,
-            "line": 8830,
+            "line": 291,
             "posx": 400.0,
             "posy": 125.0,
-            "stop1": 8833,
-            "stop2": 8834,
+            "stop1": 294,
+            "stop2": 295,
             "tags": "line2"
         },
         "29205350-455c-41d2-9996-af81b7cb3292": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 8841,
+            "bbox": 302,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -3944,14 +2869,14 @@
             "tags": "point13"
         },
         "294ffd9a-e658-4095-9446-9608c6565ea5": {
-            "bbox": 8845,
+            "bbox": 306,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 11,
             "mirror": "",
-            "posx": 850.0,
-            "posy": 650.0,
+            "posx": 875.0,
+            "posy": 525.0,
             "tags": "section11"
         },
         "2a487715-ca64-4c3c-b9f8-b6ace67d34c2": {
@@ -3966,7 +2891,7 @@
                 false,
                 ""
             ],
-            "bbox": 8856,
+            "bbox": 317,
             "dccaspects": [
                 [
                     [
@@ -4633,8 +3558,8 @@
                     0
                 ]
             ],
-            "posx": 925.0,
-            "posy": 650.0,
+            "posx": 950.0,
+            "posy": 525.0,
             "sigarms": [
                 [
                     [
@@ -5036,23 +3961,45 @@
                 0,
                 0
             ],
-            "bbox": 8862,
+            "bbox": 323,
             "colour": "black",
-            "end1": 8858,
-            "end2": 8859,
+            "end1": 319,
+            "end2": 320,
             "endx": 825.0,
             "endy": 750.0,
             "item": "line",
             "itemid": 36,
-            "line": 8857,
+            "line": 318,
             "posx": 625.0,
             "posy": 750.0,
-            "stop1": 8860,
-            "stop2": 8861,
+            "stop1": 321,
+            "stop2": 322,
             "tags": "line36"
         },
+        "30116bef-b1cb-4a72-811a-1e0a51fa1b7d": {
+            "arrowends": 0,
+            "arrowtype": [
+                0,
+                0,
+                0
+            ],
+            "bbox": 329,
+            "colour": "black",
+            "end1": 325,
+            "end2": 326,
+            "endx": 1100.0,
+            "endy": 825.0,
+            "item": "line",
+            "itemid": 12,
+            "line": 324,
+            "posx": 900.0,
+            "posy": 825.0,
+            "stop1": 327,
+            "stop2": 328,
+            "tags": "line12"
+        },
         "30b8cd94-2eb6-46f7-9d8f-b29f93974a16": {
-            "bbox": 8866,
+            "bbox": 333,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5063,7 +4010,7 @@
             "tags": "section37"
         },
         "30f44eb7-a19e-4797-9002-4ae97f36f5e6": {
-            "bbox": 8870,
+            "bbox": 337,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -5085,7 +4032,7 @@
                 false,
                 ""
             ],
-            "bbox": 8887,
+            "bbox": 354,
             "dccaspects": [
                 [
                     [
@@ -6149,7 +5096,7 @@
             ]
         },
         "3487c94a-82a2-4c9c-aea4-6ce463344c8d": {
-            "bbox": 8891,
+            "bbox": 358,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -6171,7 +5118,7 @@
                 false,
                 ""
             ],
-            "bbox": 8902,
+            "bbox": 369,
             "dccaspects": [
                 [
                     [
@@ -6838,8 +5785,8 @@
                     0
                 ]
             ],
-            "posx": 925.0,
-            "posy": 550.0,
+            "posx": 950.0,
+            "posy": 425.0,
             "sigarms": [
                 [
                     [
@@ -7235,7 +6182,7 @@
             ]
         },
         "36a17429-1e73-4970-bc0e-04d7763bd528": {
-            "bbox": 8906,
+            "bbox": 373,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -7245,1081 +6192,6 @@
             "posy": 850.0,
             "tags": "section32"
         },
-        "36ffdea8-566f-482c-a95b-639d96aab1a2": {
-            "approachcontrol": [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            "approachsensor": [
-                false,
-                ""
-            ],
-            "bbox": 8932,
-            "dccaspects": [
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ]
-            ],
-            "dccautoinhibit": false,
-            "dccfeathers": [
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ],
-                    [
-                        0,
-                        false
-                    ]
-                ]
-            ],
-            "dcctheatre": [
-                [
-                    "#",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    "",
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ]
-                ]
-            ],
-            "distautomatic": false,
-            "feathers": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "fullyautomatic": false,
-            "interlockahead": false,
-            "item": "signal",
-            "itemid": 7,
-            "itemsubtype": 1,
-            "itemtype": 3,
-            "orientation": 0,
-            "overrideahead": false,
-            "overridesignal": false,
-            "passedsensor": [
-                true,
-                "10"
-            ],
-            "pointinterlock": [
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ],
-                [
-                    [
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ],
-                        [
-                            0,
-                            false
-                        ]
-                    ],
-                    "",
-                    0
-                ]
-            ],
-            "posx": 925.0,
-            "posy": 375.0,
-            "sigarms": [
-                [
-                    [
-                        true,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ],
-                [
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ],
-                    [
-                        false,
-                        0
-                    ]
-                ]
-            ],
-            "siginterlock": [
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ],
-                [
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ],
-                    [
-                        0,
-                        [
-                            false,
-                            false,
-                            false,
-                            false,
-                            false
-                        ]
-                    ]
-                ]
-            ],
-            "sigroutes": [
-                true,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subroutes": [
-                false,
-                false,
-                false,
-                false,
-                false
-            ],
-            "subsidary": [
-                false,
-                0
-            ],
-            "tags": "signal7",
-            "theatreroute": false,
-            "timedsequences": [
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    false,
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "trackinterlock": [
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ],
-                [
-                    0,
-                    0,
-                    0
-                ]
-            ],
-            "tracksections": [
-                0,
-                [
-                    [
-                        7,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ],
-                    [
-                        0,
-                        0,
-                        0
-                    ]
-                ]
-            ]
-        },
         "38c100f7-e62a-4665-86ae-75beb7d63f71": {
             "arrowends": 0,
             "arrowtype": [
@@ -8327,24 +6199,24 @@
                 0,
                 0
             ],
-            "bbox": 8938,
+            "bbox": 379,
             "colour": "black",
-            "end1": 8934,
-            "end2": 8935,
+            "end1": 375,
+            "end2": 376,
             "endx": 825.0,
             "endy": 900.0,
             "item": "line",
             "itemid": 39,
-            "line": 8933,
+            "line": 374,
             "posx": 725.0,
             "posy": 900.0,
-            "stop1": 8936,
-            "stop2": 8937,
+            "stop1": 377,
+            "stop2": 378,
             "tags": "line39"
         },
         "3921c74d-11e9-4a28-baac-22741f00f5f6": {
             "background": "grey85",
-            "bbox": 8941,
+            "bbox": 382,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -8365,20 +6237,38 @@
                 0,
                 0
             ],
-            "bbox": 8947,
+            "bbox": 388,
             "colour": "black",
-            "end1": 8943,
-            "end2": 8944,
+            "end1": 384,
+            "end2": 385,
             "endx": 625.0,
             "endy": 700.0,
             "item": "line",
             "itemid": 31,
-            "line": 8942,
+            "line": 383,
             "posx": 600.0,
             "posy": 725.0,
-            "stop1": 8945,
-            "stop2": 8946,
+            "stop1": 386,
+            "stop2": 387,
             "tags": "line31"
+        },
+        "3ad18aaf-2eb4-4251-86e3-337c07f23f13": {
+            "alsoswitch": 0,
+            "automatic": false,
+            "bbox": 394,
+            "colour": "black",
+            "dccaddress": 0,
+            "dccreversed": false,
+            "hasfpl": false,
+            "item": "point",
+            "itemid": 19,
+            "itemtype": 2,
+            "orientation": 0,
+            "posx": 1000.0,
+            "posy": 900.0,
+            "reverse": false,
+            "siginterlock": [],
+            "tags": "point19"
         },
         "3bd65ffb-4f36-4d7b-8606-bd1b875623e2": {
             "arrowends": 0,
@@ -8387,20 +6277,31 @@
                 0,
                 0
             ],
-            "bbox": 8953,
+            "bbox": 400,
             "colour": "black",
-            "end1": 8949,
-            "end2": 8950,
-            "endx": 1100.0,
-            "endy": 600.0,
+            "end1": 396,
+            "end2": 397,
+            "endx": 1125.0,
+            "endy": 475.0,
             "item": "line",
             "itemid": 14,
-            "line": 8948,
-            "posx": 800.0,
-            "posy": 600.0,
-            "stop1": 8951,
-            "stop2": 8952,
+            "line": 395,
+            "posx": 825.0,
+            "posy": 475.0,
+            "stop1": 398,
+            "stop2": 399,
             "tags": "line14"
+        },
+        "40e9f8d6-763e-463c-bd9a-5cc7601ebaae": {
+            "bbox": 404,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 7,
+            "mirror": "",
+            "posx": 950.0,
+            "posy": 825.0,
+            "tags": "section7"
         },
         "41271867-259f-4e9b-92d8-fc6362917365": {
             "approachcontrol": [
@@ -8414,7 +6315,7 @@
                 false,
                 ""
             ],
-            "bbox": 8970,
+            "bbox": 421,
             "dccaspects": [
                 [
                     [
@@ -9489,7 +7390,7 @@
                 false,
                 ""
             ],
-            "bbox": 8978,
+            "bbox": 429,
             "dccaspects": [
                 [
                     [
@@ -10559,34 +8460,34 @@
                 0,
                 0
             ],
-            "bbox": 8984,
+            "bbox": 435,
             "colour": "black",
-            "end1": 8980,
-            "end2": 8981,
+            "end1": 431,
+            "end2": 432,
             "endx": 350.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 51,
-            "line": 8979,
+            "line": 430,
             "posx": 325.0,
             "posy": 800.0,
-            "stop1": 8982,
-            "stop2": 8983,
+            "stop1": 433,
+            "stop2": 434,
             "tags": "line51"
         },
         "48f66d15-6c33-42bd-8189-135b00fd0b01": {
-            "bbox": 8988,
+            "bbox": 439,
             "item": "tracksensor",
             "itemid": 2,
             "passedsensor": "23",
             "posx": 1000.0,
-            "posy": 800.0,
+            "posy": 725.0,
             "routeahead": [
                 [
                     [
                         [
-                            0,
-                            false
+                            19,
+                            true
                         ],
                         [
                             0,
@@ -10884,31 +8785,20 @@
                 0,
                 0
             ],
-            "bbox": 8994,
+            "bbox": 445,
             "colour": "black",
-            "end1": 8990,
-            "end2": 8991,
+            "end1": 441,
+            "end2": 442,
             "endx": 900.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 8,
-            "line": 8989,
+            "line": 440,
             "posx": 525.0,
             "posy": 150.0,
-            "stop1": 8992,
-            "stop2": 8993,
+            "stop1": 443,
+            "stop2": 444,
             "tags": "line8"
-        },
-        "4e39406c-54ed-48bb-9835-c4a93664e288": {
-            "bbox": 8998,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "item": "section",
-            "itemid": 7,
-            "mirror": "",
-            "posx": 1050.0,
-            "posy": 375.0,
-            "tags": "section7"
         },
         "4ec8decd-fe88-4ef8-8510-0f8b3097f86c": {
             "approachcontrol": [
@@ -10922,7 +8812,7 @@
                 false,
                 ""
             ],
-            "bbox": 9015,
+            "bbox": 462,
             "dccaspects": [
                 [
                     [
@@ -11988,7 +9878,7 @@
         "52028ce3-d790-4b02-86c2-7600c81905d5": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9021,
+            "bbox": 468,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12006,7 +9896,7 @@
         "551bcd35-606a-45ef-ac41-a399f74bed80": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9027,
+            "bbox": 474,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12028,34 +9918,34 @@
                 0,
                 0
             ],
-            "bbox": 9033,
+            "bbox": 480,
             "colour": "black",
-            "end1": 9029,
-            "end2": 9030,
+            "end1": 476,
+            "end2": 477,
             "endx": 525.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 53,
-            "line": 9028,
+            "line": 475,
             "posx": 500.0,
             "posy": 800.0,
-            "stop1": 9031,
-            "stop2": 9032,
+            "stop1": 478,
+            "stop2": 479,
             "tags": "line53"
         },
         "58a3b159-ccd8-46fa-b40e-cb8e0f6dfe7b": {
-            "bbox": 9037,
+            "bbox": 484,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 9,
             "mirror": "",
-            "posx": 1050.0,
-            "posy": 550.0,
+            "posx": 1075.0,
+            "posy": 425.0,
             "tags": "section9"
         },
         "59728ad9-d204-4ca9-8c8d-a3e340bc7e72": {
-            "bbox": 9041,
+            "bbox": 488,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -12072,19 +9962,19 @@
                 0,
                 0
             ],
-            "bbox": 9047,
+            "bbox": 494,
             "colour": "black",
-            "end1": 9043,
-            "end2": 9044,
+            "end1": 490,
+            "end2": 491,
             "endx": 300.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 21,
-            "line": 9042,
+            "line": 489,
             "posx": 25.0,
             "posy": 350.0,
-            "stop1": 9045,
-            "stop2": 9046,
+            "stop1": 492,
+            "stop2": 493,
             "tags": "line21"
         },
         "5e14d312-7750-4ab5-9376-09c40e391a55": {
@@ -12094,19 +9984,19 @@
                 0,
                 0
             ],
-            "bbox": 9053,
+            "bbox": 500,
             "colour": "black",
-            "end1": 9049,
-            "end2": 9050,
+            "end1": 496,
+            "end2": 497,
             "endx": 350.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 24,
-            "line": 9048,
+            "line": 495,
             "posx": 325.0,
             "posy": 375.0,
-            "stop1": 9051,
-            "stop2": 9052,
+            "stop1": 498,
+            "stop2": 499,
             "tags": "line24"
         },
         "5f7adc51-3867-4068-89e9-951344c619aa": {
@@ -12121,7 +10011,7 @@
                 false,
                 ""
             ],
-            "bbox": 9079,
+            "bbox": 526,
             "dccaspects": [
                 [
                     [
@@ -13191,23 +11081,23 @@
                 0,
                 0
             ],
-            "bbox": 9085,
+            "bbox": 532,
             "colour": "black",
-            "end1": 9081,
-            "end2": 9082,
+            "end1": 528,
+            "end2": 529,
             "endx": 725.0,
             "endy": 900.0,
             "item": "line",
             "itemid": 32,
-            "line": 9080,
+            "line": 527,
             "posx": 700.0,
             "posy": 875.0,
-            "stop1": 9083,
-            "stop2": 9084,
+            "stop1": 530,
+            "stop2": 531,
             "tags": "line32"
         },
         "67ab0983-6537-46c7-95e5-8e6f48075319": {
-            "bbox": 9089,
+            "bbox": 536,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -13224,19 +11114,19 @@
                 0,
                 0
             ],
-            "bbox": 9095,
+            "bbox": 542,
             "colour": "black",
-            "end1": 9091,
-            "end2": 9092,
+            "end1": 538,
+            "end2": 539,
             "endx": 825.0,
             "endy": 850.0,
             "item": "line",
             "itemid": 38,
-            "line": 9090,
+            "line": 537,
             "posx": 725.0,
             "posy": 850.0,
-            "stop1": 9093,
-            "stop2": 9094,
+            "stop1": 540,
+            "stop2": 541,
             "tags": "line38"
         },
         "6a0ff8a2-26bc-4cba-a5f9-9a434b2f33e7": {
@@ -13246,19 +11136,19 @@
                 0,
                 0
             ],
-            "bbox": 9101,
+            "bbox": 548,
             "colour": "black",
-            "end1": 9097,
-            "end2": 9098,
+            "end1": 544,
+            "end2": 545,
             "endx": 575.0,
             "endy": 750.0,
             "item": "line",
             "itemid": 30,
-            "line": 9096,
+            "line": 543,
             "posx": 550.0,
             "posy": 775.0,
-            "stop1": 9099,
-            "stop2": 9100,
+            "stop1": 546,
+            "stop2": 547,
             "tags": "line30"
         },
         "6adea958-0dca-4a25-a546-6cf71f1ab346": {
@@ -13268,19 +11158,19 @@
                 0,
                 0
             ],
-            "bbox": 9107,
+            "bbox": 554,
             "colour": "black",
-            "end1": 9103,
-            "end2": 9104,
-            "endx": 1100.0,
-            "endy": 550.0,
+            "end1": 550,
+            "end2": 551,
+            "endx": 1125.0,
+            "endy": 425.0,
             "item": "line",
             "itemid": 15,
-            "line": 9102,
-            "posx": 800.0,
-            "posy": 550.0,
-            "stop1": 9105,
-            "stop2": 9106,
+            "line": 549,
+            "posx": 825.0,
+            "posy": 425.0,
+            "stop1": 552,
+            "stop2": 553,
             "tags": "line15"
         },
         "6c791787-8ce0-4db7-9308-7c5144fe412f": {
@@ -13295,7 +11185,7 @@
                 false,
                 ""
             ],
-            "bbox": 9157,
+            "bbox": 603,
             "dccaspects": [
                 [
                     [
@@ -13838,7 +11728,7 @@
                             false
                         ]
                     ],
-                    "",
+                    "7",
                     0
                 ],
                 [
@@ -14361,7 +12251,7 @@
         "6e5bb0e2-e690-4589-b788-061a06c387ab": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9163,
+            "bbox": 609,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -14383,19 +12273,19 @@
                 0,
                 0
             ],
-            "bbox": 9169,
+            "bbox": 615,
             "colour": "black",
-            "end1": 9165,
-            "end2": 9166,
+            "end1": 611,
+            "end2": 612,
             "endx": 200.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 26,
-            "line": 9164,
+            "line": 610,
             "posx": 25.0,
             "posy": 600.0,
-            "stop1": 9167,
-            "stop2": 9168,
+            "stop1": 613,
+            "stop2": 614,
             "tags": "line26"
         },
         "72965bb9-1193-4c97-af23-7581d6856826": {
@@ -14405,42 +12295,20 @@
                 0,
                 0
             ],
-            "bbox": 9175,
+            "bbox": 621,
             "colour": "black",
-            "end1": 9171,
-            "end2": 9172,
+            "end1": 617,
+            "end2": 618,
             "endx": 375.0,
             "endy": 825.0,
             "item": "line",
             "itemid": 52,
-            "line": 9170,
+            "line": 616,
             "posx": 425.0,
             "posy": 875.0,
-            "stop1": 9173,
-            "stop2": 9174,
+            "stop1": 619,
+            "stop2": 620,
             "tags": "line52"
-        },
-        "7482f7e1-f1ad-473d-b856-6f70ab6a8015": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 9181,
-            "colour": "black",
-            "end1": 9177,
-            "end2": 9178,
-            "endx": 1100.0,
-            "endy": 375.0,
-            "item": "line",
-            "itemid": 12,
-            "line": 9176,
-            "posx": 800.0,
-            "posy": 375.0,
-            "stop1": 9179,
-            "stop2": 9180,
-            "tags": "line12"
         },
         "76a00814-9701-437d-99a8-32e60ed4ba17": {
             "arrowends": 0,
@@ -14449,23 +12317,23 @@
                 0,
                 0
             ],
-            "bbox": 9187,
+            "bbox": 627,
             "colour": "black",
-            "end1": 9183,
-            "end2": 9184,
+            "end1": 623,
+            "end2": 624,
             "endx": 475.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 5,
-            "line": 9182,
+            "line": 622,
             "posx": 450.0,
             "posy": 75.0,
-            "stop1": 9185,
-            "stop2": 9186,
+            "stop1": 625,
+            "stop2": 626,
             "tags": "line5"
         },
         "792e40e8-1303-49a8-b2d7-1e1e255cbff0": {
-            "bbox": 9191,
+            "bbox": 631,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -14487,7 +12355,7 @@
                 false,
                 ""
             ],
-            "bbox": 9208,
+            "bbox": 648,
             "dccaspects": [
                 [
                     [
@@ -15550,6 +13418,22 @@
                 ]
             ]
         },
+        "815e5a81-0614-4783-bd22-e0d6cfb055d0": {
+            "background": "grey85",
+            "bbox": 651,
+            "border": 2,
+            "colour": "black",
+            "font": "Courier",
+            "fontsize": 16,
+            "fontstyle": "bold ",
+            "item": "textbox",
+            "itemid": 0,
+            "justify": 2,
+            "posx": 250.0,
+            "posy": 225.0,
+            "tags": "815e5a81-0614-4783-bd22-e0d6cfb055d0",
+            "text": " Layout file must be saves in \n EDIT Mode with Automation ON "
+        },
         "88daa56e-c0d6-4b39-8949-89c0eace8cb0": {
             "arrowends": 0,
             "arrowtype": [
@@ -15557,23 +13441,23 @@
                 0,
                 0
             ],
-            "bbox": 9214,
+            "bbox": 657,
             "colour": "black",
-            "end1": 9210,
-            "end2": 9211,
+            "end1": 653,
+            "end2": 654,
             "endx": 575.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 11,
-            "line": 9209,
+            "line": 652,
             "posx": 550.0,
             "posy": 225.0,
-            "stop1": 9212,
-            "stop2": 9213,
+            "stop1": 655,
+            "stop2": 656,
             "tags": "line11"
         },
         "8bae3fe9-f026-416d-8d53-cbaf1017b776": {
-            "bbox": 9218,
+            "bbox": 661,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -15584,34 +13468,18 @@
             "tags": "section31"
         },
         "95c43eba-116d-461f-acf5-2942ee2de9a0": {
-            "bbox": 9222,
+            "bbox": 665,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 10,
             "mirror": "",
-            "posx": 850.0,
-            "posy": 600.0,
+            "posx": 875.0,
+            "posy": 475.0,
             "tags": "section10"
         },
-        "97e058d0-9fc8-4595-a6c1-38b76dbc6930": {
-            "background": "grey85",
-            "bbox": 9225,
-            "border": 0,
-            "colour": "black",
-            "font": "Courier",
-            "fontsize": 10,
-            "fontstyle": "",
-            "item": "textbox",
-            "itemid": 0,
-            "justify": 2,
-            "posx": 957.0,
-            "posy": 311.0,
-            "tags": "97e058d0-9fc8-4595-a6c1-38b76dbc6930",
-            "text": "Section ahead or section behind tests\nNon distant/shunt-ahead signal types"
-        },
         "97f92095-a77f-4a82-ac03-58020be13cda": {
-            "bbox": 9240,
+            "bbox": 680,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 2,
@@ -15634,7 +13502,7 @@
                 false,
                 ""
             ],
-            "bbox": 9269,
+            "bbox": 708,
             "dccaspects": [
                 [
                     [
@@ -16698,18 +14566,18 @@
             ]
         },
         "99942f6d-a746-459b-84db-e3fb2474ac4c": {
-            "bbox": 9273,
+            "bbox": 712,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 39,
             "mirror": "",
             "posx": 950.0,
-            "posy": 850.0,
+            "posy": 775.0,
             "tags": "section39"
         },
         "9a297b55-f32f-427e-97f3-d29601155e06": {
-            "bbox": 9277,
+            "bbox": 716,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -16720,18 +14588,18 @@
             "tags": "section24"
         },
         "9dc022bc-753e-4da7-8965-7a9d3dfe572f": {
-            "bbox": 9281,
+            "bbox": 720,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 38,
             "mirror": "",
             "posx": 1050.0,
-            "posy": 800.0,
+            "posy": 725.0,
             "tags": "section38"
         },
         "9f044ede-2ea9-4576-b088-bcf66e039359": {
-            "bbox": 9285,
+            "bbox": 724,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -16741,9 +14609,1084 @@
             "posy": 700.0,
             "tags": "section36"
         },
+        "a1553d9a-2eab-45de-ba3b-8d9102b61c9c": {
+            "approachcontrol": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "approachsensor": [
+                false,
+                ""
+            ],
+            "bbox": 750,
+            "dccaspects": [
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ]
+            ],
+            "dccautoinhibit": false,
+            "dccfeathers": [
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ],
+                    [
+                        0,
+                        false
+                    ]
+                ]
+            ],
+            "dcctheatre": [
+                [
+                    "#",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    "",
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ]
+                ]
+            ],
+            "distautomatic": false,
+            "feathers": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "fullyautomatic": false,
+            "interlockahead": false,
+            "item": "signal",
+            "itemid": 7,
+            "itemsubtype": 1,
+            "itemtype": 3,
+            "orientation": 0,
+            "overrideahead": false,
+            "overridesignal": false,
+            "passedsensor": [
+                true,
+                ""
+            ],
+            "pointinterlock": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    "",
+                    0
+                ]
+            ],
+            "posx": 325.0,
+            "posy": 600.0,
+            "sigarms": [
+                [
+                    [
+                        true,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ],
+                [
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ],
+                    [
+                        false,
+                        0
+                    ]
+                ]
+            ],
+            "siginterlock": [
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ],
+                [
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ],
+                    [
+                        0,
+                        [
+                            false,
+                            false,
+                            false,
+                            false,
+                            false
+                        ]
+                    ]
+                ]
+            ],
+            "sigroutes": [
+                true,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subroutes": [
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "subsidary": [
+                false,
+                0
+            ],
+            "tags": "signal7",
+            "theatreroute": false,
+            "timedsequences": [
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    false,
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "trackinterlock": [
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    0
+                ]
+            ],
+            "tracksections": [
+                0,
+                [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        0,
+                        0,
+                        0
+                    ]
+                ]
+            ]
+        },
         "a168039e-a91a-4d28-8f9c-c9847dddcb6d": {
             "background": "grey85",
-            "bbox": 9288,
+            "bbox": 753,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -16758,7 +15701,7 @@
             "text": "Shunt-ahead signal route tests"
         },
         "a2a63569-61ec-4286-806c-3fb2b9669cae": {
-            "bbox": 9292,
+            "bbox": 757,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -16775,24 +15718,24 @@
                 0,
                 0
             ],
-            "bbox": 9298,
+            "bbox": 763,
             "colour": "black",
-            "end1": 9294,
-            "end2": 9295,
+            "end1": 759,
+            "end2": 760,
             "endx": 900.0,
             "endy": 50.0,
             "item": "line",
             "itemid": 6,
-            "line": 9293,
+            "line": 758,
             "posx": 475.0,
             "posy": 50.0,
-            "stop1": 9296,
-            "stop2": 9297,
+            "stop1": 761,
+            "stop2": 762,
             "tags": "line6"
         },
         "a37162c4-c2da-42a6-9d5d-2ded06f14cc5": {
             "background": "grey85",
-            "bbox": 9301,
+            "bbox": 766,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -16809,7 +15752,7 @@
         "a46c7541-5009-4243-b51e-8a885c07a46f": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9307,
+            "bbox": 772,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16827,7 +15770,7 @@
         "a4a3951a-8365-413c-a29f-001a13e6ef21": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9313,
+            "bbox": 778,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16854,7 +15797,7 @@
             "tags": "point6"
         },
         "a6510982-7180-4a78-a46e-55ef46497bef": {
-            "bbox": 9317,
+            "bbox": 782,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -16867,7 +15810,7 @@
         "a7754934-0d4a-428d-ab57-5599d44e8d85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9324,
+            "bbox": 789,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -16950,19 +15893,19 @@
                 0,
                 0
             ],
-            "bbox": 9330,
+            "bbox": 795,
             "colour": "black",
-            "end1": 9326,
-            "end2": 9327,
+            "end1": 791,
+            "end2": 792,
             "endx": 475.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 4,
-            "line": 9325,
+            "line": 790,
             "posx": 425.0,
             "posy": 150.0,
-            "stop1": 9328,
-            "stop2": 9329,
+            "stop1": 793,
+            "stop2": 794,
             "tags": "line4"
         },
         "a994fe0e-a4e6-48c3-bd42-b865c18f6624": {
@@ -16977,7 +15920,7 @@
                 false,
                 ""
             ],
-            "bbox": 9356,
+            "bbox": 821,
             "dccaspects": [
                 [
                     [
@@ -18040,19 +16983,8 @@
                 ]
             ]
         },
-        "aa85f250-0909-453e-9de0-fc5dd1ac977a": {
-            "bbox": 9360,
-            "defaultlabel": "XXXXX",
-            "editable": true,
-            "item": "section",
-            "itemid": 8,
-            "mirror": "",
-            "posx": 850.0,
-            "posy": 425.0,
-            "tags": "section8"
-        },
         "ab1c75b8-5187-4e29-89aa-1ad8efff6e41": {
-            "bbox": 9364,
+            "bbox": 825,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -18069,23 +17001,23 @@
                 0,
                 0
             ],
-            "bbox": 9370,
+            "bbox": 831,
             "colour": "black",
-            "end1": 9366,
-            "end2": 9367,
+            "end1": 827,
+            "end2": 828,
             "endx": 150.0,
             "endy": 875.0,
             "item": "line",
             "itemid": 46,
-            "line": 9365,
+            "line": 826,
             "posx": 125.0,
             "posy": 900.0,
-            "stop1": 9368,
-            "stop2": 9369,
+            "stop1": 829,
+            "stop2": 830,
             "tags": "line46"
         },
         "ab65202c-8dbc-4a49-9df4-b2a210d1b773": {
-            "bbox": 9374,
+            "bbox": 835,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -18102,23 +17034,23 @@
                 0,
                 0
             ],
-            "bbox": 9380,
+            "bbox": 841,
             "colour": "black",
-            "end1": 9376,
-            "end2": 9377,
+            "end1": 837,
+            "end2": 838,
             "endx": 750.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 18,
-            "line": 9375,
+            "line": 836,
             "posx": 650.0,
             "posy": 550.0,
-            "stop1": 9378,
-            "stop2": 9379,
+            "stop1": 839,
+            "stop2": 840,
             "tags": "line18"
         },
         "aeadfd4e-edcf-427f-a4e9-1305637e679e": {
-            "bbox": 9384,
+            "bbox": 845,
             "item": "tracksensor",
             "itemid": 1,
             "passedsensor": "22",
@@ -18432,7 +17364,7 @@
                 false,
                 ""
             ],
-            "bbox": 9432,
+            "bbox": 893,
             "dccaspects": [
                 [
                     [
@@ -19496,7 +18428,7 @@
             ]
         },
         "afd35369-6f78-4dab-be3c-62460b51f8bd": {
-            "bbox": 9436,
+            "bbox": 897,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -19508,7 +18440,7 @@
         },
         "b1357b6e-7b98-476e-ae22-39d22c08122c": {
             "background": "grey85",
-            "bbox": 9439,
+            "bbox": 900,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -19518,14 +18450,14 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1007.0,
-            "posy": 736.0,
+            "posy": 661.0,
             "tags": "b1357b6e-7b98-476e-ae22-39d22c08122c",
             "text": "Section ahead or section behind tests\n Intermediate Track Sections"
         },
         "b149ba67-d83f-4f67-ac37-6ac099d886d1": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9445,
+            "bbox": 906,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -19534,7 +18466,7 @@
             "itemid": 5,
             "itemtype": 2,
             "orientation": 0,
-            "posx": 1150.0,
+            "posx": 975.0,
             "posy": 600.0,
             "reverse": false,
             "siginterlock": [
@@ -19583,7 +18515,7 @@
                 false,
                 ""
             ],
-            "bbox": 9464,
+            "bbox": 925,
             "dccaspects": [
                 [
                     [
@@ -20646,28 +19578,6 @@
                 ]
             ]
         },
-        "b84cc69b-5360-4e46-8ee9-a42fb19c9414": {
-            "arrowends": 0,
-            "arrowtype": [
-                0,
-                0,
-                0
-            ],
-            "bbox": 9470,
-            "colour": "black",
-            "end1": 9466,
-            "end2": 9467,
-            "endx": 1100.0,
-            "endy": 425.0,
-            "item": "line",
-            "itemid": 13,
-            "line": 9465,
-            "posx": 800.0,
-            "posy": 425.0,
-            "stop1": 9468,
-            "stop2": 9469,
-            "tags": "line13"
-        },
         "b856e2a7-75ca-49ef-861b-53408393f625": {
             "arrowends": 0,
             "arrowtype": [
@@ -20675,19 +19585,19 @@
                 0,
                 0
             ],
-            "bbox": 9476,
+            "bbox": 931,
             "colour": "black",
-            "end1": 9472,
-            "end2": 9473,
+            "end1": 927,
+            "end2": 928,
             "endx": 225.0,
             "endy": 700.0,
             "item": "line",
             "itemid": 42,
-            "line": 9471,
+            "line": 926,
             "posx": 25.0,
             "posy": 700.0,
-            "stop1": 9474,
-            "stop2": 9475,
+            "stop1": 929,
+            "stop2": 930,
             "tags": "line42"
         },
         "bc1c1e57-d938-4721-a8f1-4009975fc3fd": {
@@ -20697,19 +19607,19 @@
                 20,
                 5
             ],
-            "bbox": 9482,
+            "bbox": 937,
             "colour": "black",
-            "end1": 9478,
-            "end2": 9479,
+            "end1": 933,
+            "end2": 934,
             "endx": 250.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 27,
-            "line": 9477,
+            "line": 932,
             "posx": 225.0,
             "posy": 575.0,
-            "stop1": 9480,
-            "stop2": 9481,
+            "stop1": 935,
+            "stop2": 936,
             "tags": "line27"
         },
         "bd279716-4844-4b0b-879d-40c4a280d9c3": {
@@ -20719,23 +19629,23 @@
                 0,
                 0
             ],
-            "bbox": 9488,
+            "bbox": 943,
             "colour": "black",
-            "end1": 9484,
-            "end2": 9485,
+            "end1": 939,
+            "end2": 940,
             "endx": 125.0,
             "endy": 900.0,
             "item": "line",
             "itemid": 41,
-            "line": 9483,
+            "line": 938,
             "posx": 25.0,
             "posy": 900.0,
-            "stop1": 9486,
-            "stop2": 9487,
+            "stop1": 941,
+            "stop2": 942,
             "tags": "line41"
         },
         "be3430e8-fa0a-4ed5-8e15-bbe161956db4": {
-            "bbox": 9492,
+            "bbox": 947,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -20752,19 +19662,19 @@
                 0,
                 0
             ],
-            "bbox": 9498,
+            "bbox": 953,
             "colour": "black",
-            "end1": 9494,
-            "end2": 9495,
+            "end1": 949,
+            "end2": 950,
             "endx": 450.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 40,
-            "line": 9493,
+            "line": 948,
             "posx": 400.0,
             "posy": 800.0,
-            "stop1": 9496,
-            "stop2": 9497,
+            "stop1": 951,
+            "stop2": 952,
             "tags": "line40"
         },
         "c051bf55-cdef-4f31-b57c-fe37266c08f4": {
@@ -20779,7 +19689,7 @@
                 false,
                 ""
             ],
-            "bbox": 9524,
+            "bbox": 979,
             "dccaspects": [
                 [
                     [
@@ -21849,19 +20759,19 @@
                 0,
                 0
             ],
-            "bbox": 9530,
+            "bbox": 985,
             "colour": "black",
-            "end1": 9526,
-            "end2": 9527,
+            "end1": 981,
+            "end2": 982,
             "endx": 650.0,
             "endy": 600.0,
             "item": "line",
             "itemid": 19,
-            "line": 9525,
+            "line": 980,
             "posx": 625.0,
             "posy": 575.0,
-            "stop1": 9528,
-            "stop2": 9529,
+            "stop1": 983,
+            "stop2": 984,
             "tags": "line19"
         },
         "c1f715bc-9c10-4de3-8a70-d62fe8fbd10b": {
@@ -21871,24 +20781,24 @@
                 0,
                 0
             ],
-            "bbox": 9536,
+            "bbox": 991,
             "colour": "black",
-            "end1": 9532,
-            "end2": 9533,
+            "end1": 987,
+            "end2": 988,
             "endx": 1100.0,
-            "endy": 850.0,
+            "endy": 775.0,
             "item": "line",
             "itemid": 56,
-            "line": 9531,
+            "line": 986,
             "posx": 900.0,
-            "posy": 850.0,
-            "stop1": 9534,
-            "stop2": 9535,
+            "posy": 775.0,
+            "stop1": 989,
+            "stop2": 990,
             "tags": "line56"
         },
         "c27d25b7-5b4c-44d3-bd35-e5a1449de1ec": {
             "background": "grey85",
-            "bbox": 9539,
+            "bbox": 994,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -21902,10 +20812,313 @@
             "tags": "c27d25b7-5b4c-44d3-bd35-e5a1449de1ec",
             "text": "Override secondary distant arms\non distant signal ahead (i.e\n distant arms mirror distant ahead)"
         },
+        "c34c24e1-e64e-4e32-8b92-d5decbbfb361": {
+            "bbox": 998,
+            "item": "tracksensor",
+            "itemid": 4,
+            "passedsensor": "25",
+            "posx": 1000.0,
+            "posy": 825.0,
+            "routeahead": [
+                [
+                    [
+                        [
+                            19,
+                            true
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    8
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "routebehind": [
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    7
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ],
+                [
+                    [
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ],
+                        [
+                            0,
+                            false
+                        ]
+                    ],
+                    0
+                ]
+            ],
+            "tags": "sensor4"
+        },
         "c47af54d-b826-4360-996c-22dc8ef0b906": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9546,
+            "bbox": 1005,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -21927,23 +21140,23 @@
                 0,
                 0
             ],
-            "bbox": 9552,
+            "bbox": 1011,
             "colour": "black",
-            "end1": 9548,
-            "end2": 9549,
+            "end1": 1007,
+            "end2": 1008,
             "endx": 750.0,
             "endy": 400.0,
             "item": "line",
             "itemid": 23,
-            "line": 9547,
+            "line": 1006,
             "posx": 350.0,
             "posy": 400.0,
-            "stop1": 9550,
-            "stop2": 9551,
+            "stop1": 1009,
+            "stop2": 1010,
             "tags": "line23"
         },
         "c5e61491-9bc4-4afd-bbda-ef1d44ab3a85": {
-            "bbox": 9556,
+            "bbox": 1015,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -21954,7 +21167,7 @@
             "tags": "section28"
         },
         "c6bcd861-e896-4b6c-9d38-d472b7d12d67": {
-            "bbox": 9560,
+            "bbox": 1019,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -21971,25 +21184,25 @@
                 20,
                 5
             ],
-            "bbox": 9566,
+            "bbox": 1025,
             "colour": "black",
-            "end1": 9562,
-            "end2": 9563,
+            "end1": 1021,
+            "end2": 1022,
             "endx": 275.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 29,
-            "line": 9561,
+            "line": 1020,
             "posx": 325.0,
             "posy": 550.0,
-            "stop1": 9564,
-            "stop2": 9565,
+            "stop1": 1023,
+            "stop2": 1024,
             "tags": "line29"
         },
         "c9be255e-8c79-46ae-813c-80cd31db2961": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9572,
+            "bbox": 1031,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22007,7 +21220,7 @@
         "cd6f0f22-d678-4aec-91a0-2b54c188c73e": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9578,
+            "bbox": 1037,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22036,7 +21249,7 @@
         "cd84d65b-c1fb-48f9-abfe-e37d2799986c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9585,
+            "bbox": 1044,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22089,19 +21302,19 @@
                 0,
                 0
             ],
-            "bbox": 9591,
+            "bbox": 1050,
             "colour": "black",
-            "end1": 9587,
-            "end2": 9588,
+            "end1": 1046,
+            "end2": 1047,
             "endx": 900.0,
             "endy": 100.0,
             "item": "line",
             "itemid": 7,
-            "line": 9586,
+            "line": 1045,
             "posx": 475.0,
             "posy": 100.0,
-            "stop1": 9589,
-            "stop2": 9590,
+            "stop1": 1048,
+            "stop2": 1049,
             "tags": "line7"
         },
         "ceeb1fc0-ac5f-496e-950d-c3c1a690be5f": {
@@ -22111,23 +21324,23 @@
                 0,
                 0
             ],
-            "bbox": 9597,
+            "bbox": 1056,
             "colour": "black",
-            "end1": 9593,
-            "end2": 9594,
+            "end1": 1052,
+            "end2": 1053,
             "endx": 200.0,
             "endy": 825.0,
             "item": "line",
             "itemid": 47,
-            "line": 9592,
+            "line": 1051,
             "posx": 175.0,
             "posy": 850.0,
-            "stop1": 9595,
-            "stop2": 9596,
+            "stop1": 1054,
+            "stop2": 1055,
             "tags": "line47"
         },
         "cfa18894-c904-43dc-9659-e5bb376873b0": {
-            "bbox": 9601,
+            "bbox": 1060,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -22140,7 +21353,7 @@
         "cff06336-0304-4d14-aee0-3281912bf82c": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9608,
+            "bbox": 1067,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22158,7 +21371,7 @@
         "d210a466-1fdb-417c-b9a4-b190c54b8c0d": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9615,
+            "bbox": 1074,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -22221,19 +21434,19 @@
                 0,
                 0
             ],
-            "bbox": 9621,
+            "bbox": 1080,
             "colour": "black",
-            "end1": 9617,
-            "end2": 9618,
+            "end1": 1076,
+            "end2": 1077,
             "endx": 900.0,
             "endy": 250.0,
             "item": "line",
             "itemid": 10,
-            "line": 9616,
+            "line": 1075,
             "posx": 575.0,
             "posy": 250.0,
-            "stop1": 9619,
-            "stop2": 9620,
+            "stop1": 1078,
+            "stop2": 1079,
             "tags": "line10"
         },
         "d41f0e5f-13e5-4a7f-bc3e-3388254d6b8c": {
@@ -22248,7 +21461,7 @@
                 false,
                 ""
             ],
-            "bbox": 9647,
+            "bbox": 1106,
             "dccaspects": [
                 [
                     [
@@ -23318,19 +22531,19 @@
                 0,
                 0
             ],
-            "bbox": 9653,
+            "bbox": 1112,
             "colour": "black",
-            "end1": 9649,
-            "end2": 9650,
+            "end1": 1108,
+            "end2": 1109,
             "endx": 825.0,
             "endy": 700.0,
             "item": "line",
             "itemid": 35,
-            "line": 9648,
+            "line": 1107,
             "posx": 625.0,
             "posy": 700.0,
-            "stop1": 9651,
-            "stop2": 9652,
+            "stop1": 1110,
+            "stop2": 1111,
             "tags": "line35"
         },
         "d6860058-80ef-4edd-910e-7822d3d4c06e": {
@@ -23340,19 +22553,19 @@
                 0,
                 0
             ],
-            "bbox": 9659,
+            "bbox": 1118,
             "colour": "black",
-            "end1": 9655,
-            "end2": 9656,
+            "end1": 1114,
+            "end2": 1115,
             "endx": 375.0,
             "endy": 150.0,
             "item": "line",
             "itemid": 1,
-            "line": 9654,
+            "line": 1113,
             "posx": 25.0,
             "posy": 150.0,
-            "stop1": 9657,
-            "stop2": 9658,
+            "stop1": 1116,
+            "stop2": 1117,
             "tags": "line1"
         },
         "da669646-6975-4489-9d20-5a5f4bcd2ed7": {
@@ -23367,7 +22580,7 @@
                 false,
                 ""
             ],
-            "bbox": 9688,
+            "bbox": 1146,
             "dccaspects": [
                 [
                     [
@@ -24437,19 +23650,19 @@
                 0,
                 0
             ],
-            "bbox": 9694,
+            "bbox": 1152,
             "colour": "black",
-            "end1": 9690,
-            "end2": 9691,
+            "end1": 1148,
+            "end2": 1149,
             "endx": 125.0,
             "endy": 850.0,
             "item": "line",
             "itemid": 45,
-            "line": 9689,
+            "line": 1147,
             "posx": 25.0,
             "posy": 850.0,
-            "stop1": 9692,
-            "stop2": 9693,
+            "stop1": 1150,
+            "stop2": 1151,
             "tags": "line45"
         },
         "e031e4f1-e98e-4694-bed5-87c9e5e0ff88": {
@@ -24459,23 +23672,23 @@
                 0,
                 0
             ],
-            "bbox": 9700,
+            "bbox": 1158,
             "colour": "black",
-            "end1": 9696,
-            "end2": 9697,
+            "end1": 1154,
+            "end2": 1155,
             "endx": 600.0,
             "endy": 550.0,
             "item": "line",
             "itemid": 17,
-            "line": 9695,
+            "line": 1153,
             "posx": 450.0,
             "posy": 550.0,
-            "stop1": 9698,
-            "stop2": 9699,
+            "stop1": 1156,
+            "stop2": 1157,
             "tags": "line17"
         },
         "e1b0ee5f-12f4-45de-8fc6-7d4615c50a8d": {
-            "bbox": 9704,
+            "bbox": 1162,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -24488,7 +23701,7 @@
         "e2b503f9-ac5b-4e55-8fc5-d15c72b63297": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9710,
+            "bbox": 1168,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -24515,7 +23728,7 @@
                 false,
                 ""
             ],
-            "bbox": 9736,
+            "bbox": 1194,
             "dccaspects": [
                 [
                     [
@@ -25585,23 +24798,23 @@
                 0,
                 0
             ],
-            "bbox": 9742,
+            "bbox": 1200,
             "colour": "black",
-            "end1": 9738,
-            "end2": 9739,
+            "end1": 1196,
+            "end2": 1197,
             "endx": 275.0,
             "endy": 750.0,
             "item": "line",
             "itemid": 48,
-            "line": 9737,
+            "line": 1195,
             "posx": 300.0,
             "posy": 775.0,
-            "stop1": 9740,
-            "stop2": 9741,
+            "stop1": 1198,
+            "stop2": 1199,
             "tags": "line48"
         },
         "ea7fe3f2-f03e-46b4-b081-a9a7fd72c579": {
-            "bbox": 9746,
+            "bbox": 1204,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -25618,25 +24831,25 @@
                 0,
                 0
             ],
-            "bbox": 9752,
+            "bbox": 1210,
             "colour": "black",
-            "end1": 9748,
-            "end2": 9749,
+            "end1": 1206,
+            "end2": 1207,
             "endx": 500.0,
             "endy": 175.0,
             "item": "line",
             "itemid": 3,
-            "line": 9747,
+            "line": 1205,
             "posx": 525.0,
             "posy": 200.0,
-            "stop1": 9750,
-            "stop2": 9751,
+            "stop1": 1208,
+            "stop2": 1209,
             "tags": "line3"
         },
         "ecdbe7e9-941c-45d4-9054-be1fc4e9bf85": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 9758,
+            "bbox": 1216,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -25679,23 +24892,23 @@
                 0,
                 0
             ],
-            "bbox": 9764,
+            "bbox": 1222,
             "colour": "black",
-            "end1": 9760,
-            "end2": 9761,
-            "endx": 1100.0,
-            "endy": 650.0,
+            "end1": 1218,
+            "end2": 1219,
+            "endx": 1125.0,
+            "endy": 525.0,
             "item": "line",
             "itemid": 16,
-            "line": 9759,
-            "posx": 800.0,
-            "posy": 650.0,
-            "stop1": 9762,
-            "stop2": 9763,
+            "line": 1217,
+            "posx": 825.0,
+            "posy": 525.0,
+            "stop1": 1220,
+            "stop2": 1221,
             "tags": "line16"
         },
         "ee1cb09a-869b-4445-a027-105f24cc1685": {
-            "bbox": 9768,
+            "bbox": 1226,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -25706,7 +24919,7 @@
             "tags": "section17"
         },
         "ef6b7696-ab25-4bba-95c5-a3c885155f3c": {
-            "bbox": 9772,
+            "bbox": 1230,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -25723,19 +24936,19 @@
                 0,
                 0
             ],
-            "bbox": 9778,
+            "bbox": 1236,
             "colour": "black",
-            "end1": 9774,
-            "end2": 9775,
+            "end1": 1232,
+            "end2": 1233,
             "endx": 825.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 37,
-            "line": 9773,
+            "line": 1231,
             "posx": 675.0,
             "posy": 800.0,
-            "stop1": 9776,
-            "stop2": 9777,
+            "stop1": 1234,
+            "stop2": 1235,
             "tags": "line37"
         },
         "f0ac44b6-117a-41af-a60c-88087dc5304a": {
@@ -25745,19 +24958,19 @@
                 0,
                 0
             ],
-            "bbox": 9784,
+            "bbox": 1242,
             "colour": "black",
-            "end1": 9780,
-            "end2": 9781,
+            "end1": 1238,
+            "end2": 1239,
             "endx": 275.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 50,
-            "line": 9779,
+            "line": 1237,
             "posx": 225.0,
             "posy": 800.0,
-            "stop1": 9782,
-            "stop2": 9783,
+            "stop1": 1240,
+            "stop2": 1241,
             "tags": "line50"
         },
         "f12ed239-73f5-4c30-9027-a4534eda3ce9": {
@@ -25767,20 +24980,31 @@
                 0,
                 0
             ],
-            "bbox": 9790,
+            "bbox": 1248,
             "colour": "black",
-            "end1": 9786,
-            "end2": 9787,
+            "end1": 1244,
+            "end2": 1245,
             "endx": 625.0,
             "endy": 800.0,
             "item": "line",
             "itemid": 33,
-            "line": 9785,
+            "line": 1243,
             "posx": 575.0,
             "posy": 800.0,
-            "stop1": 9788,
-            "stop2": 9789,
+            "stop1": 1246,
+            "stop2": 1247,
             "tags": "line33"
+        },
+        "f4a7c3e0-db3e-4bdb-a195-537ce01e07c2": {
+            "bbox": 1252,
+            "defaultlabel": "XXXXX",
+            "editable": true,
+            "item": "section",
+            "itemid": 8,
+            "mirror": "",
+            "posx": 1050.0,
+            "posy": 825.0,
+            "tags": "section8"
         },
         "f4ef26af-7aeb-4d6f-beb8-cc383fa2b7f8": {
             "arrowends": 0,
@@ -25789,19 +25013,19 @@
                 0,
                 0
             ],
-            "bbox": 9796,
+            "bbox": 1258,
             "colour": "black",
-            "end1": 9792,
-            "end2": 9793,
+            "end1": 1254,
+            "end2": 1255,
             "endx": 750.0,
             "endy": 350.0,
             "item": "line",
             "itemid": 22,
-            "line": 9791,
+            "line": 1253,
             "posx": 350.0,
             "posy": 350.0,
-            "stop1": 9794,
-            "stop2": 9795,
+            "stop1": 1256,
+            "stop2": 1257,
             "tags": "line22"
         },
         "f645c8ce-1bef-4b81-b475-a3f9a9822082": {
@@ -25811,19 +25035,19 @@
                 0,
                 0
             ],
-            "bbox": 9802,
+            "bbox": 1264,
             "colour": "black",
-            "end1": 9798,
-            "end2": 9799,
+            "end1": 1260,
+            "end2": 1261,
             "endx": 225.0,
             "endy": 700.0,
             "item": "line",
             "itemid": 49,
-            "line": 9797,
+            "line": 1259,
             "posx": 250.0,
             "posy": 725.0,
-            "stop1": 9800,
-            "stop2": 9801,
+            "stop1": 1262,
+            "stop2": 1263,
             "tags": "line49"
         },
         "f6f472f7-0e6c-4c7e-8953-87c1c57ef65a": {
@@ -25833,23 +25057,23 @@
                 0,
                 0
             ],
-            "bbox": 9808,
+            "bbox": 1270,
             "colour": "black",
-            "end1": 9804,
-            "end2": 9805,
+            "end1": 1266,
+            "end2": 1267,
             "endx": 1100.0,
-            "endy": 800.0,
+            "endy": 725.0,
             "item": "line",
             "itemid": 55,
-            "line": 9803,
+            "line": 1265,
             "posx": 900.0,
-            "posy": 800.0,
-            "stop1": 9806,
-            "stop2": 9807,
+            "posy": 725.0,
+            "stop1": 1268,
+            "stop2": 1269,
             "tags": "line55"
         },
         "f82bb5bd-b0b1-4fe1-bb06-3bb60e528e30": {
-            "bbox": 9812,
+            "bbox": 1274,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -25860,7 +25084,7 @@
             "tags": "section14"
         },
         "f8dae4ee-8601-441b-8d76-7056a2289fa1": {
-            "bbox": 9816,
+            "bbox": 1278,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -25882,7 +25106,7 @@
                 false,
                 ""
             ],
-            "bbox": 9842,
+            "bbox": 1304,
             "dccaspects": [
                 [
                     [
@@ -26997,6 +26221,11 @@
             "locked": false,
             "switched": false
         },
+        "19": {
+            "fpllock": false,
+            "locked": false,
+            "switched": false
+        },
         "2": {
             "fpllock": true,
             "locked": false,
@@ -27030,7 +26259,7 @@
         "8": {
             "fpllock": false,
             "locked": false,
-            "switched": true
+            "switched": false
         },
         "9": {
             "fpllock": false,
@@ -27044,15 +26273,15 @@
             "occupied": false
         },
         "10": {
-            "labeltext": "XXXXX",
+            "labeltext": "89",
             "occupied": false
         },
         "11": {
-            "labeltext": "XXXXX",
+            "labeltext": "92",
             "occupied": false
         },
         "12": {
-            "labeltext": "XXXXX",
+            "labeltext": "92",
             "occupied": false
         },
         "13": {
@@ -27192,7 +26421,7 @@
             "occupied": false
         },
         "9": {
-            "labeltext": "XXXXX",
+            "labeltext": "87",
             "occupied": false
         }
     },
@@ -27206,7 +26435,7 @@
         "general": {
             "automation": true,
             "editmode": true,
-            "filename": "/home/pi/Software/model-railway-signalling/system_tests/test_run_layout.sig",
+            "filename": "./test_run_layout.sig",
             "info": "Document your layout here",
             "spadpopups": false,
             "version": "Version 4.3.0"
@@ -27390,7 +26619,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": true,
             "siglocked": false,
             "subclear": false,
@@ -27511,7 +26740,7 @@
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
-            "routeset": 2,
+            "routeset": 1,
             "sigclear": false,
             "siglocked": false,
             "subclear": false,
@@ -27563,17 +26792,6 @@
             "theatretext": "NONE"
         },
         "7": {
-            "override": false,
-            "releaseonred": false,
-            "releaseonyel": false,
-            "routeset": 1,
-            "sigclear": false,
-            "siglocked": false,
-            "subclear": false,
-            "sublocked": false,
-            "theatretext": "NONE"
-        },
-        "8": {
             "override": false,
             "releaseonred": false,
             "releaseonyel": false,
