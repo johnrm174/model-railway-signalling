@@ -67,9 +67,9 @@ import logging
 from typing import Union
 
 from . import common
-from . import signals_common
 from . import track_sensors
 from . import mqtt_interface
+from . import signals
 
 #---------------------------------------------------------------------------------------------------
 # We can only use gpiozero interface if we're running on a Raspberry Pi. Other Platforms may not
@@ -258,10 +258,10 @@ def make_gpio_sensor_triggered_callback(sensor_id:Union[int,str]):
     str_gpio_port = mapped_gpio_port(sensor_id)
     if gpio_port_mappings[str_gpio_port]["signal_passed"] > 0:
         sig_id = gpio_port_mappings[str_gpio_port]["signal_passed"]
-        signals_common.sig_passed_button_event(sig_id)
+        signals.sig_passed_button_event(sig_id)
     elif gpio_port_mappings[str_gpio_port]["signal_approach"] > 0:
         sig_id = gpio_port_mappings[str_gpio_port]["signal_approach"]
-        signals_common.approach_release_button_event(sig_id)
+        signals.approach_release_button_event(sig_id)
     elif gpio_port_mappings[str_gpio_port]["sensor_passed"] > 0:
         sensor_id = gpio_port_mappings[str_gpio_port]["sensor_passed"]
         track_sensors.track_sensor_triggered(sensor_id)

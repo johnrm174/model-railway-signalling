@@ -4,17 +4,11 @@
 #
 # External API - classes and functions (used by the Schematic Editor):
 #
-#   signal_subtype (use when creating signals)
-#      signal_subtype.standard
-#      signal_subtype.shunt_ahead
-#      signal_subtype.early_standard
-#      signal_subtype.early_shunt_ahead
-#
 #   create_ground_position_signal - Creates a Ground Position signal
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       signal_subtype - subtype of the ground position signal
+#       signal_subtype - subtype of the ground position signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #       callback - the function to call on signal switched or passed events
 #               Note that the callback function returns (item_id, callback type)
@@ -29,24 +23,14 @@
 #
 # --------------------------------------------------------------------------------
 
-from . import signals_common
+import logging
+
+from . import common
+from . import signals
 from . import dcc_control
 from . import file_interface
-from . import common
 
-import logging
-import enum
-
-# -------------------------------------------------------------------------
-# Classes used externally when creating/updating Ground Disk signals 
-# -------------------------------------------------------------------------
-
-# Define the superset of signal sub types that can be created
-class ground_pos_sub_type(enum.Enum):
-    standard = 1            
-    shunt_ahead = 2
-    early_standard = 3            
-    early_shunt_ahead = 4
+from .signals import ground_pos_subtype as ground_pos_subtype
 
 # -------------------------------------------------------------------------
 # Public API function to create a Ground Position Signal (drawing objects and
@@ -54,7 +38,7 @@ class ground_pos_sub_type(enum.Enum):
 # -------------------------------------------------------------------------
 
 def create_ground_position_signal(canvas, sig_id:int,
-                                  signal_subtype:ground_pos_sub_type,
+                                  signal_subtype:ground_pos_subtype,
                                   x:int, y:int, callback = None,
                                   orientation:int=0,
                                   sig_passed_button:bool=False):
@@ -62,18 +46,18 @@ def create_ground_position_signal(canvas, sig_id:int,
     canvas_tag = "signal"+str(sig_id)    # Do some basic validation on the parameters we have been given
     # Common validation (common to all signal types) 
     if not isinstance(sig_id, int) or sig_id < 1 or sig_id > 99:
-        logging.error ("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-99)")
-    elif signals_common.signal_exists(sig_id):
-        logging.error ("Signal "+str(sig_id)+": create_signal - Signal already exists")
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal ID must be an int (1-99)")
+    elif signals.signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
-    elif (signal_subtype != ground_pos_sub_type.standard and signal_subtype != ground_pos_sub_type.shunt_ahead and
-          signal_subtype != ground_pos_sub_type.early_standard and signal_subtype != ground_pos_sub_type.early_shunt_ahead):
+    elif (signal_subtype != ground_pos_subtype.standard and signal_subtype != ground_pos_subtype.shunt_ahead and
+          signal_subtype != ground_pos_subtype.early_standard and signal_subtype != ground_pos_subtype.early_shunt_ahead):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
     else:  
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
         # Create all of the signal elements common to all signal types - note this gives us the 'proper' canvas tag
-        canvas_tag = signals_common.create_common_signal_elements (canvas, sig_id,
-                                                signals_common.signal_type.ground_position,
+        canvas_tag = signals.create_common_signal_elements (canvas, sig_id,
+                                                signals.signal_type.ground_position,
                                                 x, y, orientation, callback,
                                                 sig_passed_button = sig_passed_button)
         # Draw the signal base
@@ -94,11 +78,11 @@ def create_ground_position_signal(canvas, sig_id:int,
         oval_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
         canvas.create_oval (oval_coords,fill="grey",outline="black",tags=canvas_tag)
         # Draw the "DANGER" and "PROCEED" aspects (initially hidden)
-        if signal_subtype in (ground_pos_sub_type.early_shunt_ahead,ground_pos_sub_type.shunt_ahead):
+        if signal_subtype in (ground_pos_subtype.early_shunt_ahead,ground_pos_subtype.shunt_ahead):
             danger_colour = "gold"
         else:
             danger_colour = "red"
-        if signal_subtype in (ground_pos_sub_type.standard,ground_pos_sub_type.shunt_ahead):
+        if signal_subtype in (ground_pos_subtype.standard,ground_pos_subtype.shunt_ahead):
             root_colour = danger_colour
         else:
             root_colour = "white"
@@ -111,26 +95,26 @@ def create_ground_position_signal(canvas, sig_id:int,
         line_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
         sigon2 = canvas.create_oval (line_coords,fill=danger_colour,outline="black",state="hidden",tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals_common.signals[str(sig_id)]["sig_subtype"]  = signal_subtype  # Type-specific - Signal Subtype
-        signals_common.signals[str(sig_id)]["sigoff1"]      = sigoff1         # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigoff2"]      = sigoff2         # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigon1"]       = sigon1          # Type-specific - drawing object
-        signals_common.signals[str(sig_id)]["sigon2"]       = sigon2          # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sig_subtype"]  = signal_subtype  # Type-specific - Signal Subtype
+        signals.signals[str(sig_id)]["sigoff1"]      = sigoff1         # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigoff2"]      = sigoff2         # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigon1"]       = sigon1          # Type-specific - drawing object
+        signals.signals[str(sig_id)]["sigon2"]       = sigon2          # Type-specific - drawing object
         # Get the initial state for the signal (if layout state has been successfully loaded)
         # Note that each element of 'loaded_state' will be 'None' if no data was loaded
         loaded_state = file_interface.get_initial_item_state("signals",sig_id)
         # Set the initial state from the "loaded" state - We only need to set the 'override' and
         # 'sigclear' for ground signals - everything else gets set when the signal is updated
-        if loaded_state["override"]: signals_common.set_signal_override(sig_id)
-        if loaded_state["sigclear"]: signals_common.toggle_signal_state(sig_id)
+        if loaded_state["override"]: signals.set_signal_override(sig_id)
+        if loaded_state["sigclear"]: signals.toggle_signal(sig_id)
         # Update the signal to show the initial aspect (and send out DCC commands)
         update_ground_position_signal(sig_id)
         # finally Lock the signal if required
-        if loaded_state["siglocked"]: signals_common.lock_signal(sig_id)
+        if loaded_state["siglocked"]: signals.lock_signal(sig_id)
         # Publish the initial state to the broker (for other nodes to consume). Note that changes will
         # only be published if the MQTT interface has been configured for publishing updates for this 
         # signal. This allows publish/subscribe to be configured prior to signal creation
-        signals_common.publish_signal_state(sig_id)
+        signals.send_mqtt_signal_updated_event(sig_id)
         # Return the canvas_tag for the tkinter drawing objects
     return(canvas_tag)
 
@@ -142,44 +126,44 @@ def create_ground_position_signal(canvas, sig_id:int,
 
 def update_ground_position_signal (sig_id:int):
     # Establish what the signal should be displaying based on the state
-    if not signals_common.signals[str(sig_id)]["sigclear"]:
-        if ( signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.shunt_ahead or
-             signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.early_shunt_ahead ):
-            aspect_to_set = signals_common.signal_state_type.CAUTION
+    if not signals.signals[str(sig_id)]["sigclear"]:
+        if ( signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.shunt_ahead or
+             signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.early_shunt_ahead ):
+            aspect_to_set = signals.signal_state_type.CAUTION
         else:
-            aspect_to_set = signals_common.signal_state_type.DANGER
+            aspect_to_set = signals.signal_state_type.DANGER
         log_message = " (signal is ON)"
-    elif signals_common.signals[str(sig_id)]["override"]:
-        if ( signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.shunt_ahead or
-             signals_common.signals[str(sig_id)]["sig_subtype"] == ground_pos_sub_type.early_shunt_ahead ):
-            aspect_to_set = signals_common.signal_state_type.CAUTION
+    elif signals.signals[str(sig_id)]["override"]:
+        if ( signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.shunt_ahead or
+             signals.signals[str(sig_id)]["sig_subtype"] == ground_pos_subtype.early_shunt_ahead ):
+            aspect_to_set = signals.signal_state_type.CAUTION
         else:
-            aspect_to_set = signals_common.signal_state_type.DANGER
+            aspect_to_set = signals.signal_state_type.DANGER
         log_message = " (signal is OVERRIDDEN)"
     else:
-        aspect_to_set = signals_common.signal_state_type.PROCEED
+        aspect_to_set = signals.signal_state_type.PROCEED
         log_message = " (signal is OFF)"
     # Only refresh the signal if the aspect has been changed
-    if aspect_to_set != signals_common.signals[str(sig_id)]["sigstate"]:
-        logging.info ("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
-        signals_common.signals[str(sig_id)]["sigstate"] = aspect_to_set
-        if signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.PROCEED:
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="normal")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="normal")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="hidden")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="hidden")
-        elif ( signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.DANGER or
-               signals_common.signals[str(sig_id)]["sigstate"] == signals_common.signal_state_type.CAUTION):
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff1"],state="hidden")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigoff2"],state="hidden")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon1"],state="normal")
-            signals_common.signals[str(sig_id)]["canvas"].itemconfig(signals_common.signals[str(sig_id)]["sigon2"],state="normal")
+    if aspect_to_set != signals.signals[str(sig_id)]["sigstate"]:
+        logging.info("Signal "+str(sig_id)+": Changing aspect to " + str(aspect_to_set).rpartition('.')[-1] + log_message)
+        signals.signals[str(sig_id)]["sigstate"] = aspect_to_set
+        if signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.PROCEED:
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff1"],state="normal")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff2"],state="normal")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon1"],state="hidden")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon2"],state="hidden")
+        elif ( signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.DANGER or
+               signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.CAUTION):
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff1"],state="hidden")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigoff2"],state="hidden")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon1"],state="normal")
+            signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["sigon2"],state="normal")
         # Send the required DCC bus commands to change the signal to the desired aspect. Note that commands will only
         # be sent if the Pi-SPROG interface has been successfully configured and a DCC mapping exists for the signal
         dcc_control.update_dcc_signal_aspects(sig_id, aspect_to_set)
         # Publish the signal changes to the broker (for other nodes to consume). Note that state changes will only
         # be published if the MQTT interface has been successfully configured for publishing updates for this signal
-        signals_common.publish_signal_state(sig_id)            
+        signals.send_mqtt_signal_updated_event(sig_id)            
     return()
 
 ###############################################################################

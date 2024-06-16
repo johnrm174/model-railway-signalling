@@ -4,7 +4,7 @@
 # Makes the following external API calls to library modules:
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
-#    signals_common.signal_exists(id) - To see if the signal exists (local)
+#    signals.signal_exists(id) - To see if the signal exists (local)
 #    track_sections.section_exists(id) - To see if the track section exists (local or remote)
 #
 # Inherits the following common editor base classes (from common):
@@ -21,7 +21,7 @@ import tkinter as Tk
 from . import common
 
 from ..library import gpio_sensors
-from ..library import signals_common
+from ..library import signals
 from ..library import track_sections
 
 #------------------------------------------------------------------------------------
@@ -346,7 +346,7 @@ class timed_signal_route_element():
         self.label2 = Tk.Label(self.frame, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
         self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False, callback=self.signal_updated,
-                exists_function=signals_common.signal_exists, tool_tip="Enter the ID of the signal to "+
+                exists_function=signals.signal_exists, tool_tip="Enter the ID of the signal to "+
                    "trigger. This can be the current signal or another semaphore / colour light "+
                             "signal (on the route ahead of the current signal)")
         self.sig.pack(side=Tk.LEFT)

@@ -87,7 +87,7 @@ def get_sig_file_config(get_sig_file_data:bool = False):
     
     if get_sig_file_data:
         layout_elements["points"]["source"] = points.points
-        layout_elements["signals"]["source"] = signals_common.signals
+        layout_elements["signals"]["source"] = signals.signals
         layout_elements["sections"]["source"] = track_sections.sections
         layout_elements["instruments"]["source"] = block_instruments.instruments
         

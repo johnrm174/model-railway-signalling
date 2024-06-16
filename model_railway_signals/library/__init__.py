@@ -1,6 +1,42 @@
 #------------------------------------------------------------------------------------
-# These are the Public API functions (when you 'from model_railway_signals import *')
+# These are the Public API functions for the library
 #------------------------------------------------------------------------------------
+
+from .signals import signal_type
+from .signals import signal_subtype
+from .signals import semaphore_subtype
+from .signals import ground_pos_subtype
+from .signals import ground_disc_subtype
+from .signals import signal_state_type
+from .signals import route_type
+from .signals import signal_callback_type
+from .signals import signal_exists
+from .signals import delete_signal
+from .signals import set_route
+from .signals import lock_signal
+from .signals import unlock_signal
+from .signals import lock_subsidary
+from .signals import unlock_subsidary
+from .signals import set_signal_override
+from .signals import clear_signal_override
+from .signals import set_signal_override_caution
+from .signals import clear_signal_override_caution
+from .signals import set_approach_control
+from .signals import clear_approach_control
+from .signals import toggle_signal
+from .signals import toggle_subsidary
+from .signals import signal_clear
+from .signals import subsidary_clear
+from .signals import signal_state
+from .signals import trigger_timed_signal
+from .signals import update_colour_light_signal
+from .signals import reset_signals_mqtt_configuration
+from .signals import subscribe_to_remote_signals
+from .signals import set_signals_to_publish_state
+from .signals_colour_lights import create_colour_light_signal
+from .signals_semaphores import create_semaphore_signal
+from .signals_ground_position import create_ground_position_signal
+from .signals_ground_disc import create_ground_disc_signal
 
 from .points import point_type
 from .points import point_callback_type
@@ -84,48 +120,6 @@ from .common import set_root_window
 from .common import shutdown
 from .common import configure_edit_mode
 
-##########################TO UPDATE####################################
-from .signals_common import signal_type
-from .signals_common import route_type
-from .signals_common import signal_callback_type
-from .signals_common import signal_state_type
-from .signals_common import signal_exists
-from .signals_common import delete_signal
-
-from .signals_colour_lights import signal_sub_type
-from .signals_colour_lights import create_colour_light_signal
-
-from .signals_semaphores import semaphore_sub_type
-from .signals_semaphores import create_semaphore_signal
-
-from .signals_ground_position import ground_pos_sub_type
-from .signals_ground_position import create_ground_position_signal
-
-from .signals_ground_disc import ground_disc_sub_type
-from .signals_ground_disc import create_ground_disc_signal
-
-from .signals import set_route
-from .signals import update_signal
-from .signals import lock_signal
-from .signals import unlock_signal
-from .signals import toggle_signal
-from .signals import lock_subsidary
-from .signals import unlock_subsidary
-from .signals import toggle_subsidary
-from .signals import signal_clear
-from .signals import subsidary_clear
-from .signals import signal_state
-from .signals import set_signal_override
-from .signals import clear_signal_override
-from .signals import set_signal_override_caution
-from .signals import clear_signal_override_caution
-from .signals import set_approach_control
-from .signals import clear_approach_control
-from .signals import trigger_timed_signal
-from .signals import subscribe_to_remote_signals
-from .signals import set_signals_to_publish_state
-######################END OF TO UPDATE########################################
-
 __all__ = [
       # Public common functions
         'set_root_window',
@@ -150,40 +144,42 @@ __all__ = [
         'delete_track_sensor',
         'track_sensor_exists',
       # Public signal types/functions
-        'route_type',
-        'signal_exists',
         'signal_type',
-        'signal_sub_type',
-        'semaphore_sub_type',
-        'ground_pos_sub_type',
-        'ground_disc_sub_type',
-        'signal_callback_type',
+        'signal_subtype',
+        'semaphore_subtype',
+        'ground_pos_subtype',
+        'ground_disc_subtype',
         'signal_state_type',
-        'create_colour_light_signal',
-        'create_semaphore_signal',
-        'create_ground_position_signal',
-        'create_ground_disc_signal',
+        'route_type',
+        'signal_callback_type',
+        'signal_exists',
         'delete_signal',
         'set_route',
-        'update_signal',
         'lock_signal',
         'unlock_signal',
-        'toggle_signal',
         'lock_subsidary',
         'unlock_subsidary',
-        'toggle_subsidary',
-        'signal_clear',
-        'subsidary_clear',
-        'signal_state',
         'set_signal_override',
         'clear_signal_override',
         'set_signal_override_caution',
         'clear_signal_override_caution',
         'set_approach_control',
         'clear_approach_control',
+        'toggle_signal',
+        'toggle_subsidary',
+        'signal_clear',
+        'subsidary_clear',
+        'signal_state',
         'trigger_timed_signal',
+        'update_colour_light_signal',
+        'reset_signals_mqtt_configuration',
         'subscribe_to_remote_signals',
         'set_signals_to_publish_state',
+        'create_colour_light_signal',
+        'create_semaphore_signal',
+        'create_ground_position_signal',
+        'create_ground_disc_signal',
+
       # Public track section types/functions
         'section_callback_type',
         'create_section',
@@ -246,3 +242,4 @@ __all__ = [
         'purge_loaded_state_information'
            ]
 
+#############################################################################################################
