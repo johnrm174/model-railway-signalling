@@ -23,14 +23,18 @@ My youTube channel also has a number of videos demonstrating the use of the appl
 
 ## What's new for Release 4.3.0:
 
-* 'Y' points can now be created on the schematic
+* 'Y' points can now be created on the schematic (select in the point configuration dialog
+* Improvements to the 'look' of signal objects on the schematic
 * Bugfix to 'Track Sensor' selection when toggling modes
 
-Bug reports and feedback are welcome and appreciated:
+Bug reports and feedback is welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
 * What aspects do you particularly like?
 * What aspects particularly irritate you?
 * What new features would you like to see?
+
+email: enquiries@model-railway-signalling.co.uk
+(if reporting bugs then please attach the sig file, application logs and any relevant screenshots)
 
 ## Installing the application
 
