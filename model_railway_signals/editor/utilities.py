@@ -358,11 +358,11 @@ class dcc_programming():
             # Create the top level window for DCC Programming 
             self.window = Tk.Toplevel(root_window)
             self.window.title("DCC Programming")
-            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             dcc_programming_window = self.window
             # Create the ok/close button and tooltip - pack first so it remains visible on re-sizing
-            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.close_window)
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
             self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
             # Create an overall frame to pack everything  else in
@@ -378,7 +378,7 @@ class dcc_programming():
             self.cv_programming = cv_programming_element(root_window, self.window, self.labelframe2,
                     dcc_programming_enabled_function, dcc_power_off_function, dcc_power_on_function)        
         
-    def ok(self):
+    def close_window(self):
         global dcc_programming_window
         dcc_programming_window = None
         self.window.destroy()
@@ -402,7 +402,7 @@ class dcc_mappings():
             # Create the top level window 
             self.window = Tk.Toplevel(root_window)
             self.window.title("DCC Mappings")
-            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             dcc_mappings_window = self.window
             # Create the ok/close and refresh buttons - pack first so they remain visible on re-sizing
@@ -411,22 +411,22 @@ class dcc_mappings():
             # Create a subframe to center the buttons in
             self.subframe = Tk.Frame(self.frame1)
             self.subframe.pack()
-            self.B1 = Tk.Button (self.subframe, text = "Ok / Close",command=self.ok)
+            self.B1 = Tk.Button (self.subframe, text = "Ok / Close",command=self.close_window)
             self.B1.pack(side=Tk.LEFT, padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
-            self.B2 = Tk.Button (self.subframe, text = "Refresh",command=self.refresh_display)
+            self.B2 = Tk.Button (self.subframe, text = "Refresh",command=self.load_state)
             self.B2.pack(side=Tk.LEFT, padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.B2, "Reload the current DCC address mappings")
             # Create an overall frame to pack everything else in
             self.mappings_frame = None
-            self.refresh_display()
+            self.load_state()
         
-    def ok(self):
+    def close_window(self):
         global dcc_mappings_window
         dcc_mappings_window = None
         self.window.destroy()
     
-    def refresh_display(self):
+    def load_state(self):
         # Create a frame to hold the mappings (destroy the old one first if needed)
         if self.mappings_frame is not None:
             self.mappings_frame.destroy()
