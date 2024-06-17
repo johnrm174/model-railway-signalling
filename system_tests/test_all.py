@@ -13,6 +13,7 @@ import test_run_layout
 import test_object_edit_windows
 import test_mqtt_networking
 import test_configuration_updates
+import test_menubar_windows
 
 import test_interlocking_examples
 import test_automation_examples
