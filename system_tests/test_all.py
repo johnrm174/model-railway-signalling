@@ -29,6 +29,14 @@ def run_all_tests():
     print("*** Running tests from 'basic_library_tests2.py' ***")
     basic_library_tests2.run_all_basic_library_tests()
     
+    print("*** Running tests from 'test_menubar_windows.py' ***")
+    test_menubar_windows.run_all_menubar_window_tests()
+    print("*** Running tests from 'test_object_edit_windows.py' ***")
+    test_object_edit_windows.run_all_configuration_window_tests()
+    
+    print("*** Running tests from 'test_configuration_updates.py' ***")
+    test_configuration_updates.run_all_configuration_update_tests()
+
     print("*** Running tests from 'test_schematic_editor.py' ***")
     test_schematic_editor.run_all_schematic_editor_tests()
     print("*** Running tests from 'test_object_editing.py' ***")
@@ -37,11 +45,6 @@ def run_all_tests():
     test_run_layout.run_all_run_layout_tests()
     print("*** Running tests from 'test_mqtt_networking.py' ***")
     test_mqtt_networking.run_all_mqtt_networking_tests()
-
-    print("*** Running tests from 'test_configuration_updates.py' ***")
-    test_configuration_updates.run_all_configuration_update_tests()
-    print("*** Running tests from 'test_object_edit_windows.py' ***")
-    test_object_edit_windows.run_all_configuration_window_tests()
 
     print("*** Running tests from 'test_interlocking_examples.py' ***")
     test_interlocking_examples.run_all_interlocking_example_tests()
