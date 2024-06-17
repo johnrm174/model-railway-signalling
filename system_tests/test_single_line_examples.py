@@ -85,8 +85,6 @@ def run_interlocking_tests():
     set_fpls_on(1,2)
     assert_signals_unlocked(3,7)
     assert_signals_locked(1,2,4,5,6,8)
-    
-    
     # Block instrument interlocking
     set_instrument_clear(2)
     assert_signals_unlocked(1,3,7)
@@ -107,7 +105,6 @@ def run_interlocking_tests():
     # Block instrument interlocking #2
     set_instrument_blocked(2)
     set_instrument_clear(1)
-    print("here1")    
     assert_signals_unlocked(6,3,7)
     assert_signals_locked(1,2,4,5,8)
     # Point interlocking with signals (RH)
