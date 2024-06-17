@@ -1,7 +1,7 @@
 # model-railway-signalling
 
 A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
-signalling schemes to be designed and configured via the UI without the need to write any code. The 
+signalling schemes to be designed and configured via the UI without the need to write any code. The
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
 without some of the Raspberry-Pi specific interfacing functions).
 
@@ -16,28 +16,59 @@ without some of the Raspberry-Pi specific interfacing functions).
 
 Configured / pre-installed systems are now available to purchase from:
 [https://www.model-railway-signalling.co.uk/](https://www.model-railway-signalling.co.uk/)
+The website also included a number of user guides that can be downloaded (in PDF format).
 
-## What's new for Release 4.2.0:
+My youTube channel also has a number of videos demonstrating the use of the application:
+[https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-* New 'Track Sensors' feature - extends track occupancy into non-signalled areas such as goods yards and MPDs.
-* Improved 'signal passed' logic - will now detect (and warn the user about) Signal Passed at Danger events.
-* New DCC Mappings utility - to display all mapped DCC addresses and the signals/points they are assigned to.
-* Improved DCC validation - Prevents DCC addresses being mapped if already assigned to another signal or point.
-* Improved GPIO Sensor Settings window -  now includes a back reference to the mapped Signals / 'Track sensors'.
-* GPIO library updated - GPIO inputs are now fully functional on the most recent versions of RPi-OS/Python.
-* A new Public API - to enable integration of your own custom layout interfaces via the MQTT network.
+## What's new for Release 4.3.0:
 
-Bug reports and feedback are welcome and appreciated:
+* 'Y' points can now be created on the schematic (select in the point configuration dialog
+* Improvements to the 'look' of signal objects on the schematic
+* Bugfix to 'Track Sensor' selection when toggling modes
+
+Bug reports and feedback is welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
 * What aspects do you particularly like?
 * What aspects particularly irritate you?
 * What new features would you like to see?
+
+email: enquiries@model-railway-signalling.co.uk
+(if reporting bugs then please attach the sig file, application logs and any relevant screenshots)
 
 ## Installing the application
 
 For a first time installation use:
 <pre>
 $ python3 -m pip install model-railway-signals 
+</pre>
+When installing the application on later versions of python you may get the following error:
+<pre>
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+
+    If you wish to install a non-Debian-packaged Python package,
+    create a virtual environment using python3 -m venv path/to/venv.
+    Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+    sure you have python3-full installed.
+
+    If you wish to install a non-Debian packaged Python application,
+    it may be easiest to use pipx install xyz, which will manage a
+    virtual environment for you. Make sure you have pipx installed.
+
+    See /usr/share/doc/python3.11/README.venv for more information.
+
+note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+hint: See PEP 668 for the detailed specification.
+</pre>
+To overcome this, remove the 'EXTERNALLY-MANAGED' file from the default python installation and then re-attempt the install:
+<pre>
+$ sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/EXTERNALLY-MANAGED.old
+$ python3 -m pip install model-railway-signals
 </pre>
 To upgrade to the latest version use:
 <pre>
@@ -70,11 +101,14 @@ If required, the logging level can be specified at startup (ERROR, WARNING, INFO
 $ python3 -m model_railway_signals -f layout_file.sig -l DEBUG
 </pre>
 
-Documentation, in the form of a Quick-Start guide can be found in the 'user_guide' folder: 
+Application documentation, can be found in the 'user_guide' folder: 
 [https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide](https://github.com/johnrm174/model-railway-signalling/tree/main/user_guide)
 
 Some example layout configuration files can be found in the 'configuration_examples' folder:
 [https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples](https://github.com/johnrm174/model-railway-signalling/tree/main/configuration_examples)
+
+My youTube channel also has a number of videos demonstrating the use of the application:
+[https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
 And finally, a top tip for running the application on the latest Debian Bookworm release which uses Wayland as the GUI backend
 rather than X11 (which was the backend for previous Debian releases). I found that with Wayland, the Tkinter GUI performance

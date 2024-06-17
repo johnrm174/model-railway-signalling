@@ -33,11 +33,11 @@
 #    objects.object_type - used to establish the type of the schematic objects
 #
 # Accesses the following external library objects directly:
-#    signals_common.sig_type - Used to access the signal type
-#    signals_colour_lights.signal_sub_type - Used to access the signal subtype
-#    signals_semaphores.semaphore_sub_type - Used to access the signal subtype
-#    signals_ground_position.ground_pos_sub_type - Used to access the signal subtype
-#    signals_ground_disc.ground_disc_sub_type - Used to access the signal subtype
+#    signals.signal_type - Used to access the signal type
+#    signals.signal_subtype - Used to access the signal subtype
+#    signals.semaphore_subtype - Used to access the signal subtype
+#    signals.ground_pos_subtype - Used to access the signal subtype
+#    signals.ground_disc_subtype - Used to access the signal subtype
 #    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
 #
@@ -45,11 +45,7 @@
 
 import tkinter as Tk
 
-from ..library import signals_common
-from ..library import signals_colour_lights
-from ..library import signals_semaphores
-from ..library import signals_ground_position
-from ..library import signals_ground_disc
+from ..library import signals
 from ..library import block_instruments
 from ..library import points
 
@@ -932,17 +928,17 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     selections = [ ["textbox", lambda:create_object(objects.object_type.textbox) ],
                    ["line", lambda:create_object(objects.object_type.line) ],
                    ["colourlight", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.colour_light.value,
-                                        signals_colour_lights.signal_sub_type.four_aspect.value) ],
+                                        signals.signal_type.colour_light.value,
+                                        signals.signal_subtype.four_aspect.value) ],
                    ["semaphore", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.semaphore.value,
-                                        signals_semaphores.semaphore_sub_type.home.value) ],
+                                        signals.signal_type.semaphore.value,
+                                        signals.semaphore_subtype.home.value) ],
                    ["groundpos", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.ground_position.value,
-                                        signals_ground_position.ground_pos_sub_type.standard.value) ],
+                                        signals.signal_type.ground_position.value,
+                                        signals.ground_pos_subtype.standard.value) ],
                    ["grounddisc", lambda:create_object(objects.object_type.signal,
-                                        signals_common.sig_type.ground_disc.value,
-                                        signals_ground_disc.ground_disc_sub_type.standard.value) ],
+                                        signals.signal_type.ground_disc.value,
+                                        signals.ground_disc_subtype.standard.value) ],
                    ["lhpoint", lambda:create_object(objects.object_type.point,
                                         points.point_type.LH.value) ],
                    ["rhpoint", lambda:create_object(objects.object_type.point,

@@ -1,19 +1,11 @@
 #------------------------------------------------------------------------------------
 # Functions and sub Classes for the Edit Signal "Automation" Tab
-#
-# Makes the following external API calls to other editor modules:
-#########################################################################################################
-# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-# function will not work in edit mode as the Track Section library objects don't exist in edit mode
-# To be addressed in a future software update when the Track Sections functionality is re-factored
-#########################################################################################################
-#    objects.section_exists(id) - To see if the section exists (local) ##################################
-#
+##
 # Makes the following external API calls to library modules:
 #    gpio_sensors.gpio_sensor_exists(id) - To see if the GPIO sensor exists (local or remote)
 #    gpio_sensors.get_gpio_sensor_callback - To see if a GPIO sensor is already mapped
-#    signals_common.sig_exists(id) - To see if the signal exists (local)
-#    track_sections.section_exists(id) - To see if the track section exists       ####################
+#    signals.signal_exists(id) - To see if the signal exists (local)
+#    track_sections.section_exists(id) - To see if the track section exists (local or remote)
 #
 # Inherits the following common editor base classes (from common):
 #    common.str_int_item_id_entry_box
@@ -27,10 +19,9 @@
 import tkinter as Tk
 
 from . import common
-from . import objects ############################################################################
 
 from ..library import gpio_sensors
-from ..library import signals_common
+from ..library import signals
 from ..library import track_sections
 
 #------------------------------------------------------------------------------------
@@ -139,10 +130,6 @@ class signal_passed_sensor_frame:
 #    "get_value" - will return the last "valid" value (integer)
 # Public Class instance methods provided by the section_ahead_frame class:
 #    "validate" - validate all 'section ahead' entry box values and return True/false
-#
-# Note that the software only supports automation of track sections on the local schematic
-# (local sections should be created to 'mirror' remote sections for networked layouts)
-# so we use the section_exists function from the objects module for entry validation
 #------------------------------------------------------------------------------------
 
 class section_behind_element(common.int_item_id_entry_box):
@@ -150,7 +137,7 @@ class section_behind_element(common.int_item_id_entry_box):
         self.frame = Tk.Frame(parent_frame)
         self.frame.pack()
         tool_tip = "Sepecify the track section 'in the rear of' this signal to be cleared when the signal is passed"
-        super().__init__(self.frame, tool_tip=tool_tip, exists_function=objects.section_exists)
+        super().__init__(self.frame, tool_tip=tool_tip, exists_function=track_sections.section_exists)
         self.pack(side=Tk.LEFT)
         self.label = Tk.Label(self.frame, text=" "+u"\u2192")
         self.label.pack(side=Tk.LEFT)
@@ -165,11 +152,11 @@ class section_ahead_element():
                              "to be occupied when the signal is passed")
         tool_tip2 = ("Specify any other track sections on the route that will also override "+
                             "this signal to ON if occupied (if enabled on the right)")
-        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip1)
+        self.t1 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip1)
         self.t1.pack(side = Tk.LEFT)
-        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip2)
+        self.t2 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip2)
         self.t2.pack(side = Tk.LEFT)
-        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=objects.section_exists, tool_tip=tool_tip2)
+        self.t3 = common.int_item_id_entry_box(self.frame, exists_function=track_sections.section_exists, tool_tip=tool_tip2)
         self.t3.pack(side = Tk.LEFT)
 
     def validate(self):
@@ -336,7 +323,7 @@ class general_settings_frame():
 #               Note this class also needs the current signal ID for validation
 #    "get_values" - get the last "validated" values of the check box and entry boxes
 #
-# ote that although the signals.sig_exists function will match both local and remote
+# ote that although the signals.signal_exists function will match both local and remote
 # Signal IDs, the int_item_id_entry_box only allows integers to be selected - so we
 # can safely use this function here for consistency.
 #------------------------------------------------------------------------------------
@@ -359,7 +346,7 @@ class timed_signal_route_element():
         self.label2 = Tk.Label(self.frame, text="  Signal to trigger:")
         self.label2.pack(side=Tk.LEFT)
         self.sig = common.int_item_id_entry_box(self.frame, allow_empty=False, callback=self.signal_updated,
-                exists_function=signals_common.sig_exists, tool_tip="Enter the ID of the signal to "+
+                exists_function=signals.signal_exists, tool_tip="Enter the ID of the signal to "+
                    "trigger. This can be the current signal or another semaphore / colour light "+
                             "signal (on the route ahead of the current signal)")
         self.sig.pack(side=Tk.LEFT)

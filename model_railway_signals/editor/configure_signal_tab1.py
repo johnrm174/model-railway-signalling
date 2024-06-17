@@ -2,7 +2,7 @@
 # Functions and sub Classes for the Edit Signal "Configuration" Tab
 #
 # Makes the following external API calls to library modules:
-#    signals_common.sig_exists(id) - To see if the signal exists (local)
+#    signals.signal_exists(id) - To see if the signal exists (local)
 #    dcc_control.dcc_address_mapping(address) - To see if an address is already mapped
 #
 # Inherits the following common editor base classes (from common):
@@ -18,7 +18,7 @@
 import tkinter as Tk
 
 from . import common
-from ..library import signals_common
+from ..library import signals
 from ..library import dcc_control
 
 #------------------------------------------------------------------------------------
@@ -1139,11 +1139,11 @@ class signal_configuration_tab:
         # Create a Frame to hold the Signal ID and Signal Type Selections
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
-        # Create the UI Element for Item ID selection. Note that although the signals_common.sig_exists
+        # Create the UI Element for Item ID selection. Note that although the signals.signal_exists
         # function will match both local and remote Signal IDs, the object_id_selection only allows integers to
         # be selected - so we can safely use this function here for consistency.
         self.sigid = common.object_id_selection(self.frame1,"Signal ID",
-                                exists_function = signals_common.sig_exists)
+                                exists_function = signals.signal_exists)
         self.sigid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both')
         self.sigtype = common.selection_buttons(self.frame1,"Signal Type",
                     "Select signal type",sig_type_updated,"Colour Light",

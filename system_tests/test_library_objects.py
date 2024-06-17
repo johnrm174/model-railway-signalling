@@ -4,7 +4,6 @@
 
 from system_test_harness import *
 from model_railway_signals.library import signals
-from model_railway_signals.library import signals_common
 import test_object_edit_windows
 
 def test_basic_point_operation(delay:float=0.0):
@@ -116,14 +115,14 @@ def test_basic_semaphore_operation(delay:float=0.0):
     shunt_ahead_signals = (41,33)
     MAIN_dist_arms_only = (36,71,72,73,74,75,76,4,24,3,67,69,16,6)
     MAIN_home_arms_only = (35,45,65,52,64,60,66,70,10,68,18,9,11,21,42,17)
-    MAIN_home_and_sub_arms = (37,50,51,53,54,55,56,20,15,29,13,31,5,8,77,78)
+    MAIN_home_and_sub_arms = (31,37,50,51,53,54,55,56,20,15,29,13,5,8,77,78)
     MAIN_home_and_dist_arms = (39,59,61,58,62,57,63,1,2,32,7,25,12,19,79,80)
-    MAIN_home_dist_and_sub_arms = (38,43,44,46,47,48,49,34,30,22,14,26,23,28,81,82)
+    MAIN_home_dist_and_sub_arms = (26,47,38,43,44,46,48,49,34,30,22,14,23,28,81,82)
     MAIN_all_signals = (MAIN_dist_arms_only + MAIN_home_arms_only + MAIN_home_and_sub_arms +
                    MAIN_home_and_dist_arms + MAIN_home_dist_and_sub_arms + shunt_signals+shunt_ahead_signals)
-    route = list(signals_common.route_type)[1]
+    route = list(signals.route_type)[1]
     print("Running basic semaphore signal switching tests for route: "+str(route))
-    for sig_id in MAIN_all_signals: signals.set_route (sig_id, list(signals_common.route_type)[1],"M")
+    for sig_id in MAIN_all_signals: signals.set_route (sig_id, list(signals.route_type)[1],"M")
     # Tests start here
     assert_signals_PROCEED(*MAIN_dist_arms_only)
     assert_signals_PROCEED(*MAIN_home_arms_only)
@@ -165,9 +164,9 @@ def test_basic_semaphore_operation(delay:float=0.0):
     LH1_home_dist_and_sub_arms = (43,44,48,49,30,22,23,28,81,82)
     LH1_all_signals = (LH1_dist_arms_only + LH1_home_arms_only + LH1_home_and_sub_arms +
                    LH1_home_and_dist_arms + LH1_home_dist_and_sub_arms + shunt_signals + shunt_ahead_signals)
-    route = list(signals_common.route_type)[2]
+    route = list(signals.route_type)[2]
     print("Running basic semaphore signal switching tests for route: "+str(route))
-    for sig_id in LH1_all_signals: signals.set_route (sig_id, list(signals_common.route_type)[2],"1")
+    for sig_id in LH1_all_signals: signals.set_route (sig_id, list(signals.route_type)[2],"1")
     # Tests start here
     assert_signals_PROCEED(*LH1_dist_arms_only)
     assert_signals_PROCEED(*LH1_home_arms_only)
@@ -209,9 +208,9 @@ def test_basic_semaphore_operation(delay:float=0.0):
     LH2_home_dist_and_sub_arms = (44,49,22,28,81,82)
     LH2_all_signals = (LH2_dist_arms_only + LH2_home_arms_only + LH2_home_and_sub_arms +
                    LH2_home_and_dist_arms + LH2_home_dist_and_sub_arms + shunt_signals+shunt_ahead_signals)
-    route = list(signals_common.route_type)[3]
+    route = list(signals.route_type)[3]
     print("Running basic semaphore signal switching tests for route: "+str(route))
-    for sig_id in LH2_all_signals: signals.set_route (sig_id, list(signals_common.route_type)[3],"2")    
+    for sig_id in LH2_all_signals: signals.set_route (sig_id, list(signals.route_type)[3],"2")    
     # Tests start here
     assert_signals_PROCEED(*LH2_dist_arms_only)
     assert_signals_PROCEED(*LH2_home_arms_only)
@@ -253,9 +252,9 @@ def test_basic_semaphore_operation(delay:float=0.0):
     RH1_home_dist_and_sub_arms = (46,47,48,49,14,26,23,28,81,82)
     RH1_all_signals = (RH1_dist_arms_only + RH1_home_arms_only + RH1_home_and_sub_arms +
                    RH1_home_and_dist_arms + RH1_home_dist_and_sub_arms + shunt_signals + shunt_ahead_signals)
-    route = list(signals_common.route_type)[4]
+    route = list(signals.route_type)[4]
     print("Running basic semaphore signal switching tests for route: "+str(route))
-    for sig_id in RH1_all_signals: signals.set_route (sig_id, list(signals_common.route_type)[4],"3")    
+    for sig_id in RH1_all_signals: signals.set_route (sig_id, list(signals.route_type)[4],"3")    
     # Tests start here
     assert_signals_PROCEED(*RH1_dist_arms_only)
     assert_signals_PROCEED(*RH1_home_arms_only)
@@ -297,9 +296,9 @@ def test_basic_semaphore_operation(delay:float=0.0):
     RH2_home_dist_and_sub_arms = (47,49,26,28,81,82)
     RH2_all_signals = (RH2_dist_arms_only + RH2_home_arms_only + RH2_home_and_sub_arms +
                    RH2_home_and_dist_arms + RH2_home_dist_and_sub_arms + shunt_signals + shunt_ahead_signals)
-    route = list(signals_common.route_type)[5]
+    route = list(signals.route_type)[5]
     print("Running basic semaphore signal switching tests for route: "+str(route))
-    for sig_id in RH2_all_signals: signals.set_route (sig_id, list(signals_common.route_type)[5],"4")    
+    for sig_id in RH2_all_signals: signals.set_route (sig_id, list(signals.route_type)[5],"4")    
     # Tests start here
     assert_signals_PROCEED(*RH2_dist_arms_only)
     assert_signals_PROCEED(*RH2_home_arms_only)
@@ -337,7 +336,7 @@ def test_basic_semaphore_operation(delay:float=0.0):
 
 ######################################################################################################
 
-def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_basic_library_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_library_objects1.sig")
     # basic_library_tests1.sig was saved in edit mode
     set_run_mode()
@@ -368,10 +367,10 @@ def run_all_basic_library_tests(delay:float=0.0, shutdown:bool=False):
     ### TO DO - semaphore release on red
     set_edit_mode()
     test_object_edit_windows.test_all_object_edit_windows(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_basic_library_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_basic_library_tests(delay=0.0))
 
 ###############################################################################################################################
     

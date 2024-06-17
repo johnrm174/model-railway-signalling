@@ -9,12 +9,6 @@
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
 #    objects.signal(signal_id) - To get the object_id for a given signal ID
 #    objects.track_sensor(sensor_id) - To get the object_id for a given sensor ID
-#########################################################################################################
-# Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-# function will not work in edit mode as local Track Section library objects don't exist in edit mode
-# To be addressed in a future software update when the Track Sections functionality is re-factored
-#########################################################################################################
-#    objects.section_exists(id) - To see if the Track Section exists  ###################################
 #
 # Accesses the following external editor objects directly:
 #    objects.track_sensor_index - To iterate through all the track sensor objects
@@ -190,21 +184,11 @@ class mirrored_section(common.str_int_item_id_entry_box):
         # Call the common base class init function to create the EB
         self.label1 = Tk.Label(self.subframe1,text="Section to mirror:")
         self.label1.pack(side=Tk.LEFT, padx=2, pady=2)
-        #########################################################################################################
-        # Note that we need to use the a custom 'section_exists' function as the the library 'section_exists'
-        # function will not work for local track sections in edit mode as the local Track Section library objects
-        # don't exist in edit mode (although any subscribed remote track sections will exist). We therefore have
-        # to use a combination of the 'objects.section_exists' and ' track_sections.section_exists' functions
-        # To be addressed in a future software update when the Track Sections functionality is re-factored
-        #########################################################################################################
         super().__init__(self.subframe1, tool_tip = "Enter the ID of the track section to mirror - "+
                          "This can be a local section ID or a remote section ID (in the form 'Node-ID') "+
                          "which has been subscribed to via MQTT networking",
-                          exists_function = self.section_exists)
+                          exists_function = track_sections.section_exists)
         self.pack(side=Tk.LEFT, padx=2, pady=2)
-
-    def section_exists(self,entered_value:str):
-        return (objects.section_exists(entered_value) or track_sections.section_exists(entered_value))
 
 #------------------------------------------------------------------------------------
 # Class for the Default lable entry box - builds on the common entry_box class
@@ -251,13 +235,8 @@ class section_configuration_tab():
         self.frame1 = Tk.Frame(parent_tab)
         self.frame1.pack(padx=2, pady=2, fill='x')
         # Create the UI Element for Section ID selection
-        #########################################################################################################
-        # Note that we need to use the 'objects.section_exists' function as the the library 'section_exists'
-        # function will not work in edit mode as the Track Section library objects don't exist in edit mode
-        # To be addressed in a future software update when the Track Sections functionality is re-factored
-        #########################################################################################################
         self.sectionid = common.object_id_selection(self.frame1, "Section ID",
-                                exists_function = objects.section_exists) 
+                                exists_function = track_sections.section_exists) 
         self.sectionid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create a labelframe for the General settings
         self.subframe1 = Tk.LabelFrame(self.frame1, text="General Settings")
@@ -394,14 +373,7 @@ class edit_section():
             new_object_configuration["itemid"] = self.config.sectionid.get_value()
             new_object_configuration["editable"] = not self.config.readonly.get_value()
             new_object_configuration["mirror"] = self.config.mirror.get_value()
-            # If the default label has changed then we also need to update the actual
-            # label if the actual label text is still set to the old default label text
-            current_label = new_object_configuration["label"]
-            old_default_label = new_object_configuration["defaultlabel"]
-            new_default_label = self.config.label.get_value()
-            new_object_configuration["defaultlabel"] = new_default_label
-            if old_default_label != new_default_label and current_label == old_default_label:
-                new_object_configuration["label"] = new_default_label
+            new_object_configuration["defaultlabel"] = self.config.label.get_value()
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"

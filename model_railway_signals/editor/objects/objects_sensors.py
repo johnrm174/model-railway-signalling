@@ -33,8 +33,7 @@
 #    track_sensors.create_track_sensor(id) - Create the library object
 #    track_sensors.delete_track_sensor(id) - Delete the library object
 #    track_sensors.track_sensor_exists - to find out if the specified Item ID already exists
-#    gpio_sensors.add_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
-#    gpio_sensors.remove_gpio_sensor_callbacks - To remove any GPIO Sensor triggered callbacks
+#    gpio_sensors.update_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
 #
 #-------------------------------------------------------------------------------------------------------------
 
@@ -217,10 +216,10 @@ def redraw_track_sensor_object(object_id):
     canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags
-    objects_common.set_bbox(object_id, objects_common.canvas.bbox(canvas_tags))
+    objects_common.set_bbox(object_id, canvas_tags)
     # If an external GPIO sensor is specified then map this to the Track Sensor
     gpio_sensor = objects_common.schematic_objects[object_id]["passedsensor"] 
-    if gpio_sensor != "": gpio_sensors.add_gpio_sensor_callback(gpio_sensor, sensor_passed=item_id)
+    if gpio_sensor != "": gpio_sensors.update_gpio_sensor_callback(gpio_sensor, sensor_passed=item_id)
     return()
 
 #------------------------------------------------------------------------------------------------------------------
@@ -283,7 +282,7 @@ def delete_track_sensor_object(object_id):
     track_sensors.delete_track_sensor(item_id)
     # Delete the track sensor mapping for the intermediate sensor (if any)
     linked_gpio_sensor = objects_common.schematic_objects[object_id]["passedsensor"]
-    if linked_gpio_sensor != "": gpio_sensors.remove_gpio_sensor_callback(linked_gpio_sensor)
+    if linked_gpio_sensor != "": gpio_sensors.update_gpio_sensor_callback(linked_gpio_sensor)
     return()
 
 #------------------------------------------------------------------------------------------------------------------

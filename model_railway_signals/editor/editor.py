@@ -8,14 +8,11 @@
 #    run_editor() - Start the application
 #
 # Makes the following external API calls to other editor modules:
-#    objects.configure_edit_mode(edit_mode) - Configure the objects module for Edit or Run Mode ######################
 #    objects.reset_objects() - Reset the schematic back to its default state
 #    objects.save_schematic_state(reset_pointer) - Save the state following save or load
 #    objects.set_all(new_objects) - Set the dict of objects following a load
 #    objects.get_all() - Retrieve the dict of objects for saving to file
-#    objects.mqtt_update_signals(pub_list, sub_list) - configure MQTT networking
-#    objects.mqtt_update_sections(pub_list, sub_list) - configure MQTT networking
-#    objects.mqtt_update_instruments(pub_list, sub_list) - configure MQTT networking
+#    objects.configure_remote_gpio_sensor_event_mappings() - set up the GPIO Sensor event mappings
 #    schematic.initialise(root, callback, width, height, grid, snap) - Create the canvas
 #    schematic.configure_edit_mode(edit_mode) - Configure the schematic module for Edit or Run Mode
 #    schematic.update_canvas(width,height,grid,snap) - Update the canvas following reload/resizing
@@ -23,6 +20,7 @@
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
+#    run_layout.schematic_callback() ###################################
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
@@ -46,22 +44,42 @@
 #
 # Makes the following external API calls to library modules:
 #    library_common.set_root_window(widget) - To set the root window
-#    library_common.shutdown() - To shutdown the library module gracefully
 #    library_common.configure_edit_mode(edit_mode) - Configure the library for Edit or Run Mode
+#    library_common.shutdown() - To shutdown the library module gracefully
+#
 #    file_interface.load_schematic(filename) - To load all settings and objects
-#    file_interface.save_schematic(settings,objects,filename,save_as) - Save the layout
-#    file_interface.purge_loaded_state_information() - Called following a re-load
+#    file_interface.save_schematic(settings, objects,filename, save_as) - Save the layout
+#    file_interface.purge_loaded_state_information() - Call following a re-load to clear state
+#
 #    pi_sprog_interface.sprog_connect(port,baud,debug) - Connect to the Pi-sprog
 #    pi_sprog_interface.sprog_disconnect() - Disconnect from the Pi-SPROG
 #    pi_sprog_interface.request_dcc_power_off() - To turn off the track power
 #    pi_sprog_interface.request_dcc_power_on() - To turn on the track power
-#    mqtt_interface.mqtt_broker_connect(url,port,user,pssword) - Connect to the broker
-#    mqtt_interface.mqtt_broker_disconnect() - Disconnect (prior to reconfiguration)
+#
 #    mqtt_interface.configure_mqtt_client(settings) - configure client network details
-#    dcc_control.reset_mqtt_configuration() - reset all publish/subscribe
-#    dcc_control.set_node_to_publish_dcc_commands(publish) - set note to publish DCC
-#    dcc_control.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC from other nodes
+#    mqtt_interface.mqtt_broker_connect(url, port, user, password) - Connect to MQTT broker
+#    mqtt_interface.mqtt_broker_disconnect() - Disconnect from MQTT broker
+#
+#    dcc_control.reset_dcc_mqtt_configuration() - Resets the publish/subscribe configuration
+#    dcc_control.set_node_to_publish_dcc_commands(publish) - set note to publish DCC command feed
+#    dcc_control.subscribe_to_dcc_command_feed(nodes) - subscribe to DCC command feeds from other nodes
+#
 #    gpio_sensors.gpio_interface_enabled() - is the app running on a Raspberry Pi
+#    gpio_sensors.reset_gpio_mqtt_configuration() - Resets the publish/subscribe configuration
+#    gpio_sensors.set_gpio_sensors_to_publish_state(*ids) - Configure objects to publish state changes
+#    objects.subscribe_to_remote_gpio_sensors(*ids) #########################################
+#
+#    signals.reset_signals_mqtt_configuration() - Resets the publish/subscribe configuration
+#    signals.set_signals_to_publish_state(*ids) - Configure objects to publish state changes
+#    signals.subscribe_to_remote_signals(*ids) - subscribe to state updates from other nodes
+#
+#    track_sections.reset_mqtt_setions_configuration() - Resets the publish/subscribe configuration
+#    track_sections.set_sections_to_publish_state(*ids) - Configure objects to publish state changes
+#    track_sections.subscribe_to_remote_sections(*ids) - subscribe to state updates from other nodes
+#
+#    block_instruments.reset_instruments_mqtt_configuration() - Resets the publish/subscribe configuration
+#    block_instruments.set_instruments_to_publish_state(*ids) - Configure objects to publish state changes
+#    block_instruments.subscribe_to_remote_instruments(*ids) - subscribe to state updates from other nodes
 #
 #------------------------------------------------------------------------------------
 
@@ -69,6 +87,7 @@ import os
 import tkinter as Tk
 import logging
 import argparse
+import importlib.resources ######
 
 from . import objects
 from . import settings
@@ -80,7 +99,10 @@ from ..library import file_interface
 from ..library import pi_sprog_interface
 from ..library import mqtt_interface
 from ..library import gpio_sensors
+from ..library import signals
+from ..library import track_sections
 from ..library import dcc_control
+from ..library import block_instruments
 from ..library import common as library_common
 
 # The following imports are only used for the advanced debugging functions
@@ -93,12 +115,23 @@ import tracemalloc
 
 class main_menubar:
     def __init__(self, root):
-        self.root = root
         # Configure the logger (log level gets set later)
         logging.basicConfig(format='%(levelname)s: %(message)s')
         # Create the menu bar
+        self.root = root
         self.mainmenubar = Tk.Menu(self.root)
-        self.root.configure(menu=self.mainmenubar)    
+        self.root.configure(menu=self.mainmenubar)
+        # Create a dummy menubar item for the application Logo
+        resource_folder = 'model_railway_signals.editor.resources'
+        logo_filename = 'dcc_signalling_logo.png'
+        try:
+            with importlib.resources.path(resource_folder, logo_filename) as fully_qualified_filename:
+                self.logo_image = Tk.PhotoImage(file=fully_qualified_filename)
+                self.dummy_menu = Tk.Menu(self.mainmenubar, tearoff=False)
+                self.mainmenubar.add_cascade(menu=self.dummy_menu, image=self.logo_image,
+                                             background="white",activebackground="white")
+        except:
+            pass
         # Create the various menubar items for the File Dropdown
         self.file_menu = Tk.Menu(self.mainmenubar, tearoff=False)
         self.file_menu.add_command(label=" New", command=self.new_schematic)
@@ -271,12 +304,13 @@ class main_menubar:
             sprog_connected = self.sprog_connect()
             if sprog_connected and settings.get_sprog()[4]:
                 self.dcc_power_on()
-        # Initialise the MQTT networking (if configured). Note that we use the menubar 
-        # function for connection so the state is correctly reflected in the UI
-        # The "connect on startup" flag is the 8th parameter returned
+        # Initialise the MQTT networking (if configured). Note that we use the menubar
+        # functionfor connection so the state is correctly reflected in the UI.
+        # The "connect on startup" flag is the 8th parameter returned.
+        self.reset_mqtt_pub_sub_configuration()
         self.mqtt_reconfigure_client()
         if settings.get_mqtt()[7]: self.mqtt_connect()
-        self.mqtt_reconfigure_pub_sub()
+        self.apply_new_mqtt_pub_sub_configuration()
         # Set the Automation Mode (5th param in the returned tuple)
         # Either of these calls will update 'run_layout'
         if settings.get_general()[4]: self.automation_enable()
@@ -337,7 +371,6 @@ class main_menubar:
             settings.set_general(editmode=True)
             schematic.configure_edit_mode(True)
             library_common.configure_edit_mode(True)
-            objects.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
@@ -353,7 +386,6 @@ class main_menubar:
             self.mode_label = new_label
             settings.set_general(editmode=False)
             schematic.configure_edit_mode(False)
-            objects.configure_edit_mode(False)
             library_common.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
         # Enable the the automation menubar selection and update to reflect the current setting
@@ -472,13 +504,15 @@ class main_menubar:
         self.update_mqtt_menubar_controls(False, connected, True)
 
     def mqtt_update(self):
+        # Clear down the existing Pub/sub configuration
+        self.reset_mqtt_pub_sub_configuration()
         # Apply the new signalling network confguration
         self.mqtt_reconfigure_client()
         # Only reset the broker connection if we are already connected - otherwise 
         # do nothing (wait until the next time the user attempts to connect)
         if self.mqtt_label == "MQTT:Connected" : self.mqtt_connect()
         # Reconfigure all publish and subscribe settings
-        self.mqtt_reconfigure_pub_sub()
+        self.apply_new_mqtt_pub_sub_configuration()
         
     def mqtt_reconfigure_client(self):
         network = settings.get_mqtt()[2]
@@ -489,14 +523,25 @@ class main_menubar:
         mqtt_interface.configure_mqtt_client(network, node, debug, publish_shutdown, act_on_shutdown,
                         shutdown_callback = lambda:self.quit_schematic(ask_for_confirm=False))
         
-    def mqtt_reconfigure_pub_sub(self):
-        dcc_control.reset_mqtt_configuration()
+    def reset_mqtt_pub_sub_configuration(self):
+        dcc_control.reset_dcc_mqtt_configuration()
+        gpio_sensors.reset_gpio_mqtt_configuration()
+        signals.reset_signals_mqtt_configuration()
+        track_sections.reset_sections_mqtt_configuration()
+        block_instruments.reset_instruments_mqtt_configuration()
+        
+    def apply_new_mqtt_pub_sub_configuration(self):
         dcc_control.set_node_to_publish_dcc_commands(settings.get_pub_dcc())
         dcc_control.subscribe_to_dcc_command_feed(*settings.get_sub_dcc_nodes())
-        objects.mqtt_update_gpio_sensors(settings.get_pub_sensors(), settings.get_sub_sensors())
-        objects.mqtt_update_signals(settings.get_pub_signals(), settings.get_sub_signals())
-        objects.mqtt_update_sections(settings.get_pub_sections(), settings.get_sub_sections())
-        objects.mqtt_update_instruments(settings.get_pub_instruments(), settings.get_sub_instruments())
+        gpio_sensors.set_gpio_sensors_to_publish_state(*settings.get_pub_sensors())
+        gpio_sensors.subscribe_to_remote_gpio_sensors(*settings.get_sub_sensors())
+        signals.set_signals_to_publish_state(*settings.get_pub_signals())
+        signals.subscribe_to_remote_signals(run_layout.schematic_callback, *settings.get_sub_signals())
+        track_sections.set_sections_to_publish_state(*settings.get_pub_sections())
+        track_sections.subscribe_to_remote_sections(*settings.get_sub_sections())
+        block_instruments.set_instruments_to_publish_state(*settings.get_pub_instruments())
+        block_instruments.subscribe_to_remote_instruments(*settings.get_sub_instruments())
+        objects.configure_remote_gpio_sensor_event_mappings()
 
     #------------------------------------------------------------------------------------------
     # OTHER menubar functions
@@ -521,8 +566,10 @@ class main_menubar:
                     message="Not running on Raspberry Pi - no track sensors will be active")
         # Delete all track sensor objects and then re-create from the updated settings - we do this
         # even if not running on a Raspberry Pi (to enable transfer of layout files between platforms)
-        objects.update_local_gpio_sensors(trigger, timeout, mappings)
-
+        # Then update the GPIO Sensor to Signal / Track Sensor Event Mapings as required
+        objects.create_gpio_sensors(trigger, timeout, mappings)
+        objects.configure_local_gpio_sensor_event_mappings()
+        
     def general_settings_update(self):
         # The spad popups enabled flag is the 6th parameter returned
         run_layout.configure_spad_popups(settings.get_general()[5])
@@ -540,9 +587,10 @@ class main_menubar:
             # Kill off the PhotoImage objects so we don't get spurious exceptions on window close and
             # perform an orderly shutdown (cleanup and disconnect from the MQTT broker, Switch off DCC
             # power and disconnect from the serial port, Revert all GPIO ports to their default states
-            # and then wait until all scheduled Tkinter tasks have completed before destroying root
+            # and then wait until all scheduled Tkinter tasks have completed before destroying root)
             schematic.shutdown()
             library_common.shutdown()
+            self.root.destroy()
         return()
                 
     def new_schematic(self, ask_for_confirm:bool=True):
@@ -601,15 +649,15 @@ class main_menubar:
                 application_version = settings.get_general()[2]
                 if self.tuple_version(sig_file_version) > self.tuple_version(application_version):
                     # We don't provide forward compatibility (too difficult) - so fail fast
-                    logging.error("LOAD LAYOUT - File was saved by "+sig_file_version)
-                    logging.error("LOAD LAYOUT - Current version of the application is "+application_version)
+                    logging.error("Load File - File was saved by "+sig_file_version)
+                    logging.error("Load File - Current version of the application is "+application_version)
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". Upgrade application to "+
                                         sig_file_version+" or later to support this layout file.")
                 elif self.tuple_version(sig_file_version) < self.tuple_version("3.5.0"):
                     # We only provide backward compatibility for a few versions - before that, fail fast
-                    logging.error("LOAD LAYOUT - File was saved by application "+sig_file_version)
-                    logging.error("LOAD LAYOUT - Current version of the application is "+application_version)
+                    logging.error("Load File - File was saved by application "+sig_file_version)
+                    logging.error("Load File - Current version of the application is "+application_version)
                     Tk.messagebox.showerror(parent=self.root, title="Load Error", 
                         message="File was saved by "+sig_file_version+". "+
                                 "This version of the application only supports files saved by version "+
@@ -618,8 +666,8 @@ class main_menubar:
                     # We should now be OK to attempt the load, but if the file was saved under a
                     # previous version then we still want to flag a warning message to the user
                     if self.tuple_version(sig_file_version) < self.tuple_version(application_version):
-                        logging.warning("LOAD LAYOUT - File was saved by application "+sig_file_version)
-                        logging.warning("LOAD LAYOUT - Current version of the application is "+application_version)
+                        logging.warning("Load File - File was saved by application "+sig_file_version)
+                        logging.warning("Load File - Current version of the application is "+application_version)
                         Tk.messagebox.showwarning(parent=self.root, title="Load Warning", 
                             message="File was saved by "+sig_file_version+". "+
                                 "Re-save with current version to ensure forward compatibility.")

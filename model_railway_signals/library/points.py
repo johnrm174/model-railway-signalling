@@ -7,10 +7,13 @@
 #   point_type (use when creating points)
 #      point_type.RH
 #      point_type.LH
+#      point_type.Y
 # 
 #   point_callback_type (tells the calling program what has triggered the callback):
 #      point_callback_type.point_switched (point has been switched)
 #      point_callback_type.fpl_switched (facing point lock has been switched)
+#
+#   point_exists(point_id:int) - returns true if the point object 'exists' 
 # 
 #   create_point - Creates a point object and returns the "tag" for all tkinter canvas drawing objects 
 #                  This allows the editor to move the point object on the schematic as required 
@@ -48,13 +51,13 @@
 #
 #---------------------------------------------------------------------------------------------------
 
+import enum
+import logging
+import tkinter as Tk
+
 from . import dcc_control
 from . import common
 from . import file_interface
-
-import tkinter as Tk
-import enum
-import logging
 
 # -------------------------------------------------------------------------
 # Public API classes (to be used by external functions)
@@ -63,6 +66,7 @@ import logging
 class point_type(enum.Enum):
     RH = 1   # Right Hand point
     LH = 2   # Left Hand point
+    Y = 3    # Y point
     
 # Define the different callbacks types for the point
 class point_callback_type(enum.Enum):
@@ -81,7 +85,7 @@ points: dict = {}
 
 def point_exists(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": point_exists - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": point_exists - Point ID must be an int")
         point_exists = False
     else:
         point_exists = str(point_id) in points.keys()
@@ -111,7 +115,7 @@ def change_button_event(point_id:int):
 def toggle_fpl(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": toggle_fpl - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": toggle_fpl - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": toggle_fpl - Point ID does not exist")
     elif not points[str(point_id)]["hasfpl"]:
@@ -122,12 +126,12 @@ def toggle_fpl(point_id:int):
         if not points[str(point_id)]["fpllock"]:
             logging.info("Point "+str(point_id)+": Activating FPL")
             points[str(point_id)]["changebutton"].config(state="disabled") 
-            points[str(point_id)]["lockbutton"].config(relief="sunken",bg="white") 
+            points[str(point_id)]["lockbutton"].config(relief="sunken",bg=common.bgsunken) 
             points[str(point_id)]["fpllock"] = True 
         else:
             logging.info("Point "+str(point_id)+": Clearing FPL")
             points[str(point_id)]["changebutton"].config(state="normal")  
-            points[str(point_id)]["lockbutton"].config(relief="raised",bg="grey85")
+            points[str(point_id)]["lockbutton"].config(relief="raised",bg=common.bgraised)
             points[str(point_id)]["fpllock"] = False
     return()
 
@@ -144,7 +148,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to SWITCHED")
-        points[str(point_id)]["changebutton"].config(relief="sunken",bg="white")
+        points[str(point_id)]["changebutton"].config(relief="sunken",bg=common.bgsunken)
         points[str(point_id)]["switched"] = True
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="normal") #switched
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="hidden") #normal
@@ -154,7 +158,7 @@ def toggle_point_state (point_id:int, switched_by_another_point:bool=False):
             logging.info("Point "+str(point_id)+": Changing point to NORMAL (switched with another point)")
         else:
             logging.info("Point "+str(point_id)+": Changing point to NORMAL")
-        points[str(point_id)]["changebutton"].config(relief="raised",bg="grey85") 
+        points[str(point_id)]["changebutton"].config(relief="raised",bg=common.bgraised) 
         points[str(point_id)]["switched"] = False
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],state="hidden") #switched 
         points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],state="normal") #normal
@@ -190,7 +194,7 @@ def update_downstream_points(point_id:int):
 def toggle_point(point_id:int, switched_by_another_point:bool=False):
     global points
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": toggle_point - Point ID must be an integer")
+        logging.error("Point "+str(point_id)+": toggle_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": toggle_point - Point ID does not exist")
     elif points[str(point_id)]["automatic"] and not switched_by_another_point:
@@ -221,49 +225,55 @@ def create_point (canvas, point_id:int, pointtype:point_type,
     global points
     # Set a unique 'tag' to reference the tkinter drawing objects
     canvas_tag = "point"+str(point_id)
-    if not isinstance(point_id, int) or point_id < 1:
-        logging.error("Point "+str(point_id)+": create_point - Point ID must be a positive integer")
+    if not isinstance(point_id, int) or point_id < 1 or point_id > 99:
+        logging.error("Point "+str(point_id)+": create_point - Point ID must be an int(1-99)")
     elif point_exists(point_id):
         logging.error("Point "+str(point_id)+": create_point - Point ID already exists")
     elif not isinstance(also_switch, int):
-        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an integer")
+        logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID must be an int")
     elif also_switch == point_id:
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
-    elif pointtype != point_type.LH and pointtype != point_type.RH:
+    elif pointtype != point_type.LH and pointtype != point_type.RH and pointtype != point_type.Y:
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Type specified")
     elif fpl and auto:
         logging.error("Point "+str(point_id)+": create_point - Automatic point should be created without a FPL")
     else:
         logging.debug("Point "+str(point_id)+": Creating library object on the schematic")
         # Create the button objects and their callbacks
-        if point_id < 10: main_button_text = "0" + str(point_id)
-        else: main_button_text = str(point_id)
-        point_button = Tk.Button (canvas, text=main_button_text, state="normal", relief="raised",
-                                  font=('Courier',common.fontsize,"normal"),bg= "grey85",
+        point_button = Tk.Button (canvas, text=format(point_id,'02d'), state="normal", relief="raised",
+                                  font=('Courier',common.fontsize,"normal"),bg=common.bgraised,
                                   padx=common.xpadding, pady=common.ypadding,
                                   command = lambda:change_button_event(point_id))
         fpl_button = Tk.Button (canvas,text="L",state="normal", relief="sunken",
-                                font=('Courier',common.fontsize,"normal"), bg = "white",
+                                font=('Courier',common.fontsize,"normal"), bg=common.bgsunken,
                                 padx=common.xpadding, pady=common.ypadding, 
                                 command = lambda:fpl_button_event(point_id))
         # Disable the change button if the point has FPL (default state = FPL active)
         if fpl: point_button.config(state="disabled")
-        # Create the Tkinter drawing objects for the point
+        # Create the Tkinter drawing objects
         if pointtype==point_type.RH:
             # Draw the lines representing a Right Hand point
-            line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
-            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
-            line_coords = common.rotate_line (x,y,-25,0,-15,+10,orientation)
-            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
-            line_coords = common.rotate_line (x,y,-10,0,+25,0,orientation)
-            canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
-            line_coords = common.rotate_line (x,y,-15,+10,0,+25,orientation)
+            line_coords = common.rotate_line(x,y,-25,0,-10,0,orientation) 
+            blade1 = canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
+            line_coords = common.rotate_line(x,y,-25,0,-15,+10,orientation)
+            blade2 = canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
+            line_coords = common.rotate_line(x,y,-10,0,+25,0,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
+            line_coords = common.rotate_line(x,y,-15,+10,0,+25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button_y_offset = -9-(common.fontsize/2)
+            if fpl and orientation == 0: button_x_offset = 2-common.fontsize
+            elif fpl: button_x_offset = 8-common.fontsize
+            else: button_x_offset = -6-(common.fontsize/2)
             # Create the button windows in the correct relative positions for a Right Hand Point
-            point_coords = common.rotate_point (x,y,-3,-13,orientation)
-            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
-            if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
-        else: 
+            # Note that the button is offset to take into account the default font size in 'common'
+            point_coords = common.rotate_point (x,y,button_x_offset,button_y_offset,orientation)
+            if fpl: 
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                canvas.create_window (point_coords,window=point_button,tags=canvas_tag) 
+        elif pointtype==point_type.LH: 
             # Draw the lines representing a Left Hand point
             line_coords = common.rotate_line (x,y,-25,0,-10,0,orientation) 
             blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
@@ -273,10 +283,43 @@ def create_point (canvas, point_id:int, pointtype:point_type,
             canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
             line_coords = common.rotate_line (x,y,-15,-10,0,-25,orientation)
             canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button_y_offset = +9+(common.fontsize/2)
+            if fpl and orientation == 0: button_x_offset = -common.fontsize
+            elif fpl: button_x_offset = 8-common.fontsize
+            else: button_x_offset = -6-(common.fontsize/2)
             # Create the button windows in the correct relative positions for a Left Hand Point
-            point_coords = common.rotate_point (x,y,-3,+13,orientation)
-            if not auto: canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
-            if fpl: canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            # Note that the button is offset to take into account the default font size in 'common'
+            point_coords = common.rotate_point (x,y,button_x_offset,button_y_offset,orientation)
+            if fpl: 
+                canvas.create_window (point_coords,anchor=Tk.W,window=point_button,tags=canvas_tag) 
+                canvas.create_window (point_coords,anchor=Tk.E,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                canvas.create_window (point_coords,window=point_button,tags=canvas_tag) 
+        elif pointtype==point_type.Y:
+            # Draw the lines representing a Y point
+            line_coords = common.rotate_line(x,y,-25,0,0,0,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) # Root route
+            line_coords = common.rotate_line(x,y,0,0,+10,-10,orientation) 
+            blade1 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straignt blade
+            line_coords = common.rotate_line(x,y,0,0,+10,+10,orientation)
+            blade2 = canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #switched blade
+            line_coords = common.rotate_line(x,y,+10,-10,+25,-25,orientation)
+            canvas.create_line (line_coords,fill=colour,width=3,tags=canvas_tag) #straight route
+            line_coords = common.rotate_line(x,y,+10,+10,+25,+25,orientation)
+            canvas.create_line(line_coords,fill=colour,width=3,tags=canvas_tag) #switched route
+            button1_y_offset = +9+(common.fontsize/2)
+            button2_y_offset = -9-(common.fontsize/2)
+            button_x_offset = -10-(common.fontsize/2)
+            # Create the button windows in the correct relative positions for a Y Point
+            # Note that the button is offset to take into account the default font size in 'common'
+            if fpl: 
+                point_coords = common.rotate_point(x,y,button_x_offset,button1_y_offset,orientation)
+                canvas.create_window(point_coords,window=point_button,tags=canvas_tag) 
+                point_coords = common.rotate_point(x,y,button_x_offset,button2_y_offset,orientation)
+                canvas.create_window(point_coords,window=fpl_button,tags=canvas_tag)
+            elif not auto:
+                point_coords = common.rotate_point(x,y,button_x_offset,button1_y_offset,orientation)
+                canvas.create_window(point_coords,window=point_button,tags=canvas_tag) 
         # The "normal" state of the point is the straight through route by default
         # With reverse set to True, the divergent route becomes the "normal" state
         if reverse is True: blade1, blade2 = blade2, blade1
@@ -332,7 +375,7 @@ def create_point (canvas, point_id:int, pointtype:point_type,
 def lock_point(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": lock_point - Point ID does not exist")
     elif not points[str(point_id)]["locked"]:
@@ -356,7 +399,7 @@ def lock_point(point_id:int):
 def unlock_point(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": unlock_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": unlock_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": unlock_point - Point ID does not exist")
     elif points[str(point_id)]["locked"]:
@@ -376,7 +419,7 @@ def unlock_point(point_id:int):
 
 def point_switched(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": point_switched - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": point_switched - Point ID must be an int")    
         switched = False
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": point_switched - Point ID does not exist")
@@ -391,7 +434,7 @@ def point_switched(point_id:int):
 
 def fpl_active(point_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": fpl_active - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": fpl_active - Point ID must be an int")    
         locked = False
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": fpl_active - Point ID does not exist")
@@ -412,7 +455,7 @@ def fpl_active(point_id:int):
 def delete_point(point_id:int):
     global points
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": delete_point - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": delete_point - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": delete_point - Point ID does not exist")
     else:
@@ -435,11 +478,11 @@ def delete_point(point_id:int):
 
 def update_autoswitch(point_id:int, autoswitch_id:int):
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": update_autoswitch - Point ID must be an integer")    
+        logging.error("Point "+str(point_id)+": update_autoswitch - Point ID must be an int")    
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": update_autoswitch - Point ID does not exist")
     elif not isinstance(autoswitch_id, int):
-        logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID must be an integer")    
+        logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID must be an int")    
     elif autoswitch_id > 0 and not point_exists(autoswitch_id):
         logging.error("Point "+str(point_id)+": update_autoswitch - Autoswitch ID does not exist")
     else:

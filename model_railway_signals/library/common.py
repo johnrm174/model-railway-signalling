@@ -23,10 +23,12 @@ import math
 import queue
 import logging
 import time
+
 from . import mqtt_interface
 from . import pi_sprog_interface
 from . import gpio_sensors
 from . import track_sensors
+from . import track_sections
 
 # -------------------------------------------------------------------------
 # Global variables used within the Library Modules
@@ -54,6 +56,7 @@ shutdown_initiated = False
 
 def configure_edit_mode(edit_mode:bool):
     track_sensors.configure_edit_mode(edit_mode)
+    track_sections.configure_edit_mode(edit_mode)
     return()
 
 #-------------------------------------------------------------------------
@@ -72,9 +75,10 @@ def shutdown():
         # Clear out any retained messages and disconnect from broker
         mqtt_interface.mqtt_shutdown()
         # Turn off the DCC bus power and close the comms port
-        pi_sprog_interface.sprog_shutdown()
+        pi_sprog_interface.request_dcc_power_off()
+        pi_sprog_interface.sprog_disconnect()
         # Return the GPIO ports to their original configuration
-        gpio_sensors.gpio_shutdown()
+        gpio_sensors.delete_all_local_gpio_sensors()
         # Wait until all the tasks we have scheduled via the tkinter 'after' method have completed
         # We need to put a timeout around this to deal with any scheduled Tkinter "after" events
         # (although its unlikely the user would initiate a shut down until these have finished)
@@ -88,7 +92,6 @@ def shutdown():
                 break
         if time.time() >= timeout_start + 30:
             logging.warning ("Timeout waiting for scheduled tkinter events to complete - Exiting anyway")
-        root_window.destroy()
     return()
 
 #-------------------------------------------------------------------------

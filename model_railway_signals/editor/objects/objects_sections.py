@@ -10,20 +10,16 @@
 #    delete_section_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    default_section_object - The dictionary of default values for the object
-#    mqtt_update_sections(pub_list, sub_list) - Configure MQTT publish/subscribe
-#    enable_editing() - Called when 'Edit' Mode is selected (from Schematic Module)
-#    disable_editing() - Called when 'Run' Mode is selected (from Schematic Module)
 #
 # Makes the following external API calls to other editor modules:
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.section - To get The Object_ID for a given Item_ID
-#    objects_common.section_exists - Common function to see if a given item exists
-#    objects_signals.update_references_to_instrument - when the instrument ID is changed
-#    objects_signals.remove_references_to_instrument - when the instrument is deleted
-#    objects_sensors.update_references_to_point - called when the point ID is changed
-#    objects_sensors.remove_references_to_point - called when the point is deleted
+#    objects_signals.update_references_to_section - when the Section ID is changed
+#    objects_signals.remove_references_to_section - when the Section is deleted
+#    objects_sensors.update_references_to_section - called when the Section ID is changed
+#    objects_sensors.remove_references_to_section - called when the Section is deleted
 #    
 # Accesses the following external editor objects directly:
 #    run_layout.schematic_callback - setting the object callbacks when created/recreated
@@ -34,12 +30,10 @@
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
 # Makes the following external API calls to library modules:
+#    track_sections.section_exists - Common function to see if a given item exists
 #    track_sections.delete_section(id) - delete library drawing object (part of soft delete)
 #    track_sections.create_section(id) -  To create the library object (create or redraw)
-#    track_sections.get_boundary_box(id) - get the boundary box for the section (i.e. selection area)
-#    track_sections.bind_selection_events(id) - Bind schematic events to the section "button"
-#    track_sections.set_sections_to_publish_state(IDs) - configure MQTT networking
-#    track_sections.subscribe_to_section_updates(node,IDs) - configure MQTT networking
+#    track_sections.update_mirrored(id, mirrored_id) - To update the mirrored section reference
 #
 #------------------------------------------------------------------------------------
 
@@ -60,72 +54,8 @@ from .. import run_layout
 default_section_object = copy.deepcopy(objects_common.default_object)
 default_section_object["item"] = objects_common.object_type.section
 default_section_object["defaultlabel"] = "XXXXX"
-default_section_object["label"] = default_section_object["defaultlabel"]
-default_section_object["state"] = False
 default_section_object["editable"] = True
 default_section_object["mirror"] = ""
-
-#------------------------------------------------------------------------------------
-# The editing_enabled flag is used to control whether the track section object
-# is created as 'editable' or 'non-editable' (i.e. when 'running' the layout)
-#------------------------------------------------------------------------------------
-
-editing_enabled = True
-
-#------------------------------------------------------------------------------------
-# Internal function to delete/re-draw the track section objects following a mode change.
-# We delete everything first before re-drawing to keep Tkinter happy (otherwise it breaks)
-# The 'reset_state' flag is False when the objects are being re-drawn after a mode toggle
-# between edit and run mode to maintain state (improved the user experience). For all other
-# cases, the track section will be set to its default state on re-drawing (i.e. exactly
-# the same behavior as all other library objects (signals, points, instruments)
-#------------------------------------------------------------------------------------
-
-def redraw_all_section_objects(reset_state:bool=False):
-    for section_id in objects_common.section_index:
-        object_id = objects_common.section(section_id)
-        delete_section_object(object_id)
-    for section_id in objects_common.section_index:
-        object_id = objects_common.section(section_id)
-        redraw_section_object(object_id, reset_state=False)
-    return()
-
-#------------------------------------------------------------------------------------
-# Functions to set run/edit mode - We care about this for track sections as we can
-# only use library objects in run mode. In edit mode we have to use a 'fake' track
-# section object that is selectable/moveable via canvas mouse/keyboard events
-#------------------------------------------------------------------------------------
-
-def enable_editing():
-    global editing_enabled
-    editing_enabled = True
-    # Save the current state of the track section library objects
-    for section_id in objects_common.section_index:
-        object_id = objects_common.section(section_id)
-        current_state = track_sections.section_occupied(int(section_id))
-        current_label = track_sections.section_label(int(section_id))
-        objects_common.schematic_objects[object_id]["state"] = current_state
-        objects_common.schematic_objects[object_id]["label"] = current_label
-    # Re-draw the section objects - this will delete the library track section
-    # objects and draw dummy objects in their place
-    redraw_all_section_objects()
-    return()
-
-def disable_editing():
-    global editing_enabled
-    editing_enabled = False
-    # Re-draw the section objects - this will delete the dummy placeholder objects
-    # and create the 'real' library track section objects in their place
-    redraw_all_section_objects()
-    # Set the state of the track section objects to match the retained configuration
-    for section_id in objects_common.section_index:
-        object_id = objects_common.section(section_id)
-        section_label = objects_common.schematic_objects[object_id]["label"]
-        if objects_common.schematic_objects[object_id]["state"]:
-            track_sections.set_section_occupied(section_id, section_label)
-        else:
-            track_sections.clear_section_occupied(section_id, section_label)
-    return()
 
 #------------------------------------------------------------------------------------
 # Internal function to Update any references from other Track Sections (mirrored section)
@@ -138,6 +68,8 @@ def update_references_to_section(old_section_id:int, new_section_id:int):
         # We use strings as the IDs support local or remote sections
         if objects_common.schematic_objects[object_id]["mirror"] == str(old_section_id):
             objects_common.schematic_objects[object_id]["mirror"] = str(new_section_id)
+            # Update the mirrored section reference for the library object
+            track_sections.update_mirrored(int(section_id), str(new_section_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -151,10 +83,12 @@ def remove_references_to_section(deleted_sec_id:int):
         # We use string comparison as the IDs support local or remote sections
         if objects_common.schematic_objects[section_object]["mirror"] == str(deleted_sec_id):
             objects_common.schematic_objects[section_object]["mirror"] = ""
+            # Update the mirrored section reference for the library object
+            track_sections.update_mirrored(int(section_id), "")
     return()
 
 #------------------------------------------------------------------------------------
-# Function to to update asection object after a configuration change
+# Function to to update a section object after a configuration change
 #------------------------------------------------------------------------------------
 
 def update_section(object_id, new_object_configuration):
@@ -186,49 +120,20 @@ def update_section(object_id, new_object_configuration):
 # (i.e. exactly the same behavior as all other library objects (signals, points etc)
 #------------------------------------------------------------------------------------
 
-def redraw_section_object(object_id, reset_state:bool=True):
-    global editing_enabled
-    if reset_state:
-        objects_common.schematic_objects[object_id]["state"] = default_section_object["state"]
-        objects_common.schematic_objects[object_id]["label"] = objects_common.schematic_objects[object_id]["defaultlabel"]
-    # If we are in edit mode then we draw a "dummy" Tracck Section using canvas objects
-    # so we can use the mouse events for selecting and moving them (normal Track section
-    # objects are selectable buttons which makes selection/moving overly complicated)
-    if editing_enabled:
-        # Set the tkinter 'tags' to use when creating the drawing objects
-        objects_common.schematic_objects[object_id]["tags"] = "section"+ str(objects_common.schematic_objects[object_id]["itemid"])
-        # Create the text item first using the default section label to define the width
-        text_item = objects_common.canvas.create_text(
-                    objects_common.schematic_objects[object_id]["posx"],
-                    objects_common.schematic_objects[object_id]["posy"],
-                    text = objects_common.schematic_objects[object_id]["defaultlabel"],
-                    tags=objects_common.schematic_objects[object_id]["tags"],
-                    font=('Ariel',8,"normal"), fill="white")
-        # get the boundary box of the text box and use this to create the background rectangle
-        bbox = objects_common.canvas.bbox(text_item)
-        rect_item = objects_common.canvas.create_rectangle(
-                    bbox[0]-4, bbox[1]-3, bbox[2]+4, bbox[3]+3,
-                    tags=objects_common.schematic_objects[object_id]["tags"],
-                    fill="black")
-        # raise the text item to be in front of the rectangle item
-        objects_common.canvas.tag_raise(text_item,rect_item)
-        # Now the width is set, update the section label to show the section ID
-        section_label = format(objects_common.schematic_objects[object_id]["itemid"],'02d')
-        objects_common.canvas.itemconfigure(text_item, text=section_label)
-        # Create/update the selection rectangle for the Track Section
-        objects_common.set_bbox(object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
-    else:
-        track_sections.create_section(
-                    canvas = objects_common.canvas,
-                    section_id = objects_common.schematic_objects[object_id]["itemid"],
-                    x = objects_common.schematic_objects[object_id]["posx"],
-                    y = objects_common.schematic_objects[object_id]["posy"],
-                    section_callback = run_layout.schematic_callback,
-                    label = objects_common.schematic_objects[object_id]["defaultlabel"],
-                    editable = objects_common.schematic_objects[object_id]["editable"])
-        # Create/update the canvas "tags" and selection rectangle for the Track Section
-        objects_common.schematic_objects[object_id]["tags"] = track_sections.get_tags(objects_common.schematic_objects[object_id]["itemid"])
-        objects_common.set_bbox(object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
+def redraw_section_object(object_id):
+    # Create the Track Section library object
+    canvas_tags = track_sections.create_section(
+                canvas = objects_common.canvas,
+                section_id = objects_common.schematic_objects[object_id]["itemid"],
+                x = objects_common.schematic_objects[object_id]["posx"],
+                y = objects_common.schematic_objects[object_id]["posy"],
+                section_callback = run_layout.schematic_callback,
+                default_label = objects_common.schematic_objects[object_id]["defaultlabel"],
+                editable = objects_common.schematic_objects[object_id]["editable"],
+                mirror_id = objects_common.schematic_objects[object_id]["mirror"])
+    # Create/update the canvas "tags" and selection rectangle for the Track Section
+    objects_common.schematic_objects[object_id]["tags"] = canvas_tags
+    objects_common.set_bbox(object_id, canvas_tags)
     return()
  
 #------------------------------------------------------------------------------------
@@ -241,7 +146,7 @@ def create_section():
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_section_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=objects_common.section_exists)
+    item_id = objects_common.new_item_id(exists_function=track_sections.section_exists)
     # Add the specific elements for this particular instance of the section
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["posx"] = x
@@ -264,7 +169,7 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=objects_common.section_exists)
+    new_id = objects_common.new_item_id(exists_function=track_sections.section_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.section_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
@@ -272,9 +177,6 @@ def paste_section(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy:
     objects_common.schematic_objects[new_object_id]["mirror"] = default_section_object["mirror"]
-    objects_common.schematic_objects[new_object_id]["state"] = default_section_object["state"]
-    # Copy across the default label and "reset" the actual lable to the copied default label
-    objects_common.schematic_objects[new_object_id]["label"] = objects_common.schematic_objects[new_object_id]["defaultlabel"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Draw the new object
@@ -312,16 +214,4 @@ def delete_section(object_id):
     del objects_common.schematic_objects[object_id]
     return()
 
-#------------------------------------------------------------------------------------
-# Function to update the MQTT networking configuration for sections, namely
-# subscribing to remote sections and setting local sections to publish state
-#------------------------------------------------------------------------------------
-
-def mqtt_update_sections(sections_to_publish:list, sections_to_subscribe_to:list):
-    track_sections.reset_mqtt_configuration()
-    track_sections.set_sections_to_publish_state(*sections_to_publish)
-    for section_identifier in sections_to_subscribe_to:
-        track_sections.subscribe_to_remote_section(section_identifier, run_layout.schematic_callback)
-    return()
-    
 ####################################################################################

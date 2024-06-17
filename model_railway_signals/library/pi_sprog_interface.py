@@ -51,8 +51,6 @@
 #   send_accessory_short_event(address:int, active:bool) - sends out a CBUS command to the
 #          Pi-Sprog to be translated into a DCC command for transmission on the DCC Bus
 #
-#   sprog_shutdown() - performs an ordely DCC power off and disconnect
-#
 # --------------------------------------------------------------------------------------------
 #
 # Note that the Pi-SPROG-3 needs the UART interfaces to be swapped so that
@@ -456,17 +454,6 @@ def sprog_disconnect():
     return(pi_sprog_disconnected)
 
 #------------------------------------------------------------------------------
-# Function called on shutdown to turn off DCC bus power and close the comms port
-#------------------------------------------------------------------------------
-
-def sprog_shutdown():
-    # Ensure the track power is turned off
-    if serial_port.is_open: request_dcc_power_off()
-    # Now close the comms port and exit
-    sprog_disconnect()
-    return()
-
-#------------------------------------------------------------------------------
 # Function to send a RSTAT (Request command Station Status) command (response logged)
 # Returns True if successful and False if no response is received (timeout)
 # Results in a character string of ':SA020N0C' being sent out to the Pi-SPROG
@@ -522,8 +509,6 @@ def request_dcc_power_on():
         else: logging.error("Pi-SPROG: Request to turn on Track Power failed")
         # Give things time to get established before sending out any commands
         time.sleep (0.1)
-    else:
-        logging.warning("Pi-SPROG: Cannot Request Track Power On - SPROG is disconnected")
     return(ton_response)
 
 #------------------------------------------------------------------------------
@@ -550,8 +535,6 @@ def request_dcc_power_off():
             logging.debug("Pi-SPROG: Received TOF (Track OFF) acknowledgement")
             logging.info("Pi-SPROG: Track power has been turned OFF")
         else: logging.error("Pi-SPROG: Request to turn off Track Power failed")
-    else:
-        logging.warning("Pi-SPROG: Cannot Request Track Power Off - SPROG is disconnected")
     return(tof_response)
 
 #------------------------------------------------------------------------------

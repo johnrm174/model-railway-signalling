@@ -1,3 +1,9 @@
+#################################################################################################
+#################################################################################################
+### Includes Code to handle breaking changes for Release 4.3.0 in the load_file function ########
+#################################################################################################
+#################################################################################################
+
 # ----------------------------------------------------------------------------------------------
 # This library module enables layout schematics to be saved and loaded to/from file
 # (this includes all schematic editor settings, schematic objects and object state)
@@ -38,7 +44,8 @@ import json
 import logging
 import tkinter.messagebox
 import tkinter.filedialog
-from . import signals_common
+
+from . import signals
 from . import track_sections
 from . import block_instruments
 from . import points
@@ -80,7 +87,7 @@ def get_sig_file_config(get_sig_file_data:bool = False):
     
     if get_sig_file_data:
         layout_elements["points"]["source"] = points.points
-        layout_elements["signals"]["source"] = signals_common.signals
+        layout_elements["signals"]["source"] = signals.signals
         layout_elements["sections"]["source"] = track_sections.sections
         layout_elements["instruments"]["source"] = block_instruments.instruments
         
@@ -158,8 +165,30 @@ def load_schematic(requested_filename:str=None):
                 # update the global 'last_fully_qualified_file_name' for the next save/load
                 layout_state = loaded_state
                 last_fully_qualified_file_name = filename_to_load
-        # Return the filename that was actually loaded (which will be None if the load failed)
-        # And the dictionary containing the layout state (configuration, objects, state etc)
+
+            #################################################################################################
+            ### Handle breaking change for refactoring of track sections from release 4.3.0 onwards #########
+            ### Track section library objects now exist in both RUN and EDIT modes but old 'sig' files ######
+            ### (Release 4.2.0 or earlier) hold the 'state' information in the 'object' configuration #######
+            ### rather than the 'library' configuration - we therefore need to read this across #############
+            #################################################################################################
+            if layout_state["sections"] == {}:
+                for object_id in layout_state["objects"]:
+                    if layout_state["objects"][object_id]["item"] == "section":
+                        section_id = layout_state["objects"][object_id]["itemid"]
+                        section_state = layout_state["objects"][object_id]["state"]
+                        section_text = layout_state["objects"][object_id]["label"]
+                        logging.debug("LOAD LAYOUT - Section "+str(section_id)+" - Assigning state from "
+                                      + "object onfiguration (handle breaking change for Release 4.3.0)")
+                        layout_state["sections"][str(section_id)] = {}
+                        layout_state["sections"][str(section_id)]["occupied"] = section_state
+                        layout_state["sections"][str(section_id)]["labeltext"] = section_text
+            #################################################################################################
+            ### End of Handle Breaking Changes for Track Sensor Refactoring #################################
+            #################################################################################################
+
+    # Return the filename that was actually loaded (which will be None if the load failed)
+    # And the dictionary containing the layout state (configuration, objects, state etc)
     return(filename_to_load, layout_state)
 
 #-------------------------------------------------------------------------------------------------

@@ -10,17 +10,15 @@
 #    point(item_id:int) - helper function to find the object Id by Item ID
 #    section(item_id:int) - helper function to find the object Id by Item ID
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
+#    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
-#    section_exists(item_id:int) - Common function to see if a given item exists ###############
+#
 #    line_exists (item_id:int) - Common function to see if a given item exists #################
 #
-#    update_local_gpio_sensors(trigger,timeout,mappings) - configure local track sections
-#    mqtt_update_sensors(pub_list, sub_list) - configure MQTT publish/subscribe
-#    mqtt_update_signals(pub_list, sub_list) - configure MQTT publish/subscribe
-#    mqtt_update_sections(pub_list, sub_list) - configure MQTT publish/subscribe
-#    mqtt_update_instruments(pub_list, sub_list) - configure MQTT publish/subscribe
+#    create_gpio_sensors(trigger,timeout,mappings) - Configure the local GPIO sensor mappings
+#    configure_local_gpio_sensor_event_mappings() - configure local GPIO event mappings (after MQTT config update)
+#    configure_remote_gpio_sensor_event_mappings() - configure remote GPIO event mappings (after MQTT config update)
 #
-#    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #    reset_objects() - resets all points, signals, instruments and sections to default state
 #    set_all(new_objects) - Creates a new dictionary of objects (following a load)
 #    get_all() - returns the current dictionary of objects (for saving to file)
@@ -43,8 +41,9 @@
 #    schematic_objects - For accessing/editing the configuration of an object
 #    signal_index - for iterating through all the signal objects
 #    point_index - for iterating through all the point objects
-#    instrument_index - for iterating through all the instrument objects
 #    section_index - for iterating through all the section objects
+#    line_index - for iterating through all the line objects
+#    track_sensor_index - for iterating through all the track_sensor objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -64,8 +63,8 @@ from .objects import copy_objects
 from .objects import paste_objects
 from .objects import update_object
 from .objects import save_schematic_state
-from .objects import configure_edit_mode
 from .objects import reset_objects
+
 from .objects_common import initialise
 from .objects_common import update_canvas
 from .objects_common import signal 
@@ -75,7 +74,6 @@ from .objects_common import instrument
 from .objects_common import line
 from .objects_common import track_sensor
 
-from .objects_common import section_exists  ####################
 from .objects_common import line_exists  #######################
 
 from .objects_common import object_type
@@ -88,52 +86,54 @@ from .objects_common import line_index
 from .objects_common import track_sensor_index
 
 from .objects_lines import get_endstop_offsets
-from .objects_signals import mqtt_update_signals
-from .objects_sections import mqtt_update_sections
-from .objects_instruments import mqtt_update_instruments
-from .objects_gpio import update_local_gpio_sensors
-from .objects_gpio import mqtt_update_gpio_sensors
 
-# The following code does nothing apart from suppressing
-# the spurious pyflakes warnings for unused imports
+from .objects_gpio import create_gpio_sensors
+from .objects_gpio import configure_remote_gpio_sensor_event_mappings
+from .objects_gpio import configure_local_gpio_sensor_event_mappings
 
-assert set_all
-assert get_all
-assert undo
-assert redo
-assert create_object
-assert delete_objects
-assert rotate_objects
-assert move_objects
-assert copy_objects
-assert paste_objects
-assert update_object
-assert save_schematic_state
-assert configure_edit_mode
-assert reset_objects
-assert initialise
-assert update_canvas
-assert signal 
-assert point 
-assert section
-assert instrument
-assert line
-assert track_sensor
-assert section_exists  #######################
-assert line_exists  ##########################
-assert object_type
-assert get_endstop_offsets
-assert update_local_gpio_sensors
-assert mqtt_update_gpio_sensors
-assert mqtt_update_signals
-assert mqtt_update_sections
-assert mqtt_update_instruments
-assert type(schematic_objects) 
-assert type(signal_index)
-assert type(point_index)
-assert type(section_index)
-assert type(instrument_index)
-assert type(line_index)
-assert type(track_sensor_index)
+__all__ = [
+    # Initialisation and update functions
+    'initialise',
+    'update_canvas',
+    'save_schematic_state',
+    # Enumeration of the object type
+    'object_type',
+    # Save and load functions
+    'set_all',
+    'get_all',
+    # Schematic editor functions
+    'undo',
+    'redo',
+    'create_object',
+    'delete_objects',
+    'rotate_objects',
+    'move_objects',
+    'copy_objects',
+    'paste_objects',
+    'update_object',
+    'reset_objects',
+    # Helper functions to get the obj ID of an item ID
+    'signal',
+    'point',
+    'section',
+    'instrument',
+    'line',
+    'track_sensor',
+    'line_exists',  ##########################
+    # Function to get the x and y deltas for a line 'end stop' 
+    'get_endstop_offsets',
+    # Main schematic object dict and the type-specific indexes
+    'schematic_objects',
+    'signal_index',
+    'point_index',
+    'section_index',
+    'instrument_index',
+    'line_index',
+    'track_sensor_index',
+    # GPIO Event configuration functions
+    'create_gpio_sensors',
+    'configure_remote_gpio_sensor_event_mappings',
+    'configure_local_gpio_sensor_event_mappings'
+    ]
 
 ##########################################################################################################################

@@ -11,9 +11,6 @@
 #    delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    default_signal_object - The dictionary of default values for the object
-#    mqtt_update_signals(pub_list, sub_list) - Configure MQTT publish/subscribe
-#    mqtt_update_sensors(pub_list, sub_list) - Configure MQTT publish/subscribe
-#    update_local_sensors(trigger,timeout,mappings) - Configure local track sensors
 #    remove_references_to_point (point_id) - remove point references from the interlocking tables
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
@@ -37,42 +34,37 @@
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
 #
 # Accesses the following external library objects directly:
-#    signals_common.sig_exists - Common function to see if a given item exists
-#    signals_common.sig_type - for setting the enum value when creating the object
-#    signals_colour_lights.signal_sub_type - for setting the enum value when creating the object
-#    signals_semaphores.semaphore_sub_type - for setting the enum value when creating the object
-#    signals_ground_position.ground_pos_sub_type - for setting the enum value when creating the object
-#    signals_ground_disc.ground_disc_sub_type - for setting the enum value when creating the object
+#    signals.signal_exists - Common function to see if a given item exists
+#    signals.signal_type - for setting the enum value when creating the object
+#    signals.signal_subtype - for setting the enum value when creating the object
+#    signals.semaphore_subtype - for setting the enum value when creating the object
+#    signals.ground_pos_subtype - for setting the enum value when creating the object
+#    signals.ground_disc_subtype - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
-#    signals.update_signal(id) - To set the initial colour light signal aspect following creation
+#    signals.update_colour_light_signal(id) - To set the initial colour light signal aspect following creation
 #    signals.set_route(id,route) - To set the initial route for a signal following creation
 #    signals_colour_lights.create_colour_light_signal - To create the library object (create or redraw)
 #    signals_semaphores.create_semaphore_signal - To create the library object (create or redraw)
 #    signals_ground_position.create_ground_position_signal - To create the library object (create or redraw)
 #    signals_ground_disc.create_ground_disc_signal - To create the library object (create or redraw)
-#    signals_common.get_tags(id) - get the canvas 'tags' for the signal drawing objects
-#    signals_common.delete_signal(id) - delete library drawing object (part of soft delete)
-#    signals.reset_mqtt_configuration - reset MQTT networking prior to reconfiguration
-#    signals.set_signals_to_publish_state(IDs) - configure MQTT networking
-#    signals.subscribe_to_remote_signal(ID,callback) - configure MQTT networking
+#    signals.get_tags(id) - get the canvas 'tags' for the signal drawing objects
+#    signals.delete_signal(id) - delete library drawing object (part of soft delete)
 #    dcc_control.delete_signal_mapping - delete the existing DCC mapping for the signal
 #    dcc_control.map_dcc_signal - to create a new DCC mapping for the signal
 #    dcc_control.map_semaphore_signal - to create a new DCC mapping for the signal
-#    gpio_sensors.add_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
-#    gpio_sensors.remove_gpio_sensor_callback - To remove any GPIO Sensor triggered callbacks
+#    gpio_sensors.update_gpio_sensor_callback - To set up a GPIO Sensor triggered callback
 #
 #------------------------------------------------------------------------------------
 
 import uuid
 import copy
 
-from ...library import signals
-from ...library import signals_common
 from ...library import signals_colour_lights
 from ...library import signals_semaphores
 from ...library import signals_ground_position
 from ...library import signals_ground_disc
+from ...library import signals
 from ...library import dcc_control
 from ...library import gpio_sensors
 
@@ -87,8 +79,8 @@ from .. import run_layout
 # This is the default signal object definition
 default_signal_object = copy.deepcopy(objects_common.default_object)
 default_signal_object["item"] = objects_common.object_type.signal
-default_signal_object["itemtype"] = signals_common.sig_type.colour_light.value
-default_signal_object["itemsubtype"] = signals_colour_lights.signal_sub_type.four_aspect.value
+default_signal_object["itemtype"] = signals.signal_type.colour_light.value
+default_signal_object["itemsubtype"] = signals.signal_subtype.four_aspect.value
 default_signal_object["orientation"] = 0 
 default_signal_object["subsidary"] = [False,0]  # [has_subsidary, dcc_address]
 default_signal_object["theatreroute"] = False
@@ -471,17 +463,17 @@ def update_signal(object_id, new_object_configuration):
 
 def redraw_signal_object(object_id):
     # Turn the signal type value back into the required enumeration type
-    sig_type = signals_common.sig_type(objects_common.schematic_objects[object_id]["itemtype"])
+    sig_type = signals.signal_type(objects_common.schematic_objects[object_id]["itemtype"])
     # Update the sensor mapping callbacks for the signal (if any have been specified)
     if objects_common.schematic_objects[object_id]["passedsensor"][1] != "":     
-        gpio_sensors.add_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["passedsensor"][1],
                                     signal_passed = objects_common.schematic_objects[object_id]["itemid"] )
     if objects_common.schematic_objects[object_id]["approachsensor"][1] != "":  
-        gpio_sensors.add_gpio_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
+        gpio_sensors.update_gpio_sensor_callback(objects_common.schematic_objects[object_id]["approachsensor"][1],
                                     signal_approach = objects_common.schematic_objects[object_id]["itemid"] )
     # Create the DCC Mappings for the signal (depending on signal type)
-    if (sig_type == signals_common.sig_type.colour_light or
-            sig_type == signals_common.sig_type.ground_position):
+    if (sig_type == signals.signal_type.colour_light or
+            sig_type == signals.signal_type.ground_position):
         # Create the new DCC Mapping for the Colour Light Signal
         dcc_control.map_dcc_signal (objects_common.schematic_objects[object_id]["itemid"],
                     auto_route_inhibit = objects_common.schematic_objects[object_id]["dccautoinhibit"],
@@ -499,8 +491,8 @@ def redraw_signal_object(object_id):
                     RH2 = objects_common.schematic_objects[object_id]["dccfeathers"][5],
                     subsidary = objects_common.schematic_objects[object_id]["subsidary"][1],
                     THEATRE = objects_common.schematic_objects[object_id]["dcctheatre"] )
-    elif (sig_type == signals_common.sig_type.semaphore or
-              sig_type == signals_common.sig_type.ground_disc):
+    elif (sig_type == signals.signal_type.semaphore or
+              sig_type == signals.signal_type.ground_disc):
         # Create the new DCC Mapping for the Semaphore Signal
         dcc_control.map_semaphore_signal (objects_common.schematic_objects[object_id]["itemid"],
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][0][1],
@@ -523,21 +515,21 @@ def redraw_signal_object(object_id):
                     rh1_signal = objects_common.schematic_objects[object_id]["sigarms"][3][2][1],
                     rh2_signal = objects_common.schematic_objects[object_id]["sigarms"][4][2][1] )
     # Create the new signal object (according to the signal type)
-    if sig_type == signals_common.sig_type.colour_light:
+    if sig_type == signals.signal_type.colour_light:
         # Turn the signal subtype value back into the required enumeration type
-        sub_type = signals_colour_lights.signal_sub_type(objects_common.schematic_objects[object_id]["itemsubtype"])
+        sub_type = signals.signal_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
         # Create the signal drawing object on the canvas
-        signals_colour_lights.create_colour_light_signal (
+        canvas_tags = signals_colour_lights.create_colour_light_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
+                    signal_subtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    signal_subtype = sub_type,
-                    sig_callback = run_layout.schematic_callback,
+                    callback = run_layout.schematic_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
-                    approach_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
-                    position_light = objects_common.schematic_objects[object_id]["subsidary"][0],
+                    sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
+                    has_subsidary = objects_common.schematic_objects[object_id]["subsidary"][0],
                     mainfeather = objects_common.schematic_objects[object_id]["feathers"][0],
                     lhfeather45 = objects_common.schematic_objects[object_id]["feathers"][1],
                     lhfeather90 = objects_common.schematic_objects[object_id]["feathers"][2],
@@ -551,22 +543,22 @@ def redraw_signal_object(object_id):
             signals.set_route(sig_id = objects_common.schematic_objects[object_id]["itemid"],
                     theatre_text = objects_common.schematic_objects[object_id]["dcctheatre"][1][0])
         # update the signal to show the initial aspect
-        signals.update_signal(objects_common.schematic_objects[object_id]["itemid"])
-    elif sig_type == signals_common.sig_type.semaphore:
+        signals.update_colour_light_signal(objects_common.schematic_objects[object_id]["itemid"])
+    elif sig_type == signals.signal_type.semaphore:
         # Turn the signal subtype value back into the required enumeration type
-        sub_type = signals_semaphores.semaphore_sub_type(objects_common.schematic_objects[object_id]["itemsubtype"])
+        sub_type = signals.semaphore_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
         # Create the signal drawing object on the canvas. Note that the main signal arm is always enabled for home
         # or distant signals - it is only optional for secondary distant signals (created after the main signal)
-        signals_semaphores.create_semaphore_signal (
+        canvas_tags = signals_semaphores.create_semaphore_signal(
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
+                    signal_subtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    signal_subtype = sub_type,
-                    sig_callback = run_layout.schematic_callback,
+                    callback = run_layout.schematic_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0],
-                    approach_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
+                    sig_release_button = objects_common.schematic_objects[object_id]["approachsensor"][0],
                     main_signal = True,
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][0][0],
                     lh2_signal = objects_common.schematic_objects[object_id]["sigarms"][2][0][0],
@@ -582,14 +574,14 @@ def redraw_signal_object(object_id):
         # Create the associated distant signal (signal_id = home_signal_id + 100)
         if has_associated_distant(object_id):
             # Create the signal drawing object on the canvas
-            signals_semaphores.create_semaphore_signal (
+            signals_semaphores.create_semaphore_signal(
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"]+100,
+                    signal_subtype = signals.semaphore_subtype.distant,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    signal_subtype = signals_semaphores.semaphore_sub_type.distant,
+                    callback = run_layout.schematic_callback,
                     associated_home = objects_common.schematic_objects[object_id]["itemid"],
-                    sig_callback = run_layout.schematic_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     main_signal = objects_common.schematic_objects[object_id]["sigarms"][0][2][0],
                     lh1_signal = objects_common.schematic_objects[object_id]["sigarms"][1][2][0],
@@ -597,35 +589,35 @@ def redraw_signal_object(object_id):
                     rh1_signal = objects_common.schematic_objects[object_id]["sigarms"][3][2][0],
                     rh2_signal = objects_common.schematic_objects[object_id]["sigarms"][4][2][0],
                     fully_automatic = objects_common.schematic_objects[object_id]["distautomatic"])
-    elif sig_type == signals_common.sig_type.ground_position:
+    elif sig_type == signals.signal_type.ground_position:
         # Turn the signal subtype value back into the required enumeration type
-        sub_type = signals_ground_position.ground_pos_sub_type(objects_common.schematic_objects[object_id]["itemsubtype"])
+        sub_type = signals.ground_pos_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
         # Create the signal drawing object on the canvas
-        signals_ground_position.create_ground_position_signal (
+        canvas_tags = signals_ground_position.create_ground_position_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
+                    signal_subtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    signal_subtype = sub_type,
-                    sig_callback = run_layout.schematic_callback,
+                    callback = run_layout.schematic_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0])
-    elif sig_type == signals_common.sig_type.ground_disc:
+    elif sig_type == signals.signal_type.ground_disc:
         # Turn the signal subtype value back into the required enumeration type
-        sub_type = signals_ground_disc.ground_disc_sub_type(objects_common.schematic_objects[object_id]["itemsubtype"])
+        sub_type = signals.ground_disc_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
         # Create the signal drawing object on the canvas
-        signals_ground_disc.create_ground_disc_signal (
+        canvas_tags = signals_ground_disc.create_ground_disc_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
+                    signal_subtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
-                    signal_subtype = sub_type,
-                    sig_callback = run_layout.schematic_callback,
+                    callback = run_layout.schematic_callback,
                     orientation = objects_common.schematic_objects[object_id]["orientation"],
                     sig_passed_button = objects_common.schematic_objects[object_id]["passedsensor"][0]) 
     # Create/update the canvas "tags" and selection rectangle for the signal
-    objects_common.schematic_objects[object_id]["tags"] = signals_common.get_tags(objects_common.schematic_objects[object_id]["itemid"])
-    objects_common.set_bbox (object_id, objects_common.canvas.bbox(objects_common.schematic_objects[object_id]["tags"]))         
+    objects_common.schematic_objects[object_id]["tags"] = canvas_tags
+    objects_common.set_bbox (object_id, objects_common.schematic_objects[object_id]["tags"])
     return()
 
 #------------------------------------------------------------------------------------
@@ -638,7 +630,7 @@ def create_signal(item_type, item_subtype):
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_signal_object)
     # Find the initial canvas position for the new object and assign the item ID
     x, y = objects_common.find_initial_canvas_position()
-    item_id = objects_common.new_item_id(exists_function=signals_common.sig_exists)
+    item_id = objects_common.new_item_id(exists_function=signals.signal_exists)
     # Add the specific elements for this particular instance of the object
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
@@ -663,7 +655,7 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
     new_object_id = str(uuid.uuid4())
     objects_common.schematic_objects[new_object_id] = copy.deepcopy(object_to_paste)
     # Assign a new type-specific ID for the object and add to the index
-    new_id = objects_common.new_item_id(exists_function=signals_common.sig_exists)
+    new_id = objects_common.new_item_id(exists_function=signals.signal_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.signal_index[str(new_id)] = new_object_id
     # Set the position for the "pasted" object (offset from the original position)
@@ -715,16 +707,16 @@ def paste_signal(object_to_paste, deltax:int, deltay:int):
 
 def delete_signal_object(object_id):
     # Delete the signal drawing objects and associated DCC mapping
-    signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
+    signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"])
     dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"])
     # Delete the track sensor mappings for the signal (if any)
     passed_sensor = objects_common.schematic_objects[object_id]["passedsensor"][1]
     approach_sensor = objects_common.schematic_objects[object_id]["approachsensor"][1]
-    if passed_sensor != "": gpio_sensors.remove_gpio_sensor_callback(passed_sensor)
-    if approach_sensor != "": gpio_sensors.remove_gpio_sensor_callback(approach_sensor)
+    if passed_sensor != "": gpio_sensors.update_gpio_sensor_callback(passed_sensor)
+    if approach_sensor != "": gpio_sensors.update_gpio_sensor_callback(approach_sensor)
     # Delete the associated distant signal (if there is one)
     if has_associated_distant(object_id):
-        signals_common.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
+        signals.delete_signal(objects_common.schematic_objects[object_id]["itemid"]+100)
         dcc_control.delete_signal_mapping(objects_common.schematic_objects[object_id]["itemid"]+100)
     return()
 
@@ -745,19 +737,6 @@ def delete_signal(object_id):
     del objects_common.schematic_objects[object_id]
     # Recalculate point interlocking tables to remove references to the signal
     objects_points.reset_point_interlocking_tables()
-    return()
-
-#------------------------------------------------------------------------------------
-# Function to update the MQTT networking configuration for signals, namely
-# subscribing to remote signals and setting local signals to publish state
-# Note that the editor doesn't use signal passed events
-#------------------------------------------------------------------------------------
-
-def mqtt_update_signals(signals_to_publish:list, signals_to_subscribe_to:list):
-    signals_common.reset_mqtt_configuration()
-    signals.set_signals_to_publish_state(*signals_to_publish)
-    for signal_identifier in signals_to_subscribe_to:
-        signals.subscribe_to_remote_signal(signal_identifier, run_layout.schematic_callback)
     return()
 
 ####################################################################################

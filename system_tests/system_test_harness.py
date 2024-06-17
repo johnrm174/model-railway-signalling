@@ -152,7 +152,6 @@ from model_railway_signals.editor import objects
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
-from model_railway_signals.library import signals_common
 from model_railway_signals.library import signals_colour_lights
 from model_railway_signals.library import signals_semaphores
 from model_railway_signals.library import signals_ground_position
@@ -263,8 +262,12 @@ def initialise_test_harness(filename=None):
 # ------------------------------------------------------------------------------
 
 def report_results():
-    print ("Tests Run:",tests_executed,"  Tests Passed:",
-              tests_executed-test_failures,"  Test failures",test_failures,"  Test Warnings",test_warnings)
+    print ("")
+    print ("##################################################################################################################")
+    print ("Tests Run:", tests_executed, "  Tests Passed:",
+              tests_executed-test_failures, "  Test failures" ,test_failures ,"  Test Warnings",test_warnings)
+    print ("##################################################################################################################")
+    print ("")
     
 # ------------------------------------------------------------------------------
 # Sleep Function to allow pauses to be included between test steps. This enables
@@ -279,79 +282,79 @@ def sleep(sleep_time:float): time.sleep(sleep_time)
     
 def set_signals_on(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" does not exist")
         elif not signals.signal_clear(sigid):
             raise_test_warning ("set_signals_on - Signal: "+str(sigid)+" is already ON")
         else:
-            run_function(lambda:signals_common.signal_button_event(sigid))
+            run_function(lambda:signals.signal_button_event(sigid))
 
 def set_signals_off(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_signals_off - Signal: "+str(sigid)+" does not exist")
         elif signals.signal_clear(sigid):
             raise_test_warning ("set_signals_off - Signal: "+str(sigid)+" is already OFF")
         else:
-            run_function(lambda:signals_common.signal_button_event(sigid))
+            run_function(lambda:signals.signal_button_event(sigid))
 
 def set_subsidaries_on(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_subsidaries_on - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["hassubsidary"]:
+        elif not signals.signals[str(sigid)]["hassubsidary"]:
             raise_test_warning ("set_subsidaries_on - Signal: "+str(sigid)+" does not have a subsidary")
         elif not signals.subsidary_clear(sigid):
             raise_test_warning ("set_subsidaries_on - Signal: "+str(sigid)+" - subsidary is already ON")
         else:
-            run_function(lambda:signals_common.subsidary_button_event(sigid))                                
+            run_function(lambda:signals.subsidary_button_event(sigid))                                
 
 def set_subsidaries_off(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["hassubsidary"]:
+        elif not signals.signals[str(sigid)]["hassubsidary"]:
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" does not have a subsidary")
         elif signals.subsidary_clear(sigid):
             raise_test_warning ("set_subsidaries_off - Signal: "+str(sigid)+" - subsidary is already OFF")
         else:
-            run_function(lambda:signals_common.subsidary_button_event(sigid))                  
+            run_function(lambda:signals.subsidary_button_event(sigid))                  
 
 def set_secondary_dists_on(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not exist")
-        elif str(sigid+100) not in signals_common.signals.keys():
+        elif str(sigid+100) not in signals.signals.keys():
             raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" does not have a secondary distant")
         elif not signals.signal_clear(sigid+100):
             raise_test_warning ("set_secondary_dists_on - Signal: "+str(sigid)+" - Secondary distant is already ON")
         else:
-            run_function(lambda:signals_common.signal_button_event(sigid+100))                                
+            run_function(lambda:signals.signal_button_event(sigid+100))                                
 
 def set_secondary_dists_off(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not exist")
-        elif str(sigid+100) not in signals_common.signals.keys():
+        elif str(sigid+100) not in signals.signals.keys():
             raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" does not have a secondary distant")
         elif signals.signal_clear(sigid+100):
             raise_test_warning ("set_secondary_dists_off - Signal: "+str(sigid)+" - Secondary distant is already ON")
         else:
-            run_function(lambda:signals_common.signal_button_event(sigid+100))
+            run_function(lambda:signals.signal_button_event(sigid+100))
 
 def trigger_signals_passed(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("trigger_signals_passed - Signal: "+str(sigid)+" does not exist")
         else:
-            run_function(lambda:signals_common.sig_passed_button_event(sigid))
+            run_function(lambda:signals.sig_passed_button_event(sigid))
                                                
 def trigger_signals_released(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("trigger_signals_released - Signal: "+str(sigid)+" does not exist")
         else:
-            run_function(lambda:signals_common.approach_release_button_event(sigid) )                             
+            run_function(lambda:signals.approach_release_button_event(sigid) )                             
 
 def trigger_sensors_passed(*sensorids):
     for sensorid in sensorids:
@@ -409,9 +412,9 @@ def set_sections_occupied(*sectionids):
             if track_sections.section_occupied(secid):
                 raise_test_warning ("set_sections_occupied - Section: "+str(secid)+" is already OCCUPIED")
             else:
-                # Two calls are needed - we first clear the section to set the section label
+                # Two calls are needed - we first set the label using the 'update_label' function
                 # then we call the section callback library function to simulate the 'click'
-                run_function(lambda:track_sections.clear_section_occupied(secid,str(train_identifier)))
+                run_function(lambda:track_sections.update_label(secid,str(train_identifier)))
                 run_function(lambda:track_sections.section_button_event(secid))
             train_identifier=train_identifier+1
 
@@ -505,224 +508,224 @@ def assert_points_normal(*pointids):
 
 def assert_signals_locked(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_locked - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["siglocked"]:
+        elif not signals.signals[str(sigid)]["siglocked"]:
             raise_test_error ("assert_signals_locked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
             
 def assert_signals_unlocked(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_unlocked - Signal: "+str(sigid)+" does not exist")
-        elif signals_common.signals[str(sigid)]["siglocked"]:
+        elif signals.signals[str(sigid)]["siglocked"]:
             raise_test_error ("assert_signals_unlocked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_subsidaries_locked(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_subsidaries_locked - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["hassubsidary"]:
+        elif not signals.signals[str(sigid)]["hassubsidary"]:
             raise_test_warning ("assert_subsidaries_locked - Signal: "+str(sigid)+" does not have a subsidary")
-        elif not signals_common.signals[str(sigid)]["sublocked"]:
+        elif not signals.signals[str(sigid)]["sublocked"]:
             raise_test_error ("assert_subsidaries_locked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
             
 def assert_subsidaries_unlocked(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["hassubsidary"]:
+        elif not signals.signals[str(sigid)]["hassubsidary"]:
             raise_test_warning ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" does not have a subsidary")
-        elif signals_common.signals[str(sigid)]["sublocked"]:
+        elif signals.signals[str(sigid)]["sublocked"]:
             raise_test_error ("assert_subsidaries_unlocked - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
         
 def assert_signals_override_set(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_override_set - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["override"]:
+        elif not signals.signals[str(sigid)]["override"]:
             raise_test_error ("assert_signals_override_set - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
         
 def assert_signals_override_clear(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_override_clear - Signal: "+str(sigid)+" does not exist")
-        elif signals_common.signals[str(sigid)]["override"]:
+        elif signals.signals[str(sigid)]["override"]:
             raise_test_error ("assert_signals_override_clear - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_signals_override_caution_set(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_override_caution_set - Signal: "+str(sigid)+" does not exist")
-        elif not signals_common.signals[str(sigid)]["overcaution"]:
+        elif not signals.signals[str(sigid)]["overcaution"]:
             raise_test_error ("assert_signals_override_caution_set - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
         
 def assert_signals_override_caution_clear(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_override_caution_clear - Signal: "+str(sigid)+" - does not exist")
-        elif signals_common.signals[str(sigid)]["overcaution"]:
+        elif signals.signals[str(sigid)]["overcaution"]:
             raise_test_error ("assert_signals_override_caution_clear - Signal: "+str(sigid)+" - Test Fail")
         increment_tests_executed()
         
 def assert_signals_app_cntl_set(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_app_cntl_set - Signal: "+str(sigid)+" does not exist")
-        elif ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
-             "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
+        elif ( "releaseonred" not in signals.signals[str(sigid)].keys() or
+             "releaseonyel" not in signals.signals[str(sigid)].keys() ):
             raise_test_warning ("assert_signals_app_cntl_set - Signal: "+str(sigid)+" does not support approach control")
-        elif ( not signals_common.signals[str(sigid)]["releaseonred"] and
-               not signals_common.signals[str(sigid)]["releaseonyel"] ):
+        elif ( not signals.signals[str(sigid)]["releaseonred"] and
+               not signals.signals[str(sigid)]["releaseonyel"] ):
             raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
         increment_tests_executed()
         
 def assert_signals_app_cntl_clear(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_app_cntl_clear - Signal: "+str(sigid)+" does not exist")
-        elif ( "releaseonred" not in signals_common.signals[str(sigid)].keys() or
-             "releaseonyel" not in signals_common.signals[str(sigid)].keys() ):
+        elif ( "releaseonred" not in signals.signals[str(sigid)].keys() or
+             "releaseonyel" not in signals.signals[str(sigid)].keys() ):
             raise_test_warning ("assert_signals_app_cntl_clear - Signal: "+str(sigid)+" does not support approach control")
-        elif ( signals_common.signals[str(sigid)]["releaseonred"] or
-               signals_common.signals[str(sigid)]["releaseonyel"] ):
+        elif ( signals.signals[str(sigid)]["releaseonred"] or
+               signals.signals[str(sigid)]["releaseonyel"] ):
             raise_test_error ("Signal:"+str(sigid)+" - Test Fail")
         increment_tests_executed()
 
 def assert_signals_DANGER(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_DANGER - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.DANGER:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.DANGER:
                 raise_test_error ("assert_signals_DANGER - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
             
 def assert_signals_PROCEED(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_PROCEED - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.PROCEED:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.PROCEED:
                 raise_test_error ("assert_signals_PROCEED - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
             
 def assert_signals_CAUTION(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_CAUTION - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.CAUTION:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.CAUTION:
                 raise_test_error ("assert_signals_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
 
 def assert_signals_CAUTION_APP_CNTL(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_CAUTION_APP_CNTL - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.CAUTION_APP_CNTL:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.CAUTION_APP_CNTL:
                 raise_test_error ("assert_signals_CAUTION_APP_CNTL - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
 
 def assert_signals_PRELIM_CAUTION(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_PRELIM_CAUTION - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.PRELIM_CAUTION:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.PRELIM_CAUTION:
                 raise_test_error ("assert_signals_PRELIM_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
 
 def assert_signals_FLASH_CAUTION(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_FLASH_CAUTION - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.FLASH_CAUTION:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.FLASH_CAUTION:
                 raise_test_error ("assert_signals_FLASH_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
 
 def assert_signals_FLASH_PRELIM_CAUTION(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_FLASH_PRELIM_CAUTION - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_state = signals_common.signals[str(sigid)]["sigstate"]
-            if signal_state != signals_common.signal_state_type.FLASH_PRELIM_CAUTION:
+            signal_state = signals.signals[str(sigid)]["sigstate"]
+            if signal_state != signals.signal_state_type.FLASH_PRELIM_CAUTION:
                 raise_test_error ("assert_signals_FLASH_PRELIM_CAUTION - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal state: "+str(signal_state))
         increment_tests_executed()
         
 def assert_signals_route_MAIN(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_route_MAIN - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_route = signals_common.signals[str(sigid)]["routeset"]
-            if signal_route != signals_common.route_type.MAIN:
+            signal_route = signals.signals[str(sigid)]["routeset"]
+            if signal_route != signals.route_type.MAIN:
                 raise_test_error ("assert_signals_route_MAIN - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
         increment_tests_executed()
 
 def assert_signals_route_LH1(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_route_LH1 - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_route = signals_common.signals[str(sigid)]["routeset"]
-            if signal_route != signals_common.route_type.LH1:
+            signal_route = signals.signals[str(sigid)]["routeset"]
+            if signal_route != signals.route_type.LH1:
                 raise_test_error ("assert_signals_route_LH1 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
         increment_tests_executed()
 
 def assert_signals_route_LH2(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_route_LH2 - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_route = signals_common.signals[str(sigid)]["routeset"]
-            if signal_route != signals_common.route_type.LH2:
+            signal_route = signals.signals[str(sigid)]["routeset"]
+            if signal_route != signals.route_type.LH2:
                 raise_test_error ("assert_signals_route_LH2 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
         increment_tests_executed()
 
 def assert_signals_route_RH1(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_route_RH1 - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_route = signals_common.signals[str(sigid)]["routeset"]
-            if signal_route != signals_common.route_type.RH1:
+            signal_route = signals.signals[str(sigid)]["routeset"]
+            if signal_route != signals.route_type.RH1:
                 raise_test_error ("assert_signals_route_RH1 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
         increment_tests_executed()
 
 def assert_signals_route_RH2(*sigids):
     for sigid in sigids:
-        if str(sigid) not in signals_common.signals.keys():
+        if str(sigid) not in signals.signals.keys():
             raise_test_warning ("assert_signals_route_RH2 - Signal: "+str(sigid)+" does not exist")
         else:
-            signal_route = signals_common.signals[str(sigid)]["routeset"]
-            if signal_route != signals_common.route_type.RH2:
+            signal_route = signals.signals[str(sigid)]["routeset"]
+            if signal_route != signals.route_type.RH2:
                 raise_test_error ("assert_signals_route_RH2 - Signal: "+str(sigid)+" - Test Fail "+
                               "- Signal route: "+str(signal_route))
         increment_tests_executed()
@@ -796,29 +799,29 @@ def create_track_sensor():
 
 def create_colour_light_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                        signals_common.sig_type.colour_light.value,
-                        signals_colour_lights.signal_sub_type.four_aspect.value))
+                        signals.signal_type.colour_light.value,
+                        signals.signal_subtype.four_aspect.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_semaphore_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.semaphore.value,
-                           signals_semaphores.semaphore_sub_type.home.value))
+                           signals.signal_type.semaphore.value,
+                           signals.semaphore_subtype.home.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_position_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_position.value,
-                           signals_ground_position.ground_pos_sub_type.standard.value))
+                           signals.signal_type.ground_position.value,
+                           signals.ground_pos_subtype.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_ground_disc_signal():
     run_function(lambda:schematic.create_object(objects.object_type.signal,
-                           signals_common.sig_type.ground_disc.value,
-                           signals_ground_disc.ground_disc_sub_type.standard.value))
+                           signals.signal_type.ground_disc.value,
+                           signals.ground_disc_subtype.standard.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
@@ -1119,35 +1122,7 @@ def undo():
 def redo():
     run_function(lambda:schematic.schematic_redo(),delay=0.5)
 
-def test_all_edit_object_windows(test_all_controls:bool=False, report_object_tested:bool=False):
-    object_types = (objects.object_type.textbox, objects.object_type.line, objects.object_type.point, objects.object_type.signal,
-                              objects.object_type.section, objects.object_type.instrument, objects.object_type.track_sensor)
-    for object_type in object_types:
-        for object_id in objects.schematic_objects.keys():
-            if objects.schematic_objects[object_id]["item"] == object_type:
-                configuration = copy.deepcopy(objects.schematic_objects[object_id])
-                if report_object_tested:
-                    print("Testing object edit window for:",configuration["item"],configuration["itemid"])
-                # Get rid of the bits we dont need
-                if configuration["item"] == objects.object_type.line:
-                    del configuration["line"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end1"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["end2"]   ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop1"]  ## Tkinter drawing object - re-created on re-draw
-                    del configuration["stop2"]  ## Tkinter drawing object - re-created on re-draw
-                elif configuration["item"] == objects.object_type.section:
-                    del configuration["label"]  ## Always reset to default after editing
-                    del configuration["state"]  ## Always reset to default after editing
-                run_function(lambda:schematic.deselect_all_objects())
-                run_function(lambda:schematic.select_object(object_id))
-                run_function(lambda:schematic.edit_selected_object(), delay=1.0)
-                if test_all_controls:
-                    run_function(lambda:schematic.close_edit_window(reset=True), delay=0.2)
-                    run_function(lambda:schematic.close_edit_window(apply=True), delay=0.2)
-                    run_function(lambda:schematic.close_edit_window(cancel=True), delay=0.2)
-                    run_function(lambda:schematic.edit_selected_object(), delay=1.0)
-                run_function(lambda:schematic.close_edit_window(ok=True), delay=0.5)
-                assert_object_configuration(object_id, configuration)
+
     
 # ------------------------------------------------------------------------------
 # Functions to make test 'asserts' - in terms of expected state/behavior

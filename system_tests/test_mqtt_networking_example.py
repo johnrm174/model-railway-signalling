@@ -240,7 +240,7 @@ def test_circular_layout(delay=0.0):
 
 ######################################################################################################
 
-def run_all_mqtt_networking_example_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_mqtt_networking_example_tests(delay:float=0.0):
     initialise_test_harness(filename="../configuration_examples/mqtt_networked_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -248,9 +248,9 @@ def run_all_mqtt_networking_example_tests(delay:float=0.0, shutdown:bool=False):
     set_run_mode()
     test_circular_layout(delay)
     test_end_to_end_layout(delay)
-    if shutdown: report_results()
+    report_results()
 
 if __name__ == "__main__":
-    start_application(lambda:run_all_mqtt_networking_example_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_mqtt_networking_example_tests(delay=0.0))
 
 ######################################################################################################

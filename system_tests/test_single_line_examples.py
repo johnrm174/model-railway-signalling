@@ -86,9 +86,9 @@ def run_interlocking_tests():
     assert_signals_unlocked(3,7)
     assert_signals_locked(1,2,4,5,6,8)
     # Block instrument interlocking
-    set_instrument_clear(1)
-    assert_signals_unlocked(3,7,6)
-    assert_signals_locked(1,2,5,4,8)
+    set_instrument_clear(2)
+    assert_signals_unlocked(1,3,7)
+    assert_signals_locked(2,4,8,5,6)
     # Point interlocking with signals (LH)
     set_signals_off(1)
     assert_points_locked(2)
@@ -102,6 +102,11 @@ def run_interlocking_tests():
     set_signals_on(3)
     assert_points_unlocked(1,2)
     assert_signals_locked(4)
+    # Block instrument interlocking #2
+    set_instrument_blocked(2)
+    set_instrument_clear(1)
+    assert_signals_unlocked(6,3,7)
+    assert_signals_locked(1,2,4,5,8)
     # Point interlocking with signals (RH)
     set_signals_off(6)
     assert_points_locked(1)
@@ -313,7 +318,7 @@ def run_shunting_tests(delay:float=0.0):
 
 #-----------------------------------------------------------------------------------
 
-def run_all_single_line_example_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_single_line_example_tests(delay:float=0.0):
     initialise_test_harness(filename="../configuration_examples/single_line_semaphore_example.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -325,9 +330,9 @@ def run_all_single_line_example_tests(delay:float=0.0, shutdown:bool=False):
     run_signal_route_tests()
     run_signal_override_tests()
     run_shunting_tests(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_single_line_example_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_single_line_example_tests(delay=0.0))
 
 ######################################################################################################

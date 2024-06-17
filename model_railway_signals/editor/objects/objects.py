@@ -1,3 +1,9 @@
+#################################################################################################
+#################################################################################################
+### Includes Code to handle breaking changes for previous releases in the set_all function ######
+#################################################################################################
+#################################################################################################
+
 #------------------------------------------------------------------------------------
 # This module contains all the functions for managing layout objects. This is
 # effectively the "top-level" objects module (with all public API functions)
@@ -20,8 +26,6 @@
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
-#    run_layout.enable_editing() - To set "edit mode" for processing schematic object callbacks
-#    run_layout.disable_editing() - To set "edit mode" for processing schematic object callbacks
 #    objects_instruments.create_instrument(type) - Create a default object on the schematic
 #    objects_instruments.delete_instrument(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_instruments.update_instrument(obj_id,new_obj) - Update the configuration of an existing instrument object
@@ -58,8 +62,6 @@
 #    objects_sections.delete_section_object(object_id) - Soft delete the drawing object (prior to recreating))
 #    objects_sections.redraw_section_object(object_id) - Redraw the object on the canvas following an update
 #    objects_sections.default_section_object - The dictionary of default values for the object
-#    objects_sections.enable_editing() - Called when 'Edit' Mode is selected (from Schematic Module)
-#    objects_sections.disable_editing() - Called when 'Run' Mode is selected (from Schematic Module)
 #    objects_signals.create_signal(type,subtype) - Create a default object on the schematic
 #    objects_signals.delete_signal(object_id) - Hard Delete an object when deleted from the schematic
 #    objects_signals.update_signal(obj_id,new_obj) - Update the configuration of an existing signal object
@@ -73,14 +75,14 @@
 import copy 
 import logging
 
-from . import objects_common
 from . import objects_signals
-from . import objects_points
+from . import objects_common
 from . import objects_lines
 from . import objects_sections
 from . import objects_instruments
 from . import objects_textboxes
 from . import objects_sensors
+from . import objects_points
 
 from .. import run_layout
 
@@ -122,7 +124,7 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
         elif this_object_type == objects_common.object_type.point:
             objects_points.redraw_point_object(object_id)
         elif this_object_type == objects_common.object_type.section:
-            objects_sections.redraw_section_object(object_id, reset_state=reset_state)
+            objects_sections.redraw_section_object(object_id)
         elif this_object_type == objects_common.object_type.instrument:
             objects_instruments.redraw_instrument_object(object_id)
         elif this_object_type == objects_common.object_type.track_sensor:
@@ -221,17 +223,6 @@ def restore_schematic_state():
     # basis they would have successfully been restored with the rest of the snapshot)
     objects_points.reset_point_interlocking_tables()
     return()
-
-#------------------------------------------------------------------------------------
-# Functions to Enable and disable editing 
-#------------------------------------------------------------------------------------
-
-############################################################################
-def configure_edit_mode(edit_mode:bool):
-    if edit_mode: objects_sections.enable_editing()
-    else: objects_sections.disable_editing()
-    return()
-###########################################################################
 
 #------------------------------------------------------------------------------------
 # Function to reset the schematic back to its default state with all signals 'on',
@@ -414,10 +405,12 @@ def move_objects(list_of_object_ids, xdiff1:int=None,
                 if xdiff2 is not None and ydiff2 is not None:
                     objects_common.schematic_objects[object_id]["endx"] += xdiff2 
                     objects_common.schematic_objects[object_id]["endy"] += ydiff2 
-                # Update the boundary box to reflect the new line position
-                objects_common.set_bbox(object_id,objects_common.canvas.bbox
-                                (objects_common.schematic_objects[object_id]["line"]))
+                # Update the boundary box to reflect the new line geometry - to cover the case
+                # of one of the line ends being moved independently to the other line end
+                objects_common.set_bbox(object_id, objects_common.schematic_objects[object_id]["tags"])
             else:
+                # Note that we don't need to update the boundary box for objects other than lines as
+                # this will have been moved with the object but the geometry will not have changed
                 objects_common.schematic_objects[object_id]["posx"] += xdiff1 
                 objects_common.schematic_objects[object_id]["posy"] += ydiff1
         # Ensure all track sections are in front of any lines
@@ -529,7 +522,7 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 #################################################################################################
-                ## Handle breaking change of tracksections now a list of 3 sections from release 4.0.0 ##########
+                ## Handle breaking change of tracks ections now a list of 3 sections from release 4.0.0 #########
                 ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
                 ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
                 ## Before release 4.0.0, each route element was a single track section (integer value) ##########
@@ -545,12 +538,15 @@ def set_all(new_objects):
                                 " - Handling version 4.0.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
-                ##################################################################################
-                ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-                ### This is something we can resolve without affecting the user so we resolve ####
-                ### it silently without an Log message or load warning message - unless the ######
-                ### track sensors - in which case we need to list them for the user to resolve ###
-                ##################################################################################
+                #################################################################################################
+                ## End of Handle breaking change for Track sections #############################################
+                #################################################################################################
+
+                #################################################################################################
+                ### Handle change of GPIO sensor IDs being strings from Release 3.6.0 onwards ###################
+                ### This is something we can resolve without affecting the user so we resolve ###################
+                ### it silently without an Log message or load warning message ##################################
+                #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "passedsensor":
                     objects_common.schematic_objects[object_id][element][0] = new_objects[object_id][element][0]
                     if new_objects[object_id][element][1] == 0:
@@ -577,32 +573,36 @@ def set_all(new_objects):
                                 " - Handling version 3.6.0 breaking change to : '"+element+"'")
                     else:
                         objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-                #############################################################################################
-                ## End of Handle breaking change for track sections and sensor IDs ##########################
-                #############################################################################################
-                ########################################################################################################
-                ## Handle bugfix for Signal point interlocking tables (i.e. length point list was wrongly getting 7 ####
-                ## points assigned on point deletion whereas the list should only ever include 6 points ################ 
-                ########################################################################################################
+                #################################################################################################
+                ## End of Handle breaking change for GPIO sensor IDs ############################################
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle bugfix for Signal point interlocking tables (i.e. list wrongly included 7 points ######
+                ## on point deletion whereas the list should only ever include 6 points #########################
+                #################################################################################################
                 elif new_object_type == objects_common.object_type.signal and element == "pointinterlock":
                     for index, route in enumerate (new_objects[object_id][element]):
                         objects_common.schematic_objects[object_id][element][index][0] = route[0][0:6]
                         objects_common.schematic_objects[object_id][element][index][1] = route[1]
                         objects_common.schematic_objects[object_id][element][index][2] = route[2]
-                ########################################################################################################
-                ## End of Handle bugfix for Signal point interlocking tables ###########################################
-                ########################################################################################################
+                #################################################################################################
+                ## End of Handle bugfix for Signal point interlocking tables ####################################
+                #################################################################################################
+
                 else:
                     objects_common.schematic_objects[object_id][element] = new_objects[object_id][element]
-            ##################################################################################
-            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards #########
-            ##################################################################################
+
+            #################################################################################################
+            ### Handle change of sensor IDs being strings from Release 3.6.0 onwards ########################
+            #################################################################################################
             if len(list_of_track_sensors_to_create) > 0:
                 logging.debug("LOAD LAYOUT - Populating track sensor mappings to handle version 3.6.0 breaking change")
                 settings.set_gpio(mappings = list_of_track_sensors_to_create)       
-            ##################################################################################
-            ## End of Handle breaking change for sensor IDs ##################################
-            ##################################################################################
+            #################################################################################################
+            ## End of Handle breaking change for sensor IDs #################################################
+            #################################################################################################
+
             # Now report any elements missing from the new object - intended to provide a
             # level of backward capability (able to load old config files into an extended config)
             for element in default_object:

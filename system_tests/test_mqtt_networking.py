@@ -104,6 +104,7 @@ def run_basic_networking_tests(delay:float=0.0):
 
 def run_specific_signal_ahead_tests(delay:float=0.0):
     print("MQTT interlocking and override on signals ahead tests")
+    print("Expected ERROR - assert_signals_PROCEED - Signal: 1 - Test Fail - Signal state: signal_state_type.CAUTION")
     # As we are using networking, we need to introduce an additional delay for messages
     # to be sent to and received from the MQTT message broker - as we are using a
     # local broker, a short delay of 100ms should suffice
@@ -208,7 +209,7 @@ def run_specific_signal_ahead_tests(delay:float=0.0):
     set_signals_off(1)
     sleep(delay)
     sleep(network_delay)
-    assert_signals_PROCEED(1) ##################################################################################
+    assert_signals_PROCEED(1) ################# This fails - returns CAUTION ##############################
     set_signals_on(1)
     sleep(delay)
     sleep(network_delay)
@@ -360,7 +361,7 @@ def run_object_deletion_tests(delay:float=0.0):
      
 ######################################################################################################
 
-def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
+def run_all_mqtt_networking_tests(delay:float=0.0):
     initialise_test_harness(filename="./test_mqtt_networking.sig")
     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
     set_edit_mode()
@@ -370,10 +371,10 @@ def run_all_mqtt_networking_tests(delay:float=0.0, shutdown:bool=False):
     run_remote_track_sensor_tests(delay)
     run_specific_signal_ahead_tests(delay)
     run_object_deletion_tests(delay)
-    if shutdown: report_results()
+    report_results()
     
 if __name__ == "__main__":
-    start_application(lambda:run_all_mqtt_networking_tests(delay=0.0, shutdown=True))
+    start_application(lambda:run_all_mqtt_networking_tests(delay=0.0))
 
 ###############################################################################################################################
     

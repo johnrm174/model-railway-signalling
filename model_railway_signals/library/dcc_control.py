@@ -81,11 +81,11 @@
 #   delete_signal_mapping(sig_id:int) - Delete a DCC mapping (called when the Signal is deleted)
 #
 # The following API functions are for configuring the pub/sub of DCC command feeds. The functions are called
-# by the editor on 'Apply' of the MQTT settings. First, 'reset_mqtt_configuration' is called to clear down
+# by the editor on 'Apply' of the MQTT settings. First, 'reset_dcc_mqtt_configuration' is called to clear down
 # the existing pub/sub configuration, followed by 'set_node_to_publish_dcc_commands' (either True or False)
 # and 'subscribe_to_dcc_command_feed' for each REMOTE DCC Node (DCC Command feed subscribed).
 #
-#   reset_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
+#   reset_dcc_mqtt_configuration() - Clears down the current DCC Command feed pub/sub configuration
 #
 #   set_node_to_publish_dcc_commands(publish_dcc_commands:bool) - Enable publishing of DCC command feed
 #           All DCC commands wil lthen be published to the MQTT broker for consumption by other nodes
@@ -97,12 +97,12 @@
 #
 #   update_dcc_point(point_id:int,state:bool) - Called on state change of a point
 #
-#   update_dcc_signal_aspects(sig_id:int, sig_state:signals_common.signal_state_type) - called on change of a Colour Light Signal
+#   update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type) - called on change of a Colour Light Signal
 #
 #   update_dcc_signal_element(sig_id:int, state:bool, element:str)- called on update of a Semaphore Signal
 #       (also called for Colour Light signals to change the 'main_subsidary' element when this changes)
 #
-#   update_dcc_signal_route(sig_id:int, route:signals_common.route_type, signal_change:bool=False ,sig_at_danger:bool=False)
+#   update_dcc_signal_route(sig_id:int, route:signals.route_type, signal_change:bool=False ,sig_at_danger:bool=False)
 #
 #   update_dcc_signal_theatre(sig_id:int, character_to_display:str, signal_change:bool=False, sig_at_danger:bool=False):
 #
@@ -167,12 +167,12 @@
 #
 #----------------------------------------------------------------------------------------------------
 
-from . import signals_common
-from . import pi_sprog_interface
-from . import mqtt_interface
-
 import enum
 import logging
+
+from . import signals
+from . import pi_sprog_interface
+from . import mqtt_interface
 
 #----------------------------------------------------------------------------------------------------
 # Global definitions
@@ -298,19 +298,19 @@ def map_dcc_signal(sig_id:int,
                 "auto_route_inhibit" : auto_route_inhibit,                                         # Common to Colour_Light & Semaphore Mappings
                 "main_subsidary" :  subsidary,                                                     # Common to Colour_Light & Semaphore Mappings 
                 "THEATRE" : THEATRE,                                                               # Common to Colour_Light & Semaphore Mappings                  
-                str(signals_common.signal_state_type.DANGER) : danger,                             # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.PROCEED) : proceed,                           # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.CAUTION) : caution,                           # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.CAUTION_APP_CNTL) : caution,                  # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.PRELIM_CAUTION) : prelim_caution,             # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.FLASH_CAUTION) : flash_caution,               # Specific to Colour_Light Mappings
-                str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour_Light Mappings
-                str(signals_common.route_type.LH1) : LH1,                                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.LH2) : LH2,                                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.RH1) : RH1,                                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.RH2) : RH2,                                          # Specific to Colour_Light Mappings
-                str(signals_common.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
-                str(signals_common.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.DANGER) : danger,                             # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.PROCEED) : proceed,                           # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.CAUTION) : caution,                           # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.CAUTION_APP_CNTL) : caution,                  # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.PRELIM_CAUTION) : prelim_caution,             # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.FLASH_CAUTION) : flash_caution,               # Specific to Colour_Light Mappings
+                str(signals.signal_state_type.FLASH_PRELIM_CAUTION) : flash_prelim_caution, # Specific to Colour_Light Mappings
+                str(signals.route_type.LH1) : LH1,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.LH2) : LH2,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.RH1) : RH1,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.RH2) : RH2,                                          # Specific to Colour_Light Mappings
+                str(signals.route_type.MAIN) : MAIN,                                        # Specific to Colour_Light Mappings
+                str(signals.route_type.NONE) : NONE }                                       # Specific to Colour_Light Mappings
             dcc_signal_mappings[str(sig_id)] = new_dcc_mapping
             # Update the DCC mappings dictionary (note the key is an INTEGER)
             for entry in addresses:
@@ -456,7 +456,7 @@ def update_dcc_point(point_id:int, state:bool):
 # Signal. The commands to be sent will depend on the displayed aspect of the signal.
 #----------------------------------------------------------------------------------------------------
 
-def update_dcc_signal_aspects(sig_id:int, sig_state:signals_common.signal_state_type):
+def update_dcc_signal_aspects(sig_id:int, sig_state:signals.signal_state_type):
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for Colour Light Signal Types
@@ -511,8 +511,8 @@ def update_dcc_signal_element(sig_id:int, state:bool, element:str="main_subsidar
 # display, and for all ROUTE changes when the signal is not at DANGER
 #----------------------------------------------------------------------------------------------------
             
-def update_dcc_signal_route(sig_id:int,route:signals_common.route_type,
-                              signal_change:bool=False,sig_at_danger:bool=False):
+def update_dcc_signal_route(sig_id:int, route:signals.route_type,
+                    signal_change:bool=False, sig_at_danger:bool=False):
     if sig_mapped(sig_id):
         # Retrieve the DCC mappings for our signal and validate its the correct mapping
         # This function should only be called for Colour Light Signal Types
@@ -659,18 +659,18 @@ def delete_signal_mapping(sig_id:int):
             # Compile a list of all DCC commands associated with the signal (aspects, feathers)
             # Note we don't need to add the 'CAUTION_APP_CNTL' list as this is the same as CAUTION
             dcc_command_list = [[dcc_signal_mapping["main_subsidary"],True]]
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.DANGER)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.PROCEED)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.CAUTION)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.PRELIM_CAUTION)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.FLASH_CAUTION)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.signal_state_type.FLASH_PRELIM_CAUTION)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.NONE)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.MAIN)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.LH1)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.LH2)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.RH1)])
-            dcc_command_list.extend(dcc_signal_mapping[str(signals_common.route_type.RH2)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.DANGER)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.PROCEED)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.PRELIM_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.FLASH_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.signal_state_type.FLASH_PRELIM_CAUTION)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.NONE)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.MAIN)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.LH1)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.LH2)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.RH1)])
+            dcc_command_list.extend(dcc_signal_mapping[str(signals.route_type.RH2)])
             # Add the Theatre route indicator addresses - Each Route Element is [char,[[address,state],]]
             for theatre_route_element in dcc_signal_mapping["THEATRE"]:
                 dcc_command_list.extend(theatre_route_element[1])
@@ -711,7 +711,7 @@ def delete_signal_mapping(sig_id:int):
 # via the 'subscribe_to_dcc_command_feed' & 'set_node_to_publish_dcc_commands' functions.
 #----------------------------------------------------------------------------------------------------
 
-def reset_mqtt_configuration():
+def reset_dcc_mqtt_configuration():
     global publish_dcc_commands_to_mqtt_broker
     logging.debug("DCC Control: Resetting MQTT publish and subscribe configuration")
     publish_dcc_commands_to_mqtt_broker = False
@@ -729,7 +729,6 @@ def set_node_to_publish_dcc_commands (publish_dcc_commands:bool=False):
         logging.error("DCC Control: set_node_to_publish_dcc_commands - invalid publish_dcc_commands flag")
     else:
         if publish_dcc_commands: logging.debug("DCC Control: Configuring Application to publish DCC Commands to MQTT broker")
-        else: logging.debug("DCC Control: Configuring Application NOT to publish DCC Commands to MQTT broker")
         publish_dcc_commands_to_mqtt_broker = publish_dcc_commands
     return()
 

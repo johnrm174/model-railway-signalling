@@ -55,7 +55,7 @@
 #    common.scrollable_text_box
 #
 # Uses the following library functions:
-#    gpio_sensors.get_list_of_available_ports() - to get a list of supported ports
+#    gpio_sensors.get_list_of_available_gpio_ports() - to get a list of supported ports
 #    mqtt_interface.get_node_status() - to get a list of connected nodes and timestamps
 #------------------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ class display_help():
             # Create the top level window for application help
             self.window = Tk.Toplevel(root_window)
             self.window.title("Application Help")
-            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             help_window = self.window
             # Create the link to the Quickstart Guide
             self.frame = Tk.Frame(self.window)
@@ -155,7 +155,7 @@ class display_help():
             self.text = common.scrollable_text_frame(self.window, max_height=25)
             self.text.set_value(help_text)
             # Create the ok/close button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.ok)
+            self.B1 = Tk.Button (self.window, text = "Ok / Close", command=self.close_window)
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
             # Pack the OK button First - so it remains visible on re-sizing
             self.B1.pack(padx=5, pady=5, side=Tk.BOTTOM)
@@ -164,7 +164,7 @@ class display_help():
     def callback(self,event):
         webbrowser.open_new_tab(self.hyperlink)
 
-    def ok(self):
+    def close_window(self):
         global help_window
         help_window = None
         self.window.destroy()
@@ -201,7 +201,7 @@ class display_about():
             # Create the (non-resizable) top level window for application about
             self.window = Tk.Toplevel(root_window)
             self.window.title("Application Info")
-            self.window.protocol("WM_DELETE_WINDOW", self.ok)
+            self.window.protocol("WM_DELETE_WINDOW", self.close_window)
             self.window.resizable(False, False)
             about_window = self.window
             # Create the Help text and hyperlink
@@ -212,11 +212,11 @@ class display_about():
             self.label2.pack(padx=5, pady=5)
             self.label2.bind("<Button-1>", self.callback)
             # Create the close button and tooltip
-            self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.ok)
+            self.B1 = Tk.Button (self.window, text = "Ok / Close",command=self.close_window)
             self.B1.pack(padx=2, pady=2)
             self.TT1 = common.CreateToolTip(self.B1, "Close window")
         
-    def ok(self):
+    def close_window(self):
         global about_window
         about_window = None
         self.window.destroy()
@@ -993,7 +993,7 @@ class gpio_port_entry_frame():
         self.frame.pack(padx=2, pady=2, fill='x')
         self.list_of_subframes = []
         self.list_of_entry_boxes = []                
-        self.list_of_available_gpio_ports = gpio_sensors.get_list_of_available_ports()
+        self.list_of_available_gpio_ports = gpio_sensors.get_list_of_available_gpio_ports()
         while len(self.list_of_entry_boxes) < len(self.list_of_available_gpio_ports):
             # Create the Frame for the row
             self.list_of_subframes.append(Tk.Frame(self.frame))
