@@ -3,7 +3,7 @@
 A DCC model railway signalling application written in Python, enabling automated and interlocked layout 
 signalling schemes to be designed and configured via the UI without the need to write any code. The
 application is primarily intended for the Raspberry Pi, but will also run on other platforms (albeit 
-without some of the Raspberry-Pi specific interfacing functions).
+without some of the Raspberry-Pi specific interfacing functions). 
 
 * Enables layout schematics to be created with signals, points, track sections and block instruments.
 * Supports most types of UK colour light signals, semaphore signals, and ground signals.
