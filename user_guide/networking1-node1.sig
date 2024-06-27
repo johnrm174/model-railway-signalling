@@ -67,7 +67,7 @@
                 false,
                 ""
             ],
-            "bbox": 154,
+            "bbox": 152,
             "dccaspects": [
                 [
                     [
@@ -1136,11 +1136,9 @@
             "editable": true,
             "item": "section",
             "itemid": 1,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 175.0,
             "posy": 125.0,
-            "state": false,
             "tags": "section1"
         },
         "56eeb076-0e5f-4da9-a0bb-980c28494739": {
@@ -1155,7 +1153,7 @@
                 false,
                 ""
             ],
-            "bbox": 184,
+            "bbox": 182,
             "dccaspects": [
                 [
                     [
@@ -2220,7 +2218,7 @@
         },
         "6408cbee-f763-41ad-8fca-3130f53d2519": {
             "background": "grey85",
-            "bbox": 187,
+            "bbox": 185,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2246,7 +2244,7 @@
                 false,
                 ""
             ],
-            "bbox": 206,
+            "bbox": 202,
             "dccaspects": [
                 [
                     [
@@ -3316,32 +3314,30 @@
                 20,
                 5
             ],
-            "bbox": 212,
+            "bbox": 208,
             "colour": "black",
-            "end1": 208,
-            "end2": 209,
+            "end1": 204,
+            "end2": 205,
             "endx": 475.0,
             "endy": 300.0,
             "item": "line",
             "itemid": 3,
-            "line": 207,
+            "line": 203,
             "posx": 75.0,
             "posy": 300.0,
-            "stop1": 210,
-            "stop2": 211,
+            "stop1": 206,
+            "stop2": 207,
             "tags": "line3"
         },
         "70194f30-ef69-484a-b947-66951acf8a72": {
-            "bbox": 214,
+            "bbox": 212,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 2,
-            "label": "XXXXX",
             "mirror": "",
             "posx": 350.0,
             "posy": 125.0,
-            "state": false,
             "tags": "section2"
         },
         "705f5d8f-465e-4ccc-a399-f1c7c2cf048a": {
@@ -3356,7 +3352,7 @@
                 false,
                 ""
             ],
-            "bbox": 233,
+            "bbox": 229,
             "dccaspects": [
                 [
                     [
@@ -4420,21 +4416,19 @@
             ]
         },
         "73be5b7a-289a-4a48-959b-0f06dc39c0e9": {
-            "bbox": 235,
+            "bbox": 233,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
             "itemid": 3,
-            "label": "XXXXX",
             "mirror": "Node2-4",
             "posx": 525.0,
             "posy": 125.0,
-            "state": false,
             "tags": "section3"
         },
         "862f860b-d823-4a1a-9de9-1b2236bcc453": {
             "background": "grey85",
-            "bbox": 238,
+            "bbox": 236,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -4450,7 +4444,7 @@
         },
         "9a8b2db4-dadb-4a28-bf0f-5ce1baaa363f": {
             "background": "grey85",
-            "bbox": 241,
+            "bbox": 239,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -4465,7 +4459,7 @@
             "text": "To\nNode2"
         },
         "a271c006-6796-436a-b85f-c805554d8237": {
-            "bbox": 256,
+            "bbox": 254,
             "bellsound": "bell-ring-01.wav",
             "item": "instrument",
             "itemid": 1,
@@ -4478,7 +4472,7 @@
         },
         "aad6451e-e1e2-4a4d-8f93-064d331acafd": {
             "background": "grey85",
-            "bbox": 259,
+            "bbox": 257,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -4504,7 +4498,7 @@
                 false,
                 ""
             ],
-            "bbox": 287,
+            "bbox": 283,
             "dccaspects": [
                 [
                     [
@@ -5583,7 +5577,7 @@
             "occupied": false
         },
         "Node2-4": {
-            "labeltext": "XXXX",
+            "labeltext": "XXXXX",
             "occupied": false
         }
     },
@@ -5600,7 +5594,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/user_guide/networking1-node1.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.2.0"
+            "version": "Version 4.3.0"
         },
         "gpio": {
             "portmappings": [
