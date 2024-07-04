@@ -271,7 +271,7 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
     elif new_object_type == objects_common.object_type.signal:
         object_id = objects_signals.create_signal(item_type, item_subtype)
     elif new_object_type == objects_common.object_type.point:
-         object_id = objects_points.create_point(item_type)
+         object_id = objects_points.create_point(item_type, item_subtype)
     elif new_object_type == objects_common.object_type.section:
         object_id = objects_sections.create_section()
     elif new_object_type == objects_common.object_type.instrument:

@@ -264,6 +264,41 @@ class dcc_address_settings():
         return (self.EB.get_value(), self.CB.get_value())
 
 #------------------------------------------------------------------------------------
+# Class for the point Button Offset settings UI element - provides the following functions
+#    "set_values" - will set the entry box values (xoff:int, yoff:int)
+#    "get_values" - will return the entry box values (xoff:int, yoff:int]
+#    "validate" - Ensure the Entry boxes are valid
+#------------------------------------------------------------------------------------
+
+class button_offsets():
+    def __init__(self, parent_frame):
+        # Create a Label frame to hold the Offset entry boxes
+        self.frame = Tk.LabelFrame(parent_frame,text="Point Control Button Offsets")
+        # Create the two entry boxes in a seperate subframe so they are centered in the LabelFrame
+        self.subframe = Tk.Frame(self.frame)
+        self.subframe.pack()
+        tooltip=("Specify any offsets (in pixels between -25 and +25) for the point buttons to de-conflict "+
+                    "with other drawing objects on the schematic (or leave blank if no offsets are required)")
+        self.L1 =Tk.Label(self.subframe, text="Button X offset:")
+        self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB1 = common.integer_entry_box(self.subframe, width=3, min_value=-25, max_value=+25, tool_tip=tooltip)
+        self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.L2 =Tk.Label(self.subframe, text="  Button Y offset:")
+        self.L2.pack(side=Tk.LEFT, padx=2, pady=2)
+        self.EB2 = common.integer_entry_box(self.subframe, width=3, min_value=-25, max_value=+25, tool_tip=tooltip)
+        self.EB2.pack(side=Tk.LEFT, padx=2, pady=2)
+
+    def validate(self):
+        return(self.EB1.validate() and self.EB2.validate())
+
+    def set_values(self, xoffset:int, yoffset:int):
+        self.EB1.set_value(xoffset)
+        self.EB2.set_value(yoffset)
+
+    def get_values(self):
+        return (self.EB1.get_value(), self.EB2.get_value())
+
+#------------------------------------------------------------------------------------
 # Top level Class for the Point Configuration Tab
 #------------------------------------------------------------------------------------
 
@@ -277,12 +312,22 @@ class point_configuration_tab():
                                 exists_function = points.point_exists) 
         self.pointid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
         # Create the UI Element for Point Type selection
-        self.pointtype = common.selection_buttons(self.frame, "Point type",
-                                      "Select Point Type", None, "RH", "LH", "Y")
-        self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
+        self.pointtype = common.selection_buttons(self.frame, "Point Type",
+                    "Select Point Type", self.point_type_updated, "RH", "LH", "Y-Point")
+        self.pointtype.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='both', expand=True)
         # Create the Point colour selection element
         self.colour = common.colour_selection(self.frame, label="Colour")
         self.colour.frame.pack(side=Tk.LEFT,padx=2, pady=2, fill='y')
+        # Create the point subtype selection
+        subtype_tooltip= ("Select Point Subtype:\nNorm=Default Point\nTRP=Trap Point\n"+
+                    "SS1=Single Slip - side 1\nSS2=Single Slip - side 2\nDS1=Double Slip - side 1\n"+
+                    "DS2=Double slip - side 2\nSX=Scissors crossover (or 3-way Point) components")
+        self.pointsubtype = common.selection_buttons(parent_tab, "Point Subtype", subtype_tooltip,
+                                        None, "Norm", "TRP", "SS1", "SS2", "DS1", "DS2", "SX")
+        self.pointsubtype.frame.pack(padx=2, pady=2, fill='x')
+        # Create the UI element for the point button offset settings
+        self.buttonoffsets = button_offsets(parent_tab)
+        self.buttonoffsets.frame.pack(padx=2, pady=2, fill='x')
         # Create the UI element for the general settings
         self.settings = general_settings(parent_tab)
         self.settings.frame.pack(padx=2, pady=2, fill='x')
@@ -292,6 +337,13 @@ class point_configuration_tab():
         # Create the UI element for the DCC Settings 
         self.dccsettings = dcc_address_settings(parent_tab)
         self.dccsettings.frame.pack(padx=2, pady=2, fill='x')
+
+    def point_type_updated(self):
+        if self.pointtype.get_value() == points.point_type.Y.value:
+            self.pointsubtype.set_value(points.point_subtype.normal.value)
+            self.pointsubtype.disable()
+        else:
+            self.pointsubtype.enable()
 
 #------------------------------------------------------------------------------------
 # Top level Class for the Point Interlocking Tab
@@ -373,6 +425,7 @@ class edit_point():
             self.config.alsoswitch.set_value(objects.schematic_objects[self.object_id]["alsoswitch"],item_id)
             self.config.alsoswitch.set_switched_with(self.switched_with_point(self.object_id))
             self.config.pointtype.set_value(objects.schematic_objects[self.object_id]["itemtype"])
+            self.config.pointsubtype.set_value(objects.schematic_objects[self.object_id]["itemsubtype"])
             self.config.colour.set_value(objects.schematic_objects[self.object_id]["colour"])
             # These are the general settings for the point (note the function also needs the current point id)
             auto = objects.schematic_objects[self.object_id]["automatic"]
@@ -381,6 +434,10 @@ class edit_point():
             if objects.schematic_objects[self.object_id]["orientation"] == 180: rot = True
             else:rot = False
             self.config.settings.set_values(rot, rev, auto, fpl, item_id)
+            # These are the point button position offsets:
+            xoffset = objects.schematic_objects[self.object_id]["xbuttonoffset"]
+            yoffset = objects.schematic_objects[self.object_id]["ybuttonoffset"]
+            self.config.buttonoffsets.set_values(xoffset, yoffset)
             # Set the initial DCC address values (note the function also needs the current point id)
             add = objects.schematic_objects[self.object_id]["dccaddress"]
             rev = objects.schematic_objects[self.object_id]["dccreversed"]
@@ -389,6 +446,8 @@ class edit_point():
             self.locking.signals.set_values(objects.schematic_objects[self.object_id]["siginterlock"])
             # Hide the validation error message
             self.validation_error.pack_forget()
+            # Enable or disable the point subtype selections depending on the point_type
+            self.config.point_type_updated()
         return()
         
     def save_state(self, close_window:bool):
@@ -399,12 +458,14 @@ class edit_point():
         # Validate all user entries prior to applying the changes. Each of these would have
         # been validated on entry, but changes to other objects may have been made since then
         elif (self.config.pointid.validate() and self.config.alsoswitch.validate() and
-                 self.config.settings.validate() and self.config.dccsettings.validate()):
+              self.config.settings.validate() and self.config.dccsettings.validate() and
+              self.config.buttonoffsets.validate()):
             # Copy the original point Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the point coniguration elements from the current user selections
             new_object_configuration["itemid"] = self.config.pointid.get_value()
             new_object_configuration["itemtype"] = self.config.pointtype.get_value()
+            new_object_configuration["itemsubtype"] = self.config.pointsubtype.get_value()
             new_object_configuration["alsoswitch"] = self.config.alsoswitch.get_value()
             new_object_configuration["colour"] = self.config.colour.get_value()
             # These are the general settings
@@ -414,6 +475,10 @@ class edit_point():
             new_object_configuration["hasfpl"] = fpl
             if rot: new_object_configuration["orientation"] = 180
             else: new_object_configuration["orientation"] = 0
+            # These are the point button position offsets:
+            xoffset, yoffset = self.config.buttonoffsets.get_values()
+            new_object_configuration["xbuttonoffset"] = xoffset
+            new_object_configuration["ybuttonoffset"] = yoffset
             # Get the  DCC address
             add, rev = self.config.dccsettings.get_values()
             new_object_configuration["dccaddress"] = add

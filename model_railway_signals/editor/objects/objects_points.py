@@ -34,6 +34,7 @@
 #
 # Accesses the following external library objects directly:
 #    points.point_type - for setting the enum value when creating the object
+#    points.point_subtype - for setting the enum value when creating the object
 #
 # Makes the following external API calls to library modules:
 #    points.point_exists - Common function to see if a given item exists
@@ -63,7 +64,10 @@ from .. import run_layout
 default_point_object = copy.deepcopy(objects_common.default_object)
 default_point_object["item"] = objects_common.object_type.point
 default_point_object["itemtype"] = points.point_type.LH.value
+default_point_object["itemsubtype"] = points.point_subtype.normal.value
 default_point_object["orientation"] = 0
+default_point_object["xbuttonoffset"] = 0
+default_point_object["ybuttonoffset"] = 0
 default_point_object["colour"] = "black"
 default_point_object["alsoswitch"] = 0
 default_point_object["reverse"] = False
@@ -183,17 +187,21 @@ def redraw_point_object(object_id):
     dcc_control.map_dcc_point (objects_common.schematic_objects[object_id]["itemid"],
                                objects_common.schematic_objects[object_id]["dccaddress"],
                                objects_common.schematic_objects[object_id]["dccreversed"])
-    # Turn the point type value back into the required enumeration type
+    # Turn the point type and subtype values back into the required enumeration type
     point_type = points.point_type(objects_common.schematic_objects[object_id]["itemtype"])
+    point_subtype = points.point_subtype(objects_common.schematic_objects[object_id]["itemsubtype"])
     # Create the new point object
     canvas_tags = points.create_point (
                 canvas = objects_common.canvas,
                 point_id = objects_common.schematic_objects[object_id]["itemid"],
                 pointtype = point_type,
+                pointsubtype = point_subtype,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
                 callback = run_layout.schematic_callback,
                 colour = objects_common.schematic_objects[object_id]["colour"],
+                button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
+                button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],
                 orientation = objects_common.schematic_objects[object_id]["orientation"],
                 also_switch = objects_common.schematic_objects[object_id]["alsoswitch"],
                 reverse = objects_common.schematic_objects[object_id]["reverse"],
@@ -208,7 +216,7 @@ def redraw_point_object(object_id):
 # Function to Create a new default Point (and draw it on the canvas)
 #------------------------------------------------------------------------------------
         
-def create_point(item_type):
+def create_point(item_type, item_subtype):
     # Generate a new object from the default configuration with a new UUID 
     object_id = str(uuid.uuid4())
     objects_common.schematic_objects[object_id] = copy.deepcopy(default_point_object)
@@ -218,6 +226,7 @@ def create_point(item_type):
     # Add the specific elements for this particular instance of the point
     objects_common.schematic_objects[object_id]["itemid"] = item_id
     objects_common.schematic_objects[object_id]["itemtype"] = item_type
+    objects_common.schematic_objects[object_id]["itemsubtype"] = item_subtype
     objects_common.schematic_objects[object_id]["posx"] = x
     objects_common.schematic_objects[object_id]["posy"] = y
     # Add the new object to the index of points
