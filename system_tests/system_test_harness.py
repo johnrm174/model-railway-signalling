@@ -837,12 +837,12 @@ def create_block_instrument():
     return(object_id)
 
 def create_left_hand_point():
-    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value))
+    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value,points.point_subtype.normal.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 
 def create_right_hand_point():
-    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value))
+    run_function(lambda:schematic.create_object(objects.object_type.point,points.point_type.LH.value,points.point_subtype.normal.value))
     object_id = list(objects.schematic_objects)[-1]
     return(object_id)
 

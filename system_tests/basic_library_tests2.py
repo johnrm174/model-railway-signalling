@@ -321,23 +321,25 @@ def run_point_library_tests():
     assert len(points.points) == 0
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 8 errors:")
-    points.create_point(canvas, 10, points.point_type.RH, 100, 100, point_callback) #  Valid
-    points.create_point(canvas, 11, points.point_type.LH, 200, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 12, points.point_type.RH, 300, 100, point_callback, also_switch=11)  # Valid
-    points.create_point(canvas, 13, points.point_type.LH, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 14, points.point_type.LH, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 15, points.point_type.Y, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 16, points.point_type.Y, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 0, points.point_type.RH, 100, 100, point_callback)   # Error (<1)
-    points.create_point(canvas, 100, points.point_type.RH, 100, 100, point_callback)  # Error (>99)
-    points.create_point(canvas, "15", points.point_type.RH,100, 100, point_callback)  # Error (not int)
-    points.create_point(canvas, 10, points.point_type.RH, 100, 100, point_callback)  # Error (duplicate)
-    points.create_point(canvas, 17, "random-type", 100, 100, point_callback)  # Error - invalid type
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback) #  Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11)  # Valid
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
+    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
+    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)   # Error (<1)
+    points.create_point(canvas, 100, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (>99)
+    points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback)  # Error (not int)
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (duplicate)
+    points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback)  # Error - invalid type
+    points.create_point(canvas, 18, points.point_type.RH,"random-subtype", 100, 100, point_callback)  # Error - invalid subtype
+    points.create_point(canvas, 19, points.point_type.Y, points.point_subtype.trap, 100, 100, point_callback)  # Error - Not normal Subtype
     # Alsoswitch combinations
-    points.create_point(canvas, 18, points.point_type.LH, 100, 100, point_callback, also_switch="10") # Error (not an int)
-    points.create_point(canvas, 19, points.point_type.LH, 100, 100, point_callback, also_switch=19) # Error (switch itself)
+    points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch="10") # Error (not an int)
+    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=19) # Error (switch itself)
     # Automatic and FPL combinations
-    points.create_point(canvas, 20, points.point_type.LH, 100, 100, point_callback, auto=True, fpl=True) # Error
+    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, auto=True, fpl=True) # Error
     assert len(points.points) == 7
     # point_exists
     print("Library Tests - point_exists - will generate 1 error:")
@@ -490,13 +492,13 @@ def run_point_library_tests():
     assert not points.point_exists(12)
     assert len(points.points) == 0
     print("Library Tests - create autoswitched point - will generate 1 warning:")
-    points.create_point(canvas, 10, points.point_type.LH, 100, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=11) # Valid
     points.toggle_point_state(10)
-    points.create_point(canvas, 11, points.point_type.LH, 200, 100, point_callback, auto=True) # Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True) # Valid
     assert len(points.points) == 2
     assert points.point_switched(10)
     assert points.point_switched(11)
-    points.create_point(canvas, 12, points.point_type.LH, 300, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 12, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11) # Valid
     assert points.point_switched(10)
     assert not points.point_switched(11)
     assert not points.point_switched(11)

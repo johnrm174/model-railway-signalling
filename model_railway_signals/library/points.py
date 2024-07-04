@@ -10,13 +10,13 @@
 #      point_type.Y
 #
 #   point_subtype (use when creating points)
-#      point_type.normal
-#      point_type.trap
-#      point_type.sslip1
-#      point_type.sslip2
-#      point_type.dslip1
-#      point_type.dslip2
-#      point_type.xcross
+#      point_subtype.normal
+#      point_subtype.trap
+#      point_subtype.sslip1
+#      point_subtype.sslip2
+#      point_subtype.dslip1
+#      point_subtype.dslip2
+#      point_subtype.xcross
 # 
 #   point_callback_type (tells the calling program what has triggered the callback):
 #      point_callback_type.point_switched (point has been switched)
@@ -271,11 +271,11 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         logging.error("Point "+str(point_id)+": create_point - Alsoswitch ID is the same as the Point ID")
     elif pointtype != point_type.LH and pointtype != point_type.RH and pointtype != point_type.Y:
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Type specified")
-    elif ( pointsubtype != pointsubtype.normal and pointsubtype != pointsubtype.trap and pointsubtype != pointsubtype.sslip1 and
-           pointsubtype != pointsubtype.sslip2 and pointsubtype != pointsubtype.dslip1 and pointsubtype != pointsubtype.dslip2 and
-           pointsubtype != pointsubtype.xcross):
+    elif ( pointsubtype != point_subtype.normal and pointsubtype != point_subtype.trap and pointsubtype != point_subtype.sslip1 and
+           pointsubtype != point_subtype.sslip2 and pointsubtype != point_subtype.dslip1 and pointsubtype != point_subtype.dslip2 and
+           pointsubtype != point_subtype.xcross):
         logging.error("Point "+str(point_id)+": create_point - Invalid Point Subtype specified")
-    elif pointtype == point_type.Y and pointsubtype != pointsubtype.normal:
+    elif pointtype == point_type.Y and pointsubtype != point_subtype.normal:
         logging.error("Point "+str(point_id)+": create_point - Y-points should be created with a subtype of 'normal'")
     elif fpl and auto:
         logging.error("Point "+str(point_id)+": create_point - Automatic point should be created without a FPL")
