@@ -14,7 +14,7 @@
                 false,
                 ""
             ],
-            "bbox": 3341,
+            "bbox": 8459,
             "dccaspects": [
                 [
                     [
@@ -1089,7 +1089,7 @@
                 false,
                 ""
             ],
-            "bbox": 3371,
+            "bbox": 8489,
             "dccaspects": [
                 [
                     [
@@ -2164,7 +2164,7 @@
                 false,
                 ""
             ],
-            "bbox": 3399,
+            "bbox": 8517,
             "dccaspects": [
                 [
                     [
@@ -3239,7 +3239,7 @@
                 false,
                 ""
             ],
-            "bbox": 3427,
+            "bbox": 8545,
             "dccaspects": [
                 [
                     [
@@ -4314,7 +4314,7 @@
                 false,
                 ""
             ],
-            "bbox": 3477,
+            "bbox": 8595,
             "dccaspects": [
                 [
                     [
@@ -5389,7 +5389,7 @@
                 false,
                 ""
             ],
-            "bbox": 3507,
+            "bbox": 8625,
             "dccaspects": [
                 [
                     [
@@ -6464,7 +6464,7 @@
                 false,
                 ""
             ],
-            "bbox": 3535,
+            "bbox": 8653,
             "dccaspects": [
                 [
                     [
@@ -7539,7 +7539,7 @@
                 false,
                 ""
             ],
-            "bbox": 3561,
+            "bbox": 8679,
             "dccaspects": [
                 [
                     [
@@ -8614,7 +8614,7 @@
                 false,
                 ""
             ],
-            "bbox": 3592,
+            "bbox": 8710,
             "dccaspects": [
                 [
                     [
@@ -9689,7 +9689,7 @@
                 false,
                 ""
             ],
-            "bbox": 3626,
+            "bbox": 8744,
             "dccaspects": [
                 [
                     [
@@ -10764,7 +10764,7 @@
                 false,
                 ""
             ],
-            "bbox": 3679,
+            "bbox": 8797,
             "dccaspects": [
                 [
                     [
@@ -11839,7 +11839,7 @@
                 false,
                 ""
             ],
-            "bbox": 3708,
+            "bbox": 8826,
             "dccaspects": [
                 [
                     [
@@ -12914,7 +12914,7 @@
                 false,
                 ""
             ],
-            "bbox": 3758,
+            "bbox": 8876,
             "dccaspects": [
                 [
                     [
@@ -13989,7 +13989,7 @@
                 false,
                 ""
             ],
-            "bbox": 3793,
+            "bbox": 8911,
             "dccaspects": [
                 [
                     [
@@ -15064,7 +15064,7 @@
                 false,
                 ""
             ],
-            "bbox": 3849,
+            "bbox": 8967,
             "dccaspects": [
                 [
                     [
@@ -16139,7 +16139,7 @@
                 false,
                 ""
             ],
-            "bbox": 3880,
+            "bbox": 8998,
             "dccaspects": [
                 [
                     [
@@ -17214,7 +17214,7 @@
                 false,
                 ""
             ],
-            "bbox": 3910,
+            "bbox": 9028,
             "dccaspects": [
                 [
                     [
@@ -18289,7 +18289,7 @@
                 false,
                 ""
             ],
-            "bbox": 3938,
+            "bbox": 9056,
             "dccaspects": [
                 [
                     [
@@ -19364,7 +19364,7 @@
                 false,
                 ""
             ],
-            "bbox": 3968,
+            "bbox": 9086,
             "dccaspects": [
                 [
                     [
@@ -20439,7 +20439,7 @@
                 false,
                 ""
             ],
-            "bbox": 4020,
+            "bbox": 9138,
             "dccaspects": [
                 [
                     [
@@ -21514,7 +21514,7 @@
                 false,
                 ""
             ],
-            "bbox": 4046,
+            "bbox": 9164,
             "dccaspects": [
                 [
                     [
@@ -22589,7 +22589,7 @@
                 false,
                 ""
             ],
-            "bbox": 4075,
+            "bbox": 9193,
             "dccaspects": [
                 [
                     [
@@ -23664,7 +23664,7 @@
                 false,
                 ""
             ],
-            "bbox": 4109,
+            "bbox": 9227,
             "dccaspects": [
                 [
                     [
@@ -24739,7 +24739,7 @@
                 false,
                 ""
             ],
-            "bbox": 4160,
+            "bbox": 9278,
             "dccaspects": [
                 [
                     [
@@ -25814,7 +25814,7 @@
                 false,
                 ""
             ],
-            "bbox": 4190,
+            "bbox": 9308,
             "dccaspects": [
                 [
                     [
@@ -26889,7 +26889,7 @@
                 false,
                 ""
             ],
-            "bbox": 4219,
+            "bbox": 9337,
             "dccaspects": [
                 [
                     [
@@ -27964,7 +27964,7 @@
                 false,
                 ""
             ],
-            "bbox": 4249,
+            "bbox": 9367,
             "dccaspects": [
                 [
                     [
@@ -29039,7 +29039,7 @@
                 false,
                 ""
             ],
-            "bbox": 4278,
+            "bbox": 9396,
             "dccaspects": [
                 [
                     [
@@ -30114,7 +30114,7 @@
                 false,
                 ""
             ],
-            "bbox": 4331,
+            "bbox": 9449,
             "dccaspects": [
                 [
                     [
@@ -31189,7 +31189,7 @@
                 false,
                 ""
             ],
-            "bbox": 4358,
+            "bbox": 9476,
             "dccaspects": [
                 [
                     [
@@ -32264,7 +32264,7 @@
                 false,
                 ""
             ],
-            "bbox": 4385,
+            "bbox": 9503,
             "dccaspects": [
                 [
                     [
@@ -33339,7 +33339,7 @@
                 false,
                 ""
             ],
-            "bbox": 4413,
+            "bbox": 9531,
             "dccaspects": [
                 [
                     [
@@ -34414,7 +34414,7 @@
                 false,
                 ""
             ],
-            "bbox": 4465,
+            "bbox": 9583,
             "dccaspects": [
                 [
                     [
@@ -35489,7 +35489,7 @@
                 false,
                 ""
             ],
-            "bbox": 4515,
+            "bbox": 9633,
             "dccaspects": [
                 [
                     [
@@ -36564,7 +36564,7 @@
                 false,
                 ""
             ],
-            "bbox": 4564,
+            "bbox": 9682,
             "dccaspects": [
                 [
                     [
@@ -37639,7 +37639,7 @@
                 false,
                 ""
             ],
-            "bbox": 4620,
+            "bbox": 9738,
             "dccaspects": [
                 [
                     [
@@ -38714,7 +38714,7 @@
                 false,
                 ""
             ],
-            "bbox": 4670,
+            "bbox": 9788,
             "dccaspects": [
                 [
                     [
@@ -39789,7 +39789,7 @@
                 false,
                 ""
             ],
-            "bbox": 4697,
+            "bbox": 9815,
             "dccaspects": [
                 [
                     [
@@ -40864,7 +40864,7 @@
                 false,
                 ""
             ],
-            "bbox": 4731,
+            "bbox": 9849,
             "dccaspects": [
                 [
                     [
@@ -41939,7 +41939,7 @@
                 false,
                 ""
             ],
-            "bbox": 4784,
+            "bbox": 9902,
             "dccaspects": [
                 [
                     [
@@ -43014,7 +43014,7 @@
                 false,
                 ""
             ],
-            "bbox": 4837,
+            "bbox": 9955,
             "dccaspects": [
                 [
                     [
@@ -44089,7 +44089,7 @@
                 false,
                 ""
             ],
-            "bbox": 4845,
+            "bbox": 9963,
             "dccaspects": [
                 [
                     [
@@ -45164,7 +45164,7 @@
                 false,
                 ""
             ],
-            "bbox": 4873,
+            "bbox": 9991,
             "dccaspects": [
                 [
                     [
@@ -46239,7 +46239,7 @@
                 false,
                 ""
             ],
-            "bbox": 4923,
+            "bbox": 10041,
             "dccaspects": [
                 [
                     [
@@ -47314,7 +47314,7 @@
                 false,
                 ""
             ],
-            "bbox": 4971,
+            "bbox": 10089,
             "dccaspects": [
                 [
                     [
@@ -48389,7 +48389,7 @@
                 false,
                 ""
             ],
-            "bbox": 5001,
+            "bbox": 10119,
             "dccaspects": [
                 [
                     [
@@ -49464,7 +49464,7 @@
                 false,
                 ""
             ],
-            "bbox": 5053,
+            "bbox": 10171,
             "dccaspects": [
                 [
                     [
@@ -50539,7 +50539,7 @@
                 false,
                 ""
             ],
-            "bbox": 5084,
+            "bbox": 10202,
             "dccaspects": [
                 [
                     [
@@ -51614,7 +51614,7 @@
                 false,
                 ""
             ],
-            "bbox": 5112,
+            "bbox": 10230,
             "dccaspects": [
                 [
                     [
@@ -52689,7 +52689,7 @@
                 false,
                 ""
             ],
-            "bbox": 5165,
+            "bbox": 10283,
             "dccaspects": [
                 [
                     [
@@ -53764,7 +53764,7 @@
                 false,
                 ""
             ],
-            "bbox": 5217,
+            "bbox": 10335,
             "dccaspects": [
                 [
                     [
@@ -54839,7 +54839,7 @@
                 false,
                 ""
             ],
-            "bbox": 5270,
+            "bbox": 10388,
             "dccaspects": [
                 [
                     [
@@ -55914,7 +55914,7 @@
                 false,
                 ""
             ],
-            "bbox": 5278,
+            "bbox": 10396,
             "dccaspects": [
                 [
                     [
@@ -56989,7 +56989,7 @@
                 false,
                 ""
             ],
-            "bbox": 5335,
+            "bbox": 10453,
             "dccaspects": [
                 [
                     [
@@ -58064,7 +58064,7 @@
                 false,
                 ""
             ],
-            "bbox": 5361,
+            "bbox": 10479,
             "dccaspects": [
                 [
                     [
@@ -59139,7 +59139,7 @@
                 false,
                 ""
             ],
-            "bbox": 5411,
+            "bbox": 10529,
             "dccaspects": [
                 [
                     [
@@ -60214,7 +60214,7 @@
                 false,
                 ""
             ],
-            "bbox": 5468,
+            "bbox": 10586,
             "dccaspects": [
                 [
                     [
@@ -61289,7 +61289,7 @@
                 false,
                 ""
             ],
-            "bbox": 5499,
+            "bbox": 10617,
             "dccaspects": [
                 [
                     [
@@ -62364,7 +62364,7 @@
                 false,
                 ""
             ],
-            "bbox": 5548,
+            "bbox": 10666,
             "dccaspects": [
                 [
                     [
@@ -63439,7 +63439,7 @@
                 false,
                 ""
             ],
-            "bbox": 5599,
+            "bbox": 10717,
             "dccaspects": [
                 [
                     [
@@ -64514,7 +64514,7 @@
                 false,
                 ""
             ],
-            "bbox": 5629,
+            "bbox": 10747,
             "dccaspects": [
                 [
                     [
@@ -65589,7 +65589,7 @@
                 false,
                 ""
             ],
-            "bbox": 5657,
+            "bbox": 10775,
             "dccaspects": [
                 [
                     [
@@ -66664,7 +66664,7 @@
                 false,
                 ""
             ],
-            "bbox": 5688,
+            "bbox": 10806,
             "dccaspects": [
                 [
                     [
@@ -67739,7 +67739,7 @@
                 false,
                 ""
             ],
-            "bbox": 5740,
+            "bbox": 10858,
             "dccaspects": [
                 [
                     [
@@ -68814,7 +68814,7 @@
                 false,
                 ""
             ],
-            "bbox": 5748,
+            "bbox": 10866,
             "dccaspects": [
                 [
                     [
@@ -69889,7 +69889,7 @@
                 false,
                 ""
             ],
-            "bbox": 5800,
+            "bbox": 10918,
             "dccaspects": [
                 [
                     [
@@ -70964,7 +70964,7 @@
                 false,
                 ""
             ],
-            "bbox": 5828,
+            "bbox": 10946,
             "dccaspects": [
                 [
                     [
@@ -72039,7 +72039,7 @@
                 false,
                 ""
             ],
-            "bbox": 5877,
+            "bbox": 10995,
             "dccaspects": [
                 [
                     [
@@ -73114,7 +73114,7 @@
                 false,
                 ""
             ],
-            "bbox": 5926,
+            "bbox": 11044,
             "dccaspects": [
                 [
                     [
@@ -74189,7 +74189,7 @@
                 false,
                 ""
             ],
-            "bbox": 5977,
+            "bbox": 11095,
             "dccaspects": [
                 [
                     [
@@ -75264,7 +75264,7 @@
                 false,
                 ""
             ],
-            "bbox": 6011,
+            "bbox": 11129,
             "dccaspects": [
                 [
                     [
@@ -76339,7 +76339,7 @@
                 false,
                 ""
             ],
-            "bbox": 6039,
+            "bbox": 11157,
             "dccaspects": [
                 [
                     [
@@ -77414,7 +77414,7 @@
                 false,
                 ""
             ],
-            "bbox": 6069,
+            "bbox": 11187,
             "dccaspects": [
                 [
                     [
@@ -78489,7 +78489,7 @@
                 false,
                 ""
             ],
-            "bbox": 6096,
+            "bbox": 11214,
             "dccaspects": [
                 [
                     [
@@ -79564,7 +79564,7 @@
                 false,
                 ""
             ],
-            "bbox": 6126,
+            "bbox": 11244,
             "dccaspects": [
                 [
                     [
@@ -80639,7 +80639,7 @@
                 false,
                 ""
             ],
-            "bbox": 6177,
+            "bbox": 11295,
             "dccaspects": [
                 [
                     [
@@ -81714,7 +81714,7 @@
                 false,
                 ""
             ],
-            "bbox": 6208,
+            "bbox": 11326,
             "dccaspects": [
                 [
                     [
@@ -82789,7 +82789,7 @@
                 false,
                 ""
             ],
-            "bbox": 6238,
+            "bbox": 11356,
             "dccaspects": [
                 [
                     [
@@ -83864,7 +83864,7 @@
                 false,
                 ""
             ],
-            "bbox": 6264,
+            "bbox": 11382,
             "dccaspects": [
                 [
                     [
@@ -84939,7 +84939,7 @@
                 false,
                 ""
             ],
-            "bbox": 6272,
+            "bbox": 11390,
             "dccaspects": [
                 [
                     [
@@ -86014,7 +86014,7 @@
                 false,
                 ""
             ],
-            "bbox": 6307,
+            "bbox": 11425,
             "dccaspects": [
                 [
                     [
@@ -87089,7 +87089,7 @@
                 false,
                 ""
             ],
-            "bbox": 6337,
+            "bbox": 11455,
             "dccaspects": [
                 [
                     [
@@ -88168,7 +88168,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/system_tests/test_library_objects2.sig",
             "info": "Document your layout here",
             "spadpopups": false,
-            "version": "Version 4.3.0"
+            "version": "Version 4.4.0"
         },
         "gpio": {
             "portmappings": [],

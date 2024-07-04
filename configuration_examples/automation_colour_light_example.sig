@@ -1222,6 +1222,7 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 5,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
             "posx": 1275.0,
@@ -1279,7 +1280,9 @@
                     ]
                 ]
             ],
-            "tags": "point5"
+            "tags": "point5",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "3c7bba34-5257-4b19-824b-0ccee7c32079": {
             "approachcontrol": [
@@ -9988,13 +9991,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 4,
+            "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 180,
             "posx": 1225.0,
             "posy": 225.0,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point4"
+            "tags": "point4",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "6df4e851-8669-4940-8dc9-fec3e1873294": {
             "background": "grey85",
@@ -14619,6 +14625,7 @@
             "hasfpl": true,
             "item": "point",
             "itemid": 3,
+            "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 0,
             "posx": 1225.0,
@@ -14666,7 +14673,9 @@
                     ]
                 ]
             ],
-            "tags": "point3"
+            "tags": "point3",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c157e7b9-9ea8-46a6-8b6f-99f2ac3b6626": {
             "arrowends": 0,
@@ -14700,6 +14709,7 @@
             "hasfpl": true,
             "item": "point",
             "itemid": 2,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
             "posx": 775.0,
@@ -14747,7 +14757,9 @@
                     ]
                 ]
             ],
-            "tags": "point2"
+            "tags": "point2",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
             "arrowends": 2,
@@ -16975,13 +16987,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 1,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
             "posx": 775.0,
             "posy": 175.0,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point1"
+            "tags": "point1",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e3b1ad43-1e39-456d-aad8-7943e5864ac8": {
             "bbox": 573,
@@ -19208,13 +19223,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 6,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
             "posx": 1275.0,
             "posy": 225.0,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point6"
+            "tags": "point6",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "f514300f-50b5-477c-9673-8cacdaac0c5b": {
             "background": "grey85",
@@ -21549,7 +21567,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/automation_colour_light_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration. 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to'off' as soon as the section ahead is cleared. The actual aspect displayed when 'off' will \ndepend on the aspect of the signal ahead (specified via the 'interlocking tab'). This means that any\nsignals on the layout that don't need a level of manual control can be 'fully automated' (no buttons).\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed they are overriden to 'on' (as\nper the other signals on the layout) but then cycle back through the aspects back to 'proceed'.\n\nTrack sensors can also positioned slightly before the signal and mapped to generate 'signal approached'\nevents to simulate 'approach control'. In this example, signal 1 is configured for 'release on yellow'\napproach control for the diverging route (in the case of the diverging route having a speed restriction).\nThis means the signal (when 'off') will initially display a yellow aspect (with the signals behind \ndisplaying flashing yellow and flashing double yellow). When the train approaches the signal (having\nslowed down for the diverging route) it will automatically change to green.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. unlock, switch and re-lock points 2 and 3 for the\ndiverging loop line and set signals 8, 1, 2 and 4 to 'off'. Right click the far left track section and\nenter a train designation code of your choice (this sets the section to 'occupied'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of signal 1 if you want to see\napproach control working). When you get to signal 4, the train will disappear 'off scene' and the signal\nwill cycle back through the aspects (with a short delay between aspects) until it gets back to green.\n\nAlternatively, if running on a Raspberry pi, the track sensors can be triggered directly via the Ri-Pi's \nGPIO ports (momentarily connect the appropriate GPIO pin to one of the R-Pi's 0V DC pins). Select \n'Settings' =>'Sensors' from the Menubar to view the configuration. In this example the Track Sensor IDs\nhave been mapped to the GPIO port number, but any numbering scheme can be used (e.g. allocate the same ID \nfor the sensor as the signal ID it is triggering). \n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n\n\n",
             "spadpopups": false,
-            "version": "Version 4.3.0"
+            "version": "Version 4.4.0"
         },
         "gpio": {
             "portmappings": [
