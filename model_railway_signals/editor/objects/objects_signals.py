@@ -522,7 +522,7 @@ def redraw_signal_object(object_id):
         canvas_tags = signals_colour_lights.create_colour_light_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
-                    signal_subtype = sub_type,
+                    signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
                     callback = run_layout.schematic_callback,
@@ -552,7 +552,7 @@ def redraw_signal_object(object_id):
         canvas_tags = signals_semaphores.create_semaphore_signal(
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
-                    signal_subtype = sub_type,
+                    signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
                     callback = run_layout.schematic_callback,
@@ -577,7 +577,7 @@ def redraw_signal_object(object_id):
             signals_semaphores.create_semaphore_signal(
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"]+100,
-                    signal_subtype = signals.semaphore_subtype.distant,
+                    signalsubtype = signals.semaphore_subtype.distant,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
                     callback = run_layout.schematic_callback,
@@ -596,7 +596,7 @@ def redraw_signal_object(object_id):
         canvas_tags = signals_ground_position.create_ground_position_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
-                    signal_subtype = sub_type,
+                    signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
                     callback = run_layout.schematic_callback,
@@ -609,7 +609,7 @@ def redraw_signal_object(object_id):
         canvas_tags = signals_ground_disc.create_ground_disc_signal (
                     canvas = objects_common.canvas,
                     sig_id = objects_common.schematic_objects[object_id]["itemid"],
-                    signal_subtype = sub_type,
+                    signalsubtype = sub_type,
                     x = objects_common.schematic_objects[object_id]["posx"],
                     y = objects_common.schematic_objects[object_id]["posy"],
                     callback = run_layout.schematic_callback,

@@ -8,7 +8,7 @@
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       signal_subtype - subtype of the ground position signal (see above)
+#       signalsubtype - subtype of the ground position signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #       callback - the function to call on signal switched or passed events
 #               Note that the callback function returns (item_id, callback type)
@@ -38,7 +38,7 @@ from .signals import ground_pos_subtype as ground_pos_subtype
 # -------------------------------------------------------------------------
 
 def create_ground_position_signal(canvas, sig_id:int,
-                                  signal_subtype:ground_pos_subtype,
+                                  signalsubtype:ground_pos_subtype,
                                   x:int, y:int, callback = None,
                                   orientation:int=0,
                                   sig_passed_button:bool=False):
@@ -50,8 +50,8 @@ def create_ground_position_signal(canvas, sig_id:int,
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
-    elif (signal_subtype != ground_pos_subtype.standard and signal_subtype != ground_pos_subtype.shunt_ahead and
-          signal_subtype != ground_pos_subtype.early_standard and signal_subtype != ground_pos_subtype.early_shunt_ahead):
+    elif (signalsubtype != ground_pos_subtype.standard and signalsubtype != ground_pos_subtype.shunt_ahead and
+          signalsubtype != ground_pos_subtype.early_standard and signalsubtype != ground_pos_subtype.early_shunt_ahead):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
     else:  
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
@@ -78,11 +78,11 @@ def create_ground_position_signal(canvas, sig_id:int,
         oval_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
         canvas.create_oval (oval_coords,fill="grey",outline="black",tags=canvas_tag)
         # Draw the "DANGER" and "PROCEED" aspects (initially hidden)
-        if signal_subtype in (ground_pos_subtype.early_shunt_ahead,ground_pos_subtype.shunt_ahead):
+        if signalsubtype in (ground_pos_subtype.early_shunt_ahead,ground_pos_subtype.shunt_ahead):
             danger_colour = "gold"
         else:
             danger_colour = "red"
-        if signal_subtype in (ground_pos_subtype.standard,ground_pos_subtype.shunt_ahead):
+        if signalsubtype in (ground_pos_subtype.standard,ground_pos_subtype.shunt_ahead):
             root_colour = danger_colour
         else:
             root_colour = "white"
@@ -95,7 +95,7 @@ def create_ground_position_signal(canvas, sig_id:int,
         line_coords = common.rotate_line (x,y,+1,-21,+6,-16,orientation)
         sigon2 = canvas.create_oval (line_coords,fill=danger_colour,outline="black",state="hidden",tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals.signals[str(sig_id)]["sig_subtype"]  = signal_subtype  # Type-specific - Signal Subtype
+        signals.signals[str(sig_id)]["sig_subtype"]  = signalsubtype  # Type-specific - Signal Subtype
         signals.signals[str(sig_id)]["sigoff1"]      = sigoff1         # Type-specific - drawing object
         signals.signals[str(sig_id)]["sigoff2"]      = sigoff2         # Type-specific - drawing object
         signals.signals[str(sig_id)]["sigon1"]       = sigon1          # Type-specific - drawing object

@@ -8,7 +8,7 @@
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       signal_subtype - subtype of the ground disc signal (see above)
+#       signalsubtype - subtype of the ground disc signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #       callback - the function to call on signal switched or passed events
 #               Note that the callback function returns (item_id, callback type)
@@ -38,7 +38,7 @@ from .signals import ground_disc_subtype as ground_disc_subtype
 # -------------------------------------------------------------------------
 
 def create_ground_disc_signal (canvas, sig_id:int,
-                               signal_subtype:ground_disc_subtype,
+                               signalsubtype:ground_disc_subtype,
                                x:int, y:int, callback,
                                orientation:int=0,
                                sig_passed_button:bool=False):
@@ -50,7 +50,7 @@ def create_ground_disc_signal (canvas, sig_id:int,
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
-    elif signal_subtype not in (ground_disc_subtype.standard, ground_disc_subtype.shunt_ahead):
+    elif signalsubtype not in (ground_disc_subtype.standard, ground_disc_subtype.shunt_ahead):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
@@ -68,14 +68,14 @@ def create_ground_disc_signal (canvas, sig_id:int,
         oval_coords = common.rotate_line (x,y,+5,-21,+21,-5,orientation)
         canvas.create_oval(oval_coords,fill="white",outline="black",tags=canvas_tag)
         # Draw the banner arms for the signal
-        if signal_subtype == ground_disc_subtype.shunt_ahead: arm_colour="yellow3"
+        if signalsubtype == ground_disc_subtype.shunt_ahead: arm_colour="yellow3"
         else: arm_colour = "red"
         line_coords = common.rotate_line(x,y,+13,-21,+13,-5,orientation)
         sigon = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
         line_coords = common.rotate_line(x,y,+18,-19,+8,-7,orientation)
         sigoff = canvas.create_line(line_coords,fill=arm_colour,width=3,tags=canvas_tag)
         # Add all of the signal-specific elements we need to manage Ground Position light signal types
-        signals.signals[str(sig_id)]["sig_subtype"] = signal_subtype  # Type-specific - signal subtype
+        signals.signals[str(sig_id)]["sig_subtype"] = signalsubtype  # Type-specific - signal subtype
         signals.signals[str(sig_id)]["sigon"] = sigon                 # Type-specific - drawing object
         signals.signals[str(sig_id)]["sigoff"] = sigoff               # Type-specific - drawing object
         # Get the initial state for the signal (if layout state has been successfully loaded)

@@ -8,7 +8,7 @@
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       signal_subtype - subtype of the semaphore signal (see above)
+#       signalsubtype - subtype of the semaphore signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #       callback - the function to call on signal switched, approached or passed events
 #               Note that the callback function returns (item_id, callback type)
@@ -62,7 +62,7 @@ from .signals import semaphore_subtype as semaphore_subtype
 # ---------------------------------------------------------------------------------
     
 def create_semaphore_signal(canvas, sig_id:int,
-                            signal_subtype:semaphore_subtype,
+                            signalsubtype:semaphore_subtype,
                             x:int, y:int, callback,
                             orientation:int=0,
                             sig_passed_button:bool=False,
@@ -93,19 +93,19 @@ def create_semaphore_signal(canvas, sig_id:int,
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
-    elif signal_subtype not in (semaphore_subtype.home, semaphore_subtype.distant):
+    elif signalsubtype not in (semaphore_subtype.home, semaphore_subtype.distant):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
     elif has_route_arms and theatre_route_indicator:
         logging.error("Signal "+str(sig_id)+": create_signal - Route Arms AND Theatre Route Indicator specified")
-    elif signal_subtype == semaphore_subtype.distant and theatre_route_indicator:
+    elif signalsubtype == semaphore_subtype.distant and theatre_route_indicator:
         logging.error("Signal "+str(sig_id)+": create_signal - Distant signals do not support Theatre Route Indicators")
-    elif signal_subtype == semaphore_subtype.distant and has_subsidary:
+    elif signalsubtype == semaphore_subtype.distant and has_subsidary:
         logging.error("Signal "+str(sig_id)+": create_signal - Distant signals do not support subsidary signals")
-    elif signal_subtype == semaphore_subtype.distant and sig_release_button:
+    elif signalsubtype == semaphore_subtype.distant and sig_release_button:
         logging.error("Signal "+str(sig_id)+": create_signal - Distant signals do not support Approach Control")
     elif not isinstance(associated_home, int):
         logging.error("Signal "+str(sig_id)+": create_signal - Associated Home ID must be an int")
-    elif associated_home > 0 and signal_subtype == semaphore_subtype.home:
+    elif associated_home > 0 and signalsubtype == semaphore_subtype.home:
         logging.error("Signal "+str(sig_id)+": create_signal - Cannot specify an associated home for a home signal")
     elif associated_home > 0 and not signals.signal_exists(associated_home):
         logging.error("Signal "+str(sig_id)+": create_signal - Associated home "+str(associated_home)+" does not exist")
@@ -194,7 +194,7 @@ def create_semaphore_signal(canvas, sig_id:int,
                     line_coords = common.rotate_line(x,y,25,rh1offset,38,rh1offset,orientation) ##
                     canvas.create_line(line_coords,width=2,fill="snow",tags=canvas_tag)
         # set the colour of the signal arm according to the signal type
-        if signal_subtype == semaphore_subtype.distant: arm_colour="yellow"
+        if signalsubtype == semaphore_subtype.distant: arm_colour="yellow"
         else: arm_colour = "red"
         # If this is a distant signal associated with an existing home signal then the distant arms need
         # to be created underneath the main home signal arms - we therefore need to apply a vertical offset
@@ -284,7 +284,7 @@ def create_semaphore_signal(canvas, sig_id:int,
         # Compile a dictionary of everything we need to track for the signal
         # Note that all MANDATORY attributes are signals_common to ALL signal types
         # All SHARED attributes are signals_common to more than one signal Types
-        signals.signals[str(sig_id)]["subtype"]          = signal_subtype         # Type-specific - subtype of the signal (home/distant)
+        signals.signals[str(sig_id)]["subtype"]          = signalsubtype         # Type-specific - subtype of the signal (home/distant)
         signals.signals[str(sig_id)]["associatedsignal"] = associated_home        # Type-specific - subtype of the signal (home/distant)
         signals.signals[str(sig_id)]["main_subsidary"]   = main_subsidary         # Type-specific - details of the signal configuration
         signals.signals[str(sig_id)]["lh1_subsidary"]    = lh1_subsidary          # Type-specific - details of the signal configuration
