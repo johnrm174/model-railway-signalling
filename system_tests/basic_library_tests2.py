@@ -7,14 +7,9 @@ import time
 import logging
 
 import system_test_harness
-from model_railway_signals.library import track_sensors
-from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import points
-from model_railway_signals.library import signals
+from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
-from model_railway_signals.library import dcc_control
-from model_railway_signals.library import pi_sprog_interface
-from model_railway_signals.library import mqtt_interface
 from model_railway_signals.library import track_sections
 
 from model_railway_signals.editor import schematic
@@ -822,10 +817,10 @@ def run_instrument_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-#     run_track_sensor_library_tests()
-#     run_track_section_library_tests()
+    run_track_sensor_library_tests()
+    run_track_section_library_tests()
     run_point_library_tests()
-#     run_instrument_library_tests()
+    run_instrument_library_tests()
     system_test_harness.report_results()
 
 if __name__ == "__main__":
