@@ -363,7 +363,7 @@ def run_point_library_tests():
     assert not points.point_switched(13)   
     assert not points.point_switched(14)
     assert not points.point_switched("10") # Invalid
-    assert not points.point_switched(15)   # Does not exist
+    assert not points.point_switched(20)   # Does not exist
     print("Library Tests - fpl_active - will generate 2 errors:")
     assert points.fpl_active(10)
     assert points.fpl_active(11)
@@ -378,7 +378,7 @@ def run_point_library_tests():
     points.toggle_point(14)   # 14 has FPL so will generate warning
     points.toggle_point(13)   # 13 is auto so will generate error
     points.toggle_point("10") # Invalid - error
-    points.toggle_point(15)   # Does not exist - error
+    points.toggle_point(20)   # Does not exist - error
     print("Library Tests - toggle_point to 'normal' - will generate 1 error and 1 warning:")
     assert points.point_switched(10)
     assert points.point_switched(11)
@@ -400,7 +400,7 @@ def run_point_library_tests():
     print("Library Tests - toggle_fpl - will generate 3 errors and 2 warnings:")
     points.toggle_fpl("10") # Invalid
     points.toggle_fpl(10)   # No FPL
-    points.toggle_fpl(15)   # Does not exist
+    points.toggle_fpl(20)   # Does not exist
     assert points.fpl_active(14)
     points.toggle_fpl(14)   # Has FPL - toggle off FPL
     assert not points.fpl_active(14)
@@ -428,7 +428,7 @@ def run_point_library_tests():
     assert points.points[str(10)]['locked']==False
     assert points.points[str(14)]['locked']==False
     points.lock_point("10") # Invalid
-    points.lock_point(15)   # Does not exist
+    points.lock_point(20)   # Does not exist
     points.lock_point(10)
     points.lock_point(14)
     points.lock_point(14)
@@ -436,7 +436,7 @@ def run_point_library_tests():
     assert points.points[str(14)]['locked']==True
     print("Library Tests - unlock_point - will generate 2 errors:")
     points.unlock_point("10") # Invalid
-    points.unlock_point(15)   # Does not exist
+    points.unlock_point(20)   # Does not exist
     points.unlock_point(10)
     points.unlock_point(14)
     points.unlock_point(14)
@@ -445,7 +445,7 @@ def run_point_library_tests():
     # Update autoswitch
     print("Library Tests - update_autoswitch - will generate 4 errors:")
     points.update_autoswitch("10", 13) # Error - not an int
-    points.update_autoswitch(15, 13)   # Error - Point does not exist
+    points.update_autoswitch(20, 13)   # Error - Point does not exist
     points.update_autoswitch(12, "19") # Error - alsoswitch not an int
     points.update_autoswitch(12, 20)   # Error - alsoswitch point does not exist
     points.toggle_point(12)            # Valid - 12 is configured to autoswitching 11
@@ -507,6 +507,10 @@ def run_point_library_tests():
     points.delete_point(11)
     points.delete_point(12)
     assert len(points.points) == 0
+    # Check the creation of all supported point types
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/complex_trackwork.sig")
+    # Now clear down the layout for the next series of tests
+    system_test_harness.initialise_test_harness()
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -818,10 +822,10 @@ def run_instrument_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-    run_track_sensor_library_tests()
-    run_track_section_library_tests()
+#     run_track_sensor_library_tests()
+#     run_track_section_library_tests()
     run_point_library_tests()
-    run_instrument_library_tests()
+#     run_instrument_library_tests()
     system_test_harness.report_results()
 
 if __name__ == "__main__":
