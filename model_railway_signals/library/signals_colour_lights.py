@@ -8,7 +8,7 @@
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the signal is to be displayed
 #       sig_id:int - The ID for the signal - also displayed on the signal button
-#       signal_subtype - subtype of the semaphore signal (see above)
+#       signalsubtype - subtype of the semaphore signal (see above)
 #       x:int, y:int - Position of the signal on the canvas (in pixels) 
 #       callback - the function to call on signal switched, approached or passed events
 #               Note that the callback function returns (item_id, callback type)
@@ -56,7 +56,7 @@ import logging
 # ---------------------------------------------------------------------------------
     
 def create_colour_light_signal (canvas, sig_id:int,
-                                signal_subtype:signal_subtype,
+                                signalsubtype:signal_subtype,
                                 x:int, y:int, callback,
                                 orientation:int=0,
                                 sig_passed_button:bool=False,
@@ -80,14 +80,16 @@ def create_colour_light_signal (canvas, sig_id:int,
     elif signals.signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": create_signal - Signal already exists")
     # Type specific validation
-    elif signal_subtype not in (signal_subtype.home, signal_subtype.distant,
+    elif signalsubtype not in (signal_subtype.home, signal_subtype.distant,
           signal_subtype.red_ylw, signal_subtype.three_aspect, signal_subtype.four_aspect):
         logging.error("Signal "+str(sig_id)+": create_signal - Invalid Signal subtype specified")
     elif signal_has_feathers and theatre_route_indicator:
         logging.error("Signal "+str(sig_id)+": create_signal - Feathers AND Theatre Route Indicator specified")
-    elif (signal_has_feathers or theatre_route_indicator) and signal_subtype == signal_subtype.distant:
+    elif (signal_has_feathers or theatre_route_indicator) and signalsubtype == signal_subtype.distant:
         logging.error("Signal "+str(sig_id)+": create_signal - 2 Aspect distant signals do not support Route Indicators")
-    elif sig_release_button and signal_subtype == signal_subtype.distant:
+    elif signalsubtype == signal_subtype.distant and has_subsidary:
+        logging.error("Signal "+str(sig_id)+": create_signal - 2 Aspect distant signals do not support subsidary signals")
+    elif sig_release_button and signalsubtype == signal_subtype.distant:
         logging.error("Signal "+str(sig_id)+": create_signal - 2 Aspect distant signals do not support Approach Control")
     else:
         logging.debug("Signal "+str(sig_id)+": Creating library object on the schematic")
@@ -134,17 +136,17 @@ def create_colour_light_signal (canvas, sig_id:int,
         # the signal type - so that the feathers and theatre route indicator sit on top of the signal
         # If its a 2 aspect signal we need to hide the green and the 2nd yellow aspect
         # We also need to 'reassign" the other aspects if its a Home or Distant signal
-        if signal_subtype in (signal_subtype.home, signal_subtype.distant, signal_subtype.red_ylw):
+        if signalsubtype in (signal_subtype.home, signal_subtype.distant, signal_subtype.red_ylw):
             offset = -16
             canvas.itemconfigure(yel2,state='hidden')
             canvas.itemconfigure(grn,state='hidden')
-            if signal_subtype == signal_subtype.home:
+            if signalsubtype == signal_subtype.home:
                 grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
-            elif signal_subtype == signal_subtype.distant:
+            elif signalsubtype == signal_subtype.distant:
                 grn = yel  # Reassign the green aspect to aspect#2 (normally yellow in 3/4 aspect signals)
                 yel = red  # Reassign the Yellow aspect to aspect#1 (normally red in 3/4 aspect signals)
         # If its a 3 aspect signal we  need to hide the 2nd yellow aspect
-        elif signal_subtype == signal_subtype.three_aspect:
+        elif signalsubtype == signal_subtype.three_aspect:
             canvas.itemconfigure(yel2,state='hidden')
             offset = -8
         else: # its a 4 aspect signal
@@ -169,7 +171,7 @@ def create_colour_light_signal (canvas, sig_id:int,
         # Set the "Override" Aspect - this is the default aspect that will be displayed
         # by the signal when it is overridden - This will be RED apart from 2 aspect
         # Distant signals where it will be YELLOW
-        if signal_subtype == signal_subtype.distant:
+        if signalsubtype == signal_subtype.distant:
             override_aspect = signals.signal_state_type.CAUTION
         else:
             override_aspect = signals.signal_state_type.DANGER
@@ -184,7 +186,7 @@ def create_colour_light_signal (canvas, sig_id:int,
         # as the associated drawing objects have been "swapped" by the code above
         # All SHARED attributes are signals_common to more than one signal Types
         signals.signals[str(sig_id)]["overriddenaspect"] = override_aspect        # Type-specific - The 'Overridden' aspect
-        signals.signals[str(sig_id)]["subtype"] = signal_subtype                  # Type-specific - subtype of the signal
+        signals.signals[str(sig_id)]["subtype"] = signalsubtype                  # Type-specific - subtype of the signal
         signals.signals[str(sig_id)]["refresh"] = refresh_immediately             # Type-specific - controls when aspects are updated
         signals.signals[str(sig_id)]["hasfeathers"] = signal_has_feathers         # Type-specific - If there is a Feather Route display
         signals.signals[str(sig_id)]["featherenabled"] = None                     # Type-specific - State of the Feather Route display
