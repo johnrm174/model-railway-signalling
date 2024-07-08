@@ -170,6 +170,7 @@ def run_gpio_sensor_library_tests():
     print ("GPIO Sensors - reset_mqtt_configuration")
     gpio_sensors.reset_gpio_mqtt_configuration()
     assert len(gpio_sensors.gpio_port_mappings) == 4
+    assert len(gpio_sensors.list_of_track_sensors_to_publish) == 0
     assert not gpio_sensors.gpio_sensor_exists("box1-20")
     assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert not gpio_sensors.gpio_sensor_exists("box1-22")
