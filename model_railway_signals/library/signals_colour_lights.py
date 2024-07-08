@@ -595,9 +595,6 @@ class timed_sequence():
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
                     # Update the signal for automatic "signal passed" events as Signal is OVERRIDDEN
                     update_colour_light_signal(self.sig_id)
-                    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
-                    # mqtt interface has been successfully configured and the signal has been set to publish passed events
-                    signals.publish_signal_passed_event(self.sig_id)
                     signals.signals[str(self.sig_id)]["extcallback"] (self.sig_id, signals.signal_callback_type.sig_passed)
                 else:
                     update_colour_light_signal(self.sig_id)

@@ -710,9 +710,6 @@ class timed_sequence():
                 if self.start_delay > 0:                 
                     logging.info("Signal "+str(self.sig_id)+": Timed Signal - Signal Passed Event **************************")
                     update_semaphore_signal(self.sig_id)
-                    # Publish the signal passed event via the mqtt interface. Note that the event will only be published if the
-                    # mqtt interface has been successfully configured and the signal has been set to publish passed events
-                    signals.publish_signal_passed_event(self.sig_id)
                     signals.signals[str(self.sig_id)]["extcallback"] (self.sig_id,signals.signal_callback_type.sig_passed)
                 else:
                     update_semaphore_signal(self.sig_id)
