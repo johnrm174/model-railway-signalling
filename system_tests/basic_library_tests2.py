@@ -226,10 +226,12 @@ def run_track_section_library_tests():
     track_sections.update_mirrored(1,"box1-0")      # Fail - Remote Mirrored ID invalid
     track_sections.update_mirrored(1,"box1-100")    # Fail - Remote Mirrored ID invalid
     print("Library Tests - set_sections_to_publish_state - 4 Errors and 2 warnings will be generated")    
+    assert len(track_sections.list_of_sections_to_publish) == 0
     track_sections.set_sections_to_publish_state(1,2,20)    # Valid
     track_sections.set_sections_to_publish_state(1,2)       # Already set to publish - 2 warnings
     track_sections.set_sections_to_publish_state("1,","2")  # Not integers - 2 Errors
     track_sections.set_sections_to_publish_state(0, 100)    # Integer but out of range - 2 errors
+    assert len(track_sections.list_of_sections_to_publish) == 3
     # Create a Section already set to publish state on creation
     print("Library Tests - set_sections_to_publish_state - Exercise Publishing of Events code")
     track_sections.create_section(canvas,8,800,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="")
@@ -240,7 +242,7 @@ def run_track_section_library_tests():
     track_sections.update_identifier(2,"Train11")
     track_sections.section_button_event(2)
     track_sections.section_button_event(3)
-    print("Library Tests - subscribe_to_remote_instruments - 5 Errors and 2 warnings will be generated")
+    print("Library Tests - subscribe_to_remote_sections - 5 Errors and 2 warnings will be generated")
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
     track_sections.subscribe_to_remote_sections("box1","51", 3)        # Fail - 3 errors
@@ -271,6 +273,7 @@ def run_track_section_library_tests():
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","labeltext":"Train20"})     # Warning - spurious message    
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     track_sections.reset_sections_mqtt_configuration()
+    assert len(track_sections.list_of_sections_to_publish) == 0
     assert len(track_sections.sections) == 8
     assert not track_sections.section_exists("box1-50")
     assert not track_sections.section_exists("box1-51")
