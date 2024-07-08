@@ -490,7 +490,7 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
     else:
         theatre_text = canvas.create_text(text_coordinates,state='hidden',tags=canvas_tag)
     # Add the Theatre elements to the dictionary of signal objects
-    signals[str(sig_id)]["theatretext"]    = "NONE"              # SHARED - Initial Theatre Text to display (none)
+    signals[str(sig_id)]["theatretext"]    = ""                  # SHARED - Initial Theatre Text to display (none)
     signals[str(sig_id)]["hastheatre"]     = has_theatre         # SHARED - Whether the signal has a theatre display or not
     signals[str(sig_id)]["theatreobject"]  = theatre_text        # SHARED - Text drawing object
     signals[str(sig_id)]["theatreenabled"] = None                # SHARED - State of the Theatre display (None at creation)
@@ -510,10 +510,10 @@ def update_theatre_route_indication(sig_id:int, theatre_text:str):
             signals[str(sig_id)]["canvas"].itemconfig(signals[str(sig_id)]["theatreobject"],text=theatre_text)
             signals[str(sig_id)]["theatretext"] = theatre_text
             if signals[str(sig_id)]["theatreenabled"] == True:
-                logging.info("Signal "+str(sig_id)+": Changing theatre route display to \'" + theatre_text + "\'")
+                logging.info("Signal "+str(sig_id)+": Changing theatre route display to '" + theatre_text + "'")
                 dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=False)
             else:
-                logging.info("Signal "+str(sig_id)+": Setting theatre route to \'" + theatre_text + "\'")
+                logging.info("Signal "+str(sig_id)+": Setting theatre route to '" + theatre_text + "'")
                 # We always call the function to update the DCC route indication on a change in route even if the signal
                 # is at Danger to cater for DCC signal types that automatically enable/disable the route indication 
                 dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=False,sig_at_danger=True)
@@ -537,7 +537,7 @@ def enable_disable_theatre_route_indication(sig_id:int):
             # This is where we send the special character to inhibit the theatre route indication
             dcc_control.update_dcc_signal_theatre(sig_id,"#",signal_change=True,sig_at_danger=True)
         elif signals[str(sig_id)]["sigstate"] != signal_state_type.DANGER and signals[str(sig_id)]["theatreenabled"] != True:
-            logging.info("Signal "+str(sig_id)+": Enabling theatre route display of \'"+signals[str(sig_id)]["theatretext"]+"\'")
+            logging.info("Signal "+str(sig_id)+": Enabling theatre route display of '"+signals[str(sig_id)]["theatretext"]+"'")
             signals[str(sig_id)]["canvas"].itemconfig (signals[str(sig_id)]["theatreobject"],state="normal")
             signals[str(sig_id)]["theatreenabled"] = True
             dcc_control.update_dcc_signal_theatre(sig_id,signals[str(sig_id)]["theatretext"],signal_change=True,sig_at_danger=False)
@@ -664,7 +664,7 @@ def set_approach_control(sig_id:int, release_on_yellow:bool=False, force_set:boo
             if signals[str(sig_id)]["subtype"] == semaphore_subtype.distant:
                 logging.error("Signal "+str(sig_id)+": Can't set approach control for semaphore distant signals")
             elif release_on_yellow:
-                logging.error("Signal "+str(sig_id)+": Can't set \'release on yellow\' approach control for home signals")
+                logging.error("Signal "+str(sig_id)+": Can't set 'release on yellow' approach control for home signals")
             else:
                 function_call_valid = True
     # If the call is valid for the signal type then set the approach control mode - but only if the signal
@@ -956,6 +956,10 @@ def trigger_timed_signal(sig_id:int, start_delay:int, time_delay:int):
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": trigger_timed_signal - Signal ID does not exist")
+    elif not isinstance(start_delay, int) or start_delay < 0:
+        logging.error("Signal "+str(sig_id)+": trigger_timed_signal - Start delay is not a positive int")
+    elif not isinstance(time_delay, int) or time_delay < 0:
+        logging.error("Signal "+str(sig_id)+": trigger_timed_signal - time delay is not a positive int")
     elif signals[str(sig_id)]["sigtype"] == signal_type.colour_light:
         logging.info("Signal "+str(sig_id)+": Triggering Timed Signal")
         signals_colour_lights.trigger_timed_colour_light_signal(sig_id, start_delay, time_delay)
@@ -978,6 +982,12 @@ def set_route(sig_id:int, route:route_type=None, theatre_text:str=""):
         logging.error("Signal "+str(sig_id)+": set_route - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": set_route - Signal ID does not exist")
+    elif route is not None and route not in (route_type.MAIN, route_type.LH1, route_type.LH2, route_type.RH1, route_type.RH2):
+        logging.error("Signal "+str(sig_id)+": set_route - Invalid route specified: '"+str(route)+"'")
+    elif not isinstance(theatre_text, str) or len(theatre_text) > 1:
+        logging.error("Signal "+str(sig_id)+": set_route - Invalid theatre text specified: '"+str(theatre_text)+"'")
+    elif len(theatre_text) > 0 and not signals[str(sig_id)]["hastheatre"]:
+        logging.error("Signal "+str(sig_id)+": set_route - Signal does not have a theatre route indicator")
     else:
         if route is not None:
             # call the signal type-specific functions to update the signal
