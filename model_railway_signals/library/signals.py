@@ -379,10 +379,14 @@ def create_common_signal_elements(canvas, sig_id:int,
                                   sig_automatic:bool=False,
                                   associated_home:int=0):
     global signals
-    # Define the "Tag" for all drawing objects for this signal instance
-    # If it is an associated distant then set the tag the same as the home signal
-    if associated_home > 0: canvas_tag = "signal"+str(associated_home)
-    else: canvas_tag = "signal"+str(sig_id)
+    # Define the "Tags" for all drawing objects for this signal instance.  If it is an associated distant
+    # signal then we assign 2 tags - the tag associated with the signal itself (this is stored in the 
+    # signal dict entry and used for subsequently deleting all drawing objects) and the tag that would 
+    # have been assigned to the associated home signal's drawing objects (so this can be used by the 
+    # editor for moving the combined signal elements as one).
+    main_canvas_tag = "signal"+str(sig_id)
+    if associated_home > 0: canvas_tag = (main_canvas_tag, "signal"+str(associated_home))
+    else: canvas_tag = main_canvas_tag
     # Create the Signal Buttons. If an 'associated_home' has been specified then this represents the
     # special case of a semaphore distant signal being created on the same "post" as a home signal, where
     # we label the button as "D" to differentiate it from the main signal button and apply a position offset
@@ -447,7 +451,7 @@ def create_common_signal_elements(canvas, sig_id:int,
     signals[str(sig_id)]["sigbutton"]    = sig_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["subbutton"]    = sub_button           # MANDATORY - Button Drawing object (main Signal)
     signals[str(sig_id)]["passedbutton"] = passed_button        # MANDATORY - Button drawing object (subsidary signal)
-    signals[str(sig_id)]["tags"]         = canvas_tag           # MANDATORY - Canvas Tags for all drawing objects
+    signals[str(sig_id)]["tags"]         = main_canvas_tag      # MANDATORY - Canvas Tags for all drawing objects
     return(canvas_tag)
 
 # -------------------------------------------------------------------------
@@ -752,7 +756,7 @@ def clear_signal_override(sig_id:int):
 
 # -------------------------------------------------------------------------
 # Library API function to set a signal override (at caution)
-# (supported by Semaphore and Colour Light distant signals only)
+# (supported by all Semaphore and Colour Light types apart from HOME signals)
 # -------------------------------------------------------------------------
 
 def set_signal_override_caution(sig_id:int):
@@ -762,10 +766,12 @@ def set_signal_override_caution(sig_id:int):
         logging.error("Signal "+str(sig_id)+": set_signal_override_caution - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": set_signal_override_caution - Signal ID does not exist")
-    elif ( ( signals[str(sig_id)]["sigtype"] != signal_type.colour_light or
-             signals[str(sig_id)]["subtype"] != signal_subtype.distant ) and
-           ( signals[str(sig_id)]["sigtype"] != signal_type.semaphore or
-             signals[str(sig_id)]["subtype"] != semaphore_subtype.distant ) ):
+    elif ( signals[str(sig_id)]["sigtype"] == signal_type.ground_position or
+           signals[str(sig_id)]["sigtype"] == signal_type.ground_disc or
+           ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light and
+             signals[str(sig_id)]["subtype"] == signal_subtype.home ) or
+           ( signals[str(sig_id)]["sigtype"] == signal_type.semaphore and
+             signals[str(sig_id)]["subtype"] == semaphore_subtype.home ) ):
         logging.error("Signal "+str(sig_id)+": - set_signal_override_caution - Function not supported by signal type")
     elif not signals[str(sig_id)]["overcaution"]:
         # Set the Signal Override Caution and update the displayed aspect
@@ -786,10 +792,12 @@ def clear_signal_override_caution(sig_id:int):
         logging.error("Signal "+str(sig_id)+": clear_signal_override_caution - Signal ID must be an int")    
     elif not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": clear_signal_override_caution - Signal ID does not exist")
-    elif ( ( signals[str(sig_id)]["sigtype"] != signal_type.colour_light or
-             signals[str(sig_id)]["subtype"] != signal_subtype.distant ) and
-           ( signals[str(sig_id)]["sigtype"] != signal_type.semaphore or
-             signals[str(sig_id)]["subtype"] != semaphore_subtype.distant ) ):
+    elif ( signals[str(sig_id)]["sigtype"] == signal_type.ground_position or
+           signals[str(sig_id)]["sigtype"] == signal_type.ground_disc or
+           ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light and
+             signals[str(sig_id)]["subtype"] == signal_subtype.home ) or
+           ( signals[str(sig_id)]["sigtype"] == signal_type.semaphore and
+             signals[str(sig_id)]["subtype"] == semaphore_subtype.home ) ):
         logging.error("Signal "+str(sig_id)+": - clear_signal_override_caution - Function not supported by signal type")
     elif signals[str(sig_id)]["overcaution"]:
         # Clear the Signal Override Caution and update the displayed aspect
@@ -986,6 +994,8 @@ def set_route(sig_id:int, route:route_type=None, theatre_text:str=""):
         logging.error("Signal "+str(sig_id)+": set_route - Invalid route specified: '"+str(route)+"'")
     elif not isinstance(theatre_text, str) or len(theatre_text) > 1:
         logging.error("Signal "+str(sig_id)+": set_route - Invalid theatre text specified: '"+str(theatre_text)+"'")
+    elif len(theatre_text) > 0 and signals[str(sig_id)]["sigtype"] not in (signal_type.colour_light, signal_type.semaphore):
+        logging.error("Signal "+str(sig_id)+": set_route - Signal type does not support theatre route indicators")
     elif len(theatre_text) > 0 and not signals[str(sig_id)]["hastheatre"]:
         logging.error("Signal "+str(sig_id)+": set_route - Signal does not have a theatre route indicator")
     else:
