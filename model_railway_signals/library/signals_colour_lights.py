@@ -413,7 +413,7 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
 # -------------------------------------------------------------------------
 
 def flash_aspect_off(sig_id:int):
-    if not common.shutdown_initiated:
+    if not common.shutdown_initiated and signals.signal_exists(sig_id):
         if (signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION
             or signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_PRELIM_CAUTION):
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel"],fill="grey")
@@ -422,7 +422,7 @@ def flash_aspect_off(sig_id:int):
     return()
 
 def flash_aspect_on(sig_id:int):
-    if not common.shutdown_initiated:
+    if not common.shutdown_initiated and signals.signal_exists(sig_id):
         if signals.signals[str(sig_id)]["sigstate"] == signals.signal_state_type.FLASH_CAUTION:
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel"],fill="yellow")
             signals.signals[str(sig_id)]["canvas"].itemconfig(signals.signals[str(sig_id)]["yel2"],fill="grey")
