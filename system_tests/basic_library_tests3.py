@@ -16,16 +16,16 @@ from model_railway_signals.library.signals_ground_disc import create_ground_disc
 from model_railway_signals.editor import schematic
 
 #---------------------------------------------------------------------------------------------------------
-# Test Signal Library objects
+# Test basic Signal Library API
 #---------------------------------------------------------------------------------------------------------
 
 def signal_callback(signal_id, callback_type):
     logging_string="Signal Callback from Signal "+str(signal_id)+"-"+str(callback_type)
     logging.info(logging_string)
     
-def run_function_validation_tests():
+def run_library_api_tests():
     # Test all functions - including negative tests for parameter validation
-    print("Library Tests - Signal Objects")
+    print("Library API Tests - Signal Objects")
     canvas = schematic.canvas
     # create_signal
     print("Library Tests - create_colour_light_signal - will generate 10 errors:")
@@ -120,12 +120,21 @@ def run_function_validation_tests():
     assert not signals.signals["2"]["override"]
     print("Library Tests - set_signal_override_caution (distants only) - will generate 6 errors:")
     # Create signals to facilitate this test
-    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250, signal_callback)
-    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.distant, 250, 250, signal_callback)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback)
+    create_colour_light_signal(canvas, 11, signals.signal_subtype.three_aspect, 250, 250, signal_callback)
+    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 400, 250, signal_callback)
+    create_colour_light_signal(canvas, 13, signals.signal_subtype.distant, 550, 250, signal_callback)
+    create_semaphore_signal(canvas, 14, signals.semaphore_subtype.distant, 700, 250, signal_callback)
     assert not signals.signals["10"]["overcaution"]
     assert not signals.signals["11"]["overcaution"]
-    signals.set_signal_override_caution(10)    # Success - colour light distant
-    signals.set_signal_override_caution(11)    # Success - semaphore distant
+    assert not signals.signals["12"]["overcaution"]
+    assert not signals.signals["13"]["overcaution"]
+    assert not signals.signals["14"]["overcaution"]
+    signals.set_signal_override_caution(10)    # Success - colour light 4 aspect
+    signals.set_signal_override_caution(11)    # Success - colour light 3 aspect
+    signals.set_signal_override_caution(12)    # Success - colour light red/ylw 
+    signals.set_signal_override_caution(13)    # Success - colour light distant
+    signals.set_signal_override_caution(14)    # Success - semaphore distant
     signals.set_signal_override_caution(1)     # Error - unsupported for type
     signals.set_signal_override_caution(2)     # Error - unsupported for type
     signals.set_signal_override_caution(4)     # Error - unsupported for type
@@ -134,9 +143,15 @@ def run_function_validation_tests():
     signals.set_signal_override_caution("1")   # Error - not an int
     assert signals.signals["10"]["overcaution"]
     assert signals.signals["11"]["overcaution"]
+    assert signals.signals["12"]["overcaution"]
+    assert signals.signals["13"]["overcaution"]
+    assert signals.signals["14"]["overcaution"]
     print("Library Tests - clear_signal_override - will generate 6 errors:")
-    signals.clear_signal_override_caution(10)    # Success - colour light distant
-    signals.clear_signal_override_caution(11)    # Success - semaphore distant
+    signals.clear_signal_override_caution(10)    # Success - colour light 4 aspect
+    signals.clear_signal_override_caution(11)    # Success - colour light 3 aspect
+    signals.clear_signal_override_caution(12)    # Success - colour light red/ylw 
+    signals.clear_signal_override_caution(13)    # Success - colour light distant
+    signals.clear_signal_override_caution(14)    # Success - semaphore distant
     signals.clear_signal_override_caution(1)     # Error - unsupporte3d for type
     signals.clear_signal_override_caution(2)     # Error - unsupporte3d for type
     signals.clear_signal_override_caution(4)     # Error - unsupporte3d for type
@@ -145,9 +160,15 @@ def run_function_validation_tests():
     signals.clear_signal_override_caution("1")   # Error - not an int
     assert not signals.signals["10"]["overcaution"]
     assert not signals.signals["11"]["overcaution"]
+    assert not signals.signals["12"]["overcaution"]
+    assert not signals.signals["13"]["overcaution"]
+    assert not signals.signals["14"]["overcaution"]
     # Delete the signals we created for this test
     signals.delete_signal(10)
     signals.delete_signal(11)
+    signals.delete_signal(12)
+    signals.delete_signal(13)
+    signals.delete_signal(14)
     print("Library Tests - lock_signal (also tests toggle_signal) - will generate 3 errors and 1 warning:")
     assert not signals.signals["1"]["siglocked"]
     signals.lock_signal(1)
@@ -316,7 +337,7 @@ def run_function_validation_tests():
     assert signals.signal_state(5) == signals.signal_state_type.DANGER     # Valid - ID str
     assert signals.signal_state(5.2) == signals.signal_state_type.DANGER   # Error - not an int
     assert signals.signal_state(6) == signals.signal_state_type.DANGER     # Error - does not exist
-    print("Library Tests - set_route (validation failures) - will generate 6 errors:")
+    print("Library Tests - set_route (validation failures) - will generate 9 errors:")
     # Signal Route
     assert signals.signals["1"]["routeset"] == signals.route_type.MAIN
     signals.set_route(1, route=signals.route_type.LH1)
@@ -346,6 +367,10 @@ def run_function_validation_tests():
     signals.set_route(1, theatre_text="1")    # Error - does not have a theatre
     signals.set_route(1, theatre_text="AB")   # Error - too many characters
     signals.set_route(1, theatre_text=8)      # Error - not a str
+    signals.set_route(1, theatre_text="1")    # Error - does not have a theatre
+    signals.set_route(3, theatre_text="1")    # Error - unsupported type
+    signals.set_route(4, theatre_text="1")    # Error - unsupported type
+    signals.set_route(5, theatre_text="1")    # Error - unsupported type
     print("Library Tests - update_colour_light_signal (validation failures) - will generate 9 errors:")
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback,theatre_route_indicator=True)
     signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
@@ -404,14 +429,426 @@ def run_function_validation_tests():
     signals.handle_mqtt_signal_updated_event({"sourceidentifier":"box1-70", "sigstate":1,})        # Warning - Not subscribed
     signals.handle_mqtt_signal_updated_event({"sourceidentifier":"box1-50"})                       # Warning - spurious message
     signals.handle_mqtt_signal_updated_event({"sigstate": 1})                                      # Warning - spurious message
-    print("Library Tests - reset_signals_mqtt_configuration (all subscribed signals will be deleted)")
+    print("Library Tests - reset_signals_mqtt_configuration (all subscribed signals will be deleted) - no errors")
     signals.reset_signals_mqtt_configuration()
     assert len(signals.list_of_signals_to_publish) == 0
     assert len(signals.signals) == 5
+    # Clean up
+    signals.delete_signal(5)
+    signals.delete_signal(4)
+    signals.delete_signal(3)
+    signals.delete_signal(2)
+    signals.delete_signal(1)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
     
+#---------------------------------------------------------------------------------------------------------
+# Test Timed signal sequences
+#---------------------------------------------------------------------------------------------------------
+    
+def run_timed_signal_tests():
+    print("Library Tests - Timed Signals")
+    canvas = schematic.canvas
+    # Set up the initial test conditions
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback)
+    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100, signal_callback)
+    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100, signal_callback)
+    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100, signal_callback)
+    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100, signal_callback)
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100, signal_callback)
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100, signal_callback)
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_signal(4)
+    signals.toggle_signal(5)
+    signals.toggle_signal(6)
+    signals.toggle_signal(7)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    print("Library Tests - trigger_timed_signal (no start delay) - no errors")
+    signals.trigger_timed_signal(1, 0, 1)
+    signals.trigger_timed_signal(2, 0, 1)
+    signals.trigger_timed_signal(3, 0, 1)
+    signals.trigger_timed_signal(4, 0, 1)
+    signals.trigger_timed_signal(5, 0, 1)
+    signals.trigger_timed_signal(6, 0, 1)
+    signals.trigger_timed_signal(7, 0, 1)
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.PRELIM_CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    print("Library Tests - trigger_timed_signal (with a start delay) - no errors")
+    signals.trigger_timed_signal(1, 1, 1)
+    signals.trigger_timed_signal(2, 1, 1)
+    signals.trigger_timed_signal(3, 1, 1)
+    signals.trigger_timed_signal(4, 1, 1)
+    signals.trigger_timed_signal(5, 1, 1)
+    signals.trigger_timed_signal(6, 1, 1)
+    signals.trigger_timed_signal(7, 1, 1)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.PRELIM_CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    time.sleep(1.1)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    # Clean up
+    signals.delete_signal(1)
+    signals.delete_signal(2)
+    signals.delete_signal(3)
+    signals.delete_signal(4)
+    signals.delete_signal(5)
+    signals.delete_signal(6)
+    signals.delete_signal(7)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test signal aspects
+#---------------------------------------------------------------------------------------------------------
+
+def run_signal_aspect_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    # create_signal
+    print("Library Tests - signal aspect tests - no errors")
+    # Set up the initial test conditions
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback)
+    create_colour_light_signal(canvas, 2, signals.signal_subtype.three_aspect, 225, 100, signal_callback)
+    create_colour_light_signal(canvas, 3, signals.signal_subtype.red_ylw, 350, 100, signal_callback)
+    create_colour_light_signal(canvas, 4, signals.signal_subtype.distant, 475, 100, signal_callback)
+    create_colour_light_signal(canvas, 5, signals.signal_subtype.home, 600, 100, signal_callback)
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.home, 725, 100, signal_callback)
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 850, 100, signal_callback)
+    create_ground_position_signal(canvas, 8, signals.ground_pos_subtype.standard, 100, 200, signal_callback)
+    create_ground_position_signal(canvas, 9, signals.ground_pos_subtype.shunt_ahead, 200, 200, signal_callback)
+    create_ground_position_signal(canvas, 10, signals.ground_pos_subtype.early_standard, 300, 200, signal_callback)
+    create_ground_position_signal(canvas, 11, signals.ground_pos_subtype.early_shunt_ahead, 400, 200, signal_callback)
+    create_ground_disc_signal(canvas, 12, signals.ground_disc_subtype.standard, 500, 200, signal_callback)
+    create_ground_disc_signal(canvas, 13, signals.ground_disc_subtype.shunt_ahead, 600, 200, signal_callback)
+    # All signals ON
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(8) == signals.signal_state_type.DANGER
+    assert signals.signal_state(9) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(12) == signals.signal_state_type.DANGER
+    assert signals.signal_state(13) == signals.signal_state_type.CAUTION
+    # All signals OFF
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_signal(4)
+    signals.toggle_signal(5)
+    signals.toggle_signal(6)
+    signals.toggle_signal(7)
+    signals.toggle_signal(8)
+    signals.toggle_signal(9)
+    signals.toggle_signal(10)
+    signals.toggle_signal(11)
+    signals.toggle_signal(12)
+    signals.toggle_signal(13)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(8) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(9) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(12) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(13) == signals.signal_state_type.PROCEED
+    # All signals overridden (to ON)
+    signals.set_signal_override(1)
+    signals.set_signal_override(2)
+    signals.set_signal_override(3)
+    signals.set_signal_override(4)
+    signals.set_signal_override(5)
+    signals.set_signal_override(6)
+    signals.set_signal_override(7)
+    signals.set_signal_override(8)
+    signals.set_signal_override(9)
+    signals.set_signal_override(10)
+    signals.set_signal_override(11)
+    signals.set_signal_override(12)
+    signals.set_signal_override(13)
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(8) == signals.signal_state_type.DANGER
+    assert signals.signal_state(9) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(12) == signals.signal_state_type.DANGER
+    assert signals.signal_state(13) == signals.signal_state_type.CAUTION    
+    signals.clear_signal_override(1)
+    signals.clear_signal_override(2)
+    signals.clear_signal_override(3)
+    signals.clear_signal_override(4)
+    signals.clear_signal_override(5)
+    signals.clear_signal_override(6)
+    signals.clear_signal_override(7)
+    signals.clear_signal_override(8)
+    signals.clear_signal_override(9)
+    signals.clear_signal_override(10)
+    signals.clear_signal_override(11)
+    signals.clear_signal_override(12)
+    signals.clear_signal_override(13)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(8) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(9) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(12) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(13) == signals.signal_state_type.PROCEED
+    # All non-home signals overridden (to CAUTION)
+    signals.set_signal_override_caution(1)
+    signals.set_signal_override_caution(2)
+    signals.set_signal_override_caution(3)
+    signals.set_signal_override_caution(4)
+    signals.set_signal_override_caution(7)
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(7) == signals.signal_state_type.CAUTION
+    signals.clear_signal_override_caution(1)
+    signals.clear_signal_override_caution(2)
+    signals.clear_signal_override_caution(3)
+    signals.clear_signal_override_caution(4)
+    signals.clear_signal_override_caution(7)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    # Signals subject to 'Release on Red' approach control
+    signals.set_approach_control(1,release_on_yellow=False)
+    signals.set_approach_control(2,release_on_yellow=False)
+    signals.set_approach_control(3,release_on_yellow=False)
+    signals.set_approach_control(5,release_on_yellow=False)
+    signals.set_approach_control(6,release_on_yellow=False)
+    assert signals.signal_state(1) == signals.signal_state_type.DANGER
+    assert signals.signal_state(2) == signals.signal_state_type.DANGER
+    assert signals.signal_state(3) == signals.signal_state_type.DANGER
+    assert signals.signal_state(5) == signals.signal_state_type.DANGER
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    signals.clear_approach_control(1)
+    signals.clear_approach_control(2)
+    signals.clear_approach_control(3)
+    signals.clear_approach_control(5)
+    signals.clear_approach_control(6)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(7) == signals.signal_state_type.PROCEED
+    # Signals subject to 'Release on Yellow' approach control
+    signals.set_approach_control(1,release_on_yellow=True)
+    signals.set_approach_control(2,release_on_yellow=True)
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION_APP_CNTL
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION_APP_CNTL
+    signals.clear_approach_control(1)
+    signals.clear_approach_control(2)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    # Slotting for secondary distant semaphore signals
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    create_semaphore_signal(canvas, 16, signals.semaphore_subtype.distant, 725, 100, signal_callback, associated_home=6)
+    # Signal 16 will be ON (CAUTION) and signal 6 will be OFF (PROCEED) going into these tests
+    assert signals.signal_state(16) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(6) == signals.signal_state_type.CAUTION
+    signals.toggle_signal(16)
+    assert signals.signal_state(16) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    signals.toggle_signal(6)
+    # When the home arm is at danger the distant arm will be set to CAUTION
+    assert signals.signal_state(16) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(6) == signals.signal_state_type.DANGER
+    signals.toggle_signal(6)
+    assert signals.signal_state(16) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(6) == signals.signal_state_type.PROCEED
+    signals.toggle_signal(16)
+    assert signals.signal_state(16) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(6) == signals.signal_state_type.CAUTION
+    signals.delete_signal(16)
+    # Colour light signal aspects based on signal ahead
+    # We're going to create a dummy signal and 'cheat' by setting the aspect
+    # Note that all signals are OFF (PROCEED) going into this test
+    create_colour_light_signal(canvas, 20, signals.signal_subtype.four_aspect, 100, 300, signal_callback)
+    # First aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.PROCEED
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.DANGER
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.CAUTION
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.PRELIM_CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.PRELIM_CAUTION
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.CAUTION_APP_CNTL
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.FLASH_CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.FLASH_CAUTION
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION         # Red/Yellow - so no flashing aspect
+    assert signals.signal_state(4) == signals.signal_state_type.FLASH_CAUTION
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED         # Distant - so no caution aspect
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_CAUTION
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.FLASH_PRELIM_CAUTION
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Next Aspect
+    signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_PRELIM_CAUTION
+    signals.update_colour_light_signal(1,20)
+    signals.update_colour_light_signal(2,20)
+    signals.update_colour_light_signal(3,20)
+    signals.update_colour_light_signal(4,20)
+    signals.update_colour_light_signal(5,20)
+    assert signals.signal_state(1) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(2) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(3) == signals.signal_state_type.CAUTION
+    assert signals.signal_state(4) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(5) == signals.signal_state_type.PROCEED    
+    signals.delete_signal(20)
+    # Clean up
+    signals.delete_signal(1)
+    signals.delete_signal(2)
+    signals.delete_signal(3)
+    signals.delete_signal(4)
+    signals.delete_signal(5)
+    signals.delete_signal(6)
+    signals.delete_signal(7)
+    signals.delete_signal(8)
+    signals.delete_signal(9)
+    signals.delete_signal(10)
+    signals.delete_signal(11)
+    signals.delete_signal(12)
+    signals.delete_signal(13)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
     
     ##################################################################################################
     ## Work in progress ##############################################################################
@@ -422,9 +859,14 @@ def run_function_validation_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-    run_function_validation_tests()
+    run_library_api_tests()
+    run_timed_signal_tests()
+    run_signal_aspect_tests()
+    # Check the creation of all supported Signal configurations
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/semaphore_signals.sig")
     system_test_harness.report_results()
-
+    
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
 
