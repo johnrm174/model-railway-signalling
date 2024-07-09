@@ -1026,13 +1026,13 @@ def update_colour_light_signal(sig_id:int, sig_ahead_id:Union[int,str]=None):
     # Validate the parameters we have been given as this is a library API function
     if not isinstance(sig_id, int):
         logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal ID must be an int")
-    elif sig_ahead_id is not None and not isinstance(sig_ahead_id, str) and not isinstance(sig_id, int):
+    elif sig_ahead_id is not None and not isinstance(sig_ahead_id, str) and not isinstance(sig_ahead_id, int):
         logging.error("Signal "+str(sig_id)+": update_colour_light_signal - Signal Ahead ID must be an int or str")
     elif not signal_exists(sig_id):
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal does not exist")
     elif sig_ahead_id is not None and not signal_exists(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" does not exist")
-    elif str(sig_id) == sig_ahead_id: 
+    elif str(sig_id) == str(sig_ahead_id): 
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Signal ahead "+str(sig_ahead_id)+" is the same ID")
     elif signals[str(sig_id)]["sigtype"] != signal_type.colour_light:
         logging.error ("Signal "+str(sig_id)+": update_colour_light_signal - Not a colour light signal")
