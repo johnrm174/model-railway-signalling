@@ -44,26 +44,27 @@ def run_library_api_tests():
     create_colour_light_signal(canvas, 7, signals.signal_subtype.distant, 100, 100, signal_callback, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 1
     print("Library Tests - create_semaphore_signal - will generate 10 errors:")
-    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100, signal_callback)        # Success
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100, signal_callback, main_subsidary=True)  # Success
     create_semaphore_signal(canvas, "3", signals.semaphore_subtype.home, 250, 100, signal_callback)      # Error - not an int
     create_semaphore_signal(canvas, 0, signals.semaphore_subtype.home, 250, 100, signal_callback)        # Error - out of range
     create_semaphore_signal(canvas, 200, signals.semaphore_subtype.home, 250, 100, signal_callback)      # Error - out of range
     create_semaphore_signal(canvas, 1, signals.semaphore_subtype.home, 250, 100, signal_callback)        # Error - already exists
     create_semaphore_signal(canvas, 3, signals.signal_type.colour_light, 250, 100, signal_callback)      # Error - invalid subtype
-    create_semaphore_signal(canvas, 3, signals.signal_type.colour_light, 250, 100, signal_callback, main_signal=False)  # Error - no main arm
-    create_semaphore_signal(canvas, 4, signals.signal_subtype.home, 250, 100, signal_callback,
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.home, 250, 100, signal_callback, main_signal=False)  # Error - no main arm
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 250, 100, signal_callback,
                                             lh1_signal=True, theatre_route_indicator=True)               # Error - Route Arms and theatre
-    create_semaphore_signal(canvas, 5, signals.signal_subtype.distant, 250, 100, signal_callback, lh1_subsidary=True)  # Error - Dist & Subsidary
-    create_semaphore_signal(canvas, 6, signals.signal_subtype.distant, 250, 100, signal_callback, theatre_route_indicator=True)  # Error - Dist & Theatre
-    create_semaphore_signal(canvas, 7, signals.signal_subtype.distant, 250, 100, signal_callback, sig_release_button=True)  # Error - Dist & App control
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100, signal_callback, lh1_subsidary=True)  # Error - Dist & Subsidary
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100, signal_callback, theatre_route_indicator=True)  # Error - Dist & Theatre
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100, signal_callback, sig_release_button=True)  # Error - Dist & App control
     assert len(signals.signals) == 2
-    print("Library Tests - create_semaphore_signal (validate associated home params) - will generate 5 errors:")
+    print("Library Tests - create_semaphore_signal (validate associated home params) - will generate 6 errors:")
     create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=2)        # Success
-    create_semaphore_signal(canvas, "4", signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=1)      # Error - not an int
-    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=1)        # Error - not a semaphore
-    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=3)        # Error - not a home
-    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=4)        # Error - does not exist
-    create_semaphore_signal(canvas, 8, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=2, sig_passed_button=True)  # Error - button
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home="1")      # Error - associated ID not an int
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=1)        # Error - associated sig not a semaphore
+    create_semaphore_signal(canvas, 6, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=3)        # Error - associated sig not a home
+    create_semaphore_signal(canvas, 7, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=4)        # Error - associated sig does not exist
+    create_semaphore_signal(canvas, 8, signals.semaphore_subtype.home, 250, 100, signal_callback, associated_home=2)           # Error - sig type is a home
+    create_semaphore_signal(canvas, 9, signals.semaphore_subtype.distant, 250, 100, signal_callback, associated_home=2, sig_passed_button=True)  # Error - passed button
     assert len(signals.signals) == 3
     print("Library Tests - create_ground_disc_signal - will generate 5 errors:")
     create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 400, 100, signal_callback)        # Success
@@ -89,6 +90,7 @@ def run_library_api_tests():
     assert signals.signal_exists(4)
     assert signals.signal_exists(5)
     print("Library Tests - delete_signal - will generate 2 errors:")
+    # Create some additional signals (to delete) for this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback)   # Success
     create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 250, signal_callback)    # Success
     create_ground_position_signal(canvas, 12, signals.ground_pos_subtype.shunt_ahead, 400, 250, signal_callback)   # Success
@@ -106,6 +108,7 @@ def run_library_api_tests():
     assert not signals.signals["1"]["override"]
     assert not signals.signals["2"]["override"]
     signals.set_signal_override(1)
+    signals.set_signal_override(1)
     signals.set_signal_override(2)
     signals.set_signal_override(6)     # Error - does not exist
     signals.set_signal_override("1")   # Error - not an int
@@ -113,13 +116,14 @@ def run_library_api_tests():
     assert signals.signals["2"]["override"]
     print("Library Tests - clear_signal_override - will generate 2 errors:")
     signals.clear_signal_override(1)
+    signals.clear_signal_override(1)
     signals.clear_signal_override(2)
     signals.clear_signal_override(6)     # Error - does not exist
     signals.clear_signal_override("1")   # Error - not an int
     assert not signals.signals["1"]["override"]
     assert not signals.signals["2"]["override"]
     print("Library Tests - set_signal_override_caution (distants only) - will generate 6 errors:")
-    # Create signals to facilitate this test
+    # Create some additional signals to facilitate this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback)
     create_colour_light_signal(canvas, 11, signals.signal_subtype.three_aspect, 250, 250, signal_callback)
     create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 400, 250, signal_callback)
@@ -130,6 +134,7 @@ def run_library_api_tests():
     assert not signals.signals["12"]["overcaution"]
     assert not signals.signals["13"]["overcaution"]
     assert not signals.signals["14"]["overcaution"]
+    signals.set_signal_override_caution(10)    # Success - colour light 4 aspect
     signals.set_signal_override_caution(10)    # Success - colour light 4 aspect
     signals.set_signal_override_caution(11)    # Success - colour light 3 aspect
     signals.set_signal_override_caution(12)    # Success - colour light red/ylw 
@@ -148,6 +153,7 @@ def run_library_api_tests():
     assert signals.signals["14"]["overcaution"]
     print("Library Tests - clear_signal_override - will generate 6 errors:")
     signals.clear_signal_override_caution(10)    # Success - colour light 4 aspect
+    signals.clear_signal_override_caution(10)    # Success - colour light 4 aspect
     signals.clear_signal_override_caution(11)    # Success - colour light 3 aspect
     signals.clear_signal_override_caution(12)    # Success - colour light red/ylw 
     signals.clear_signal_override_caution(13)    # Success - colour light distant
@@ -163,16 +169,22 @@ def run_library_api_tests():
     assert not signals.signals["12"]["overcaution"]
     assert not signals.signals["13"]["overcaution"]
     assert not signals.signals["14"]["overcaution"]
-    # Delete the signals we created for this test
+    # Delete the additional signals we created for this test
     signals.delete_signal(10)
     signals.delete_signal(11)
     signals.delete_signal(12)
     signals.delete_signal(13)
     signals.delete_signal(14)
-    print("Library Tests - lock_signal (also tests toggle_signal) - will generate 3 errors and 1 warning:")
+    print("Library Tests - lock_signal (also tests toggle_signal) - will generate 2 errors and 1 warning:")
+    # Create a fully automatic signal for this test (to fully excersise the code)
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250, signal_callback, fully_automatic=True)
     assert not signals.signals["1"]["siglocked"]
+    assert not signals.signals["10"]["siglocked"]
     signals.lock_signal(1)
+    signals.lock_signal(1)
+    signals.lock_signal(10)
     assert signals.signals["1"]["siglocked"]
+    assert signals.signals["10"]["siglocked"]
     signals.lock_signal("2")  # Error - not an int
     signals.lock_signal(6)    # Error - does not exist
     # Test locking of a signal that is off (also tests toggle_signal)
@@ -182,27 +194,33 @@ def run_library_api_tests():
     assert signals.signals["2"]["sigclear"]
     signals.lock_signal(2)    # Warning - signal is OFF - locking anyway
     assert signals.signals["2"]["siglocked"]
-    print("Library Tests - unlock_signal (also tests toggle_signal) - will generate 2 errors and 1 warning:")
+    print("Library Tests - unlock_signal (also tests toggle_signal) - will generate 2 errors:")
     assert signals.signals["1"]["siglocked"]
     assert signals.signals["2"]["siglocked"]
     signals.unlock_signal(1)
+    signals.unlock_signal(1)
+    signals.unlock_signal(10)
     signals.unlock_signal(2)
     signals.unlock_signal("2")  # Error - not an int
     signals.unlock_signal(6)    # Error - does not exist
     signals.toggle_signal(2)    # Toggle to ON (revert to normal)
     assert not signals.signals["1"]["siglocked"]
+    assert not signals.signals["10"]["siglocked"]
     assert not signals.signals["2"]["siglocked"]
     assert not signals.signals["2"]["sigclear"]
+    # Delete the automatic signal we specifically created for this test
+    signals.delete_signal(10)
     print("Library Tests - lock_subsidary (also tests toggle_subsidary) - will generate 3 errors and 1 warning:")
     assert not signals.signals["1"]["sublocked"]
+    signals.lock_subsidary(1)
     signals.lock_subsidary(1)
     assert signals.signals["1"]["sublocked"]
     signals.lock_subsidary("2")  # Error - not an int
     signals.lock_subsidary(6)    # Error - does not exist
     # Test locking of a signal that does not have a subsidary
-    assert not signals.signals["2"]["sublocked"]
-    signals.lock_subsidary(2)  # Error - signal does not have a subsidary
-    assert not signals.signals["2"]["sublocked"]
+    assert not signals.signals["3"]["sublocked"]
+    signals.lock_subsidary(3)  # Error - signal does not have a subsidary
+    assert not signals.signals["3"]["sublocked"]
     # Test locking of a subsidary that is OFF
     signals.unlock_subsidary(1)  # Unlock subsidary first (to reset for the test)
     assert not signals.signals["1"]["sublocked"]
@@ -211,22 +229,25 @@ def run_library_api_tests():
     assert signals.signals["1"]["subclear"]
     signals.lock_subsidary(1)       # Warning - subsidary is OFF - locking anyway
     assert signals.signals["1"]["sublocked"]
-    print("Library Tests - unlock_subsidary (also tests toggle_subsidary) - will generate 2 errors and 1 warning:")
+    print("Library Tests - unlock_subsidary (also tests toggle_subsidary) - will generate 3 errors:")
     assert signals.signals["1"]["sublocked"]
     signals.unlock_subsidary(1)
-    signals.unlock_signal("2")  # Error - not an int
-    signals.unlock_signal(6)    # Error - does not exist
+    signals.unlock_subsidary(1)
+    signals.unlock_subsidary("2")  # Error - not an int
+    signals.unlock_subsidary(6)    # Error - does not exist
     # Test unlocking of a signal that does not have a subsidary
-    signals.unlock_subsidary(2)  # Error - signal does not have a subsidary
+    signals.unlock_subsidary(3)  # Error - signal does not have a subsidary
     signals.toggle_subsidary(1)  # Toggle subsidary to ON (revert to normal)
     assert not signals.signals["1"]["sublocked"]
     assert not signals.signals["2"]["sigclear"]
-    print("Library Tests - set_approach_control - will generate 7 errors:")
+    print("Library Tests - set_approach_control - will generate 9 errors:")
     # Create some additional signals for these tests
     create_colour_light_signal(canvas, 10, signals.signal_subtype.distant, 100, 250, signal_callback)
-    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.distant, 250, 250, signal_callback)
-    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 400, 250, signal_callback)
-    create_colour_light_signal(canvas, 13, signals.signal_subtype.four_aspect, 550, 250, signal_callback)
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.distant, 225, 250, signal_callback)
+    create_colour_light_signal(canvas, 12, signals.signal_subtype.red_ylw, 350, 250, signal_callback)
+    create_colour_light_signal(canvas, 13, signals.signal_subtype.four_aspect, 475, 250, signal_callback)
+    create_colour_light_signal(canvas, 14, signals.signal_subtype.home, 600, 250, signal_callback)
+    create_semaphore_signal(canvas, 15, signals.semaphore_subtype.home, 725, 250, signal_callback)
     assert not signals.signals["1"]["released"]
     assert not signals.signals["1"]["releaseonyel"]
     assert not signals.signals["1"]["releaseonred"]
@@ -238,12 +259,14 @@ def run_library_api_tests():
     signals.set_approach_control(2, release_on_yellow=False)     # Success
     signals.set_approach_control(13, release_on_yellow=True)     # Success
     signals.set_approach_control("1", release_on_yellow=False)   # Error - not an int
-    signals.set_approach_control(4, release_on_yellow=False)     # Error - not supported for sig type
-    signals.set_approach_control(5, release_on_yellow=False)     # Error - not supported for sig type
+    signals.set_approach_control(4, release_on_yellow=False)     # Error - not supported for sig type (ground pos)
+    signals.set_approach_control(5, release_on_yellow=False)     # Error - not supported for sig type (ground disc)
     signals.set_approach_control(6, release_on_yellow=False)     # Error - does not exist
-    signals.set_approach_control(10, release_on_yellow=False)    # Error - not supported for sig subtype
-    signals.set_approach_control(11, release_on_yellow=False)    # Error - not supported for sig subtype
-    signals.set_approach_control(12, release_on_yellow=True)     # Error - not supported for sig subtype
+    signals.set_approach_control(10, release_on_yellow=False)    # Error - not supported for sig subtype (colour light distant)
+    signals.set_approach_control(11, release_on_yellow=False)    # Error - not supported for sig subtype (semaphore distant)
+    signals.set_approach_control(12, release_on_yellow=True)     # Error - not supported for sig subtype (colour light red/ylw)
+    signals.set_approach_control(14, release_on_yellow=True)     # Error - not supported for sig subtype (colour light home)
+    signals.set_approach_control(15, release_on_yellow=True)     # Error - not supported for sig subtype (semaphore home)
     assert signals.signals["1"]["releaseonred"]
     assert not signals.signals["1"]["releaseonyel"]
     assert signals.signals["2"]["releaseonred"]
@@ -264,13 +287,14 @@ def run_library_api_tests():
     assert not signals.signals["2"]["releaseonyel"]
     assert not signals.signals["13"]["releaseonred"]
     assert not signals.signals["13"]["releaseonyel"]
-    # Delete the signals we created for this test
+    # Delete the additional signals we created for this test
     signals.delete_signal(10)
     signals.delete_signal(11)
     signals.delete_signal(12)
     signals.delete_signal(13)
+    signals.delete_signal(14)
+    signals.delete_signal(15)
     print("Library Tests - signal_clear (also tests toggle_signal) - will generate 2 errors:")
-    # Create some additional signals for these tests
     assert not signals.signal_clear(1)
     assert not signals.signal_clear(2)
     assert not signals.signal_clear(3)
@@ -299,35 +323,46 @@ def run_library_api_tests():
     assert not signals.signal_clear("1")   # Error - not an int
     assert not signals.signal_clear(6)     # Error - does not exist
     print("Library Tests - subsidary_clear (also tests toggle_subsidary) - will generate 3 errors:")
-    # Create some additional signals for these tests
     assert not signals.subsidary_clear(1)
     signals.toggle_subsidary(1)
     assert signals.subsidary_clear(1)
     signals.toggle_subsidary(1)
     assert not signals.subsidary_clear(1)
-    assert not signals.subsidary_clear(2)     # Error - no subsidary
+    assert not signals.subsidary_clear(3)     # Error - no subsidary
     assert not signals.subsidary_clear("1")   # Error - not an int
     assert not signals.subsidary_clear(6)     # Error - does not exist        
     print("Library Tests - toggle_signal (validation failures) - will generate 2 errors and 1 warning:")
+    # Create a fully automatic signal (without control buttons)to excersise the code
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 250, signal_callback, fully_automatic=True)
     signals.toggle_signal("1")   # Error - not an int
     signals.toggle_signal(6)     # Error - does not exist
     assert not signals.signal_clear(1)
+    assert signals.signal_clear(10)
+    signals.toggle_signal(10)
     signals.lock_signal(1)
+    signals.lock_signal(10)
     signals.toggle_signal(1)     # Warning - signal is locked
     assert signals.signal_clear(1)
     signals.unlock_signal(1)
-    signals.toggle_signal(1)    
+    signals.toggle_signal(1)
+    signals.toggle_signal(10)
+    # Delete the fully automatic signal we created for this test
+    signals.delete_signal(10)
     assert not signals.signal_clear(1)
     print("Library Tests - toggle_subsidary (validation failures) - will generate 3 errors and 1 warning:")
     signals.toggle_subsidary("1")   # Error - not an int
     signals.toggle_subsidary(6)     # Error - does not exist
-    signals.toggle_subsidary(2)     # Error - does not have a subsidary
+    signals.toggle_subsidary(3)     # Error - does not have a subsidary
     assert not signals.subsidary_clear(1)
+    assert not signals.subsidary_clear(2)
     signals.lock_subsidary(1)
     signals.toggle_subsidary(1)     # Warning - signal is locked
+    signals.toggle_subsidary(2)
     assert signals.subsidary_clear(1)
+    assert signals.subsidary_clear(2)
     signals.unlock_subsidary(1)
     signals.toggle_subsidary(1)    
+    signals.toggle_subsidary(2)    
     assert not signals.subsidary_clear(1)
     print("Library Tests - signal_state (validation failures) - will generate 2 errors:")
     assert signals.signal_state("1") == signals.signal_state_type.DANGER   # Valid - ID str
@@ -337,8 +372,8 @@ def run_library_api_tests():
     assert signals.signal_state(5) == signals.signal_state_type.DANGER     # Valid - ID str
     assert signals.signal_state(5.2) == signals.signal_state_type.DANGER   # Error - not an int
     assert signals.signal_state(6) == signals.signal_state_type.DANGER     # Error - does not exist
-    print("Library Tests - set_route (validation failures) - will generate 9 errors:")
-    # Signal Route
+    print("Library Tests - set_route (validation failures) - will generate 10 errors:")
+    # Signal Route indications
     assert signals.signals["1"]["routeset"] == signals.route_type.MAIN
     signals.set_route(1, route=signals.route_type.LH1)
     assert signals.signals["1"]["routeset"] == signals.route_type.LH1
@@ -349,7 +384,7 @@ def run_library_api_tests():
     signals.set_route("1", route=signals.route_type.MAIN) # Error - not an int
     signals.set_route(1, route=signals.route_type.NONE)   # Error - invalid route
     signals.set_route(6, route=signals.route_type.MAIN)   # Error - does not exist
-    # Theatre text
+    # Theatre Route indication
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback,theatre_route_indicator=True)
     assert signals.signals["10"]["hastheatre"]
     assert signals.signals["10"]["theatretext"] == ""
@@ -372,6 +407,7 @@ def run_library_api_tests():
     signals.set_route(4, theatre_text="1")    # Error - unsupported type
     signals.set_route(5, theatre_text="1")    # Error - unsupported type
     print("Library Tests - update_colour_light_signal (validation failures) - will generate 9 errors:")
+    # Create an additional signal with a theatre route indicator for this test
     create_colour_light_signal(canvas, 10, signals.signal_subtype.home, 100, 250, signal_callback,theatre_route_indicator=True)
     signals.update_colour_light_signal(1,sig_ahead_id=10)    # Success
     signals.update_colour_light_signal(1,sig_ahead_id="10")  # Success
@@ -384,6 +420,7 @@ def run_library_api_tests():
     signals.update_colour_light_signal(3,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
     signals.update_colour_light_signal(4,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
     signals.update_colour_light_signal(5,sig_ahead_id=1)     # Fail - Sig ID is not a colour light signal
+    # Delete the additional signal we created for this test
     signals.delete_signal(10)
     print("Library Tests - trigger_timed_signal (validation failures) - will generate 8 errors:")
     signals.trigger_timed_signal("1", 1, 1)    # Error - sig ID not an int
@@ -433,7 +470,7 @@ def run_library_api_tests():
     signals.reset_signals_mqtt_configuration()
     assert len(signals.list_of_signals_to_publish) == 0
     assert len(signals.signals) == 5
-    # Clean up
+    # Clean up by deleting all the signals we originally created
     signals.delete_signal(5)
     signals.delete_signal(4)
     signals.delete_signal(3)
@@ -480,6 +517,11 @@ def run_timed_signal_tests():
     assert signals.signal_state(6) == signals.signal_state_type.PROCEED
     assert signals.signal_state(7) == signals.signal_state_type.PROCEED
     print("Library Tests - trigger_timed_signal (no start delay) - no errors")
+    # First test that timed sequences in progressare correctly aborted
+    signals.trigger_timed_signal(1, 0, 1)
+    signals.trigger_timed_signal(6, 0, 1)
+    time.sleep(0.2)
+    # Trigger the timed sequences for the remainder of the test (aborting the previous sequences)
     signals.trigger_timed_signal(1, 0, 1)
     signals.trigger_timed_signal(2, 0, 1)
     signals.trigger_timed_signal(3, 0, 1)
@@ -508,6 +550,11 @@ def run_timed_signal_tests():
     time.sleep(1.1)
     assert signals.signal_state(1) == signals.signal_state_type.PROCEED
     print("Library Tests - trigger_timed_signal (with a start delay) - no errors")
+    # First test that timed sequences in progressare correctly aborted
+    signals.trigger_timed_signal(1, 1, 1)
+    signals.trigger_timed_signal(6, 1, 1)
+    time.sleep(0.2)
+    # Trigger the timed sequences for the remainder of the test (aborting the previous sequences)
     signals.trigger_timed_signal(1, 1, 1)
     signals.trigger_timed_signal(2, 1, 1)
     signals.trigger_timed_signal(3, 1, 1)
@@ -551,8 +598,6 @@ def run_timed_signal_tests():
     signals.delete_signal(5)
     signals.delete_signal(6)
     signals.delete_signal(7)
-    print("----------------------------------------------------------------------------------------")
-    print("")
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -560,9 +605,7 @@ def run_timed_signal_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_signal_aspect_tests():
-    # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
-    # create_signal
     print("Library Tests - signal aspect tests - no errors")
     # Set up the initial test conditions
     create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback)
@@ -807,6 +850,8 @@ def run_signal_aspect_tests():
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION         # Red/Yellow - so no flashing aspect
     assert signals.signal_state(4) == signals.signal_state_type.FLASH_CAUTION
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED         # Distant - so no caution aspect
+    # Sleep for a while to excersise the flashing aspects
+    time.sleep(2.0)
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_CAUTION
     signals.update_colour_light_signal(1,20)
@@ -819,6 +864,8 @@ def run_signal_aspect_tests():
     assert signals.signal_state(3) == signals.signal_state_type.CAUTION
     assert signals.signal_state(4) == signals.signal_state_type.PROCEED
     assert signals.signal_state(5) == signals.signal_state_type.PROCEED
+    # Sleep for a while to excersise the flashing aspects
+    time.sleep(2.0)
     # Next Aspect
     signals.signals["20"]["sigstate"] = signals.signal_state_type.FLASH_PRELIM_CAUTION
     signals.update_colour_light_signal(1,20)
@@ -846,13 +893,224 @@ def run_signal_aspect_tests():
     signals.delete_signal(11)
     signals.delete_signal(12)
     signals.delete_signal(13)
+    return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test signal routes
+#---------------------------------------------------------------------------------------------------------
+
+def run_signal_route_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    # create_signal
+    print("Library Tests - signal route tests - no errors")
+    # Set up the initial test conditions
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback,
+                            mainfeather=True, lhfeather45=True, lhfeather90=True, rhfeather45=True, rhfeather90=True)
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 250, 100, signal_callback, main_signal=True,
+                            lh1_signal=True, lh2_signal=True,rh1_signal=True, rh2_signal=True, main_subsidary=True,
+                            lh1_subsidary=True, lh2_subsidary=True, rh1_subsidary=True,  rh2_subsidary=True)
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 250, 100, signal_callback, main_signal=True,
+                            lh1_signal=True, lh2_signal=True,rh1_signal=True, rh2_signal=True, associated_home=2)
+    create_semaphore_signal(canvas, 4, signals.semaphore_subtype.home, 400, 100, signal_callback, main_subsidary=True,lh1_signal=True)
+    create_semaphore_signal(canvas, 5, signals.semaphore_subtype.home, 400, 100, signal_callback, main_subsidary=True,rh1_signal=True)
+    # Negative tests for unsupported semaphore routes (to exersise the logging code)
+    signals.toggle_signal(4)
+    signals.toggle_subsidary(4)
+    signals.toggle_signal(5)
+    signals.toggle_subsidary(5)
+    signals.set_route(4, signals.route_type.LH1)
+    signals.set_route(4, signals.route_type.LH2)
+    signals.set_route(4, signals.route_type.RH1)
+    signals.set_route(4, signals.route_type.RH2)
+    signals.set_route(4, signals.route_type.MAIN)
+    signals.set_route(5, signals.route_type.LH1)
+    signals.set_route(5, signals.route_type.LH2)
+    signals.set_route(5, signals.route_type.RH1)
+    signals.set_route(5, signals.route_type.RH2)
+    signals.set_route(5, signals.route_type.MAIN)
+    # Check the MAIN route
+    assert not signals.signal_clear(1, signals.route_type.MAIN)
+    assert not signals.signal_clear(2, signals.route_type.MAIN)
+    assert not signals.signal_clear(3, signals.route_type.MAIN)
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    assert signals.signal_clear(1, signals.route_type.MAIN)
+    assert signals.signal_clear(2, signals.route_type.MAIN)
+    assert signals.signal_clear(3, signals.route_type.MAIN)
+    assert signals.subsidary_clear(2, signals.route_type.MAIN)
+    assert not signals.signal_clear(1, signals.route_type.LH1)
+    assert not signals.signal_clear(1, signals.route_type.LH2)
+    assert not signals.signal_clear(1, signals.route_type.RH1)
+    assert not signals.signal_clear(1, signals.route_type.RH2)
+    # Check the LH1 route (note the route is set whilst the signal is OFF for this transition
+    # But for all subsequent transitions we set the signal to ON prior to changing the route)
+    signals.set_route(1, signals.route_type.LH1)
+    signals.set_route(2, signals.route_type.LH1)
+    signals.set_route(3, signals.route_type.LH1)
+    assert signals.signal_clear(1, signals.route_type.LH1)
+    assert signals.signal_clear(2, signals.route_type.LH1)
+    assert signals.signal_clear(3, signals.route_type.LH1)
+    assert signals.subsidary_clear(2, signals.route_type.LH1)
+    assert not signals.signal_clear(1, signals.route_type.MAIN)
+    assert not signals.signal_clear(1, signals.route_type.LH2)
+    assert not signals.signal_clear(1, signals.route_type.RH1)
+    assert not signals.signal_clear(1, signals.route_type.RH2)
+    # Check the LH2 route
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    signals.set_route(1, signals.route_type.LH2)
+    signals.set_route(2, signals.route_type.LH2)
+    signals.set_route(3, signals.route_type.LH2)
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    assert signals.signal_clear(1, signals.route_type.LH2)
+    assert signals.signal_clear(2, signals.route_type.LH2)
+    assert signals.signal_clear(3, signals.route_type.LH2)
+    assert signals.subsidary_clear(2, signals.route_type.LH2)
+    assert not signals.signal_clear(1, signals.route_type.MAIN)
+    assert not signals.signal_clear(1, signals.route_type.LH1)
+    assert not signals.signal_clear(1, signals.route_type.RH1)
+    assert not signals.signal_clear(1, signals.route_type.RH2)
+    # Check the RH1 route
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    signals.set_route(1, signals.route_type.RH1)
+    signals.set_route(2, signals.route_type.RH1)
+    signals.set_route(3, signals.route_type.RH1)
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    assert signals.signal_clear(1, signals.route_type.RH1)
+    assert signals.signal_clear(2, signals.route_type.RH1)
+    assert signals.signal_clear(3, signals.route_type.RH1)
+    assert signals.subsidary_clear(2, signals.route_type.RH1)
+    assert not signals.signal_clear(1, signals.route_type.MAIN)
+    assert not signals.signal_clear(1, signals.route_type.LH1)
+    assert not signals.signal_clear(1, signals.route_type.LH2)
+    assert not signals.signal_clear(1, signals.route_type.RH2)
+    # Check the RH2 route
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    signals.set_route(1, signals.route_type.RH2)
+    signals.set_route(2, signals.route_type.RH2)
+    signals.set_route(3, signals.route_type.RH2)
+    signals.toggle_signal(1)
+    signals.toggle_signal(2)
+    signals.toggle_signal(3)
+    signals.toggle_subsidary(2)
+    assert signals.signal_clear(1, signals.route_type.RH2)
+    assert signals.signal_clear(2, signals.route_type.RH2)
+    assert signals.signal_clear(3, signals.route_type.RH2)
+    assert signals.subsidary_clear(2, signals.route_type.RH2)
+    assert not signals.signal_clear(1, signals.route_type.MAIN)
+    assert not signals.signal_clear(1, signals.route_type.LH1)
+    assert not signals.signal_clear(1, signals.route_type.LH2)
+    assert not signals.signal_clear(1, signals.route_type.RH1)
+    # clean up
+    signals.delete_signal(1)
+    signals.delete_signal(2)
+    signals.delete_signal(3)
+    signals.delete_signal(4)
+    signals.delete_signal(5)
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
+
+#---------------------------------------------------------------------------------------------------------
+# Test signal routes
+#---------------------------------------------------------------------------------------------------------
+
+def run_signal_button_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    # create_signal
+    print("Library Tests - signal button tests - Will generate 2 Errors")
+    # Set up the initial test conditions
+    create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100, signal_callback,
+                            has_subsidary=True, sig_passed_button=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 2, signals.semaphore_subtype.home, 300, 100, signal_callback,
+                            main_subsidary=True, sig_passed_button=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 3, signals.semaphore_subtype.distant, 300, 100, signal_callback, associated_home=2)
+    create_ground_disc_signal(canvas, 4, signals.ground_disc_subtype.standard, 500, 100, signal_callback,sig_passed_button=True)
+    create_ground_position_signal(canvas, 5, signals.ground_pos_subtype.standard, 650, 100, signal_callback,sig_passed_button=True)
+    # Test the main control buttons
+    assert not signals.signal_clear(1)
+    assert not signals.signal_clear(2)
+    assert not signals.signal_clear(3)
+    assert not signals.signal_clear(4)
+    assert not signals.signal_clear(5)
+    assert not signals.subsidary_clear(1)
+    assert not signals.subsidary_clear(2)
+    signals.signal_button_event(1)
+    signals.signal_button_event(2)
+    signals.signal_button_event(3)
+    signals.signal_button_event(4)
+    signals.signal_button_event(5)
+    signals.subsidary_button_event(1)
+    signals.subsidary_button_event(2)
+    assert signals.signal_clear(1)
+    assert signals.signal_clear(2)
+    assert signals.signal_clear(3)
+    assert signals.signal_clear(4)
+    assert signals.signal_clear(5)
+    assert signals.subsidary_clear(1)
+    assert signals.subsidary_clear(2)
+    signals.signal_button_event(1)
+    signals.signal_button_event(2)
+    signals.signal_button_event(3)
+    signals.signal_button_event(4)
+    signals.signal_button_event(5)
+    signals.subsidary_button_event(1)
+    signals.subsidary_button_event(2)
+    assert not signals.signal_clear(1)
+    assert not signals.signal_clear(2)
+    assert not signals.signal_clear(3)
+    assert not signals.signal_clear(4)
+    assert not signals.signal_clear(5)
+    assert not signals.subsidary_clear(1)
+    assert not signals.subsidary_clear(2)
+    # Test the 'passed' and 'approach' buttons - negative tests
+    signals.sig_passed_button_event(6)  # Error - does not exist
+    signals.approach_release_button_event(6)  # Error - does not exist
+    # Test the 'passed' and 'approach' buttons - positive tests
+    signals.sig_passed_button_event(1)
+    signals.sig_passed_button_event(2)
+    signals.sig_passed_button_event(4)
+    signals.sig_passed_button_event(5)
+    signals.approach_release_button_event(1)
+    signals.approach_release_button_event(2)
+    # Sleep a while to allow the buttons to 'time out' 
+    time.sleep (1.5)
+    signals.sig_passed_button_event(1)
+    signals.sig_passed_button_event(2)
+    signals.sig_passed_button_event(4)
+    signals.sig_passed_button_event(5)
+    signals.approach_release_button_event(1)
+    signals.approach_release_button_event(2)
+    # Clean up
+    signals.delete_signal(1)
+    signals.delete_signal(2)
+    signals.delete_signal(3)
+    signals.delete_signal(4)
+    signals.delete_signal(5)
+    return()
     
     ##################################################################################################
-    ## Work in progress ##############################################################################
+    ## To do - Specific tests for approach control ###################################################
     ##################################################################################################
+
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
@@ -862,6 +1120,8 @@ def run_all_basic_library_tests():
     run_library_api_tests()
     run_timed_signal_tests()
     run_signal_aspect_tests()
+    run_signal_route_tests()
+    run_signal_button_tests()
     # Check the creation of all supported Signal configurations
     system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
     system_test_harness.initialise_test_harness(filename="../configuration_examples/semaphore_signals.sig")
