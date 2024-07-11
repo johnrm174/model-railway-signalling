@@ -507,7 +507,9 @@ def create_theatre_route_elements(canvas, sig_id:int, x:int, y:int,
 
 def update_theatre_route_indication(sig_id:int, theatre_text:str):
     global signals
-    # Only update the Theatre route indication if one exists for the signal
+    # Only update the Theatre route indication if one exists for the signal/ If this function has been called from the
+    # main API 'set_route' function then this will already have been validated, but the function is also called from
+    # 'create_colour_light_signal' and 'create_semaphore_signal' to set the initial signal state.
     if signals[str(sig_id)]["hastheatre"]:
         # Deal with route changes (if a new route has been passed in) - but only if the theatre text has changed
         if theatre_text != signals[str(sig_id)]["theatretext"]:
