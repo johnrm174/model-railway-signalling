@@ -476,8 +476,6 @@ def run_library_api_tests():
     signals.delete_signal(3)
     signals.delete_signal(2)
     signals.delete_signal(1)
-    print("----------------------------------------------------------------------------------------")
-    print("")
     return()
     
 #---------------------------------------------------------------------------------------------------------
@@ -902,7 +900,6 @@ def run_signal_aspect_tests():
 def run_signal_route_tests():
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
-    # create_signal
     print("Library Tests - signal route tests - no errors")
     # Set up the initial test conditions
     create_colour_light_signal(canvas, 1, signals.signal_subtype.four_aspect, 100, 100, signal_callback,
@@ -1024,8 +1021,6 @@ def run_signal_route_tests():
     signals.delete_signal(3)
     signals.delete_signal(4)
     signals.delete_signal(5)
-    print("----------------------------------------------------------------------------------------")
-    print("")
     return()
 
 #---------------------------------------------------------------------------------------------------------
@@ -1035,8 +1030,7 @@ def run_signal_route_tests():
 def run_signal_button_tests():
     # Test all functions - including negative tests for parameter validation
     canvas = schematic.canvas
-    # create_signal
-    print("Library Tests - signal button tests - Will generate 2 Errors")
+    print("Library Tests - signal button tests - Will generate 4 Errors")
     # Set up the initial test conditions
     create_colour_light_signal(canvas, 1, signals.signal_subtype.home, 100, 100, signal_callback,
                             has_subsidary=True, sig_passed_button=True, sig_release_button=True)
@@ -1084,6 +1078,8 @@ def run_signal_button_tests():
     # Test the 'passed' and 'approach' buttons - negative tests
     signals.sig_passed_button_event(6)  # Error - does not exist
     signals.approach_release_button_event(6)  # Error - does not exist
+    signals.approach_release_button_event(4)  # Error - sig does not support approach control
+    signals.approach_release_button_event(5)  # Error - sig does not support approach control
     # Test the 'passed' and 'approach' buttons - positive tests
     signals.sig_passed_button_event(1)
     signals.sig_passed_button_event(2)
@@ -1106,11 +1102,128 @@ def run_signal_button_tests():
     signals.delete_signal(4)
     signals.delete_signal(5)
     return()
-    
-    ##################################################################################################
-    ## To do - Specific tests for approach control ###################################################
-    ##################################################################################################
 
+#---------------------------------------------------------------------------------------------------------
+# Test signal routes
+#---------------------------------------------------------------------------------------------------------
+
+def run_approach_control_tests():
+    # Test all functions - including negative tests for parameter validation
+    canvas = schematic.canvas
+    # Create some signals for this test
+    create_colour_light_signal(canvas, 10, signals.signal_subtype.four_aspect, 100, 100, signal_callback,
+                                            sig_passed_button=True, sig_release_button=True)
+    create_semaphore_signal(canvas, 11, signals.semaphore_subtype.home, 250, 100, signal_callback,
+                                            sig_passed_button=True, sig_release_button=True)
+    print("Library Tests - Approach Control Tests - Release on Red - no errors")
+    # Set up the initial test conditions (for Approach Control Release on Red)
+    signals.toggle_signal(10)
+    signals.toggle_signal(11)
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    signals.set_approach_control(10, release_on_yellow=False, force_set=False)
+    signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    assert signals.signals["10"]["releaseonred"]
+    assert signals.signals["11"]["releaseonred"]
+    assert not signals.signals["10"]["released"]
+    assert not signals.signals["11"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    # Test the signals are released on signal approach events
+    signals.approach_release_button_event(10)
+    signals.approach_release_button_event(11)
+    assert not signals.signals["10"]["releaseonred"]
+    assert not signals.signals["11"]["releaseonred"]
+    assert signals.signals["10"]["released"]
+    assert signals.signals["11"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    # Test that approach control cannot normally be reset between approach and passed events
+    signals.set_approach_control(10, release_on_yellow=False, force_set=False)
+    signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    assert not signals.signals["10"]["releaseonred"]
+    assert not signals.signals["11"]["releaseonred"]
+    assert signals.signals["10"]["released"]
+    assert signals.signals["11"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    # Test that approach control can be normally reset after a signal passed event
+    signals.sig_passed_button_event(10)
+    signals.sig_passed_button_event(11)
+    assert not signals.signals["10"]["released"]
+    assert not signals.signals["11"]["released"]
+    signals.set_approach_control(10, release_on_yellow=False, force_set=False)
+    signals.set_approach_control(11, release_on_yellow=False, force_set=False)
+    assert not signals.signals["10"]["released"]
+    assert not signals.signals["11"]["released"]    
+    assert signals.signals["10"]["releaseonred"]
+    assert signals.signals["11"]["releaseonred"]
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    # Test that approach control can be 'force set' between approach and release events
+    signals.approach_release_button_event(10)
+    signals.approach_release_button_event(11)
+    assert signals.signals["10"]["released"]
+    assert signals.signals["11"]["released"]    
+    assert not signals.signals["10"]["releaseonred"]
+    assert not signals.signals["11"]["releaseonred"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    signals.set_approach_control(10, release_on_yellow=False, force_set=True)
+    signals.set_approach_control(11, release_on_yellow=False, force_set=True)
+    assert not signals.signals["10"]["released"]
+    assert not signals.signals["11"]["released"]    
+    assert signals.signals["10"]["releaseonred"]
+    assert signals.signals["11"]["releaseonred"]
+    assert signals.signal_state(10) == signals.signal_state_type.DANGER
+    assert signals.signal_state(11) == signals.signal_state_type.DANGER
+    # Put everything back to normal for the next test
+    signals.approach_release_button_event(10)
+    signals.approach_release_button_event(11)
+    signals.sig_passed_button_event(10)
+    signals.sig_passed_button_event(11)
+    assert not signals.signals["10"]["releaseonred"]
+    assert not signals.signals["11"]["releaseonred"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    assert signals.signal_state(11) == signals.signal_state_type.PROCEED
+    
+    print("Library Tests - Approach Control Tests - Release on Yellow - no errors")
+    # Set up the initial test conditions (for Approach Control Release on Yellow)
+    # We can only test this for colour light signals (not supported by semaphores)
+    signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    assert signals.signals["10"]["releaseonyel"]
+    assert not signals.signals["10"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
+    # Test the signal is released on signal approach events
+    signals.approach_release_button_event(10)
+    assert not signals.signals["10"]["releaseonyel"]
+    assert signals.signals["10"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    # Test that approach control cannot normally be reset between approach and passed events
+    signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    assert not signals.signals["10"]["releaseonyel"]
+    assert signals.signals["10"]["released"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    # Test that approach control can be normally reset after a signal passed event
+    signals.sig_passed_button_event(10)
+    assert not signals.signals["10"]["released"]
+    signals.set_approach_control(10, release_on_yellow=True, force_set=False)
+    assert not signals.signals["10"]["released"]
+    assert signals.signals["10"]["releaseonyel"]
+    assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
+    # Test that approach control can be 'force set' between approach and release events
+    signals.approach_release_button_event(10)
+    assert signals.signals["10"]["released"]
+    assert not signals.signals["10"]["releaseonyel"]
+    assert signals.signal_state(10) == signals.signal_state_type.PROCEED
+    signals.set_approach_control(10, release_on_yellow=True, force_set=True)
+    assert not signals.signals["10"]["released"]
+    assert signals.signals["10"]["releaseonyel"]
+    assert signals.signal_state(10) == signals.signal_state_type.CAUTION_APP_CNTL
+    # Clean up
+    signals.delete_signal(10)
+    signals.delete_signal(11)
+    return()
 
 #---------------------------------------------------------------------------------------------------------
 # Run all library Tests
@@ -1118,14 +1231,19 @@ def run_signal_button_tests():
 
 def run_all_basic_library_tests():
     run_library_api_tests()
+    print("----------------------------------------------------------------------------------------")
+    print("")
     run_timed_signal_tests()
     run_signal_aspect_tests()
     run_signal_route_tests()
     run_signal_button_tests()
+    run_approach_control_tests()
     # Check the creation of all supported Signal configurations
+    print("Library Tests - Test creation of all supported signal configurations - no errors")
     system_test_harness.initialise_test_harness(filename="../configuration_examples/colour_light_signals.sig")
     system_test_harness.initialise_test_harness(filename="../configuration_examples/semaphore_signals.sig")
-    system_test_harness.report_results()
+    print("----------------------------------------------------------------------------------------")
+    print("")
     
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
