@@ -338,6 +338,8 @@ def approach_release_button_event(sig_id:int):
     # We validate the Sig_Id as function can be called from GPIO sensor events
     if not signal_exists(sig_id):
         logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not exist")
+    elif signals[str(sig_id)]["sigtype"] != signal_type.colour_light and signals[str(sig_id)]["sigtype"] != signal_type.semaphore:
+        logging.error("Signal "+str(sig_id)+": approach_release_button_event - signal does not support approach control")
     else:
         logging.info("Signal "+str(sig_id)+": Approach Release Event *******************************************")
         # Pulse the approach release button to provide a visual indication (but not if a shutdown has been initiated)
@@ -346,10 +348,8 @@ def approach_release_button_event(sig_id:int):
             common.root_window.after(1000,lambda:reset_sig_released_button(sig_id))
         # Set the approach control 'released' state (if the signal supports approach control).
         # We also clear down the approach control mode and update the displayed signal aspects.
-        if ( signals[str(sig_id)]["sigtype"] == signal_type.colour_light or
-             signals[str(sig_id)]["sigtype"] == signal_type.semaphore ):
-            signals[str(sig_id)]["released"] = True
-            clear_approach_control(sig_id)
+        signals[str(sig_id)]["released"] = True
+        clear_approach_control(sig_id)
         # Make the external callback
         signals[str(sig_id)]['extcallback'] (sig_id,signal_callback_type.sig_released)
     return ()
