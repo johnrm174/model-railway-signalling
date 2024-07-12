@@ -824,7 +824,6 @@ def run_all_basic_library_tests():
     run_track_section_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
-    system_test_harness.report_results()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)

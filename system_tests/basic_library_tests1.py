@@ -566,7 +566,6 @@ def run_all_basic_library_tests():
     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
     run_mqtt_interface_tests()
-    system_test_harness.report_results()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
