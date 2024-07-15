@@ -7,14 +7,9 @@ import time
 import logging
 
 import system_test_harness
-from model_railway_signals.library import track_sensors
-from model_railway_signals.library import gpio_sensors
 from model_railway_signals.library import points
-from model_railway_signals.library import signals
+from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
-from model_railway_signals.library import dcc_control
-from model_railway_signals.library import pi_sprog_interface
-from model_railway_signals.library import mqtt_interface
 from model_railway_signals.library import track_sections
 
 from model_railway_signals.editor import schematic
@@ -231,10 +226,12 @@ def run_track_section_library_tests():
     track_sections.update_mirrored(1,"box1-0")      # Fail - Remote Mirrored ID invalid
     track_sections.update_mirrored(1,"box1-100")    # Fail - Remote Mirrored ID invalid
     print("Library Tests - set_sections_to_publish_state - 4 Errors and 2 warnings will be generated")    
+    assert len(track_sections.list_of_sections_to_publish) == 0
     track_sections.set_sections_to_publish_state(1,2,20)    # Valid
     track_sections.set_sections_to_publish_state(1,2)       # Already set to publish - 2 warnings
     track_sections.set_sections_to_publish_state("1,","2")  # Not integers - 2 Errors
     track_sections.set_sections_to_publish_state(0, 100)    # Integer but out of range - 2 errors
+    assert len(track_sections.list_of_sections_to_publish) == 3
     # Create a Section already set to publish state on creation
     print("Library Tests - set_sections_to_publish_state - Exercise Publishing of Events code")
     track_sections.create_section(canvas,8,800,100, track_section_callback, "OCCUPIED", editable=True, mirror_id="")
@@ -245,7 +242,7 @@ def run_track_section_library_tests():
     track_sections.update_identifier(2,"Train11")
     track_sections.section_button_event(2)
     track_sections.section_button_event(3)
-    print("Library Tests - subscribe_to_remote_instruments - 5 Errors and 2 warnings will be generated")
+    print("Library Tests - subscribe_to_remote_sections - 5 Errors and 2 warnings will be generated")
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # Success
     track_sections.subscribe_to_remote_sections("box1-50","box1-51")   # 2 Warnings - already subscribed
     track_sections.subscribe_to_remote_sections("box1","51", 3)        # Fail - 3 errors
@@ -276,6 +273,7 @@ def run_track_section_library_tests():
     track_sections.handle_mqtt_section_updated_event({"sourceidentifier":"box1-50","labeltext":"Train20"})     # Warning - spurious message    
     print("Library Tests - reset_mqtt_configuration (all subscribed instruments will be deleted)")
     track_sections.reset_sections_mqtt_configuration()
+    assert len(track_sections.list_of_sections_to_publish) == 0
     assert len(track_sections.sections) == 8
     assert not track_sections.section_exists("box1-50")
     assert not track_sections.section_exists("box1-51")
@@ -321,23 +319,25 @@ def run_point_library_tests():
     assert len(points.points) == 0
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 8 errors:")
-    points.create_point(canvas, 10, points.point_type.RH, 100, 100, point_callback) #  Valid
-    points.create_point(canvas, 11, points.point_type.LH, 200, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 12, points.point_type.RH, 300, 100, point_callback, also_switch=11)  # Valid
-    points.create_point(canvas, 13, points.point_type.LH, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 14, points.point_type.LH, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 15, points.point_type.Y, 400, 100, point_callback, auto=True)  # Valid
-    points.create_point(canvas, 16, points.point_type.Y, 500, 100, point_callback, fpl=True)  # Valid
-    points.create_point(canvas, 0, points.point_type.RH, 100, 100, point_callback)   # Error (<1)
-    points.create_point(canvas, 100, points.point_type.RH, 100, 100, point_callback)  # Error (>99)
-    points.create_point(canvas, "15", points.point_type.RH,100, 100, point_callback)  # Error (not int)
-    points.create_point(canvas, 10, points.point_type.RH, 100, 100, point_callback)  # Error (duplicate)
-    points.create_point(canvas, 17, "random-type", 100, 100, point_callback)  # Error - invalid type
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback) #  Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11)  # Valid
+    points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 14, points.point_type.LH, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
+    points.create_point(canvas, 15, points.point_type.Y, points.point_subtype.normal, 400, 100, point_callback, auto=True)  # Valid
+    points.create_point(canvas, 16, points.point_type.Y, points.point_subtype.normal, 500, 100, point_callback, fpl=True)  # Valid
+    points.create_point(canvas, 0, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)   # Error (<1)
+    points.create_point(canvas, 100, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (>99)
+    points.create_point(canvas, "15", points.point_type.RH, points.point_subtype.normal,100, 100, point_callback)  # Error (not int)
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback)  # Error (duplicate)
+    points.create_point(canvas, 17, "random-type", points.point_subtype.normal, 100, 100, point_callback)  # Error - invalid type
+    points.create_point(canvas, 18, points.point_type.RH,"random-subtype", 100, 100, point_callback)  # Error - invalid subtype
+    points.create_point(canvas, 19, points.point_type.Y, points.point_subtype.trap, 100, 100, point_callback)  # Error - Not normal Subtype
     # Alsoswitch combinations
-    points.create_point(canvas, 18, points.point_type.LH, 100, 100, point_callback, also_switch="10") # Error (not an int)
-    points.create_point(canvas, 19, points.point_type.LH, 100, 100, point_callback, also_switch=19) # Error (switch itself)
+    points.create_point(canvas, 18, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch="10") # Error (not an int)
+    points.create_point(canvas, 19, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=19) # Error (switch itself)
     # Automatic and FPL combinations
-    points.create_point(canvas, 20, points.point_type.LH, 100, 100, point_callback, auto=True, fpl=True) # Error
+    points.create_point(canvas, 20, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, auto=True, fpl=True) # Error
     assert len(points.points) == 7
     # point_exists
     print("Library Tests - point_exists - will generate 1 error:")
@@ -361,7 +361,7 @@ def run_point_library_tests():
     assert not points.point_switched(13)   
     assert not points.point_switched(14)
     assert not points.point_switched("10") # Invalid
-    assert not points.point_switched(15)   # Does not exist
+    assert not points.point_switched(20)   # Does not exist
     print("Library Tests - fpl_active - will generate 2 errors:")
     assert points.fpl_active(10)
     assert points.fpl_active(11)
@@ -376,7 +376,7 @@ def run_point_library_tests():
     points.toggle_point(14)   # 14 has FPL so will generate warning
     points.toggle_point(13)   # 13 is auto so will generate error
     points.toggle_point("10") # Invalid - error
-    points.toggle_point(15)   # Does not exist - error
+    points.toggle_point(20)   # Does not exist - error
     print("Library Tests - toggle_point to 'normal' - will generate 1 error and 1 warning:")
     assert points.point_switched(10)
     assert points.point_switched(11)
@@ -398,7 +398,7 @@ def run_point_library_tests():
     print("Library Tests - toggle_fpl - will generate 3 errors and 2 warnings:")
     points.toggle_fpl("10") # Invalid
     points.toggle_fpl(10)   # No FPL
-    points.toggle_fpl(15)   # Does not exist
+    points.toggle_fpl(20)   # Does not exist
     assert points.fpl_active(14)
     points.toggle_fpl(14)   # Has FPL - toggle off FPL
     assert not points.fpl_active(14)
@@ -426,7 +426,7 @@ def run_point_library_tests():
     assert points.points[str(10)]['locked']==False
     assert points.points[str(14)]['locked']==False
     points.lock_point("10") # Invalid
-    points.lock_point(15)   # Does not exist
+    points.lock_point(20)   # Does not exist
     points.lock_point(10)
     points.lock_point(14)
     points.lock_point(14)
@@ -434,7 +434,7 @@ def run_point_library_tests():
     assert points.points[str(14)]['locked']==True
     print("Library Tests - unlock_point - will generate 2 errors:")
     points.unlock_point("10") # Invalid
-    points.unlock_point(15)   # Does not exist
+    points.unlock_point(20)   # Does not exist
     points.unlock_point(10)
     points.unlock_point(14)
     points.unlock_point(14)
@@ -443,7 +443,7 @@ def run_point_library_tests():
     # Update autoswitch
     print("Library Tests - update_autoswitch - will generate 4 errors:")
     points.update_autoswitch("10", 13) # Error - not an int
-    points.update_autoswitch(15, 13)   # Error - Point does not exist
+    points.update_autoswitch(20, 13)   # Error - Point does not exist
     points.update_autoswitch(12, "19") # Error - alsoswitch not an int
     points.update_autoswitch(12, 20)   # Error - alsoswitch point does not exist
     points.toggle_point(12)            # Valid - 12 is configured to autoswitching 11
@@ -490,13 +490,13 @@ def run_point_library_tests():
     assert not points.point_exists(12)
     assert len(points.points) == 0
     print("Library Tests - create autoswitched point - will generate 1 warning:")
-    points.create_point(canvas, 10, points.point_type.LH, 100, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 10, points.point_type.LH, points.point_subtype.normal, 100, 100, point_callback, also_switch=11) # Valid
     points.toggle_point_state(10)
-    points.create_point(canvas, 11, points.point_type.LH, 200, 100, point_callback, auto=True) # Valid
+    points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, auto=True) # Valid
     assert len(points.points) == 2
     assert points.point_switched(10)
     assert points.point_switched(11)
-    points.create_point(canvas, 12, points.point_type.LH, 300, 100, point_callback, also_switch=11) # Valid
+    points.create_point(canvas, 12, points.point_type.LH, points.point_subtype.normal, 300, 100, point_callback, also_switch=11) # Valid
     assert points.point_switched(10)
     assert not points.point_switched(11)
     assert not points.point_switched(11)
@@ -505,6 +505,10 @@ def run_point_library_tests():
     points.delete_point(11)
     points.delete_point(12)
     assert len(points.points) == 0
+    # Check the creation of all supported point types
+    system_test_harness.initialise_test_harness(filename="../configuration_examples/complex_trackwork.sig")
+    # Now clear down the layout for the next series of tests
+    system_test_harness.initialise_test_harness()
     print("----------------------------------------------------------------------------------------")
     print("")
     return()
@@ -820,7 +824,6 @@ def run_all_basic_library_tests():
     run_track_section_library_tests()
     run_point_library_tests()
     run_instrument_library_tests()
-    system_test_harness.report_results()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)

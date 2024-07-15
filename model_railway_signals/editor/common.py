@@ -19,7 +19,7 @@
 #    dcc_command_entry() - combines dcc_entry_box and state_box
 #    signal_route_selections() - combines int_item_id_entry_box and 5 state_boxes
 #    signal_route_frame() - read only list of signal_route_selections()
-#    selection_buttons() - combines up to 5 RadioButtons
+#    selection_buttons() - combines multiple RadioButtons
 #    colour_selection() - Allows the colour of an item to be changed
 #    window_controls() - apply/ok/reset/cancel
 #------------------------------------------------------------------------------------
@@ -432,7 +432,7 @@ class integer_entry_box(entry_box):
                 self.TT.text = ("Must specify a value between "+
                         str(self.min_value)+ " and "+str(self.max_value) )
                 valid = False
-        elif not entered_value.isdigit(): 
+        elif not entered_value.lstrip('-+').isdigit():
             self.TT.text = "Not a valid integer"
             valid = False
         elif int(entered_value) < self.min_value or int(entered_value) > self.max_value:
@@ -999,21 +999,23 @@ class signal_route_frame():
             self.label.pack()
 
 #------------------------------------------------------------------------------------
-# Compound UI Element for a LabelFrame containing up to 5 radio buttons
+# Compound UI Element for a LabelFrame containing up to 7 radio buttons
 # Note the responsibility of the instantiating func/class to 'pack' the Frame of
 # the UI element - i.e. '<class_instance>.frame.pack()'
 #
 # Class instance elements to use externally are:
-#    "B1" to "B5 - to access the button widgets (i.e. for reconfiguration)
+#    "B1" to "B7" - to access the button widgets (i.e. for reconfiguration)
 #
 # Class instance functions to use externally are:
 #    "set_value" - will set the current value (integer 1-5)
 #    "get_value" - will return the last "valid" value (integer 1-5)
+#    "enable" - enable all radio buttons
+#    "disable" - disable all radio buttons
 #------------------------------------------------------------------------------------
 
 class selection_buttons():
     def __init__(self, parent_frame, label:str, tool_tip:str, callback=None, 
-                        b1=None, b2=None, b3=None, b4=None, b5=None):
+                        b1=None, b2=None, b3=None, b4=None, b5=None, b6=None, b7=None):
         # Create a labelframe to hold the buttons
         self.frame = Tk.LabelFrame(parent_frame, text=label)
         self.value = Tk.IntVar(self.frame, 0)
@@ -1048,6 +1050,16 @@ class selection_buttons():
                 command=self.updated, variable=self.value, value=5)
             self.B5.pack(side=Tk.LEFT, padx=2, pady=2)
             self.B5TT = CreateToolTip(self.B5, tool_tip)
+        if b6 is not None:
+            self.B6 = Tk.Radiobutton(self.subframe, text=b6, anchor='w',
+                command=self.updated, variable=self.value, value=6)
+            self.B6.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.B6TT = CreateToolTip(self.B6, tool_tip)
+        if b7 is not None:
+            self.B7 = Tk.Radiobutton(self.subframe, text=b7, anchor='w',
+                command=self.updated, variable=self.value, value=7)
+            self.B7.pack(side=Tk.LEFT, padx=2, pady=2)
+            self.B7TT = CreateToolTip(self.B7, tool_tip)
             
     def updated(self):
         self.frame.focus()
@@ -1058,6 +1070,24 @@ class selection_buttons():
         
     def get_value(self):
         return(self.value.get())
+
+    def enable(self):
+        self.B1.configure(state="normal")
+        self.B2.configure(state="normal")
+        self.B3.configure(state="normal")
+        self.B4.configure(state="normal")
+        self.B5.configure(state="normal")
+        self.B6.configure(state="normal")
+        self.B7.configure(state="normal")
+
+    def disable(self):
+        self.B1.configure(state="disabled")
+        self.B2.configure(state="disabled")
+        self.B3.configure(state="disabled")
+        self.B4.configure(state="disabled")
+        self.B5.configure(state="disabled")
+        self.B6.configure(state="disabled")
+        self.B7.configure(state="disabled")
 
 #------------------------------------------------------------------------------------
 # Compound UI Element for Colour selection

@@ -10883,6 +10883,7 @@
             "hasfpl": true,
             "item": "point",
             "itemid": 3,
+            "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 0,
             "posx": 1300,
@@ -10930,7 +10931,9 @@
                     ]
                 ]
             ],
-            "tags": "point3"
+            "tags": "point3",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "71e6fad1-a16e-4a4a-be41-a40a63a0f006": {
             "approachcontrol": [
@@ -15352,13 +15355,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 4,
+            "itemsubtype": 1,
             "itemtype": 1,
             "orientation": 180,
             "posx": 1300,
             "posy": 225,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point4"
+            "tags": "point4",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "bd8c0b62-add0-4714-b49a-7bbae0da4124": {
             "bbox": 1189,
@@ -16478,6 +16484,7 @@
             "hasfpl": true,
             "item": "point",
             "itemid": 2,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
             "posx": 950,
@@ -16525,7 +16532,9 @@
                     ]
                 ]
             ],
-            "tags": "point2"
+            "tags": "point2",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "c8564be9-6891-48f3-999a-53472f24c85f": {
             "arrowends": 2,
@@ -17656,6 +17665,7 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 5,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 0,
             "posx": 1350,
@@ -17713,7 +17723,9 @@
                     ]
                 ]
             ],
-            "tags": "point5"
+            "tags": "point5",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "dcf7ea0d-cd58-45bf-842e-d4e6e87c9a2a": {
             "bbox": 1260,
@@ -17736,13 +17748,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 1,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
             "posx": 950,
             "posy": 175,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point1"
+            "tags": "point1",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "e0705584-fbf0-47f0-a695-810489e4d5d4": {
             "bbox": 1269,
@@ -18840,13 +18855,16 @@
             "hasfpl": false,
             "item": "point",
             "itemid": 6,
+            "itemsubtype": 1,
             "itemtype": 2,
             "orientation": 180,
             "posx": 1350,
             "posy": 225,
             "reverse": false,
             "siginterlock": [],
-            "tags": "point6"
+            "tags": "point6",
+            "xbuttonoffset": 0,
+            "ybuttonoffset": 0
         },
         "f455f78a-6e63-453c-b335-28b389182cbb": {
             "approachcontrol": [
@@ -19935,7 +19953,7 @@
                 true,
                 ""
             ],
-            "bbox": 1321,
+            "bbox": 1320,
             "dccaspects": [
                 [
                     [
@@ -20999,7 +21017,7 @@
             ]
         },
         "fc4b8a11-3862-417f-ba09-493456b59064": {
-            "bbox": 1325,
+            "bbox": 1324,
             "defaultlabel": "XXXXX",
             "editable": true,
             "item": "section",
@@ -21117,7 +21135,7 @@
             "filename": "/home/pi/Software/model-railway-signalling/configuration_examples/automation_semaphore_example.sig",
             "info": "This layout is a development of the basic interlocking example to demonstrate signalling automation\n(note that the application needs to be in 'run' mode for all automation features to function).\n\nTrack sensors (such as those from TrainTech, Heathcote Electronics, DCC Concepts etc) can be located \nwith each signal and connected in to the R-Pi's GPIO ports (via appropriate opto-isolator circuits).\nEach GPIO port can then be mapped to a signal to generate 'signal passed' events - In 'edit' mode,\nclick on a signal and select the 'automation' tab to view the configuration (note that external\nGPIO sensors haven't been configured for this particular example layout). 'Signal passed' events\ncan also be triggered by clicking on the small button at the base of each signal (as an aid to \ndevelopment and testing of signalling schemes before going 'live' with the R-Pi).\n\nTrack sections can be added to the schematic to provide a mimic display of track occupancy (when a\ntrain passes a signal (signal must be 'off') it gets passed from the section behind to the section ahead.\nThe required behavior is configured via the 'automation' tab of each signal. For example, signal 1\ncontrols two 'routes' so when passed, section 2 will be cleared and either section 12 or 3 will be set \nto occupied, depending on which route the signal is cleared for.\n\nAll main signals are configured to be 'overridden' if the track section ahead is occupied. This means\nthat each signal will automatically change to 'on' when passed (section ahead is occupied) and then\nrevert to 'off' as soon as the section ahead is cleared. Note that some of the signals in this example \nhave been configured as 'fully automatic' (without a control button). This means that they will be 'off'\nby default and controlled entirely by whether the track section ahead is occupied or not.\n\nTo simulate prototypical aspect changes for trains going off scene, the 'exit' signals (signals 4 and\n11 in this example) can be configured as 'timed signals'. Once passed (when 'off') they are overriden \nto 'on' (as per the other signals on the layout) but then revert to 'off' after the specified delay.\n\nTrack sensors can also be positioned slightly before the signal and mapped to generate 'signal \napproached' events to simulate 'approach control'. In this example, all non-fully-automatic home signals \nare configured for 'release on red based on the signals ahead'. This means that if any home signals ahead\nare showing danger then the home signal will also be overridden to 'on' by default.As the train approaches\nthe signal (at a slow speed as the signal is against it) then the signal will be released to 'off' to\nallow the train to pass and then revert back to the overidden 'on' state when the signal is passed.\nSignal 1 is also configured for 'release on red' for the diverging (low-speed) route. In this case it\nwill be overridden to 'on' even if all home signals ahead are 'off', only released as the train approaches.\n\nTo demonstrate all the above in action, set 'run' mode and reset the layout to set all signals, points\nand track sections back to their default states. Right click the far left track section and enter a train\ndesignation code of your choice (this sets the section to 'occupied'). Set signals 8, 1 and 3 to 'off' (note\nthat they will remail overridden to 'on' as home signal ahead 4 is still showing 'on'. Now, move the train\nthrough the schematic, clicking the 'signal passed' button at the base of each signal along the route\nin turn (don't forget to click the 'signal approached' button ahead of each signal if you want to see\napproach control working). When the train reaches signal 4, set the signal to 'off' and trigger the signal\npassed event. The track section before the signal will be cleared and the signal overridden to 'on' as part\nof the timed sequence. After a short delay it will revert to 'off' and when it does, all home signals behind\nwill also revert to 'off' (as they will no longer be overridden on a home signal ahead).\n\nThe layout is fully configured to support all possible train movements (including shunting movements)\nso have a play - but note that signals can only be 'passed' when 'off' for the track occupancy\nchanges to work correctly (the application currently doesn't support any form of SPAD functionality)\n\n",
             "spadpopups": false,
-            "version": "Version 4.3.0"
+            "version": "Version 4.4.0"
         },
         "gpio": {
             "portmappings": [],

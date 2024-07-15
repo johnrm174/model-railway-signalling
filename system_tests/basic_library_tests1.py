@@ -170,6 +170,7 @@ def run_gpio_sensor_library_tests():
     print ("GPIO Sensors - reset_mqtt_configuration")
     gpio_sensors.reset_gpio_mqtt_configuration()
     assert len(gpio_sensors.gpio_port_mappings) == 4
+    assert len(gpio_sensors.list_of_track_sensors_to_publish) == 0
     assert not gpio_sensors.gpio_sensor_exists("box1-20")
     assert not gpio_sensors.gpio_sensor_exists("box1-21")
     assert not gpio_sensors.gpio_sensor_exists("box1-22")
@@ -565,7 +566,6 @@ def run_all_basic_library_tests():
     run_pi_sprog_interface_tests(baud_rate)
     run_dcc_control_tests(baud_rate)
     run_mqtt_interface_tests()
-    system_test_harness.report_results()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)

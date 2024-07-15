@@ -10,7 +10,8 @@ without some of the Raspberry-Pi specific interfacing functions).
 * Interfaces with the Pi-SPROG DCC command station to drive the signals and points out on the layout.
 * Uses the Raspberry Pi GPIO inputs to provide train detection in support of signalling automation.
 * Incorporates MQTT networking to allow multiple signalling applications to be linked for larger layouts.
-* Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) to support custom layout control interfaces.
+* Provides a [Public API](https://github.com/johnrm174/model-railway-signalling/blob/main/PUBLIC_API.md) 
+to support custom layout control interfaces.
 
 ![Example Screenshot](https://github.com/johnrm174/model-railway-signalling/blob/main/README_screenshot2.png)
 
@@ -21,11 +22,12 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.3.0:
+## What's new for Release 4.4.0:
 
-* 'Y' points can now be created on the schematic (select in the point configuration dialog
-* Improvements to the 'look' of signal objects on the schematic
-* Bugfix to 'Track Sensor' selection when toggling modes
+* Support for 'complex trackwork': single slips, double slips, scissor crossovers, trap points, Y-points and 3-way points 
+can now be represented on the schematic and incorporated within your layout signalling scheme.
+* The position of point control buttons can be 'tweaked' via the UI to de-conflict with other schematic objects
+when developing complex and/or 'busy' track schematics
 
 Bug reports and feedback is welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?

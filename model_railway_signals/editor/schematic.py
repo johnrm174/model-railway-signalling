@@ -40,6 +40,7 @@
 #    signals.ground_disc_subtype - Used to access the signal subtype
 #    block_instruments.instrument_type - Used to access the block_instrument type
 #    points.point_type - Used to access the point type
+#    points.point_subtype - Used to access the point subtype
 #
 #------------------------------------------------------------------------------------
 
@@ -940,9 +941,11 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
                                         signals.signal_type.ground_disc.value,
                                         signals.ground_disc_subtype.standard.value) ],
                    ["lhpoint", lambda:create_object(objects.object_type.point,
-                                        points.point_type.LH.value) ],
+                                        points.point_type.LH.value,
+                                        points.point_subtype.normal.value) ],
                    ["rhpoint", lambda:create_object(objects.object_type.point,
-                                        points.point_type.RH.value) ],
+                                        points.point_type.RH.value,
+                                        points.point_subtype.normal.value) ],
                    ["section", lambda:create_object(objects.object_type.section) ],
                    ["sensor", lambda:create_object(objects.object_type.track_sensor) ],
                    ["instrument", lambda:create_object(objects.object_type.instrument,
