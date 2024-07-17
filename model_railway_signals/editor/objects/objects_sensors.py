@@ -24,7 +24,7 @@
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
-#    objects_common.track_sensor_index - the type-specific index for this onject type
+#    objects_common.track_sensor_index - the type-specific index for this object type
 #    objects_common.default_object - The dictionary of object common configuration elements
 #    objects_common.object_type - The enumeration of supported object types
 #    objects_common.canvas - Reference to the Tkinter drawing canvas
@@ -255,8 +255,6 @@ def paste_track_sensor(object_to_paste, deltax:int, deltay:int):
     new_id = objects_common.new_item_id(exists_function=track_sensors.track_sensor_exists)
     objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     objects_common.track_sensor_index[str(new_id)] = new_object_id
-    # Add the specific elements for this particular instance of the object
-    objects_common.schematic_objects[new_object_id]["itemid"] = new_id
     # Set the position for the "pasted" object (offset from the original position)
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
@@ -276,7 +274,6 @@ def paste_track_sensor(object_to_paste, deltax:int, deltay:int):
 #------------------------------------------------------------------------------------------------------------------
 
 def delete_track_sensor_object(object_id):
-    global button_mappings
     # Delete the associated library objects
     item_id = objects_common.schematic_objects[object_id]["itemid"]
     track_sensors.delete_track_sensor(item_id)
