@@ -51,6 +51,8 @@
 #   lock_point(point_id:int) - use for point/signal interlocking
 # 
 #   unlock_point(point_id:int) - use for point/signal interlocking
+#
+#   point locked(point_id:int) - returns the current state of the interlocking
 # 
 #   toggle_point(point_id:int) - use for route setting (use 'point_switched' to find state first)
 # 
@@ -60,6 +62,10 @@
 # 
 #   fpl_active(point_id:int) - returns the FPL state (True/False) - to support interlocking
 #                             - Will return True if the point does not have a Facing point Lock
+#
+#   set_point_colour(point_id:int, colour:str) - change the colour of a point
+#
+#   reset_point_colour(point_id:int) - reset the colour of a point back to default
 #
 #---------------------------------------------------------------------------------------------------
 
@@ -292,7 +298,7 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                                command = lambda:fpl_button_event(point_id))
         # Create the Tkinter drawing objects (lines) for each point/ We use tkinter 'tags' to uniquely identify
         # each point's 'blades' so these can easily be hidden/displayed when the point is changed
-        blade1, blade2 = canvas_tag+"blade1", canvas_tag+"blade2"
+        blade1, blade2, routes = canvas_tag+"blade1", canvas_tag+"blade2", canvas_tag+"routes"
         # Normal Point or Trap Point or Scissors Crossover Point - Right Hand
         if ( pointsubtype == point_subtype.normal or pointsubtype == point_subtype.trap or
              pointsubtype == point_subtype.xcross ) and pointtype == point_type.RH:
@@ -306,14 +312,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,-10,0,+25,0,orientation)
             else:
                 line_coords = common.rotate_line(x,y,-10,0,+0,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Normal' route line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))    ## 'Normal' route line
             # The length of the 'Switched' route line will depend on Point Subtype
             if pointsubtype == point_subtype.trap:
                 line_coords = common.rotate_line(x,y,-15,+10,-18,+7,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)        ## 'Switched' route line
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Switched' route line
             else:
                 line_coords = common.rotate_line(x,y,-15,+10,0,+25,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)        ## 'Switched' route line
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Switched' route line
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset - 9 - (common.fontsize/2)
             if orientation == 180 and fpl: button_xoffset = button_xoffset - 20 + (common.fontsize*9/4)
@@ -334,14 +340,14 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
                 line_coords = common.rotate_line(x,y,-10,0,+25,0,orientation)
             else:
                 line_coords = common.rotate_line(x,y,-10,0,0,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Normal' route line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))     ## 'Normal' route line
             # The length of the 'Switched' route line will depend on Point Subtype
             if pointsubtype == point_subtype.trap:
                 line_coords = common.rotate_line(x,y,-15,-10,-18,-7,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)        ## 'Switched' route line
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes)) ## 'Switched' route line
             else:
                 line_coords = common.rotate_line(x,y,-15,-10,0,-25,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)        ## 'Switched' route line
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes)) ## 'Switched' route line
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset + 9 + (common.fontsize/2)
             if orientation == 180 and fpl: button_xoffset = button_xoffset - 20 + (common.fontsize*9/4)
@@ -353,47 +359,47 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         elif pointtype==point_type.Y:
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,-25,0,0,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Root' route line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Root' route line
             line_coords = common.rotate_line(x,y,0,0,+10,-10,orientation) 
             canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade
             line_coords = common.rotate_line(x,y,0,0,+10,+10,orientation)
             canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade
             line_coords = common.rotate_line(x,y,+10,-10,+25,-25,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Normal' route line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Normal' route line
             line_coords = common.rotate_line(x,y,+10,+10,+25,+25,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Switched' route line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Switched' route line
             button1_yoffset = button_yoffset + 9 +(common.fontsize/2)
             button2_yoffset = button_yoffset - 9 -(common.fontsize/2)
             button_xoffset = button_xoffset - 10 - (common.fontsize/2)
             # Work out the offsets of the buttons and create them (in windows)
             if fpl:
                 point_coords = common.rotate_point(x, y, button_xoffset ,button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=canvas_tag)
+                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag, routes))
                 point_coords = common.rotate_point(x, y, button_xoffset, button2_yoffset, orientation)
-                canvas.create_window(point_coords, window=fpl_button, tags=canvas_tag)
+                canvas.create_window(point_coords, window=fpl_button, tags=(canvas_tag, routes))
             elif not auto:
                 point_coords = common.rotate_point(x, y, button_xoffset, button1_yoffset, orientation)
-                canvas.create_window(point_coords, window=point_button, tags=canvas_tag)
+                canvas.create_window(point_coords, window=point_button, tags=(canvas_tag, routes))
         # Side 1 of a Single Slip or Double Slip - Left Hand
         elif (pointsubtype == point_subtype.sslip1 or pointsubtype == point_subtype.dslip1) and pointtype==point_type.LH:
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,-25,0,+10,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)                 ## Horizontal 'Root' line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## Horizontal 'Root' line
             line_coords = common.rotate_line(x,y,+10,0,+33,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))       ## 'Normal' blade
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade
             line_coords = common.rotate_line(x,y,+10,0,+25,-7,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))       ## 'Switched' blade
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade
             # Create the extra 'blades' for the double slip
             if pointsubtype == point_subtype.dslip1:
                 line_coords = common.rotate_line(x,y,0,+25,+10,+15,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## Crossing route Line (dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing route Line (dslip)
                 line_coords = common.rotate_line(x,y,+10,+15,+25,+7,orientation)
                 canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade (dslip)
                 line_coords = common.rotate_line(x,y,+10,+15,+30,-5,orientation)
                 canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade (dslip)
             else:
                 line_coords = common.rotate_line(x,y,0,+25,+30,-5,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## Crossing route line (sslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing route line (sslip)
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset - 9 - (common.fontsize/2)
             if orientation == 180 and fpl: button_xoffset = button_xoffset + 22 - (common.fontsize*3)
@@ -404,23 +410,23 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         elif (pointsubtype == point_subtype.sslip2 or pointsubtype == point_subtype.dslip2) and pointtype==point_type.LH:
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,0,-25,-10,-15,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)                 ## Crossing 'Root' line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing 'Root' line
             line_coords = common.rotate_line(x,y,-10,-15,-30,+5,orientation)
-            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))      ## 'Normal' blade
+            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade
             line_coords = common.rotate_line(x,y,-10,-15,-25,-7,orientation)
-            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))      ## 'Switched' blade
+            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade
             # Create the extra 'blades' for the double slip
             if pointsubtype == point_subtype.dslip2:
                 line_coords = common.rotate_line(x,y,+25,0,-10,0,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## 'Normal' route line (Dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Normal' route line (Dslip)
                 line_coords = common.rotate_line(x,y,-10,0,-25,+7,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))   ## 'Normal' blade (Dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade (Dslip)
                 line_coords = common.rotate_line(x,y,-10,0,-30,0,orientation)
-                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade (Dslip)
+                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2)) ## 'Switched' blade (Dslip)
             else:
                 # Draw the lines representing side 1 of a single slip
                 line_coords = common.rotate_line(x,y,+25,0,-30,0,orientation)
-                canvas.create_line (line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Normal' route line (Sslip)
+                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, routes)) ## 'Normal' route line (Sslip)
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset + 9 + (common.fontsize/2)
             if orientation == 0 and fpl: button_xoffset = button_xoffset - 16 + (common.fontsize*9/4)
@@ -431,22 +437,22 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         elif (pointsubtype == point_subtype.sslip1 or pointsubtype == point_subtype.dslip1) and pointtype==point_type.RH:
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,-25,0,+10,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)                 ## Horizontal 'Root' line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## Horizontal 'Root' line
             line_coords = common.rotate_line(x,y,+10,0,+33,0,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))       ## 'Normal' blade
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade
             line_coords = common.rotate_line(x,y,+10,0,+25,+7,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))       ## 'Switched' blade
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade
             # Create the extra 'blades' for the double slip
             if pointsubtype == point_subtype.dslip1:
                 line_coords = common.rotate_line(x,y,0,-25,+10,-15,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## Crossing route Line (dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing route Line (dslip)
                 line_coords = common.rotate_line(x,y,+10,-15,+25,-7,orientation)
                 canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade (dslip)
                 line_coords = common.rotate_line(x,y,+10,-15,+30,+5,orientation)
                 canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade (dslip)
             else:
                 line_coords = common.rotate_line(x,y,0,-25,+30,+5,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## Crossing route line (sslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing route line (sslip)
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset + 9 + (common.fontsize/2)
             if orientation == 180 and fpl: button_xoffset = button_xoffset + 22 - (common.fontsize*3)
@@ -457,23 +463,23 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         elif (pointsubtype == point_subtype.sslip2 or pointsubtype == point_subtype.dslip2) and pointtype==point_type.RH:
             # Create the line objects to represent the point
             line_coords = common.rotate_line(x,y,0,+25,-10,+15,orientation)
-            canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)                 ## Crossing 'Root' line
+            canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))   ## Crossing 'Root' line
             line_coords = common.rotate_line(x,y,-10,+15,-30,-5,orientation)
-            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))      ## 'Normal' blade
+            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade
             line_coords = common.rotate_line(x,y,-10,+15,-25,+7,orientation)
-            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))      ## 'Switched' blade
+            canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade
             # Create the extra 'blades' for the double slip
             if pointsubtype == point_subtype.dslip2:
                 line_coords = common.rotate_line(x,y,+25,0,-10,0,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=canvas_tag)             ## 'Normal' route line (Dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Normal' route line (Dslip)
                 line_coords = common.rotate_line(x,y,-10,0,-25,-7,orientation)
-                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))   ## 'Normal' blade (Dslip)
+                canvas.create_line(line_coords, fill=colour, width=3, tags=(canvas_tag, blade1))  ## 'Normal' blade (Dslip)
                 line_coords = common.rotate_line(x,y,-10,0,-30,0,orientation)
-                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2))  ## 'Switched' blade (Dslip)
+                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, blade2)) ## 'Switched' blade (Dslip)
             else:
                 # Draw the lines representing side 1 of a single slip
                 line_coords = common.rotate_line(x,y,+25,0,-30,0,orientation)
-                canvas.create_line (line_coords, fill=colour, width=3, tags=canvas_tag)            ## 'Normal' route line (Sslip)
+                canvas.create_line (line_coords, fill=colour, width=3, tags=(canvas_tag, routes))  ## 'Normal' route line (Sslip)
             # Work out the offsets of the buttons and create them (in windows)
             button_yoffset = button_yoffset - 9 - (common.fontsize/2)
             if orientation == 0 and fpl: button_xoffset = button_xoffset - 16 + (common.fontsize*9/4)
@@ -490,8 +496,9 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         # Compile a dictionary of everything we need to track
         points[str(point_id)] = {}
         points[str(point_id)]["canvas"] = canvas               # Tkinter canvas object
-        points[str(point_id)]["blade1"] = blade1               # Tkinter drawing object
-        points[str(point_id)]["blade2"] = blade2               # Tkinter drawing object
+        points[str(point_id)]["blade1"] = blade1               # Tkinter tag for blade1
+        points[str(point_id)]["blade2"] = blade2               # Tkinter tag for blade2
+        points[str(point_id)]["routes"] = routes               # Tkinter tag for other route lines
         points[str(point_id)]["changebutton"] = point_button   # Tkinter button object
         points[str(point_id)]["lockbutton"] = fpl_button       # Tkinter button object
         points[str(point_id)]["extcallback"] = callback        # The callback to make on an event
@@ -501,6 +508,7 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         points[str(point_id)]["fpllock"] = fpl                 # Initial state of the FPL (locked if it has FPL)
         points[str(point_id)]["locked"] = False                # Initial "interlocking" state of the point
         points[str(point_id)]["switched"] = False              # Initial "switched" state of the point
+        points[str(point_id)]["colour"] = colour               # the default colour for the point
         points[str(point_id)]["tags"] = canvas_tag             # Canvas Tags for all drawing objects
         # Get the initial state for the point (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
@@ -531,13 +539,43 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
     return(canvas_tag)
 
 # -------------------------------------------------------------------------
+# Public API function to change the colour of a point
+# -------------------------------------------------------------------------
+
+def set_point_colour(point_id:int, colour:str):
+    if not isinstance(point_id, int):
+        logging.error("Point "+str(point_id)+": set_point_colour - Point ID must be an int")
+    elif not point_exists(point_id):
+        logging.error("Point "+str(point_id)+": set_point_colour - Point ID does not exist")
+    else:
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=colour)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=colour)
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["routes"],fill=colour)
+    return()
+
+# -------------------------------------------------------------------------
+# Public API function to set the colour of a point back to default
+# -------------------------------------------------------------------------
+
+def reset_point_colour(point_id:int):
+    if not isinstance(point_id, int):
+        logging.error("Point "+str(point_id)+": reset_point_colour - Point ID must be an int")
+    elif not point_exists(point_id):
+        logging.error("Point "+str(point_id)+": reset_point_colour - Point ID does not exist")
+    else:
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade1"],fill=points[str(point_id)]["colour"])
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["blade2"],fill=points[str(point_id)]["colour"])
+        points[str(point_id)]["canvas"].itemconfig(points[str(point_id)]["routes"],fill=points[str(point_id)]["colour"])
+    return()
+
+# -------------------------------------------------------------------------
 # Public API function to Lock a points (Warning generated if APL and not FPL active)
 # -------------------------------------------------------------------------
 
 def lock_point(point_id:int):
     global points 
     if not isinstance(point_id, int):
-        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")    
+        logging.error("Point "+str(point_id)+": lock_point - Point ID must be an int")
     elif not point_exists(point_id):
         logging.error("Point "+str(point_id)+": lock_point - Point ID does not exist")
     elif not points[str(point_id)]["locked"]:
@@ -574,6 +612,21 @@ def unlock_point(point_id:int):
             points[str(point_id)]["lockbutton"].config(state="normal") 
         points[str(point_id)]["locked"] = False
     return()
+
+# -------------------------------------------------------------------------
+# API function to Return the current state of the point interlocking
+# -------------------------------------------------------------------------
+
+def point_locked(point_id:int):
+    if not isinstance(point_id, int):
+        logging.error("Point "+str(point_id)+": point_locked - Point ID must be an int")
+        locked = False
+    elif not point_exists(point_id):
+        logging.error("Point "+str(point_id)+": point_locked - Point ID does not exist")
+        locked = False
+    else:
+        locked = points[str(point_id)]["locked"]
+    return(locked)
 
 # -------------------------------------------------------------------------
 # API function to Return the current state of the point
