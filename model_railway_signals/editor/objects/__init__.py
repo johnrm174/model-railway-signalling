@@ -12,6 +12,7 @@
 #    instrument(item_id:int) - helper function to find the object Id by Item ID
 #    track_sensor(item_id:int) - helper function to find the object Id by Item ID
 #    line(item_id:int) - helper function to find the object Id by Item ID
+#    route(item_id:int) - helper function to find the object Id by Item ID
 #
 #    line_exists (item_id:int) - Common function to see if a given item exists #################
 #
@@ -44,6 +45,7 @@
 #    section_index - for iterating through all the section objects
 #    line_index - for iterating through all the line objects
 #    track_sensor_index - for iterating through all the track_sensor objects
+#    route_index - for iterating through all the route objects
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -73,6 +75,7 @@ from .objects_common import section
 from .objects_common import instrument
 from .objects_common import line
 from .objects_common import track_sensor
+from .objects_common import route
 
 from .objects_common import line_exists  #######################
 
@@ -84,6 +87,7 @@ from .objects_common import section_index
 from .objects_common import instrument_index
 from .objects_common import line_index
 from .objects_common import track_sensor_index
+from .objects_common import route_index
 
 from .objects_lines import get_endstop_offsets
 
@@ -119,6 +123,8 @@ __all__ = [
     'instrument',
     'line',
     'track_sensor',
+    'route',
+    # Function to test if a line exists
     'line_exists',  ##########################
     # Function to get the x and y deltas for a line 'end stop' 
     'get_endstop_offsets',
@@ -130,6 +136,7 @@ __all__ = [
     'instrument_index',
     'line_index',
     'track_sensor_index',
+    'route_index',
     # GPIO Event configuration functions
     'create_gpio_sensors',
     'configure_remote_gpio_sensor_event_mappings',

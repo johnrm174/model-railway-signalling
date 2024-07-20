@@ -15,8 +15,10 @@ from .signals import delete_signal
 from .signals import set_route
 from .signals import lock_signal
 from .signals import unlock_signal
+from .signals import signal_locked
 from .signals import lock_subsidary
 from .signals import unlock_subsidary
+from .signals import subsidary_locked
 from .signals import set_signal_override
 from .signals import clear_signal_override
 from .signals import set_signal_override_caution
@@ -46,10 +48,13 @@ from .points import update_autoswitch
 from .points import point_exists
 from .points import lock_point
 from .points import unlock_point
+from .points import point_locked
 from .points import toggle_point
 from .points import toggle_fpl
 from .points import point_switched
 from .points import fpl_active
+from .points import set_point_colour
+from .points import reset_point_colour
 
 from .track_sections import section_callback_type
 from .track_sections import create_section
@@ -112,6 +117,13 @@ from .block_instruments import reset_instruments_mqtt_configuration
 from .block_instruments import set_instruments_to_publish_state
 from .block_instruments import subscribe_to_remote_instruments
 
+from .buttons import button_callback_type
+from .buttons import create_button
+from .buttons import button_exists
+from .buttons import delete_button
+from .buttons import enable_button
+from .buttons import disable_button
+
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
 from .file_interface import save_schematic
@@ -134,10 +146,13 @@ __all__ = [
         'point_exists',
         'lock_point',
         'unlock_point',
+        'point_locked',
         'point_switched',
         'fpl_active',
         'toggle_point',
         'toggle_fpl',
+        'set_point_colour',
+        'reset_point_colour',
       # public track sensor types/functions
         'track_sensor_callback_type',
         'create_track_sensor',
@@ -157,8 +172,10 @@ __all__ = [
         'set_route',
         'lock_signal',
         'unlock_signal',
+        'signal_locked',
         'lock_subsidary',
         'unlock_subsidary',
+        'subsidary_locked',
         'set_signal_override',
         'clear_signal_override',
         'set_signal_override_caution',
@@ -179,7 +196,6 @@ __all__ = [
         'create_semaphore_signal',
         'create_ground_position_signal',
         'create_ground_disc_signal',
-
       # Public track section types/functions
         'section_callback_type',
         'create_section',
@@ -236,6 +252,13 @@ __all__ = [
         'reset_instruments_mqtt_configuration',
         'subscribe_to_remote_instruments',
         'set_instruments_to_publish_state',
+      # public Button types/functions
+        'button_callback_type',
+        'create_button',
+        'button_exists',
+        'delete_button',
+        'enable_button',
+        'disable_button',
       # Public file interface functions
         'save_schematic',
         'load_schematic',

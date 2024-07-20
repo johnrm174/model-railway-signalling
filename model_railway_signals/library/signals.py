@@ -124,6 +124,10 @@
 #
 #   unlock_subsidary(sig_id:int) - use for point/signal interlocking
 #
+#   signal_locked(signal_id:int) - returns the current state of the interlocking
+#
+#   subsidary_locked(signal_id:int) - returns the current state of the interlocking
+#
 #   set_signal_override(sig_id:int) - Override the signal to DANGER (irrespective of ON/OFF)
 #
 #   clear_signal_override(sig_id:int)  - Revert the signal to display its normal aspect
@@ -894,6 +898,41 @@ def unlock_subsidary(sig_id:int):
         signals[str(sig_id)]["subbutton"].config(state="normal")
         signals[str(sig_id)]["sublocked"] = False
     return()
+
+# -------------------------------------------------------------------------
+# Library API function to get the interlocking state of a signal
+# -------------------------------------------------------------------------
+
+def signal_locked(sig_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": signal_locked - Signal ID must be an int")
+        locked = False
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": signal_locked - Signal ID does not exist")
+        locked = False
+    else:
+        locked = signals[str(sig_id)]["siglocked"]
+    return(locked)
+
+# -------------------------------------------------------------------------
+# Library API function to get the interlocking state of a signal
+# -------------------------------------------------------------------------
+
+def subsidary_locked(sig_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(sig_id, int):
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal ID must be an int")
+        locked = False
+    elif not signal_exists(sig_id):
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal ID does not exist")
+        locked = False
+    elif not signals[str(sig_id)]["hassubsidary"]:
+        logging.error("Signal "+str(sig_id)+": subsidary_locked - Signal does not have a subsidary")
+        locked = False
+    else:
+        locked = signals[str(sig_id)]["sublocked"]
+    return(locked)
 
 # -------------------------------------------------------------------------
 # Library API function to return the current SWITCHED state of the signal
