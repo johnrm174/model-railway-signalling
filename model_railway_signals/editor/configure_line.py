@@ -7,10 +7,12 @@
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.line_exists(item_id) - to see if a line of that ID already exists  ###################
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - To load/save the object configuration
+#
+# Makes the following external API calls to library modules:
+#    lines.line_exists(line_id) - To see if a specified Line ID exists
 #
 # Inherits the following common editor base classes (from common):
 #    common.Createtool_tip
@@ -28,6 +30,8 @@ import tkinter as Tk
 
 from . import common
 from . import objects
+
+from ..library import lines
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -150,7 +154,7 @@ class edit_line():
             self.frame.pack(padx=2, pady=2, fill='x')
             # Create the UI Element for Line ID selection
             self.lineid = common.object_id_selection(self.frame, "Line ID",
-                                    exists_function = objects.line_exists) 
+                                    exists_function = lines.line_exists) 
             self.lineid.frame.pack(side=Tk.LEFT, padx=2, pady=2, fill='y')
             # Create the line colour selection element
             self.colour = common.colour_selection(self.frame, label="Colour")
