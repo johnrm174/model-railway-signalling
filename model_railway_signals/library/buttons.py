@@ -24,6 +24,8 @@
 #
 #   delete_button(button_id:int) - Delete the library object from the schematic
 #
+#   button_state(button_id:int) - get the current state of a button (returns True for Active)
+#
 #   enable_button(button_id:int) - enable the button (and revert to the standard tooltip)
 #
 #   disable_button(button_id:int, tooltip:str) - disable the button (with a new toottip)
@@ -59,7 +61,7 @@ buttons: dict = {}
                                                             
 #---------------------------------------------------------------------------------------------
 # API function to set/clear Edit Mode (called by the editor on mode change)
-# The appearance of Button objects will change in Edit Mode
+# The appearance of Button objects will change between Edit and run Modes
 #---------------------------------------------------------------------------------------------
 
 editing_enabled = False
@@ -129,7 +131,23 @@ def toggle_button(button_id:int):
     return()
 
 #---------------------------------------------------------------------------------------------
-# Internal function to toggle the state of a Button
+# API function toget the current state of a Button
+#---------------------------------------------------------------------------------------------
+
+def button_state(button_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": button_state - Button ID must be an int")
+        button_state = False
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": button_state - Button ID does not exist")
+        button_state = False
+    else:
+        button_state = buttons[str(button_id)]["selected"]
+    return(button_state)
+
+#---------------------------------------------------------------------------------------------
+# API functions to enable or disable a Button
 #---------------------------------------------------------------------------------------------
 
 def enable_button(button_id:int):
@@ -217,9 +235,9 @@ def create_button (canvas, button_id:int, x:int, y:int, callback,
     return(canvas_tag)
 
 #---------------------------------------------------------------------------------------------
-# API function to delete a Track Section library object (including all the drawing objects)
-# This is used by the schematic editor for updating the section config where we delete the existing
-# track section with all its data and then recreate it (with the same ID) in its new configuration.
+# API function to delete a Button library object (including all the drawing objects)
+# This is used by the schematic editor for updating the Button config where we delete the existing
+# Button object with all its data and then recreate it (with the same ID) in its new configuration.
 #---------------------------------------------------------------------------------------------
 
 def delete_button(button_id:int):
@@ -231,10 +249,10 @@ def delete_button(button_id:int):
         logging.error("Button "+str(button_id)+": delete_button - Button ID does not exist")
     else:
         logging.debug("Button "+str(button_id)+": Deleting library object from the schematic")    
-        # Delete all the tkinter drawing objects associated with the track section
+        # Delete all the tkinter drawing objects associated with the Button
         buttons[str(button_id)]["canvas"].delete(buttons[str(button_id)]["tags"])
         buttons[str(button_id)]["button"].destroy()
-        # Delete the track section entry from the dictionary of sections
+        # Delete the button entry from the dictionary of buttons
         del buttons[str(button_id)]
     return()
 

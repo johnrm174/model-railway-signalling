@@ -123,6 +123,7 @@ from .buttons import button_exists
 from .buttons import delete_button
 from .buttons import enable_button
 from .buttons import disable_button
+from .buttons import button_state
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -259,6 +260,7 @@ __all__ = [
         'delete_button',
         'enable_button',
         'disable_button',
+        'button_state',
       # Public file interface functions
         'save_schematic',
         'load_schematic',
