@@ -277,15 +277,15 @@ class button_offsets():
         # Create the two entry boxes in a seperate subframe so they are centered in the LabelFrame
         self.subframe = Tk.Frame(self.frame)
         self.subframe.pack()
-        tooltip=("Specify any offsets (in pixels between -25 and +25) for the point buttons to de-conflict "+
-                    "with other drawing objects on the schematic (or leave blank if no offsets are required)")
+        tooltip=("Specify any offsets (pixels -100 to +100) for the point buttons "+
+                    "(note that for rotated points the offsets will will be applied in the opposite direction)")
         self.L1 =Tk.Label(self.subframe, text="Button X offset:")
         self.L1.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB1 = common.integer_entry_box(self.subframe, width=3, min_value=-25, max_value=+25, tool_tip=tooltip)
+        self.EB1 = common.integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
         self.EB1.pack(side=Tk.LEFT, padx=2, pady=2)
         self.L2 =Tk.Label(self.subframe, text="  Button Y offset:")
         self.L2.pack(side=Tk.LEFT, padx=2, pady=2)
-        self.EB2 = common.integer_entry_box(self.subframe, width=3, min_value=-25, max_value=+25, tool_tip=tooltip)
+        self.EB2 = common.integer_entry_box(self.subframe, width=3, min_value=-100, max_value=+100, tool_tip=tooltip)
         self.EB2.pack(side=Tk.LEFT, padx=2, pady=2)
 
     def validate(self):
