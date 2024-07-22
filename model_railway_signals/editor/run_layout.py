@@ -2,7 +2,7 @@
 # This module contains all the functions to "run" the layout
 #
 # External API functions intended for use by other editor modules:
-#    initialise(canvas) - sets a global reference to the tkinter canvas object
+#    initialise(root, canvas) - sets a global reference to the tkinter canvas object
 #    initialise_layout() - call after object changes/deletions or load of a new schematic
 #    schematic_callback(item_id,callback_type) - the callback for all library objects
 #    configure_edit_mode(edit_mode) - Set the mode - True for Edit Mode, False for Run Mode
@@ -14,13 +14,14 @@
 #    objects.point(point_id) - To get the object_id for a given point_id
 #    objects.section(section_id) - To get the object_id for a given section_id
 #    objects.track_sensor(sensor_id) - To get the object_id for a given sensor_id
+#    objects.route(route_id) - To get the object_id for a given sensor_id
 #    
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
 #    objects.object_type - used to establish the type of the schematic objects
 #    objects.signal_index - To iterate through all the signal objects
 #    objects.point_index - To iterate through all the point objects
-#    objects.section_index - To iterate through all the section objects
+#    objects.route_index - To iterate through all the route objects
 #
 # Accesses the following external library objects directly:
 #    signals.route_type - for accessing the enum value
@@ -33,6 +34,7 @@
 #    signals.signal_subtype - for accessing the enum value
 #    signals.semaphore_subtype - for accessing the enum value
 #    track_sensors.track_sensor_callback_type - for accessing the enum value
+#    buttons.button_callback_type - for accessing the enum value
 #
 # Makes the following external API calls to library modules:
 #    signals.signal_state(sig_id) - For testing the current displayed aspect
@@ -43,6 +45,8 @@
 #    signals.unlock_signal(sig_id) - To unlock a signal
 #    signals.lock_subsidary(sig_id) - To lock a subsidary signal
 #    signals.unlock_subsidary(sig_id) - To unlock a subsidary signal
+#    signals.signal_locked(sig_id) - Test if the signal is locked
+#    signals.subsidary_locked(sig_id) - Test if the subsidary is locked
 #    signals.set_approach_control - Enable approach control mode for the signal
 #    signals.clear_approach_control - Clear approach control mode for the signal
 #    signals.set_route(sig_id, sig_route, theatre) - To set the route for the signal
@@ -55,22 +59,33 @@
 #    points.point_switched(point_id) - Test if the point is switched (for interlocking)
 #    points.lock_point(point_id) - Lock a point (for interlocking)
 #    points.unlock_point(point_id) - Unlock a point (for interlocking)
+#    points.point_locked(point_id) - Test if the point is locked
+#    points.set_point_colour(point_id) - Used for shematic route setting
+#    points.reset_point_colour(point_id) - Used for shematic route setting
 #    block_instruments.block_section_ahead_clear(inst_id) - Get the state (for interlocking)
 #    track_sections.set_section_occupied (section_id) - Set Track Section to "Occupied"
 #    track_sections.clear_section_occupied (section_id) - Set Track Section to "Clear"
 #    track_sections.section_occupied (section_id) - To test if a section is occupied
 #    track_sections.section_label - get the current label for an occupied section
+#    button.enable_button - To enable the schematic route selection
+#    button.disable_button - toi disable the schematic route selection
+#    lines.set_line_colour(line_id) - Used for shematic route setting
+#    lines.reset_line_colour(line_id) - Used for shematic route setting
+#
 #------------------------------------------------------------------------------------
 
 import logging
 import tkinter as Tk
 from typing import Union
+import functools
 
 from ..library import signals
 from ..library import points
 from ..library import block_instruments
 from ..library import track_sections
 from ..library import track_sensors
+from ..library import buttons
+from ..library import lines
 
 from . import objects
 
@@ -79,18 +94,19 @@ from . import objects
 # The editing_enabled and run_mode flags control the behavior of run_layout
 #------------------------------------------------------------------------------------
 
+root = None
 canvas = None
 run_mode = None
 automation_enabled = None
 spad_popups = False
-enhanced_debugging = False  # Switch this on to enable 'info'
 
 #------------------------------------------------------------------------------------
 # The set_canvas function is called at application startup (on canvas creation)
 #------------------------------------------------------------------------------------
 
-def initialise(canvas_object):
-    global canvas
+def initialise(root_window, canvas_object):
+    global root, canvas
+    root = root_window
     canvas = canvas_object
     return()
 
@@ -182,9 +198,14 @@ def is_distant_signal(int_signal_id:int):
 # For a Track Sensor, each route entry comprises: [[p1, p2, p3, p4, p5, p6, p7] section_id]
 # Each route comprises: [[p1, p2, p3, p4, p5, p6, p7] signal, block_inst]
 # Each point element comprises [point_id, point_state]
+#
+# The function also allows routes to be found based on "theoretical point settings" - used by the 
+# schematic route setting functions to 'test' routes to see whether they are viable or not (so the 
+# route button can beeither enabled or disabled accordingly). The "theoretical point settings" are 
+# passed in as a variable length dictionary comprising {point_id: point_state,}.
 #------------------------------------------------------------------------------------
 
-def find_route(object_id, dict_key:str):
+def find_route(object_id, dict_key:str, theoretical_settings:dict={}):
     route_to_return = None
     # Iterate through each route in the specified table 
     for index, route_entry in enumerate(objects.schematic_objects[object_id][dict_key]):
@@ -193,11 +214,18 @@ def find_route(object_id, dict_key:str):
         for point_entry in route_entry[0]:
             if point_entry[0] > 0:
                 route_has_points = True
-                if not points.point_switched(point_entry[0]) == point_entry[1]:
-                    valid_route = False
-                if not points.fpl_active(point_entry[0]):
-                    points_locked = False
-                if not valid_route: break
+                # This code is for testing a theoretical point setting (if one has been specified)
+                # As it is a theoretical point setting, we have to assume the FPL would be active.
+                if str(point_entry[0]) in theoretical_settings.keys():
+                    if theoretical_settings[str(point_entry[0])] != point_entry[1]:
+                        valid_route = False
+                # If a theoretical point setting has not been specified, we use the real point settings
+                else:
+                    if points.point_switched(point_entry[0]) != point_entry[1]:
+                        valid_route = False
+                    if not points.fpl_active(point_entry[0]):
+                        points_locked = False
+                    if not valid_route: break
         # Valid route if all points on the route are set and locked correctly
         # Or if the route is MAIN and no points have been specified for the route
         if (index == 0 and not route_has_points) or (route_has_points and valid_route):
@@ -218,6 +246,16 @@ def find_valid_route(object_id, dict_key:str):
 def find_locked_route(object_id, dict_key:str):
     route, locked = find_route(object_id, dict_key)
     if not locked: route = None
+    return(route)
+
+#------------------------------------------------------------------------------------
+# This third function also builds on the build on the 'find_route' function and is
+# used by the route setting functions to find a vaild route for a signal, based on
+# the point settings that would exist if the route was activated
+#------------------------------------------------------------------------------------
+
+def find_theoretical_route(object_id, dict_key:str, theoretical_settings:dict):
+    route, locked = find_route(object_id, dict_key, theoretical_settings)
     return(route)
 
 #------------------------------------------------------------------------------------
@@ -890,37 +928,383 @@ def process_all_aspect_updates():
         process_aspect_updates(int(str_signal_id))
     return()
 
+##################################################################################################
+# The following functions are associated with schematic route setting
+##################################################################################################
+
 #------------------------------------------------------------------------------------
+# This is a sub-function to test if any of thee signals along the route would be locked
+# by an opposing signal once the route has been set up. The function is called twice from
+# the enable_disable_all_route_buttons function - once for the main signals on the route
+# and a second time for the subsidariy signals (attached to a main signal) on the route.
+#------------------------------------------------------------------------------------
+
+def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool, subsidaries:bool=False):
+    # Set up the function to check Signals or subsidaries
+    if subsidaries:
+        signals_on_route_dict_key = "subsidariesonroute"
+        signal_routes_dict_key = "subroutes"
+        sig_type = "Subsidary "
+    else:
+        signals_on_route_dict_key = "signalsonroute"
+        signal_routes_dict_key = "sigroutes"
+        sig_type = "Signal "
+    # See if any signals along the route WOULD be locked by an opposing signal once all the points
+    # for the route have been switched into their correct states.
+    for signal_id in route_object[signals_on_route_dict_key]:
+        # Find the future 'route' for the signal (once all the points have been correctl set for the route)
+        signal_object_id = objects.signal(signal_id)
+        signal_object = objects.schematic_objects[signal_object_id]
+        signal_route = find_theoretical_route(signal_object_id, "pointinterlock", route_object["pointsonroute"] )
+        # 'sigroutes' and 'subroutes' are the routes supported by the signal - [main, lh1, lh2, rh1, rh2]
+        # If there is no signal/subsidary route then the route configuration must be invalid
+        if signal_route is None or not signal_object[signal_routes_dict_key][signal_route.value-1]:
+            message = "\n"+sig_type+str(signal_id)+" has no route for the point settings specified"
+            route_tooltip = route_tooltip + message
+            route_viable = False
+        else:
+            # Now we know the future route, we can identify any opposing signals for that future route
+            # The opposing signal interlocking table comprises a list of routes [main, lh1, lh2, rh1, rh2]
+            # Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
+            # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+            # Where each route element is a boolean value (True or False)
+            opposing_signals_on_route = signal_object["siginterlock"][signal_route.value-1]
+            # Iterate through the opposing signals (opposing the route signal) to find their current state.
+            # If they are ON, then they won't affect the route. If they are OFF then we need to establish
+            # what the signal route would be once all the points (to set our route) have been changed and
+            # then check if that signal/route would be opposing our route signal once the rute is set up
+            # the signal (when set to that future route)
+            for opposing_signal_entry in opposing_signals_on_route:
+                if opposing_signal_entry[0] > 0:
+                    opposing_signal_id = opposing_signal_entry[0]
+                    opposing_signal_object_id = objects.signal(opposing_signal_id)
+                    opposing_signal_routes = opposing_signal_entry[1]
+                    if (signals.signal_clear(opposing_signal_id) or (has_subsidary(opposing_signal_id)
+                                                    and signals.subsidary_clear(opposing_signal_id))):
+                        # Find what the route of the opposing signal would be
+                        other_signal_route = find_theoretical_route(opposing_signal_object_id,
+                                                "pointinterlock", route_object["pointsonroute"] )
+                        # Test whether if a Signal OFF for that route would be locking our signal. If there is no
+                        # Route for the signal once the points have changed then we don't worry about it
+                        if other_signal_route is not None and opposing_signal_routes[other_signal_route.value-1]:
+                            if signals.signal_clear(opposing_signal_id):
+                                message = "\n"+sig_type+str(signal_id)+" would be locked by signal "+str(opposing_signal_id)
+                            if has_subsidary(opposing_signal_id) and signals.subsidary_clear(opposing_signal_id):
+                                message = "\n"+sig_type+str(signal_id)+" would be locked by subsidary "+str(opposing_signal_id)
+                            route_tooltip = route_tooltip + message
+                            route_viable = False
+    return(route_tooltip, route_viable)
+
+#------------------------------------------------------------------------------------
+# This function is called after any layout state change that might affect the viability
+# of a schematic route, enabling or disabling the route buttons accordingly
+#------------------------------------------------------------------------------------
+
+def enable_disable_all_route_buttons():
+    # Iterate through all the schematic routes
+    for str_route_id in objects.route_index:
+        route_viable = True
+        route_tooltip = "Route cannot be set because:"
+        route_object = objects.schematic_objects[objects.route(str_route_id)]
+        # See if any points along the route are locked by another signal at OFF (i.e. a signal that
+        # is not in the route definition - as those will be locked/unlocked when the route is applied)
+        # Note we ignore any automatic points (switched by another point) in the list
+        for str_point_id in route_object["pointsonroute"].keys():
+            automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+            required_point_state = route_object["pointsonroute"][str_point_id]
+            int_point_id = int(str_point_id)
+            if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
+                # We've found a point that needs switching for the route but is currently locked
+                # We then iterate through the signal interlocking table for the point to test each
+                # interlocked signal (and signal route) to find the signal(s) that are locking the point
+                # The Point interlocking Table comprises a variable length list of interlocked signals
+                # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+                # Each route element in the list of routes is a boolean value (True or False)
+                point_object = objects.schematic_objects[objects.point(int_point_id)]
+                for interlocked_signal in point_object["siginterlock"]:
+                    interlocked_sig_id = interlocked_signal[0]
+                    interlocked_routes = interlocked_signal[1]
+                    # We only care about signals not on the route (as signals on the route will be
+                    # set to OFF before changing the points when the route is applied)
+                    if (interlocked_sig_id not in route_object["signalsonroute"] and
+                             interlocked_sig_id not in route_object["subsidariesonroute"]):
+                        for index, interlocked_route in enumerate(interlocked_routes):
+                            # Similarly we only care if the signal is cleared for a ROUTE that locks the point
+                            route_to_test = signals.route_type(index+1)
+                            if interlocked_route:
+                                if signals.signal_clear(interlocked_sig_id, route_to_test):
+                                    message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
+                                    route_tooltip = route_tooltip + message
+                                    route_viable = False
+                                if has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
+                                    message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
+                                    route_tooltip = route_tooltip + message
+                                    route_viable = False
+        # See if any signals along the route WOULD be locked by an opposing signal once the route is set
+        route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable)
+        route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable, subsidaries=True)
+        
+        ############################################################################################################
+        ############################################################################################################
+        ## TODO 1 - Check if any signals are interlocked with Track sections ahead #################################
+        ## TODO 2 - Check if any signals are interlocked with Block Instruments ahead ##############################
+        ## TODO 3 - Check if sigs/subs on route are set/cleared for a different sig/sub route ######################
+        ############################################################################################################
+        ############################################################################################################
+        
+        # Enable/disable the route button as required
+        if route_viable: buttons.enable_button(int(str_route_id))
+        else: buttons.disable_button(int(str_route_id), route_tooltip)
+        return()
+    
+#------------------------------------------------------------------------------------
+# The following class and functions are used to process the setting up and clearing
+# down of schematic routes, one action at a time (with a delay in between if specified).
+# The schedule_task class is used to schedule the other functions at a point in the
+# future by set_schematic_route and clear_schematic route functions.
+#------------------------------------------------------------------------------------
+
+class schedule_task():
+    def __init__(self, delay:int, function, *args):
+        root.after(delay, lambda:function(*args))
+    
+def set_signal_state(signal_id:int, state:bool):
+    if signals.signal_clear(signal_id) != state:
+        # If the signal is being switched to OFF, ensure the subsidary is ON
+        if state and has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
+            signals.toggle_subsidary(signal_id)
+            process_all_signal_interlocking()
+        # Toggle the signal into the required state
+        signals.toggle_signal(signal_id)
+        update_signal_approach_control(signal_id, force_set=True)
+        process_all_point_interlocking()
+        process_all_signal_interlocking()
+        update_all_signal_overrides()
+        update_all_distant_overrides()     
+        process_all_aspect_updates()
+    return()
+
+def set_subsidary_state(signal_id:int, state:bool):
+    if signals.subsidary_clear(signal_id) != state:
+        # If the subsidary is being switched to OFF, ensure the main signal is ON
+        if state and signals.signal_clear(signal_id):
+            signals.toggle_signal(signal_id)
+            process_all_signal_interlocking()
+        # Toggle the subsidary into the required state
+        signals.toggle_subsidary(signal_id)
+        process_all_point_interlocking()
+        process_all_signal_interlocking()
+    return()
+
+def set_fpl_state(point_id:int, state:bool):
+    if points.fpl_active(point_id) != state:
+        points.toggle_fpl(point_id)
+        process_all_signal_interlocking()
+    return()
+
+def set_point_state(point_id:int, state:bool):
+    if points.point_switched(point_id) != state:
+        points.toggle_point(point_id)
+        set_all_signal_routes()
+        process_all_signal_interlocking()
+    return()
+
+def set_route_colour(route_id:int, colour:str="DEFAULT"):
+    # update the point colours
+    for str_point_id in objects.schematic_objects[objects.route(route_id)]["pointsonroute"].keys():
+        if colour=="DEFAULT": points.reset_point_colour(int(str_point_id))
+        else: points.set_point_colour(int(str_point_id), colour)
+    for line_id in objects.schematic_objects[objects.route(route_id)]["linesonroute"]:
+        if colour=="DEFAULT": lines.reset_line_colour(line_id)
+        else: lines.set_line_colour(line_id, colour)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to configure a route on the schematic. First any signals along the route that
+# are locking any points along the route (which need switching) are set to ON. Next, all
+# points are set to the correct state (unlocking/relocking FPLs before/after as required).
+# Then, all the signals along the route which are currently 'ON' are toggled to 'OFF'.
+# All these events are scheduled, to provide a realistic delay between each change. Note
+# that after each change, the layout state is re-processed to ensure all appropriate override
+# and approach control settings are applied to maintain the overall integrity of the schematic.
+# Note that this function assumes the route changes are 'feasable' in that none of the points and
+# signals along the route will be locked by other points, signals or sections on the schematic.
+#------------------------------------------------------------------------------------
+
+def set_schematic_route(route_id:int):
+    # Retrieve the object configuration for the Route
+    route_object = objects.schematic_objects[objects.route(route_id)]
+    delay = route_object["switchdelay"]
+    # See if any of the points that need changing are locked, and if so, what signals they are
+    # interlocked with. If these signals are currently OFF we change them to ON, which should
+    # unlock the points so we can change them without any warnings being raised. Note that
+    # we ignore any automatic points (i.e. points switched by another point)
+    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
+    # The "signalsonroute" and "subsidariesonroute" elements comprise a list of signal_ids
+    route_object = objects.schematic_objects[objects.route(route_id)]
+    for str_point_id in route_object["pointsonroute"].keys():
+        automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+        required_point_state = route_object["pointsonroute"][str_point_id]
+        int_point_id = int(str_point_id)
+        if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
+            # We've found a point that needs switching for the route but the point is currently locked. 
+            # Iterate through the point's interlocking table to find the signals that are locking the point.
+            # The Point's interlocking Table comprises a variable length list of interlocked signals
+            # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+            # Each route element in the list of routes is a boolean value (True or False)
+            point_object = objects.schematic_objects[objects.point(int_point_id)]
+            for interlocked_signal in point_object["siginterlock"]:
+                interlocked_sig_id = interlocked_signal[0]
+                interlocked_routes = interlocked_signal[1]
+                # We only care about signals on the route we are setting - we should not find any
+                # other signals (not on the route) locking the point as this would have made the
+                # route unselectable (see enable_disable_all_route_buttons function above)
+                # We also only care if the signal is cleared for a ROUTE that locks the point
+                if interlocked_sig_id in route_object["signalsonroute"] or interlocked_sig_id in route_object["subsidariesonroute"]:
+                    for index, interlocked_route in enumerate(interlocked_routes):
+                        if interlocked_route:
+                            route_to_test = signals.route_type(index+1)
+                            if signals.signal_clear(interlocked_sig_id, route_to_test):
+                                schedule_task(delay, set_signal_state, interlocked_sig_id, False)
+                                delay = delay + route_object["switchdelay"]
+                            elif has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
+                                schedule_task(delay, set_subsidary_state, interlocked_sig_id, False)
+                                delay = delay + route_object["switchdelay"]
+    # All the points we need to change should now be unlocked (as we have set the signals to ON)
+    # Set all the points to the correct state for the route (disabling/enabling the FPLs as required)
+    # Note that we ignore any automatic points (i.e. points switched by another point)
+    for str_point_id in route_object["pointsonroute"].keys():
+        required_point_state = route_object["pointsonroute"][str_point_id]
+        point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
+        automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+        int_point_id = int(str_point_id)
+        if not automatic_point and points.point_switched(int_point_id) != required_point_state:
+            if point_has_fpl and points.fpl_active(int_point_id):
+                schedule_task(delay, set_fpl_state, int_point_id, False)
+                delay = delay + route_object["switchdelay"]
+            schedule_task(delay, set_point_state, int_point_id, required_point_state)
+            delay = delay + route_object["switchdelay"]
+            if point_has_fpl:
+                schedule_task(delay, set_fpl_state, int_point_id, True)
+                delay = delay + route_object["switchdelay"]
+        elif not automatic_point and point_has_fpl and not points.fpl_active(int_point_id):
+            schedule_task(delay, set_fpl_state, int_point_id, True)
+            delay = delay + route_object["switchdelay"]
+    # Set all the signals along the route to OFF (Each entry list is a signal_id). Note we don't test
+    # if a signal is already clear at this point as when the scheduled task to change the signal is run
+    # a signal that is ON now may have been subsequently set to OFF to unlock points along the route
+    for signal_id in route_object["signalsonroute"]:
+        schedule_task(delay, set_signal_state, signal_id, True)
+        delay = delay + route_object["switchdelay"]
+    # Note the user may have specified the same signal ID in both the signals and subsidaries
+    # list. in this case the signal takes precidence (the subsidary is ignored)
+    for signal_id in route_object["subsidariesonroute"]:
+        if signal_id not in route_object["signalsonroute"]:
+            schedule_task(delay, set_subsidary_state, signal_id, True)
+            delay = delay + route_object["switchdelay"]
+    # Finally, update the colour of all points/lines to highlight the route
+    schedule_task(delay, set_route_colour, route_id, route_object["routecolour"])
+    return()
+            
+#------------------------------------------------------------------------------------
+# Function to 'clear down' a route on the schematic. First all all the signals along the
+# route are toggled to 'ON'. Next, the points on the route are set to their default state
+# (unlocking/relocking FPLs before/after as required). All these events are scheduled,
+# to provide a realistic delay between each change. Note that after each change, the layout
+# state is re-processed to ensure all override and approach control settings are applied.
+#------------------------------------------------------------------------------------
+
+def clear_schematic_route(route_id:int):
+    # Retrieve the object configuration for the Route
+    route_object = objects.schematic_objects[objects.route(route_id)]
+    delay = route_object["switchdelay"]
+    # Set all the signals along the route to ON. The "signalsonroute" and "subsidariesonroute"
+    # elements of the route object comprise a list of signal_ids
+    for signal_id in route_object["signalsonroute"]:
+        if signals.signal_clear(signal_id):
+            schedule_task(delay, set_signal_state, signal_id, False)
+            delay = delay + route_object["switchdelay"]
+    for signal_id in route_object["subsidariesonroute"]:
+        if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
+            schedule_task(delay, set_subsidary_state, signal_id, False)
+            delay = delay + route_object["switchdelay"]
+    # Reset all the points along the route back to their default state
+    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
+    # Note that we ignore any automatic points (i.e. points switched by another point)
+    for str_point_id in route_object["pointsonroute"].keys():
+        point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
+        automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+        int_point_id = int(str_point_id)
+        if not automatic_point and points.point_switched(int_point_id):
+            if point_has_fpl and points.fpl_active(int_point_id):
+                schedule_task(delay, set_fpl_state, int_point_id, False)
+                delay = delay + route_object["switchdelay"]
+            schedule_task(delay, set_point_state, int_point_id, False)
+            delay = delay + route_object["switchdelay"]
+            if point_has_fpl:
+                schedule_task(delay, set_fpl_state, int_point_id, True)
+                delay = delay + route_object["switchdelay"]
+    # Finally, reset the colour of all points/lines back to their default colours
+    schedule_task(delay, set_route_colour, route_id)
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to initialise all routes after a layout reset, layout load or switching
+# between edit/run modes (this function will be called for all above events).
+#
+# If we are in edit mode then any route buttons that are current 'set' will be 'unset' and
+# the colour of all points/lines reverted to their default colours. Note that we leave all
+# points and signals in their current states rather that 'clearing down' the route. This
+# case takes precident over the 'reset' and 'load' use cases
+#
+# For the 'load' use case, all signals, points and route buttons will have been be re-created 
+# in the state they were saved so the route is effectively already set up. However, the points 
+# and lines will have been recreted with their default colours, so we need to change the colour 
+# for any routes wich are enabled. Note we clear down the route colours in edit mode
+#
+# For the 'reset' use case, all schematic objects will have been set back to their default
+# states so the points and lines on the route will have already been set to their default 
+# colours and the route buttons will be 'unset'. In this case, there is nothing to do.
+#------------------------------------------------------------------------------------
+
+def initialise_all_schematic_routes():
+    for str_route_id in objects.route_index:
+        if buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
+            if run_mode:
+                set_route_colour(int(str_route_id), colour=objects.schematic_objects[objects.route(str_route_id)]["routecolour"])
+            else:
+                buttons.toggle_button(int(str_route_id))
+                set_route_colour(int(str_route_id))
+        else:
+            set_route_colour(int(str_route_id))
+    return()
+
+##################################################################################################
 # Main callback function for when anything on the layout changes
 # Note that the returned item_id could be a remote ID (str) for the following events:
 #    track_sections.section_callback_type.section_updated
 #    signals.signal_callback_type.sig_updated
-#------------------------------------------------------------------------------------
+##################################################################################################
 
 def schematic_callback(item_id:Union[int,str], callback_type):
-    if enhanced_debugging: logging.info("RUN LAYOUT - Callback - Item: "+str(item_id)+" - Callback Type: "+str(callback_type))
     # 'signal_passed' events (from LOCAL SIGNALS) can trigger changes in track occupancy 
     # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
     # in Run mode) - and are enabled in RUN MODE whether automation is ENABLED or DISABLED
     if callback_type == signals.signal_callback_type.sig_passed and run_mode:
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (signal passed event):")
         update_track_occupancy(objects.signal(item_id))
     # Timed signal sequences can be triggered by 'signal_passed' events (from LOCAL SIGNALS) 
     # Timed sequences are only Enabled in RUN Mode when Automation is ENABLED
     if (callback_type == signals.signal_callback_type.sig_passed and run_mode and automation_enabled):
-        if enhanced_debugging: logging.info("RUN LAYOUT - Triggering any Timed Signal sequences (signal passed event):")
         trigger_timed_sequence(item_id) 
     # 'sensor_passed' events can trigger changes in track occupancy - LOCAL TRACK SENSORS ONLY
     # Track Occupancy changes are enabled ONLY IN RUN MODE (as Track section library objects only 'exist'
     # in Run mode) - but remain enabled in Run Mode whether automation is Enabled or Disabled
     if callback_type == track_sensors.track_sensor_callback_type.sensor_triggered and run_mode:
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Track Section occupancy (Track Sensor passed event):")
         update_track_occupancy(objects.track_sensor(item_id))
     # Signal routes are updated on 'point_switched' or 'fpl_switched' events
     # Route Setting is ENABLED in both Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched ):
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
         set_all_signal_routes()
     # Signal aspects need to be updated on 'sig_switched'(where a signal state has been manually
     # changed via the UI), 'sig_updated' (either a timed signal sequence or a remote signal update),
@@ -941,7 +1325,6 @@ def schematic_callback(item_id:Union[int,str], callback_type):
         if run_mode and automation_enabled:
             # First we update all signal overrides based on track occupancy, but ONLY IN RUN MODE
             # (as track sections only exist in RUN Mode), if Automation is ENABLED
-            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Overrides to reflect Track Occupancy:")
             update_all_signal_overrides()
             # Approach control is made complex by the need to support the case of setting approach
             # control on the state of home signals ahead (for layout automation). We therefore have
@@ -949,18 +1332,15 @@ def schematic_callback(item_id:Union[int,str], callback_type):
             # Note that the item_id is only used in conjunction with the signal_passed event
             # so the function will not 'break' if the item-id is an int or a str
             # Approach Control is only ENABLED in RUN Mode if automation is ENABLED
-            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control to reflect Signals ahead:")
             update_all_signal_approach_control(item_id, callback_type)
             # Finally process any distant signal overrides on home signals ahead (walks the home signals
             # ahead and will override the distant signal to CAUTION if any of the home signals are at DANGER
             # This is a seperate override function to the main signal override (works an an OR function)
             # Distant Overrides are only ENABLED in RUN Mode if automation is ENABLED
-            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal CAUTION Overrides to reflect Signals ahead:")
             update_all_distant_overrides()
         else:    
             # If we are in EDIT mode and/or Automation is DISABLED, we still want to update the
             # signals to reflect the displayed aspects of the signal ahead
-            if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Aspects to reflect Signals ahead:")
             process_all_aspect_updates()
     # Signal interlocking is updated on point, signal or block instrument switched events
     # We also need to process signal interlocking on any event which may have changed the
@@ -975,70 +1355,62 @@ def schematic_callback(item_id:Union[int,str], callback_type):
          callback_type == points.point_callback_type.point_switched or
          callback_type == points.point_callback_type.fpl_switched or
          callback_type == track_sections.section_callback_type.section_updated  ):
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Interlocking:")
         process_all_signal_interlocking()
     # Point interlocking is updated on signal (or subsidary signal) switched events
     # Interlocking is ENABLED in  Run and Edit Modes, whether automation is Enabled or Disabled
     if ( callback_type == signals.signal_callback_type.sig_switched or
          callback_type == signals.signal_callback_type.sub_switched):
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Point Interlocking:")
         process_all_point_interlocking()
-    if enhanced_debugging: logging.info("**************************************************************************************")
+    # Set up or clear down schematic routes on button events. For all other events we
+    # can enable/disable the route buttons now that layout processing is complete
+    if callback_type == buttons.button_callback_type.button_selected:
+        set_schematic_route(item_id)
+    elif callback_type == buttons.button_callback_type.button_deselected:
+        clear_schematic_route(item_id)
+    else:
+        enable_disable_all_route_buttons()
+    # End of processing schematic layout 
     # Refocus back on the canvas to ensure that any keypress events function
-    canvas.focus_set()
+    canvas.focus_set()        
     return()
 
-#------------------------------------------------------------------------------------
+##################################################################################################
 # Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
 # Enable/Disable, layout reset, layout load, object deletion (from the schematic) or
 # the configuration change of any schematic object
-#------------------------------------------------------------------------------------
+##################################################################################################
 
 def initialise_layout():
     global list_of_movements
-    if enhanced_debugging: logging.info("RUN LAYOUT - Initialising Schematic **************************************************")
     # Reset the list of track occupancy movements
     list_of_movements = []
     # We always process signal routes - for all modes whether automation is enabled/disabled
-    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Routes based on Point settings:")
     set_all_signal_routes()
-    if run_mode and not automation_enabled:
-        # Run Mode (Track Sections exist) with Automation Disabled. Note that we need to call
-        # the process_all_aspect_updates function (as we are not making the other update calls)
-        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
-        clear_all_signal_overrides()
-        clear_all_distant_overrides()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
-        clear_all_approach_control()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
-        process_all_aspect_updates()
-    elif run_mode and automation_enabled:
+    if run_mode and automation_enabled:
         # Run Mode (Track Sections exist) with Automation Enabled. Note that aspects are 
         # updated by update_all_signal_approach_control and update_all_distant_overrides
-        if enhanced_debugging: logging.info("RUN LAYOUT - Overriding Signals to reflect Track Occupancy:")
         update_all_signal_overrides()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Approach Control and updating signal aspects:")
         update_all_signal_approach_control()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating Distant Signal Overrides based on Home Signals ahead:")
         update_all_distant_overrides()        
     else:
-        # Edit mode (automation disabled by default - we don't care about the user selection)
+        # Automation is disabled (either de-selected in RUN mode or we are in EDIT mode)
         # Note that we need to call the process_all_aspect_updates function (see above)
-        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Signal Overrides (automation disabled):")
+        # as we are not calling the other functions that would do this for us
         clear_all_signal_overrides()
         clear_all_distant_overrides()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Clearing down all Approach Control (automation disabled):")
         clear_all_approach_control()
-        if enhanced_debugging: logging.info("RUN LAYOUT - Updating signal aspects to reflect the signals ahead:")
         process_all_aspect_updates()
     # We always process interlocking - for all modes whether automation is enabled/disabled
-    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Signal Interlocking:")
     process_all_signal_interlocking()
-    if enhanced_debugging: logging.info("RUN LAYOUT - Updating Point Interlocking:")
     process_all_point_interlocking()
-    if enhanced_debugging: logging.info("**************************************************************************************")
+    # We always process the route setting buttons - for all modes whether automation is enabled/disabled
+    enable_disable_all_route_buttons()
+    initialise_all_schematic_routes()
     # Refocus back on the canvas to ensure that any keypress events function
     canvas.focus_set()
     return()
+        
+##################################################################################################
 
-########################################################################################
+
+    

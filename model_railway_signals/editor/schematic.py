@@ -25,8 +25,8 @@
 #    configure_line.edit_line(root,object_id) - Open line edit window (on double click)
 #    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
 #    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
+#    configure_route.edit_route(root,object_id) - Open the edit window (on double click)
 #    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the canvas reference
-#
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -62,6 +62,7 @@ from . import configure_instrument
 from . import configure_line
 from . import configure_textbox
 from . import configure_track_sensor
+from . import configure_route
 
 import importlib.resources
 import math
@@ -240,6 +241,8 @@ def edit_selected_object():
         edit_popup = configure_instrument.edit_instrument(root,object_id)
     elif objects.schematic_objects[object_id]["item"] == objects.object_type.track_sensor:
         edit_popup = configure_track_sensor.edit_track_sensor(root,object_id)
+    elif objects.schematic_objects[object_id]["item"] == objects.object_type.route:
+        edit_popup = configure_route.edit_route(root,object_id)
     return()
 
 # The following function is for test purposes only - to close the windows opened above by the system tests

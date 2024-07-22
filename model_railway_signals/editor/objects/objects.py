@@ -22,7 +22,6 @@
 #    paste_objects() - Paste Clipboard objects onto the canvas (returnslist of new IDs)
 #    update_object(object ID, new_object) - update the config of an existing object
 #    reset_objects() - resets all points, signals, instruments and sections to default state
-#    configure_edit_mode(edit_mode) - True to select Edit Mode, False to set Run Mode
 #
 # Makes the following external API calls to other editor modules:
 #    run_layout.initialise_layout() - Re-initiallise the state of schematic objects following a change
@@ -69,7 +68,14 @@
 #    objects_signals.delete_signal_object(object_id) - soft delete the drawing object (prior to recreating)
 #    objects_signals.redraw_signal_object(object_id) - Redraw the object on the canvas following an update
 #    objects_signals.default_signal_object - The dictionary of default values for the object
-#
+#    objects_routes.create_route() - Create a default object on the schematic
+#    objects_routes.delete_route(object_id) - Hard Delete an object when deleted from the schematic
+#    objects_routes.update_route(obj_id,new_obj) - Update the configuration of an existing object
+#    objects_routes.paste_route(object) - Paste a copy of an object to create a new one (returns new object_id)
+#    objects_routes.delete_route_object(object_id) - soft delete the drawing object (prior to recreating)
+#    objects_routes.redraw_route_object(object_id) - Redraw the object on the canvas following an update
+#    objects_routes.default_route_object - The dictionary of default values for the object
+
 #------------------------------------------------------------------------------------
 
 import copy 
@@ -83,6 +89,7 @@ from . import objects_instruments
 from . import objects_textboxes
 from . import objects_sensors
 from . import objects_points
+from . import objects_routes
 
 from .. import run_layout
 
@@ -129,6 +136,8 @@ def redraw_all_objects(create_new_bbox:bool, reset_state:bool):
             objects_instruments.redraw_instrument_object(object_id)
         elif this_object_type == objects_common.object_type.track_sensor:
             objects_sensors.redraw_track_sensor_object(object_id)
+        elif this_object_type == objects_common.object_type.route:
+            objects_routes.redraw_route_object(object_id)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     return()
@@ -156,6 +165,8 @@ def reset_all_schematic_indexes():
             objects_common.instrument_index[str(this_object_item_id)] = object_id
         elif this_object_type == objects_common.object_type.track_sensor:
             objects_common.track_sensor_index[str(this_object_item_id)] = object_id
+        elif this_object_type == objects_common.object_type.route:
+            objects_common.route_index[str(this_object_item_id)] = object_id
         # Note that textboxes don't have an index as we don't track their IDs
     return()
 
@@ -248,6 +259,8 @@ def reset_objects():
             objects_instruments.delete_instrument_object(object_id)
         elif type_of_object == objects_common.object_type.track_sensor:
             objects_sensors.delete_track_sensor_object(object_id)
+        elif type_of_object == objects_common.object_type.route:
+            objects_routes.delete_route_object(object_id)
     # Redraw all point, section, instrument and signal objects in their default state
     # We don't need to create a new bbox as soft_delete keeps the tkinter object
     redraw_all_objects(create_new_bbox=False, reset_state=True)
@@ -278,6 +291,8 @@ def create_object(new_object_type, item_type=None, item_subtype=None):
         object_id = objects_instruments.create_instrument(item_type)
     elif new_object_type == objects_common.object_type.track_sensor:
         object_id = objects_sensors.create_track_sensor()
+    elif new_object_type == objects_common.object_type.route:
+        object_id = objects_routes.create_route()
     else:
         object_id = None
     # save the current state (for undo/redo)
@@ -306,6 +321,8 @@ def update_object(object_id, new_object):
         objects_instruments.update_instrument(object_id, new_object)
     elif type_of_object == objects_common.object_type.track_sensor:
         objects_sensors.update_track_sensor(object_id, new_object)
+    elif type_of_object == objects_common.object_type.route:
+        objects_routes.update_route(object_id, new_object)
     # Ensure all track sections are brought forward on the schematic (in front of any lines)
     bring_track_sections_to_the_front()
     # save the current state (for undo/redo)
@@ -336,6 +353,8 @@ def delete_object(object_id):
         objects_instruments.delete_instrument(object_id)
     elif type_of_object == objects_common.object_type.track_sensor:
         objects_sensors.delete_track_sensor(object_id)
+    elif type_of_object == objects_common.object_type.route:
+        objects_routes.delete_route(object_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -462,6 +481,8 @@ def paste_objects():
             new_object_id = objects_instruments.paste_instrument(object_to_paste, deltax, deltay)
         elif type_of_object == objects_common.object_type.track_sensor:
             new_object_id = objects_sensors.paste_track_sensor(object_to_paste, deltax, deltay)
+        elif type_of_object == objects_common.object_type.route:
+            new_object_id = objects_routes.paste_route(object_to_paste, deltax, deltay)
         # Add the new object to the list of clipboard objects
         # in case the user wants to paste the same objects again
         list_of_new_object_ids.append(new_object_id)
@@ -510,6 +531,8 @@ def set_all(new_objects):
             default_object = objects_instruments.default_instrument_object
         elif new_object_type == objects_common.object_type.track_sensor:
             default_object = objects_sensors.default_track_sensor_object
+        elif new_object_type == objects_common.object_type.route:
+            default_object = objects_routes.default_route_object
         else:
             default_object = {}
             logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
