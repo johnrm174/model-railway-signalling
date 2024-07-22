@@ -26,6 +26,8 @@
 #
 #   button_state(button_id:int) - get the current state of a button (returns True for Active)
 #
+#   toggle_button(button_id:int) - toggle the state of the button
+#
 #   enable_button(button_id:int) - enable the button (and revert to the standard tooltip)
 #
 #   disable_button(button_id:int, tooltip:str) - disable the button (with a new toottip)
@@ -113,12 +115,17 @@ def button_event (button_id:int):
     return ()
 
 #---------------------------------------------------------------------------------------------
-# Internal function to toggle the state of a Button
+# API function to toggle the state of a Button
 #---------------------------------------------------------------------------------------------
 
 def toggle_button(button_id:int):
     global buttons
-    if buttons[str(button_id)]["selected"]:
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": toggle_button - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
+    elif buttons[str(button_id)]["selected"]:
         logging.info("Button "+str(button_id)+": has been de-selected")
         buttons[str(button_id)]["selected"] = False
         buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3",fg="black",

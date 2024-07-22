@@ -121,6 +121,7 @@ from .buttons import button_callback_type
 from .buttons import create_button
 from .buttons import button_exists
 from .buttons import delete_button
+from .buttons import toggle_button
 from .buttons import enable_button
 from .buttons import disable_button
 from .buttons import button_state
@@ -258,6 +259,7 @@ __all__ = [
         'create_button',
         'button_exists',
         'delete_button',
+        'toggle_button',
         'enable_button',
         'disable_button',
         'button_state',
