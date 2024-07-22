@@ -58,7 +58,8 @@ default_route_object["buttonwidth"] = 15
 default_route_object["signalsonroute"] = []
 default_route_object["subsidariesonroute"] = []
 default_route_object["pointsonroute"] = {}
-default_route_object["linesonroute"] = []
+default_route_object["linestohighlight"] = []
+default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
 

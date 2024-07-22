@@ -1002,19 +1002,18 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
 
 def enable_disable_all_route_buttons():
     # Iterate through all the schematic routes
-    for str_route_id in objects.route_index:
+    for str_route_id in objects.route_index.keys():
         route_viable = True
         route_tooltip = "Route cannot be set because:"
         route_object = objects.schematic_objects[objects.route(str_route_id)]
-        # See if any points along the route are locked by another signal at OFF (i.e. a signal that
-        # is not in the route definition - as those will be locked/unlocked when the route is applied)
-        # Note we ignore any automatic points (switched by another point) in the list
+        # See if any points that need to be set for the route are locked by a signal at OFF
+        # Note that automatic signals are ignored (manual points should have been specified))
         for str_point_id in route_object["pointsonroute"].keys():
             automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
             required_point_state = route_object["pointsonroute"][str_point_id]
             int_point_id = int(str_point_id)
             if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
-                # We've found a point that needs switching for the route but is currently locked
+                # We've found a manual point that needs switching for the route but is currently locked
                 # We then iterate through the signal interlocking table for the point to test each
                 # interlocked signal (and signal route) to find the signal(s) that are locking the point
                 # The Point interlocking Table comprises a variable length list of interlocked signals
@@ -1024,22 +1023,17 @@ def enable_disable_all_route_buttons():
                 for interlocked_signal in point_object["siginterlock"]:
                     interlocked_sig_id = interlocked_signal[0]
                     interlocked_routes = interlocked_signal[1]
-                    # We only care about signals not on the route (as signals on the route will be
-                    # set to OFF before changing the points when the route is applied)
-                    if (interlocked_sig_id not in route_object["signalsonroute"] and
-                             interlocked_sig_id not in route_object["subsidariesonroute"]):
-                        for index, interlocked_route in enumerate(interlocked_routes):
-                            # Similarly we only care if the signal is cleared for a ROUTE that locks the point
-                            route_to_test = signals.route_type(index+1)
-                            if interlocked_route:
-                                if signals.signal_clear(interlocked_sig_id, route_to_test):
-                                    message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
-                                    route_tooltip = route_tooltip + message
-                                    route_viable = False
-                                if has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
-                                    message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
-                                    route_tooltip = route_tooltip + message
-                                    route_viable = False
+                    for index, interlocked_route in enumerate(interlocked_routes):
+                        route_to_test = signals.route_type(index+1)
+                        if interlocked_route:
+                            if signals.signal_clear(interlocked_sig_id, route_to_test):
+                                message = "\nPoint "+str_point_id+" is locked by Signal "+str(interlocked_sig_id)
+                                route_tooltip = route_tooltip + message
+                                route_viable = False
+                            if has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
+                                message = "\nPoint "+str_point_id+" is locked by subsidary "+str(interlocked_sig_id)
+                                route_tooltip = route_tooltip + message
+                                route_viable = False
         # See if any signals along the route WOULD be locked by an opposing signal once the route is set
         route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable)
         route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable, subsidaries=True)
@@ -1048,14 +1042,14 @@ def enable_disable_all_route_buttons():
         ############################################################################################################
         ## TODO 1 - Check if any signals are interlocked with Track sections ahead #################################
         ## TODO 2 - Check if any signals are interlocked with Block Instruments ahead ##############################
-        ## TODO 3 - Check if sigs/subs on route are set/cleared for a different sig/sub route ######################
+        ## TODO 3 (done??)- Check if sigs/subs on route are set/cleared for a different sig/sub route ##############
         ############################################################################################################
         ############################################################################################################
         
         # Enable/disable the route button as required
         if route_viable: buttons.enable_button(int(str_route_id))
         else: buttons.disable_button(int(str_route_id), route_tooltip)
-        return()
+    return()
     
 #------------------------------------------------------------------------------------
 # The following class and functions are used to process the setting up and clearing
@@ -1111,10 +1105,10 @@ def set_point_state(point_id:int, state:bool):
 
 def set_route_colour(route_id:int, colour:str="DEFAULT"):
     # update the point colours
-    for str_point_id in objects.schematic_objects[objects.route(route_id)]["pointsonroute"].keys():
-        if colour=="DEFAULT": points.reset_point_colour(int(str_point_id))
-        else: points.set_point_colour(int(str_point_id), colour)
-    for line_id in objects.schematic_objects[objects.route(route_id)]["linesonroute"]:
+    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
+        if colour=="DEFAULT": points.reset_point_colour(point_id)
+        else: points.set_point_colour(point_id, colour)
+    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
         if colour=="DEFAULT": lines.reset_line_colour(line_id)
         else: lines.set_line_colour(line_id, colour)
     return()
@@ -1135,43 +1129,9 @@ def set_schematic_route(route_id:int):
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]
-    # See if any of the points that need changing are locked, and if so, what signals they are
-    # interlocked with. If these signals are currently OFF we change them to ON, which should
-    # unlock the points so we can change them without any warnings being raised. Note that
-    # we ignore any automatic points (i.e. points switched by another point)
-    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
-    # The "signalsonroute" and "subsidariesonroute" elements comprise a list of signal_ids
-    route_object = objects.schematic_objects[objects.route(route_id)]
-    for str_point_id in route_object["pointsonroute"].keys():
-        automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
-        required_point_state = route_object["pointsonroute"][str_point_id]
-        int_point_id = int(str_point_id)
-        if not automatic_point and points.point_switched(int_point_id) != required_point_state and points.point_locked(int_point_id):
-            # We've found a point that needs switching for the route but the point is currently locked. 
-            # Iterate through the point's interlocking table to find the signals that are locking the point.
-            # The Point's interlocking Table comprises a variable length list of interlocked signals
-            # Each signal entry in the list comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-            # Each route element in the list of routes is a boolean value (True or False)
-            point_object = objects.schematic_objects[objects.point(int_point_id)]
-            for interlocked_signal in point_object["siginterlock"]:
-                interlocked_sig_id = interlocked_signal[0]
-                interlocked_routes = interlocked_signal[1]
-                # We only care about signals on the route we are setting - we should not find any
-                # other signals (not on the route) locking the point as this would have made the
-                # route unselectable (see enable_disable_all_route_buttons function above)
-                # We also only care if the signal is cleared for a ROUTE that locks the point
-                if interlocked_sig_id in route_object["signalsonroute"] or interlocked_sig_id in route_object["subsidariesonroute"]:
-                    for index, interlocked_route in enumerate(interlocked_routes):
-                        if interlocked_route:
-                            route_to_test = signals.route_type(index+1)
-                            if signals.signal_clear(interlocked_sig_id, route_to_test):
-                                schedule_task(delay, set_signal_state, interlocked_sig_id, False)
-                                delay = delay + route_object["switchdelay"]
-                            elif has_subsidary(interlocked_sig_id) and signals.subsidary_clear(interlocked_sig_id, route_to_test):
-                                schedule_task(delay, set_subsidary_state, interlocked_sig_id, False)
-                                delay = delay + route_object["switchdelay"]
-    # All the points we need to change should now be unlocked (as we have set the signals to ON)
-    # Set all the points to the correct state for the route (disabling/enabling the FPLs as required)
+    # Iterate through all the required point settings and schedule the tasks to change the points
+    # (disabling/enabling the FPLs as required). All the points we need to change should be unlocked
+    # (as the route setting button would have been inhibited otherwise)
     # Note that we ignore any automatic points (i.e. points switched by another point)
     for str_point_id in route_object["pointsonroute"].keys():
         required_point_state = route_object["pointsonroute"][str_point_id]
@@ -1179,6 +1139,7 @@ def set_schematic_route(route_id:int):
         automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
         int_point_id = int(str_point_id)
         if not automatic_point and points.point_switched(int_point_id) != required_point_state:
+            # We've found a point that needs changing
             if point_has_fpl and points.fpl_active(int_point_id):
                 schedule_task(delay, set_fpl_state, int_point_id, False)
                 delay = delay + route_object["switchdelay"]
@@ -1187,23 +1148,26 @@ def set_schematic_route(route_id:int):
             if point_has_fpl:
                 schedule_task(delay, set_fpl_state, int_point_id, True)
                 delay = delay + route_object["switchdelay"]
+        # Finally - even if the point does not require switching, we toggle the FPL on
         elif not automatic_point and point_has_fpl and not points.fpl_active(int_point_id):
             schedule_task(delay, set_fpl_state, int_point_id, True)
             delay = delay + route_object["switchdelay"]
-    # Set all the signals along the route to OFF (Each entry list is a signal_id). Note we don't test
-    # if a signal is already clear at this point as when the scheduled task to change the signal is run
-    # a signal that is ON now may have been subsequently set to OFF to unlock points along the route
-    for signal_id in route_object["signalsonroute"]:
-        schedule_task(delay, set_signal_state, signal_id, True)
-        delay = delay + route_object["switchdelay"]
+    # Iterate through all the required signals/subsidaries and schedule the tasks to set them OFF
     # Note the user may have specified the same signal ID in both the signals and subsidaries
     # list. in this case the signal takes precidence (the subsidary is ignored)
+    for signal_id in route_object["signalsonroute"]:
+        if not signals.signal_clear(signal_id):
+            schedule_task(delay, set_signal_state, signal_id, True)
+            delay = delay + route_object["switchdelay"]
     for signal_id in route_object["subsidariesonroute"]:
         if signal_id not in route_object["signalsonroute"]:
-            schedule_task(delay, set_subsidary_state, signal_id, True)
-            delay = delay + route_object["switchdelay"]
-    # Finally, update the colour of all points/lines to highlight the route
+            if has_subsidary(signal_id) and not signals.subsidary_clear(signal_id):
+                schedule_task(delay, set_subsidary_state, signal_id, True)
+                delay = delay + route_object["switchdelay"]
+    # Update the colour of all points/lines to highlight the route
     schedule_task(delay, set_route_colour, route_id, route_object["routecolour"])
+    # Finally lock/unlock any other route buttons as required
+    schedule_task(delay, enable_disable_all_route_buttons)
     return()
             
 #------------------------------------------------------------------------------------
@@ -1218,8 +1182,8 @@ def clear_schematic_route(route_id:int):
     # Retrieve the object configuration for the Route
     route_object = objects.schematic_objects[objects.route(route_id)]
     delay = route_object["switchdelay"]
-    # Set all the signals along the route to ON. The "signalsonroute" and "subsidariesonroute"
-    # elements of the route object comprise a list of signal_ids
+    # Schedule tasks to set all the signals along the route to ON. The "signalsonroute" and
+    # "subsidariesonroute" elements of the route object comprise a list of signal_ids
     for signal_id in route_object["signalsonroute"]:
         if signals.signal_clear(signal_id):
             schedule_task(delay, set_signal_state, signal_id, False)
@@ -1228,7 +1192,7 @@ def clear_schematic_route(route_id:int):
         if has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
             schedule_task(delay, set_subsidary_state, signal_id, False)
             delay = delay + route_object["switchdelay"]
-    # Reset all the points along the route back to their default state
+    # Schedule tasks to reset all the points along the route back to their default state
     # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
     # Note that we ignore any automatic points (i.e. points switched by another point)
     for str_point_id in route_object["pointsonroute"].keys():
@@ -1244,8 +1208,10 @@ def clear_schematic_route(route_id:int):
             if point_has_fpl:
                 schedule_task(delay, set_fpl_state, int_point_id, True)
                 delay = delay + route_object["switchdelay"]
-    # Finally, reset the colour of all points/lines back to their default colours
+    # Reset the colour of all points/lines back to their default colours
     schedule_task(delay, set_route_colour, route_id)
+    # Finally lock/unlock any other route buttons as required
+    schedule_task(delay, enable_disable_all_route_buttons)
     return()
 
 #------------------------------------------------------------------------------------
@@ -1268,15 +1234,19 @@ def clear_schematic_route(route_id:int):
 #------------------------------------------------------------------------------------
 
 def initialise_all_schematic_routes():
+    # First reset all buttons if we are not in Run mode
+    if not run_mode:
+        for str_route_id in objects.route_index:
+            if buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
+                buttons.toggle_button(int(str_route_id))
+    # Now we reset all unselected routes back to their default colours
+    for str_route_id in objects.route_index:
+        if not buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
+            set_route_colour(int(str_route_id))
+    # Now we can highlight any selected routes
     for str_route_id in objects.route_index:
         if buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
-            if run_mode:
                 set_route_colour(int(str_route_id), colour=objects.schematic_objects[objects.route(str_route_id)]["routecolour"])
-            else:
-                buttons.toggle_button(int(str_route_id))
-                set_route_colour(int(str_route_id))
-        else:
-            set_route_colour(int(str_route_id))
     return()
 
 ##################################################################################################

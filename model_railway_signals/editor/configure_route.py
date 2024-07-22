@@ -116,26 +116,31 @@ class edit_route():
             self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
             #-----------------------------------------------------------------            
             # Create the point, signal and line entry lists
-            self.frame2 = Tk.LabelFrame(self.main_frame, text="Points")
+            self.frame2 = Tk.LabelFrame(self.main_frame, text="Points to set")
             self.frame2.pack(padx=2, pady=2, fill='x')
             self.points = common.entry_box_grid(self.frame2, base_class=common.point_interlocking_entry, columns=5,
-                exists_function = points.point_exists, tool_tip="Specify ALL points along the route and their "+
-                                                                      "required configuration (normal/switched)")
-            self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals")
+                exists_function = points.point_exists, tool_tip="Specify the (manual) points to set for the route "+
+                                                                     "and their required configuration (normal/switched)")
+            self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
             self.frame3.pack(padx=2, pady=2, fill='x')
             self.signals = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = signals.signal_exists, tool_tip="Specify the main signals that need "+
                                                                           "to be cleared to set up the route")
-            self.frame4 = Tk.LabelFrame(self.main_frame, text="Subsidary signals")
+            self.frame4 = Tk.LabelFrame(self.main_frame, text="Subsidary signals to clear")
             self.frame4.pack(padx=2, pady=2, fill='x')
             self.subsidaries = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = signals.signal_exists, tool_tip="Specify the subsidary signals "+
                                     "(associated with a main signal) that need to be cleared to set up the route")
-            self.frame5 = Tk.LabelFrame(self.main_frame, text="Route lines")
+            self.frame5 = Tk.LabelFrame(self.main_frame, text="Route lines to highlight")
             self.frame5.pack(padx=2, pady=2, fill='x')
-            self.lines = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9,
+            self.highlightlines = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = lines.line_exists, tool_tip="Specify the track lines comprising the route "+
                                                                "(these will be highlighted when the route is selected)")
+            self.frame6 = Tk.LabelFrame(self.main_frame, text="Points to highlight")
+            self.frame6.pack(padx=2, pady=2, fill='x')
+            self.highlightpoints = common.entry_box_grid(self.frame6, base_class=common.int_item_id_entry_box, columns=9,
+                width=3, exists_function = points.point_exists, tool_tip="Specify the points (manual or automatic) that "+
+                                                "comprise the route (these will be highlighted when the route is selected)")
 
             #############################################################################################################
             ############################ To DO - Switch delay UI Element ################################################
@@ -170,7 +175,8 @@ class edit_route():
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
             self.signals.set_values(objects.schematic_objects[self.object_id]["signalsonroute"])
             self.subsidaries.set_values(objects.schematic_objects[self.object_id]["subsidariesonroute"])
-            self.lines.set_values(objects.schematic_objects[self.object_id]["linesonroute"])
+            self.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
+            self.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element needs a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before loading the UI element
@@ -196,7 +202,7 @@ class edit_route():
         # been validated on entry, but changes to other objects may have been made since then
         elif (self.routeid.validate() and self.name.validate() and self.buttonwidth.validate() and
               self.points.validate() and self.signals.validate() and self.subsidaries.validate() and
-              self.lines.validate() ): ###############To Do - switch delay ###########################################
+              self.highlightlines.validate() and self.highlightpoints.validate()): ######## TODO - switch delay ###########
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
@@ -207,7 +213,8 @@ class edit_route():
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
             new_object_configuration["signalsonroute"] = self.signals.get_values()
             new_object_configuration["subsidariesonroute"] = self.subsidaries.get_values()
-            new_object_configuration["linesonroute"] = self.lines.get_values()
+            new_object_configuration["linestohighlight"] = self.highlightlines.get_values()
+            new_object_configuration["pointstohighlight"] = self.highlightpoints.get_values()
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element returns a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before saving in the configuration.
