@@ -179,7 +179,7 @@ def create_button (canvas, button_id:int, x:int, y:int,
     else:
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
         # Create the button object, callbacks and window to hold it.
-        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey20",
+        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey40",
                            font=('Courier',common.fontsize,"normal"), bg="SeaGreen3", activebackground="SeaGreen2",
                            padx=common.xpadding, pady=common.ypadding, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag)
