@@ -1120,12 +1120,12 @@ def check_routes_valid_after_point_change(point_id:int):
 class schedule_task():
     def __init__(self, delay:int, function, *args):
         root.after(delay, lambda:function(*args))
-    
+
 def set_signal_state(signal_id:int, state:bool):
     if signals.signal_clear(signal_id) != state:
         signals.toggle_signal(signal_id)
         if run_mode and automation_enabled:
-            update_approach_control_status_for_all_signals(signal_id)    
+            update_approach_control_status_for_all_signals(signal_id)
             override_distant_signals_based_on_signals_ahead()
         else:
             process_signal_aspect_update(signal_id)
