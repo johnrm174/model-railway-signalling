@@ -35,7 +35,6 @@
 import copy
 
 import tkinter as Tk
-from tkinter import ttk
 
 from . import common
 from . import objects
