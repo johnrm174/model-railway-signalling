@@ -17,10 +17,6 @@
 #      point_subtype.dslip1
 #      point_subtype.dslip2
 #      point_subtype.xcross
-# 
-#   point_callback_type (tells the calling program what has triggered the callback):
-#      point_callback_type.point_switched (point has been switched)
-#      point_callback_type.fpl_switched (facing point lock has been switched)
 #
 #   point_exists(point_id:int) - returns true if the point object 'exists' 
 # 
@@ -32,8 +28,8 @@
 #       pointtype:point_type - either point_type.RH or point_type.LH or point_type.Y
 #       pointsubtype:point_type - The Point subtype (only valid for LH and RH points)
 #       x:int, y:int - Position of the point on the canvas (in pixels)
-#       callback - the function to call on track point or FPL switched events
-#               Note that the callback function returns (item_id, callback type)
+#       point_callback - the function to call on point switched events (returns item_id)
+#       fpl_callback - the function to call on FPL switched events (returns item_id)
 #     Optional Parameters:
 #       colour:str - Any tkinter colour can be specified as a string - default = "Black"
 #       button_xoffset:int - Position offset for the point buttons (from default) - default = 0
@@ -95,11 +91,6 @@ class point_subtype(enum.Enum):
     dslip2 = 6      # Double Slip - side 2 (LH or RH)
     xcross = 7      # Scissors Crossover - (LH or RH)
 
-# Define the different callbacks types for the point
-class point_callback_type(enum.Enum):
-    point_switched = 11   # The point has been switched by the user
-    fpl_switched = 12     # The facing point lock has been switched by the user
-
 # -------------------------------------------------------------------------
 # Points are to be added to a global dictionary when created
 # -------------------------------------------------------------------------
@@ -125,13 +116,13 @@ def point_exists(point_id:int):
 def fpl_button_event(point_id:int):
     logging.info("Point "+str(point_id)+": FPL Button Event ************************************************************")
     toggle_fpl(point_id)
-    points[str(point_id)]["extcallback"] (point_id,point_callback_type.fpl_switched)
+    points[str(point_id)]["fplcallback"] (point_id)
     return ()
 
 def change_button_event(point_id:int):
     logging.info("Point "+str(point_id)+": Change Button Event *********************************************************")
     toggle_point(point_id)
-    points[str(point_id)]["extcallback"] (point_id,point_callback_type.point_switched)
+    points[str(point_id)]["pointcallback"] (point_id)
     return ()
 
 # -------------------------------------------------------------------------
@@ -260,7 +251,7 @@ def create_button_windows(canvas, point_coords, fpl, auto, canvas_tag, point_but
 # -------------------------------------------------------------------------
 
 def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: point_subtype,
-                  x:int, y:int, callback, colour:str="black",
+                  x:int, y:int, point_callback, fpl_callback, colour:str="black",
                   button_xoffset:int=0, button_yoffset:int=0,
                   orientation:int = 0, also_switch:int = 0,
                   reverse:bool=False, auto:bool=False, fpl:bool=False):
@@ -495,21 +486,22 @@ def create_point (canvas, point_id:int, pointtype:point_type, pointsubtype: poin
         canvas.itemconfig(blade2, state="hidden")
         # Compile a dictionary of everything we need to track
         points[str(point_id)] = {}
-        points[str(point_id)]["canvas"] = canvas               # Tkinter canvas object
-        points[str(point_id)]["blade1"] = blade1               # Tkinter tag for blade1
-        points[str(point_id)]["blade2"] = blade2               # Tkinter tag for blade2
-        points[str(point_id)]["routes"] = routes               # Tkinter tag for other route lines
-        points[str(point_id)]["changebutton"] = point_button   # Tkinter button object
-        points[str(point_id)]["lockbutton"] = fpl_button       # Tkinter button object
-        points[str(point_id)]["extcallback"] = callback        # The callback to make on an event
-        points[str(point_id)]["alsoswitch"] = also_switch      # Point to automatically switch (0=none)
-        points[str(point_id)]["automatic"] = auto              # Whether the point is automatic or not
-        points[str(point_id)]["hasfpl"] = fpl                  # Whether the point has a FPL or not
-        points[str(point_id)]["fpllock"] = fpl                 # Initial state of the FPL (locked if it has FPL)
-        points[str(point_id)]["locked"] = False                # Initial "interlocking" state of the point
-        points[str(point_id)]["switched"] = False              # Initial "switched" state of the point
-        points[str(point_id)]["colour"] = colour               # the default colour for the point
-        points[str(point_id)]["tags"] = canvas_tag             # Canvas Tags for all drawing objects
+        points[str(point_id)]["canvas"] = canvas                 # Tkinter canvas object
+        points[str(point_id)]["blade1"] = blade1                 # Tkinter tag for blade1
+        points[str(point_id)]["blade2"] = blade2                 # Tkinter tag for blade2
+        points[str(point_id)]["routes"] = routes                 # Tkinter tag for other route lines
+        points[str(point_id)]["changebutton"] = point_button     # Tkinter button object
+        points[str(point_id)]["lockbutton"] = fpl_button         # Tkinter button object
+        points[str(point_id)]["fplcallback"] = fpl_callback      # The callback to make on an event
+        points[str(point_id)]["pointcallback"] = point_callback  # The callback to make on an event
+        points[str(point_id)]["alsoswitch"] = also_switch        # Point to automatically switch (0=none)
+        points[str(point_id)]["automatic"] = auto                # Whether the point is automatic or not
+        points[str(point_id)]["hasfpl"] = fpl                    # Whether the point has a FPL or not
+        points[str(point_id)]["fpllock"] = fpl                   # Initial state of the FPL (locked if it has FPL)
+        points[str(point_id)]["locked"] = False                  # Initial "interlocking" state of the point
+        points[str(point_id)]["switched"] = False                # Initial "switched" state of the point
+        points[str(point_id)]["colour"] = colour                 # the default colour for the point
+        points[str(point_id)]["tags"] = canvas_tag               # Canvas Tags for all drawing objects
         # Get the initial state for the point (if layout state has been successfully loaded)
         # if nothing has been loaded then the default state (as created) will be applied
         loaded_state = file_interface.get_initial_item_state("points",point_id)

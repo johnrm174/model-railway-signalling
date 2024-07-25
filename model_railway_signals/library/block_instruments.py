@@ -9,10 +9,6 @@
 #      instrument_type.single_line
 #      instrument_type.double_line
 #
-#   block_callback_type (tells the calling program what has triggered the callback)
-#      block_callback_type. block_section_ahead_updated - The block section AHEAD has been updated
-#                               (i.e. the block section state of the linked block instrument)
-# 
 #   create_instrument - Creates an instrument and returns the "tag" for all tkinter canvas drawing objects 
 #                       This allows the editor to move the point object on the schematic as required
 #      Mandatory Parameters:
@@ -107,9 +103,6 @@ audio_enabled = is_simpleaudio_installed()
 class instrument_type(enum.Enum):
     single_line = 1
     double_line = 2
-
-class block_callback_type(enum.Enum):
-    block_section_ahead_updated = 51   # The instrument has been updated
 
 # --------------------------------------------------------------------------------
 # Block Instruments are to be added to a global dictionary when created
@@ -365,7 +358,7 @@ def set_repeater_blocked(inst_id:int,make_callback:bool=True):
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -391,7 +384,7 @@ def set_repeater_clear(inst_id:int,make_callback:bool=True):
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id)
     return ()
 
 # --------------------------------------------------------------------------------
@@ -417,7 +410,7 @@ def set_repeater_occupied(inst_id:int,make_callback:bool=True):
         # Make an external callback (if one was specified) to notify that the block section AHEAD has been updated
         # This enables full block section interlocking to be implemented for the starter signal in OUR block section
         if make_callback:
-            instruments[str(inst_id)]["extcallback"] (inst_id,block_callback_type.block_section_ahead_updated)
+            instruments[str(inst_id)]["extcallback"] (inst_id)
     return ()
 
 # --------------------------------------------------------------------------------

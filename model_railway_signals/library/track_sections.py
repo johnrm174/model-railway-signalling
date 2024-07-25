@@ -4,16 +4,12 @@
 #
 # Public types and functions:
 # 
-#   section_callback_type (tells the calling program what has triggered the callback):
-#      section_callback_type.section_updated - The section has been updated by the user
-# 
 #   create_section - Creates a Track Occupancy section object
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the section is to be displayed
 #       section_id:int - The ID to be used for the section 
 #       x:int, y:int - Position of the section on the canvas (in pixels)
-#       callback - The function to call when the track section is updated
-#                Note that the callback function returns (item_id, callback type)
+#       callback - The function to call when the track section is updated (returns item_id )
 #     Optional parameters:
 #       default_label:str - The default label to display when occupied - default = 'OCCUPIED'
 #       editable:bool - If the section can be manually toggled and/or edited - default = True
@@ -59,7 +55,6 @@
 # 
 #---------------------------------------------------------------------------------------------
 
-import enum
 import logging
 import tkinter as Tk
 from typing import Union
@@ -67,13 +62,6 @@ from typing import Union
 from . import common
 from . import mqtt_interface
 from . import file_interface
-
-#---------------------------------------------------------------------------------------------
-# Public API Classes (to be used by external functions)
-#---------------------------------------------------------------------------------------------
-    
-class section_callback_type(enum.Enum):
-    section_updated = 21   # The section has been updated by the user
     
 #---------------------------------------------------------------------------------------------
 # Track sections are to be added to a global dictionary when created
@@ -149,7 +137,7 @@ def update_identifier(section_id:int, new_label:str):
     # Update any Local mirrored sections (no callbacks will be raised for updating these)
     update_mirrored_sections(section_id)
     # Make an external callback to indicate the section has been updated
-    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
+    sections[str(section_id)]["extcallback"] (section_id)
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -206,7 +194,7 @@ def section_button_event (section_id:int):
     # Update any LOCAL mirrored sections (no callbacks or MQTT Messages will be generated for these updates)
     update_mirrored_sections(section_id)
     # Make the external callback (if one has been defined)
-    sections[str(section_id)]["extcallback"] (section_id,section_callback_type.section_updated)
+    sections[str(section_id)]["extcallback"] (section_id)
     return ()
 
 #---------------------------------------------------------------------------------------------
@@ -299,21 +287,23 @@ def update_mirrored_sections(section_id:int, publish_to_broker:bool=True):
     # Iterate through all other local track sections (where the section ID will be a digit rather than a remote
     # identifier) to see if any of them are configured to mirror this track section. If so then we need to update
     # the label and/or state of the other track section to match the label/state of the current track section
-    for other_section in sections:
-        if other_section.isdigit() and sections[other_section]["mirror"] == str(section_id):
+    for other_section_id in sections:
+        if other_section_id.isdigit() and sections[other_section_id]["mirror"] == str(section_id):
             other_section_updated = False
-            if sections[other_section]["labeltext"] != sections[str(section_id)]["labeltext"]:
-                update_label(other_section, sections[str(section_id)]["labeltext"])
+            if sections[other_section_id]["labeltext"] != sections[str(section_id)]["labeltext"]:
+                update_label(other_section_id, sections[str(section_id)]["labeltext"])
                 other_section_updated = True
-            if sections[other_section]["occupied"] != sections[str(section_id)]["occupied"]:
-                toggle_section_button(other_section)
+            if sections[other_section_id]["occupied"] != sections[str(section_id)]["occupied"]:
+                toggle_section_button(int(other_section_id))
                 other_section_updated = True
             # If the section has been updated then Publish the changes to the MQTT broker (only if the Section
             # has been configured for publishing updates) and then recursively call back into the function to see
-            # if any other track sections are mirroring the section we have just updated
+            # if any other track sections are mirroring the section we have just updated. We also make a
+            # section_updated callback to propogate the change through to the editor
             if other_section_updated:
-                if publish_to_broker: send_mqtt_section_updated_event(int(other_section))
-                update_mirrored_sections(int(other_section), publish_to_broker)
+                if publish_to_broker: send_mqtt_section_updated_event(int(other_section_id))
+                sections[other_section_id]["extcallback"] (int(other_section_id))
+                update_mirrored_sections(int(other_section_id), publish_to_broker)
     return()
 
 #---------------------------------------------------------------------------------------------

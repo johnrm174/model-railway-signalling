@@ -4,17 +4,13 @@
 #
 # Public types and functions:
 # 
-#  button_callback_type (tells the calling program what has triggered the callback):
-#      button_callback_type.button_selected - The button has been selected by the user
-#      button_callback_type.button_deselected - The button has been deselected by the user
-# 
 #   create_button - Creates a button object
 #     Mandatory Parameters:
 #       Canvas - The Tkinter Drawing canvas on which the Button is to be displayed
 #       button_id:int - The ID to be used for the Button 
 #       x:int, y:int - Position of the Button on the canvas (in pixels)
-#       callback - The function to call when the Button is selected/deselected
-#                Note that the callback function returns (item_id, callback type)
+#       selected_callback - The function to call when the Button is selected (returns item_id)
+#       deselected_callback - The function to call when the Button is deselected (returns item_id)
 #     Optional parameters:
 #       width:int - The width of the  button in characters (default 10)
 #       label:int - The label for the button (default is empty string)
@@ -38,7 +34,6 @@
 # 
 #---------------------------------------------------------------------------------------------
 
-import enum
 import logging
 import tkinter as Tk
 
@@ -47,14 +42,6 @@ from ..editor.common import CreateToolTip
 
 from . import file_interface
 
-#---------------------------------------------------------------------------------------------
-# Public API Classes (to be used by external functions)
-#---------------------------------------------------------------------------------------------
-    
-class button_callback_type(enum.Enum):
-    button_selected = 71     # The button has been selected
-    button_deselected = 72   # The section has been de-selected
-    
 #---------------------------------------------------------------------------------------------
 # Button objects are to be added to a global dictionary when created
 #---------------------------------------------------------------------------------------------
@@ -108,10 +95,8 @@ def button_event (button_id:int):
     # Toggle the state of the button and make the external callback
     toggle_button(button_id)
     # Make the external callback
-    if buttons[str(button_id)]["selected"]:
-        buttons[str(button_id)]["extcallback"] (button_id, button_callback_type.button_selected)
-    else:
-        buttons[str(button_id)]["extcallback"] (button_id, button_callback_type.button_deselected)
+    if buttons[str(button_id)]["selected"]: buttons[str(button_id)]["selectedcallback"] (button_id)
+    else: buttons[str(button_id)]["deselectedcallback"] (button_id)
     return ()
 
 #---------------------------------------------------------------------------------------------
@@ -184,7 +169,8 @@ def disable_button(button_id:int, tooltip:str):
 # Public API function to create a Button object (drawing objects plus internal state)
 #---------------------------------------------------------------------------------------------
 
-def create_button (canvas, button_id:int, x:int, y:int, callback,
+def create_button (canvas, button_id:int, x:int, y:int,
+                   selected_callback, deselected_callback,
                     width:int=10, label:str="", tooltip=""):
     global buttons
     # Set a unique 'tag' to reference the tkinter drawing objects
@@ -225,16 +211,17 @@ def create_button (canvas, button_id:int, x:int, y:int, callback,
             canvas.itemconfig(placeholder2, state='hidden')
         # Compile a dictionary of everything we need to track
         buttons[str(button_id)] = {}
-        buttons[str(button_id)]["canvas"] = canvas                  # Tkinter canvas object
-        buttons[str(button_id)]["extcallback"] = callback           # External callback to make
-        buttons[str(button_id)]["selected"] = False                 # Current state (selected or de-selected)
-        buttons[str(button_id)]["button"] = button                  # Tkinter button object (for run mode)
-        buttons[str(button_id)]["buttonwindow"] = button_window     # Tkinter drawing object (for run mode)
-        buttons[str(button_id)]["placeholder1"] = placeholder1      # Tkinter drawing object (for edit mode)
-        buttons[str(button_id)]["placeholder2"] = placeholder2      # Tkinter drawing object (for edit mode)
-        buttons[str(button_id)]["tooltiptext"] = tooltip            # The default tooltip text to display
-        buttons[str(button_id)]["tooltip"] = tooltip_object         # Reference to the Tooltip class instance
-        buttons[str(button_id)]["tags"] = canvas_tag                # Canvas Tag for ALL drawing objects
+        buttons[str(button_id)]["canvas"] = canvas                            # Tkinter canvas object
+        buttons[str(button_id)]["selectedcallback"] = selected_callback       # External callback to make
+        buttons[str(button_id)]["deselectedcallback"] = deselected_callback   # External callback to make
+        buttons[str(button_id)]["selected"] = False                           # Current state (selected or de-selected)
+        buttons[str(button_id)]["button"] = button                            # Tkinter button object (for run mode)
+        buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
+        buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
+        buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
+        buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display
+        buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
+        buttons[str(button_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
         # Get the initial state for the button (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("buttons",button_id)
         # Toggle the button to 'Selected' if required

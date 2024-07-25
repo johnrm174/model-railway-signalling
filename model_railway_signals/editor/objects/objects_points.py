@@ -24,7 +24,8 @@
 #    objects_sensors.remove_references_to_point - called when the point is deleted
 #
 # Accesses the following external editor objects directly:
-#    run_layout.schematic_callback - to set the callbacks when creating/recreating
+#    run_layout.point_switched_callback - to set the callbacks when creating/recreating
+#    run_layout.fpl_switched_callback - to set the callbacks when creating/recreating
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
 #    objects_common.point_index - The index of Point Objects (for iterating)
 #    objects_common.signal_index - The index of Signal Objects (for iterating)
@@ -198,7 +199,8 @@ def redraw_point_object(object_id):
                 pointsubtype = point_subtype,
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                callback = run_layout.schematic_callback,
+                point_callback = run_layout.point_switched_callback,
+                fpl_callback = run_layout.fpl_switched_callback,
                 colour = objects_common.schematic_objects[object_id]["colour"],
                 button_xoffset = objects_common.schematic_objects[object_id]["xbuttonoffset"],
                 button_yoffset = objects_common.schematic_objects[object_id]["ybuttonoffset"],

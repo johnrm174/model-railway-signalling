@@ -16,7 +16,7 @@
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the route tables
 #
 # Makes the following external API calls to other editor modules:
-#    run_layout.schematic_callback - the callback specified when creating the library objects
+#    run_layout.sensor_passed_callback - the callback specified when creating the library objects
 #    objects_common.set_bbox - to create/update the boundary box for the canvas drawing objects
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
@@ -212,7 +212,7 @@ def redraw_track_sensor_object(object_id):
     x = objects_common.schematic_objects[object_id]["posx"]
     y = objects_common.schematic_objects[object_id]["posy"]
     item_id = objects_common.schematic_objects[object_id]["itemid"]
-    callback = run_layout.schematic_callback
+    callback = run_layout.sensor_passed_callback
     canvas_tags = track_sensors.create_track_sensor(objects_common.canvas, item_id, x, y, callback=callback)
     # Store the tkinter tags for the library object and Create/update the selection rectangle
     objects_common.schematic_objects[object_id]["tags"] = canvas_tags

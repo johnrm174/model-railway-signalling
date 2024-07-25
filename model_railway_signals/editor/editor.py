@@ -20,7 +20,7 @@
 #    run_layout.configure_automation(automation) - Configure run layout module for automation on/off
 #    run_layout.configure_edit_mode(edit_mode) - Configure run layout module for Edit or Run Mode
 #    run_layout.configure_spad_popups() - On settings update or load
-#    run_layout.schematic_callback() ###################################
+#    run_layout.run_layout.signal_updated_callback()
 #    settings.get_all() - Get all settings (for save)
 #    settings.set_all() - Set all settings (following load)
 #    settings.get_canvas() - Get default/loaded canvas settings (for resizing)
@@ -536,7 +536,7 @@ class main_menubar:
         gpio_sensors.set_gpio_sensors_to_publish_state(*settings.get_pub_sensors())
         gpio_sensors.subscribe_to_remote_gpio_sensors(*settings.get_sub_sensors())
         signals.set_signals_to_publish_state(*settings.get_pub_signals())
-        signals.subscribe_to_remote_signals(run_layout.schematic_callback, *settings.get_sub_signals())
+        signals.subscribe_to_remote_signals(run_layout.signal_updated_callback, *settings.get_sub_signals())
         track_sections.set_sections_to_publish_state(*settings.get_pub_sections())
         track_sections.subscribe_to_remote_sections(*settings.get_sub_sections())
         block_instruments.set_instruments_to_publish_state(*settings.get_pub_instruments())
