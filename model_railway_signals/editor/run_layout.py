@@ -1071,6 +1071,100 @@ def initialise_all_schematic_routes():
                 set_route_colour(int(str_route_id), colour=objects.schematic_objects[objects.route(str_route_id)]["routecolour"])
     return()
 
+#------------------------------------------------------------------------------------
+# Functions to reset a schematic route if any of the points and signals along the route
+# have been changed manually by the user. If so, then the route selection button is
+# toggled to 'unselected' and the route highlighting cleared down. All other points,
+# signals and subsidaries on the route are left in their current states.
+#------------------------------------------------------------------------------------
+
+def check_routes_valid_after_signal_change(signal_id:int):
+    for str_route_id in objects.route_index:
+        route_object = objects.schematic_objects[objects.route(str_route_id)]
+        if ( buttons.button_state(int(str_route_id)) and
+               signal_id in route_object["signalsonroute"] and
+               not signals.signal_clear(signal_id) ):
+            buttons.toggle_button(int(str_route_id))
+            set_route_colour(int(str_route_id))
+    return()
+
+def check_routes_valid_after_subsidary_change(signal_id:int):
+    for str_route_id in objects.route_index:
+        route_object = objects.schematic_objects[objects.route(str_route_id)]
+        if ( buttons.button_state(int(str_route_id)) and
+               signal_id in route_object["subsidariesonroute"] and
+               not signals.subsidary_clear(signal_id) ):
+            buttons.toggle_button(int(str_route_id))
+            set_route_colour(int(str_route_id))
+    return()
+
+def check_routes_valid_after_point_change(point_id:int):
+    for str_route_id in objects.route_index:
+        route_object = objects.schematic_objects[objects.route(str_route_id)]
+        if buttons.button_state(int(str_route_id)) and str(point_id) in route_object["pointsonroute"].keys():
+            point_has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
+            if ( points.point_switched(point_id) != route_object["pointsonroute"][str(point_id)] or
+                     (point_has_fpl and not points.fpl_active(point_id)) ):
+                buttons.toggle_button(int(str_route_id))
+                set_route_colour(int(str_route_id))
+    return()
+
+
+#-------------------------------------------------------------------------------------------------
+# The following class and functions are used to process the setting up and clearing
+# down of schematic routes, one action at a time (with a delay in between if specified).
+# The schedule_task class is used to schedule the other functions at a point in the
+# future by set_schematic_route and clear_schematic route functions.
+#-------------------------------------------------------------------------------------------------
+
+class schedule_task():
+    def __init__(self, delay:int, function, *args):
+        root.after(delay, lambda:function(*args))
+    
+def set_signal_state(signal_id:int, state:bool):
+    if signals.signal_clear(signal_id) != state:
+        signals.toggle_signal(signal_id)
+        if run_mode and automation_enabled:
+            update_approach_control_status_for_all_signals(signal_id)    
+            override_distant_signals_based_on_signals_ahead()
+        else:
+            process_signal_aspect_update(signal_id)
+        process_all_signal_interlocking()
+        process_all_point_interlocking()
+    return()
+
+def set_subsidary_state(signal_id:int, state:bool):
+    if signals.subsidary_clear(signal_id) != state:
+        signals.toggle_subsidary(signal_id)
+        process_all_signal_interlocking()
+        process_all_point_interlocking()
+    return()
+
+def set_fpl_state(point_id:int, state:bool):
+    if points.fpl_active(point_id) != state:
+        points.toggle_fpl(point_id)
+        process_all_signal_interlocking()
+    return()
+
+def set_point_state(point_id:int, state:bool):
+    if points.point_switched(point_id) != state:
+        points.toggle_point(point_id)
+        configure_all_signal_routes()
+        if run_mode and automation_enabled:
+            override_signals_based_on_track_sections_ahead()
+        process_all_signal_interlocking()
+    return()
+
+def set_route_colour(route_id:int, colour:str="DEFAULT"):
+    # update the point colours
+    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
+        if colour=="DEFAULT": points.reset_point_colour(point_id)
+        else: points.set_point_colour(point_id, colour)
+    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
+        if colour=="DEFAULT": lines.reset_line_colour(line_id)
+        else: lines.set_line_colour(line_id, colour)
+    return()
+
 ##################################################################################################
 # Function to "initialise" the layout - Called on change of Edit/Run Mode, Automation
 # Enable/Disable, layout reset, layout load, object deletion (from the schematic) or
@@ -1116,73 +1210,58 @@ def initialise_layout():
 enhanced_debugging = False
 
 def point_switched_callback(point_id:int):
-    if enhanced_debugging: print("########## point_switched_callback ",point_id)
+    if enhanced_debugging: logging.info("########## point_switched_callback "+str(point_id))
     configure_all_signal_routes()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
-        #update_approach_control_status_for_all_signals()
-        #override_distant_signals_based_on_signals_ahead()
-    #else:
-        #update_all_displayed_signal_aspects()
     process_all_signal_interlocking()
-    ## reset_invalidated_schematic_routes()
+    check_routes_valid_after_point_change(point_id)
     canvas.focus_set()
     return()
 
 def fpl_switched_callback(point_id:int):
-    if enhanced_debugging: print("########## fpl_switched_callback ",point_id)
-    #configure_all_signal_routes()
-    #if run_mode and automation_enabled:
-        #override_signals_based_on_track_sections_ahead()
-        #update_approach_control_status_for_all_signals()
-        #override_distant_signals_based_on_signals_ahead()
-    #else:
-        #update_all_displayed_signal_aspects()
+    if enhanced_debugging: logging.info("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
-    ## reset_invalidated_schematic_routes()
+    check_routes_valid_after_point_change(point_id)
     canvas.focus_set()
     return()
 
 def signal_updated_callback(signal_id:Union[int,str]):
-    if enhanced_debugging: print("########## signal_updated_callback ",signal_id)
+    if enhanced_debugging: logging.info("########## signal_updated_callback "+str(signal_id))
     if run_mode and automation_enabled:
-        #override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()
         override_distant_signals_based_on_signals_ahead()
     else:
-        #update_all_displayed_signal_aspects()
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     canvas.focus_set()
     return()
 
 def signal_switched_callback(signal_id:int):
-    if enhanced_debugging: print("########## signal_switched_callback ",signal_id)
+    if enhanced_debugging: logging.info("########## signal_switched_callback "+str(signal_id))
     if run_mode and automation_enabled:
-        #override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals(signal_id)    
         override_distant_signals_based_on_signals_ahead()
     else:
-        #update_all_displayed_signal_aspects()
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     process_all_point_interlocking()
-    ## reset_invalidated_schematic_routes()
+    check_routes_valid_after_signal_change(signal_id)
     enable_disable_schematic_routes_based_on_viability()
     canvas.focus_set()
     return()
 
 def subsidary_switched_callback(signal_id:int):
-    if enhanced_debugging: print("########## subsidary_switched_callback ",signal_id)
+    if enhanced_debugging: logging.info("########## subsidary_switched_callback "+str(signal_id))
     process_all_signal_interlocking()
     process_all_point_interlocking()
-    ## reset_invalidated_schematic_routes()
+    check_routes_valid_after_subsidary_change(signal_id)
     enable_disable_schematic_routes_based_on_viability()
     canvas.focus_set()
     return()
 
 def signal_passed_callback(signal_id:int):
-    if enhanced_debugging: print("########## signal_passed_callback ",signal_id)
+    if enhanced_debugging: logging.info("########## signal_passed_callback "+str(signal_id))
     if run_mode:
         update_track_occupancy_for_signal(signal_id)
         if automation_enabled:
@@ -1190,23 +1269,17 @@ def signal_passed_callback(signal_id:int):
             override_signals_based_on_track_sections_ahead()
             update_approach_control_status_for_all_signals()    
             override_distant_signals_based_on_signals_ahead()
-        #else:
-            #update_all_displayed_signal_aspects()
-    #else:
-        #update_all_displayed_signal_aspects()
     process_all_signal_interlocking()
     enable_disable_schematic_routes_based_on_viability()
     canvas.focus_set()
     return()
 
 def signal_released_callback(signal_id:int):
-    if enhanced_debugging: print("########## signal_released_callback ",signal_id)
+    if enhanced_debugging: logging.info("########## signal_released_callback "+str(signal_id))
     if run_mode and automation_enabled:
-        #override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()    
         override_distant_signals_based_on_signals_ahead()
     else:
-        #update_all_displayed_signal_aspects()
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     enable_disable_schematic_routes_based_on_viability()
@@ -1214,86 +1287,32 @@ def signal_released_callback(signal_id:int):
     return()
 
 def sensor_passed_callback(sensor_id:int):
-    if enhanced_debugging: print("########## sensor_passed_callback ",sensor_id)
+    if enhanced_debugging: logging.info("########## sensor_passed_callback "+str(sensor_id))
     if run_mode:
         update_track_occupancy_for_track_sensor(sensor_id)
         if automation_enabled:
             override_signals_based_on_track_sections_ahead()
             update_approach_control_status_for_all_signals()    
             override_distant_signals_based_on_signals_ahead()
-        #else:
-            #update_all_displayed_signal_aspects()
-    #else:
-        #update_all_displayed_signal_aspects()
     process_all_signal_interlocking()
     enable_disable_schematic_routes_based_on_viability()
     canvas.focus_set()
     return()
         
 def section_updated_callback(section_id:int):
-    if enhanced_debugging: print("########## section_updated_callback ",section_id)
+    if enhanced_debugging: logging.info("########## section_updated_callback "+str(section_id))
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
         update_approach_control_status_for_all_signals()    
         override_distant_signals_based_on_signals_ahead()
-    #else:
-        #update_all_displayed_signal_aspects()
     process_all_signal_interlocking()
     enable_disable_schematic_routes_based_on_viability()
     return()
 
 def instrument_updated_callback(instrument_id:int):
-    if enhanced_debugging: print("########## instrument_updated_callback ",instrument_id)
+    if enhanced_debugging: logging.info("########## instrument_updated_callback "+str(instrument_id))
     process_all_signal_interlocking()
     enable_disable_schematic_routes_based_on_viability()
-    return()
-    
-    
-#-------------------------------------------------------------------------------------------------
-# Button Events (Route Selection Buttons)
-#-------------------------------------------------------------------------------------------------
-
-# The following class and functions are used to process the setting up and clearing
-# down of schematic routes, one action at a time (with a delay in between if specified).
-# The schedule_task class is used to schedule the other functions at a point in the
-# future by set_schematic_route and clear_schematic route functions.
-
-class schedule_task():
-    def __init__(self, delay:int, function, *args):
-        root.after(delay, lambda:function(*args))
-    
-def set_signal_state(signal_id:int, state:bool):
-    if signals.signal_clear(signal_id) != state:
-        signals.toggle_signal(signal_id)
-        signal_switched_callback(signal_id)
-    return()
-
-def set_subsidary_state(signal_id:int, state:bool):
-    if signals.subsidary_clear(signal_id) != state:
-        signals.toggle_subsidary(signal_id)
-        subsidary_switched_callback(signal_id)
-    return()
-
-def set_fpl_state(point_id:int, state:bool):
-    if points.fpl_active(point_id) != state:
-        points.toggle_fpl(point_id)
-        fpl_switched_callback(point_id)
-    return()
-
-def set_point_state(point_id:int, state:bool):
-    if points.point_switched(point_id) != state:
-        points.toggle_point(point_id)
-        point_switched_callback(point_id)
-    return()
-
-def set_route_colour(route_id:int, colour:str="DEFAULT"):
-    # update the point colours
-    for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
-        if colour=="DEFAULT": points.reset_point_colour(point_id)
-        else: points.set_point_colour(point_id, colour)
-    for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
-        if colour=="DEFAULT": lines.reset_line_colour(line_id)
-        else: lines.set_line_colour(line_id, colour)
     return()
 
 #------------------------------------------------------------------------------------
