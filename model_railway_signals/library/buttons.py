@@ -90,7 +90,7 @@ def button_exists(button_id:int):
 # Internal callback for processing Button presses (select/deselect)
 #---------------------------------------------------------------------------------------------
 
-def button_event (button_id:int):
+def button_event(button_id:int):
     logging.info ("Button "+str(button_id)+": Button Toggled *********************************************************")
     # Toggle the state of the button and make the external callback
     toggle_button(button_id)
@@ -113,13 +113,11 @@ def toggle_button(button_id:int):
     elif buttons[str(button_id)]["selected"]:
         logging.info("Button "+str(button_id)+": has been de-selected")
         buttons[str(button_id)]["selected"] = False
-        buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3",fg="black",
-                                activebackground="SeaGreen3", activeforeground="black")
+        buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3")
     else:
         logging.info("Button "+str(button_id)+": has been selected")
         buttons[str(button_id)]["selected"] = True
-        buttons[str(button_id)]["button"].config(relief="sunken",bg="SeaGreen1",fg="black",
-                                activebackground="SeaGreen1", activeforeground="black")
+        buttons[str(button_id)]["button"].config(relief="sunken",bg="SeaGreen1")
     return()
 
 #---------------------------------------------------------------------------------------------
@@ -150,7 +148,6 @@ def enable_button(button_id:int):
         logging.error("Button "+str(button_id)+": enable_button - Button ID does not exist")
     else:
         buttons[str(button_id)]["button"].config(state="normal")
-        buttons[str(button_id)]["button"].bind('<Button-1>', lambda event:button_event(button_id))
         buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["tooltiptext"]
     return()
 
@@ -161,7 +158,6 @@ def disable_button(button_id:int, tooltip:str):
         logging.error("Button "+str(button_id)+": disable_button - Button ID does not exist")
     else:
         buttons[str(button_id)]["button"].config(state="disabled")
-        buttons[str(button_id)]["button"].unbind('<Button-1>')
         buttons[str(button_id)]["tooltip"].text = tooltip
     return()
 
@@ -183,10 +179,9 @@ def create_button (canvas, button_id:int, x:int, y:int,
     else:
         logging.debug("Button "+str(button_id)+": Creating Button on the Canvas")
         # Create the button object, callbacks and window to hold it.
-        button = Tk.Button(canvas,text=label, state="normal", relief="raised", width=width,  bg="SeaGreen3",
-                  fg="black", font=('Courier',common.fontsize,"normal"), padx=common.xpadding, pady=common.ypadding,
-                  activebackground="SeaGreen3", activeforeground="black",disabledforeground="grey40")
-        button.bind('<Button-1>', lambda event:button_event(button_id))
+        button = Tk.Button(canvas, text=label, state="normal", relief="raised", width=width, disabledforeground="grey20",
+                           font=('Courier',common.fontsize,"normal"), bg="SeaGreen3", activebackground="SeaGreen2",
+                           padx=common.xpadding, pady=common.ypadding, command=lambda:button_event(button_id))
         button_window = canvas.create_window(x, y, window=button, tags=canvas_tag)
         # Create and store a tool-tip for the button
         tooltip_object = CreateToolTip(button, text=tooltip)
