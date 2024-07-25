@@ -53,9 +53,6 @@ from ..library import lines
 
 open_windows={}
 
-
-
-
 #####################################################################################
 # Top level Class for the Edit Route window
 # This window doesn't have any tabs (unlike the other object configuration windows)
@@ -140,11 +137,18 @@ class edit_route():
             self.highlightpoints = common.entry_box_grid(self.frame6, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = points.point_exists, tool_tip="Specify the points (manual or automatic) that "+
                                                 "comprise the route (these will be highlighted when the route is selected)")
-
-            #############################################################################################################
-            ############################ To DO - Switch delay UI Element ################################################
-            #############################################################################################################
-
+            #-----------------------------------------------------------------            
+            # Create the switching delay entry element
+            self.frame7 = Tk.LabelFrame(self.main_frame, text="Route settings")
+            self.frame7.pack(padx=2, pady=2, fill='x')
+            self.subframe2 = Tk.Frame(self.frame7)
+            self.subframe2.pack()
+            self.label3 = Tk.Label(self.subframe2, text="Switching delay:")
+            self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.delay = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value= 5000,
+                        tool_tip="Specify the time delay between signal and/or point switching events when "+
+                                                  "setting up and clearing down the route (0-5000ms)")         
+            self.delay.pack(padx=2, pady=2, side=Tk.LEFT)
             # Create the common Apply/OK/Reset/Cancel buttons for the window
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
@@ -172,6 +176,7 @@ class edit_route():
             self.name.set_value(objects.schematic_objects[self.object_id]["routename"])
             self.description.set_value(objects.schematic_objects[self.object_id]["routedescription"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
+            self.delay.set_value(objects.schematic_objects[self.object_id]["switchdelay"])
             self.signals.set_values(objects.schematic_objects[self.object_id]["signalsonroute"])
             self.subsidaries.set_values(objects.schematic_objects[self.object_id]["subsidariesonroute"])
             self.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
@@ -183,11 +188,6 @@ class edit_route():
             point_settings_dict = objects.schematic_objects[self.object_id]["pointsonroute"]
             for key,value in point_settings_dict.items(): point_settings_list.append([int(key),value])
             self.points.set_values(point_settings_list)
-
-            #############################################################################################################
-            ############################ To DO - Switch delay UI Element ################################################
-            #############################################################################################################
-            
             # Hide the validation error message
             self.validation_error.pack_forget()        
         return()
@@ -201,7 +201,7 @@ class edit_route():
         # been validated on entry, but changes to other objects may have been made since then
         elif (self.routeid.validate() and self.name.validate() and self.buttonwidth.validate() and
               self.points.validate() and self.signals.validate() and self.subsidaries.validate() and
-              self.highlightlines.validate() and self.highlightpoints.validate()): ######## TODO - switch delay ###########
+              self.highlightlines.validate() and self.highlightpoints.validate() and self.delay.validate()):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
@@ -210,6 +210,7 @@ class edit_route():
             new_object_configuration["routename"] = self.name.get_value()
             new_object_configuration["routedescription"] = self.description.get_value()
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
+            new_object_configuration["switchdelay"] = self.delay.get_value()
             new_object_configuration["signalsonroute"] = self.signals.get_values()
             new_object_configuration["subsidariesonroute"] = self.subsidaries.get_values()
             new_object_configuration["linestohighlight"] = self.highlightlines.get_values()
@@ -223,11 +224,6 @@ class edit_route():
             for [key, value] in point_settings_list:
                 if key > 0: point_settings_dict[str(key)] = value
             new_object_configuration["pointsonroute"] = point_settings_dict
-                        
-            #############################################################################################################
-            ############################ To DO - Switch delay UI Element ################################################
-            #############################################################################################################
-
             # Save the updated configuration (and re-draw the object)
             objects.update_object(self.object_id, new_object_configuration)
             # Close window on "OK" or re-load UI for "apply"
