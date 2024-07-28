@@ -20,8 +20,8 @@
 #    update_references_to_line(old_id, new_id) - update line_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
-#    run_layout.set_schematic_route_callback - setting the object callbacks when created/recreated
-#    run_layout.clear_schematic_route_callback - setting the object callbacks when created/recreated
+#    run_routes.set_schematic_route_callback - setting the object callbacks when created/recreated
+#    run_routes.clear_schematic_route_callback - setting the object callbacks when created/recreated
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
@@ -44,7 +44,7 @@ import uuid
 import copy
 
 from ...library import buttons
-from .. import run_layout
+from .. import run_routes
 from . import objects_common
 
 #------------------------------------------------------------------------------------
@@ -143,8 +143,8 @@ def redraw_route_object(object_id):
                 button_id = objects_common.schematic_objects[object_id]["itemid"],
                 x = objects_common.schematic_objects[object_id]["posx"],
                 y = objects_common.schematic_objects[object_id]["posy"],
-                selected_callback = run_layout.set_schematic_route_callback,
-                deselected_callback = run_layout.clear_schematic_route_callback,
+                selected_callback = run_routes.set_schematic_route_callback,
+                deselected_callback = run_routes.clear_schematic_route_callback,
                 width = objects_common.schematic_objects[object_id]["buttonwidth"],
                 label = objects_common.schematic_objects[object_id]["routename"],
                 tooltip = objects_common.schematic_objects[object_id]["routedescription"] )

@@ -26,7 +26,8 @@
 #    configure_textbox.edit_textbox(root,object_id) - Open textbox edit window (on double click)
 #    configure_track_sensor.edit_track_sensor(root,object_id) - Open the edit window (on double click)
 #    configure_route.edit_route(root,object_id) - Open the edit window (on double click)
-#    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the canvas reference
+#    run_layout.initialise(root_window, canvas) - Initialise the run_layout module with the root and canvas
+#    run_routes.initialise(root_window, canvas) - Initialise the run_routes module with the root and canvas 
 #
 # Accesses the following external editor objects directly:
 #    objects.schematic_objects - the dict holding descriptions for all objects
@@ -55,6 +56,7 @@ from ..library import lines
 
 from . import objects
 from . import run_layout
+from . import run_routes
 from . import configure_signal
 from . import configure_point
 from . import configure_section
@@ -942,6 +944,7 @@ def initialise (root_window, event_callback, width:int, height:int, grid:int, sn
     # Initialise the Objects and run_layout modules with the canvas details
     objects.initialise(canvas, canvas_width, canvas_height, canvas_grid)
     run_layout.initialise(root_window, canvas)
+    run_routes.initialise(root_window, canvas)
     return()
 
 # The following shutdown function is to overcome what seems to be a bug in TkInter where
