@@ -16,6 +16,8 @@
 #       label:int - The label for the button (default is empty string)
 #       tooltip:str - the default tooltip to be displayed (default is empty string)
 #
+#   processing_complete(button_id:int) - 'activate' the button after completing the associated processing
+#
 #   button_exists(button_id:int) - returns true if the Button object 'exists' on the schematic
 #
 #   delete_button(button_id:int) - Delete the library object from the schematic
@@ -49,7 +51,7 @@ from . import file_interface
 buttons: dict = {}
                                                             
 #---------------------------------------------------------------------------------------------
-# API function to set/clear Edit Mode (called by the editor on mode change)
+# Library function to set/clear Edit Mode (called by the editor on mode change)
 # The appearance of Button objects will change between Edit and run Modes
 #---------------------------------------------------------------------------------------------
 
@@ -87,41 +89,119 @@ def button_exists(button_id:int):
     return(button_exists)
 
 #---------------------------------------------------------------------------------------------
-# Internal callback for processing Button presses (select/deselect)
+# Internal callback for processing Button presses (select/deselect). This function toggles
+# the state of the button and makes the external callback to trigger the required processing
+# (arising from the button select/deselect event). We disable the button to prevent further
+# user clicks until we are told that the required processing is complete (by the application
+# making a call the 'processing_complete' function).
 #---------------------------------------------------------------------------------------------
 
 def button_event(button_id:int):
     logging.info ("Button "+str(button_id)+": Button Toggled *********************************************************")
-    # Toggle the state of the button and make the external callback
-    toggle_button(button_id)
-    # Make the external callback
-    if buttons[str(button_id)]["selected"]: buttons[str(button_id)]["selectedcallback"] (button_id)
-    else: buttons[str(button_id)]["deselectedcallback"] (button_id)
+    buttons[str(button_id)]["processing"] = True
+    update_button_appearance(button_id)
+    if buttons[str(button_id)]["selected"]:
+        logging.info("Button "+str(button_id)+": has been de-selected")
+        buttons[str(button_id)]["selected"] = False
+        buttons[str(button_id)]["processing"] = True
+        update_button_appearance(button_id)
+        buttons[str(button_id)]["deselectedcallback"] (button_id)
+    else:
+        logging.info("Button "+str(button_id)+": has been selected")
+        buttons[str(button_id)]["selected"] = True
+        buttons[str(button_id)]["processing"] = True
+        update_button_appearance(button_id)
+        buttons[str(button_id)]["selectedcallback"] (button_id)
     return ()
 
 #---------------------------------------------------------------------------------------------
-# API function to toggle the state of a Button
+# API function to toggle the internal state of before updating the button state. If this
+# function gets called whilst processing of a previous button event is still in progress
+# then we assume that processing of that event has been cancelled
 #---------------------------------------------------------------------------------------------
 
 def toggle_button(button_id:int):
     global buttons
-    # Validate the parameters we have been given as this is a library API function
     if not isinstance(button_id, int) :
         logging.error("Button "+str(button_id)+": toggle_button - Button ID must be an int")
     elif not button_exists(button_id):
         logging.error("Button "+str(button_id)+": toggle_button - Button ID does not exist")
     elif buttons[str(button_id)]["selected"]:
-        logging.info("Button "+str(button_id)+": has been de-selected")
+        logging.info("Button "+str(button_id)+": has been toggled to OFF")
         buttons[str(button_id)]["selected"] = False
-        buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3")
     else:
-        logging.info("Button "+str(button_id)+": has been selected")
+        logging.info("Button "+str(button_id)+": has been toggled to ON")
         buttons[str(button_id)]["selected"] = True
-        buttons[str(button_id)]["button"].config(relief="sunken",bg="SeaGreen1")
+    buttons[str(button_id)]["processing"] = False
+    update_button_appearance(button_id)
     return()
 
 #---------------------------------------------------------------------------------------------
-# API function toget the current state of a Button
+# API function to confirm that the processing (arising from the activation/deactivation of the
+# button has been completed (and the button can therefore be unlocked to allow further clicks
+#---------------------------------------------------------------------------------------------
+
+def processing_complete(button_id:int):
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": processing_complete - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": processing_complete - Button ID does not exist")
+    else:
+        logging.debug("Button "+str(button_id)+": processing_complete - unlocking button")
+        buttons[str(button_id)]["processing"] = False
+        update_button_appearance(button_id)
+    return()
+
+#---------------------------------------------------------------------------------------------
+# API functions to enable or disable a Button - for the disable function, a tooltip can also
+# be specified to provide the user with the reasons why the button is disabled
+#---------------------------------------------------------------------------------------------
+
+def enable_button(button_id:int):
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": enable_button - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": enable_button - Button ID does not exist")
+    else:
+        buttons[str(button_id)]["enabled"] = True
+        update_button_appearance(button_id)
+    return()
+
+def disable_button(button_id:int, tooltip:str):
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": disable_button - Button ID must be an int")
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": disable_button - Button ID does not exist")
+    else:
+        buttons[str(button_id)]["disabledtooltiptext"] = tooltip
+        buttons[str(button_id)]["enabled"] = False
+        update_button_appearance(button_id)
+    return()
+
+#---------------------------------------------------------------------------------------------
+# Internal function to update the appearance of the button depending on its current state
+#---------------------------------------------------------------------------------------------
+
+def update_button_appearance(button_id:int):
+    # Enable or disable the button (with the appropriate tooltip)
+    if not buttons[str(button_id)]["enabled"]:
+        buttons[str(button_id)]["button"].config(state="disabled")
+        buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["disabledtooltiptext"]
+    elif buttons[str(button_id)]["processing"]:
+        buttons[str(button_id)]["button"].config(state="disabled")
+        buttons[str(button_id)]["tooltip"].text = "Processing in progress"
+    else:
+        buttons[str(button_id)]["button"].config(state="normal")
+        buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["enabledtooltiptext"]
+    # Activate or deactivate the button
+    if buttons[str(button_id)]["selected"]:
+        buttons[str(button_id)]["button"].config(relief="sunken",bg="SeaGreen1")
+    else:
+        buttons[str(button_id)]["button"].config(relief="raised",bg="SeaGreen3")
+    return()
+
+#---------------------------------------------------------------------------------------------
+# API function to get the current state of a Button (selected or unselected)
 #---------------------------------------------------------------------------------------------
 
 def button_state(button_id:int):
@@ -135,31 +215,6 @@ def button_state(button_id:int):
     else:
         button_state = buttons[str(button_id)]["selected"]
     return(button_state)
-
-#---------------------------------------------------------------------------------------------
-# API functions to enable or disable a Button
-#---------------------------------------------------------------------------------------------
-
-def enable_button(button_id:int):
-    # Validate the parameters we have been given as this is a library API function
-    if not isinstance(button_id, int) :
-        logging.error("Button "+str(button_id)+": enable_button - Button ID must be an int")
-    elif not button_exists(button_id):
-        logging.error("Button "+str(button_id)+": enable_button - Button ID does not exist")
-    else:
-        buttons[str(button_id)]["button"].config(state="normal")
-        buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["tooltiptext"]
-    return()
-
-def disable_button(button_id:int, tooltip:str):
-    if not isinstance(button_id, int) :
-        logging.error("Button "+str(button_id)+": disable_button - Button ID must be an int")
-    elif not button_exists(button_id):
-        logging.error("Button "+str(button_id)+": disable_button - Button ID does not exist")
-    else:
-        buttons[str(button_id)]["button"].config(state="disabled")
-        buttons[str(button_id)]["tooltip"].text = tooltip
-    return()
 
 #---------------------------------------------------------------------------------------------
 # Public API function to create a Button object (drawing objects plus internal state)
@@ -214,8 +269,11 @@ def create_button (canvas, button_id:int, x:int, y:int,
         buttons[str(button_id)]["buttonwindow"] = button_window               # Tkinter drawing object (for run mode)
         buttons[str(button_id)]["placeholder1"] = placeholder1                # Tkinter drawing object (for edit mode)
         buttons[str(button_id)]["placeholder2"] = placeholder2                # Tkinter drawing object (for edit mode)
-        buttons[str(button_id)]["tooltiptext"] = tooltip                      # The default tooltip text to display
+        buttons[str(button_id)]["enabledtooltiptext"] = tooltip               # The default tooltip text to display
+        buttons[str(button_id)]["disabledtooltiptext"] = tooltip              # The tooltip text to display when disabled
         buttons[str(button_id)]["tooltip"] = tooltip_object                   # Reference to the Tooltip class instance
+        buttons[str(button_id)]["enabled"] = False                            # Flag to indicate if the button is enabled/disabled
+        buttons[str(button_id)]["processing"] = False                         # True between button press and processing complete events
         buttons[str(button_id)]["tags"] = canvas_tag                          # Canvas Tag for ALL drawing objects
         # Get the initial state for the button (if layout state has been successfully loaded)
         loaded_state = file_interface.get_initial_item_state("buttons",button_id)
