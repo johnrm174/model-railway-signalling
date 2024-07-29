@@ -119,6 +119,7 @@ from .buttons import toggle_button
 from .buttons import enable_button
 from .buttons import disable_button
 from .buttons import button_state
+from .buttons import processing_complete
 
 from .file_interface import load_schematic
 from .file_interface import purge_loaded_state_information
@@ -251,6 +252,7 @@ __all__ = [
         'enable_button',
         'disable_button',
         'button_state',
+        'processing_complete',
       # Public file interface functions
         'save_schematic',
         'load_schematic',
