@@ -1032,6 +1032,7 @@ def sensor_passed_callback(sensor_id:int):
             update_approach_control_status_for_all_signals()    
             override_distant_signals_based_on_signals_ahead()
     process_all_signal_interlocking()
+    run_routes.clear_down_routes_after_sensor_passed(sensor_id)
     run_routes.enable_disable_schematic_routes()
     canvas.focus_set()
     return()

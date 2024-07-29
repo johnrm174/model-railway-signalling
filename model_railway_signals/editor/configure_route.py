@@ -3,32 +3,32 @@
 #------------------------------------------------------------------------------------
 #
 # External API functions intended for use by other editor modules:
-#    edit_route- Open the edit point top level window
+#    edit_route - Open the edit point top level window
 #
 # Makes the following external API calls to other editor modules:
 #    objects.update_object(obj_id,new_obj) - Update the configuration on save
-#    objects.route(route_id) - To get the object_id for a given route_id
 #
 # Accesses the following external editor objects directly:
-#    objects.route_index - To iterate through all the route objects   
 #    objects.schematic_objects - To load/save the object configuration
 #
 # Makes the following external API calls to library modules:
+#    points.point_exists(button_id) - To see if a specified point ID exists
+#    signals.signal_exists(button_id) - To see if a specified signal ID exists
+#    lines.line_exists(button_id) - To see if a specified line ID exists
 #    buttons.button_exists(button_id) - To see if a specified (route) button ID exists
+#    track_sensors.track_sensor_exists(sensor_id) - To see if a specified track sensor ID exists
 #
-# # Inherits the following common editor base classes (from common):
+# Inherits the following common editor base classes (from common):
 #    common.int_item_id_entry_box
 #    common.object_id_selection
 #    common.colour_selection
-#    common.window_controls
+#    common.entry_box
+#    common.integer_entry_box
+#    common.point_interlocking_entry
 #    common.entry_box_grid
-
-
-# #    common.Createtool_tip
-# #    common.check_box
-# #    common.dcc_entry_box
-# #    common.selection_buttons
-# #    common.signal_route_frame
+#    common.scrollable_text_frame
+#    common.window_controls
+#    common.check_box
 #
 #------------------------------------------------------------------------------------
 
@@ -43,6 +43,7 @@ from ..library import buttons
 from ..library import points
 from ..library import signals
 from ..library import lines
+from ..library import track_sensors
 
 #------------------------------------------------------------------------------------
 # We maintain a global dictionary of open edit windows (where the key is the UUID
@@ -55,7 +56,7 @@ open_windows={}
 
 #####################################################################################
 # Top level Class for the Edit Route window
-# This window doesn't have any tabs (unlike the other object configuration windows)
+# This window doesn't have any tabs (unlike other object configuration windows)
 #####################################################################################
 
 class edit_route():
@@ -80,6 +81,7 @@ class edit_route():
             self.main_frame.pack()
             #------------------------------------------------------------------
             # Create a Frame to hold the Route ID and Route Colour Selections
+            #------------------------------------------------------------------
             self.frame = Tk.Frame(self.main_frame)
             self.frame.pack(padx=2, pady=2, fill='x')
             # Create the UI Element for Line ID selection
@@ -91,6 +93,7 @@ class edit_route():
             self.colour.frame.pack(padx=2, pady=2, fill='x')
             #-----------------------------------------------------------------
             # Create the route name/description/button width elements
+            #------------------------------------------------------------------
             self.frame1 = Tk.LabelFrame(self.main_frame, text="Route information")
             self.frame1.pack(padx=2, pady=2, fill='x')
             self.subframe1 = Tk.Frame(self.frame1)
@@ -112,21 +115,22 @@ class edit_route():
             self.buttonwidth.pack(padx=2, pady=2, side=Tk.LEFT)
             #-----------------------------------------------------------------            
             # Create the point, signal and line entry lists
+            #------------------------------------------------------------------
             self.frame2 = Tk.LabelFrame(self.main_frame, text="Points to set")
             self.frame2.pack(padx=2, pady=2, fill='x')
             self.points = common.entry_box_grid(self.frame2, base_class=common.point_interlocking_entry, columns=5,
-                exists_function = points.point_exists, tool_tip="Specify the (manual) points to set for the route "+
-                                                                     "and their required configuration (normal/switched)")
+                exists_function = points.point_exists, tool_tip="Specify the points that need to be set and locked "+
+                                                    "for the route and their required configuration (normal/switched)")
             self.frame3 = Tk.LabelFrame(self.main_frame, text="Main signals to clear")
             self.frame3.pack(padx=2, pady=2, fill='x')
             self.signals = common.entry_box_grid(self.frame3, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = signals.signal_exists, tool_tip="Specify the main signals that need "+
-                                                                          "to be cleared to set up the route")
+                                                                          "to be cleared for the route")
             self.frame4 = Tk.LabelFrame(self.main_frame, text="Subsidary signals to clear")
             self.frame4.pack(padx=2, pady=2, fill='x')
             self.subsidaries = common.entry_box_grid(self.frame4, base_class=common.int_item_id_entry_box, columns=9,
                 width=3, exists_function = signals.signal_exists, tool_tip="Specify the subsidary signals "+
-                                    "(associated with a main signal) that need to be cleared to set up the route")
+                                    "(associated with a main signal) that need to be cleared for the route")
             self.frame5 = Tk.LabelFrame(self.main_frame, text="Route lines to highlight")
             self.frame5.pack(padx=2, pady=2, fill='x')
             self.highlightlines = common.entry_box_grid(self.frame5, base_class=common.int_item_id_entry_box, columns=9,
@@ -139,17 +143,32 @@ class edit_route():
                                                 "comprise the route (these will be highlighted when the route is selected)")
             #-----------------------------------------------------------------            
             # Create the switching delay entry element
+            #------------------------------------------------------------------
             self.frame7 = Tk.LabelFrame(self.main_frame, text="Route settings")
             self.frame7.pack(padx=2, pady=2, fill='x')
             self.subframe2 = Tk.Frame(self.frame7)
             self.subframe2.pack()
-            self.label3 = Tk.Label(self.subframe2, text="Switching delay:")
+            self.label3 = Tk.Label(self.subframe2, text="Switching delay (ms):")
             self.label3.pack(padx=2, pady=2, side=Tk.LEFT)
             self.delay = common.integer_entry_box(self.subframe2, width=5, min_value=0, max_value= 5000,
                         tool_tip="Specify the time delay between signal and/or point switching events when "+
                                                   "setting up and clearing down the route (0-5000ms)")         
             self.delay.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.subframe3 = Tk.Frame(self.frame7)
+            self.subframe3.pack()
+            self.label4 = Tk.Label(self.subframe3, text="Track Sensor for route reset:")
+            self.label4.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.sensor = common.int_item_id_entry_box(self.subframe3, exists_function=track_sensors.track_sensor_exists,
+                    tool_tip="Enter the ID of a track sensor to automatically clear down the route when the sensor is passed")
+            self.sensor.pack(padx=2, pady=2, side=Tk.LEFT)
+            self.subframe4 = Tk.Frame(self.frame7)
+            self.subframe4.pack()
+            self.reset = common.check_box(self.subframe4, label="Reset points on deselection",
+                    tool_tip="Select to reset all points back to their default state when route is deselected")
+            self.reset.pack(padx=2, pady=2, side=Tk.LEFT)
+            #------------------------------------------------------------------
             # Create the common Apply/OK/Reset/Cancel buttons for the window
+            #------------------------------------------------------------------
             self.controls = common.window_controls(self.window, self.load_state, self.save_state, self.close_window)
             self.controls.frame.pack(padx=2, pady=2)
             # Create the Validation error message (this gets packed/unpacked on apply/save)
@@ -176,11 +195,13 @@ class edit_route():
             self.name.set_value(objects.schematic_objects[self.object_id]["routename"])
             self.description.set_value(objects.schematic_objects[self.object_id]["routedescription"])
             self.buttonwidth.set_value(objects.schematic_objects[self.object_id]["buttonwidth"])
-            self.delay.set_value(objects.schematic_objects[self.object_id]["switchdelay"])
             self.signals.set_values(objects.schematic_objects[self.object_id]["signalsonroute"])
             self.subsidaries.set_values(objects.schematic_objects[self.object_id]["subsidariesonroute"])
             self.highlightlines.set_values(objects.schematic_objects[self.object_id]["linestohighlight"])
             self.highlightpoints.set_values(objects.schematic_objects[self.object_id]["pointstohighlight"])
+            self.delay.set_value(objects.schematic_objects[self.object_id]["switchdelay"])
+            self.sensor.set_value(objects.schematic_objects[self.object_id]["tracksensor"])
+            self.reset.set_value(objects.schematic_objects[self.object_id]["resetpoints"])
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element needs a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before loading the UI element
@@ -201,7 +222,8 @@ class edit_route():
         # been validated on entry, but changes to other objects may have been made since then
         elif (self.routeid.validate() and self.name.validate() and self.buttonwidth.validate() and
               self.points.validate() and self.signals.validate() and self.subsidaries.validate() and
-              self.highlightlines.validate() and self.highlightpoints.validate() and self.delay.validate()):
+              self.highlightlines.validate() and self.highlightpoints.validate() and
+              self.delay.validate() and self.sensor.validate()):
             # Copy the original object Configuration (elements get overwritten as required)
             new_object_configuration = copy.deepcopy(objects.schematic_objects[self.object_id])
             # Update the object coniguration elements from the current user selections
@@ -210,11 +232,13 @@ class edit_route():
             new_object_configuration["routename"] = self.name.get_value()
             new_object_configuration["routedescription"] = self.description.get_value()
             new_object_configuration["buttonwidth"] = self.buttonwidth.get_value()
-            new_object_configuration["switchdelay"] = self.delay.get_value()
             new_object_configuration["signalsonroute"] = self.signals.get_values()
             new_object_configuration["subsidariesonroute"] = self.subsidaries.get_values()
             new_object_configuration["linestohighlight"] = self.highlightlines.get_values()
             new_object_configuration["pointstohighlight"] = self.highlightpoints.get_values()
+            new_object_configuration["switchdelay"] = self.delay.get_value()
+            new_object_configuration["tracksensor"] = self.sensor.get_value()
+            new_object_configuration["resetpoints"] = self.reset.get_value()
             # The "pointsonroute" element is a dict along the lines of {"1":True, "3":False}. A dict is uses
             # as it simplifies processing in run_layout. However, the UI element returns a list of lists along
             # the lines of [[1:True], [3:False]] so we have to convert it before saving in the configuration.

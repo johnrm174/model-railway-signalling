@@ -63,6 +63,8 @@ default_route_object["linestohighlight"] = []
 default_route_object["pointstohighlight"] = []
 default_route_object["routecolour"] = "black"
 default_route_object["switchdelay"] = 0
+default_route_object["resetpoints"] = False
+default_route_object["tracksensor"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from the Route's points table.

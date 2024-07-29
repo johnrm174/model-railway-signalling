@@ -10,6 +10,7 @@
 #    check_routes_valid_after_point_change(point_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_signal_change(signal_id) - Clears down route highlighting if compromised
 #    check_routes_valid_after_subsidary_change(subsidary_id) - Clears down route highlighting if compromised
+#    clear_down_routes_after_sensor_passed(sensor_id) - automatically clear down routes on sensor passed events
 #    enable_disable_schematic_routes() - enable/disable route buttons based on route viability
 #    initialise_all_schematic_routes() - highlight/unhighlight routes demending on mode and route selections
 #
@@ -30,6 +31,7 @@
 #
 # Makes the following external API calls to library modules:
 #    signals.toggle_signal(sig_id) - To toggle the state of a signal
+#    signals.toggle_subsidary(sig_id) - To toggle the state of a subsidary
 #    signals.signal_clear(sig_id, sig_route) - To test if a signal is clear
 #    signals.subsidary_clear(sig_id, sig_route) - to test if a subsidary is clear
 #    signals.signal_locked(sig_id) - Test if the signal is locked
@@ -147,7 +149,7 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
                     if (signals.signal_clear(opposing_signal_id) or (run_layout.has_subsidary(opposing_signal_id)
                                                     and signals.subsidary_clear(opposing_signal_id))):
                         # Find what the route of the opposing signal would be
-                        other_signal_route = find_theoretical_route(opposing_signal_object_id,
+                        other_signal_route = run_layout.find_theoretical_route(opposing_signal_object_id,
                                                 "pointinterlock", route_object["pointsonroute"] )
                         # Test whether if a Signal OFF for that route would be locking our signal. If there is no
                         # Route for the signal once the points have changed then we don't worry about it
@@ -287,6 +289,17 @@ def check_routes_valid_after_point_change(point_id:int):
                      (point_has_fpl and not points.fpl_active(point_id)) ):
                 buttons.toggle_button(int(str_route_id))
                 complete_route_cleardown(int(str_route_id))
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to automatically reset a schematic route after a track sensor passed event
+#------------------------------------------------------------------------------------
+
+def clear_down_routes_after_sensor_passed(sensor_id:int):
+    for str_route_id in objects.route_index:
+        route_object = objects.schematic_objects[objects.route(str_route_id)]
+        if route_object["tracksensor"] == sensor_id:
+            clear_schematic_route_callback(int(str_route_id))
     return()
 
 #-------------------------------------------------------------------------------------------------
@@ -470,22 +483,23 @@ def clear_schematic_route_callback(route_id:int):
         if run_layout.has_subsidary(signal_id) and signals.subsidary_clear(signal_id):
             schedule_task(delay, set_subsidary_state, signal_id, False)
             delay = delay + route_object["switchdelay"]
-#     # Schedule tasks to reset all the points along the route back to their default state
-#     # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
-#     # Note that we ignore any automatic points (i.e. points switched by another point)
-#     for str_point_id in route_object["pointsonroute"].keys():
-#         point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
-#         automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
-#         int_point_id = int(str_point_id)
-#         if not automatic_point and points.point_switched(int_point_id):
-#             if point_has_fpl and points.fpl_active(int_point_id):
-#                 schedule_task(delay, set_fpl_state, int_point_id, False)
-#                 delay = delay + route_object["switchdelay"]
-#             schedule_task(delay, set_point_state, int_point_id, False)
-#             delay = delay + route_object["switchdelay"]
-#             if point_has_fpl:
-#                 schedule_task(delay, set_fpl_state, int_point_id, True)
-#                 delay = delay + route_object["switchdelay"]
+    # Schedule tasks to reset all the points along the route back to their default state
+    # The "pointsonroute" element is a dictionary comprising {point_id:point_state,}
+    # Note that we ignore any automatic points (i.e. points switched by another point)
+    if route_object["resetpoints"]:
+        for str_point_id in route_object["pointsonroute"].keys():
+            point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
+            automatic_point = objects.schematic_objects[objects.point(str_point_id)]["automatic"]
+            int_point_id = int(str_point_id)
+            if not automatic_point and points.point_switched(int_point_id):
+                if point_has_fpl and points.fpl_active(int_point_id):
+                    schedule_task(delay, set_fpl_state, int_point_id, False)
+                    delay = delay + route_object["switchdelay"]
+                schedule_task(delay, set_point_state, int_point_id, False)
+                delay = delay + route_object["switchdelay"]
+                if point_has_fpl:
+                    schedule_task(delay, set_fpl_state, int_point_id, True)
+                    delay = delay + route_object["switchdelay"]
     # Reset the colour of all points/lines back to their default colours
     schedule_task(delay, complete_route_cleardown, route_id)
     # Finally lock/unlock any other route buttons as required
