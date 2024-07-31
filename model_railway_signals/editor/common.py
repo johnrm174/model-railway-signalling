@@ -831,7 +831,6 @@ class object_id_selection(integer_entry_box):
 #    "get_value" - will return the last "valid" value [point_id:int, state:bool]
 #    "disable" - disables/blanks the entry box (and associated state button)
 #    "enable"  enables/loads the entry box (and associated state button)
-#    "pack"  packs the point_interlocking UI element into the frame
 #------------------------------------------------------------------------------------
 
 class point_interlocking_entry(Tk.Frame):
@@ -872,51 +871,56 @@ class point_interlocking_entry(Tk.Frame):
     def get_value(self):
         # Returns a 2 element list of [Point_id, Point_state]
         return([self.EB.get_value(), self.CB.get_value()])
-    
+
 #------------------------------------------------------------------------------------
-# Compound UI Element for a signal route selections (Sig ID EB + route selection CBs)
-# Note the responsibility of the instantiating func/class to 'pack' the Frame of
-# the UI element - i.e. '<class_instance>.frame.pack()'
+# Class for a signal route selection element (Sig ID EB and route selection CBs)
+# Note the responsibility of the instantiating func/class to 'pack' the UI element
 #
-# Public class instance methods provided by this class are
-#    "validate" - Checks whether the entry is a valid Item Id 
-#    "set_values" - Sets the EB value and all route selection CBs- Also takes the
-#               optional current item ID (int) for validation purposes (default=0) 
-#    "get_values" - Gets the EB value and all route selection CBs 
-#    "enable" - Enables/loads the EB value and all route selection CBs 
-#    "disable" - Disables/blanks EB value and all route selection CBs
+# Public class instance methods provided are:
+#    "validate" - validate the current entry box value and return True/false
+#    "set_value" - will set the current value [signal_routes_entry, current_sig_id]
+#    "get_value" - will return the last "valid" value [signal_routes_entry]
+#    "disable" - disables/blanks the entry box (and associated state buttons)
+#    "enable"  enables/loads the entry box (and associated state buttons)
 #------------------------------------------------------------------------------------
 
-class signal_route_selections():
+class signal_route_selections(Tk.Frame):
     def __init__(self, parent_frame, tool_tip:str, exists_function=None, read_only:bool=False):
         self.read_only = read_only
         # We need to know the current Signal ID for validation (for the non read-only
-        # instance of this class used for the interlocking conflicting signals window
+        # instance of this class used for the interlocking conflicting signals window)
         self.signal_id = 0
-        # Create a Frame to hold all the elements
-        self.frame = Tk.Frame(parent_frame)
+        # Create the Frame to hold all the elements
+        super().__init__(parent_frame)
+        # Add a spacer to improve the UI appearnace when used in a grid
+        self.label1 = Tk.Label(self, width=1)
+        self.label1.pack(side=Tk.LEFT)
         # Call the common base class init function to create the EB
-        self.EB = int_item_id_entry_box(self.frame, tool_tip=tool_tip,
+        self.EB = int_item_id_entry_box(self, tool_tip=tool_tip,
                     callback=self.eb_updated, exists_function=exists_function)
         self.EB.pack(side=Tk.LEFT)
-        # Disable the EB (we don't use the disable method as we want to display the value_
+        # Disable the EB (we don't use the disable method as we want to display the value)
         if self.read_only: self.EB.configure(state="disabled")
         # Create the UI Elements for each of the possible route selections
-        self.main = state_box(self.frame, label_off="MAIN", label_on="MAIN",
+        self.main = state_box(self, label_off="MAIN", label_on="MAIN",
                 width=5, tool_tip=tool_tip, read_only=read_only)
         self.main.pack(side=Tk.LEFT)
-        self.lh1 = state_box(self.frame, label_off="LH1", label_on="LH1",
+        self.lh1 = state_box(self, label_off="LH1", label_on="LH1",
                 width=4, tool_tip=tool_tip, read_only=read_only)
         self.lh1.pack(side=Tk.LEFT)
-        self.lh2 = state_box(self.frame, label_off="LH2", label_on="LH2",
+        self.lh2 = state_box(self, label_off="LH2", label_on="LH2",
                 width=4, tool_tip=tool_tip, read_only=read_only)
         self.lh2.pack(side=Tk.LEFT)
-        self.rh1 = state_box(self.frame, label_off="RH1", label_on="RH1",
+        self.rh1 = state_box(self, label_off="RH1", label_on="RH1",
                 width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh1.pack(side=Tk.LEFT)
-        self.rh2 = state_box(self.frame, label_off="RH2", label_on="RH2",
+        self.rh2 = state_box(self, label_off="RH2", label_on="RH2",
                 width=4, tool_tip=tool_tip, read_only=read_only)
         self.rh2.pack(side=Tk.LEFT)
+        # Add a spacer to improve the UI appearnace when used in a grid
+        self.label2 = Tk.Label(self, width=1)
+        self.label2.pack(side=Tk.LEFT)
+        self.eb_updated()
 
     def eb_updated(self):
         # Enable/disable the checkboxes depending on the EB state
@@ -946,26 +950,29 @@ class signal_route_selections():
         self.EB.disable()
         self.eb_updated()
 
-    def set_values(self, signal:[int,[bool,bool,bool,bool,bool]], signal_id:int=0):
-        # Each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
-        self.EB.set_value(signal[0], signal_id)
-        self.main.set_value(signal[1][0])
-        self.lh1.set_value(signal[1][1])
-        self.lh2.set_value(signal[1][2])
-        self.rh1.set_value(signal[1][3])
-        self.rh2.set_value(signal[1][4])
+    def set_value(self, signal_route):
+        # The signal_route comprises [signal_route_entry, current_signal_id]
+        signal_route_entry = signal_route[0]
+        current_signal_id = signal_route[1]
+        # The signal_route_entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # The sig_id is an int and each route element is a boolean (True or False)
+        self.EB.set_value(signal_route_entry[0], current_signal_id)
+        self.main.set_value(signal_route_entry[1][0])
+        self.lh1.set_value(signal_route_entry[1][1])
+        self.lh2.set_value(signal_route_entry[1][2])
+        self.rh1.set_value(signal_route_entry[1][3])
+        self.rh2.set_value(signal_route_entry[1][4])
         self.eb_updated()
 
-    def get_values(self):
-        # each signal comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
-        # Where each route element is a boolean value (True or False)
+    def get_value(self):
+        # The signal_route_entry comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
+        # The sig_id is an int and each route element is a boolean (True or False)
         return ( [ self.EB.get_value(), [ self.main.get_value(),
                                           self.lh1.get_value(),
                                           self.lh2.get_value(),
                                           self.rh1.get_value(),
                                           self.rh2.get_value() ] ])
-        
+
 #------------------------------------------------------------------------------------
 # Compound UI Element for a "read only" signal_route_frame (LabelFrame) - creates a 
 # variable number of instances of the signal_route_selection_element when "set_values" 
@@ -998,8 +1005,11 @@ class signal_route_frame():
                 # sig_interlocking_routes comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
                 # Where each route element is a boolean value (True or False)            
                 self.sigelements.append(signal_route_selections(self.subframe, read_only=True, tool_tip=self.tooltip))
-                self.sigelements[-1].frame.pack()
-                self.sigelements[-1].set_values (sig_interlocking_routes)
+                self.sigelements[-1].pack()
+                # For populating the base class, we also need to pass in the current signal_id
+                # as zero - note this is not used in the read-only version of this class
+                signal_route = [sig_interlocking_routes, 0]
+                self.sigelements[-1].set_value(signal_route)
         else:
             self.label = Tk.Label(self.subframe, text="Nothing configured")
             self.label.pack()
@@ -1164,6 +1174,9 @@ class entry_box_grid():
         self.frame = Tk.Frame(self.parent_frame)
         self.frame.pack(side=Tk.LEFT,padx=2,pady=2)
         self.kwargs = kwargs
+        self.list_of_subframes = []
+        self.list_of_entry_boxes = []
+        self.list_of_buttons = []
 
     def create_row(self, pack_after=None):
         # Create the Frame for the row
@@ -1230,7 +1243,17 @@ class entry_box_grid():
             if entry_box.winfo_exists():
                 if not entry_box.validate(): valid = False
         return(valid)
-    
+
+    def enable(self):
+        for entry_box in self.list_of_entry_boxes:
+            if entry_box.winfo_exists():
+                entry_box.enable()
+
+    def disable(self):
+        for entry_box in self.list_of_entry_boxes:
+            if entry_box.winfo_exists():
+                entry_box.disable()
+
 #------------------------------------------------------------------------------------
 # Compound UI element for the Apply/OK/Reset/Cancel Buttons - will make callbacks
 # to the specified "load_callback" and "save_callback" functions as appropriate 
