@@ -150,32 +150,13 @@ default_signal_object["pointinterlock"] = [
 # Each route element contains a list of interlocked sections for that route [t1,t2,t3]
 # Each entry is the ID of a (loacl) track section the signal is to be interlocked with
 default_signal_object["trackinterlock"] = [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], [0,0,0] ]
-# This is the default opposing signal interlocking table for a signal
-# The table comprises a list of route elements [main, lh1, lh2, rh1, rh2]
-# Each route element comprises a list of signals [sig1, sig2, sig3, sig4]
+# From Release 4.5.0, the default opposing signal interlocking table for a signal
+# comprises a list of route elements [main, lh1, lh2, rh1, rh2]
+# Each route element comprises a variable length list of signals [sig1, etc, ]
 # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Where each route element is a boolean value (True or False)
-default_signal_object["siginterlock"] = [
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ], 
-             [ [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]], 
-               [0, [False, False, False, False, False]] ] ]
+default_signal_object["siginterlock"] = [[],[],[],[],[]]
+
 # Set the default route selections for the signal
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [False,False,False,False,False]
@@ -243,15 +224,12 @@ def remove_references_to_signal(deleted_sig_id:int):
             list_of_conflicting_signals = list_of_interlocked_signal_routes[index1]
             # Create a new 'blank' list for copying the signals (that haven't been deleted) across
             # We do this to 'tidy up' the list (i.e. remove the 'blanks' caused by signal removals)
-            null_entry = [0, [False, False, False, False, False]]
-            new_list_of_conflicting_signals = [null_entry, null_entry, null_entry, null_entry]
-            index2 = 0
+            new_list_of_conflicting_signals = []
             # Iterate through each signal on the route in the interlocking table
             # to build up the new list of signals (that are to be retained)
             for conflicting_signal in list_of_conflicting_signals:
                 if conflicting_signal[0] != deleted_sig_id:
-                    new_list_of_conflicting_signals[index2] = conflicting_signal
-                    index2 = index2 + 1
+                    new_list_of_conflicting_signals.append(conflicting_signal)
             # replace the list of conflicting signals
             objects_common.schematic_objects[sig_object]["siginterlock"][index1] = new_list_of_conflicting_signals
         # Remove any "Trigger Timed signal" references to the signal
