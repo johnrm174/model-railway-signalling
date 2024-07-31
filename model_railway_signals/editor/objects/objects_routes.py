@@ -192,13 +192,15 @@ def paste_route(object_to_paste, deltax:int, deltay:int):
     objects_common.schematic_objects[new_object_id]["posx"] += deltax
     objects_common.schematic_objects[new_object_id]["posy"] += deltay
     # Now set the default values for all elements we don't want to copy
+    # The bits we want to copy are - buttonwidth, routecolour, switchdelay, resetpoints
     objects_common.schematic_objects[new_object_id]["routename"] = default_route_object["routename"]
     objects_common.schematic_objects[new_object_id]["routedescription"] = default_route_object["routedescription"]
     objects_common.schematic_objects[new_object_id]["signalsonroute"] = default_route_object["signalsonroute"]
     objects_common.schematic_objects[new_object_id]["subsidariesonroute"] = default_route_object["subsidariesonroute"]
     objects_common.schematic_objects[new_object_id]["pointsonroute"] = default_route_object["pointsonroute"]
-    objects_common.schematic_objects[new_object_id]["linesonroute"] = default_route_object["linesonroute"]
-    objects_common.schematic_objects[new_object_id]["routecolour"] = default_route_object["routecolour"]
+    objects_common.schematic_objects[new_object_id]["linestohighlight"] = default_route_object["linestohighlight"]
+    objects_common.schematic_objects[new_object_id]["pointstohighlight"] = default_route_object["pointstohighlight"]
+    objects_common.schematic_objects[new_object_id]["tracksensor"] = default_route_object["tracksensor"]
     # Set the Boundary box for the new object to None so it gets created on re-draw
     objects_common.schematic_objects[new_object_id]["bbox"] = None
     # Create the associated library objects
