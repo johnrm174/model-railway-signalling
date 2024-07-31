@@ -156,7 +156,6 @@ default_signal_object["trackinterlock"] = [ [0,0,0], [0,0,0], [0,0,0], [0,0,0], 
 # Each signal element comprises [sig_id, [main, lh1, lh2, rh1, rh2]]
 # Where each route element is a boolean value (True or False)
 default_signal_object["siginterlock"] = [[],[],[],[],[]]
-
 # Set the default route selections for the signal
 default_signal_object["sigroutes"] = [True,False,False,False,False]
 default_signal_object["subroutes"] = [False,False,False,False,False]
