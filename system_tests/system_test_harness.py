@@ -145,17 +145,12 @@ import threading
 
 import sys
 sys.path.append("..")
-from model_railway_signals.editor import settings
 from model_railway_signals.editor import editor
 from model_railway_signals.editor import schematic
 from model_railway_signals.editor import objects
 from model_railway_signals.library import common
 from model_railway_signals.library import points
 from model_railway_signals.library import signals
-from model_railway_signals.library import signals_colour_lights
-from model_railway_signals.library import signals_semaphores
-from model_railway_signals.library import signals_ground_position
-from model_railway_signals.library import signals_ground_disc
 from model_railway_signals.library import track_sections
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sensors
