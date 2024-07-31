@@ -472,54 +472,54 @@ def update_tab1_route_selection_elements(signal):
 def update_tab2_available_signal_routes(signal):
     # Hide (pack.forget) all the Conflicting signal elements for diverging routes
     # The ones that need to be enabled get re-packed (in the right order) below
-    signal.locking.conflicting_sigs.lh1.frame.pack_forget()
-    signal.locking.conflicting_sigs.lh2.frame.pack_forget()
-    signal.locking.conflicting_sigs.rh1.frame.pack_forget()
-    signal.locking.conflicting_sigs.rh2.frame.pack_forget()
+    signal.locking.conflicting_sigs.lh1_frame.pack_forget()
+    signal.locking.conflicting_sigs.lh2_frame.pack_forget()
+    signal.locking.conflicting_sigs.rh1_frame.pack_forget()
+    signal.locking.conflicting_sigs.rh2_frame.pack_forget()
     # Get the current route selections
     sig_routes = get_sig_routes(signal)
     sub_routes = get_sub_routes(signal)
     # Note that the MAIN route is always enabled for all signal types
     signal.locking.interlocking.main.enable_route()
     signal.locking.interlocked_sections.main.enable_route()
-    signal.locking.conflicting_sigs.main.enable_route()
+    signal.locking.conflicting_sigs.main.enable()
     # Other routes are enabled if either the main signal or subsidary signal supports them
     if sig_routes[1] or sub_routes[1]:
         signal.locking.interlocking.lh1.enable_route()
         signal.locking.interlocked_sections.lh1.enable_route()
-        signal.locking.conflicting_sigs.lh1.enable_route()
-        signal.locking.conflicting_sigs.lh1.frame.pack(padx=2, pady=2, fill='x')
+        signal.locking.conflicting_sigs.lh1.enable()
+        signal.locking.conflicting_sigs.lh1_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh1.disable_route()
         signal.locking.interlocked_sections.lh1.disable_route()
-        signal.locking.conflicting_sigs.lh1.disable_route()
+        signal.locking.conflicting_sigs.lh1.disable()
     if sig_routes[2] or sub_routes[2]:
         signal.locking.interlocking.lh2.enable_route()
         signal.locking.interlocked_sections.lh2.enable_route()
-        signal.locking.conflicting_sigs.lh2.enable_route()
-        signal.locking.conflicting_sigs.lh2.frame.pack(padx=2, pady=2, fill='x')
+        signal.locking.conflicting_sigs.lh2.enable()
+        signal.locking.conflicting_sigs.lh2_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.lh2.disable_route()
         signal.locking.interlocked_sections.lh2.disable_route()
-        signal.locking.conflicting_sigs.lh2.disable_route()
+        signal.locking.conflicting_sigs.lh2.disable()
     if sig_routes[3] or sub_routes[3]:
         signal.locking.interlocking.rh1.enable_route()
         signal.locking.interlocked_sections.rh1.enable_route()
-        signal.locking.conflicting_sigs.rh1.enable_route()
-        signal.locking.conflicting_sigs.rh1.frame.pack(padx=2, pady=2, fill='x')
+        signal.locking.conflicting_sigs.rh1.enable()
+        signal.locking.conflicting_sigs.rh1_frame.pack(padx=2, pady=2, fill='x')
     else: 
         signal.locking.interlocking.rh1.disable_route()
         signal.locking.interlocked_sections.rh1.disable_route()
-        signal.locking.conflicting_sigs.rh1.disable_route()
+        signal.locking.conflicting_sigs.rh1.disable()
     if sig_routes[4] or sub_routes[4]:
         signal.locking.interlocking.rh2.enable_route()
         signal.locking.interlocked_sections.rh2.enable_route()
-        signal.locking.conflicting_sigs.rh2.enable_route()
-        signal.locking.conflicting_sigs.rh2.frame.pack(padx=2, pady=2, fill='x')
+        signal.locking.conflicting_sigs.rh2.enable()
+        signal.locking.conflicting_sigs.rh2_frame.pack(padx=2, pady=2, fill='x')
     else:
         signal.locking.interlocking.rh2.disable_route()
         signal.locking.interlocked_sections.rh2.disable_route()
-        signal.locking.conflicting_sigs.rh2.disable_route()
+        signal.locking.conflicting_sigs.rh2.disable()
     # Enable/disable the signal / block instrument ahead selections on signal type
     # Signal Ahead selection is enabled for all Main Semaphore and Colour Light signal types
     # Block Ahead selection is only enabled for Semaphore or Colour Light Home signals
@@ -990,6 +990,14 @@ class edit_signal:
                 new_object_configuration["trackinterlock"] = self.locking.interlocked_sections.get_routes()
                 new_object_configuration["siginterlock"] = self.locking.conflicting_sigs.get_values()
                 new_object_configuration["interlockahead"] = self.locking.interlock_ahead.get_value()
+                # Remove any blank entries from the conflicting signals interlocking table
+                new_sig_interlock_table = [[],[],[],[],[]]
+                interlocked_signal_routes = self.locking.conflicting_sigs.get_values()
+                for index, interlocked_signal_route in enumerate(interlocked_signal_routes):
+                    for interlocked_signal in interlocked_signal_route:
+                        if interlocked_signal[0] > 0:
+                            new_sig_interlock_table[index].append(interlocked_signal)
+                new_object_configuration["siginterlock"] = new_sig_interlock_table
                 # These elements are for the Automation tab
                 new_object_configuration["passedsensor"][0] = True
                 new_object_configuration["passedsensor"][1] = self.automation.gpio_sensors.passed.get_value()
