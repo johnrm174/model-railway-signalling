@@ -545,7 +545,7 @@ def set_all(new_objects):
                     logging.debug("LOAD LAYOUT - "+new_object_type+" "+str(item_id)+
                             " - Unexpected element: '"+element+"' - DISCARDED")
                 #################################################################################################
-                ## Handle breaking change of tracks ections now a list of 3 sections from release 4.0.0 #########
+                ## Handle breaking change of tracks sections now a list of 3 sections from release 4.0.0 #########
                 ## The 'tracksections' element is a list of [section_behind, sections_ahead] ####################
                 ## The sections_ahead element is a list of the available signal routes [MAIN,LH1,LH2,RH1,RH2] ###
                 ## Before release 4.0.0, each route element was a single track section (integer value) ##########
@@ -563,6 +563,25 @@ def set_all(new_objects):
                         objects_common.schematic_objects[object_id][element][1] = new_objects[object_id][element][1]
                 #################################################################################################
                 ## End of Handle breaking change for Track sections #############################################
+                #################################################################################################
+
+                #################################################################################################
+                ## Handle non-breaking change of signal interlocking table for opposing signals. ################
+                ## Up to Release 4.4.0, each 'route' element was a fixed length list of 4 signals ###############
+                ## From Release 4.5.0 each 'route' element is a variable length list of signals #################
+                ## We don't really need to handle this at load time, but it 'tidies up' the lists ###############
+                ## for the next time the layout is saved (without having to edit/apply each signal config #######
+                #################################################################################################
+                elif new_object_type == objects_common.object_type.signal and element == "siginterlock":
+                    new_sig_interlock_table = [[],[],[],[],[]]
+                    interlocked_signal_routes = new_objects[object_id][element]
+                    for index, interlocked_signal_route in enumerate(interlocked_signal_routes):
+                        for interlocked_signal in interlocked_signal_route:
+                            if interlocked_signal[0] > 0:
+                                new_sig_interlock_table[index].append(interlocked_signal)
+                    objects_common.schematic_objects[object_id][element] = new_sig_interlock_table
+                #################################################################################################
+                ## End of Handle non-breaking change for Signal opposing signals interlocking table #############
                 #################################################################################################
 
                 #################################################################################################
