@@ -8,6 +8,7 @@ import logging
 
 import system_test_harness
 from model_railway_signals.library import points
+from model_railway_signals.library import lines
 from model_railway_signals.library import track_sensors
 from model_railway_signals.library import block_instruments
 from model_railway_signals.library import track_sections
@@ -850,14 +851,88 @@ def run_instrument_library_tests():
     return()
 
 #---------------------------------------------------------------------------------------------------------
+# Test 'Line' Library objects
+#---------------------------------------------------------------------------------------------------------
+
+def run_line_library_tests():
+    # Test all functions - including negative tests for parameter validation
+    print("Library Tests - Line Objects")
+    canvas = schematic.canvas
+    print("Library Tests - create_line - will generate 4 errors:")
+    assert len(lines.lines) == 0    
+    lines.create_line(canvas, 10, 100, 100, 200, 100, arrow_type=[20,20,5], arrow_ends=0, colour="red")  # success
+    lines.create_line(canvas, 11, 100, 150, 200, 150, arrow_type=[20,20,5], arrow_ends=1)     # success
+    lines.create_line(canvas, 12, 100, 200, 200, 200, arrow_type=[20,20,5], arrow_ends=2)     # success
+    lines.create_line(canvas, 13, 100, 250, 200, 250, arrow_type=[20,20,5], arrow_ends=3)     # success
+    lines.create_line(canvas, 14, 100, 300, 200, 300, arrow_type=[1,1,1], arrow_ends=0)       # success
+    lines.create_line(canvas, 15, 100, 350, 200, 350, arrow_type=[1,1,1], arrow_ends=1)       # success
+    lines.create_line(canvas, 16, 100, 400, 200, 400, arrow_type=[1,1,1], arrow_ends=2)       # success
+    lines.create_line(canvas, 17, 100, 450, 200, 450, arrow_type=[1,1,1], arrow_ends=3)       # success
+    lines.create_line(canvas, 0, 100, 100, 200, 100)      # Fail (ID < 1)
+    lines.create_line(canvas, 100, 100, 100, 200, 100)    # Fail (ID > 99)
+    lines.create_line(canvas, 10, 100, 100, 200, 100)     # Fail (ID already exists)
+    assert len(lines.lines) == 8
+    print("Library Tests - line_exists - will generate 1 error:")
+    assert lines.line_exists(10)         # True (exists)
+    assert not lines.line_exists(20)     # False (exists)
+    assert not lines.line_exists("10")   # Error - not an int (exists)
+    print("Library Tests - move_line_end_1 - will generate 2 errors:")
+    # line coords before move are 100, 100, 200, 100
+    print ( canvas.coords(lines.lines[str(10)]["line"]))
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [100, 100, 200, 100]
+    lines.move_line_end_1(10, 300, 200)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 200, 100]
+    lines.move_line_end_1("10",100,100)   # Error - not an int (exists)
+    lines.move_line_end_1(20,100,100)     # Error - does not exist
+    print("Library Tests - move_line_end_2 - will generate 2 errors:")
+    lines.move_line_end_2(10, 100, 100)
+    assert canvas.coords(lines.lines[str(10)]["line"]) == [400, 300, 300, 200]
+    lines.move_line_end_2("10",100,100)   # Error - not an int (exists)
+    lines.move_line_end_2(20,100,100)     # Error - does not exist
+    print("Library Tests - set_line_colour - will generate 2 errors:")
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    lines.set_line_colour("10", "blue") # Line ID not an int
+    lines.set_line_colour(20, "blue")   # Line ID does not exist
+    lines.set_line_colour(10, "blue")
+    lines.set_line_colour(11, "blue")
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "blue"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "blue"
+    print("Library Tests - reset_line_colour - will generate 2 errors:")
+    lines.reset_line_colour("10") # Line ID not an int
+    lines.reset_line_colour(20)   # Line ID does not exist
+    lines.reset_line_colour(10)
+    lines.reset_line_colour(11)
+    assert canvas.itemcget(lines.lines[str(10)]["line"],"fill") == "red"
+    assert canvas.itemcget(lines.lines[str(11)]["line"],"fill") == "black"
+    print("Library Tests - delete_line - will generate 2 errors:")
+    assert len(lines.lines) == 8
+    lines.delete_line("10")   # Fail - not an int
+    lines.delete_line(20)     # Fail - does not exist
+    lines.delete_line(10)     # success
+    assert len(lines.lines) == 7
+    assert not lines.line_exists(10)
+    lines.delete_line(11)
+    lines.delete_line(12)
+    lines.delete_line(13)
+    lines.delete_line(14)
+    lines.delete_line(15)
+    lines.delete_line(16)
+    lines.delete_line(17)
+    print("----------------------------------------------------------------------------------------")
+    print("")
+    return()
+
+#---------------------------------------------------------------------------------------------------------
 # Run all library Tests
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
 #     run_track_sensor_library_tests()
 #     run_track_section_library_tests()
-    run_point_library_tests()
+#     run_point_library_tests()
 #     run_instrument_library_tests()
+    run_line_library_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
