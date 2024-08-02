@@ -127,31 +127,41 @@ def get_endstop_offsets(x1, y1, x2, y2):
 #------------------------------------------------------------------------------------
 
 def move_line_end_1(line_id:int, xdiff:int, ydiff:int):
-    # Move the tkinter selection circle for the 'start' of the line
-    lines[str(line_id)]["canvas"].move(lines[str(line_id)]["end1"], xdiff, ydiff)
-    # Update the line coordinates to reflect the changed 'start' position
-    end1x, end1y, end2x, end2y = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
-    x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["end1"])
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"], (x1+x2)/2, (y1+y2)/2, end2x, end2y)
-    # Update the position of the line end stops to reflect the new line geometry
-    x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
-    dx, dy = get_endstop_offsets(x1, y1, x2, y2)
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": move_line_end_1 - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": move_line_end_1 - Line ID does not exist")
+    else:
+        # Move the tkinter selection circle for the 'start' of the line
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["end1"], xdiff, ydiff)
+        # Update the line coordinates to reflect the changed 'start' position
+        end1x, end1y, end2x, end2y = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
+        x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["end1"])
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"], (x1+x2)/2, (y1+y2)/2, end2x, end2y)
+        # Update the position of the line end stops to reflect the new line geometry
+        x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
+        dx, dy = get_endstop_offsets(x1, y1, x2, y2)
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
     return()
 
 def move_line_end_2(line_id:int, xdiff:int,ydiff:int):
-    # Move the tkinter selection circle for the 'end' of the line
-    lines[str(line_id)]["canvas"].move(lines[str(line_id)]["end2"], xdiff, ydiff)
-    # Update the line coordinates to reflect the changed 'end' position
-    end1x, end1y, end2x, end2y = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
-    x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["end2"])
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"], end1x, end1y, (x1+x2)/2, (y1+y2)/2)
-    # Update the position of the line end stops to reflect the new line geometry
-    x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
-    dx, dy = get_endstop_offsets(x1, y1, x2, y2)
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
-    lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
+    if not isinstance(line_id, int):
+        logging.error("Line "+str(line_id)+": move_line_end_2 - Line ID must be an int")
+    elif not line_exists(line_id):
+        logging.error("Line "+str(line_id)+": move_line_end_2 - Line ID does not exist")
+    else:
+        # Move the tkinter selection circle for the 'end' of the line
+        lines[str(line_id)]["canvas"].move(lines[str(line_id)]["end2"], xdiff, ydiff)
+        # Update the line coordinates to reflect the changed 'end' position
+        end1x, end1y, end2x, end2y = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
+        x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["end2"])
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"], end1x, end1y, (x1+x2)/2, (y1+y2)/2)
+        # Update the position of the line end stops to reflect the new line geometry
+        x1, y1, x2, y2 = lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["line"])
+        dx, dy = get_endstop_offsets(x1, y1, x2, y2)
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop1"], x1+dx, y1+dy, x1-dx, y1-dy)
+        lines[str(line_id)]["canvas"].coords(lines[str(line_id)]["stop2"], x2+dx, y2+dy, x2-dx, y2-dy)
     return()
 
 # -------------------------------------------------------------------------
