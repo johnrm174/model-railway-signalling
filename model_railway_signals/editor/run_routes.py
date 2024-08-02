@@ -50,6 +50,7 @@
 #    buttons.processing_complete(button_id) - to enable the button after route setting has completed
 #    lines.set_line_colour(line_id) - Used for shematic route setting
 #    lines.reset_line_colour(line_id) - Used for shematic route setting
+#    block_instruments.block_section_ahead_clear(inst_id) - Test if an instrument is clear
 #
 #------------------------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ from . import run_layout
 
 from ..library import signals
 from ..library import points
-#from ..library import block_instruments
+from ..library import block_instruments
 #from ..library import track_sections
 from ..library import buttons
 from ..library import lines
@@ -160,6 +161,13 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
                                 message = "\n"+sig_type+str(signal_id)+" would be locked by subsidary "+str(opposing_signal_id)
                             route_tooltip = route_tooltip + message
                             route_viable = False
+            # While we are looping through the signals on the (valid) route, we might as well check if
+            # the signal would be locked by a block instrument ahead (on the theoretical route)
+            instrument_id = signal_object["pointinterlock"][signal_route.value-1][2]
+            if not subsidaries and instrument_id > 0 and not block_instruments.block_section_ahead_clear(instrument_id):
+                route_viable = False
+                message = "\n"+sig_type+str(signal_id)+" would be locked by instrument "+str(instrument_id)
+                route_tooltip = route_tooltip + message
     return(route_tooltip, route_viable)
 
 #------------------------------------------------------------------------------------
@@ -202,14 +210,13 @@ def enable_disable_schematic_routes():
                                 route_tooltip = route_tooltip + message
                                 route_viable = False
         # See if any signals along the route WOULD be locked by an opposing signal once the route is set
+        # This function also tests to see any of the signals WOULD be locked by the Block Instrument Ahead
         route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable)
         route_tooltip, route_viable = check_conflicting_signals(route_object, route_tooltip, route_viable, subsidaries=True)
         
         ############################################################################################################
         ############################################################################################################
         ## TODO 1 - Check if any signals are interlocked with Track sections ahead #################################
-        ## TODO 2 - Check if any signals are interlocked with Block Instruments ahead ##############################
-        ## TODO 3 (done??)- Check if sigs/subs on route are set/cleared for a different sig/sub route ##############
         ############################################################################################################
         ############################################################################################################
         
