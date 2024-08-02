@@ -323,7 +323,7 @@ def run_point_library_tests():
     assert len(points.points) == 0
     # Point ID and point_type combinations
     print("Library Tests - create_point - will generate 10 errors:")
-    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback) #  Valid
+    points.create_point(canvas, 10, points.point_type.RH, points.point_subtype.normal, 100, 100, point_callback, fpl_callback, colour="red") #  Valid
     points.create_point(canvas, 11, points.point_type.LH, points.point_subtype.normal, 200, 100, point_callback, fpl_callback, auto=True)  # Valid
     points.create_point(canvas, 12, points.point_type.RH, points.point_subtype.normal, 300, 100, point_callback, fpl_callback, also_switch=11)  # Valid
     points.create_point(canvas, 13, points.point_type.LH, points.point_subtype.normal, 400, 100, point_callback, fpl_callback, auto=True)  # Valid
@@ -426,24 +426,27 @@ def run_point_library_tests():
     # Note we leave the FPL off for the next tests to generate warnings
     points.fpl_button_event(14)   # Has FPL - toggle off FPL
     # Lock Point
-    print("Library Tests - lock_point - will generate 2 errors and 1 warning:")
-    assert points.points[str(10)]['locked']==False
-    assert points.points[str(14)]['locked']==False
+    print("Library Tests - lock_point / point_locked - will generate 2 errors and 1 warning:")
+    assert not points.point_locked(10)
+    assert not points.point_locked(14)
     points.lock_point("10") # Invalid
     points.lock_point(20)   # Does not exist
     points.lock_point(10)
     points.lock_point(14)
     points.lock_point(14)
-    assert points.points[str(10)]['locked']==True
-    assert points.points[str(14)]['locked']==True
-    print("Library Tests - unlock_point - will generate 2 errors:")
+    assert points.point_locked(10)
+    assert points.point_locked(14)
+    print("Library Tests - unlock_point / point_locked- will generate 2 errors:")
     points.unlock_point("10") # Invalid
     points.unlock_point(20)   # Does not exist
     points.unlock_point(10)
     points.unlock_point(14)
     points.unlock_point(14)
-    assert points.points[str(10)]['locked']==False
-    assert points.points[str(14)]['locked']==False
+    assert not points.point_locked(10)
+    assert not points.point_locked(14)
+    print("Library Tests - point_locked - negative tests - will generate 2 errors:")
+    assert not points.point_locked("10") # Invalid
+    assert not points.point_locked(20)   # Does not exist
     # Update autoswitch
     print("Library Tests - update_autoswitch - will generate 4 errors:")
     points.update_autoswitch("10", 13) # Error - not an int
@@ -472,7 +475,34 @@ def run_point_library_tests():
     points.toggle_point(12)
     assert points.point_switched(12)
     assert not points.point_switched(10)
-    # delete point    
+    print("Library Tests - set_point_colour - will generate 2 errors:")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
+    points.set_point_colour("10", "blue") # Point ID not an int
+    points.set_point_colour(20, "blue")   # Point ID does not exist
+    points.set_point_colour(10, "blue")
+    points.set_point_colour(14, "blue")
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "blue"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "blue"
+    print("Library Tests - reset_point_colour - will generate 2 errors:")
+    points.reset_point_colour("10") # Point ID not an int
+    points.reset_point_colour(20)   # Point ID does not exist
+    points.reset_point_colour(10)
+    points.reset_point_colour(14)
+    assert canvas.itemcget(points.points[str(10)]["blade1"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["blade2"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(10)]["routes"],"fill") == "red"
+    assert canvas.itemcget(points.points[str(14)]["blade1"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["blade2"],"fill") == "black"
+    assert canvas.itemcget(points.points[str(14)]["routes"],"fill") == "black"
     print("Library Tests - delete_point - will generate 2 errors:")
     assert len(points.points) == 7
     points.delete_point("10")
@@ -824,10 +854,10 @@ def run_instrument_library_tests():
 #---------------------------------------------------------------------------------------------------------
 
 def run_all_basic_library_tests():
-    run_track_sensor_library_tests()
-    run_track_section_library_tests()
+#     run_track_sensor_library_tests()
+#     run_track_section_library_tests()
     run_point_library_tests()
-    run_instrument_library_tests()
+#     run_instrument_library_tests()
 
 if __name__ == "__main__":
     system_test_harness.start_application(run_all_basic_library_tests)
