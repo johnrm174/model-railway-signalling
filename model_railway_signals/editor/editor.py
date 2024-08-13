@@ -359,6 +359,7 @@ class main_menubar:
         settings.set_general(automation=True)
         run_layout.configure_automation(True)
         run_routes.configure_automation(True)
+        run_layout.initialise_layout()
 
     def automation_disable(self):
         new_label = "Automation:Off"
@@ -367,6 +368,7 @@ class main_menubar:
         settings.set_general(automation=False)
         run_layout.configure_automation(False)
         run_routes.configure_automation(False)
+        run_layout.initialise_layout()
 
     def edit_mode(self):
         if self.mode_label != "Mode:Edit":
@@ -378,6 +380,7 @@ class main_menubar:
             library_common.configure_edit_mode(True)
             run_layout.configure_edit_mode(True)
             run_routes.configure_edit_mode(True)
+            run_layout.initialise_layout()
         # Disable the automation menubar selection and set to "off" (automation is always disabled
         # in Run mode so we just need to update the indication (no need to update 'run_layout')
         new_label1 = "Automation:N/A"
@@ -395,6 +398,7 @@ class main_menubar:
             library_common.configure_edit_mode(False)
             run_layout.configure_edit_mode(False)
             run_routes.configure_edit_mode(False)
+            run_layout.initialise_layout()
         # Enable the the automation menubar selection and update to reflect the current setting
         # Note that automation is only enbled in Run mode so we just need to update the indication
         # no need to update 'run_layout'. Note the Automation flag is the fifth parameter returned

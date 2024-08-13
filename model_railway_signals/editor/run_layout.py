@@ -107,13 +107,11 @@ def initialise(root_window, canvas_object):
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
-    initialise_layout()
     return()
 
 def configure_automation(automation:bool):
     global automation_enabled
     automation_enabled = automation
-    initialise_layout()
     return()
 
 def configure_spad_popups(popups:bool):
