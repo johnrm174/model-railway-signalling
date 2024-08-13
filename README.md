@@ -22,12 +22,17 @@ The website also included a number of user guides that can be downloaded (in PDF
 My youTube channel also has a number of videos demonstrating the use of the application:
 [https://www.youtube.com/@DCCModelRailwaySignalling](https://www.youtube.com/@DCCModelRailwaySignalling)
 
-## What's new for Release 4.4.0:
+## What's new for Release 4.5.0:
 
-* Support for 'complex trackwork': single slips, double slips, scissor crossovers, trap points, Y-points and 3-way points 
-can now be represented on the schematic and incorporated within your layout signalling scheme.
-* The position of point control buttons can be 'tweaked' via the UI to de-conflict with other schematic objects
-when developing complex and/or 'busy' track schematics
+* Schematic Route Buttons Feature:
+** 'One click' select/deselect of routes, changing all points and signals as required
+** Point and signal changes can be instantaneous or sequenced with a user-specified time delay
+** Once successfully set up, routes can be highlighted on the schematic in user-defined colours
+** Automatic clear-down of highlighting if routes are invalidated (e.g. subsequent point or signal changes)
+** Track-sensors can be used to automatically de-select routes when the trains have cleared the routes
+** Interlocking is preserved - If a route isn't possible the button will be disabled (with a tooltip)
+
+* Removed constraint on interlocking with conflicting signals - more than 4 signals can now be specified
 
 Bug reports and feedback is welcome and appreciated:
 * What aspects are intuitive? What aspects aren't?
