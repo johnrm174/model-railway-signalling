@@ -15,7 +15,7 @@
 #    update_references_to_point(old_pt_id, new_pt_id) - update point_id in the interlocking tables
 #    remove_references_to_section (sec_id) - remove section references from the interlocking tables
 #    update_references_to_section(old_id, new_id) - update section_id in the interlocking tables
-#    remove_references_to_instrument (inst_id) - remove instr references from the interlocking tables
+#    remove_references_to_instrument(inst_id) - remove instr references from the interlocking tables
 #    update_references_to_instrument(old_id, new_id) - update inst_id in the interlocking tables
 #
 # Makes the following external API calls to other editor modules:
@@ -24,6 +24,8 @@
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
 #    objects_common.signal - To get The Object_ID for a given Item_ID
 #    objects_points.reset_point_interlocking_tables() - recalculate interlocking tables 
+#    objects_routes.update_references_to_signal - called when the signal ID is changed
+#    objects_routes.remove_references_to_signal - called when the signal is deleted
 #
 # Accesses the following external editor objects directly:
 #    run_layout.signal_switched_callback - setting the object callbacks when created/recreated
@@ -74,6 +76,7 @@ from ...library import gpio_sensors
 
 from . import objects_common
 from . import objects_points
+from . import objects_routes
 from .. import run_layout
 
 #------------------------------------------------------------------------------------
@@ -433,6 +436,8 @@ def update_signal(object_id, new_object_configuration):
         objects_common.signal_index[str(new_item_id)] = object_id
         # Update any "signal Ahead" references when signal ID is changed
         update_references_to_signal(old_item_id, new_item_id)
+        # Update any references to the signal in the route tables
+        objects_routes.update_references_to_signal(old_item_id, new_item_id)
     # Recalculate point interlocking tables in case they are affected
     objects_points.reset_point_interlocking_tables()
     return()
@@ -725,6 +730,8 @@ def delete_signal(object_id):
     delete_signal_object(object_id)
     # Remove any references to the signal from other signals
     remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
+    # Remove any references to the signal from the schematic route tables
+    objects_routes.remove_references_to_signal(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

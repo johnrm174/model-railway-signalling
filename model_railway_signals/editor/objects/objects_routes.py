@@ -10,13 +10,13 @@
 #    delete_route_object(object_id) - Soft delete the drawing object (prior to recreating)
 #    redraw_route_object(object_id) - Redraw the object on the canvas following an update
 #    default_route_object - The dictionary of default values for the object
-#    remove_references_to_section (sec_id) - remove section_id references from the route's configuration
-#    update_references_to_section (old_id, new_id) - update section_id references in the route's configuration
-#    remove_references_to_signal (signal_id) - remove signal_id references from the route's configuration
+#    remove_references_to_sensor(sensor_id) - remove section_id references from the route's configuration
+#    update_references_to_sensor(old_id, new_id) - update section_id references in the route's configuration
+#    remove_references_to_signal(signal_id) - remove signal_id references from the route's configuration
 #    update_references_to_signal(old_id, new_id) - update signal_id references in the route's configuration
-#    remove_references_to_point (point_id) - remove point_id references from the route's configuration
+#    remove_references_to_point(point_id) - remove point_id references from the route's configuration
 #    update_references_to_point(old_id, new_id) - update point_id references in the route's configuration
-#    remove_references_to_line (line_id) - remove line_id references from the route's configuration
+#    remove_references_to_line(line_id) - remove line_id references from the route's configuration
 #    update_references_to_line(old_id, new_id) - update line_id references in the route's configuration
 #
 # Makes the following external API calls to other editor modules:
@@ -68,59 +68,137 @@ default_route_object["tracksensor"] = 0
 
 #------------------------------------------------------------------------------------
 # Function to remove all references to a point from the Route's points table.
-# The points table comprises comprises a list of point_entries [point_id, point_state]
+# The 'pointsonroute' table comprises a dict of point settings (True/False) with the
+# key of str(Point_ID). The 'pointstohighlight' table comprises a list of point IDs
 #------------------------------------------------------------------------------------
 
 def remove_references_to_point(point_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        # Update the "pointstohighlight" table
+        current_points_table = objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"]
+        new_points_table = []
+        for item_id in current_points_table:
+            if item_id != point_id:
+                new_points_table.append(item_id)
+        objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"] = new_points_table
+        # Update the "pointsonroute" table
+        if str(point_id) in objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].keys():
+            del objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"][str(point_id)]
     return()
 
 #------------------------------------------------------------------------------------
 # Function to update all references to a point in the Route's configuration.
-# The points table comprises comprises a list of point_entries [point_id, point_state]
-# that need to be configured to enable the route
+# The 'pointsonroute' table comprises a dict of point settings (True/False) with the
+# key of str(Point_ID). The 'pointstohighlight' table comprises a list of point IDs
 #------------------------------------------------------------------------------------
 
 def update_references_to_point(old_point_id:int, new_point_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        # Update the "pointstohighlight" table
+        current_points_table = objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"]
+        for index, item_id in enumerate(current_points_table):
+            if item_id == old_point_id:
+                objects_common.schematic_objects[objects_common.route(route_id)]["pointstohighlight"][index] = new_point_id
+        # Update the "pointsonroute" table
+        if str(old_point_id) in objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].keys():
+            value = objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"].pop(str(old_point_id))
+            objects_common.schematic_objects[objects_common.route(route_id)]["pointsonroute"][str(new_point_id)] = value   
     return()
 
 #------------------------------------------------------------------------------------
 # Function to remove references to a Signal from the Route's configuration
-# The signals table comprises comprises a list of signals (sig IDs) that
-# need to be set to OFF to clear the route from start to finish.
+# The 'signalsonroute' and 'subsidariesonroute' tables comprise a list of signal
+# IDs that need to be set to OFF to clear the route from start to finish.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_signal(signal_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        # Remove the signal ID from the "signalsonroute" table
+        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"]
+        new_signals_table = []
+        for item_id in current_signals_table:
+            if item_id != signal_id:
+                new_signals_table.append(item_id)
+        objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"] = new_signals_table
+        # Remove the signal ID from the in the "subsidariesonroute" table
+        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"]
+        new_signals_table = []
+        for item_id in current_signals_table:
+            if item_id != signal_id:
+                new_signals_table.append(item_id)
+        objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"] = new_signals_table
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update references to a Signal in the Route's configuration
-# The signals table comprises comprises a list of signals (sig IDs) that
-# need to be set to OFF to clear the route from start to finish.
+# Function to update references to a Signal ID in the Route's configuration
+# The 'signalsonroute' and 'subsidariesonroute' tables comprise a list of signal
+# IDs that need to be set to OFF to clear the route from start to finish.
 #------------------------------------------------------------------------------------
 
 def update_references_to_signal(old_signal_id:int, new_signal_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        # UYpdate the signal ID in the "signalsonroute" table
+        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"]
+        for index, item_id in enumerate(current_signals_table):
+            if item_id == old_signal_id:
+                objects_common.schematic_objects[objects_common.route(route_id)]["signalsonroute"][index] = new_signal_id
+        # Update the signal ID in the "subsidariesonroute" table
+        current_signals_table = objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"]
+        for index, item_id in enumerate(current_signals_table):
+            if item_id == old_signal_id:
+                objects_common.schematic_objects[objects_common.route(route_id)]["subsidariesonroute"][index] = new_signal_id
     return()
 
 #------------------------------------------------------------------------------------
-# Function to remove references to a Line (line_ID) from the Route's configuration
-# The 'Line table' comprises comprises a list of lines that comprise the route.
+# Function to remove references to a Line ID from the Route's configuration
+# The 'linestohighlight' table comprises a list of line IDs for the route.
 #------------------------------------------------------------------------------------
 
 def remove_references_to_line(line_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        current_lines_table = objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"]
+        new_lines_table = []
+        for item_id in current_lines_table:
+            if item_id != line_id:
+                new_lines_table.append(item_id)
+        objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"] = new_lines_table
     return()
 
 #------------------------------------------------------------------------------------
-# Function to update references to a Line (line_ID) in the Route's configuration
-# The 'Line table' comprises comprises a list of lines that comprise the route.
+# Function to update references to a Line ID in the Route's configuration.
+# The 'linestohighlight' table comprises a list of line IDs for the route.
 #------------------------------------------------------------------------------------
 
 def update_references_to_line(old_line_id:int, new_line_id:int):
-    pass ################### TO DO ####################################
+    for route_id in objects_common.route_index:
+        current_lines_table = objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"]
+        for index, item_id in enumerate(current_lines_table):
+            if item_id == old_line_id:
+                objects_common.schematic_objects[objects_common.route(route_id)]["linestohighlight"][index] = new_line_id
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to remove references to a Sensor ID from the Route's configuration.
+# This is the 'tracksensor' element in the Route description dictionary.
+#------------------------------------------------------------------------------------
+
+def remove_references_to_sensor(sensor_id:int):
+    for route_id in objects_common.route_index:
+        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_sensor_id == sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = 0
+    return()
+
+#------------------------------------------------------------------------------------
+# Function to update references to a Sensor ID in the Route's configuration
+# This is the 'tracksensor' element in the Route description dictionary.
+#------------------------------------------------------------------------------------
+
+def update_references_to_sensor(old_sensor_id:int, new_sensor_id:int):
+    for route_id in objects_common.route_index:
+        current_sensor_id = objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"]
+        if current_sensor_id == old_sensor_id:
+            objects_common.schematic_objects[objects_common.route(route_id)]["tracksensor"] = new_sensor_id
     return()
 
 #------------------------------------------------------------------------------------

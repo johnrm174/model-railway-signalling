@@ -21,6 +21,8 @@
 #    objects_common.new_item_id - to get the next 'free' type-specific Item ID (when creating objects)
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.track_sensor - to find the object_id from a given item_id
+#    objects_routes.remove_references_to_sensor - called when the Sensor ID is changed
+#    objects_routes.update_references_to_sensor - called when the Sensor is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -45,6 +47,7 @@ from ...library import gpio_sensors
 
 from .. import run_layout
 from . import objects_common
+from . import objects_routes
 
 #-------------------------------------------------------------------------------------------------------------
 # Default Object parameters (i.e. state at creation)
@@ -200,6 +203,8 @@ def update_track_sensor(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.track_sensor_index[str(old_item_id)]
         objects_common.track_sensor_index[str(new_item_id)] = object_id
+        # Update any affected route tables to reference the new sensor ID
+        objects_routes.update_references_to_sensor(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------------------------------------
@@ -289,6 +294,8 @@ def delete_track_sensor_object(object_id):
 def delete_track_sensor(object_id):
     # Delete the associated library objects
     delete_track_sensor_object(object_id)
+    # Remove any references to the sensor from the route tables
+    objects_routes.remove_references_to_sensor(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])

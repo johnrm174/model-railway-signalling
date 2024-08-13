@@ -14,6 +14,8 @@
 #    objects_common.set_bbox - to create/update the boundary box for the schematic object
 #    objects_common.find_initial_canvas_position - to find the next 'free' canvas position
 #    objects_common.new_item_id - to find the next 'free' item ID when creating objects
+#    objects_routes.update_references_to_line - called when the Line ID is changed
+#    objects_routes.remove_references_to_line - called when the Line is deleted
 #    
 # Accesses the following external editor objects directly:
 #    objects_common.schematic_objects - the master dictionary of Schematic Objects
@@ -28,6 +30,7 @@ import uuid
 import copy
 
 from . import objects_common
+from . import objects_routes
 from ...library import lines
 
 #------------------------------------------------------------------------------------
@@ -62,9 +65,8 @@ def update_line(object_id, new_object_configuration):
         # Update the type-specific index
         del objects_common.line_index[str(old_item_id)]
         objects_common.line_index[str(new_item_id)] = object_id
-        #########################################################################
-        ## TODO - This will be important if we use these IDs for route display ##
-        #########################################################################
+        # Update any references to the line in the route tables
+        objects_routes.update_references_to_line(old_item_id, new_item_id)
     return()
 
 #------------------------------------------------------------------------------------
@@ -154,6 +156,8 @@ def delete_line_object(object_id):
 def delete_line(object_id):
     # Soft delete the associated library objects from the canvas
     delete_line_object(object_id)
+    # Remove any references to the line from the route tables
+    objects_routes.remove_references_to_line(objects_common.schematic_objects[object_id]["itemid"])
     # "Hard Delete" the selected object - deleting the boundary box rectangle and deleting
     # the object from the dictionary of schematic objects (and associated dictionary keys)
     objects_common.canvas.delete(objects_common.schematic_objects[object_id]["bbox"])
