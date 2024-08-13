@@ -28,7 +28,7 @@ My youTube channel also has a number of videos demonstrating the use of the appl
     * 'One click' select/deselect of routes, changing all points and signals as required
     * Point and signal changes can be instantaneous or sequenced with a user-specified time delay
     * Once successfully set up, routes can be highlighted on the schematic in user-defined colours
-    * Automatic clear-down of highlighting if routes are invalidated (e.g. subsequent point or signal changes)
+    * Automatic clear-down of highlighting if routes are invalidated (e.g. point or signal changes)
     * Track-sensors can be used to automatically de-select routes when the trains have cleared the routes
     * Interlocking is preserved - If a route isn't possible the button will be disabled (with a tooltip)
 
