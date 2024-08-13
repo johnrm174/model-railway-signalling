@@ -94,6 +94,10 @@ def initialise(root_window, canvas_object):
 def configure_edit_mode(edit_mode:bool):
     global run_mode
     run_mode = not edit_mode
+    # In EDIT mode all schematic routes are cleared down, unhighlighted and all route buttons disabled
+    # In RUN mode, any schematic routes that are still selected are highlighted (layout load use case)
+    enable_disable_schematic_routes()
+    initialise_all_schematic_routes()
     return()
 
 def configure_automation(automation:bool):
@@ -248,19 +252,22 @@ def enable_disable_schematic_routes():
 #------------------------------------------------------------------------------------
 
 def initialise_all_schematic_routes():
-    # First reset all buttons if we are not in Run mode
+    # If we are in EDIT Mode then Reset all buttons and route highlighting
+    # All the signals and points get left in their current states
     if not run_mode:
-        for str_route_id in objects.route_index:
-            if buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
+        for str_route_id in objects.route_index.keys():
+            if buttons.button_state(int(str_route_id)):
                 buttons.toggle_button(int(str_route_id))
-    # Now we reset all unselected routes back to their default colours
-    for str_route_id in objects.route_index:
-        if not buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
-            complete_route_cleardown(int(str_route_id))
-    # Now we can highlight any routes that are still selected
-    for str_route_id in objects.route_index:
-        if buttons.button_state(objects.schematic_objects[objects.route(str_route_id)]["itemid"]):
-            complete_route_setup(int(str_route_id))
+                complete_route_cleardown(int(str_route_id))
+    # If we are in RUN Mode then we reset all unselected routes back to their default colours
+    # and highlight any routes that are still selected (use cases - 'load' and 'reset')
+    else:
+        for str_route_id in objects.route_index.keys():
+            if not buttons.button_state(int(str_route_id)):
+                complete_route_cleardown(int(str_route_id))
+        for str_route_id in objects.route_index.keys():
+            if buttons.button_state(int(str_route_id)):
+                complete_route_setup(int(str_route_id))
     return()
 
 #------------------------------------------------------------------------------------
@@ -308,7 +315,10 @@ def check_routes_valid_after_point_change(point_id:int):
 def clear_down_routes_after_sensor_passed(sensor_id:int):
     for str_route_id in objects.route_index:
         route_object = objects.schematic_objects[objects.route(str_route_id)]
-        if route_object["tracksensor"] == sensor_id:
+        if buttons.button_state(int(str_route_id)) and route_object["tracksensor"] == sensor_id:
+            # Reset the button to show the route has been cleared down
+            buttons.toggle_button(int(str_route_id))
+            # Schedule all the events to clear down the route
             clear_schematic_route_callback(int(str_route_id))
     return()
 
@@ -381,8 +391,6 @@ def complete_route_setup(route_id:int):
     for int_signal_id in subsidaries_on_route:
         if not signals.subsidary_clear(int_signal_id):
             route_set_up_and_locked = False
-    # Unlock the route button now the processing is complete (whether successful or not)
-    buttons.processing_complete(route_id)
     # If successful we update the point and line colours to highlight the route
     # If unsuccessful we de-select the button (to show the route was not set up)
     if route_set_up_and_locked:
@@ -393,16 +401,18 @@ def complete_route_setup(route_id:int):
             lines.set_line_colour(line_id, colour)
     else:
         if buttons.button_state(route_id): buttons.toggle_button(route_id)
+    # Unlock the route button now the processing is complete
+    buttons.processing_complete(route_id)
     return()
 
 def complete_route_cleardown(route_id:int):
-    # Unlock the route button now the processing is complete 
-    buttons.processing_complete(route_id)
     # Reset the point and line colours to un-highlight the route
     for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
         points.reset_point_colour(point_id)
     for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
         lines.reset_line_colour(line_id)
+    # Unlock the route button now the processing is complete 
+    buttons.processing_complete(route_id)
     return()
 
 #------------------------------------------------------------------------------------

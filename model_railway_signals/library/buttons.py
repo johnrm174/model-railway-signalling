@@ -132,7 +132,7 @@ def toggle_button(button_id:int):
     else:
         logging.info("Button "+str(button_id)+": has been toggled to ON")
         buttons[str(button_id)]["selected"] = True
-    buttons[str(button_id)]["processing"] = False
+    buttons[str(button_id)]["processing"] = True
     update_button_appearance(button_id)
     return()
 
