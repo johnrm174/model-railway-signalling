@@ -15,6 +15,7 @@ import test_object_edit_windows
 import test_mqtt_networking
 import test_configuration_updates
 import test_menubar_windows
+import test_schematic_routes
 
 import test_interlocking_examples
 import test_automation_examples
@@ -47,6 +48,8 @@ def run_all_tests():
     test_run_layout.run_all_run_layout_tests()
     print("*** Running tests from 'test_mqtt_networking.py' ***")
     test_mqtt_networking.run_all_mqtt_networking_tests()
+    print("*** Running tests from 'test_schematic_routes.py' ***")
+    test_schematic_routes.run_all_schematic_routes_tests()
 
     print("*** Running tests from 'test_interlocking_examples.py' ***")
     test_interlocking_examples.run_all_interlocking_example_tests()
@@ -54,8 +57,6 @@ def run_all_tests():
     test_automation_examples.run_all_automation_example_tests()
     print("*** Running tests from 'test_single_line_examples.py' ***")
     test_single_line_examples.run_all_single_line_example_tests()
-    print("*** Running tests from 'test_mqtt_networking_example.py' ***")
-    test_mqtt_networking_example.run_all_mqtt_networking_example_tests()
 
     print("*** Running tests from 'test_load_layout_failures.py' ***")
     test_load_layout_failures.run_all_load_layout_negative_tests()
