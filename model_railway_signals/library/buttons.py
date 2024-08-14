@@ -24,6 +24,8 @@
 #
 #   button_state(button_id:int) - get the current state of a button (returns True for Active)
 #
+#   button_enabled(button_id:int) - get the current state of a button (returns True for Enabled)
+#
 #   toggle_button(button_id:int) - toggle the state of the button
 #
 #   enable_button(button_id:int) - enable the button (and revert to the standard tooltip)
@@ -215,6 +217,22 @@ def button_state(button_id:int):
     else:
         button_state = buttons[str(button_id)]["selected"]
     return(button_state)
+
+#---------------------------------------------------------------------------------------------
+# API function to get the current state of a Button (enabled or disabled)
+#---------------------------------------------------------------------------------------------
+
+def button_enabled(button_id:int):
+    # Validate the parameters we have been given as this is a library API function
+    if not isinstance(button_id, int) :
+        logging.error("Button "+str(button_id)+": button_locked - Button ID must be an int")
+        button_enabled = False
+    elif not button_exists(button_id):
+        logging.error("Button "+str(button_id)+": button_locked - Button ID does not exist")
+        button_enabled = False
+    else:
+        button_enabled = buttons[str(button_id)]["enabled"]
+    return(button_enabled)
 
 #---------------------------------------------------------------------------------------------
 # Public API function to create a Button object (drawing objects plus internal state)
