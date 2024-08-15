@@ -186,7 +186,7 @@ def disable_button(button_id:int, tooltip:str):
 
 def update_button_appearance(button_id:int):
     # Enable or disable the button (with the appropriate tooltip)
-    if not buttons[str(button_id)]["enabled"]:
+    if not buttons[str(button_id)]["enabled"] and not buttons[str(button_id)]["selected"]:
         buttons[str(button_id)]["button"].config(state="disabled")
         buttons[str(button_id)]["tooltip"].text = buttons[str(button_id)]["disabledtooltiptext"]
     elif buttons[str(button_id)]["processing"]:
@@ -231,7 +231,8 @@ def button_enabled(button_id:int):
         logging.error("Button "+str(button_id)+": button_locked - Button ID does not exist")
         button_enabled = False
     else:
-        button_enabled = buttons[str(button_id)]["enabled"]
+        # Button is always enabled if selected (so it can always be de-selected)
+        button_enabled = buttons[str(button_id)]["enabled"] or buttons[str(button_id)]["selected"]
     return(button_enabled)
 
 #---------------------------------------------------------------------------------------------
