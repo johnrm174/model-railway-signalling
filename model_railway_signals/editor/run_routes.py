@@ -148,24 +148,23 @@ def check_conflicting_signals(route_object, route_tooltip:str, route_viable:bool
             # then check if that signal/route would be opposing our route signal once the rute is set up
             # the signal (when set to that future route)
             for opposing_signal_entry in opposing_signals_on_route:
-                if opposing_signal_entry[0] > 0:
-                    opposing_signal_id = opposing_signal_entry[0]
-                    opposing_signal_object_id = objects.signal(opposing_signal_id)
-                    opposing_signal_routes = opposing_signal_entry[1]
-                    if (signals.signal_clear(opposing_signal_id) or (run_layout.has_subsidary(opposing_signal_id)
-                                                    and signals.subsidary_clear(opposing_signal_id))):
-                        # Find what the route of the opposing signal would be
-                        other_signal_route = run_layout.find_theoretical_route(opposing_signal_object_id,
-                                                "pointinterlock", route_object["pointsonroute"] )
-                        # Test whether if a Signal OFF for that route would be locking our signal. If there is no
-                        # Route for the signal once the points have changed then we don't worry about it
-                        if other_signal_route is not None and opposing_signal_routes[other_signal_route.value-1]:
-                            if signals.signal_clear(opposing_signal_id):
-                                message = "\n"+sig_type+str(signal_id)+" would be locked by signal "+str(opposing_signal_id)
-                            if run_layout.has_subsidary(opposing_signal_id) and signals.subsidary_clear(opposing_signal_id):
-                                message = "\n"+sig_type+str(signal_id)+" would be locked by subsidary "+str(opposing_signal_id)
-                            route_tooltip = route_tooltip + message
-                            route_viable = False
+                opposing_signal_id = opposing_signal_entry[0]
+                opposing_signal_object_id = objects.signal(opposing_signal_id)
+                opposing_signal_routes = opposing_signal_entry[1]
+                if (signals.signal_clear(opposing_signal_id) or (run_layout.has_subsidary(opposing_signal_id)
+                                                and signals.subsidary_clear(opposing_signal_id))):
+                    # Find what the route of the opposing signal would be
+                    other_signal_route = run_layout.find_theoretical_route(opposing_signal_object_id,
+                                            "pointinterlock", route_object["pointsonroute"] )
+                    # Test whether if a Signal OFF for that route would be locking our signal. If there is no
+                    # Route for the signal once the points have changed then we don't worry about it
+                    if other_signal_route is not None and opposing_signal_routes[other_signal_route.value-1]:
+                        if signals.signal_clear(opposing_signal_id):
+                            message = "\n"+sig_type+str(signal_id)+" would be locked by signal "+str(opposing_signal_id)
+                        if run_layout.has_subsidary(opposing_signal_id) and signals.subsidary_clear(opposing_signal_id):
+                            message = "\n"+sig_type+str(signal_id)+" would be locked by subsidary "+str(opposing_signal_id)
+                        route_tooltip = route_tooltip + message
+                        route_viable = False
             # While we are looping through the signals on the (valid) route, we might as well check if
             # the signal would be locked by a block instrument ahead (on the theoretical route)
             if not subsidaries:
@@ -277,6 +276,12 @@ def initialise_all_schematic_routes():
 # signals and subsidaries on the route are left in their current states.
 #------------------------------------------------------------------------------------
 
+##########################################################################################################
+############### BUG HERE - Both Shunting and Main routes can be selected at the same Time ################
+# Maybe we need to call these functions after every signal or point change we make as we set up or #######
+# Clear down the route, with the ID of the route that made the change. ###################################
+##########################################################################################################
+
 def check_routes_valid_after_signal_change(signal_id:int):
     for str_route_id in objects.route_index:
         route_object = objects.schematic_objects[objects.route(str_route_id)]
@@ -330,6 +335,8 @@ def clear_down_routes_after_sensor_passed(sensor_id:int):
 # change is still possible (e.g. not possible if the signal or point has been locked)
 # The schedule_task class is used to schedule the other functions at a point in the
 # future by set_schematic_route and clear_schematic route functions.
+# Note we only run the tasks if we are still in RUN MODE. The exception to this is
+# complete_route_cleardown where we could be doing this after switching to EDIT Mode
 #-------------------------------------------------------------------------------------------------
 
 class schedule_task():
@@ -337,9 +344,9 @@ class schedule_task():
         root.after(delay, lambda:function(*args))
 
 def set_signal_state(signal_id:int, state:bool):
-    if signals.signal_clear(signal_id) != state and not signals.signal_locked(signal_id):
+    if run_mode and signals.signal_clear(signal_id) != state and not signals.signal_locked(signal_id):
         signals.toggle_signal(signal_id)
-        if run_mode and automation_enabled:
+        if automation_enabled:
             run_layout.update_approach_control_status_for_all_signals(signal_id)
             run_layout.override_distant_signals_based_on_signals_ahead()
         else:
@@ -349,7 +356,8 @@ def set_signal_state(signal_id:int, state:bool):
     return()
 
 def set_subsidary_state(signal_id:int, state:bool):
-    if signals.subsidary_clear(signal_id) != state and not signals.subsidary_locked(signal_id):
+    if (run_mode and run_layout.has_subsidary(signal_id) and signals.subsidary_clear(signal_id) != state
+                  and not signals.subsidary_locked(signal_id)):
         signals.toggle_subsidary(signal_id)
         run_layout.process_all_signal_interlocking()
         run_layout.process_all_point_interlocking()
@@ -357,52 +365,53 @@ def set_subsidary_state(signal_id:int, state:bool):
 
 def set_fpl_state(point_id:int, state:bool):
     point_has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
-    if point_has_fpl and points.fpl_active(point_id) != state and not points.point_locked(point_id):
+    if run_mode and point_has_fpl and points.fpl_active(point_id) != state and not points.point_locked(point_id):
         points.toggle_fpl(point_id)
         run_layout.process_all_signal_interlocking()
     return()
 
 def set_point_state(point_id:int, state:bool):
     point_has_fpl = objects.schematic_objects[objects.point(point_id)]["hasfpl"]
-    if (points.point_switched(point_id) != state and not points.point_locked(point_id) and
-              (not point_has_fpl or (point_has_fpl and not points.fpl_active(point_id)))):
+    if ( run_mode and points.point_switched(point_id) != state and not points.point_locked(point_id) and
+              (not point_has_fpl or (point_has_fpl and not points.fpl_active(point_id))) ):
         points.toggle_point(point_id)
         run_layout.configure_all_signal_routes()
-        if run_mode and automation_enabled:
+        if automation_enabled:
             run_layout.override_signals_based_on_track_sections_ahead()
         run_layout.process_all_signal_interlocking()
     return()
 
 def complete_route_setup(route_id:int):
-    # Confirm the route has been set up correctly - just in case there have been any other events
-    # that invalidate the route whilst we have been working through the scheduled tasks to set it up
-    route_set_up_and_locked = True
-    points_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
-    signals_on_route = objects.schematic_objects[objects.route(route_id)]["signalsonroute"]
-    subsidaries_on_route = objects.schematic_objects[objects.route(route_id)]["subsidariesonroute"]
-    for str_point_id in points_on_route.keys():
-        point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
-        if ( points.point_switched(int(str_point_id)) != points_on_route[str_point_id] or
-             ( point_has_fpl and not points.fpl_active(int(str_point_id)) ) ):
-            route_set_up_and_locked = False
-    for int_signal_id in signals_on_route:
-        if not signals.signal_clear(int_signal_id):
-            route_set_up_and_locked = False
-    for int_signal_id in subsidaries_on_route:
-        if not signals.subsidary_clear(int_signal_id):
-            route_set_up_and_locked = False
-    # If successful we update the point and line colours to highlight the route
-    # If unsuccessful we de-select the button (to show the route was not set up)
-    if route_set_up_and_locked:
-        colour=objects.schematic_objects[objects.route(route_id)]["routecolour"]
-        for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
-            points.set_point_colour(point_id, colour)
-        for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
-            lines.set_line_colour(line_id, colour)
-    else:
-        if buttons.button_state(route_id): buttons.toggle_button(route_id)
-    # Unlock the route button now the processing is complete
-    buttons.processing_complete(route_id)
+    if run_mode:
+        # Confirm the route has been set up correctly - just in case there have been any other events
+        # that invalidate the route whilst we have been working through the scheduled tasks to set it up
+        route_set_up_and_locked = True
+        points_on_route = objects.schematic_objects[objects.route(route_id)]["pointsonroute"]
+        signals_on_route = objects.schematic_objects[objects.route(route_id)]["signalsonroute"]
+        subsidaries_on_route = objects.schematic_objects[objects.route(route_id)]["subsidariesonroute"]
+        for str_point_id in points_on_route.keys():
+            point_has_fpl = objects.schematic_objects[objects.point(str_point_id)]["hasfpl"]
+            if ( points.point_switched(int(str_point_id)) != points_on_route[str_point_id] or
+                 ( point_has_fpl and not points.fpl_active(int(str_point_id)) ) ):
+                route_set_up_and_locked = False
+        for int_signal_id in signals_on_route:
+            if not signals.signal_clear(int_signal_id):
+                route_set_up_and_locked = False
+        for int_signal_id in subsidaries_on_route:
+            if not signals.subsidary_clear(int_signal_id):
+                route_set_up_and_locked = False
+        # If successful we update the point and line colours to highlight the route
+        # If unsuccessful we de-select the button (to show the route was not set up)
+        if route_set_up_and_locked:
+            colour=objects.schematic_objects[objects.route(route_id)]["routecolour"]
+            for point_id in objects.schematic_objects[objects.route(route_id)]["pointstohighlight"]:
+                points.set_point_colour(point_id, colour)
+            for line_id in objects.schematic_objects[objects.route(route_id)]["linestohighlight"]:
+                lines.set_line_colour(line_id, colour)
+        else:
+            if buttons.button_state(route_id): buttons.toggle_button(route_id)
+        # Unlock the route button now the processing is complete
+        buttons.processing_complete(route_id)
     return()
 
 def complete_route_cleardown(route_id:int):
