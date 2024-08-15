@@ -71,7 +71,7 @@
     "instruments": {},
     "objects": {
         "010e5fa1-fd7a-4068-a751-d214c9950ae4": {
-            "bbox": 160,
+            "bbox": 473,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 3,
@@ -91,7 +91,7 @@
                 11
             ],
             "posx": 400.0,
-            "posy": 475.0,
+            "posy": 500.0,
             "resetpoints": false,
             "routecolour": "#ff6100",
             "routedescription": "Platform 1 departure to Down Main",
@@ -105,14 +105,14 @@
             "tracksensor": 5
         },
         "0148c4d4-8a20-45c2-9a32-a1eb5e532d9f": {
-            "bbox": 164,
+            "bbox": 477,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 7,
             "mirror": "",
             "posx": 900.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "tags": "section7"
         },
         "02365e11-198e-43ba-8cea-eaf0babbfd8b": {
@@ -122,20 +122,20 @@
                 0,
                 0
             ],
-            "bbox": 170,
+            "bbox": 483,
             "colour": "black",
             "endx": 900.0,
-            "endy": 400.0,
+            "endy": 425.0,
             "item": "line",
             "itemid": 33,
             "posx": 700.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "selection": "line33selected",
             "tags": "line33"
         },
         "02aaa6bf-c249-45ed-965f-047262cad8a5": {
             "background": "grey85",
-            "bbox": 173,
+            "bbox": 486,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -145,7 +145,7 @@
             "itemid": 0,
             "justify": 2,
             "posx": 51.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "02aaa6bf-c249-45ed-965f-047262cad8a5",
             "text": "BRANCH"
         },
@@ -156,21 +156,21 @@
                 20,
                 5
             ],
-            "bbox": 179,
+            "bbox": 492,
             "colour": "black",
             "endx": 150.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 26,
             "posx": 125.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line26selected",
             "tags": "line26"
         },
         "058012a1-4cb8-40e0-9c67-55c0139c064a": {
             "alsoswitch": 2,
             "automatic": false,
-            "bbox": 186,
+            "bbox": 499,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -181,7 +181,7 @@
             "itemtype": 1,
             "orientation": 0,
             "posx": 1175.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -251,7 +251,7 @@
                 false,
                 ""
             ],
-            "bbox": 203,
+            "bbox": 516,
             "dccaspects": [
                 [
                     [
@@ -919,7 +919,7 @@
                 ]
             ],
             "posx": 1525.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -1112,7 +1112,7 @@
         "05daf194-7943-4c0b-8540-b574716ce9ca": {
             "alsoswitch": 1,
             "automatic": false,
-            "bbox": 210,
+            "bbox": 523,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -1123,7 +1123,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 1225.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -1178,14 +1178,14 @@
                 0,
                 0
             ],
-            "bbox": 216,
+            "bbox": 529,
             "colour": "black",
             "endx": 1725.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 24,
             "posx": 1250.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line24selected",
             "tags": "line24"
         },
@@ -1201,7 +1201,7 @@
                 false,
                 ""
             ],
-            "bbox": 233,
+            "bbox": 546,
             "dccaspects": [
                 [
                     [
@@ -1869,7 +1869,7 @@
                 ]
             ],
             "posx": 1325.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -2122,7 +2122,7 @@
             ]
         },
         "0950163c-9b77-46c1-84c9-5ad56088c55a": {
-            "bbox": 237,
+            "bbox": 550,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 1,
@@ -2142,7 +2142,7 @@
                 15
             ],
             "posx": 1600.0,
-            "posy": 475.0,
+            "posy": 500.0,
             "resetpoints": false,
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Platform 1",
@@ -2157,7 +2157,7 @@
         },
         "0981c3fb-63d1-4cc4-bcdb-c89612f58ed6": {
             "background": "grey85",
-            "bbox": 240,
+            "bbox": 553,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -2167,17 +2167,17 @@
             "itemid": 0,
             "justify": 2,
             "posx": 548.0,
-            "posy": 156.0,
+            "posy": 181.0,
             "tags": "0981c3fb-63d1-4cc4-bcdb-c89612f58ed6",
             "text": "TMD"
         },
         "0add39ae-8bc2-44ca-adb4-d2a8794adcc4": {
-            "bbox": 244,
+            "bbox": 557,
             "item": "tracksensor",
             "itemid": 7,
             "passedsensor": "",
             "posx": 950.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "routeahead": [
                 [
                     [
@@ -2475,25 +2475,25 @@
             "tags": "sensor7"
         },
         "0bcc8fee-02a4-485d-a1f4-b8b935e35504": {
-            "bbox": 248,
+            "bbox": 561,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 15,
             "mirror": "",
             "posx": 900.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "tags": "section15"
         },
         "0f2a2cb4-f289-4874-992d-4e53cc1498a7": {
-            "bbox": 252,
+            "bbox": 565,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 19,
             "mirror": "",
             "posx": 200.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "section19"
         },
         "105b2259-6989-41ed-bbf8-98361303b26a": {
@@ -2508,7 +2508,7 @@
                 false,
                 ""
             ],
-            "bbox": 263,
+            "bbox": 576,
             "dccaspects": [
                 [
                     [
@@ -3176,7 +3176,7 @@
                 ]
             ],
             "posx": 650.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -3398,7 +3398,7 @@
             ]
         },
         "1625ee65-272d-41ec-a9ec-2832f28fbbe7": {
-            "bbox": 267,
+            "bbox": 580,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 17,
@@ -3425,7 +3425,7 @@
                 11
             ],
             "posx": 400.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "resetpoints": true,
             "routecolour": "#ff6100",
             "routedescription": "Goods loop departure to Down Main",
@@ -3441,7 +3441,7 @@
         "1ab8c048-bc7a-4a3b-a14c-b02afcafcaa4": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 272,
+            "bbox": 585,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -3452,7 +3452,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 725.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point4",
@@ -3471,7 +3471,7 @@
                 false,
                 ""
             ],
-            "bbox": 289,
+            "bbox": 602,
             "dccaspects": [
                 [
                     [
@@ -4139,7 +4139,7 @@
                 ]
             ],
             "posx": 500.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "sigarms": [
                 [
                     [
@@ -4254,6 +4254,16 @@
                             false,
                             false,
                             true,
+                            false
+                        ]
+                    ],
+                    [
+                        15,
+                        [
+                            true,
+                            false,
+                            false,
+                            false,
                             false
                         ]
                     ]
@@ -4372,7 +4382,7 @@
             ]
         },
         "1f8a59e9-5c19-4a50-a9ec-c9fac51c71c1": {
-            "bbox": 293,
+            "bbox": 606,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 12,
@@ -4391,7 +4401,7 @@
                 3
             ],
             "posx": 1425.0,
-            "posy": 200.0,
+            "posy": 225.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Platform 2 departure to branch",
@@ -4417,7 +4427,7 @@
                 false,
                 ""
             ],
-            "bbox": 312,
+            "bbox": 625,
             "dccaspects": [
                 [
                     [
@@ -5085,7 +5095,7 @@
                 ]
             ],
             "posx": 775.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -5366,43 +5376,43 @@
                 1,
                 1
             ],
-            "bbox": 318,
+            "bbox": 631,
             "colour": "black",
             "endx": 1325.0,
-            "endy": 175.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 17,
             "posx": 1175.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "selection": "line17selected",
             "tags": "line17"
         },
         "204a676c-058b-43ed-bc79-46fd8ca770cb": {
-            "bbox": 322,
+            "bbox": 635,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 12,
             "mirror": "",
             "posx": 200.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "tags": "section12"
         },
         "22a63804-92ab-4d6a-89fb-c5b3eed7e475": {
-            "bbox": 326,
+            "bbox": 639,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 8,
             "mirror": "",
             "posx": 1400.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "tags": "section8"
         },
         "25bde8e4-dc58-4917-b214-70b236a0e316": {
             "alsoswitch": 4,
             "automatic": false,
-            "bbox": 332,
+            "bbox": 645,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -5413,7 +5423,7 @@
             "itemtype": 1,
             "orientation": 0,
             "posx": 725.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -5474,7 +5484,7 @@
         "2660e87b-743d-4bf5-b5c9-33eb079c533c": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 337,
+            "bbox": 650,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -5485,7 +5495,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 1150.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point18",
@@ -5493,14 +5503,14 @@
             "ybuttonoffset": 0
         },
         "280ffb82-b4eb-49d3-96d3-9de9160072b7": {
-            "bbox": 341,
+            "bbox": 654,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 6,
             "mirror": "",
             "posx": 400.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "section6"
         },
         "2a4561df-28d8-43dc-8e5b-5b83c43ac3a4": {
@@ -5510,14 +5520,14 @@
                 1,
                 1
             ],
-            "bbox": 347,
+            "bbox": 660,
             "colour": "black",
             "endx": 650.0,
-            "endy": 175.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 18,
             "posx": 500.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "selection": "line18selected",
             "tags": "line18"
         },
@@ -5528,19 +5538,19 @@
                 20,
                 5
             ],
-            "bbox": 353,
+            "bbox": 666,
             "colour": "black",
             "endx": 100.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 31,
             "posx": 125.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line31selected",
             "tags": "line31"
         },
         "2bead2aa-671c-4699-9f91-4f2ec453fe9f": {
-            "bbox": 357,
+            "bbox": 670,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 6,
@@ -5563,7 +5573,7 @@
                 7
             ],
             "posx": 1425.0,
-            "posy": 425.0,
+            "posy": 450.0,
             "resetpoints": true,
             "routecolour": "#c800ff",
             "routedescription": "Goods loop departure to Up Main",
@@ -5578,7 +5588,7 @@
         },
         "2ea41ff5-d1c7-4c38-bb25-53eeadc25735": {
             "background": "grey85",
-            "bbox": 360,
+            "bbox": 673,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -5588,13 +5598,13 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1751.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "2ea41ff5-d1c7-4c38-bb25-53eeadc25735",
             "text": "DOWN\nMAIN"
         },
         "2fcbbfe6-7a94-4913-b572-8ddad96c76a3": {
             "background": "grey85",
-            "bbox": 363,
+            "bbox": 676,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -5604,12 +5614,12 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1272.0,
-            "posy": 105.0,
+            "posy": 130.0,
             "tags": "2fcbbfe6-7a94-4913-b572-8ddad96c76a3",
             "text": "Goods Yard"
         },
         "333315c4-06d2-4914-bfcb-48af3597e851": {
-            "bbox": 367,
+            "bbox": 680,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 7,
@@ -5633,7 +5643,7 @@
                 8
             ],
             "posx": 1600.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "resetpoints": true,
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into goods loop",
@@ -5648,7 +5658,7 @@
         },
         "359d1564-4a52-49ef-81e0-a72df0f02220": {
             "background": "grey85",
-            "bbox": 370,
+            "bbox": 683,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -5658,7 +5668,7 @@
             "itemid": 0,
             "justify": 2,
             "posx": 550.0,
-            "posy": 105.0,
+            "posy": 130.0,
             "tags": "359d1564-4a52-49ef-81e0-a72df0f02220",
             "text": "Headshunt"
         },
@@ -5669,32 +5679,32 @@
                 0,
                 0
             ],
-            "bbox": 376,
+            "bbox": 689,
             "colour": "black",
             "endx": 575.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 10,
             "posx": 550.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line10selected",
             "tags": "line10"
         },
         "37716476-045e-4efc-a8d0-dc30b5f9ccbb": {
-            "bbox": 380,
+            "bbox": 693,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 5,
             "mirror": "",
             "posx": 1400.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "section5"
         },
         "37fbb878-e6fd-4629-96f8-5912ec2ab8d3": {
             "alsoswitch": 0,
             "automatic": false,
-            "bbox": 387,
+            "bbox": 700,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -5705,7 +5715,7 @@
             "itemtype": 2,
             "orientation": 180,
             "posx": 1150.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -5735,7 +5745,7 @@
                 false,
                 ""
             ],
-            "bbox": 406,
+            "bbox": 719,
             "dccaspects": [
                 [
                     [
@@ -6403,7 +6413,7 @@
                 ]
             ],
             "posx": 775.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "sigarms": [
                 [
                     [
@@ -6642,14 +6652,14 @@
                 20,
                 5
             ],
-            "bbox": 412,
+            "bbox": 725,
             "colour": "black",
             "endx": 500.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 12,
             "posx": 75.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line12selected",
             "tags": "line12"
         },
@@ -6660,19 +6670,19 @@
                 0,
                 0
             ],
-            "bbox": 418,
+            "bbox": 731,
             "colour": "black",
             "endx": 1125.0,
-            "endy": 400.0,
+            "endy": 425.0,
             "item": "line",
             "itemid": 13,
             "posx": 900.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "selection": "line13selected",
             "tags": "line13"
         },
         "3b5c8ec9-898a-4724-8b45-fb33b6158df6": {
-            "bbox": 422,
+            "bbox": 735,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 20,
@@ -6698,7 +6708,7 @@
                 4
             ],
             "posx": 225.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "resetpoints": true,
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into goods loop",
@@ -6712,18 +6722,18 @@
             "tracksensor": 7
         },
         "3b9c9266-3dfe-4349-84a3-c7b9b9185cae": {
-            "bbox": 426,
+            "bbox": 739,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 17,
             "mirror": "",
             "posx": 400.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "section17"
         },
         "3ed6eb67-18ea-4f66-b2f0-e12664a6d90f": {
-            "bbox": 430,
+            "bbox": 743,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 19,
@@ -6742,7 +6752,7 @@
                 9
             ],
             "posx": 225.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Branch Arrival into Platform 3",
@@ -6763,26 +6773,26 @@
                 20,
                 5
             ],
-            "bbox": 436,
+            "bbox": 749,
             "colour": "black",
             "endx": 1650.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 25,
             "posx": 1675.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line25selected",
             "tags": "line25"
         },
         "41798b7f-8f72-4a52-9aa0-8c13ac1f7292": {
-            "bbox": 440,
+            "bbox": 753,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 2,
             "mirror": "",
             "posx": 400.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "tags": "section2"
         },
         "42268451-4d24-4320-b245-ba8ee3c0e66e": {
@@ -6792,14 +6802,14 @@
                 0,
                 0
             ],
-            "bbox": 446,
+            "bbox": 759,
             "colour": "black",
             "endx": 575.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 19,
             "posx": 75.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line19selected",
             "tags": "line19"
         },
@@ -6815,7 +6825,7 @@
                 false,
                 ""
             ],
-            "bbox": 465,
+            "bbox": 778,
             "dccaspects": [
                 [
                     [
@@ -7483,7 +7493,7 @@
                 ]
             ],
             "posx": 1000.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "sigarms": [
                 [
                     [
@@ -7722,21 +7732,21 @@
                 0,
                 0
             ],
-            "bbox": 471,
+            "bbox": 784,
             "colour": "black",
             "endx": 1075.0,
-            "endy": 175.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 2,
             "posx": 900.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "selection": "line2selected",
             "tags": "line2"
         },
         "47a9ea55-623c-48d0-af0d-6a4be22cc19f": {
             "alsoswitch": 6,
             "automatic": false,
-            "bbox": 478,
+            "bbox": 791,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -7747,7 +7757,7 @@
             "itemtype": 2,
             "orientation": 0,
             "posx": 675.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -7812,14 +7822,14 @@
                 0,
                 0
             ],
-            "bbox": 484,
+            "bbox": 797,
             "colour": "black",
             "endx": 1125.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 9,
             "posx": 900.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line9selected",
             "tags": "line9"
         },
@@ -7830,24 +7840,24 @@
                 0,
                 0
             ],
-            "bbox": 490,
+            "bbox": 803,
             "colour": "black",
             "endx": 650.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 14,
             "posx": 550.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line14selected",
             "tags": "line14"
         },
         "5424f96f-2ac5-49c0-9ea4-f8c51e696e02": {
-            "bbox": 494,
+            "bbox": 807,
             "item": "tracksensor",
             "itemid": 4,
             "passedsensor": "",
             "posx": 75.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "routeahead": [
                 [
                     [
@@ -8145,18 +8155,18 @@
             "tags": "sensor4"
         },
         "550b7d1a-fb0a-47f1-8361-9699e60514e9": {
-            "bbox": 498,
+            "bbox": 811,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 22,
             "mirror": "",
             "posx": 1600.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "section22"
         },
         "55da5108-9de2-4e68-ab11-d0dd6e32a222": {
-            "bbox": 502,
+            "bbox": 815,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 5,
@@ -8179,7 +8189,7 @@
                 5
             ],
             "posx": 1600.0,
-            "posy": 425.0,
+            "posy": 450.0,
             "resetpoints": true,
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Platform 3",
@@ -8199,20 +8209,20 @@
                 0,
                 0
             ],
-            "bbox": 508,
+            "bbox": 821,
             "colour": "black",
             "endx": 1150.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 1,
             "posx": 1125.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "selection": "line1selected",
             "tags": "line1"
         },
         "58ab1e60-0f14-4c1a-b97c-63a46790c987": {
             "background": "#d9d9b1",
-            "bbox": 511,
+            "bbox": 824,
             "border": 2,
             "colour": "black",
             "font": "Courier",
@@ -8222,12 +8232,12 @@
             "itemid": 0,
             "justify": 2,
             "posx": 900.0,
-            "posy": 436.0,
+            "posy": 461.0,
             "tags": "58ab1e60-0f14-4c1a-b97c-63a46790c987",
             "text": "   Platform 1   \n         "
         },
         "5b638f9c-8e40-4fa7-ae68-ff0b9c8d16bf": {
-            "bbox": 515,
+            "bbox": 828,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 21,
@@ -8250,7 +8260,7 @@
                 9
             ],
             "posx": 225.0,
-            "posy": 425.0,
+            "posy": 450.0,
             "resetpoints": true,
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into platform 3",
@@ -8264,12 +8274,12 @@
             "tracksensor": 9
         },
         "5c14b604-4602-4fd7-8128-449eba7dea46": {
-            "bbox": 519,
+            "bbox": 832,
             "item": "tracksensor",
             "itemid": 1,
             "passedsensor": "",
             "posx": 1100.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "routeahead": [
                 [
                     [
@@ -8569,7 +8579,7 @@
         "5e8f3ed5-e412-4861-a3d8-499d7f467e80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 524,
+            "bbox": 837,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -8580,7 +8590,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 1175.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "reverse": true,
             "siginterlock": [],
             "tags": "point1",
@@ -8599,7 +8609,7 @@
                 false,
                 ""
             ],
-            "bbox": 535,
+            "bbox": 848,
             "dccaspects": [
                 [
                     [
@@ -9267,7 +9277,7 @@
                 ]
             ],
             "posx": 650.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "sigarms": [
                 [
                     [
@@ -9502,7 +9512,7 @@
         "5fd84d01-3fc8-4592-923c-968e38f13c80": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 540,
+            "bbox": 853,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -9513,7 +9523,7 @@
             "itemtype": 2,
             "orientation": 180,
             "posx": 600.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point13",
@@ -9532,7 +9542,7 @@
                 false,
                 ""
             ],
-            "bbox": 557,
+            "bbox": 870,
             "dccaspects": [
                 [
                     [
@@ -10200,7 +10210,7 @@
                 ]
             ],
             "posx": 325.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -10397,19 +10407,19 @@
                 1,
                 1
             ],
-            "bbox": 563,
+            "bbox": 876,
             "colour": "black",
             "endx": 700.0,
-            "endy": 125.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 23,
             "posx": 500.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "selection": "line23selected",
             "tags": "line23"
         },
         "67046282-f9b4-4d33-9c90-0a23531fc6b2": {
-            "bbox": 567,
+            "bbox": 880,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 11,
@@ -10429,7 +10439,7 @@
                 3
             ],
             "posx": 1600.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Branch arrival into Goods loop",
@@ -10450,14 +10460,14 @@
                 0,
                 0
             ],
-            "bbox": 573,
+            "bbox": 886,
             "colour": "black",
             "endx": 900.0,
-            "endy": 175.0,
+            "endy": 200.0,
             "item": "line",
             "itemid": 35,
             "posx": 750.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "selection": "line35selected",
             "tags": "line35"
         },
@@ -10468,14 +10478,14 @@
                 0,
                 0
             ],
-            "bbox": 579,
+            "bbox": 892,
             "colour": "black",
             "endx": 1725.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 6,
             "posx": 1250.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line6selected",
             "tags": "line6"
         },
@@ -10486,14 +10496,14 @@
                 0,
                 0
             ],
-            "bbox": 585,
+            "bbox": 898,
             "colour": "black",
             "endx": 1150.0,
-            "endy": 375.0,
+            "endy": 400.0,
             "item": "line",
             "itemid": 15,
             "posx": 1125.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "selection": "line15selected",
             "tags": "line15"
         },
@@ -10509,7 +10519,7 @@
                 false,
                 ""
             ],
-            "bbox": 604,
+            "bbox": 917,
             "dccaspects": [
                 [
                     [
@@ -11177,7 +11187,7 @@
                 ]
             ],
             "posx": 1275.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -11456,35 +11466,35 @@
                 20,
                 5
             ],
-            "bbox": 610,
+            "bbox": 923,
             "colour": "black",
             "endx": 125.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 30,
             "posx": 100.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line30selected",
             "tags": "line30"
         },
         "7189da3b-f611-493b-b453-4c18190325b3": {
-            "bbox": 614,
+            "bbox": 927,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 4,
             "mirror": "",
             "posx": 900.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "tags": "section4"
         },
         "71aa37e6-dd5f-402d-a676-bc25644633b1": {
-            "bbox": 618,
+            "bbox": 931,
             "item": "tracksensor",
             "itemid": 9,
             "passedsensor": "",
             "posx": 950.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "routeahead": [
                 [
                     [
@@ -11788,21 +11798,21 @@
                 0,
                 0
             ],
-            "bbox": 624,
+            "bbox": 937,
             "colour": "black",
             "endx": 500.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 11,
             "posx": 75.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line11selected",
             "tags": "line11"
         },
         "771fd5da-2c58-423c-9b29-d181501dca9b": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 629,
+            "bbox": 942,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -11813,7 +11823,7 @@
             "itemtype": 2,
             "orientation": 180,
             "posx": 525.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point12",
@@ -11827,35 +11837,35 @@
                 20,
                 5
             ],
-            "bbox": 635,
+            "bbox": 948,
             "colour": "black",
             "endx": 1675.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 5,
             "posx": 1650.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line5selected",
             "tags": "line5"
         },
         "78c8911f-a18a-41bf-961d-3a43893854d4": {
-            "bbox": 639,
+            "bbox": 952,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 11,
             "mirror": "",
             "posx": 900.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "tags": "section11"
         },
         "7a30db34-8614-4de1-b459-1440f11ef0b7": {
-            "bbox": 643,
+            "bbox": 956,
             "item": "tracksensor",
             "itemid": 11,
             "passedsensor": "",
             "posx": 850.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "routeahead": [
                 [
                     [
@@ -12154,7 +12164,7 @@
         },
         "7aa34fb1-3039-4be1-b71a-9d85fa38f112": {
             "background": "grey85",
-            "bbox": 646,
+            "bbox": 959,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -12169,20 +12179,20 @@
             "text": "Example Layout with Schematic Route Selections"
         },
         "7e4470b9-8e8f-4790-b607-298c970fee30": {
-            "bbox": 650,
+            "bbox": 963,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 9,
             "mirror": "",
             "posx": 1400.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "section9"
         },
         "7f925596-94a5-43a6-b260-ce4bd63caaad": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 655,
+            "bbox": 968,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -12193,7 +12203,7 @@
             "itemtype": 1,
             "orientation": 0,
             "posx": 675.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point17",
@@ -12201,12 +12211,12 @@
             "ybuttonoffset": 0
         },
         "819aa2e8-aca4-4f1a-b08a-0c81429e32da": {
-            "bbox": 659,
+            "bbox": 972,
             "item": "tracksensor",
             "itemid": 10,
             "passedsensor": "",
             "posx": 950.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "routeahead": [
                 [
                     [
@@ -12510,20 +12520,20 @@
                 0,
                 0
             ],
-            "bbox": 665,
+            "bbox": 978,
             "colour": "black",
             "endx": 900.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 36,
             "posx": 625.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line36selected",
             "tags": "line36"
         },
         "846b5450-3bb8-443d-9552-644e650b10dd": {
             "background": "#d9d9b1",
-            "bbox": 668,
+            "bbox": 985,
             "border": 2,
             "colour": "black",
             "font": "Courier",
@@ -12533,13 +12543,13 @@
             "itemid": 0,
             "justify": 2,
             "posx": 899.0,
-            "posy": 263.0,
+            "posy": 288.0,
             "tags": "846b5450-3bb8-443d-9552-644e650b10dd",
             "text": "   Platform 3   \n   Platform 2   "
         },
         "84a2cb6e-79ed-42c2-ae61-55e5c92be7db": {
             "background": "grey85",
-            "bbox": 671,
+            "bbox": 988,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -12549,7 +12559,7 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1749.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "84a2cb6e-79ed-42c2-ae61-55e5c92be7db",
             "text": "BRANCH"
         },
@@ -12565,7 +12575,7 @@
                 false,
                 ""
             ],
-            "bbox": 682,
+            "bbox": 999,
             "dccaspects": [
                 [
                     [
@@ -13233,7 +13243,7 @@
                 ]
             ],
             "posx": 1200.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -13466,14 +13476,14 @@
             ]
         },
         "857bc7b3-6dd9-4fe8-a800-04b0845c77f2": {
-            "bbox": 686,
+            "bbox": 1003,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 16,
             "mirror": "",
             "posx": 550.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "tags": "section16"
         },
         "860ca713-8236-4511-a0db-bc7a7c34bd21": {
@@ -13488,7 +13498,7 @@
                 false,
                 ""
             ],
-            "bbox": 703,
+            "bbox": 1020,
             "dccaspects": [
                 [
                     [
@@ -14156,7 +14166,7 @@
                 ]
             ],
             "posx": 325.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -14364,14 +14374,14 @@
                 0,
                 0
             ],
-            "bbox": 709,
+            "bbox": 1026,
             "colour": "black",
             "endx": 1725.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 7,
             "posx": 1200.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line7selected",
             "tags": "line7"
         },
@@ -14382,24 +14392,24 @@
                 20,
                 5
             ],
-            "bbox": 715,
+            "bbox": 1032,
             "colour": "black",
             "endx": 100.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 27,
             "posx": 125.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line27selected",
             "tags": "line27"
         },
         "91d508bf-88f0-4324-a6f6-0a704e20fdb5": {
-            "bbox": 719,
+            "bbox": 1036,
             "item": "tracksensor",
             "itemid": 2,
             "passedsensor": "",
             "posx": 1725.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "routeahead": [
                 [
                     [
@@ -14703,20 +14713,20 @@
                 20,
                 5
             ],
-            "bbox": 725,
+            "bbox": 1042,
             "colour": "black",
             "endx": 1700.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 28,
             "posx": 1675.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line28selected",
             "tags": "line28"
         },
         "93d61cb6-a272-45a4-be73-7fcd8ae70932": {
             "background": "grey85",
-            "bbox": 728,
+            "bbox": 1045,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -14726,17 +14736,17 @@
             "itemid": 0,
             "justify": 2,
             "posx": 51.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "93d61cb6-a272-45a4-be73-7fcd8ae70932",
             "text": "DOWN\nMAIN"
         },
         "946fe314-a71f-404a-86a8-98d27a10966d": {
-            "bbox": 732,
+            "bbox": 1049,
             "item": "tracksensor",
             "itemid": 12,
             "passedsensor": "",
             "posx": 850.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "routeahead": [
                 [
                     [
@@ -15034,12 +15044,12 @@
             "tags": "sensor12"
         },
         "98f3e500-24e3-477b-b8de-8d0625da443d": {
-            "bbox": 736,
+            "bbox": 1053,
             "item": "tracksensor",
             "itemid": 3,
             "passedsensor": "",
             "posx": 1725.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "routeahead": [
                 [
                     [
@@ -15337,7 +15347,7 @@
             "tags": "sensor3"
         },
         "99bd153e-9f0c-4134-9611-853fa6740f25": {
-            "bbox": 740,
+            "bbox": 1057,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 2,
@@ -15356,7 +15366,7 @@
                 15
             ],
             "posx": 1600.0,
-            "posy": 450.0,
+            "posy": 475.0,
             "resetpoints": false,
             "routecolour": "#ff6100",
             "routedescription": "Down Main arrival into Down Avoiding loop",
@@ -15370,7 +15380,7 @@
             "tracksensor": 11
         },
         "9aec57b5-85f1-4118-b3e2-4c145e6ffaa8": {
-            "bbox": 744,
+            "bbox": 1061,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 18,
@@ -15392,7 +15402,7 @@
                 4
             ],
             "posx": 225.0,
-            "posy": 150.0,
+            "posy": 175.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Branch arrival into goods loop",
@@ -15409,7 +15419,7 @@
         "9dcab729-9273-4ede-9329-f6adc2ff05fb": {
             "alsoswitch": 17,
             "automatic": false,
-            "bbox": 751,
+            "bbox": 1068,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15420,7 +15430,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 675.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -15449,7 +15459,7 @@
             "ybuttonoffset": 0
         },
         "9f2c0ce4-5515-4591-944c-b719fe662513": {
-            "bbox": 755,
+            "bbox": 1072,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 15,
@@ -15468,7 +15478,7 @@
                 13
             ],
             "posx": 400.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Platform 3 departure to branch",
@@ -15489,20 +15499,20 @@
                 1,
                 1
             ],
-            "bbox": 761,
+            "bbox": 1078,
             "colour": "black",
             "endx": 650.0,
-            "endy": 400.0,
+            "endy": 425.0,
             "item": "line",
             "itemid": 20,
             "posx": 625.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "selection": "line20selected",
             "tags": "line20"
         },
         "a824704b-6fde-49ba-ba05-933b6f7fe189": {
             "background": "grey85",
-            "bbox": 764,
+            "bbox": 1081,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -15512,17 +15522,17 @@
             "itemid": 0,
             "justify": 2,
             "posx": 50.0,
-            "posy": 302.0,
+            "posy": 327.0,
             "tags": "a824704b-6fde-49ba-ba05-933b6f7fe189",
             "text": "UP\nMAIN"
         },
         "abc9a055-2106-4b89-8de5-f4ce4e1df22f": {
-            "bbox": 768,
+            "bbox": 1085,
             "item": "tracksensor",
             "itemid": 5,
             "passedsensor": "",
             "posx": 75.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "routeahead": [
                 [
                     [
@@ -15822,7 +15832,7 @@
         "b0f29657-f391-457d-85b7-6a5ec41b0d13": {
             "alsoswitch": 12,
             "automatic": false,
-            "bbox": 775,
+            "bbox": 1092,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -15833,7 +15843,7 @@
             "itemtype": 2,
             "orientation": 0,
             "posx": 525.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -15892,7 +15902,7 @@
             "ybuttonoffset": 0
         },
         "b118ca35-20db-4e0e-881a-e22db97c1b66": {
-            "bbox": 779,
+            "bbox": 1096,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 14,
@@ -15914,7 +15924,7 @@
                 13
             ],
             "posx": 400.0,
-            "posy": 150.0,
+            "posy": 175.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Goods Loop departure to branch",
@@ -15940,7 +15950,7 @@
                 false,
                 ""
             ],
-            "bbox": 796,
+            "bbox": 1113,
             "dccaspects": [
                 [
                     [
@@ -16608,7 +16618,7 @@
                 ]
             ],
             "posx": 1475.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -16810,23 +16820,23 @@
             ]
         },
         "b17fb551-2bfe-4d2a-9429-d2d94005c0c5": {
-            "bbox": 800,
+            "bbox": 1117,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 20,
             "mirror": "",
             "posx": 1600.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "section20"
         },
         "b20e0671-cd3e-440f-b7de-2af556846bc7": {
-            "bbox": 804,
+            "bbox": 1121,
             "item": "tracksensor",
             "itemid": 8,
             "passedsensor": "",
             "posx": 850.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "routeahead": [
                 [
                     [
@@ -17126,7 +17136,7 @@
         "b34426dc-7315-4c73-b36a-b2c97b9c94c7": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 809,
+            "bbox": 1126,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -17137,7 +17147,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 1225.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point2",
@@ -17156,7 +17166,7 @@
                 false,
                 ""
             ],
-            "bbox": 826,
+            "bbox": 1143,
             "dccaspects": [
                 [
                     [
@@ -17824,7 +17834,7 @@
                 ]
             ],
             "posx": 1000.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "sigarms": [
                 [
                     [
@@ -18026,7 +18036,7 @@
                 false,
                 ""
             ],
-            "bbox": 843,
+            "bbox": 1160,
             "dccaspects": [
                 [
                     [
@@ -18694,7 +18704,7 @@
                 ]
             ],
             "posx": 775.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "sigarms": [
                 [
                     [
@@ -18885,7 +18895,7 @@
             ]
         },
         "b7d81f2a-7d03-42f7-9125-a3559433f934": {
-            "bbox": 847,
+            "bbox": 1164,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 22,
@@ -18904,7 +18914,7 @@
                 14
             ],
             "posx": 225.0,
-            "posy": 450.0,
+            "posy": 475.0,
             "resetpoints": false,
             "routecolour": "#c800ff",
             "routedescription": "Up Main arrival into Platform 2",
@@ -18918,7 +18928,7 @@
             "tracksensor": 10
         },
         "b7f5f250-60f7-4678-95b8-0c8e50417a04": {
-            "bbox": 851,
+            "bbox": 1168,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 13,
@@ -18938,7 +18948,7 @@
                 3
             ],
             "posx": 1600.0,
-            "posy": 200.0,
+            "posy": 225.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Branch line arrival into Platform 2",
@@ -18953,7 +18963,7 @@
             "tracksensor": 8
         },
         "b9e52658-031c-49c8-a7c1-c18c6bf6d8e1": {
-            "bbox": 855,
+            "bbox": 1172,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 4,
@@ -18972,7 +18982,7 @@
                 11
             ],
             "posx": 400.0,
-            "posy": 450.0,
+            "posy": 475.0,
             "resetpoints": false,
             "routecolour": "#ff6100",
             "routedescription": "Avoiding Loop departure to Down Main",
@@ -18986,7 +18996,7 @@
             "tracksensor": 5
         },
         "bc306663-e528-4e0e-b65b-a32754ee91d5": {
-            "bbox": 859,
+            "bbox": 1176,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 10,
@@ -19006,7 +19016,7 @@
                 3
             ],
             "posx": 1425.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "resetpoints": false,
             "routecolour": "#0000ff",
             "routedescription": "Goods Loop departure to branch",
@@ -19021,25 +19031,25 @@
             "tracksensor": 2
         },
         "bc6fbf64-cd5a-418a-98b7-2e0beeb7c64e": {
-            "bbox": 863,
+            "bbox": 1180,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 18,
             "mirror": "",
             "posx": 1275.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "tags": "section18"
         },
         "bf63c705-72aa-4cc3-8d20-bbb1c69bb297": {
-            "bbox": 867,
+            "bbox": 1184,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 14,
             "mirror": "",
             "posx": 550.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "tags": "section14"
         },
         "c4b4066f-85bb-4842-8aca-d5c184ac2954": {
@@ -19049,21 +19059,21 @@
                 0,
                 0
             ],
-            "bbox": 873,
+            "bbox": 1190,
             "colour": "black",
             "endx": 900.0,
-            "endy": 225.0,
+            "endy": 250.0,
             "item": "line",
             "itemid": 34,
             "posx": 700.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "selection": "line34selected",
             "tags": "line34"
         },
         "c867d2f6-3d89-490c-a3f9-b8cdd535ae99": {
             "alsoswitch": 18,
             "automatic": false,
-            "bbox": 879,
+            "bbox": 1196,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -19074,7 +19084,7 @@
             "itemtype": 1,
             "orientation": 0,
             "posx": 1150.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -19103,14 +19113,14 @@
             "ybuttonoffset": 0
         },
         "c9d70646-364e-454c-95de-978d995c6c8e": {
-            "bbox": 883,
+            "bbox": 1200,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 3,
             "mirror": "",
             "posx": 900.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "tags": "section3"
         },
         "cb641f98-4ee0-47a4-ad0c-0888d5b8983e": {
@@ -19125,7 +19135,7 @@
                 false,
                 ""
             ],
-            "bbox": 900,
+            "bbox": 1217,
             "dccaspects": [
                 [
                     [
@@ -19793,7 +19803,7 @@
                 ]
             ],
             "posx": 275.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -20021,14 +20031,14 @@
                 0,
                 0
             ],
-            "bbox": 906,
+            "bbox": 1223,
             "colour": "black",
             "endx": 1150.0,
-            "endy": 300.0,
+            "endy": 325.0,
             "item": "line",
             "itemid": 4,
             "posx": 900.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "selection": "line4selected",
             "tags": "line4"
         },
@@ -20039,20 +20049,20 @@
                 20,
                 5
             ],
-            "bbox": 912,
+            "bbox": 1229,
             "colour": "black",
             "endx": 1650.0,
-            "endy": 250.0,
+            "endy": 275.0,
             "item": "line",
             "itemid": 29,
             "posx": 1675.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line29selected",
             "tags": "line29"
         },
         "cc0ad700-89e3-486c-8ad0-e9a05ea0556d": {
             "background": "grey85",
-            "bbox": 915,
+            "bbox": 1232,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -20062,7 +20072,7 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1275.0,
-            "posy": 155.0,
+            "posy": 180.0,
             "tags": "cc0ad700-89e3-486c-8ad0-e9a05ea0556d",
             "text": "Headshunt"
         },
@@ -20073,46 +20083,46 @@
                 0,
                 0
             ],
-            "bbox": 921,
+            "bbox": 1238,
             "colour": "black",
             "endx": 650.0,
-            "endy": 225.0,
+            "endy": 250.0,
             "item": "line",
             "itemid": 8,
             "posx": 625.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "selection": "line8selected",
             "tags": "line8"
         },
         "ce380375-14c3-464d-a468-bf9a0b7a0f10": {
-            "bbox": 925,
+            "bbox": 1246,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 21,
             "mirror": "",
             "posx": 1600.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "tags": "section21"
         },
         "ceebbc85-e329-4185-a57f-e9230865a45c": {
-            "bbox": 929,
+            "bbox": 1250,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 13,
             "mirror": "",
             "posx": 1275.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "tags": "section13"
         },
         "d3df1397-1978-4d8d-9999-a561d4d321de": {
-            "bbox": 933,
+            "bbox": 1254,
             "item": "tracksensor",
             "itemid": 6,
             "passedsensor": "",
             "posx": 850.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "routeahead": [
                 [
                     [
@@ -20412,7 +20422,7 @@
         "d433fb55-7016-4bc9-ac60-9cf142605fa8": {
             "alsoswitch": 13,
             "automatic": false,
-            "bbox": 940,
+            "bbox": 1261,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -20423,7 +20433,7 @@
             "itemtype": 2,
             "orientation": 0,
             "posx": 600.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -20472,14 +20482,14 @@
             "ybuttonoffset": 0
         },
         "d4a3a8dc-b0f1-4ada-b934-36b9646a17b7": {
-            "bbox": 944,
+            "bbox": 1265,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 10,
             "mirror": "",
             "posx": 900.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "tags": "section10"
         },
         "d54b8c9a-8486-40c5-bae4-f17b843778fb": {
@@ -20494,7 +20504,7 @@
                 false,
                 ""
             ],
-            "bbox": 961,
+            "bbox": 1282,
             "dccaspects": [
                 [
                     [
@@ -21162,7 +21172,7 @@
                 ]
             ],
             "posx": 1475.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "sigarms": [
                 [
                     [
@@ -21353,19 +21363,19 @@
             ]
         },
         "d93793ac-8990-4f68-ae7a-7a17c80043bc": {
-            "bbox": 965,
+            "bbox": 1286,
             "defaultlabel": "XXXXXxxx",
             "editable": true,
             "item": "section",
             "itemid": 1,
             "mirror": "",
             "posx": 200.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "tags": "section1"
         },
         "ddb09cbe-5c7d-4810-b27b-0b64e588e56b": {
             "background": "grey85",
-            "bbox": 968,
+            "bbox": 1289,
             "border": 0,
             "colour": "black",
             "font": "Courier",
@@ -21375,14 +21385,14 @@
             "itemid": 0,
             "justify": 2,
             "posx": 1750.0,
-            "posy": 302.0,
+            "posy": 327.0,
             "tags": "ddb09cbe-5c7d-4810-b27b-0b64e588e56b",
             "text": "UP\nMAIN"
         },
         "dec5f273-15d3-4ba7-a029-16028a9936e9": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 973,
+            "bbox": 1294,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -21393,7 +21403,7 @@
             "itemtype": 2,
             "orientation": 180,
             "posx": 675.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point6",
@@ -21407,19 +21417,19 @@
                 0,
                 0
             ],
-            "bbox": 979,
+            "bbox": 1300,
             "colour": "black",
             "endx": 1125.0,
-            "endy": 125.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 21,
             "posx": 750.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "selection": "line21selected",
             "tags": "line21"
         },
         "e2c437bb-ec9b-46d1-bf27-0a9b5467f77d": {
-            "bbox": 983,
+            "bbox": 1304,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 16,
@@ -21442,7 +21452,7 @@
                 11
             ],
             "posx": 400.0,
-            "posy": 425.0,
+            "posy": 450.0,
             "resetpoints": true,
             "routecolour": "#ff6100",
             "routedescription": "Platform 3 departure to Down Main",
@@ -21462,21 +21472,21 @@
                 1,
                 1
             ],
-            "bbox": 989,
+            "bbox": 1310,
             "colour": "black",
             "endx": 1325.0,
-            "endy": 125.0,
+            "endy": 150.0,
             "item": "line",
             "itemid": 22,
             "posx": 1175.0,
-            "posy": 125.0,
+            "posy": 150.0,
             "selection": "line22selected",
             "tags": "line22"
         },
         "e5eea518-6f34-47d9-8a17-ca314e06a52d": {
             "alsoswitch": 0,
             "automatic": true,
-            "bbox": 994,
+            "bbox": 1315,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -21487,7 +21497,7 @@
             "itemtype": 1,
             "orientation": 0,
             "posx": 1100.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "reverse": false,
             "siginterlock": [],
             "tags": "point7",
@@ -21506,7 +21516,7 @@
                 false,
                 ""
             ],
-            "bbox": 1013,
+            "bbox": 1334,
             "dccaspects": [
                 [
                     [
@@ -22174,7 +22184,7 @@
                 ]
             ],
             "posx": 500.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -22438,7 +22448,7 @@
                 false,
                 ""
             ],
-            "bbox": 1030,
+            "bbox": 1351,
             "dccaspects": [
                 [
                     [
@@ -23106,7 +23116,7 @@
                 ]
             ],
             "posx": 775.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "sigarms": [
                 [
                     [
@@ -23299,7 +23309,7 @@
         "eaed2508-4646-46cc-83fa-b9ef8ee2848b": {
             "alsoswitch": 7,
             "automatic": false,
-            "bbox": 1037,
+            "bbox": 1358,
             "colour": "black",
             "dccaddress": 0,
             "dccreversed": false,
@@ -23310,7 +23320,7 @@
             "itemtype": 1,
             "orientation": 180,
             "posx": 1100.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "reverse": false,
             "siginterlock": [
                 [
@@ -23380,7 +23390,7 @@
                 false,
                 ""
             ],
-            "bbox": 1054,
+            "bbox": 1375,
             "dccaspects": [
                 [
                     [
@@ -24048,7 +24058,7 @@
                 ]
             ],
             "posx": 275.0,
-            "posy": 300.0,
+            "posy": 325.0,
             "sigarms": [
                 [
                     [
@@ -24245,14 +24255,14 @@
                 0,
                 0
             ],
-            "bbox": 1060,
+            "bbox": 1381,
             "colour": "black",
             "endx": 900.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 32,
             "posx": 700.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line32selected",
             "tags": "line32"
         },
@@ -24263,19 +24273,19 @@
                 0,
                 0
             ],
-            "bbox": 1066,
+            "bbox": 1387,
             "colour": "black",
             "endx": 1075.0,
-            "endy": 225.0,
+            "endy": 250.0,
             "item": "line",
             "itemid": 3,
             "posx": 900.0,
-            "posy": 225.0,
+            "posy": 250.0,
             "selection": "line3selected",
             "tags": "line3"
         },
         "f4875d39-1482-47d9-a37d-3b58035e94ad": {
-            "bbox": 1070,
+            "bbox": 1391,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 8,
@@ -24297,7 +24307,7 @@
                 2
             ],
             "posx": 1425.0,
-            "posy": 450.0,
+            "posy": 475.0,
             "resetpoints": true,
             "routecolour": "#c800ff",
             "routedescription": "Platform 3 departure to Up Main",
@@ -24322,7 +24332,7 @@
                 false,
                 ""
             ],
-            "bbox": 1087,
+            "bbox": 1408,
             "dccaspects": [
                 [
                     [
@@ -24990,7 +25000,7 @@
                 ]
             ],
             "posx": 1525.0,
-            "posy": 250.0,
+            "posy": 275.0,
             "sigarms": [
                 [
                     [
@@ -25212,7 +25222,7 @@
             ]
         },
         "f85bced4-b684-4738-a166-c8b978efeb6d": {
-            "bbox": 1091,
+            "bbox": 1412,
             "buttonwidth": 20,
             "item": "route",
             "itemid": 9,
@@ -25230,7 +25240,7 @@
                 2
             ],
             "posx": 1425.0,
-            "posy": 400.0,
+            "posy": 425.0,
             "resetpoints": false,
             "routecolour": "#c800ff",
             "routedescription": "Platform 2 departure to Up Main",
@@ -25255,7 +25265,7 @@
                 false,
                 ""
             ],
-            "bbox": 1110,
+            "bbox": 1431,
             "dccaspects": [
                 [
                     [
@@ -25923,7 +25933,7 @@
                 ]
             ],
             "posx": 1000.0,
-            "posy": 175.0,
+            "posy": 200.0,
             "sigarms": [
                 [
                     [
@@ -26183,14 +26193,14 @@
                 0,
                 0
             ],
-            "bbox": 1116,
+            "bbox": 1437,
             "colour": "black",
             "endx": 1200.0,
-            "endy": 350.0,
+            "endy": 375.0,
             "item": "line",
             "itemid": 16,
             "posx": 1175.0,
-            "posy": 350.0,
+            "posy": 375.0,
             "selection": "line16selected",
             "tags": "line16"
         }
