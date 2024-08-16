@@ -624,12 +624,9 @@ def run_all_schematic_routes_tests(delay:float=0.0):
     print("Schematic Route Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_tests(delay)
-    #############################################################################################
-    ####### TO Do - a test that starts off in Run Mode and changes to Edit Mode and Back ########
-    #############################################################################################
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_object_edit_windows.test_all_object_edit_windows(delay)
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     # Run the Tests for the example layout
     initialise_test_harness(filename="../configuration_examples/schematic_routes_example.sig")
     reset_layout()
@@ -640,9 +637,9 @@ def run_all_schematic_routes_tests(delay:float=0.0):
     print("Schematic Route Example Layout Tests - Run Mode, Automation On")
     set_automation_on()
     run_schematic_routes_example_tests(delay)
-#     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
-#     set_edit_mode()
-#     test_object_edit_windows.test_all_object_edit_windows(delay)
+    # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
+    set_edit_mode()
+    test_object_edit_windows.test_all_object_edit_windows(delay)
     report_results()
     
 if __name__ == "__main__":
