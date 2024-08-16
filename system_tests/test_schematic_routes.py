@@ -214,6 +214,25 @@ def run_change_of_item_id_tests(delay:float=0.0):
 # the 'schematic_routes_example.sig example' layout file
 #-----------------------------------------------------------------------------------
 
+def run_initial_state_tests(delay:float=0.0):
+    # Test_initial condition (at layout load)
+    # Route 5 should be active with Point 2 switched and Signal 1 OFF
+    # Instrument is BLOCKED so Route 1 will not be viable (when Route 5 de-selected)
+    assert_buttons_selected(5)
+    assert_buttons_disabled(1,2,3,4)
+    assert_buttons_enabled(5,6)
+    assert_points_switched(2)
+    assert_points_normal(1)
+    assert_signals_PROCEED(1)
+    simulate_buttons_clicked(5)
+    sleep(delay+1.5)
+    assert_points_normal(1,2)
+    assert_signals_DANGER(1)
+    assert_buttons_deselected(5)
+    assert_buttons_enabled(2,3,4,5,6)
+    assert_buttons_disabled(1)
+    return()
+
 def run_schematic_routes_tests(delay:float=0.0):
     # Test Route disabled if signal interlocked with Instrument
     assert_block_section_ahead_not_clear(1)
@@ -240,8 +259,52 @@ def run_schematic_routes_tests(delay:float=0.0):
     # Instruments are set to CLEAR so they dont affect with the following tests
     set_instrument_clear(2) 
     sleep(delay)
-    # Test Conflicting Signals inhibit route buttons
+    # Test Route disabled if signal interlocked with track sections
     assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(1)
+    sleep(delay)
+    assert_buttons_disabled(1)
+    assert_buttons_enabled(2,3,4,5,6)
+    set_sections_clear(1)
+    sleep(delay)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(2)
+    sleep(delay)
+    assert_buttons_disabled(1)
+    assert_buttons_enabled(2,3,4,5,6)
+    set_sections_clear(2)
+    sleep(delay)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(3)
+    sleep(delay)
+    assert_buttons_disabled(1)
+    assert_buttons_enabled(2,3,4,5,6)
+    set_sections_clear(3)
+    sleep(delay)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    set_sections_occupied(4,5,6)
+    sleep(delay)
+    assert_buttons_disabled(3)
+    assert_buttons_enabled(1,2,4,5,6)
+    set_sections_clear(4,5,6)
+    sleep(delay)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Route can still be cleared down if signals are locked by Track Sections
+    simulate_buttons_clicked(5)
+    sleep(delay+1.5)
+    assert_buttons_selected(5)
+    set_sections_occupied(7,8,9)
+    sleep(delay)
+    assert_buttons_enabled(5)
+    assert_buttons_selected(5)
+    simulate_buttons_clicked(5)
+    sleep(delay+1.5)
+    assert_buttons_disabled(5)
+    assert_buttons_deselected(5)
+    set_sections_clear(7,8,9)
+    sleep(delay)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Conflicting Signals inhibit route buttons
     set_signals_off(6)
     sleep(delay)
     assert_buttons_disabled(1,2)
@@ -272,6 +335,14 @@ def run_schematic_routes_tests(delay:float=0.0):
     set_subsidaries_on(6,7,8)
     sleep(delay)
     assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Basic setup and cleardown of Signal Routes
+    simulate_buttons_clicked(5)
+    sleep(delay+1.5)
+    assert_buttons_selected(5)
+    simulate_buttons_clicked(5)
+    sleep(delay+1.5)
+    assert_buttons_deselected(5)
+    assert_buttons_enabled(1,2,3,4,5,6)
     # Test Basic setup and cleardown of Subsidary Routes
     simulate_buttons_clicked(2)
     sleep(delay+1.5)
@@ -280,10 +351,31 @@ def run_schematic_routes_tests(delay:float=0.0):
     sleep(delay+1.5)
     assert_buttons_deselected(2)
     assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Basic setup and cleardown of Signal Routes - where signals are already clear
+    set_signals_off(1)
+    sleep(delay)
+    assert_buttons_enabled(3,4)
+    assert_buttons_disabled(1,2,5,6)
+    simulate_buttons_clicked(3)
+    sleep(delay+1.5)
+    assert_buttons_selected(3)
+    simulate_buttons_clicked(3)
+    sleep(delay+1.5)
+    assert_buttons_deselected(3)
+    assert_buttons_enabled(1,2,3,4,5,6)
+    # Test Basic setup and cleardown of Subsidary Routes - where subsidaries are already clear
+    set_subsidaries_off(1)
+    sleep(delay)
+    assert_buttons_enabled(3,4)
+    assert_buttons_disabled(1,2,5,6)
+    simulate_buttons_clicked(4)
+    sleep(delay+1.5)
+    assert_buttons_selected(4)
+    simulate_buttons_clicked(4)
+    sleep(delay+1.5)
+    assert_buttons_deselected(4)
+    assert_buttons_enabled(1,2,3,4,5,6)
     # Test Reset of Main Signal if Subsidary Route Selected and vice versa
-    ##########################################################################################################
-    ############### BUG HERE - Both Shunting and Main routes can be selected at the same Time ################
-    ##########################################################################################################
     set_signals_off(1)
     assert_buttons_enabled(3,4)
     assert_buttons_disabled(1,2,5,6)
@@ -293,8 +385,10 @@ def run_schematic_routes_tests(delay:float=0.0):
     simulate_buttons_clicked(3)
     sleep(delay+2)
     assert_buttons_selected(3)
+    assert_buttons_deselected(4)
     simulate_buttons_clicked(3)
-    assert_buttons_deselected(3)
+    sleep(delay+2)
+    assert_buttons_deselected(3,4)
     # Test Signal Change invalidating an established route clears the route
     simulate_buttons_clicked(5)
     sleep(delay+2)
@@ -378,7 +472,7 @@ def run_schematic_routes_tests(delay:float=0.0):
     set_points_normal(3)
     sleep(delay+1.5)
     assert_buttons_deselected(7)
-    assert_points_normal(5)
+    assert_points_normal(3)
     sleep(delay)
     # Return Layout to normal
     set_instrument_blocked(2) 
@@ -515,15 +609,16 @@ def run_schematic_routes_example_tests(delay:float=0.0):
 ######################################################################################################
 
 def run_all_schematic_routes_tests(delay:float=0.0):
-#     # Run the standalone tests for Schematic routes
-#     print("Route configuration update tests (change/delete of item IDs)")
-#     initialise_test_harness()
-#     run_change_of_item_id_tests(delay)
-    # Run the tests for "test_schematic_routes.sig"
+    # Run the standalone tests for Schematic routes
+    print("Route configuration update tests (change/delete of item IDs)")
+    initialise_test_harness()
+    run_change_of_item_id_tests(delay)
+    # Run the Tests for "test_schematic_routes.sig" - Note this layout File should  
+    # have been saved in RUN Mode With Automation ON and "Route 3 Main" Active
     initialise_test_harness(filename="test_schematic_routes.sig")
-    reset_layout()
+    print("Schematic Route Tests - Initial State Tests")
+    run_initial_state_tests(delay)
     print("Schematic Route Tests - Run Mode, Automation Off")
-    set_run_mode()
     set_automation_off()
     run_schematic_routes_tests(delay)
     print("Schematic Route Tests - Run Mode, Automation On")
@@ -535,16 +630,16 @@ def run_all_schematic_routes_tests(delay:float=0.0):
 #     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
 #     set_edit_mode()
 #     test_object_edit_windows.test_all_object_edit_windows(delay)
-#     # Run the Tests for the example layout
-#     initialise_test_harness(filename="../configuration_examples/schematic_routes_example.sig")
-#     reset_layout()
-#     print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
-#     set_run_mode()
-#     set_automation_off()
-#     run_schematic_routes_example_tests(delay)
-#     print("Schematic Route Example Layout Tests - Run Mode, Automation On")
-#     set_automation_on()
-#     run_schematic_routes_example_tests(delay)
+    # Run the Tests for the example layout
+    initialise_test_harness(filename="../configuration_examples/schematic_routes_example.sig")
+    reset_layout()
+    print("Schematic Route Example Layout Tests - Run Mode, Automation Off")
+    set_run_mode()
+    set_automation_off()
+    run_schematic_routes_example_tests(delay)
+    print("Schematic Route Example Layout Tests - Run Mode, Automation On")
+    set_automation_on()
+    run_schematic_routes_example_tests(delay)
 #     # Edit/save all schematic objects to give confidence that editing doesn't break the layout configuration
 #     set_edit_mode()
 #     test_object_edit_windows.test_all_object_edit_windows(delay)
