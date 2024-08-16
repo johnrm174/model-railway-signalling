@@ -57,6 +57,8 @@ def run_all_tests():
     test_automation_examples.run_all_automation_example_tests()
     print("*** Running tests from 'test_single_line_examples.py' ***")
     test_single_line_examples.run_all_single_line_example_tests()
+    print("*** Running tests from 'test_mqtt_networking_example.py' ***")
+    test_mqtt_networking_example.run_all_mqtt_networking_example_tests()
 
     print("*** Running tests from 'test_load_layout_failures.py' ***")
     test_load_layout_failures.run_all_load_layout_negative_tests()
