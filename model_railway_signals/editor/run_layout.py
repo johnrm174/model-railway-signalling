@@ -937,26 +937,31 @@ def initialise_layout():
         
 ##################################################################################################
 # These are the run-layout callbacks (set up when creating the library objects on the schematic)
-# Note that the returned item_id could be a remote ID (str) or local_id for SIGNAL UPDATED events.
-# All other events are associated with objects on the local schematic
+# Note that the returned item_id could be a remote ID (str) or local_id (int) for SIGNAL UPDATED
+# events. All other events are local_ids (int) - associated with objects on the local schematic
+# The point_switched, fpl_switched, signal_switched and subsidary_switched functions are also
+# called following changes to the layout initiated by the schematic_routes function. In this
+# case, the route_id is also passed into the function so it can be forwarded to the functions
+# that check if routes are still valid following a change in state. This is so any changes to
+# set up or clear down a route won't trigger a route re-set - eg set FPL off to change a point
 ##################################################################################################
 
 enhanced_debugging = False
 
-def point_switched_callback(point_id:int):
+def point_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## point_switched_callback "+str(point_id))
     configure_all_signal_routes()
     if run_mode and automation_enabled:
         override_signals_based_on_track_sections_ahead()
     process_all_signal_interlocking()
-    run_routes.check_routes_valid_after_point_change(point_id)
+    run_routes.check_routes_valid_after_point_change(point_id, route_id)
     canvas.focus_set()
     return()
 
-def fpl_switched_callback(point_id:int):
+def fpl_switched_callback(point_id:int, route_id:int=0):
     if enhanced_debugging: print("########## fpl_switched_callback "+str(point_id))
     process_all_signal_interlocking()
-    run_routes.check_routes_valid_after_point_change(point_id)
+    run_routes.check_routes_valid_after_point_change(point_id, route_id)
     canvas.focus_set()
     return()
 
@@ -972,7 +977,7 @@ def signal_updated_callback(signal_id:Union[int,str]):
     canvas.focus_set()
     return()
 
-def signal_switched_callback(signal_id:int):
+def signal_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging: print("########## signal_switched_callback "+str(signal_id))
     if run_mode and automation_enabled:
         update_approach_control_status_for_all_signals(signal_id)    
@@ -981,16 +986,16 @@ def signal_switched_callback(signal_id:int):
         process_signal_aspect_update(signal_id)
     process_all_signal_interlocking()
     process_all_point_interlocking()
-    run_routes.check_routes_valid_after_signal_change(signal_id)
+    run_routes.check_routes_valid_after_signal_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
     canvas.focus_set()
     return()
 
-def subsidary_switched_callback(signal_id:int):
+def subsidary_switched_callback(signal_id:int, route_id:int=0):
     if enhanced_debugging: print("########## subsidary_switched_callback "+str(signal_id))
     process_all_signal_interlocking()
     process_all_point_interlocking()
-    run_routes.check_routes_valid_after_subsidary_change(signal_id)
+    run_routes.check_routes_valid_after_subsidary_change(signal_id, route_id)
     run_routes.enable_disable_schematic_routes()
     canvas.focus_set()
     return()
